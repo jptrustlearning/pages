@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แดชบอร์ดวางแผนการเงินส่วนบุคคล</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root {
+  --bg-main: #FDF6F0;
+  --card-bg: #FFFFFF;
+  --card-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  --card-shadow-hover: 0 4px 20px rgba(0,0,0,0.10);
+  --primary: #7C9CBF;
+  --primary-light: #B8CEE2;
+  --primary-dark: #5A7FA5;
+  --secondary: #E8A87C;
+  --secondary-light: #F3CBAE;
+  --success: #82B89C;
+  --success-light: #D4EDDF;
+  --warning: #F2C572;
+  --warning-light: #FBE8C3;
+  --danger: #D98A8A;
+  --danger-light: #F3D0D0;
+  --text-main: #3D3D3D;
+  --text-sub: #8A8A8A;
+  --border: #E8E0D8;
+  --border-light: #F0EBE5;
+  --radius-card: 16px;
+  --radius-input: 10px;
+  --radius-btn: 10px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Sarabun', sans-serif;
+  background: var(--bg-main);
+  color: var(--text-main);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* Subtle background pattern */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(124,156,191,0.06) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(232,168,124,0.06) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(130,184,156,0.04) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+h1, h2, h3, h4, h5 { font-family: 'Prompt', sans-serif; }
+.num { font-family: 'DM Sans', sans-serif; font-variant-numeric: tabular-nums; font-weight: 500; }
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ═══ HEADER ═══ */
+.header {
+  text-align: center;
+  padding: 32px 20px 24px;
+  margin-bottom: 28px;
+}
+.header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+.header h1 span { color: var(--primary); }
+.header .date-badge {
+  display: inline-block;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-sub);
+  background: var(--card-bg);
+  padding: 6px 18px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
+
+/* ═══ CARD ═══ */
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  box-shadow: var(--card-shadow);
+  padding: 28px;
+  margin-bottom: 24px;
+  transition: box-shadow 0.2s;
+}
+.card:hover { box-shadow: var(--card-shadow-hover); }
+.card-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-main);
+}
+.card-title .icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+/* ═══ SECTION DIVIDER ═══ */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 36px 0 20px;
+  font-family: 'Prompt', sans-serif;
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: var(--text-main);
+}
+.section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1.5px;
+  background: linear-gradient(to right, var(--border), transparent);
+}
+.section-divider .emoji { font-size: 1.3rem; }
+
+/* ═══ INPUT FORM ═══ */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.form-group { margin-bottom: 4px; }
+.form-group label {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+.form-group label small {
+  font-weight: 400;
+  color: var(--text-sub);
+  font-size: 0.8rem;
+}
+.form-group input[type="number"],
+.form-group select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-input);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  background: var(--card-bg);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+.form-group input:focus, .form-group select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(124,156,191,0.15);
+}
+.form-group input::placeholder { color: #C5BFB8; }
+
+/* Slider */
+.slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.slider-wrap input[type="range"] {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border);
+  outline: none;
+}
+.slider-wrap input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  transition: transform 0.15s;
+}
+.slider-wrap input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+.slider-val {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--primary-dark);
+  min-width: 42px;
+  text-align: right;
+}
+
+.group-label {
+  font-family: 'Prompt', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--primary-dark);
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1.5px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Investment sub-row */
+.invest-row {
+  background: #FAFAF7;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border-light);
+}
+.invest-row .invest-label {
+  font-weight: 600;
+  font-size: 0.88rem;
+  margin-bottom: 8px;
+  color: var(--text-main);
+}
+
+/* Buttons */
+.btn-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  justify-content: center;
+}
+.btn {
+  padding: 12px 36px;
+  border: none;
+  border-radius: var(--radius-btn);
+  font-family: 'Prompt', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 8px;
+}
+.btn:hover { transform: scale(1.02); }
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(124,156,191,0.35);
+}
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-secondary {
+  background: var(--border);
+  color: var(--text-sub);
+}
+.btn-secondary:hover { background: #DDD6CE; }
+
+/* ═══ SUMMARY CARDS ═══ */
+.summary-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.summary-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  box-shadow: var(--card-shadow);
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.summary-card:hover { transform: translateY(-2px); box-shadow: var(--card-shadow-hover); }
+.summary-card .sc-icon {
+  font-size: 1.4rem;
+  margin-bottom: 6px;
+}
+.summary-card .sc-label {
+  font-size: 0.82rem;
+  color: var(--text-sub);
+  margin-bottom: 4px;
+}
+.summary-card .sc-value {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  font-size: 1.45rem;
+  font-variant-numeric: tabular-nums;
+}
+.summary-card .sc-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 4px;
+}
+
+/* ═══ CHARTS ═══ */
+.chart-container {
+  position: relative;
+  width: 100%;
+  max-height: 380px;
+}
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* ═══ PROJECTION CONTROLS ═══ */
+.proj-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.proj-controls label { font-size: 0.88rem; font-weight: 600; }
+.pill-group { display: flex; gap: 4px; }
+.pill {
+  padding: 6px 18px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  font-family: 'Prompt', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-sub);
+}
+.pill.active, .pill:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.toggle-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.toggle-chip {
+  padding: 4px 14px;
+  border-radius: 16px;
+  font-size: 0.78rem;
+  font-family: 'Sarabun', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text-sub);
+  transition: all 0.2s;
+}
+.toggle-chip.active {
+  color: #fff;
+  border-color: transparent;
+}
+
+/* ═══ MILESTONE TABLE ═══ */
+.milestone-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  margin-top: 18px;
+}
+.milestone-table th {
+  background: #F8F4EF;
+  font-family: 'Prompt', sans-serif;
+  font-weight: 600;
+  padding: 10px 12px;
+  text-align: right;
+  border-bottom: 2px solid var(--border);
+  color: var(--text-main);
+  font-size: 0.82rem;
+}
+.milestone-table th:first-child { text-align: center; }
+.milestone-table td {
+  padding: 10px 12px;
+  text-align: right;
+  border-bottom: 1px solid var(--border-light);
+  font-family: 'DM Sans', sans-serif;
+  font-variant-numeric: tabular-nums;
+  transition: background 0.15s;
+}
+.milestone-table td:first-child { text-align: center; font-weight: 600; }
+.milestone-table tr:hover td { background: #FBF7F2; }
+.milestone-table .total-col { font-weight: 700; color: var(--primary-dark); }
+.milestone-table .return-col { color: var(--success); font-weight: 600; }
+
+/* ═══ RISK SECTION ═══ */
+.gauge-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.gauge-canvas-wrap {
+  position: relative;
+  width: 260px;
+  height: 150px;
+}
+.gauge-canvas-wrap canvas { width: 100%; height: 100%; }
+.gauge-label {
+  text-align: center;
+  margin-top: 8px;
+}
+.gauge-score {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  font-size: 2.2rem;
+}
+.gauge-level {
+  font-family: 'Prompt', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-top: 2px;
+}
+
+.risk-bars { display: grid; gap: 14px; }
+.risk-bar-item label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  margin-bottom: 5px;
+}
+.risk-bar-item label span:first-child { font-weight: 600; }
+.risk-bar-item label .rb-score { font-family: 'DM Sans', sans-serif; font-weight: 600; }
+.risk-bar-track {
+  height: 10px;
+  background: var(--border-light);
+  border-radius: 5px;
+  overflow: hidden;
+}
+.risk-bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.6s ease;
+}
+.risk-tooltip {
+  font-size: 0.78rem;
+  color: var(--text-sub);
+  margin-top: 3px;
+}
+
+/* ═══ INSIGHTS ═══ */
+.insight-card {
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.insight-card .ins-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+.insight-card.success { background: var(--success-light); color: #3D6B52; }
+.insight-card.warning { background: var(--warning-light); color: #8B6914; }
+.insight-card.danger { background: var(--danger-light); color: #8B3A3A; }
+.insight-card.info { background: #DDE8F3; color: #3A5A7A; }
+
+/* ═══ RESULTS AREA HIDDEN ═══ */
+#results { display: none; }
+#results.show { display: block; animation: fadeUp 0.5s ease; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 900px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .charts-grid { grid-template-columns: 1fr; }
+  .summary-row { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .container { padding: 12px; }
+  .header h1 { font-size: 1.45rem; }
+  .card { padding: 18px; }
+  .summary-row { grid-template-columns: 1fr; }
+  .summary-card .sc-value { font-size: 1.2rem; }
+  .btn { padding: 10px 24px; font-size: 0.9rem; }
+  .milestone-table { font-size: 0.75rem; }
+  .milestone-table th, .milestone-table td { padding: 7px 6px; }
+  .gauge-canvas-wrap { width: 200px; height: 115px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<!-- HEADER -->
+<div class="header">
+  <h1>แดชบอร์ด<span>วางแผนการเงิน</span>ส่วนบุคคล</h1>
+  <div class="date-badge" id="currentDate"></div>
+</div>
+
+<!-- ═══ SECTION 1: INPUT FORM ═══ -->
+<div class="section-divider"><span class="emoji">📝</span> กรอกข้อมูลทางการเงิน</div>
+
+<div class="card">
+  <!-- INCOME -->
+  <div class="group-label">💰 กลุ่ม A — รายรับ</div>
+  <div class="form-grid">
+    <div class="form-group">
+      <label>รายได้หลัก (เงินเดือน/ค่าจ้าง) <small>ต่อเดือน</small></label>
+      <input type="number" id="incomeMain" placeholder="25,000" min="0">
+    </div>
+    <div class="form-group">
+      <label>รายได้เสริม <small>ต่อเดือน</small></label>
+      <input type="number" id="incomeExtra" placeholder="5,000" min="0">
+    </div>
+    <div class="form-group">
+      <label>รายได้จากการลงทุน (ปันผล/ดอกเบี้ย) <small>ต่อเดือน</small></label>
+      <input type="number" id="incomeInvest" placeholder="1,000" min="0">
+    </div>
+  </div>
+
+  <div class="group-label" style="margin-top:24px;">💳 กลุ่ม B — รายจ่าย</div>
+  <div class="form-grid">
+    <div class="form-group">
+      <label>ค่าใช้จ่ายจำเป็น (ที่อยู่/อาหาร/เดินทาง) <small>ต่อเดือน</small></label>
+      <input type="number" id="expenseFixed" placeholder="12,000" min="0">
+    </div>
+    <div class="form-group">
+      <label>ค่าใช้จ่ายผันแปร (ช้อปปิ้ง/ท่องเที่ยว) <small>ต่อเดือน</small></label>
+      <input type="number" id="expenseVariable" placeholder="5,000" min="0">
+    </div>
+    <div class="form-group">
+      <label>ภาระหนี้ (ผ่อนบ้าน/รถ/บัตรเครดิต) <small>ต่อเดือน</small></label>
+      <input type="number" id="expenseDebt" placeholder="8,000" min="0">
+    </div>
+    <div class="form-group">
+      <label>ค่าประกัน/สมาชิก <small>ต่อเดือน</small></label>
+      <input type="number" id="expenseInsurance" placeholder="2,000" min="0">
+    </div>
+  </div>
+
+  <div class="group-label" style="margin-top:24px;">🏦 กลุ่ม C — การออมและการลงทุน</div>
+  <div class="form-grid">
+    <div class="form-group">
+      <label>เงินสำรองฉุกเฉิน (ยอดปัจจุบัน)</label>
+      <input type="number" id="emergencyFund" placeholder="100,000" min="0">
+    </div>
+    <div class="form-group">
+      <label>เป้าหมายเงินสำรอง <small>(กี่เดือนของรายจ่าย)</small></label>
+      <select id="emergencyTarget">
+        <option value="3">3 เดือน</option>
+        <option value="6" selected>6 เดือน</option>
+        <option value="9">9 เดือน</option>
+        <option value="12">12 เดือน</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Investment rows -->
+  <div style="margin-top:16px;">
+    <div class="invest-row">
+      <div class="invest-label">🏦 เงินฝาก / พันธบัตร</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>จำนวนต่อเดือน (฿)</label>
+          <input type="number" id="invDeposit" placeholder="3,000" min="0">
+        </div>
+        <div class="form-group">
+          <label>ผลตอบแทนคาดหวัง (% ต่อปี)</label>
+          <div class="slider-wrap">
+            <input type="range" id="rDeposit" min="0.5" max="4" step="0.1" value="2">
+            <span class="slider-val" id="rDepositVal">2.0%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="invest-row">
+      <div class="invest-label">📊 กองทุนรวม / ETF</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>จำนวนต่อเดือน (฿)</label>
+          <input type="number" id="invFund" placeholder="5,000" min="0">
+        </div>
+        <div class="form-group">
+          <label>ผลตอบแทนคาดหวัง (% ต่อปี)</label>
+          <div class="slider-wrap">
+            <input type="range" id="rFund" min="3" max="12" step="0.5" value="7">
+            <span class="slider-val" id="rFundVal">7.0%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="invest-row">
+      <div class="invest-label">📈 หุ้นไทย / US</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>จำนวนต่อเดือน (฿)</label>
+          <input type="number" id="invStock" placeholder="5,000" min="0">
+        </div>
+        <div class="form-group">
+          <label>ผลตอบแทนคาดหวัง (% ต่อปี)</label>
+          <div class="slider-wrap">
+            <input type="range" id="rStock" min="5" max="20" step="0.5" value="10">
+            <span class="slider-val" id="rStockVal">10.0%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="invest-row">
+      <div class="invest-label">🥇 ทองคำ</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>จำนวนต่อเดือน (฿)</label>
+          <input type="number" id="invGold" placeholder="2,000" min="0">
+        </div>
+        <div class="form-group">
+          <label>ผลตอบแทนคาดหวัง (% ต่อปี)</label>
+          <div class="slider-wrap">
+            <input type="range" id="rGold" min="2" max="15" step="0.5" value="8">
+            <span class="slider-val" id="rGoldVal">8.0%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="group-label" style="margin-top:24px;">⚙️ กลุ่ม D — ค่าปรับเพิ่มเติม</div>
+  <div class="form-grid">
+    <div class="form-group">
+      <label>อัตราเงินเฟ้อคาดการณ์ (% ต่อปี)</label>
+      <div class="slider-wrap">
+        <input type="range" id="inflation" min="1" max="8" step="0.5" value="3">
+        <span class="slider-val" id="inflationVal">3.0%</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>อัตราเพิ่มรายได้ต่อปี (%)</label>
+      <div class="slider-wrap">
+        <input type="range" id="incomeGrowth" min="0" max="10" step="0.5" value="3">
+        <span class="slider-val" id="incomeGrowthVal">3.0%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="calculate()">🧮 คำนวณ</button>
+    <button class="btn btn-secondary" onclick="clearAll()">🗑️ ล้างค่า</button>
+  </div>
+</div>
+
+<!-- ═══ RESULTS ═══ -->
+<div id="results">
+
+  <!-- SECTION 2: MONTHLY OVERVIEW -->
+  <div class="section-divider"><span class="emoji">📊</span> สรุปภาพรวมรายเดือน</div>
+  <div class="summary-row">
+    <div class="summary-card" id="sc-income">
+      <div class="sc-icon">📈</div>
+      <div class="sc-label">รายรับรวม / เดือน</div>
+      <div class="sc-value num" id="vIncome">฿0</div>
+      <div class="sc-bar" style="background:var(--success);"></div>
+    </div>
+    <div class="summary-card" id="sc-expense">
+      <div class="sc-icon">📉</div>
+      <div class="sc-label">รายจ่ายรวม / เดือน</div>
+      <div class="sc-value num" id="vExpense">฿0</div>
+      <div class="sc-bar" style="background:var(--danger);"></div>
+    </div>
+    <div class="summary-card" id="sc-surplus">
+      <div class="sc-icon">💰</div>
+      <div class="sc-label">เงินเหลือ / เดือน</div>
+      <div class="sc-value num" id="vSurplus">฿0</div>
+      <div class="sc-bar" id="surplusBar"></div>
+    </div>
+    <div class="summary-card" id="sc-saverate">
+      <div class="sc-icon">🎯</div>
+      <div class="sc-label">อัตราการออม (Savings Rate)</div>
+      <div class="sc-value num" id="vSaveRate">0%</div>
+      <div class="sc-bar" id="saveRateBar"></div>
+    </div>
+  </div>
+
+  <!-- Charts row -->
+  <div class="charts-grid">
+    <div class="card">
+      <div class="card-title"><div class="icon" style="background:var(--secondary-light);">🍩</div> สัดส่วนรายจ่ายและการออม</div>
+      <div class="chart-container"><canvas id="donutChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon" style="background:var(--primary-light);">📊</div> เปรียบเทียบรายรับ vs รายจ่าย vs ออม</div>
+      <div class="chart-container"><canvas id="barChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: PROJECTION -->
+  <div class="section-divider"><span class="emoji">📈</span> กราฟ Projection เงินสะสม</div>
+  <div class="card">
+    <div class="proj-controls">
+      <label>ช่วงเวลา:</label>
+      <div class="pill-group">
+        <button class="pill" data-years="1" onclick="setProjection(1,this)">1 ปี</button>
+        <button class="pill" data-years="3" onclick="setProjection(3,this)">3 ปี</button>
+        <button class="pill active" data-years="5" onclick="setProjection(5,this)">5 ปี</button>
+        <button class="pill" data-years="10" onclick="setProjection(10,this)">10 ปี</button>
+      </div>
+    </div>
+    <div class="toggle-group">
+      <button class="toggle-chip active" data-idx="0" style="background:var(--primary-light);color:var(--primary-dark);border-color:var(--primary-light);" onclick="toggleLine(0,this)">เงินฝาก/พันธบัตร</button>
+      <button class="toggle-chip active" data-idx="1" style="background:var(--secondary-light);color:#9B6A3F;border-color:var(--secondary-light);" onclick="toggleLine(1,this)">กองทุน/ETF</button>
+      <button class="toggle-chip active" data-idx="2" style="background:var(--success-light);color:#3D6B52;border-color:var(--success-light);" onclick="toggleLine(2,this)">หุ้น</button>
+      <button class="toggle-chip active" data-idx="3" style="background:var(--warning-light);color:#8B6914;border-color:var(--warning-light);" onclick="toggleLine(3,this)">ทองคำ</button>
+      <button class="toggle-chip active" data-idx="4" style="background:#3D3D3D;color:#fff;border-color:#3D3D3D;" onclick="toggleLine(4,this)">รวมทั้งหมด</button>
+      <button class="toggle-chip active" data-idx="5" style="background:#E8E0D8;color:var(--text-sub);border-color:#E8E0D8;" onclick="toggleLine(5,this)">ไม่ลงทุน (0%)</button>
+    </div>
+    <div class="chart-container" style="margin-top:16px;max-height:420px;"><canvas id="projChart"></canvas></div>
+
+    <div style="overflow-x:auto;">
+      <table class="milestone-table" id="milestoneTable">
+        <thead>
+          <tr>
+            <th>ปีที่</th>
+            <th>เงินฝาก/พันธบัตร</th>
+            <th>กองทุน/ETF</th>
+            <th>หุ้น</th>
+            <th>ทองคำ</th>
+            <th>รวม</th>
+            <th>ผลตอบแทนรวม</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 4: RISK -->
+  <div class="section-divider"><span class="emoji">🛡️</span> ระดับความเสี่ยงทางการเงิน (Financial Risk Score)</div>
+  <div class="card">
+    <div class="gauge-wrapper">
+      <div class="gauge-canvas-wrap"><canvas id="gaugeChart"></canvas></div>
+      <div class="gauge-label">
+        <div class="gauge-score num" id="gScore">0</div>
+        <div class="gauge-level" id="gLevel">—</div>
+      </div>
+    </div>
+    <div class="risk-bars" id="riskBars"></div>
+  </div>
+
+  <!-- SECTION 5: INSIGHTS -->
+  <div class="section-divider"><span class="emoji">💡</span> คำแนะนำอัตโนมัติ (Smart Insights)</div>
+  <div id="insightsContainer"></div>
+
+</div><!-- /results -->
+
+</div><!-- /container -->
+
+<script>
+// ═══ GLOBALS ═══
+let donutChart, barChart, projChart, gaugeChart;
+let projYears = 5;
+let lineVisibility = [true,true,true,true,true,true];
+let lastCalcData = null;
+
+// ═══ HELPERS ═══
+const $ = id => document.getElementById(id);
+const num = id => parseFloat($(id).value) || 0;
+const fmt = n => '฿' + Math.round(n).toLocaleString('th-TH');
+const fmtN = n => Math.round(n).toLocaleString('th-TH');
+const pct = n => n.toFixed(1) + '%';
+
+// Date
+const today = new Date();
+const thaiMonths = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+$('currentDate').textContent = `${today.getDate()} ${thaiMonths[today.getMonth()]} ${today.getFullYear()+543}`;
+
+// Sliders
+['rDeposit','rFund','rStock','rGold','inflation','incomeGrowth'].forEach(id => {
+  const el = $(id);
+  const valEl = $(id + 'Val');
+  const update = () => valEl.textContent = parseFloat(el.value).toFixed(1) + '%';
+  el.addEventListener('input', update);
+  update();
+});
+
+// ═══ LOCAL STORAGE ═══
+const STORAGE_KEY = 'jpFinPlanDash';
+const inputIds = ['incomeMain','incomeExtra','incomeInvest','expenseFixed','expenseVariable','expenseDebt','expenseInsurance','emergencyFund','emergencyTarget','invDeposit','invFund','invStock','invGold','rDeposit','rFund','rStock','rGold','inflation','incomeGrowth'];
+
+function saveToStorage() {
+  const data = {};
+  inputIds.forEach(id => {
+    const el = $(id);
+    data[id] = el.value;
+  });
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
+}
+
+function loadFromStorage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    inputIds.forEach(id => {
+      if (data[id] !== undefined && data[id] !== '') {
+        $(id).value = data[id];
+      }
+    });
+    // Update slider displays
+    ['rDeposit','rFund','rStock','rGold','inflation','incomeGrowth'].forEach(id => {
+      $(id + 'Val').textContent = parseFloat($(id).value).toFixed(1) + '%';
+    });
+  } catch(e) {}
+}
+loadFromStorage();
+
+// ═══ FV ANNUITY ═══
+function fvAnnuity(pmt, rAnnual, years) {
+  if (pmt === 0) return 0;
+  if (rAnnual === 0) return pmt * years * 12;
+  const r = rAnnual / 12;
+  const n = years * 12;
+  return pmt * ((Math.pow(1 + r, n) - 1) / r);
+}
+
+// ═══ CALCULATE ═══
+function calculate() {
+  saveToStorage();
+
+  const incMain = num('incomeMain');
+  const incExtra = num('incomeExtra');
+  const incInvest = num('incomeInvest');
+  const totalIncome = incMain + incExtra + incInvest;
+
+  const expFixed = num('expenseFixed');
+  const expVar = num('expenseVariable');
+  const expDebt = num('expenseDebt');
+  const expIns = num('expenseInsurance');
+  const totalExpense = expFixed + expVar + expDebt + expIns;
+
+  const invDep = num('invDeposit');
+  const invFund = num('invFund');
+  const invStock = num('invStock');
+  const invGold = num('invGold');
+  const totalInv = invDep + invFund + invStock + invGold;
+
+  const surplus = totalIncome - totalExpense;
+  const saveRate = totalIncome > 0 ? (surplus / totalIncome) * 100 : 0;
+
+  const rDep = parseFloat($('rDeposit').value) / 100;
+  const rFun = parseFloat($('rFund').value) / 100;
+  const rStk = parseFloat($('rStock').value) / 100;
+  const rGld = parseFloat($('rGold').value) / 100;
+  const emergFund = num('emergencyFund');
+  const emergTarget = parseInt($('emergencyTarget').value);
+
+  lastCalcData = { incMain, incExtra, incInvest, totalIncome, expFixed, expVar, expDebt, expIns, totalExpense, invDep, invFund, invStock, invGold, totalInv, surplus, saveRate, rDep, rFun, rStk, rGld, emergFund, emergTarget };
+
+  // Show results
+  $('results').classList.add('show');
+
+  // ── Section 2: Summary Cards ──
+  animateValue('vIncome', totalIncome, fmt);
+  animateValue('vExpense', totalExpense, fmt);
+  animateValue('vSurplus', surplus, fmt);
+  $('surplusBar').style.background = surplus >= 0 ? 'var(--primary)' : 'var(--danger)';
+  animateValue('vSaveRate', saveRate, v => v.toFixed(1) + '%');
+  const srBar = $('saveRateBar');
+  srBar.style.background = saveRate >= 20 ? 'var(--success)' : saveRate >= 10 ? 'var(--warning)' : 'var(--danger)';
+
+  // ── Donut Chart ──
+  if (donutChart) donutChart.destroy();
+  const donutData = [expFixed, expVar, expDebt, expIns, totalInv];
+  const donutLabels = ['ค่าใช้จ่ายจำเป็น','ค่าใช้จ่ายผันแปร','ภาระหนี้','ค่าประกัน/สมาชิก','เงินออม/ลงทุน'];
+  const donutColors = ['#7C9CBF','#E8A87C','#D98A8A','#F2C572','#82B89C'];
+  donutChart = new Chart($('donutChart'), {
+    type: 'doughnut',
+    data: { labels: donutLabels, datasets: [{ data: donutData, backgroundColor: donutColors, borderWidth: 2, borderColor: '#fff' }] },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      cutout: '58%',
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { family: 'Sarabun', size: 12 }, padding: 14, usePointStyle: true, pointStyleWidth: 10 } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${fmt(ctx.parsed)} (${(ctx.parsed / (donutData.reduce((a,b)=>a+b,0)||1)*100).toFixed(1)}%)` } }
+      }
+    }
+  });
+
+  // ── Bar Chart ──
+  if (barChart) barChart.destroy();
+  barChart = new Chart($('barChart'), {
+    type: 'bar',
+    data: {
+      labels: ['ภาพรวมรายเดือน'],
+      datasets: [
+        { label: 'รายรับ', data: [totalIncome], backgroundColor: '#82B89C', borderRadius: 4 },
+        { label: 'รายจ่าย', data: [totalExpense], backgroundColor: '#D98A8A', borderRadius: 4 },
+        { label: 'เงินออม/ลงทุน', data: [totalInv], backgroundColor: '#7C9CBF', borderRadius: 4 }
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: true,
+      scales: {
+        x: { stacked: true, ticks: { callback: v => '฿' + fmtN(v), font: { family: 'DM Sans', size: 11 } }, grid: { display: false } },
+        y: { stacked: true, display: false }
+      },
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { family: 'Sarabun', size: 12 }, usePointStyle: true, pointStyleWidth: 10, padding: 14 } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmt(ctx.parsed.x)}` } }
+      }
+    }
+  });
+
+  // ── Section 3: Projection ──
+  renderProjection();
+
+  // ── Section 4: Risk ──
+  renderRisk();
+
+  // ── Section 5: Insights ──
+  renderInsights();
+
+  // Scroll
+  setTimeout(() => {
+    $('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 200);
+}
+
+function animateValue(elId, target, fmtFn) {
+  const el = $(elId);
+  let start = 0;
+  const duration = 600;
+  const t0 = performance.now();
+  function step(now) {
+    const p = Math.min((now - t0) / duration, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    const val = start + (target - start) * ease;
+    el.textContent = fmtFn(val);
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// ═══ PROJECTION ═══
+function setProjection(y, btn) {
+  projYears = y;
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  if (lastCalcData) renderProjection();
+}
+
+function toggleLine(idx, btn) {
+  lineVisibility[idx] = !lineVisibility[idx];
+  btn.classList.toggle('active');
+  if (!lineVisibility[idx]) {
+    btn.style.background = 'transparent';
+    btn.style.color = 'var(--text-sub)';
+  } else {
+    // restore original
+    const origBgs = ['var(--primary-light)','var(--secondary-light)','var(--success-light)','var(--warning-light)','#3D3D3D','#E8E0D8'];
+    const origCols = ['var(--primary-dark)','#9B6A3F','#3D6B52','#8B6914','#fff','var(--text-sub)'];
+    btn.style.background = origBgs[idx];
+    btn.style.color = origCols[idx];
+  }
+  if (lastCalcData) renderProjection();
+}
+
+function renderProjection() {
+  const d = lastCalcData;
+  const N = projYears;
+  const months = N * 12;
+  const step = N <= 1 ? 1 : (N <= 3 ? 3 : 6); // months per data point
+  const labels = [];
+  const sDeposit = [], sFund = [], sStock = [], sGold = [], sTotal = [], sNoInvest = [];
+
+  for (let m = 0; m <= months; m += step) {
+    const y = m / 12;
+    labels.push(y % 1 === 0 ? `ปีที่ ${y}` : `${(y).toFixed(1)} ปี`);
+    const vDep = fvAnnuity(d.invDep, d.rDep, y);
+    const vFun = fvAnnuity(d.invFund, d.rFun, y);
+    const vStk = fvAnnuity(d.invStock, d.rStk, y);
+    const vGld = fvAnnuity(d.invGold, d.rGld, y);
+    const vNone = fvAnnuity(d.totalInv, 0, y);
+    sDeposit.push(vDep);
+    sFund.push(vFun);
+    sStock.push(vStk);
+    sGold.push(vGld);
+    sTotal.push(vDep + vFun + vStk + vGld);
+    sNoInvest.push(vNone);
+  }
+
+  const datasets = [
+    { label: 'เงินฝาก/พันธบัตร', data: sDeposit, borderColor: '#7C9CBF', backgroundColor: 'rgba(124,156,191,0.08)', fill: false, tension: 0.3, borderWidth: 2, pointRadius: 2, hidden: !lineVisibility[0] },
+    { label: 'กองทุนรวม/ETF', data: sFund, borderColor: '#E8A87C', backgroundColor: 'rgba(232,168,124,0.08)', fill: false, tension: 0.3, borderWidth: 2, pointRadius: 2, hidden: !lineVisibility[1] },
+    { label: 'หุ้นไทย/US', data: sStock, borderColor: '#82B89C', backgroundColor: 'rgba(130,184,156,0.08)', fill: false, tension: 0.3, borderWidth: 2, pointRadius: 2, hidden: !lineVisibility[2] },
+    { label: 'ทองคำ', data: sGold, borderColor: '#F2C572', backgroundColor: 'rgba(242,197,114,0.08)', fill: false, tension: 0.3, borderWidth: 2, pointRadius: 2, hidden: !lineVisibility[3] },
+    { label: 'รวมทั้งหมด', data: sTotal, borderColor: '#3D3D3D', backgroundColor: 'rgba(61,61,61,0.06)', fill: true, tension: 0.3, borderWidth: 3, pointRadius: 3, hidden: !lineVisibility[4] },
+    { label: 'ไม่ลงทุน (0%)', data: sNoInvest, borderColor: '#C5BFB8', borderDash: [6,4], fill: false, tension: 0.3, borderWidth: 2, pointRadius: 1, hidden: !lineVisibility[5] }
+  ];
+
+  if (projChart) projChart.destroy();
+  projChart = new Chart($('projChart'), {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        y: { ticks: { callback: v => '฿' + fmtN(v), font: { family: 'DM Sans', size: 11 } }, grid: { color: '#F0EBE5' } },
+        x: { ticks: { font: { family: 'DM Sans', size: 11 } }, grid: { display: false } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmt(ctx.parsed.y)}` } }
+      }
+    }
+  });
+
+  // Milestone table
+  const milestones = [1,3,5,10].filter(y => y <= N);
+  const tbody = document.querySelector('#milestoneTable tbody');
+  tbody.innerHTML = '';
+  milestones.forEach(y => {
+    const vD = fvAnnuity(d.invDep, d.rDep, y);
+    const vF = fvAnnuity(d.invFund, d.rFun, y);
+    const vS = fvAnnuity(d.invStock, d.rStk, y);
+    const vG = fvAnnuity(d.invGold, d.rGld, y);
+    const total = vD + vF + vS + vG;
+    const principal = d.totalInv * y * 12;
+    const ret = total - principal;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${y}</td><td>${fmt(vD)}</td><td>${fmt(vF)}</td><td>${fmt(vS)}</td><td>${fmt(vG)}</td><td class="total-col">${fmt(total)}</td><td class="return-col">+${fmt(ret)}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ═══ RISK SCORE ═══
+function renderRisk() {
+  const d = lastCalcData;
+
+  // 1. Emergency Fund Ratio
+  const monthlyExp = d.totalExpense || 1;
+  const efMonths = d.emergFund / monthlyExp;
+  const s1 = Math.min(20, Math.max(0, (efMonths / 6) * 20));
+
+  // 2. Savings Rate
+  const s2 = Math.min(20, Math.max(0, (d.saveRate / 30) * 20));
+
+  // 3. Debt-to-Income (inverted)
+  const dti = d.totalIncome > 0 ? (d.expDebt / d.totalIncome) * 100 : 50;
+  const s3 = Math.min(20, Math.max(0, ((50 - dti) / 40) * 20));
+
+  // 4. Diversification
+  const invTypes = [d.invDep, d.invFund, d.invStock, d.invGold].filter(v => v > 0).length;
+  const s4 = invTypes >= 3 ? 20 : invTypes === 2 ? 13 : invTypes === 1 ? 6 : 0;
+
+  // 5. Income stability
+  const incStab = d.incMain > 0 ? ((d.incExtra + d.incInvest) / d.incMain) * 100 : 0;
+  const s5 = Math.min(20, Math.max(0, (incStab / 30) * 20));
+
+  const totalScore = Math.round(s1 + s2 + s3 + s4 + s5);
+
+  let level, levelColor;
+  if (totalScore >= 80) { level = '🟢 แข็งแกร่ง'; levelColor = 'var(--success)'; }
+  else if (totalScore >= 60) { level = '🟡 ดี'; levelColor = 'var(--warning)'; }
+  else if (totalScore >= 40) { level = '🟠 ปานกลาง'; levelColor = 'var(--secondary)'; }
+  else if (totalScore >= 20) { level = '🔴 ต้องปรับปรุง'; levelColor = 'var(--danger)'; }
+  else { level = '⚫ วิกฤต'; levelColor = '#555'; }
+
+  // Gauge
+  if (gaugeChart) gaugeChart.destroy();
+  gaugeChart = new Chart($('gaugeChart'), {
+    type: 'doughnut',
+    data: {
+      datasets: [{
+        data: [totalScore, 100 - totalScore],
+        backgroundColor: [levelColor, '#EFEBE6'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      rotation: -90, circumference: 180,
+      cutout: '74%',
+      plugins: { legend: { display: false }, tooltip: { enabled: false } }
+    }
+  });
+  $('gScore').textContent = totalScore;
+  $('gScore').style.color = levelColor;
+  $('gLevel').textContent = level;
+  $('gLevel').style.color = levelColor;
+
+  // Risk bars
+  const bars = [
+    { name: 'เงินสำรองฉุกเฉิน (Emergency Fund)', score: s1, tip: `มีเงินสำรอง ${efMonths.toFixed(1)} เดือน (เป้าหมาย 6 เดือน)` },
+    { name: 'อัตราการออม (Savings Rate)', score: s2, tip: `อัตราการออม ${d.saveRate.toFixed(1)}% (เป้าหมาย ≥30%)` },
+    { name: 'สัดส่วนหนี้ต่อรายได้ (Debt-to-Income)', score: s3, tip: `สัดส่วนหนี้ ${dti.toFixed(1)}% (ยิ่งต่ำยิ่งดี, เป้า ≤10%)` },
+    { name: 'การกระจายการลงทุน (Diversification)', score: s4, tip: `ลงทุน ${invTypes} ประเภท (เป้าหมาย ≥3 ประเภท)` },
+    { name: 'ความมั่นคงรายได้ (Income Stability)', score: s5, tip: `รายได้เสริม/รายได้หลัก = ${incStab.toFixed(1)}% (เป้า ≥30%)` }
+  ];
+
+  const container = $('riskBars');
+  container.innerHTML = '';
+  bars.forEach(b => {
+    const c = b.score >= 16 ? 'var(--success)' : b.score >= 10 ? 'var(--warning)' : 'var(--danger)';
+    container.innerHTML += `
+      <div class="risk-bar-item">
+        <label><span>${b.name}</span><span class="rb-score" style="color:${c}">${b.score.toFixed(0)}/20</span></label>
+        <div class="risk-bar-track"><div class="risk-bar-fill" style="width:${(b.score/20)*100}%;background:${c};"></div></div>
+        <div class="risk-tooltip">${b.tip}</div>
+      </div>`;
+  });
+}
+
+// ═══ INSIGHTS ═══
+function renderInsights() {
+  const d = lastCalcData;
+  const container = $('insightsContainer');
+  container.innerHTML = '';
+
+  const add = (type, icon, text) => {
+    container.innerHTML += `<div class="insight-card ${type}"><span class="ins-icon">${icon}</span><div>${text}</div></div>`;
+  };
+
+  // Savings Rate
+  if (d.saveRate < 20 && d.totalIncome > 0) {
+    const need = d.totalIncome * 0.2 - d.surplus;
+    add('warning', '💡', `อัตราการออมอยู่ที่ ${d.saveRate.toFixed(1)}% — ลองลดค่าใช้จ่ายผันแปรลง <strong class="num">${fmt(Math.max(0,need))}</strong> จะเพิ่ม Savings Rate เป็น 20%`);
+  } else if (d.saveRate >= 20) {
+    add('success', '✅', `อัตราการออม ${d.saveRate.toFixed(1)}% อยู่ในเกณฑ์ดีมาก!`);
+  }
+
+  // Emergency Fund
+  const efMonths = d.emergFund / (d.totalExpense || 1);
+  const targetMonths = parseInt($('emergencyTarget').value);
+  if (efMonths < targetMonths) {
+    const gap = (d.totalExpense * targetMonths) - d.emergFund;
+    const monthsToFill = d.surplus > 0 ? Math.ceil(gap / (d.surplus * 0.5)) : Infinity;
+    const fillText = monthsToFill < 999 ? ` ถ้าเก็บเดือนละ ${fmt(d.surplus * 0.5)} จะครบใน ${monthsToFill} เดือน` : '';
+    add('warning', '🛡️', `ยังขาดเงินสำรองฉุกเฉินอีก <strong class="num">${fmt(gap)}</strong> (ปัจจุบัน ${efMonths.toFixed(1)} เดือน เป้าหมาย ${targetMonths} เดือน)${fillText}`);
+  } else {
+    add('success', '🛡️', `เงินสำรองฉุกเฉินครบตามเป้า (${efMonths.toFixed(1)} เดือน) 👍`);
+  }
+
+  // Debt-to-Income
+  const dti = d.totalIncome > 0 ? (d.expDebt / d.totalIncome) * 100 : 0;
+  if (dti > 30) {
+    add('danger', '⚠️', `ภาระหนี้สูง (${dti.toFixed(1)}% ของรายได้) ควรพิจารณา refinance หรือเร่งปิดหนี้ดอกเบี้ยสูงก่อน`);
+  }
+
+  // Diversification
+  const invTypes = [d.invDep, d.invFund, d.invStock, d.invGold].filter(v => v > 0).length;
+  if (invTypes <= 1 && d.totalInv > 0) {
+    add('warning', '📊', `ลงทุนเพียง ${invTypes} ประเภท — การกระจายลงทุนช่วยลดความเสี่ยง ลองจัดสรรเป็น 3 ประเภทขึ้นไป`);
+  } else if (invTypes >= 3) {
+    add('success', '📊', `กระจายการลงทุนดี (${invTypes} ประเภท) ช่วยลดความเสี่ยงได้ดี`);
+  }
+
+  // Surplus > 30%
+  if (d.surplus > d.totalIncome * 0.3 && d.totalIncome > 0) {
+    add('info', '💎', `มีเงินเหลือมากถึง ${((d.surplus/d.totalIncome)*100).toFixed(0)}% ของรายรับ — สามารถเพิ่มการลงทุนเพื่อสร้างความมั่งคั่งระยะยาวได้อีก`);
+  }
+
+  // 10-year projection
+  if (d.totalInv > 0) {
+    const total10 = fvAnnuity(d.invDep, d.rDep, 10) + fvAnnuity(d.invFund, d.rFun, 10) + fvAnnuity(d.invStock, d.rStk, 10) + fvAnnuity(d.invGold, d.rGld, 10);
+    add('info', '🚀', `ถ้าลงทุนต่อเนื่อง 10 ปี ด้วยอัตรานี้ จะมีเงินรวมประมาณ <strong class="num">${fmt(total10)}</strong>`);
+  }
+
+  if (d.totalInv === 0 && d.surplus > 0) {
+    add('warning', '💡', `ยังไม่มีการจัดสรรเงินลงทุน — ลองเริ่มต้นด้วยเงินฝากหรือกองทุนรวมเพื่อสร้างผลตอบแทนจากเงินที่เหลือ`);
+  }
+}
+
+// ═══ CLEAR ═══
+function clearAll() {
+  inputIds.forEach(id => {
+    const el = $(id);
+    if (el.tagName === 'SELECT') {
+      el.selectedIndex = 1; // default 6 months
+    } else if (el.type === 'range') {
+      // restore defaults
+      const defaults = { rDeposit:'2', rFund:'7', rStock:'10', rGold:'8', inflation:'3', incomeGrowth:'3' };
+      el.value = defaults[id] || el.defaultValue;
+    } else {
+      el.value = '';
+    }
+  });
+  // Update slider vals
+  ['rDeposit','rFund','rStock','rGold','inflation','incomeGrowth'].forEach(id => {
+    $(id + 'Val').textContent = parseFloat($(id).value).toFixed(1) + '%';
+  });
+  $('results').classList.remove('show');
+  try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+}
+</script>
+</body>
+</html>
