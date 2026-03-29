@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gold Momentum — Free Analysis | JP Trust Learning</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700;800&family=Cinzel:wght@400;500;600&family=DM+Serif+Display&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ===== FREE DASHBOARD STYLES ===== */
+:root {
+  --bg:#F0F4F9;--bg2:#E8EDF3;--bg3:#FFFFFF;--card:#FFFFFF;
+  --border:rgba(0,0,0,.08);--border2:rgba(0,0,0,.12);
+  --gold-accent:#D4AF37;--gold-dark:#B8860B;
+  --emerald:#34A853;--emerald-dim:rgba(52,168,83,.1);
+  --red:#EA4335;--red-dim:rgba(234,67,53,.1);
+  --blue:#1A73E8;--blue-dim:rgba(26,115,232,.1);
+  --text:#202124;--text2:#5F6368;--text3:#9AA0A6;
+  --font:'Anuphan',sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:var(--font); background:#FAF6ED; color:var(--text); min-height:100vh; }
+
+/* Hero Header */
+.free-hero {
+  background: linear-gradient(160deg, #1a0a0e 0%, #2d1018 25%, #3a1520 45%, #2d1018 65%, #1a0a0e 100%);
+  padding: 40px 20px 32px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.free-hero::before {
+  content:''; position:absolute; top:-40px; left:50%; transform:translateX(-50%);
+  width:80%; height:300px;
+  background:radial-gradient(ellipse,rgba(212,175,55,.12) 0%,rgba(212,175,55,.04) 40%,transparent 70%);
+  pointer-events:none;
+}
+.free-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:6px 18px; border-radius:50px;
+  background:rgba(212,175,55,.1); border:1px solid rgba(212,175,55,.3);
+  font-family:'Cinzel',serif; font-size:11px; font-weight:600;
+  color:#D4AF37; letter-spacing:3px; text-transform:uppercase; margin-bottom:16px;
+}
+.free-hero h1 {
+  font-family:var(--font); font-size:clamp(1.8rem,4vw,2.8rem); font-weight:700;
+  background:linear-gradient(135deg,#D4AF37,#F4E4BA,#D4AF37);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  margin-bottom:8px;
+}
+.free-hero .sub { color:#A09B92; font-size:.95rem; letter-spacing:2px; }
+.free-hero .price-display {
+  font-family:'DM Serif Display',serif; font-size:clamp(2.5rem,6vw,4rem);
+  color:#F4E4BA; margin:16px 0 8px;
+  text-shadow:0 0 30px rgba(212,175,55,.3);
+}
+.free-hero .price-date { color:#6B7280; font-size:.85rem; }
+
+/* Status */
+.status-bar { display:flex; justify-content:center; padding:12px 20px; background:#FAF6ED; }
+.status-indicator {
+  display:flex; align-items:center; gap:8px; font-weight:600; font-size:.85rem;
+  padding:8px 20px; border-radius:50px; border:1px solid var(--border2); background:var(--card);
+}
+.status-indicator.loading { color:var(--gold-accent); border-color:var(--gold-accent); background:rgba(212,175,55,.08); }
+.status-indicator.success { color:var(--emerald); border-color:var(--emerald); background:var(--emerald-dim); }
+.status-indicator.error { color:var(--red); border-color:var(--red); background:var(--red-dim); }
+
+/* Main Content */
+.container { max-width:1200px; width:95%; margin:0 auto; padding:20px 0 40px; }
+
+.section {
+  background:var(--card); border:1px solid var(--border); border-radius:14px;
+  padding:clamp(14px,2.5%,24px); margin-bottom:16px;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
+.section-title {
+  font-family:var(--font); font-size:clamp(1rem,2vw,1.2rem); font-weight:700;
+  color:var(--text); margin-bottom:16px; display:flex; align-items:center; gap:8px;
+}
+.section-title .dot { width:6px; height:6px; border-radius:50%; background:var(--gold-accent); }
+
+.charts-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(40%,1fr)); gap:16px; margin-bottom:16px; }
+.chart-box { height:clamp(280px,35vw,360px); position:relative; }
+
+/* Penalty Box */
+.penalty-box { padding:12px 16px; border-radius:10px; margin-bottom:8px; }
+.penalty-box.clean { background:var(--emerald-dim); border:1px solid rgba(52,168,83,.2); }
+.penalty-box.warn { background:var(--red-dim); border:1px solid rgba(234,67,53,.2); }
+.penalty-box .title { font-weight:700; font-size:.78rem; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+.penalty-box.clean .title { color:var(--emerald); }
+.penalty-box.warn .title { color:var(--red); }
+.penalty-box .desc { font-size:.85rem; color:var(--text2); }
+
+/* Info Grid (Technical Details) */
+.info-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(30%,1fr)); gap:8px; }
+.info-item { display:flex; justify-content:space-between; padding:10px 14px; background:var(--bg3); border-radius:8px; font-size:.9rem; border:1px solid var(--border); }
+.info-item .k { color:var(--text3); }
+.info-item .v { font-weight:600; }
+
+/* CTA Banner */
+.cta-banner {
+  background: linear-gradient(160deg, #1a0a0e, #2d1018, #1a0a0e);
+  border-radius:16px; padding:40px 30px; text-align:center; margin-top:24px;
+  border:1px solid rgba(212,175,55,.2); position:relative; overflow:hidden;
+}
+.cta-banner::before {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse at 50% 50%,rgba(212,175,55,.08) 0%,transparent 60%);
+  pointer-events:none;
+}
+.cta-banner h3 {
+  font-size:1.4rem; font-weight:700; color:#F4E4BA; margin-bottom:8px; position:relative;
+}
+.cta-banner p { color:#A09B92; font-size:.95rem; margin-bottom:20px; position:relative; }
+.cta-banner .cta-features {
+  display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin-bottom:24px; position:relative;
+}
+.cta-feature {
+  padding:6px 14px; border-radius:8px; font-size:.8rem; font-weight:600;
+  background:rgba(212,175,55,.08); border:1px solid rgba(212,175,55,.15); color:#D4AF37;
+}
+.cta-btn {
+  display:inline-block; padding:14px 36px;
+  background:linear-gradient(135deg,#D4AF37,#B8860B); color:#0A0A0F;
+  font-size:1rem; font-weight:700; border-radius:50px; text-decoration:none;
+  box-shadow:0 4px 25px rgba(212,175,55,.35); transition:all .3s; position:relative;
+}
+.cta-btn:hover { transform:translateY(-3px); box-shadow:0 8px 35px rgba(212,175,55,.5); }
+
+/* Loading */
+.loading-msg { text-align:center; padding:60px 20px; color:var(--text3); font-size:1.1rem; }
+.hidden { display:none !important; }
+
+/* Responsive */
+@media (max-width:768px) {
+  .charts-grid { grid-template-columns:1fr; }
+  .info-grid { grid-template-columns:1fr 1fr; }
+  .free-hero { padding:30px 16px 24px; }
+}
+@media (max-width:480px) {
+  .info-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+
+<!-- ===== HERO ===== -->
+<div class="free-hero">
+  <div class="free-badge">Free Analysis</div>
+  <h1>Gold Momentum Dashboard</h1>
+  <div class="sub">DIMENSION RADAR & TECHNICAL DETAILS</div>
+  <div class="price-display" id="heroPrice">—</div>
+  <div class="price-date" id="heroDate">กำลังโหลดข้อมูล...</div>
+</div>
+
+<!-- ===== STATUS ===== -->
+<div class="status-bar">
+  <div class="status-indicator loading" id="status"><span>●</span> กำลังโหลดข้อมูล...</div>
+</div>
+
+<!-- ===== LOADING ===== -->
+<div class="loading-msg" id="loadingMsg">⏳ กำลังดึงข้อมูลจาก GitHub...</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div class="container hidden" id="dashboard">
+
+  <!-- Radar Charts -->
+  <div class="charts-grid">
+    <div class="section">
+      <div class="section-title"><span class="dot"></span>Buy — Dimension Radar</div>
+      <div class="chart-box"><canvas id="radarChart"></canvas></div>
+      <div id="penaltyBuy" style="margin-top:12px"></div>
+    </div>
+    <div class="section">
+      <div class="section-title"><span class="dot"></span>Sell — Dimension Radar</div>
+      <div class="chart-box"><canvas id="radarSellChart"></canvas></div>
+      <div id="penaltySell" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <!-- Technical Details -->
+  <div class="section">
+    <div class="section-title"><span class="dot"></span>Technical Details</div>
+    <div class="info-grid" id="infoGrid"></div>
+  </div>
+
+  <!-- CTA Banner -->
+  <div class="cta-banner">
+    <h3>🔓 ปลดล็อค Dashboard เต็มรูปแบบ</h3>
+    <p>เข้าถึง Momentum Score, Pivot Zones, Z-Score, Bias Signal และอีกมากมาย</p>
+    <div class="cta-features">
+      <span class="cta-feature">📊 Momentum Scoring</span>
+      <span class="cta-feature">🎯 Pivot Zones</span>
+      <span class="cta-feature">📈 Price Chart</span>
+      <span class="cta-feature">⚡ Bias Signal</span>
+      <span class="cta-feature">🔍 Z-Score Analysis</span>
+      <span class="cta-feature">📋 Scenario Table</span>
+    </div>
+    <a href="register.html" class="cta-btn">สมัครสมาชิก — เริ่มต้นฟรี</a>
+  </div>
+</div>
+
+<script>
+const CSV_URL='https://raw.githubusercontent.com/jptrustlearning/gold/main/output_momentum_gold.csv';
+const SELL_CSV_URL='https://raw.githubusercontent.com/jptrustlearning/gold/main/output_momentum_gold_sell.csv';
+const NET_CSV_URL='https://raw.githubusercontent.com/jptrustlearning/gold/main/output_momentum_gold_net.csv';
+
+let D=null, DS=null, DN=null, PIVOT=null, PIVOT_ALL=null;
+
+document.addEventListener('DOMContentLoaded', loadData);
+
+async function loadData(){
+  const st=document.getElementById('status');
+  try {
+    const [sRes, sellRes, netRes] = await Promise.all([
+      fetch(CSV_URL), fetch(SELL_CSV_URL), fetch(NET_CSV_URL)
+    ]);
+    if(!sRes.ok) throw new Error('Buy CSV: HTTP '+sRes.status);
+    if(!sellRes.ok) throw new Error('Sell CSV: HTTP '+sellRes.status);
+    if(!netRes.ok) throw new Error('Net CSV: HTTP '+netRes.status);
+
+    const sText=await sRes.text(), sellText=await sellRes.text(), netText=await netRes.text();
+    const rows=parseCSV(sText);
+    const sellRows=parseCSV(sellText);
+    const netRows=parseCSV(netText);
+    if(!rows.length) throw new Error('No buy score data');
+
+    D=rows[0];
+    DS=sellRows.length?sellRows[0]:null;
+    DN=netRows.length?netRows[0]:null;
+    PIVOT_ALL=loadMultiTFPivots(D);
+    PIVOT=PIVOT_ALL['D1']||null;
+
+    st.className='status-indicator success';
+    st.innerHTML='<span>●</span> DATA LOADED — BUY + SELL + NET';
+    document.getElementById('loadingMsg').classList.add('hidden');
+    document.getElementById('dashboard').classList.remove('hidden');
+
+    // Hero price
+    const price=parseFloat(D.Price)||0;
+    document.getElementById('heroPrice').textContent='$'+price.toLocaleString('en-US',{minimumFractionDigits:2});
+    document.getElementById('heroDate').textContent='As of: '+(D.As_Of_Running||'')+'  •  BD1: '+(D.Base_Date_1||'')+'  •  BD2: '+(D.Base_Date_2||'');
+
+    render();
+  } catch(e) {
+    console.error(e);
+    st.className='status-indicator error';
+    st.innerHTML='<span>●</span> FAILED — '+e.message;
+    document.getElementById('loadingMsg').textContent='Error loading data. Check console.';
+  }
+}
+
+function loadMultiTFPivots(d){
+  const tfs={};
+  ['D1','W1','MN'].forEach(tf=>{
+    const pp=parseFloat(d['Pivot_'+tf+'_PP']);
+    if(isNaN(pp))return;
+    tfs[tf]={
+      PP:pp,
+      R1:parseFloat(d['Pivot_'+tf+'_R1']),R2:parseFloat(d['Pivot_'+tf+'_R2']),
+      S1:parseFloat(d['Pivot_'+tf+'_S1']),S2:parseFloat(d['Pivot_'+tf+'_S2']),
+    };
+  });
+  return tfs;
+}
+
+// CSV Parser
+function parseCSV(t){const l=t.trim().split('\n'),h=csvL(l[0]),r=[];for(let i=1;i<l.length;i++){const v=csvL(l[i]);if(v.length<h.length)continue;const o={};h.forEach((k,j)=>o[k]=v[j]);r.push(o);}return r;}
+function csvL(l){const r=[];let c='',q=false;for(let i=0;i<l.length;i++){const ch=l[i];if(ch==='"')q=!q;else if(ch===','&&!q){r.push(c.trim());c='';}else c+=ch;}r.push(c.trim());return r;}
+
+// Helpers
+const f=(k,d2=1)=>parseFloat(D[k]||0).toFixed(d2);
+const fi=k=>parseFloat(D[k]||0);
+const fp=v=>'$'+v.toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1});
+
+function render(){
+  renderRadarChart();
+  renderPenalty();
+  renderInfo();
+}
+
+// ── Radar Charts ──
+function renderRadarChart(){
+  const radarOpts={responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toFixed(1)+' / 100'}}},
+    scales:{r:{min:0,max:100,ticks:{stepSize:25,color:'#9AA0A6',backdropColor:'transparent',font:{size:10}},
+      grid:{color:'rgba(0,0,0,.06)'},angleLines:{color:'rgba(0,0,0,.06)'},
+      pointLabels:{color:'#5F6368',font:{size:11,family:'Anuphan',weight:'600'}}}}};
+
+  const buyData=DN?[parseFloat(DN.Buy_D1||0),parseFloat(DN.Buy_D2||0),parseFloat(DN.Buy_D3||0),parseFloat(DN.Buy_D4||0),parseFloat(DN.Buy_D5||0),parseFloat(DN.Buy_D6||0)]
+    :[fi('D1_ReturnRank')*5,fi('D2_VolumeRank')*5,fi('D3_RSI')*5,fi('D4_MA')*5,fi('D5_Volatility')*5,fi('D6_External')*5];
+
+  new Chart(document.getElementById('radarChart').getContext('2d'),{
+    type:'radar',
+    data:{labels:['Return','Volume','RSI','MA','Dir.Vol','Macro'],
+      datasets:[{label:'Buy',data:buyData,
+        backgroundColor:'rgba(52,168,83,.12)',borderColor:'#34A853',borderWidth:2,
+        pointBackgroundColor:'#34A853',pointBorderColor:'#34A853',pointRadius:5,pointHoverRadius:8}]},
+    options:radarOpts
+  });
+
+  if(DS){
+    const sellData=DN?[parseFloat(DN.Sell_D1||0),parseFloat(DN.Sell_D2||0),parseFloat(DN.Sell_D3||0),parseFloat(DN.Sell_D4||0),parseFloat(DN.Sell_D5||0),parseFloat(DN.Sell_D6||0)]
+      :[parseFloat(DS.D1_ReturnRank||0)*5,parseFloat(DS.D2_VolumeRank||0)*5,parseFloat(DS.D3_RSI||0)*5,parseFloat(DS.D4_MA||0)*5,parseFloat(DS.D5_Volatility||0)*5,parseFloat(DS.D6_External||0)*5];
+
+    new Chart(document.getElementById('radarSellChart').getContext('2d'),{
+      type:'radar',
+      data:{labels:['Return','Volume','RSI','MA','Dir.Vol','Macro'],
+        datasets:[{label:'Sell',data:sellData,
+          backgroundColor:'rgba(234,67,53,.12)',borderColor:'#EA4335',borderWidth:2,
+          pointBackgroundColor:'#EA4335',pointBorderColor:'#EA4335',pointRadius:5,pointHoverRadius:8}]},
+      options:radarOpts
+    });
+  }
+}
+
+// ── Penalty ──
+function renderPenalty(){
+  const t=fi('Penalty_Scaled'),r=fi('Penalty_Reversal'),d=fi('Penalty_DeathCross'),fl=D.Warning_Flags||'',cl=t===0;
+  let hb=`<div class="penalty-box ${cl?'clean':'warn'}"><div class="title">${cl?'✅ NO WARNING FLAGS':'🚨 WARNING FLAGS DETECTED'}</div>
+    <div class="desc">${cl?'No reversal or death cross signals.'
+    :`Penalty: ${t.toFixed(1)} | Reversal: ${r} | Death Cross: ${d}${fl&&fl!=='None'?' | '+fl:''}`}</div></div>`;
+  hb+=`<div class="info-grid" style="font-size:.85rem">
+    <div class="info-item"><span class="k">Reversal</span><span class="v" style="color:${r<0?'var(--red)':'var(--emerald)'}">${r===0?'✅ None':r+' pts'}</span></div>
+    <div class="info-item"><span class="k">Death Cross</span><span class="v" style="color:${d<0?'var(--red)':'var(--emerald)'}">${d===0?'✅ None':d+' pts'}</span></div>
+    <div class="info-item"><span class="k">Penalty (scaled)</span><span class="v" style="color:${t<0?'var(--red)':'var(--emerald)'}">${t.toFixed(1)}</span></div>
+    <div class="info-item"><span class="k">Gross → Net</span><span class="v">${f('Gross_Score_Avg')} → ${f('Net_Score_Avg')}</span></div></div>`;
+  document.getElementById('penaltyBuy').innerHTML=hb;
+
+  if(DS){
+    const sf=k=>DS[k]?parseFloat(DS[k]):0;
+    const st2=sf('Penalty_Scaled'),sr=sf('Penalty_Reversal'),sd2=sf('Penalty_GoldenCross')||sf('Penalty_DeathCross'),sfl=DS.Warning_Flags||'',scl=st2===0;
+    let hs=`<div class="penalty-box ${scl?'clean':'warn'}"><div class="title">${scl?'✅ NO WARNING FLAGS':'🚨 WARNING FLAGS DETECTED'}</div>
+      <div class="desc">${scl?'No reversal or golden cross signals.'
+      :`Penalty: ${st2.toFixed(1)} | Reversal: ${sr} | Golden Cross: ${sd2}${sfl&&sfl!=='None'?' | '+sfl:''}`}</div></div>`;
+    hs+=`<div class="info-grid" style="font-size:.85rem">
+      <div class="info-item"><span class="k">Reversal</span><span class="v" style="color:${sr<0?'var(--red)':'var(--emerald)'}">${sr===0?'✅ None':sr+' pts'}</span></div>
+      <div class="info-item"><span class="k">Golden Cross Pen.</span><span class="v" style="color:${sd2<0?'var(--red)':'var(--emerald)'}">${sd2===0?'✅ None':sd2+' pts'}</span></div>
+      <div class="info-item"><span class="k">Penalty (scaled)</span><span class="v" style="color:${st2<0?'var(--red)':'var(--emerald)'}">${st2.toFixed(1)}</span></div>
+      <div class="info-item"><span class="k">Gross → Net</span><span class="v">${sf('Gross_Score_Avg').toFixed(1)} → ${sf('Net_Score_Avg').toFixed(1)}</span></div></div>`;
+    document.getElementById('penaltySell').innerHTML=hs;
+  }
+}
+
+// ── Technical Details ──
+function renderInfo(){
+  const items=[
+    {k:'Price',v:'$'+fi('Price').toLocaleString('en-US',{minimumFractionDigits:2})},
+    {k:'Gross Score',v:f('Gross_Score_Avg')},
+    {k:'MA50',v:'$'+fi('MA50').toLocaleString('en-US',{minimumFractionDigits:2})},
+    {k:'MA200',v:'$'+fi('MA200').toLocaleString('en-US',{minimumFractionDigits:2})},
+    {k:'Golden Cross',v:String(D.Golden_Cross).toUpperCase()==='TRUE'?'✅ MA50 > MA200':'❌ MA50 < MA200'},
+    {k:'RSI (14-day)',v:fi('RSI_Value').toFixed(1)},
+    {k:'Volatility (Ann.)',v:fi('Volatility_Pct').toFixed(1)+'%'},
+    {k:'Vol Ratio (D/U)',v:D.Vol_Ratio?parseFloat(D.Vol_Ratio).toFixed(3):'N/A'},
+    {k:'WP Return Pctl',v:fi('WP_Return_Pct').toFixed(1)+'%'},
+    {k:'WP Volume Pctl',v:fi('WP_Volume_Pct').toFixed(1)+'%'},
+    {k:'DXY 1M Change',v:(fi('DXY_1M_Pct')>=0?'+':'')+fi('DXY_1M_Pct').toFixed(2)+'%'},
+    {k:'VIX Level',v:fi('VIX_Level').toFixed(2)},
+    {k:'D6 External Score',v:fi('D6_External').toFixed(1)+' / 100 (raw: '+(D.D6_Raw||'0')+')'},
+    {k:'Penalty (Scaled)',v:fi('Penalty_Scaled').toFixed(1)},
+    {k:'Base Date 1',v:D.Base_Date_1},
+    {k:'Base Date 2',v:D.Base_Date_2},
+    {k:'Net Score BD1',v:f('Net_Score_BD1')},
+    {k:'Net Score BD2',v:f('Net_Score_BD2')},
+  ];
+  if(PIVOT){
+    items.push(
+      {k:'D1 Pivot (PP)',v:fp(PIVOT.PP)},
+      {k:'D1 R1 / R2',v:fp(PIVOT.R1)+' / '+fp(PIVOT.R2)},
+      {k:'D1 S1 / S2',v:fp(PIVOT.S1)+' / '+fp(PIVOT.S2)}
+    );
+  }
+  if(PIVOT_ALL['W1']){
+    items.push(
+      {k:'W1 Pivot (PP)',v:fp(PIVOT_ALL['W1'].PP)},
+      {k:'W1 R1 / S1',v:fp(PIVOT_ALL['W1'].R1)+' / '+fp(PIVOT_ALL['W1'].S1)}
+    );
+  }
+  if(PIVOT_ALL['MN']){
+    items.push(
+      {k:'MN Pivot (PP)',v:fp(PIVOT_ALL['MN'].PP)},
+      {k:'MN R1 / S1',v:fp(PIVOT_ALL['MN'].R1)+' / '+fp(PIVOT_ALL['MN'].S1)}
+    );
+  }
+  items.push({k:'Confluence Zones',v:(D.Confluence_Zones&&D.Confluence_Zones!=='None')?'Found':'—'});
+  items.push({k:'Pivot Position (D1)',v:D.Pivot_Position||'—'});
+
+  // Z-Score
+  if(D.Z_Score_50d){
+    const z50=parseFloat(D.Z_Score_50d);
+    items.push(
+      {k:'Z-Score 50d',v:(z50>=0?'+':'')+z50.toFixed(3)},
+      {k:'Z-Score 100d',v:D.Z_Score_100d?(parseFloat(D.Z_Score_100d)>=0?'+':'')+parseFloat(D.Z_Score_100d).toFixed(3):'N/A'},
+      {k:'Z-Score 200d',v:D.Z_Score_200d?(parseFloat(D.Z_Score_200d)>=0?'+':'')+parseFloat(D.Z_Score_200d).toFixed(3):'N/A'},
+      {k:'Z-Score Zone',v:D.Z_Zone||'N/A'}
+    );
+  }
+  // Exhaustion
+  if(D.Exhaust_Scenario){
+    items.push(
+      {k:'Exhaust Signal',v:(D.Exhaust_Scenario!=='None')?D.Exhaust_Scenario+' → '+(D.Exhaust_Action||'—'):'None (ปกติ)'},
+      {k:'Net 5d Change',v:D.Net_5d_Change!==''?(parseFloat(D.Net_5d_Change)>=0?'+':'')+parseFloat(D.Net_5d_Change).toFixed(2):'N/A'},
+      {k:'D5 Shift 5d',v:D.D5_Shift_5d!==''?parseFloat(D.D5_Shift_5d).toFixed(0)+' pts':'N/A'}
+    );
+  }
+
+  document.getElementById('infoGrid').innerHTML=items.map(i=>
+    `<div class="info-item"><span class="k">${i.k}</span><span class="v">${i.v}</span></div>`
+  ).join('');
+}
+</script>
+</body>
+</html>
