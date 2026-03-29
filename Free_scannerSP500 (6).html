@@ -1,0 +1,743 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JP TRUST — S&P 500 Daily Scanner</title>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@200;300;400;500;600;700&family=Cinzel:wght@400;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--font-thai:'Anuphan',sans-serif;--font-label:'Cinzel',serif;--font-number:'DM Serif Display',serif;--gold:#D4AF37;--gold-dark:#B8860B;--gold-light:#F4E4BA;--gold-dim:rgba(212,175,55,0.08);--maroon:#722F37;--maroon-darkest:#1a0a0e;--maroon-mid:#2d1018;--maroon-light:#3a1520;--cream:#FAF6ED;--cream-warm:#F5EFE0;--cream-deep:#EDE4D0;--cream-card:#FFFEF8;--text-dark:#3D3228;--text-heading:#5A3D20;--text-muted:#7A6F62;--text-light:#E8E4DC;--text-light-heading:#F4E4BA;--text-light-muted:#A09B92;--green:#4CAF50;--green-dark:#2E7D32;--red:#E53935;--border-gold:rgba(212,175,55,0.15)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream);line-height:1.7;overflow-x:hidden}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--cream-deep)}::-webkit-scrollbar-thumb{background:rgba(114,47,55,0.25);border-radius:3px}
+.sec-dark{background:linear-gradient(160deg,#1a0a0e,#2d1018 25%,#3a1520 45%,#2d1018 65%,#1a0a0e);color:var(--text-light);position:relative}
+.sec-dark::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 30%,rgba(114,47,55,0.25),transparent 50%),radial-gradient(ellipse at 70% 60%,rgba(90,30,40,0.2),transparent 50%);pointer-events:none}
+.gold-line{height:2px;background:linear-gradient(90deg,transparent,var(--gold),#E8D48B,var(--gold),transparent)}
+.star-field{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+.star{position:absolute;border-radius:50%;pointer-events:none}
+@keyframes twinkle{0%,100%{opacity:0;transform:scale(0.3)}20%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(0.8)}80%{opacity:1;transform:scale(1.1)}}
+.header-section{padding:50px 24px 40px;position:relative;z-index:2;text-align:center}
+.header-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(212,175,55,0.05);border:1px solid rgba(212,175,55,0.2);border-radius:100px;padding:5px 18px;font-size:11px;color:#C4B88A;margin-bottom:20px;letter-spacing:3px;text-transform:uppercase;font-family:var(--font-label)}
+.header-title{font-size:clamp(26px,4.5vw,48px);font-weight:600;line-height:1.25;margin-bottom:14px;background:linear-gradient(135deg,var(--gold),var(--gold-light),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header-subtitle{font-size:15px;color:var(--text-light-muted);max-width:550px;margin:0 auto 20px;line-height:1.8}
+.header-meta{display:flex;justify-content:center;align-items:center;gap:20px;flex-wrap:wrap;font-size:0.75rem;color:var(--text-light-muted)}
+.header-meta .logo{font-family:var(--font-label);font-size:0.65rem;letter-spacing:3px;color:var(--gold);border:1px solid rgba(212,175,55,0.2);padding:4px 14px;border-radius:4px}
+.header-meta .date{font-family:var(--font-number);font-size:0.85rem}
+.status-wrap{background:var(--cream);padding:16px 24px 8px}
+.status-inner{max-width:1400px;margin:0 auto;display:flex;gap:8px;flex-wrap:wrap}
+.status-chip{display:flex;align-items:center;gap:7px;padding:5px 14px;background:var(--cream-card);border:1px solid var(--border-gold);border-radius:18px;font-size:0.73rem;color:var(--text-muted)}
+.status-chip .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.main-wrap{background:var(--cream);padding:0 24px 30px}
+.main-inner{max-width:1400px;margin:0 auto}
+.loading-overlay{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;gap:20px}
+.loading-spinner{width:44px;height:44px;border:2px solid var(--border-gold);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:0.82rem;font-weight:600;color:var(--gold-dark);letter-spacing:2px}
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px}
+.metric-card{background:linear-gradient(160deg,var(--cream-card),#F8F2E4);border:1px solid rgba(212,175,55,0.18);border-radius:14px;padding:18px;position:relative;overflow:hidden;transition:all 0.3s;box-shadow:0 2px 12px rgba(114,47,55,0.04)}
+.metric-card:hover{border-color:rgba(212,175,55,0.35);transform:translateY(-3px);box-shadow:0 8px 28px rgba(114,47,55,0.08)}
+.metric-card .label{font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:500;margin-bottom:8px}
+.metric-card .value{font-family:var(--font-number);font-size:1.6rem;color:var(--text-heading)}
+.metric-card .value.positive{color:var(--green-dark)}.metric-card .value.negative{color:var(--red)}
+.metric-card .sub{font-size:0.7rem;color:var(--text-muted);margin-top:4px}
+.metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0}
+.metric-card.gold::before{background:linear-gradient(90deg,var(--gold-dark),var(--gold))}
+.metric-card.green-accent::before{background:var(--green)}.metric-card.red-accent::before{background:var(--red)}.metric-card.cyan-accent::before{background:var(--gold)}
+.chart-section{background:linear-gradient(160deg,var(--cream-card),#F8F2E4);border:1px solid rgba(212,175,55,0.15);border-radius:14px;padding:24px;margin-bottom:20px;box-shadow:0 2px 12px rgba(114,47,55,0.04)}
+.chart-section h2{font-size:1rem;font-weight:700;color:var(--text-heading);letter-spacing:1px;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.chart-section h2 .icon{width:24px;height:24px;background:var(--gold-dim);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.8rem}
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+.chart-container{position:relative;width:100%;min-height:280px;height:40vw;max-height:400px}
+.table-section{background:linear-gradient(160deg,var(--cream-card),#F8F2E4);border:1px solid rgba(212,175,55,0.15);border-radius:14px;padding:24px;margin-bottom:20px;overflow-x:auto;box-shadow:0 2px 12px rgba(114,47,55,0.04)}
+.table-section h2{font-size:1rem;font-weight:700;color:var(--text-heading);letter-spacing:1px;margin-bottom:6px}
+.table-section .table-sub{font-size:0.72rem;color:var(--text-muted);margin-bottom:16px}
+.controls-row{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.controls-row input[type="text"]{background:var(--cream);border:1px solid var(--border-gold);border-radius:8px;padding:8px 14px;color:var(--text-dark);font-family:var(--font-thai);font-size:0.8rem;outline:none;width:200px;transition:border-color 0.3s}
+.controls-row input[type="text"]::placeholder{color:var(--text-muted)}
+.controls-row input[type="text"]:focus{border-color:var(--gold)}
+.controls-row select{background:var(--cream);border:1px solid var(--border-gold);border-radius:8px;padding:8px 14px;color:var(--text-dark);font-family:var(--font-thai);font-size:0.8rem;outline:none;cursor:pointer}
+.controls-row select:focus{border-color:var(--gold)}
+table{width:100%;border-collapse:collapse;font-size:0.8rem}
+thead th{text-align:left;padding:10px 12px;color:var(--gold-dark);font-weight:600;font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid rgba(212,175,55,0.15);white-space:nowrap;cursor:pointer;user-select:none}
+thead th:hover{color:var(--maroon)}
+thead th.sorted-asc::after{content:' ▲';font-size:0.55rem}thead th.sorted-desc::after{content:' ▼';font-size:0.55rem}
+tbody tr{transition:background 0.2s}tbody tr:hover{background:rgba(212,175,55,0.05)}
+tbody td{padding:10px 12px;border-bottom:1px solid rgba(212,175,55,0.06);font-size:0.76rem;white-space:nowrap;color:var(--text-dark)}
+tbody td.ticker{font-weight:700;color:var(--maroon)}
+.positive-cell{color:var(--green-dark)}.negative-cell{color:var(--red)}.neutral-cell{color:var(--text-muted)}
+.sector-cell{font-size:0.66rem;color:var(--text-muted);max-width:130px;overflow:hidden;text-overflow:ellipsis}
+.momentum-bar{display:inline-block;height:5px;border-radius:3px;min-width:4px;max-width:80px;vertical-align:middle;margin-left:6px}
+.momentum-bar.pos{background:var(--green);box-shadow:0 0 5px rgba(76,175,80,0.3)}
+.momentum-bar.neg{background:var(--red);box-shadow:0 0 5px rgba(229,57,53,0.3)}
+.tooltip-note{font-size:0.68rem;color:var(--text-muted);font-style:italic;margin-top:8px}
+.footer-sec{text-align:center;padding:40px 24px;position:relative;z-index:2}
+.footer-sec .brand{font-weight:700;color:var(--gold);font-size:0.8rem;letter-spacing:0.15em;margin-bottom:6px}
+.footer-sec .disc{font-size:0.7rem;color:var(--text-light-muted);line-height:1.7}
+@media(max-width:1024px){.metrics-grid{grid-template-columns:repeat(3,1fr)}.chart-container{min-height:240px;height:35vw}}
+@media(max-width:768px){.chart-row{grid-template-columns:1fr}.metrics-grid{grid-template-columns:repeat(2,1fr)}.chart-container{min-height:220px;height:50vw;max-height:350px}.main-wrap{padding:0 12px 20px}.chart-section,.table-section{padding:16px}}
+@media(max-width:480px){.metrics-grid{grid-template-columns:1fr}.chart-container{min-height:200px;height:60vw}.header-title{font-size:1.4rem}.controls-row input[type="text"]{width:100%}.controls-row{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="star-field" id="star-field"></div>
+<script>
+(function(){const sf=document.getElementById('star-field');for(let i=0;i<40;i++){const s=document.createElement('div');s.className='star';const sz=Math.random()>0.85?4:Math.random()*2.5+1;s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;background:${Math.random()>0.7?'var(--gold)':'rgba(244,228,186,0.6)'};animation:twinkle ${3+Math.random()*5}s ${Math.random()*5}s ease-in-out infinite`;sf.appendChild(s)}})();
+</script>
+
+<section class="sec-dark">
+  <div class="header-section">
+    <div class="header-badge">✦ S&P 500 Daily Scanner</div>
+    <h2 class="header-title">Momentum · Volume<br>Performance Screening</h2>
+    <p class="header-subtitle">สแกนหุ้น S&P 500 ทุกตัว วิเคราะห์โมเมนตัม ปริมาณซื้อขาย และสัญญาณทางเทคนิค อัปเดตทุกวัน</p>
+    <div class="header-meta">
+      <span class="logo">✦ JP TRUST LEARNING</span>
+      <span class="date" id="dateDisplay">—</span>
+    </div>
+  </div>
+</section>
+<div class="gold-line"></div>
+
+<div class="status-wrap">
+  <div class="status-inner" id="statusBar">
+    <div class="status-chip"><span class="dot"></span> กำลังโหลดข้อมูล...</div>
+  </div>
+</div>
+
+<div class="main-wrap">
+  <div class="main-inner" id="mainContent">
+    <div class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">FETCHING S&P 500 DATA...</div>
+      <div style="font-size:0.73rem;color:var(--text-muted);">กำลังดึงข้อมูลจาก GitHub Repository</div>
+    </div>
+  </div>
+</div>
+
+<div class="gold-line"></div>
+<section class="sec-dark">
+  <div class="footer-sec">
+    <div class="brand">JP TRUST LEARNING</div>
+    <div class="disc">ข้อมูลจาก GitHub · ไม่ใช่คำแนะนำในการลงทุน</div>
+  </div>
+</section>
+
+<script>
+// ====== DATA SOURCE — same pattern as WeeklyMomentumScanner ======
+const CLOUD_URL = 'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_sp500_daily.csv';
+const SECTOR_URL = 'https://raw.githubusercontent.com/datasets/s-and-p-500-companies/main/data/constituents.csv';
+
+// Chart.js defaults
+Chart.defaults.color = '#7A6F62';
+Chart.defaults.borderColor = 'rgba(212,175,55,0.08)';
+Chart.defaults.font.family = "'Anuphan', sans-serif";
+Chart.defaults.font.size = 11;
+
+let allStockData = {};
+let allDates = [];
+let chartInstances = {};
+let sectorMap = {}; // ticker -> GICS Sector
+let allSectors = []; // sorted unique sectors
+
+function destroyChart(id) {
+  if (chartInstances[id]) { chartInstances[id].destroy(); delete chartInstances[id]; }
+}
+
+function updateLoadingStatus(msg) {
+  const el = document.querySelector('.loading-text');
+  if (el) el.textContent = msg;
+}
+
+async function init() {
+  try {
+    updateLoadingStatus('FETCHING S&P 500 DATA...');
+    const [res, sectorRes] = await Promise.all([
+      fetch(CLOUD_URL),
+      fetch(SECTOR_URL).catch(() => null)
+    ]);
+    if (!res.ok) throw new Error('fetch fail: ' + res.status);
+    const csv = await res.text();
+
+    // Parse sector mapping
+    if (sectorRes && sectorRes.ok) {
+      updateLoadingStatus('LOADING SECTOR DATA...');
+      const sectorCsv = await sectorRes.text();
+      const sectorParsed = Papa.parse(sectorCsv.trim(), { header: true, skipEmptyLines: true });
+      sectorParsed.data.forEach(row => {
+        const sym = (row.Symbol || '').trim();
+        const sector = (row['GICS Sector'] || '').trim();
+        if (sym && sector) sectorMap[sym] = sector;
+      });
+      // Handle BRK.B -> BRK-B style differences
+      Object.keys(sectorMap).forEach(k => {
+        if (k.includes('.')) sectorMap[k.replace('.', '-')] = sectorMap[k];
+      });
+    }
+
+    updateLoadingStatus('PROCESSING DATA...');
+    processCSV(csv);
+  } catch(e) {
+    console.error(e);
+    document.getElementById('mainContent').innerHTML = `
+      <div class="loading-overlay">
+        <div style="color:var(--red);font-size:1.4rem;margin-bottom:12px;">⚠ CONNECT FAILED</div>
+        <div style="color:var(--text-secondary);font-size:0.85rem;max-width:500px;text-align:center;line-height:1.8;">
+          <div style="margin-bottom:12px;">${e.message}</div>
+          <div style="margin-top:16px;padding:14px;background:rgba(212,168,71,0.08);border:1px solid var(--border);border-radius:8px;">
+            <div style="color:var(--gold);font-size:0.85rem;font-weight:600;">วิธีแก้: Download ไฟล์ HTML → เปิดใน Chrome โดยตรง</div>
+            <div style="color:var(--text-muted);font-size:0.75rem;margin-top:6px;">ไฟล์นี้จะ fetch ข้อมูลจาก GitHub ได้ปกติเมื่อเปิดนอก iframe</div>
+          </div>
+        </div>
+      </div>`;
+  }
+}
+
+function processCSV(text) {
+  const parsed = Papa.parse(text.trim(), { header: true, skipEmptyLines: true });
+  const rows = parsed.data;
+  if (!rows.length) { throw new Error('No data rows'); }
+
+  // Long format: Ticker, Date, Open, High, Low, Close, Volume
+  // Group by ticker, collect daily OHLCV
+  const tickerMap = {};
+  const dateSet = new Set();
+  rows.forEach(row => {
+    const ticker = (row.Ticker || '').trim();
+    const date = (row.Date || '').trim();
+    const close = parseFloat(row.Close);
+    const open = parseFloat(row.Open);
+    const high = parseFloat(row.High);
+    const low = parseFloat(row.Low);
+    const volume = parseFloat(row.Volume);
+    if (!ticker || !date || isNaN(close)) return;
+    if (!tickerMap[ticker]) tickerMap[ticker] = [];
+    tickerMap[ticker].push({ date, open, high, low, close, volume: isNaN(volume) ? 0 : volume });
+    dateSet.add(date);
+  });
+
+  allDates = [...dateSet].sort();
+
+  // Filter last 3 years
+  const latestDate = new Date(allDates[allDates.length - 1]);
+  const threeYearsAgo = new Date(latestDate);
+  threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 3);
+  const cutoff = threeYearsAgo.toISOString().slice(0, 10);
+  allDates = allDates.filter(d => d >= cutoff);
+  const cutoffSet = new Set(allDates);
+
+  // Build per-ticker sorted arrays, filtered to last 3 years
+  Object.keys(tickerMap).forEach(t => {
+    const filtered = tickerMap[t]
+      .filter(d => cutoffSet.has(d.date))
+      .sort((a, b) => a.date.localeCompare(b.date));
+    if (filtered.length >= 120) {
+      allStockData[t] = filtered;
+    }
+  });
+
+  const validTickers = Object.keys(allStockData);
+
+  // Update status bar
+  const latest = allDates[allDates.length - 1];
+  const earliest = allDates[0];
+  document.getElementById('dateDisplay').textContent = latest;
+  document.getElementById('statusBar').innerHTML = `
+    <div class="status-chip"><span class="dot"></span> DATA LOADED</div>
+    <div class="status-chip">📊 ${validTickers.length} หุ้น</div>
+    <div class="status-chip">📅 ${earliest} → ${latest}</div>
+    <div class="status-chip">📈 ${allDates.length} วันทำการ</div>
+    <div class="status-chip">📋 ${rows.length.toLocaleString()} แถวข้อมูล</div>
+    <div class="status-chip">🏭 ${Object.keys(sectorMap).length > 0 ? new Set(Object.values(sectorMap)).size + ' Sectors' : 'No Sector Data'}</div>
+  `;
+
+  // Compute metrics for each ticker
+  const metrics = computeAllMetrics(validTickers);
+
+  // Build sorted unique sector list
+  const sectorSet = new Set(metrics.map(m => m.sector));
+  allSectors = [...sectorSet].filter(s => s !== 'Unknown').sort();
+  if (sectorSet.has('Unknown')) allSectors.push('Unknown');
+
+  renderDashboard(metrics, latest);
+}
+
+function computeAllMetrics(tickers) {
+  return tickers.map(ticker => {
+    const data = allStockData[ticker];
+    const n = data.length;
+    const latest = data[n - 1].close;
+    const prev = data[n - 2] ? data[n - 2].close : latest;
+
+    // 1-day return
+    const ret1d = (latest - prev) / prev * 100;
+
+    // 5-day return
+    const p5 = n > 5 ? data[n - 6].close : data[0].close;
+    const ret5d = (latest - p5) / p5 * 100;
+
+    // 1-month (~21 days)
+    const p21 = n > 21 ? data[n - 22].close : data[0].close;
+    const ret1m = (latest - p21) / p21 * 100;
+
+    // 3-month (~63 days)
+    const p63 = n > 63 ? data[n - 64].close : data[0].close;
+    const ret3m = (latest - p63) / p63 * 100;
+
+    // 6-month (~126 days)
+    const p126 = n > 126 ? data[n - 127].close : data[0].close;
+    const ret6m = (latest - p126) / p126 * 100;
+
+    // 1-year (~252 days)
+    const p252 = n > 252 ? data[n - 253].close : data[0].close;
+    const ret1y = (latest - p252) / p252 * 100;
+
+    // Volatility (20-day std of daily returns)
+    const returns20 = [];
+    for (let i = Math.max(1, n - 20); i < n; i++) {
+      returns20.push((data[i].close - data[i-1].close) / data[i-1].close);
+    }
+    const meanR = returns20.reduce((a, b) => a + b, 0) / returns20.length;
+    const vol20 = Math.sqrt(returns20.reduce((a, b) => a + (b - meanR) ** 2, 0) / returns20.length) * Math.sqrt(252) * 100;
+
+    // SMA 50
+    const sma50 = n >= 50 ? data.slice(n - 50).reduce((a, b) => a + b.close, 0) / 50 : latest;
+    // SMA 200
+    const sma200 = n >= 200 ? data.slice(n - 200).reduce((a, b) => a + b.close, 0) / 200 : latest;
+
+    // Above SMA flags
+    const aboveSma50 = latest > sma50;
+    const aboveSma200 = latest > sma200;
+
+    // RSI 14
+    let gains = 0, losses = 0;
+    for (let i = Math.max(1, n - 14); i < n; i++) {
+      const diff = data[i].close - data[i-1].close;
+      if (diff > 0) gains += diff; else losses -= diff;
+    }
+    const rs = losses === 0 ? 100 : gains / losses;
+    const rsi = 100 - 100 / (1 + rs);
+
+    // Distance from 52-week high (use actual High prices)
+    const yearData = data.slice(Math.max(0, n - 252));
+    const high52w = Math.max(...yearData.map(d => d.high || d.close));
+    const distFromHigh = (latest - high52w) / high52w * 100;
+
+    // Volume ratio (20d avg vs 50d avg)
+    const vol20d = n >= 20 ? data.slice(n-20).reduce((a,b) => a + b.volume, 0) / 20 : 0;
+    const vol50d = n >= 50 ? data.slice(n-50).reduce((a,b) => a + b.volume, 0) / 50 : vol20d;
+    const volRatio = vol50d > 0 ? vol20d / vol50d : 1;
+
+    // Momentum score (composite)
+    const momScore = (ret1m * 0.15 + ret3m * 0.25 + ret6m * 0.35 + ret1y * 0.25);
+
+    // Sector lookup
+    const sector = sectorMap[ticker] || 'Unknown';
+
+    return {
+      ticker, latest, ret1d, ret5d, ret1m, ret3m, ret6m, ret1y,
+      vol20, sma50, sma200, aboveSma50, aboveSma200, rsi,
+      high52w, distFromHigh, momScore, volRatio, sector
+    };
+  }).sort((a, b) => b.momScore - a.momScore);
+}
+
+function renderDashboard(metrics, latestDate) {
+  // Summary stats
+  const totalStocks = metrics.length;
+  const bullish = metrics.filter(m => m.aboveSma200).length;
+  const bearish = totalStocks - bullish;
+  const avgRet1d = metrics.reduce((a, b) => a + b.ret1d, 0) / totalStocks;
+  const avgMom = metrics.reduce((a, b) => a + b.momScore, 0) / totalStocks;
+  const top5 = metrics.slice(0, 5);
+  const bottom5 = metrics.slice(-5).reverse();
+  const avgRSI = metrics.reduce((a, b) => a + b.rsi, 0) / totalStocks;
+
+  // Distribution of returns
+  const retBuckets = { 'ขึ้น > 5%': 0, 'ขึ้น 2-5%': 0, 'ขึ้น 0-2%': 0, 'ลง 0-2%': 0, 'ลง 2-5%': 0, 'ลง > 5%': 0 };
+  metrics.forEach(m => {
+    const r = m.ret1m;
+    if (r > 5) retBuckets['ขึ้น > 5%']++;
+    else if (r > 2) retBuckets['ขึ้น 2-5%']++;
+    else if (r >= 0) retBuckets['ขึ้น 0-2%']++;
+    else if (r > -2) retBuckets['ลง 0-2%']++;
+    else if (r > -5) retBuckets['ลง 2-5%']++;
+    else retBuckets['ลง > 5%']++;
+  });
+
+  document.getElementById('mainContent').innerHTML = `
+    <!-- METRIC CARDS -->
+    <div class="metrics-grid">
+      <div class="metric-card gold">
+        <div class="label">จำนวนหุ้นที่สแกน</div>
+        <div class="value">${totalStocks}</div>
+        <div class="sub">S&P 500 Universe</div>
+      </div>
+      <div class="metric-card green-accent">
+        <div class="label">Breadth (> SMA200)</div>
+        <div class="value ${bullish > bearish ? 'positive' : 'negative'}">${bullish} / ${totalStocks}</div>
+        <div class="sub">${(bullish/totalStocks*100).toFixed(1)}% Bullish</div>
+      </div>
+      <div class="metric-card ${avgRet1d >= 0 ? 'green-accent' : 'red-accent'}">
+        <div class="label">ผลตอบแทนเฉลี่ยวันนี้</div>
+        <div class="value ${avgRet1d >= 0 ? 'positive' : 'negative'}">${avgRet1d >= 0 ? '+' : ''}${avgRet1d.toFixed(2)}%</div>
+        <div class="sub">Equal-weighted Avg</div>
+      </div>
+      <div class="metric-card cyan-accent">
+        <div class="label">AVG RSI (14)</div>
+        <div class="value">${avgRSI.toFixed(1)}</div>
+        <div class="sub">${avgRSI > 60 ? 'Overbought Zone' : avgRSI < 40 ? 'Oversold Zone' : 'Neutral Zone'}</div>
+      </div>
+      <div class="metric-card ${avgMom >= 0 ? 'green-accent' : 'red-accent'}">
+        <div class="label">Avg Momentum Score</div>
+        <div class="value ${avgMom >= 0 ? 'positive' : 'negative'}">${avgMom >= 0 ? '+' : ''}${avgMom.toFixed(2)}</div>
+        <div class="sub">Composite (1M-1Y weighted)</div>
+      </div>
+      <div class="metric-card gold">
+        <div class="label">ข้อมูลวันล่าสุด</div>
+        <div class="value" style="font-size:1.1rem;">${latestDate}</div>
+        <div class="sub">ย้อนหลัง 3 ปี</div>
+      </div>
+    </div>
+
+    <!-- CHARTS ROW 1 -->
+    <div class="chart-section">
+      <h2><span class="icon">📊</span> MARKET OVERVIEW</h2>
+      <div class="chart-row">
+        <div>
+          <div style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:8px;">การกระจายผลตอบแทน 1 เดือน</div>
+          <div class="chart-container"><canvas id="chartRetDist"></canvas></div>
+        </div>
+        <div>
+          <div style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:8px;">Top 10 vs Bottom 10 — Momentum Score</div>
+          <div class="chart-container"><canvas id="chartTopBottom"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHARTS ROW 2 -->
+    <div class="chart-section">
+      <h2><span class="icon">⚡</span> MOMENTUM & RISK ANALYSIS</h2>
+      <div class="chart-row">
+        <div>
+          <div style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:8px;">RSI Distribution</div>
+          <div class="chart-container"><canvas id="chartRSI"></canvas></div>
+        </div>
+        <div>
+          <div style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:8px;">Momentum vs Volatility (Scatter)</div>
+          <div class="chart-container"><canvas id="chartScatter"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHARTS ROW 3 - sector breadth -->
+    <div class="chart-section">
+      <h2><span class="icon">📈</span> PERFORMANCE HEATMAP</h2>
+      <div style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:12px;">Top 20 หุ้นที่มี Momentum Score สูงสุด — ผลตอบแทนแต่ละช่วงเวลา</div>
+      <div class="chart-container" style="min-height:300px;height:45vw;max-height:500px;"><canvas id="chartHeatBar"></canvas></div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-section">
+      <h2>STOCK SCANNER TABLE</h2>
+      <div class="table-sub">เรียงตาม Momentum Score · คลิกหัวคอลัมน์เพื่อเรียงข้อมูล</div>
+      <div class="controls-row">
+        <input type="text" id="searchInput" placeholder="🔍 ค้นหา Ticker..." oninput="filterTable()">
+        <select id="filterSMA" onchange="filterTable()">
+          <option value="all">ทั้งหมด</option>
+          <option value="above200">Above SMA200</option>
+          <option value="below200">Below SMA200</option>
+          <option value="above50">Above SMA50</option>
+          <option value="golden">Golden Cross (50>200)</option>
+        </select>
+        <select id="filterRSI" onchange="filterTable()">
+          <option value="all">RSI ทั้งหมด</option>
+          <option value="ob">RSI > 70 (Overbought)</option>
+          <option value="os">RSI < 30 (Oversold)</option>
+          <option value="neutral">RSI 30-70</option>
+        </select>
+        <select id="filterSector" onchange="filterTable()">
+          <option value="all">อุตสาหกรรมทั้งหมด</option>
+          ${allSectors.map(s => `<option value="${s}">${s}</option>`).join('')}
+        </select>
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="stockTable">
+          <thead>
+            <tr>
+              <th data-col="rank">#</th>
+              <th data-col="ticker">Ticker</th>
+              <th data-col="sector">Sector</th>
+              <th data-col="latest">Price</th>
+              <th data-col="ret1d">1D %</th>
+              <th data-col="ret5d">5D %</th>
+              <th data-col="ret1m">1M %</th>
+              <th data-col="ret3m">3M %</th>
+              <th data-col="ret6m">6M %</th>
+              <th data-col="ret1y">1Y %</th>
+              <th data-col="rsi">RSI</th>
+              <th data-col="vol20">Vol 20D</th>
+              <th data-col="volRatio">Vol Ratio</th>
+              <th data-col="distFromHigh">vs 52W High</th>
+              <th data-col="momScore">Mom Score</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <div class="tooltip-note">แสดง Momentum Score = 15%×1M + 25%×3M + 35%×6M + 25%×1Y</div>
+    </div>
+  `;
+
+  renderCharts(metrics, retBuckets, top5, bottom5);
+  populateTable(metrics);
+  setupTableSort(metrics);
+}
+
+function renderCharts(metrics, retBuckets, top5, bottom5) {
+  // 1) Return Distribution Bar
+  destroyChart('chartRetDist');
+  const ctxDist = document.getElementById('chartRetDist').getContext('2d');
+  const bucketColors = ['#4CAF50','#66BB6A','#A5D6A7','#EF9A9A','#EF5350','#E53935'];
+  chartInstances['chartRetDist'] = new Chart(ctxDist, {
+    type: 'bar',
+    data: {
+      labels: Object.keys(retBuckets),
+      datasets: [{
+        data: Object.values(retBuckets),
+        backgroundColor: bucketColors,
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+        tooltip: { backgroundColor: '#1a0a0e', titleColor: '#D4A847', bodyColor: '#F5DEB3', borderColor: '#D4A847', borderWidth: 1 }
+      },
+      scales: {
+        y: { grid: { color: 'rgba(212,168,71,0.08)' }, ticks: { font: { size: 10 } } },
+        x: { grid: { display: false }, ticks: { font: { size: 9 } } }
+      }
+    }
+  });
+
+  // 2) Top/Bottom momentum
+  destroyChart('chartTopBottom');
+  const ctxTB = document.getElementById('chartTopBottom').getContext('2d');
+  const combined = [...top5, ...bottom5.reverse()];
+  chartInstances['chartTopBottom'] = new Chart(ctxTB, {
+    type: 'bar',
+    data: {
+      labels: combined.map(m => m.ticker),
+      datasets: [{
+        label: 'Momentum Score',
+        data: combined.map(m => m.momScore),
+        backgroundColor: combined.map(m => m.momScore >= 0 ? 'rgba(76,175,80,0.7)' : 'rgba(239,83,80,0.7)'),
+        borderRadius: 4,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+        tooltip: { backgroundColor: '#1a0a0e', titleColor: '#D4A847', bodyColor: '#F5DEB3', borderColor: '#D4A847', borderWidth: 1 }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(212,168,71,0.08)' } },
+        y: { grid: { display: false }, ticks: { font: { size: 10, family: "'Anuphan'" } } }
+      }
+    }
+  });
+
+  // 3) RSI Distribution
+  destroyChart('chartRSI');
+  const ctxRSI = document.getElementById('chartRSI').getContext('2d');
+  const rsiBuckets = [0,0,0,0,0,0,0];
+  const rsiLabels = ['0-20','20-30','30-40','40-50','50-60','60-70','70-100'];
+  metrics.forEach(m => {
+    if (m.rsi < 20) rsiBuckets[0]++;
+    else if (m.rsi < 30) rsiBuckets[1]++;
+    else if (m.rsi < 40) rsiBuckets[2]++;
+    else if (m.rsi < 50) rsiBuckets[3]++;
+    else if (m.rsi < 60) rsiBuckets[4]++;
+    else if (m.rsi < 70) rsiBuckets[5]++;
+    else rsiBuckets[6]++;
+  });
+  const rsiColors = ['#E53935','#EF5350','#EF9A9A','rgba(212,168,71,0.3)','#A5D6A7','#66BB6A','#4CAF50'];
+  chartInstances['chartRSI'] = new Chart(ctxRSI, {
+    type: 'bar',
+    data: {
+      labels: rsiLabels,
+      datasets: [{
+        data: rsiBuckets,
+        backgroundColor: rsiColors,
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+        tooltip: { backgroundColor: '#1a0a0e', titleColor: '#D4A847', bodyColor: '#F5DEB3', borderColor: '#D4A847', borderWidth: 1 }
+      },
+      scales: {
+        y: { grid: { color: 'rgba(212,168,71,0.08)' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // 4) Scatter: Momentum vs Volatility
+  destroyChart('chartScatter');
+  const ctxSc = document.getElementById('chartScatter').getContext('2d');
+  chartInstances['chartScatter'] = new Chart(ctxSc, {
+    type: 'scatter',
+    data: {
+      datasets: [{
+        label: 'Stocks',
+        data: metrics.map(m => ({ x: m.vol20, y: m.momScore, ticker: m.ticker })),
+        backgroundColor: metrics.map(m => m.momScore >= 0 ? 'rgba(76,175,80,0.5)' : 'rgba(239,83,80,0.5)'),
+        pointRadius: 4,
+        pointHoverRadius: 7,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1a0a0e', titleColor: '#D4A847', bodyColor: '#F5DEB3', borderColor: '#D4A847', borderWidth: 1,
+          callbacks: {
+            label: ctx => `${ctx.raw.ticker}: Vol=${ctx.raw.x.toFixed(1)}%, Mom=${ctx.raw.y.toFixed(2)}`
+          }
+        }
+      },
+      scales: {
+        x: { title: { display: true, text: 'Volatility (20D Ann.%)', color: '#7A6F62' }, grid: { color: 'rgba(212,168,71,0.08)' } },
+        y: { title: { display: true, text: 'Momentum Score', color: '#7A6F62' }, grid: { color: 'rgba(212,168,71,0.08)' } }
+      }
+    }
+  });
+
+  // 5) Top 20 heatmap-style grouped bar
+  destroyChart('chartHeatBar');
+  const ctxHeat = document.getElementById('chartHeatBar').getContext('2d');
+  const top20 = metrics.slice(0, 20);
+  chartInstances['chartHeatBar'] = new Chart(ctxHeat, {
+    type: 'bar',
+    data: {
+      labels: top20.map(m => m.ticker),
+      datasets: [
+        { label: '1M %', data: top20.map(m => m.ret1m), backgroundColor: 'rgba(239,83,80,0.7)', borderRadius: 3 },
+        { label: '3M %', data: top20.map(m => m.ret3m), backgroundColor: 'rgba(212,168,71,0.7)', borderRadius: 3 },
+        { label: '6M %', data: top20.map(m => m.ret6m), backgroundColor: 'rgba(76,175,80,0.7)', borderRadius: 3 },
+        { label: '1Y %', data: top20.map(m => m.ret1y), backgroundColor: 'rgba(156,39,176,0.6)', borderRadius: 3 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { padding: 16, usePointStyle: true, pointStyle: 'rectRounded' } },
+        tooltip: { backgroundColor: '#1a0a0e', titleColor: '#D4A847', bodyColor: '#F5DEB3', borderColor: '#D4A847', borderWidth: 1 }
+      },
+      scales: {
+        y: { grid: { color: 'rgba(212,168,71,0.08)' }, title: { display: true, text: 'Return %', color: '#7A6F62' } },
+        x: { grid: { display: false }, ticks: { font: { size: 10, family: "'Anuphan'" } } }
+      }
+    }
+  });
+}
+
+// TABLE
+let currentMetrics = [];
+let sortCol = 'momScore';
+let sortDir = 'desc';
+
+function populateTable(metrics) {
+  currentMetrics = [...metrics];
+  renderTable();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  const search = (document.getElementById('searchInput')?.value || '').toUpperCase();
+  const smaFilter = document.getElementById('filterSMA')?.value || 'all';
+  const rsiFilter = document.getElementById('filterRSI')?.value || 'all';
+  const sectorFilter = document.getElementById('filterSector')?.value || 'all';
+
+  let filtered = currentMetrics.filter(m => {
+    if (search && !m.ticker.includes(search)) return false;
+    if (smaFilter === 'above200' && !m.aboveSma200) return false;
+    if (smaFilter === 'below200' && m.aboveSma200) return false;
+    if (smaFilter === 'above50' && !m.aboveSma50) return false;
+    if (smaFilter === 'golden' && !(m.sma50 > m.sma200)) return false;
+    if (rsiFilter === 'ob' && m.rsi <= 70) return false;
+    if (rsiFilter === 'os' && m.rsi >= 30) return false;
+    if (rsiFilter === 'neutral' && (m.rsi < 30 || m.rsi > 70)) return false;
+    if (sectorFilter !== 'all' && m.sector !== sectorFilter) return false;
+    return true;
+  });
+
+  // Sort
+  filtered.sort((a, b) => {
+    let va = a[sortCol], vb = b[sortCol];
+    if (typeof va === 'string') { va = va.toLowerCase(); vb = vb.toLowerCase(); }
+    if (sortDir === 'asc') return va > vb ? 1 : va < vb ? -1 : 0;
+    return va < vb ? 1 : va > vb ? -1 : 0;
+  });
+
+  tbody.innerHTML = filtered.map((m, i) => {
+    const fmtPct = (v) => {
+      const cls = v >= 0 ? 'positive-cell' : 'negative-cell';
+      return `<td class="${cls}">${v >= 0 ? '+' : ''}${v.toFixed(2)}%</td>`;
+    };
+    const momW = Math.min(Math.abs(m.momScore) * 1.2, 80);
+    const momCls = m.momScore >= 0 ? 'pos' : 'neg';
+    return `<tr>
+      <td>${i + 1}</td>
+      <td class="ticker">${m.ticker}</td>
+      <td class="sector-cell">${m.sector}</td>
+      <td>$${m.latest.toFixed(2)}</td>
+      ${fmtPct(m.ret1d)}
+      ${fmtPct(m.ret5d)}
+      ${fmtPct(m.ret1m)}
+      ${fmtPct(m.ret3m)}
+      ${fmtPct(m.ret6m)}
+      ${fmtPct(m.ret1y)}
+      <td class="${m.rsi > 70 ? 'positive-cell' : m.rsi < 30 ? 'negative-cell' : 'neutral-cell'}">${m.rsi.toFixed(1)}</td>
+      <td>${m.vol20.toFixed(1)}%</td>
+      <td class="${m.volRatio >= 1.2 ? 'positive-cell' : m.volRatio <= 0.8 ? 'negative-cell' : 'neutral-cell'}">${m.volRatio.toFixed(2)}x</td>
+      <td class="negative-cell">${m.distFromHigh.toFixed(1)}%</td>
+      <td class="${m.momScore >= 0 ? 'positive-cell' : 'negative-cell'}">
+        ${m.momScore >= 0 ? '+' : ''}${m.momScore.toFixed(2)}
+        <span class="momentum-bar ${momCls}" style="width:${momW}px"></span>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterTable() { renderTable(); }
+
+function setupTableSort(metrics) {
+  document.querySelectorAll('#stockTable thead th').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.dataset.col;
+      if (!col) return;
+      if (sortCol === col) sortDir = sortDir === 'desc' ? 'asc' : 'desc';
+      else { sortCol = col; sortDir = 'desc'; }
+      document.querySelectorAll('#stockTable thead th').forEach(t => t.classList.remove('sorted-asc', 'sorted-desc'));
+      th.classList.add(sortDir === 'asc' ? 'sorted-asc' : 'sorted-desc');
+      renderTable();
+    });
+  });
+}
+
+// INIT
+init();
+</script>
+</body>
+</html>
