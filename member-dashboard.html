@@ -61,7 +61,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 /* Top Bar */
 .topbar{background:transparent;padding:16px 20px 14px;position:absolute;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid;border-image:linear-gradient(90deg,transparent,var(--gold),rgba(232,212,139,0.6),var(--gold),transparent) 1}
 .topbar-left{display:flex;align-items:center;gap:12px}
-.avatar{width:42px;height:42px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:#fff;box-shadow:0 3px 10px rgba(212,175,55,0.3)}
+.avatar{width:42px;height:42px;background:linear-gradient(135deg,#722F37,#8B2252);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:#fff;box-shadow:0 3px 10px rgba(212,175,55,0.3)}
 .greeting{font-size:12px;color:var(--text-light-muted)}.user-name{font-size:16px;font-weight:600;color:var(--text-light)}
 .topbar-right{display:flex;gap:8px}
 .icon-btn{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(212,175,55,0.2);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s;position:relative}
@@ -130,7 +130,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 
 /* Settings */
 .profile-header{display:flex;flex-direction:column;align-items:center;padding:76px 20px 28px;background:linear-gradient(160deg,var(--burgundy-dark),var(--burgundy-mid));border-radius:0 0 28px 28px;margin:0 -20px 20px}
-.profile-avatar{width:72px;height:72px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:24px;font-weight:700;color:#fff;margin-bottom:14px;box-shadow:0 0 30px var(--gold-glow)}
+.profile-avatar{width:72px;height:72px;background:linear-gradient(135deg,#722F37,#8B2252);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:24px;font-weight:700;color:#fff;margin-bottom:14px;box-shadow:0 0 30px var(--gold-glow)}
 .profile-name{font-size:18px;font-weight:600;color:var(--text-light);margin-bottom:4px}.profile-email{font-size:13px;color:var(--text-light-muted);margin-bottom:10px}
 .profile-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;background:rgba(212,175,55,0.1);border:1px solid var(--gold-border);border-radius:20px;font-size:12px;color:var(--gold-light)}
 .profile-badge .jpt-icon svg{width:14px;height:14px;color:var(--gold)}
@@ -181,7 +181,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 </head>
 <body>
 <div class="login-screen" id="loginScreen">
-    <div class="login-logo">JPT</div>
+    <div class="login-logo" style="font-size:18px;letter-spacing:2px">JPT</div>
     <div class="login-title">Member Access</div>
     <div class="login-subtitle">เข้าสู่ระบบด้วยอีเมลสมาชิก</div>
     <div class="install-banner" id="installBannerLogin" onclick="handleInstallClick()">
