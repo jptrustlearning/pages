@@ -398,7 +398,12 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 
 <div class="modal-overlay" id="editModal" onclick="closeModal(event)"><div class="modal-sheet" onclick="event.stopPropagation()"><div class="modal-handle"></div><div class="modal-title" id="modalTitle">แก้ไข</div><div id="modalContent"></div></div></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+// Supabase client init
+var supabaseClient=(function(){
+    try{return window.supabase.createClient('https://rcdukwwcbyryauhqlzmx.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZHVrd3djYnlyeWF1aHFsem14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MTY0MDAsImV4cCI6MjA4NTQ5MjQwMH0.rprPmudJYyb6dyhXb9Z9GrtQWEeIX99A2Wrj55PvS54')}catch(e){console.error('Supabase init failed');return null}
+})();
 let isLoggedIn=false;let userSettings={name:'Joon',email:'joon@example.com',language:'th',darkMode:false,notifications:{momentum:true,weekly:false,price:true},risk:'medium',capital:'100000',broker:''};
 let savedPIN=null;let tempPIN='';
 try{const s=localStorage.getItem('jpt_user');if(s)userSettings=JSON.parse(s);isLoggedIn=localStorage.getItem('jpt_logged_in')==='true';savedPIN=localStorage.getItem('jpt_pin')}catch(e){}
@@ -456,10 +461,23 @@ function showForgotPIN(){
     document.getElementById('loginSubtitle').textContent='ยืนยันตัวตนด้วยอีเมล';
 }
 
-// Send OTP
-function sendOTP(){
+// Send OTP via Supabase
+async function sendOTP(){
     var e=document.getElementById('loginEmail').value.trim();
     if(!e)return;
+    var btn=document.querySelector('#stepEmail .login-btn');
+    if(btn){btn.disabled=true;btn.textContent='กำลังส่ง...';}
+    try{
+        var res=await supabaseClient.auth.signInWithOtp({email:e,options:{shouldCreateUser:false}});
+        if(res.error){
+            var msg='เกิดข้อผิดพลาด กรุณาลองใหม่';
+            if(res.error.message.includes('not allowed')||res.error.message.includes('Signups not allowed')||res.error.message.includes('User not found'))msg='อีเมลนี้ไม่ได้รับอนุญาต กรุณาติดต่อผู้ดูแลระบบ';
+            alert(msg);
+            if(btn){btn.disabled=false;btn.textContent='ส่งรหัสยืนยัน';}
+            return;
+        }
+    }catch(err){alert('เกิดข้อผิดพลาด กรุณาลองใหม่');if(btn){btn.disabled=false;btn.textContent='ส่งรหัสยืนยัน';}return;}
+    if(btn){btn.disabled=false;btn.textContent='ส่งรหัสยืนยัน';}
     userSettings.email=e;
     document.getElementById('otpEmail').textContent=e;
     document.querySelectorAll('.login-step').forEach(s=>s.classList.remove('active'));
@@ -468,10 +486,22 @@ function sendOTP(){
     document.getElementById('loginOTP').focus();
 }
 
-// Verify OTP → go to set PIN
-function verifyOTP(){
+// Verify OTP via Supabase → go to set PIN
+async function verifyOTP(){
     var o=document.getElementById('loginOTP').value.trim();
     if(o.length<6)return;
+    var btn=document.querySelector('#stepOTP .login-btn');
+    if(btn){btn.disabled=true;btn.textContent='กำลังยืนยัน...';}
+    try{
+        var res=await supabaseClient.auth.verifyOtp({email:userSettings.email,token:o,type:'email'});
+        if(res.error){
+            alert('รหัสไม่ถูกต้องหรือหมดอายุ กรุณาลองใหม่');
+            if(btn){btn.disabled=false;btn.textContent='ยืนยันรหัส';}
+            document.getElementById('loginOTP').value='';
+            return;
+        }
+    }catch(err){alert('เกิดข้อผิดพลาด กรุณาลองใหม่');if(btn){btn.disabled=false;btn.textContent='ยืนยันรหัส';}return;}
+    if(btn){btn.disabled=false;btn.textContent='ยืนยันรหัส';}
     // OTP accepted — now set PIN
     document.querySelectorAll('.login-step').forEach(s=>s.classList.remove('active'));
     document.getElementById('stepSetPin').classList.add('active');
