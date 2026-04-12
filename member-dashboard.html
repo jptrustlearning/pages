@@ -98,6 +98,22 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .member-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(212,175,55,0.1);border:1px solid var(--gold-border);border-radius:20px;font-size:12px;color:var(--gold-light);margin-top:14px}
 .member-badge .jpt-icon svg{width:14px;height:14px;color:var(--gold)}
 
+/* Reward Card */
+.reward-card{width:100%;aspect-ratio:1.6/1;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+.reward-card-inner{position:relative;width:100%;height:100%;background:linear-gradient(160deg,#2d1018 0%,#3a1520 30%,#2d1018 60%,#1a0a0e 100%);padding:20px}
+.rc-stripe{position:absolute;background:linear-gradient(135deg,rgba(212,175,55,0.9) 0%,rgba(184,134,11,0.95) 40%,rgba(212,175,55,0.85) 100%)}
+.rc-stripe-1{width:55%;height:42px;bottom:42px;left:-5%;transform:skewY(-12deg);border-radius:0 4px 4px 0}
+.rc-stripe-2{width:45%;height:36px;bottom:18px;left:-5%;transform:skewY(-12deg);opacity:0.5;border-radius:0 4px 4px 0}
+.rc-member-name{position:absolute;left:20px;bottom:100px;font-family:'Anuphan',sans-serif;font-size:16px;font-weight:500;color:var(--text-light);letter-spacing:1px}
+.rc-member-label{position:absolute;left:20px;bottom:52px;font-family:'Cinzel',serif;font-size:13px;font-weight:600;color:#1a0a0e;letter-spacing:1px;z-index:2}
+.rc-brand{position:absolute;right:20px;top:50%;transform:translateY(-50%);text-align:center}
+.rc-owl{width:40px;height:40px;margin:0 auto 6px}
+.rc-brand-name{font-family:'Cinzel',serif;font-size:13px;font-weight:600;color:var(--gold);letter-spacing:2px}
+.rc-brand-sub{font-family:'Cinzel',serif;font-size:9px;font-weight:400;color:var(--gold);letter-spacing:4px;margin-top:1px}
+.rc-expiry{position:absolute;right:20px;bottom:12px;font-size:10px;color:var(--text-light-muted);letter-spacing:0.5px}
+
+@media(max-width:360px){.rc-member-name{font-size:14px;bottom:90px}.rc-member-label{font-size:11px}.rc-brand-name{font-size:11px}.rc-owl{width:32px;height:32px}}
+
 /* Cream Content */
 .home-content{padding:16px 20px 24px;position:relative;z-index:2}
 .quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
@@ -270,10 +286,20 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
         <div class="home-hero">
             <canvas class="hero-canvas" id="heroCanvas"></canvas>
             <div class="balance-card fade-up fade-up-1">
-            <div class="balance-label">Momentum Score</div>
-            <div class="balance-row"><div class="balance-amount">78.5</div><div class="balance-currency">/ 100</div></div>
-            <div class="balance-change up">▲ +3.2 จากสัปดาห์ก่อน</div>
-            <div class="member-badge"><span class="jpt-icon" style="width:14px;height:14px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M4 17l2-12 4 5 2-6 2 6 4-5 2 12H4z"/></svg></span> Gold Member — หมดอายุ 30 พ.ค. 2026</div>
+            <div class="reward-card">
+                <div class="reward-card-inner">
+                    <div class="rc-stripe rc-stripe-1"></div>
+                    <div class="rc-stripe rc-stripe-2"></div>
+                    <div class="rc-member-name" id="cardName">Joonstinn</div>
+                    <div class="rc-member-label">Gold Member</div>
+                    <div class="rc-brand">
+                        <svg class="rc-owl" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="20" r="14" stroke="#D4AF37" stroke-width="1.2"/><circle cx="18" cy="17" r="4" stroke="#D4AF37" stroke-width="1"/><circle cx="30" cy="17" r="4" stroke="#D4AF37" stroke-width="1"/><circle cx="18" cy="17" r="1.5" fill="#D4AF37"/><circle cx="30" cy="17" r="1.5" fill="#D4AF37"/><path d="M22 24c0 1.1.9 2 2 2s2-.9 2-2" stroke="#D4AF37" stroke-width="1" stroke-linecap="round"/><path d="M10 14c-2-4 0-8 4-10" stroke="#D4AF37" stroke-width="1" stroke-linecap="round"/><path d="M38 14c2-4 0-8-4-10" stroke="#D4AF37" stroke-width="1" stroke-linecap="round"/></svg>
+                        <div class="rc-brand-name">JP TRUST</div>
+                        <div class="rc-brand-sub">REWARDS</div>
+                    </div>
+                    <div class="rc-expiry">หมดอายุ 30 พ.ค. 2026</div>
+                </div>
+            </div>
         </div></div>
         <div class="home-content">
             <div class="install-banner-home" id="installBanner" onclick="handleInstallClick()">
@@ -543,7 +569,7 @@ function backToEmail(){
     document.getElementById('loginEmail').focus();
 }
 function showApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('active');applySettings()}
-function applySettings(){const n=userSettings.name||'Member';var el;el=document.getElementById('displayName');if(el)el.textContent=n;el=document.getElementById('settingsName');if(el)el.textContent=n;el=document.getElementById('settingsEmail');if(el)el.textContent=userSettings.email;el=document.getElementById('settingNameVal');if(el)el.textContent=n;const r={low:'ต่ำ (Low)',medium:'ปานกลาง (Medium)',high:'สูง (High)'};el=document.getElementById('settingRisk');if(el)el.textContent=r[userSettings.risk]||'ปานกลาง';el=document.getElementById('settingCapital');if(el)el.textContent='฿'+Number(userSettings.capital||0).toLocaleString();el=document.getElementById('settingBroker');if(el)el.textContent=userSettings.broker||'ยังไม่ระบุ';const i=n.slice(0,2).toUpperCase();document.querySelectorAll('.avatar,.profile-avatar').forEach(el=>el.textContent=i)}
+function applySettings(){const n=userSettings.name||'Member';var el;el=document.getElementById('displayName');if(el)el.textContent=n;el=document.getElementById('settingsName');if(el)el.textContent=n;el=document.getElementById('settingsEmail');if(el)el.textContent=userSettings.email;el=document.getElementById('settingNameVal');if(el)el.textContent=n;const r={low:'ต่ำ (Low)',medium:'ปานกลาง (Medium)',high:'สูง (High)'};el=document.getElementById('settingRisk');if(el)el.textContent=r[userSettings.risk]||'ปานกลาง';el=document.getElementById('settingCapital');if(el)el.textContent='฿'+Number(userSettings.capital||0).toLocaleString();el=document.getElementById('settingBroker');if(el)el.textContent=userSettings.broker||'ยังไม่ระบุ';const i=n.slice(0,2).toUpperCase();document.querySelectorAll('.avatar,.profile-avatar').forEach(el=>el.textContent=i);el=document.getElementById('cardName');if(el)el.textContent=n}
 function doLogout(){isLoggedIn=false;try{localStorage.removeItem('jpt_logged_in')}catch(e){}location.reload()}
 function navigateTo(screen){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const t=document.getElementById('screen-'+screen);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const b=document.querySelector('.nav-item[data-screen="'+screen+'"]');if(b)b.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});t?.querySelectorAll('.fade-up').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''})}
 function openEditModal(field){const m=document.getElementById('editModal'),t=document.getElementById('modalTitle'),c=document.getElementById('modalContent');if(field==='name'){t.textContent='แก้ไขชื่อที่แสดง';c.innerHTML='<input class="modal-input" id="editValue" value="'+userSettings.name+'" placeholder="ชื่อของคุณ"><button class="modal-btn" onclick="userSettings.name=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}else if(field==='risk'){t.textContent='ระดับความเสี่ยง';c.innerHTML='<div style="display:flex;flex-direction:column;gap:8px"><button class="modal-btn" style="background:'+(userSettings.risk==='low'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='low'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'low\';saveSettings();closeModal();">ต่ำ (Low)</button><button class="modal-btn" style="background:'+(userSettings.risk==='medium'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='medium'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'medium\';saveSettings();closeModal();">ปานกลาง (Medium)</button><button class="modal-btn" style="background:'+(userSettings.risk==='high'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='high'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'high\';saveSettings();closeModal();">สูง (High)</button></div>'}else if(field==='capital'){t.textContent='ทุนเริ่มต้น (บาท)';c.innerHTML='<input class="modal-input" id="editValue" type="number" value="'+userSettings.capital+'" placeholder="100000"><button class="modal-btn" onclick="userSettings.capital=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}else if(field==='broker'){t.textContent='โบรกเกอร์ของคุณ';c.innerHTML='<input class="modal-input" id="editValue" value="'+userSettings.broker+'" placeholder="เช่น XM, Exness, IC Markets"><button class="modal-btn" onclick="userSettings.broker=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}m.classList.add('show')}
