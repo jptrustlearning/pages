@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JP Trust Learning — Member Dashboard</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a0a0e">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="JP Trust">
+    <link rel="apple-touch-icon" href="pwa-icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="pwa-icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="384x384" href="pwa-icons/icon-384x384.png">
+    <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@200;300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+    --cream:#FAF6ED;--cream-warm:#F5EFE0;--cream-deep:#EDE4D0;--cream-card:#FFFEF8;
+    --burgundy:#722F37;--burgundy-dark:#1a0a0e;--burgundy-mid:#2d1018;--burgundy-light:#3a1520;
+    --gold:#D4AF37;--gold-dark:#B8860B;--gold-deep:#8B6914;--gold-light:#F4E4BA;
+    --gold-glow:rgba(212,175,55,0.15);--gold-border:rgba(212,175,55,0.2);
+    --text-dark:#3D3228;--text-dark-sub:#5A3D20;--text-dark-muted:#7A6F62;
+    --text-light:#E8E4DC;--text-light-sub:#F4E4BA;--text-light-muted:#A09B92;
+    --green:#2E7D32;--green-light:#4CAF50;--red:#C62828;
+    --radius:16px;--radius-sm:12px;--radius-xs:8px;
+    --safe-bottom:env(safe-area-inset-bottom,0px)
+}
+html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);color:var(--text-dark);overflow-x:hidden;min-height:100vh;min-height:100dvh}
+
+/* JPT Icon system */
+.jpt-icon{display:inline-flex;align-items:center;justify-content:center}
+.jpt-icon svg{width:100%;height:100%}
+
+/* Login */
+.login-screen{position:fixed;inset:0;background:linear-gradient(160deg,var(--burgundy-dark),var(--burgundy-mid) 40%,var(--burgundy-light) 60%,var(--burgundy-mid) 80%,var(--burgundy-dark));z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;transition:opacity .5s,transform .5s}
+.login-screen.hidden{opacity:0;transform:scale(1.05);pointer-events:none}
+.login-screen::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 30%,rgba(114,47,55,0.25),transparent 50%),radial-gradient(ellipse at 70% 60%,rgba(90,30,40,0.2),transparent 50%);pointer-events:none}
+.login-logo{width:80px;height:80px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:20px;font-weight:700;color:#fff;letter-spacing:2px;box-shadow:0 0 40px var(--gold-glow),0 0 80px rgba(212,175,55,0.08);margin-bottom:28px;position:relative;z-index:1}
+.login-title{font-family:'Cinzel',serif;font-size:14px;letter-spacing:5px;color:var(--gold);text-transform:uppercase;margin-bottom:8px;position:relative;z-index:1}
+.login-subtitle{color:var(--text-light-muted);font-size:14px;margin-bottom:24px;position:relative;z-index:1}
+.login-form{width:100%;max-width:380px;display:flex;flex-direction:column;gap:14px;position:relative;z-index:1}
+.login-input{width:100%;padding:16px 20px;background:rgba(26,10,14,0.6);border:1.5px solid var(--gold-border);border-radius:var(--radius-sm);color:var(--gold-light);font-family:'Sarabun','Anuphan',sans-serif;font-size:16px;outline:none;transition:border-color .3s;backdrop-filter:blur(4px)}
+.login-input::placeholder{color:var(--text-light-muted)}.login-input:focus{border-color:var(--gold)}
+.login-otp-input{text-align:center;font-size:28px;letter-spacing:10px;font-weight:600;font-family:'DM Serif Display',serif}
+.login-btn{padding:16px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border:none;border-radius:var(--radius-sm);color:#1a0a0e;font-family:'Sarabun','Anuphan',sans-serif;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 4px 20px rgba(212,175,55,0.3);transition:transform .2s}.login-btn:active{transform:scale(.97)}
+.login-link{color:var(--text-light-muted);font-size:13px;text-align:center;margin-top:8px;cursor:pointer}.login-link span{color:var(--gold)}
+.login-step{display:none}.login-step.active{display:flex;flex-direction:column;gap:14px}
+.otp-sent-msg{background:rgba(76,175,80,0.15);color:var(--green-light);padding:12px 16px;border-radius:var(--radius-xs);font-size:13px;text-align:center}
+.install-banner{display:none;align-items:center;gap:12px;padding:14px 16px;margin-bottom:20px;max-width:380px;width:100%;background:rgba(212,175,55,0.08);border:1px solid var(--gold-border);border-radius:var(--radius);cursor:pointer;transition:all .2s;position:relative;z-index:1}
+.install-banner:active{transform:scale(.98)}.install-banner.show{display:flex}
+.install-banner-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}
+.install-banner-icon .jpt-icon svg{width:22px;height:22px}
+.install-banner-text{flex:1}.install-banner-title{font-size:14px;font-weight:600;color:var(--gold-light)}.install-banner-desc{font-size:12px;color:var(--text-light-muted);margin-top:2px}
+.install-banner-btn{padding:8px 16px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border:none;border-radius:20px;color:#1a0a0e;font-family:'Sarabun','Anuphan',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0}
+
+/* App Shell */
+.app{display:none;flex-direction:column;min-height:100vh;min-height:100dvh;padding-bottom:calc(90px + var(--safe-bottom))}.app.active{display:flex}
+
+/* Top Bar */
+.topbar{background:transparent;padding:16px 20px 14px;position:absolute;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid;border-image:linear-gradient(90deg,transparent,var(--gold),rgba(232,212,139,0.6),var(--gold),transparent) 1}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.avatar{width:42px;height:42px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:#fff;box-shadow:0 3px 10px rgba(212,175,55,0.3)}
+.greeting{font-size:12px;color:var(--text-light-muted)}.user-name{font-size:16px;font-weight:600;color:var(--text-light)}
+.topbar-right{display:flex;gap:8px}
+.icon-btn{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(212,175,55,0.2);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s;position:relative}
+.icon-btn:active{background:rgba(255,255,255,0.15)}.icon-btn svg{width:20px;height:20px;color:var(--text-light-muted)}
+.notif-dot{position:absolute;top:8px;right:8px;width:8px;height:8px;background:var(--gold);border-radius:50%;border:2px solid var(--burgundy-dark)}
+
+/* Screens */
+.screen{display:none;flex:1;overflow-y:auto}.screen.active{display:block}
+.screen-content{padding:0 20px 24px}
+
+/* Home Hero */
+.home-hero{background:linear-gradient(160deg,var(--burgundy-dark),var(--burgundy-mid) 40%,var(--burgundy-light) 60%,var(--burgundy-mid));padding:76px 20px 40px;border-radius:0 0 28px 28px;margin-bottom:-20px;position:relative;overflow:hidden}
+.home-hero::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 70% 30%,rgba(212,175,55,0.06),transparent 60%);border-radius:0 0 28px 28px;pointer-events:none}
+.hero-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.balance-card{position:relative;z-index:1}
+.balance-label{font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:8px}
+.balance-row{display:flex;align-items:baseline;gap:8px;margin-bottom:4px}
+.balance-amount{font-family:'DM Serif Display',serif;font-size:38px;color:var(--text-light);line-height:1}
+.balance-currency{font-size:14px;color:var(--text-light-muted);font-weight:500}
+.balance-change{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:500;padding:4px 10px;border-radius:20px;margin-top:4px}
+.balance-change.up{color:var(--green-light);background:rgba(76,175,80,0.15)}
+.member-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(212,175,55,0.1);border:1px solid var(--gold-border);border-radius:20px;font-size:12px;color:var(--gold-light);margin-top:14px}
+.member-badge .jpt-icon svg{width:14px;height:14px;color:var(--gold)}
+
+/* Cream Content */
+.home-content{padding:28px 20px 24px;position:relative;z-index:2}
+.quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+.quick-action{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 8px;background:var(--cream-card);border:1px solid rgba(212,175,55,0.15);border-radius:var(--radius);cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(114,47,55,0.04)}
+.quick-action:active{transform:scale(.95);box-shadow:0 4px 16px rgba(114,47,55,0.08)}
+.qa-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(139,34,82,0.2)}
+.qa-icon .jpt-icon svg{width:22px;height:22px;color:#fff;stroke:#fff}
+.qa-icon.bg-gold{background:linear-gradient(135deg,#D4AF37,#8B2252);color:#fff}.qa-icon.bg-blue{background:linear-gradient(135deg,#D4AF37,#8B2252);color:#fff}.qa-icon.bg-green{background:linear-gradient(135deg,#D4AF37,#8B2252);color:#fff}.qa-icon.bg-burgundy{background:linear-gradient(135deg,#D4AF37,#8B2252);color:#fff}
+.qa-label{font-size:11px;font-weight:500;color:var(--text-dark-muted);text-align:center;line-height:1.3}
+
+.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.section-title{font-size:16px;font-weight:600;color:var(--text-dark)}.section-link{font-size:13px;color:var(--gold-dark);cursor:pointer;font-weight:500}
+.dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+.dash-card{background:var(--cream-card);border:1px solid rgba(212,175,55,0.15);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all .2s;display:block;box-shadow:0 2px 8px rgba(114,47,55,0.04)}
+.dash-card:active{transform:scale(.97)}
+.dash-card-icon{margin-bottom:10px;color:#fff;width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#D4AF37,#8B2252);display:flex;align-items:center;justify-content:center}.dash-card-icon .jpt-icon svg{width:22px;height:22px;color:#fff;stroke:#fff}
+.dash-card-title{font-size:13px;font-weight:600;color:var(--text-dark-sub);margin-bottom:4px}.dash-card-desc{font-size:11px;color:var(--text-dark-muted);line-height:1.4}
+.dash-card-value{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text-dark);margin-top:8px}
+.dash-card-change{font-size:12px;font-weight:500;margin-top:2px}.dash-card-change.up{color:var(--green)}
+
+.activity-list{display:flex;flex-direction:column;gap:2px;margin-bottom:24px}
+.activity-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--cream-card);border-radius:var(--radius-sm);cursor:pointer;border:1px solid rgba(212,175,55,0.08)}
+.activity-item:active{background:var(--cream-warm)}
+.activity-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.activity-icon .jpt-icon svg{width:20px;height:20px;color:#fff;stroke:#fff}
+.activity-info{flex:1}.activity-name{font-size:14px;font-weight:500;color:var(--text-dark)}.activity-time{font-size:12px;color:var(--text-dark-muted)}
+.activity-value{text-align:right}.activity-score{font-family:'DM Serif Display',serif;font-size:16px}.activity-score.up{color:var(--green)}.activity-score.down{color:var(--red)}.activity-score.neutral{color:var(--text-dark-muted)}.activity-status{font-size:11px;color:var(--text-dark-muted)}
+
+/* Install Banner Home */
+.install-banner-home{display:none;align-items:center;gap:12px;padding:14px 16px;margin-bottom:16px;background:var(--cream-card);border:1px solid var(--gold-border);border-radius:var(--radius);cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(114,47,55,0.04)}
+.install-banner-home:active{transform:scale(.98)}.install-banner-home.show{display:flex}
+.install-banner-home .install-banner-icon{background:linear-gradient(135deg,var(--burgundy),var(--burgundy-dark));color:var(--gold)}
+
+/* Portfolio */
+.portfolio-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+.port-stat{background:var(--cream-card);border:1px solid rgba(212,175,55,0.15);border-radius:var(--radius);padding:16px;text-align:center}
+.port-stat-label{font-size:11px;color:var(--text-dark-muted);margin-bottom:6px;font-weight:500}.port-stat-value{font-family:'DM Serif Display',serif;font-size:24px;color:var(--text-dark)}.port-stat-value.green{color:var(--green)}
+.port-item{display:flex;align-items:center;gap:12px;padding:16px;background:var(--cream-card);border:1px solid rgba(212,175,55,0.15);border-radius:var(--radius);margin-bottom:10px}
+.port-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.port-icon .jpt-icon svg{width:22px;height:22px;color:#fff;stroke:#fff}
+.port-info{flex:1}.port-name{font-size:14px;font-weight:600;color:var(--text-dark-sub)}.port-detail{font-size:12px;color:var(--text-dark-muted)}
+.port-values{text-align:right}.port-amount{font-family:'DM Serif Display',serif;font-size:16px;color:var(--text-dark)}.port-pnl{font-size:12px;font-weight:500}.port-pnl.up{color:var(--green)}
+
+/* Settings */
+.profile-header{display:flex;flex-direction:column;align-items:center;padding:76px 20px 28px;background:linear-gradient(160deg,var(--burgundy-dark),var(--burgundy-mid));border-radius:0 0 28px 28px;margin:0 -20px 20px}
+.profile-avatar{width:72px;height:72px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:24px;font-weight:700;color:#fff;margin-bottom:14px;box-shadow:0 0 30px var(--gold-glow)}
+.profile-name{font-size:18px;font-weight:600;color:var(--text-light);margin-bottom:4px}.profile-email{font-size:13px;color:var(--text-light-muted);margin-bottom:10px}
+.profile-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;background:rgba(212,175,55,0.1);border:1px solid var(--gold-border);border-radius:20px;font-size:12px;color:var(--gold-light)}
+.profile-badge .jpt-icon svg{width:14px;height:14px;color:var(--gold)}
+.settings-group{margin-bottom:24px}.settings-group-title{font-size:12px;font-weight:600;color:var(--text-dark-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;padding-left:4px}
+.settings-list{background:var(--cream-card);border:1px solid rgba(212,175,55,0.12);border-radius:var(--radius);overflow:hidden;box-shadow:0 2px 8px rgba(114,47,55,0.04)}
+.settings-item{display:flex;align-items:center;gap:14px;padding:16px;border-bottom:1px solid rgba(212,175,55,0.08);cursor:pointer;transition:background .2s}
+.settings-item:last-child{border-bottom:none}.settings-item:active{background:var(--cream-warm)}
+.settings-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.settings-icon .jpt-icon svg{width:18px;height:18px;color:#fff;stroke:#fff}
+.settings-info{flex:1}.settings-label{font-size:14px;font-weight:500;color:var(--text-dark)}.settings-desc{font-size:12px;color:var(--text-dark-muted)}
+.settings-arrow{color:var(--text-dark-muted);font-size:18px}
+.toggle{width:48px;height:28px;background:var(--cream-deep);border-radius:14px;position:relative;cursor:pointer;transition:background .3s;flex-shrink:0;border:1px solid rgba(212,175,55,0.15)}.toggle.on{background:var(--gold)}.toggle::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;background:white;border-radius:50%;transition:transform .3s;box-shadow:0 1px 3px rgba(0,0,0,0.15)}.toggle.on::after{transform:translateX(20px)}
+.logout-btn{width:100%;padding:16px;background:transparent;border:1.5px solid rgba(198,40,40,0.3);border-radius:var(--radius-sm);color:var(--red);font-family:'Sarabun','Anuphan',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:background .2s;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px}.logout-btn:active{background:rgba(198,40,40,0.08)}
+.logout-btn .jpt-icon svg{width:18px;height:18px}
+
+/* Iframe */
+.iframe-screen{display:none;flex-direction:column;position:fixed;top:70px;left:0;right:0;bottom:calc(90px + var(--safe-bottom));background:var(--cream);z-index:500}.iframe-screen.active{display:flex}
+.iframe-topbar{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--cream-card);border-bottom:1px solid rgba(212,175,55,0.15);flex-shrink:0}
+.iframe-back{width:36px;height:36px;border-radius:50%;background:var(--cream-warm);border:1px solid rgba(212,175,55,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--text-dark-muted);font-size:18px}.iframe-back:active{background:var(--cream-deep)}
+.iframe-title{flex:1;font-size:15px;font-weight:600;color:var(--text-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iframe-loading{display:flex;align-items:center;justify-content:center;flex:1;color:var(--text-dark-muted);font-size:14px;gap:10px}
+.iframe-loading .spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--gold-border);border-radius:50%;border-top-color:var(--gold);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.iframe-container{flex:1;overflow:hidden}.iframe-container iframe{width:100%;height:100%;border:none}
+
+/* Bottom Nav */
+.bottom-nav{position:fixed;bottom:calc(12px + var(--safe-bottom));left:16px;right:16px;background:linear-gradient(135deg,var(--burgundy-dark),var(--burgundy-mid));border:1px solid rgba(212,175,55,0.15);border-radius:28px;display:flex;justify-content:space-around;padding:10px 8px;z-index:1000;box-shadow:0 8px 32px rgba(26,10,14,0.4),0 0 0 1px rgba(212,175,55,0.08)}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 12px;cursor:pointer;position:relative;border:none;background:none}
+.nav-item svg{width:22px;height:22px;color:var(--text-light-muted);transition:color .2s}
+.nav-label{font-size:10px;font-weight:500;color:var(--text-light-muted);font-family:'Sarabun','Anuphan',sans-serif}
+.nav-item.active svg{color:var(--gold)}.nav-item.active .nav-label{color:var(--gold)}
+.nav-item.active::before{content:'';position:absolute;top:-2px;left:50%;transform:translateX(-50%);width:24px;height:3px;background:var(--gold);border-radius:3px}
+.page-header{padding:8px 20px 16px}.page-title{font-size:22px;font-weight:700;color:var(--text-dark)}.page-subtitle{font-size:13px;color:var(--text-dark-muted);margin-top:2px}
+.placeholder-hero{background:linear-gradient(160deg,var(--burgundy-dark),var(--burgundy-mid));padding:76px 20px 24px;border-radius:0 0 28px 28px;margin-bottom:16px}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);z-index:5000;display:none;align-items:flex-end;justify-content:center}.modal-overlay.show{display:flex}
+.modal-sheet{background:var(--cream-card);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:20px 20px calc(20px + var(--safe-bottom));animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:40px;height:4px;background:var(--cream-deep);border-radius:2px;margin:0 auto 20px}.modal-title{font-size:18px;font-weight:600;margin-bottom:16px;text-align:center;color:var(--text-dark)}
+.modal-input{width:100%;padding:14px 16px;background:var(--cream);border:1.5px solid rgba(212,175,55,0.2);border-radius:var(--radius-xs);color:var(--text-dark);font-family:'Sarabun','Anuphan',sans-serif;font-size:15px;outline:none;margin-bottom:12px}.modal-input:focus{border-color:var(--gold)}
+.modal-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border:none;border-radius:var(--radius-xs);color:#1a0a0e;font-family:'Sarabun','Anuphan',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px}
+.ios-guide{padding:20px;text-align:center}.ios-guide-step{display:flex;align-items:center;gap:12px;padding:12px 0;text-align:left;border-bottom:1px solid rgba(212,175,55,0.1)}.ios-guide-step:last-child{border-bottom:none}
+.ios-guide-num{width:28px;height:28px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#1a0a0e;flex-shrink:0}.ios-guide-text{font-size:14px;color:var(--text-dark-muted)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .5s ease forwards}.fade-up-1{animation-delay:.05s;opacity:0}.fade-up-2{animation-delay:.1s;opacity:0}.fade-up-3{animation-delay:.15s;opacity:0}.fade-up-4{animation-delay:.2s;opacity:0}.fade-up-5{animation-delay:.25s;opacity:0}
+::-webkit-scrollbar{width:0}
+</style>
+</head>
+<body>
+<div class="login-screen" id="loginScreen">
+    <div class="login-logo">JPT</div>
+    <div class="login-title">Member Access</div>
+    <div class="login-subtitle">เข้าสู่ระบบด้วยอีเมลสมาชิก</div>
+    <div class="install-banner" id="installBannerLogin" onclick="handleInstallClick()">
+        <div class="install-banner-icon"><span class="jpt-icon" style="width:22px;height:22px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="8" x2="12" y2="14"/><polyline points="9 12 12 15 15 12"/><line x1="9" y1="18" x2="15" y2="18"/></svg></span></div>
+        <div class="install-banner-text"><div class="install-banner-title">ติดตั้งแอป JP Trust</div><div class="install-banner-desc">เพิ่มไอคอนลงหน้าจอมือถือ</div></div>
+        <button class="install-banner-btn">ติดตั้ง</button>
+    </div>
+    <div class="login-form">
+        <div class="login-step active" id="loginStep1">
+            <input type="email" class="login-input" id="loginEmail" placeholder="กรอกอีเมลสมาชิก" autocomplete="email">
+            <button class="login-btn" onclick="sendOTP()">ส่งรหัสยืนยัน</button>
+            <div class="login-link">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
+        </div>
+        <div class="login-step" id="loginStep2">
+            <div class="otp-sent-msg" id="otpMsg">ส่งรหัสไปยัง <span id="otpEmail"></span> แล้ว</div>
+            <input type="text" class="login-input login-otp-input" id="loginOTP" placeholder="000000" maxlength="6" inputmode="numeric">
+            <button class="login-btn" onclick="verifyOTP()">ยืนยันรหัส</button>
+            <div class="login-link" onclick="backToEmail()">← เปลี่ยนอีเมล</div>
+        </div>
+    </div>
+</div>
+
+<div class="app" id="mainApp">
+    <div class="topbar">
+        <div class="topbar-left"><div class="avatar">JP</div><div><div class="greeting">สวัสดี, ยินดีต้อนรับ</div><div class="user-name" id="displayName">Joon</div></div></div>
+        <div class="topbar-right">
+            <div class="icon-btn" onclick="openNotifications()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="notif-dot"></div></div>
+            <div class="icon-btn" onclick="navigateTo('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.38.18.82.28 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+        </div>
+    </div>
+
+    <div class="screen active" id="screen-home">
+        <div class="home-hero">
+            <canvas class="hero-canvas" id="heroCanvas"></canvas>
+            <div class="balance-card fade-up fade-up-1">
+            <div class="balance-label">Momentum Score</div>
+            <div class="balance-row"><div class="balance-amount">78.5</div><div class="balance-currency">/ 100</div></div>
+            <div class="balance-change up">▲ +3.2 จากสัปดาห์ก่อน</div>
+            <div class="member-badge"><span class="jpt-icon" style="width:14px;height:14px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M4 17l2-12 4 5 2-6 2 6 4-5 2 12H4z"/></svg></span> Gold Member — หมดอายุ 30 พ.ค. 2026</div>
+        </div></div>
+        <div class="home-content">
+            <div class="install-banner-home" id="installBanner" onclick="handleInstallClick()">
+                <div class="install-banner-icon"><span class="jpt-icon" style="width:22px;height:22px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="8" x2="12" y2="14"/><polyline points="9 12 12 15 15 12"/><line x1="9" y1="18" x2="15" y2="18"/></svg></span></div>
+                <div class="install-banner-text"><div class="install-banner-title" style="color:var(--text-dark-sub)">ติดตั้งแอป JP Trust</div><div class="install-banner-desc" style="color:var(--text-dark-muted)">เพิ่มไอคอนลงหน้าจอมือถือ</div></div>
+                <button class="install-banner-btn">ติดตั้ง</button>
+            </div>
+            <div class="quick-actions fade-up fade-up-2">
+                <div class="quick-action" onclick="navigateTo('weekly')"><div class="qa-icon bg-gold"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span></div><div class="qa-label">Weekly<br>Momentum</div></div>
+                <div class="quick-action" onclick="navigateTo('sixmonth')"><div class="qa-icon bg-blue"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg></span></div><div class="qa-label">6M<br>Momentum</div></div>
+                <div class="quick-action" onclick="navigateTo('gold')"><div class="qa-icon bg-gold"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span></div><div class="qa-label">Gold<br>Dashboard</div></div>
+                <div class="quick-action" onclick="navigateTo('bitcoin')"><div class="qa-icon bg-green"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 8h5a3 3 0 0 1 0 6H9V8z"/><path d="M9 14h5.5a3 3 0 0 1 0 6H9v-6z"/><line x1="11" y1="5" x2="11" y2="8"/><line x1="13" y1="5" x2="13" y2="8"/><line x1="11" y1="20" x2="11" y2="23"/><line x1="13" y1="20" x2="13" y2="23"/><line x1="7" y1="8" x2="9" y2="8"/><line x1="7" y1="14" x2="9" y2="14"/><line x1="7" y1="20" x2="9" y2="20"/></svg></span></div><div class="qa-label">Bitcoin<br>Analysis</div></div>
+            </div>
+            <div class="section-header fade-up fade-up-3"><div class="section-title">แดชบอร์ด</div><div class="section-link">ดูทั้งหมด ›</div></div>
+            <div class="dashboard-grid fade-up fade-up-3">
+                <div class="dash-card" onclick="navigateTo('gold')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span></div><div class="dash-card-title">Gold XAU/USD</div><div class="dash-card-value">2,485</div><div class="dash-card-change up">▲ +1.2%</div></div>
+                <div class="dash-card" onclick="navigateTo('bitcoin')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 8h5a3 3 0 0 1 0 6H9V8z"/><path d="M9 14h5.5a3 3 0 0 1 0 6H9v-6z"/><line x1="11" y1="5" x2="11" y2="8"/><line x1="13" y1="5" x2="13" y2="8"/><line x1="11" y1="20" x2="11" y2="23"/><line x1="13" y1="20" x2="13" y2="23"/><line x1="7" y1="8" x2="9" y2="8"/><line x1="7" y1="14" x2="9" y2="14"/><line x1="7" y1="20" x2="9" y2="20"/></svg></span></div><div class="dash-card-title">Bitcoin BTC</div><div class="dash-card-value">107,250</div><div class="dash-card-change up">▲ +2.8%</div></div>
+                <div class="dash-card" onclick="navigateTo('backtest')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="7 14 10 10 13 13 17 9"/><line x1="17" y1="9" x2="17" y2="13"/><line x1="13" y1="9" x2="17" y2="9"/></svg></span></div><div class="dash-card-title">Backtest Lab</div><div class="dash-card-desc">ทดสอบกลยุทธ์การเทรด</div></div>
+                <div class="dash-card" onclick="openIframe('S&P 500 Daily Scanner','https://jptrustlearning.github.io/pages/Free_scannerSP500%20(6).html')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16" y1="16" x2="21" y2="21"/><line x1="8" y1="11" x2="14" y2="11"/><line x1="11" y1="8" x2="11" y2="14"/></svg></span></div><div class="dash-card-title">SP500 Scanner</div><div class="dash-card-desc">สแกนหุ้น S&P 500</div></div>
+                <div class="dash-card" onclick="navigateTo('portfolio')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg></span></div><div class="dash-card-title">Portfolio</div><div class="dash-card-desc">จัดการพอร์ตการลงทุน</div></div>
+            </div>
+            <div class="section-header fade-up fade-up-4"><div class="section-title">กิจกรรมล่าสุด</div><div class="section-link">ดูทั้งหมด ›</div></div>
+            <div class="activity-list fade-up fade-up-5">
+                <div class="activity-item"><div class="activity-icon" style="background:linear-gradient(135deg,#D4AF37,#8B2252);color:#fff"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span></div><div class="activity-info"><div class="activity-name">Weekly Momentum Update</div><div class="activity-time">วันนี้ 08:30</div></div><div class="activity-value"><div class="activity-score up">+3.2</div><div class="activity-status">Bullish</div></div></div>
+                <div class="activity-item"><div class="activity-icon" style="background:linear-gradient(135deg,#D4AF37,#8B2252);color:#fff"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span></div><div class="activity-info"><div class="activity-name">Gold Signal — Buy Zone</div><div class="activity-time">เมื่อวาน 15:45</div></div><div class="activity-value"><div class="activity-score up">2,480</div><div class="activity-status">Active</div></div></div>
+                <div class="activity-item"><div class="activity-icon" style="background:linear-gradient(135deg,#D4AF37,#8B2252);color:#fff"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="7 14 10 10 13 13 17 9"/><line x1="17" y1="9" x2="17" y2="13"/><line x1="13" y1="9" x2="17" y2="9"/></svg></span></div><div class="activity-info"><div class="activity-name">Backtest: EMA Cross</div><div class="activity-time">11 เม.ย. 2026</div></div><div class="activity-value"><div class="activity-score neutral">68%</div><div class="activity-status">Win Rate</div></div></div>
+                <div class="activity-item"><div class="activity-icon" style="background:linear-gradient(135deg,#D4AF37,#8B2252);color:#fff"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 8h5a3 3 0 0 1 0 6H9V8z"/><path d="M9 14h5.5a3 3 0 0 1 0 6H9v-6z"/><line x1="11" y1="5" x2="11" y2="8"/><line x1="13" y1="5" x2="13" y2="8"/><line x1="11" y1="20" x2="11" y2="23"/><line x1="13" y1="20" x2="13" y2="23"/><line x1="7" y1="8" x2="9" y2="8"/><line x1="7" y1="14" x2="9" y2="14"/><line x1="7" y1="20" x2="9" y2="20"/></svg></span></div><div class="activity-info"><div class="activity-name">BTC Alert — Resistance</div><div class="activity-time">10 เม.ย. 2026</div></div><div class="activity-value"><div class="activity-score down">108K</div><div class="activity-status">Watch</div></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="screen" id="screen-portfolio"><div class="page-header"><div class="page-title">Portfolio</div><div class="page-subtitle">จัดการพอร์ตการลงทุนของคุณ</div></div>
+        <div class="screen-content">
+            <div class="portfolio-summary fade-up fade-up-1"><div class="port-stat"><div class="port-stat-label">มูลค่ารวม</div><div class="port-stat-value">฿285K</div></div><div class="port-stat"><div class="port-stat-label">กำไร/ขาดทุน</div><div class="port-stat-value green">+12.4%</div></div></div>
+            <div class="section-header"><div class="section-title">สินทรัพย์</div></div>
+            <div class="port-item fade-up fade-up-2"><div class="port-icon" style="background:linear-gradient(135deg,#D4AF37,#8B2252);color:#fff"><span class="jpt-icon" style="width:22px;height:22px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span></div><div class="port-info"><div class="port-name">Gold XAU/USD</div><div class="port-detail">0.5 lots · Avg: 2,410</div></div><div class="port-values"><div class="port-amount">฿125,000</div><div class="port-pnl up">+3.1% ▲</div></div></div>
+            <div class="port-item fade-up fade-up-3"><div class="port-icon" style="background:linear-gradient(135deg,#D4AF37,#8B2252);color:#fff"><span class="jpt-icon" style="width:22px;height:22px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 8h5a3 3 0 0 1 0 6H9V8z"/><path d="M9 14h5.5a3 3 0 0 1 0 6H9v-6z"/><line x1="11" y1="5" x2="11" y2="8"/><line x1="13" y1="5" x2="13" y2="8"/><line x1="11" y1="20" x2="11" y2="23"/><line x1="13" y1="20" x2="13" y2="23"/><line x1="7" y1="8" x2="9" y2="8"/><line x1="7" y1="14" x2="9" y2="14"/><line x1="7" y1="20" x2="9" y2="20"/></svg></span></div><div class="port-info"><div class="port-name">Bitcoin BTC</div><div class="port-detail">0.02 BTC · Avg: 95,200</div></div><div class="port-values"><div class="port-amount">฿72,000</div><div class="port-pnl up">+12.6% ▲</div></div></div>
+            <div class="port-item fade-up fade-up-4"><div class="port-icon" style="background:linear-gradient(135deg,#D4AF37,#8B2252);color:#fff"><span class="jpt-icon" style="width:22px;height:22px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg></span></div><div class="port-info"><div class="port-name">S&P 500 ETF</div><div class="port-detail">10 units · Avg: 5,820</div></div><div class="port-values"><div class="port-amount">฿88,000</div><div class="port-pnl up">+5.8% ▲</div></div></div>
+        </div>
+    </div>
+
+    <div class="screen" id="screen-settings"><div class="screen-content">
+        <div class="profile-header"><div class="profile-avatar">JP</div><div class="profile-name" id="settingsName">Joon</div><div class="profile-email" id="settingsEmail">joon@example.com</div><div class="profile-badge"><span class="jpt-icon" style="width:14px;height:14px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M4 17l2-12 4 5 2-6 2 6 4-5 2 12H4z"/></svg></span> Gold Member</div></div>
+        <div class="settings-group"><div class="settings-group-title">การตั้งค่าทั่วไป</div><div class="settings-list">
+            <div class="settings-item" onclick="openEditModal('name')"><div class="settings-icon" style="background:linear-gradient(135deg,#D4AF37,#8B2252);color:#fff"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span></div><div class="settings-info"><div class="settings-label">ชื่อที่แสดง</div><div class="settings-desc" id="settingNameVal">Joon</div></div><div class="settings-arrow">›</div></div>
+            <div class="settings-item" onclick="openEditModal('language')"><div class="settings-icon" style="background:linear-gradient(135deg,#D4AF37,#8B2252);color:#fff"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span></div><div class="settings-info"><div class="settings-label">ภาษา</div><div class="settings-desc">ไทย</div></div><div class="settings-arrow">›</div></div>
+            <div class="settings-item"><div class="settings-icon" style="background:linear-gradient(135deg,#D4AF37,#8B2252);color:#fff"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span></div><div class="settings-info"><div class="settings-label">โหมดมืด</div><div class="settings-desc">ปิดอยู่</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+        </div></div>
+        <div class="settings-group"><div class="settings-group-title">การแจ้งเตือน</div><div class="settings-list">
+            <div class="settings-item"><div class="settings-icon" style="background:linear-gradient(135deg,#D4AF37,#8B2252);color:#fff"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span></div><div class="settings-info"><div class="settings-label">Momentum Alerts</div><div class="settings-desc">แจ้งเตือนเมื่อสัญญาณเปลี่ยน</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="settings-item"><div class="settings-icon" style="background:linear-gradient(135deg,#D4AF37,#8B2252);color:#fff"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22 4 12 13 2 4"/></svg></span></div><div class="settings-info"><div class="settings-label">Email สรุปรายสัปดาห์</div><div class="settings-desc">รับรายงานทุกวันจันทร์</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+            <div class="settings-item"><div class="settings-icon" style="background:linear-gradient(135deg,#D4AF37,#8B2252);color:#fff"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span></div><div class="settings-info"><div class="settings-label">Price Alerts</div><div class="settings-desc">แจ้งเมื่อราคาถึงเป้า</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        </div></div>
+        <div class="settings-group"><div class="settings-group-title">การเทรด</div><div class="settings-list">
+            <div class="settings-item" onclick="openEditModal('risk')"><div class="settings-icon" style="background:linear-gradient(135deg,#D4AF37,#8B2252);color:#fff"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span></div><div class="settings-info"><div class="settings-label">ระดับความเสี่ยง</div><div class="settings-desc" id="settingRisk">ปานกลาง (Medium)</div></div><div class="settings-arrow">›</div></div>
+            <div class="settings-item" onclick="openEditModal('capital')"><div class="settings-icon" style="background:linear-gradient(135deg,#D4AF37,#8B2252);color:#fff"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span></div><div class="settings-info"><div class="settings-label">ทุนเริ่มต้น</div><div class="settings-desc" id="settingCapital">฿100,000</div></div><div class="settings-arrow">›</div></div>
+            <div class="settings-item" onclick="openEditModal('broker')"><div class="settings-icon" style="background:linear-gradient(135deg,#D4AF37,#8B2252);color:#fff"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M12 3l9 7H3l9-7z"/><line x1="5" y1="10" x2="5" y2="21"/><line x1="9" y1="10" x2="9" y2="21"/><line x1="15" y1="10" x2="15" y2="21"/><line x1="19" y1="10" x2="19" y2="21"/></svg></span></div><div class="settings-info"><div class="settings-label">โบรกเกอร์</div><div class="settings-desc" id="settingBroker">ยังไม่ระบุ</div></div><div class="settings-arrow">›</div></div>
+        </div></div>
+        <div class="settings-group"><div class="settings-group-title">สมาชิก</div><div class="settings-list">
+            <div class="settings-item"><div class="settings-icon" style="background:linear-gradient(135deg,#D4AF37,#8B2252);color:#fff"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M4 17l2-12 4 5 2-6 2 6 4-5 2 12H4z"/></svg></span></div><div class="settings-info"><div class="settings-label">แผนสมาชิก</div><div class="settings-desc">Gold — หมดอายุ 30 พ.ค. 2026</div></div><div class="settings-arrow">›</div></div>
+            <div class="settings-item"><div class="settings-icon" style="background:linear-gradient(135deg,#D4AF37,#8B2252);color:#fff"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span></div><div class="settings-info"><div class="settings-label">ประวัติการใช้งาน</div><div class="settings-desc">ดู Calibrate history</div></div><div class="settings-arrow">›</div></div>
+        </div></div>
+        <button class="logout-btn" onclick="doLogout()"><span class="jpt-icon" style="width:18px;height:18px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span> ออกจากระบบ</button>
+    </div></div>
+
+    <div class="screen" id="screen-weekly"><div class="placeholder-hero"><div class="balance-card"><div class="balance-label">Weekly Score</div><div class="balance-row"><div class="balance-amount">78.5</div><div class="balance-currency">/ 100</div></div><div class="balance-change up">▲ Bullish — แนวโน้มขาขึ้น</div></div></div><div class="screen-content"><div class="dash-card" style="padding:20px"><div style="font-size:14px;color:var(--text-dark-muted)">หน้านี้จะเชื่อมต่อไปยังแดชบอร์ด Weekly Momentum</div></div></div></div>
+    <div class="screen" id="screen-sixmonth"><div class="placeholder-hero"><div class="balance-card"><div class="balance-label">6-Month Trend</div><div class="balance-row"><div class="balance-amount">72.1</div><div class="balance-currency">/ 100</div></div><div class="balance-change up">▲ Moderate Bullish</div></div></div></div>
+    <div class="screen" id="screen-gold"><div class="placeholder-hero"><div class="balance-card"><div class="balance-label">Gold Price</div><div class="balance-row"><div class="balance-amount">2,485</div><div class="balance-currency">USD</div></div><div class="balance-change up">▲ +1.2%</div></div></div></div>
+    <div class="screen" id="screen-bitcoin"><div class="placeholder-hero"><div class="balance-card"><div class="balance-label">Bitcoin Price</div><div class="balance-row"><div class="balance-amount">107,250</div><div class="balance-currency">USD</div></div><div class="balance-change up">▲ +2.8%</div></div></div></div>
+    <div class="screen" id="screen-backtest"><div class="placeholder-hero"><div class="balance-card"><div class="balance-label">Latest Backtest</div><div class="balance-row"><div class="balance-amount">68%</div><div class="balance-currency">Win Rate</div></div><div class="balance-change up">EMA Cross Strategy</div></div></div></div>
+
+    <div class="screen iframe-screen" id="screen-iframe"><div class="iframe-topbar"><div class="iframe-back" onclick="closeIframe()">←</div><div class="iframe-title" id="iframeTitle">Loading...</div></div><div class="iframe-loading" id="iframeLoading"><div class="spinner"></div><span>กำลังโหลด...</span></div><div class="iframe-container" id="iframeContainer" style="display:none"><iframe id="iframeContent" src="about:blank" allow="fullscreen"></iframe></div></div>
+
+    <nav class="bottom-nav">
+        <button class="nav-item active" data-screen="home" onclick="navigateTo('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span class="nav-label">หน้าแรก</span></button>
+        <button class="nav-item" data-screen="weekly" onclick="navigateTo('weekly')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span class="nav-label">Momentum</span></button>
+        <button class="nav-item" data-screen="gold" onclick="navigateTo('gold')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span class="nav-label">Gold</span></button>
+        <button class="nav-item" data-screen="portfolio" onclick="navigateTo('portfolio')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg><span class="nav-label">Portfolio</span></button>
+        <button class="nav-item" data-screen="settings" onclick="navigateTo('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="nav-label">โปรไฟล์</span></button>
+    </nav>
+</div>
+
+<div class="modal-overlay" id="editModal" onclick="closeModal(event)"><div class="modal-sheet" onclick="event.stopPropagation()"><div class="modal-handle"></div><div class="modal-title" id="modalTitle">แก้ไข</div><div id="modalContent"></div></div></div>
+
+<script>
+let isLoggedIn=false;let userSettings={name:'Joon',email:'joon@example.com',language:'th',darkMode:false,notifications:{momentum:true,weekly:false,price:true},risk:'medium',capital:'100000',broker:''};
+try{const s=localStorage.getItem('jpt_user');if(s)userSettings=JSON.parse(s);isLoggedIn=localStorage.getItem('jpt_logged_in')==='true'}catch(e){}
+function saveSettings(){try{localStorage.setItem('jpt_user',JSON.stringify(userSettings))}catch(e){}applySettings()}
+function applySettings(){const n=userSettings.name||'Member';document.getElementById('displayName').textContent=n;document.getElementById('settingsName').textContent=n;document.getElementById('settingsEmail').textContent=userSettings.email;document.getElementById('settingNameVal').textContent=n;const r={low:'ต่ำ (Low)',medium:'ปานกลาง (Medium)',high:'สูง (High)'};document.getElementById('settingRisk').textContent=r[userSettings.risk]||'ปานกลาง';document.getElementById('settingCapital').textContent='฿'+Number(userSettings.capital||0).toLocaleString();document.getElementById('settingBroker').textContent=userSettings.broker||'ยังไม่ระบุ';const i=n.slice(0,2).toUpperCase();document.querySelectorAll('.avatar,.profile-avatar').forEach(el=>el.textContent=i)}
+function sendOTP(){const e=document.getElementById('loginEmail').value.trim();if(!e)return;userSettings.email=e;document.getElementById('otpEmail').textContent=e;document.getElementById('loginStep1').classList.remove('active');document.getElementById('loginStep2').classList.add('active');document.getElementById('loginOTP').focus()}
+function verifyOTP(){const o=document.getElementById('loginOTP').value.trim();if(o.length<6)return;isLoggedIn=true;try{localStorage.setItem('jpt_logged_in','true')}catch(e){}saveSettings();showApp()}
+function backToEmail(){document.getElementById('loginStep2').classList.remove('active');document.getElementById('loginStep1').classList.add('active');document.getElementById('loginEmail').focus()}
+function showApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('active');applySettings()}
+function doLogout(){isLoggedIn=false;try{localStorage.removeItem('jpt_logged_in')}catch(e){}location.reload()}
+function navigateTo(screen){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const t=document.getElementById('screen-'+screen);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const b=document.querySelector('.nav-item[data-screen="'+screen+'"]');if(b)b.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});t?.querySelectorAll('.fade-up').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''})}
+function openEditModal(field){const m=document.getElementById('editModal'),t=document.getElementById('modalTitle'),c=document.getElementById('modalContent');if(field==='name'){t.textContent='แก้ไขชื่อที่แสดง';c.innerHTML='<input class="modal-input" id="editValue" value="'+userSettings.name+'" placeholder="ชื่อของคุณ"><button class="modal-btn" onclick="userSettings.name=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}else if(field==='risk'){t.textContent='ระดับความเสี่ยง';c.innerHTML='<div style="display:flex;flex-direction:column;gap:8px"><button class="modal-btn" style="background:'+(userSettings.risk==='low'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='low'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'low\';saveSettings();closeModal();">ต่ำ (Low)</button><button class="modal-btn" style="background:'+(userSettings.risk==='medium'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='medium'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'medium\';saveSettings();closeModal();">ปานกลาง (Medium)</button><button class="modal-btn" style="background:'+(userSettings.risk==='high'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='high'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'high\';saveSettings();closeModal();">สูง (High)</button></div>'}else if(field==='capital'){t.textContent='ทุนเริ่มต้น (บาท)';c.innerHTML='<input class="modal-input" id="editValue" type="number" value="'+userSettings.capital+'" placeholder="100000"><button class="modal-btn" onclick="userSettings.capital=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}else if(field==='broker'){t.textContent='โบรกเกอร์ของคุณ';c.innerHTML='<input class="modal-input" id="editValue" value="'+userSettings.broker+'" placeholder="เช่น XM, Exness, IC Markets"><button class="modal-btn" onclick="userSettings.broker=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}m.classList.add('show')}
+function closeModal(e){if(e&&e.target!==e.currentTarget)return;document.getElementById('editModal').classList.remove('show')}
+function openNotifications(){alert('ยังไม่มีการแจ้งเตือนใหม่')}
+let lastScreen='home';
+function openIframe(title,url){const tEl=document.getElementById('iframeTitle'),ld=document.getElementById('iframeLoading'),ct=document.getElementById('iframeContainer'),ifr=document.getElementById('iframeContent');const cur=document.querySelector('.screen.active');if(cur)lastScreen=cur.id.replace('screen-','');tEl.textContent=title;ld.style.display='flex';ct.style.display='none';ifr.src='about:blank';document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-iframe').classList.add('active');setTimeout(()=>{ifr.src=url;ifr.onload=function(){ld.style.display='none';ct.style.display='block'}},100);window.scrollTo({top:0})}
+function closeIframe(){document.getElementById('iframeContent').src='about:blank';navigateTo(lastScreen)}
+if(isLoggedIn)showApp();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+document.getElementById('loginOTP')?.addEventListener('input',function(){this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)});
+let deferredPrompt=null;const ib=document.getElementById('installBanner'),ibl=document.getElementById('installBannerLogin');
+function showIB(){if(ib)ib.classList.add('show');if(ibl)ibl.classList.add('show')}function hideIB(){if(ib)ib.classList.remove('show');if(ibl)ibl.classList.remove('show')}
+function isStandalone(){return window.matchMedia('(display-mode:standalone)').matches||window.navigator.standalone===true}
+function wasDismissed(){try{return localStorage.getItem('jpt_install_dismissed')==='true'}catch(e){return false}}
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;if(!isStandalone()&&!wasDismissed())showIB()});
+setTimeout(()=>{if(!deferredPrompt&&!isStandalone()&&!wasDismissed()&&/iPhone|iPad|iPod|Android/i.test(navigator.userAgent))showIB()},2000);
+function handleInstallClick(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(r=>{if(r.outcome==='accepted')hideIB();deferredPrompt=null})}else{const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent);const m=document.getElementById('editModal'),t=document.getElementById('modalTitle'),c=document.getElementById('modalContent');t.textContent='ติดตั้งแอป JP Trust';const steps=isIOS?[['1','กดปุ่ม <strong style="color:var(--gold-dark)">Share</strong> ↑ ด้านล่างของ Safari'],['2','เลื่อนลงแล้วกด <strong style="color:var(--gold-dark)">"Add to Home Screen"</strong>'],['3','กด <strong style="color:var(--gold-dark)">"Add"</strong> — เสร็จ!']]:[['1','กดเมนู <strong style="color:var(--gold-dark)">⋮</strong> มุมขวาบนของ Chrome'],['2','กด <strong style="color:var(--gold-dark)">"เพิ่มลงในหน้าจอหลัก"</strong>'],['3','กด <strong style="color:var(--gold-dark)">"เพิ่ม"</strong> — เสร็จ!']];c.innerHTML='<div class="ios-guide"><div style="font-size:40px;margin-bottom:12px"><span class="jpt-icon" style="width:40px;height:40px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="8" x2="12" y2="14"/><polyline points="9 12 12 15 15 12"/><line x1="9" y1="18" x2="15" y2="18"/></svg></span></div><div style="font-size:14px;color:var(--text-dark-muted);margin-bottom:20px">ทำตาม 3 ขั้นตอนนี้เพื่อเพิ่มแอปลงหน้าจอ</div>'+steps.map(s=>'<div class="ios-guide-step"><div class="ios-guide-num">'+s[0]+'</div><div class="ios-guide-text">'+s[1]+'</div></div>').join('')+'<button class="modal-btn" style="margin-top:16px" onclick="closeModal()">เข้าใจแล้ว</button></div>';m.classList.add('show')}}
+window.addEventListener('appinstalled',()=>{hideIB();try{localStorage.setItem('jpt_install_dismissed','true')}catch(e){}});
+// ===== HERO CHART LINES =====
+(function(){
+    const canvas=document.getElementById('heroCanvas');
+    if(!canvas)return;
+    const ctx=canvas.getContext('2d');
+    let w,h,lines=[];
+    function resize(){w=canvas.width=canvas.offsetWidth;h=canvas.height=canvas.offsetHeight}
+    class ChartLine{
+        constructor(yBase,speed,amplitude,color,lineWidth){
+            this.yBase=yBase;this.speed=speed;this.amplitude=amplitude;this.color=color;this.lineWidth=lineWidth;
+            this.offset=Math.random()*Math.PI*4;this.freq=0.003+Math.random()*0.004;this.freq2=0.001+Math.random()*0.002;
+        }
+        draw(t){
+            ctx.beginPath();ctx.strokeStyle=this.color;ctx.lineWidth=this.lineWidth;
+            const baseY=h*this.yBase;
+            for(let x=0;x<=w;x+=2){
+                const y=baseY+Math.sin(x*this.freq+t*this.speed+this.offset)*this.amplitude+Math.sin(x*this.freq2+t*this.speed*0.7+this.offset*1.3)*this.amplitude*0.5+Math.sin(x*this.freq*2.5+t*this.speed*1.4)*this.amplitude*0.2;
+                if(x===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+            }
+            ctx.stroke();
+        }
+    }
+    function initLines(){
+        lines=[
+            new ChartLine(0.30,0.0006,28,'rgba(212,175,55,0.06)',1.5),
+            new ChartLine(0.40,0.0008,35,'rgba(212,175,55,0.09)',1.2),
+            new ChartLine(0.50,0.0005,40,'rgba(212,175,55,0.13)',1.8),
+            new ChartLine(0.55,0.0010,22,'rgba(184,134,11,0.07)',1.0),
+            new ChartLine(0.62,0.0007,32,'rgba(212,175,55,0.08)',1.4),
+            new ChartLine(0.72,0.0004,45,'rgba(212,175,55,0.06)',1.0),
+            new ChartLine(0.78,0.0009,18,'rgba(255,245,212,0.04)',0.8),
+            new ChartLine(0.45,0.0003,50,'rgba(114,47,55,0.05)',1.6),
+            new ChartLine(0.35,0.0011,15,'rgba(232,212,139,0.05)',0.7),
+        ];
+    }
+    function animate(t){ctx.clearRect(0,0,w,h);lines.forEach(l=>l.draw(t));requestAnimationFrame(animate)}
+    window.addEventListener('resize',resize);resize();initLines();requestAnimationFrame(animate);
+})();
+</script>
+</body></html>
