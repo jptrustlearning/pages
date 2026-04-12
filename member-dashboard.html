@@ -99,7 +99,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .member-badge .jpt-icon svg{width:14px;height:14px;color:var(--gold)}
 
 /* Reward Card */
-.reward-card{width:100%;overflow:hidden;position:relative}
+.reward-card{width:auto;overflow:hidden;position:relative;border-radius:16px}
 .reward-card img{width:100%;display:block}
 .rc-member-name{position:absolute;left:20px;bottom:38%;font-family:'Anuphan',sans-serif;font-size:16px;font-weight:500;color:var(--text-light);letter-spacing:1px;text-shadow:0 1px 4px rgba(0,0,0,0.4)}
 
@@ -274,8 +274,8 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
     </div>
 
     <div class="screen active" id="screen-home">
-        <div class="reward-card fade-up fade-up-1" style="margin:0 16px;">
-            <img src="member-card-gold.png" alt="Gold Member Card">
+        <div class="reward-card fade-up fade-up-1" style="margin:0 16px;overflow:hidden;border-radius:16px;">
+            <img src="member-card-gold.png" alt="Gold Member Card" style="width:100%;display:block;">
             <div class="rc-member-name" id="cardName">Joonstinn</div>
         </div>
         <div class="home-content">
