@@ -33,6 +33,16 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .jpt-icon{display:inline-flex;align-items:center;justify-content:center}
 .jpt-icon svg{width:100%;height:100%}
 
+/* Splash Screen */
+.splash-screen{position:fixed;inset:0;background:linear-gradient(160deg,var(--burgundy-dark),var(--burgundy-mid) 40%,var(--burgundy-light) 60%,var(--burgundy-mid) 80%,var(--burgundy-dark));z-index:50000;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s ease,transform .6s ease}
+.splash-screen.hidden{opacity:0;transform:scale(1.1);pointer-events:none}
+.splash-screen::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(212,175,55,0.08),transparent 60%);pointer-events:none}
+.splash-logo{width:140px;height:140px;animation:spinIn 1.5s cubic-bezier(.22,1,.36,1) forwards;position:relative;z-index:1}
+.splash-logo img{width:100%;height:100%;object-fit:contain}
+@keyframes spinIn{0%{opacity:0;transform:rotate(0deg) scale(0.5)}40%{opacity:1;transform:rotate(200deg) scale(1.05)}70%{transform:rotate(340deg) scale(0.98)}100%{opacity:1;transform:rotate(360deg) scale(1)}}
+.splash-text{font-family:'Cinzel',serif;font-size:14px;letter-spacing:5px;color:var(--gold);text-transform:uppercase;margin-top:20px;opacity:0;animation:fadeInText .8s ease .8s forwards;position:relative;z-index:1}
+@keyframes fadeInText{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
 /* Login */
 .login-screen{position:fixed;inset:0;background:linear-gradient(160deg,var(--burgundy-dark),var(--burgundy-mid) 40%,var(--burgundy-light) 60%,var(--burgundy-mid) 80%,var(--burgundy-dark));z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;transition:opacity .5s,transform .5s}
 .login-screen.hidden{opacity:0;transform:scale(1.05);pointer-events:none}
@@ -180,6 +190,12 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 </style>
 </head>
 <body>
+<!-- Splash Screen -->
+<div class="splash-screen" id="splashScreen">
+    <div class="splash-logo"><img src="jpt-owl-logo.png" alt="JP Trust"></div>
+    <div class="splash-text">JP Trust Learning</div>
+</div>
+
 <div class="login-screen" id="loginScreen">
     <div class="login-logo" style="font-size:18px;letter-spacing:2px">JPT</div>
     <div class="login-title">Member Access</div>
@@ -322,6 +338,12 @@ function openNotifications(){alert('ยังไม่มีการแจ้�
 let lastScreen='home';
 function openIframe(title,url){const tEl=document.getElementById('iframeTitle'),ld=document.getElementById('iframeLoading'),ct=document.getElementById('iframeContainer'),ifr=document.getElementById('iframeContent');const cur=document.querySelector('.screen.active');if(cur)lastScreen=cur.id.replace('screen-','');tEl.textContent=title;ld.style.display='flex';ct.style.display='none';ifr.src='about:blank';document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-iframe').classList.add('active');setTimeout(()=>{ifr.src=url;ifr.onload=function(){ld.style.display='none';ct.style.display='block'}},100);window.scrollTo({top:0})}
 function closeIframe(){document.getElementById('iframeContent').src='about:blank';navigateTo(lastScreen)}
+// Splash screen — hide after 2.2s (logo spin 1.5s + text fade 0.8s)
+setTimeout(function(){
+    var splash=document.getElementById('splashScreen');
+    if(splash){splash.classList.add('hidden');setTimeout(function(){splash.style.display='none'},600)}
+},2200);
+
 if(isLoggedIn)showApp();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 document.getElementById('loginOTP')?.addEventListener('input',function(){this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)});
