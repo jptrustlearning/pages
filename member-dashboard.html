@@ -913,6 +913,16 @@
         <div class="login-title">Member Access</div>
         <div class="login-subtitle">เข้าสู่ระบบด้วยอีเมลสมาชิก</div>
 
+        <!-- Install Banner on Login -->
+        <div class="install-banner" id="installBannerLogin" onclick="handleInstallClick()" style="max-width:380px;width:100%;margin-bottom:20px;">
+            <div class="install-banner-icon">📲</div>
+            <div class="install-banner-text">
+                <div class="install-banner-title">ติดตั้งแอป JP Trust</div>
+                <div class="install-banner-desc">เพิ่มไอคอนลงหน้าจอมือถือ</div>
+            </div>
+            <button class="install-banner-btn">ติดตั้ง</button>
+        </div>
+
         <div class="login-form">
             <!-- Step 1: Email -->
             <div class="login-step active" id="loginStep1">
@@ -1564,6 +1574,17 @@
         // ===== PWA INSTALL =====
         let deferredPrompt = null;
         const installBanner = document.getElementById('installBanner');
+        const installBannerLogin = document.getElementById('installBannerLogin');
+
+        function showInstallBanners() {
+            if (installBanner) installBanner.classList.add('show');
+            if (installBannerLogin) installBannerLogin.classList.add('show');
+        }
+
+        function hideInstallBanners() {
+            if (installBanner) installBanner.classList.remove('show');
+            if (installBannerLogin) installBannerLogin.classList.remove('show');
+        }
 
         // Detect if already installed as PWA
         function isStandalone() {
@@ -1581,20 +1602,19 @@
             e.preventDefault();
             deferredPrompt = e;
             if (!isStandalone() && !wasDismissed()) {
-                installBanner.classList.add('show');
+                showInstallBanners();
             }
         });
 
         // If no beforeinstallprompt fired (iOS or first load), show banner with guide
         setTimeout(() => {
             if (!deferredPrompt && !isStandalone() && !wasDismissed()) {
-                // Detect mobile
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                 if (isMobile) {
-                    installBanner.classList.add('show');
+                    showInstallBanners();
                 }
             }
-        }, 3000);
+        }, 2000);
 
         function handleInstallClick() {
             if (deferredPrompt) {
@@ -1663,7 +1683,7 @@
 
         // Hide after install success
         window.addEventListener('appinstalled', () => {
-            installBanner.classList.remove('show');
+            hideInstallBanners();
             try { localStorage.setItem('jpt_install_dismissed', 'true'); } catch(e) {}
         });
     </script>
