@@ -172,13 +172,12 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .nav-label{font-size:10px;font-weight:500;color:var(--text-light-muted);font-family:'Sarabun','Anuphan',sans-serif}
 .nav-item.active svg{color:var(--gold)}.nav-item.active .nav-label{color:var(--gold)}
 .nav-item.active::before{content:'';position:absolute;top:-2px;left:50%;transform:translateX(-50%);width:24px;height:3px;background:var(--gold);border-radius:3px}
-/* Center Home button — elevated owl */
-.nav-home{position:relative;margin-top:-18px}
-.nav-home-circle{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-dark));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(212,175,55,0.35);border:2px solid rgba(255,255,255,0.15)}
-.nav-home-circle svg{width:30px;height:30px;color:#fff}
-.nav-home.active .nav-home-circle{box-shadow:0 4px 20px rgba(212,175,55,0.5)}
-.nav-home.active::before{display:none}
-.nav-home .nav-label{margin-top:2px}
+/* Center Home button — same size as others */
+.nav-home{position:relative}
+.nav-home-circle{width:22px;height:22px;display:flex;align-items:center;justify-content:center}
+.nav-home-circle img{width:22px;height:22px;object-fit:contain;opacity:0.6;transition:opacity .2s}
+.nav-home.active .nav-home-circle img{opacity:1}
+.nav-home .nav-label{margin-top:4px}
 .page-header{padding:8px 20px 16px}.page-title{font-size:22px;font-weight:700;color:var(--text-dark)}.page-subtitle{font-size:13px;color:var(--text-dark-muted);margin-top:2px}
 .placeholder-hero{background:linear-gradient(160deg,var(--burgundy-dark),var(--burgundy-mid));padding:20px;border-radius:28px;margin:0 16px 16px;box-shadow:0 8px 32px rgba(26,10,14,0.4),0 0 0 1px rgba(212,175,55,0.08)}
 
