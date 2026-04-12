@@ -897,20 +897,19 @@
 
         /* ===== IFRAME VIEWER ===== */
         .iframe-screen {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: var(--bg-primary);
-            z-index: 9000;
             display: none;
             flex-direction: column;
+            flex: 1;
+            height: calc(100vh - 60px - 72px - var(--safe-bottom));
+            height: calc(100dvh - 60px - 72px - var(--safe-bottom));
         }
-        .iframe-screen.show { display: flex; }
+        .iframe-screen.active { display: flex; }
 
         .iframe-topbar {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 12px 16px;
+            padding: 10px 16px;
             background: var(--bg-card);
             border-bottom: 1px solid var(--border);
             flex-shrink: 0;
@@ -1451,8 +1450,8 @@
             </div>
         </div>
 
-        <!-- ===== IFRAME VIEWER ===== -->
-        <div class="iframe-screen" id="iframeScreen">
+        <!-- ===== IFRAME VIEWER (inline screen) ===== -->
+        <div class="screen iframe-screen" id="screen-iframe">
             <div class="iframe-topbar">
                 <div class="iframe-back" onclick="closeIframe()">←</div>
                 <div class="iframe-title" id="iframeTitle">Loading...</div>
@@ -1651,19 +1650,26 @@
         }
 
         // ===== IFRAME VIEWER =====
+        let lastScreen = 'home';
+
         function openIframe(title, url) {
-            const screen = document.getElementById('iframeScreen');
             const titleEl = document.getElementById('iframeTitle');
             const loading = document.getElementById('iframeLoading');
             const container = document.getElementById('iframeContainer');
             const iframe = document.getElementById('iframeContent');
+
+            // Remember which screen we came from
+            const currentActive = document.querySelector('.screen.active');
+            if (currentActive) lastScreen = currentActive.id.replace('screen-', '');
 
             titleEl.textContent = title;
             loading.style.display = 'flex';
             container.style.display = 'none';
             iframe.src = 'about:blank';
 
-            screen.classList.add('show');
+            // Switch to iframe screen using normal navigation
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen-iframe').classList.add('active');
 
             // Load iframe
             setTimeout(() => {
@@ -1673,13 +1679,14 @@
                     container.style.display = 'block';
                 };
             }, 100);
+
+            window.scrollTo({ top: 0 });
         }
 
         function closeIframe() {
-            const screen = document.getElementById('iframeScreen');
             const iframe = document.getElementById('iframeContent');
-            screen.classList.remove('show');
             iframe.src = 'about:blank';
+            navigateTo(lastScreen);
         }
 
         // ===== INIT =====
