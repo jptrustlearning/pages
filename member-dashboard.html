@@ -73,8 +73,10 @@ html,body{font-family:'Anuphan',sans-serif;background:var(--cream);color:var(--t
 .screen-content{padding:0 20px 24px}
 
 /* Home Hero */
-.home-hero{background:linear-gradient(160deg,var(--burgundy-dark),var(--burgundy-mid) 40%,var(--burgundy-light) 60%,var(--burgundy-mid));padding:24px 20px 40px;border-radius:0 0 28px 28px;margin-bottom:-20px;position:relative}
+.home-hero{background:linear-gradient(160deg,var(--burgundy-dark),var(--burgundy-mid) 40%,var(--burgundy-light) 60%,var(--burgundy-mid));padding:24px 20px 40px;border-radius:0 0 28px 28px;margin-bottom:-20px;position:relative;overflow:hidden}
 .home-hero::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 70% 30%,rgba(212,175,55,0.06),transparent 60%);border-radius:0 0 28px 28px;pointer-events:none}
+.hero-chart{position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:0 0 28px 28px}
+.hero-chart svg{position:absolute;bottom:0;left:0;width:100%;height:100%;opacity:1}
 .balance-card{position:relative;z-index:1}
 .balance-label{font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:8px}
 .balance-row{display:flex;align-items:baseline;gap:8px;margin-bottom:4px}
@@ -213,7 +215,57 @@ html,body{font-family:'Anuphan',sans-serif;background:var(--cream);color:var(--t
     </div>
 
     <div class="screen active" id="screen-home">
-        <div class="home-hero"><div class="balance-card fade-up fade-up-1">
+        <div class="home-hero">
+            <!-- Animated gold chart lines -->
+            <div class="hero-chart">
+                <svg viewBox="0 0 400 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Grid lines -->
+                    <line x1="0" y1="50" x2="400" y2="50" stroke="rgba(212,175,55,0.04)" stroke-width="0.5"/>
+                    <line x1="0" y1="100" x2="400" y2="100" stroke="rgba(212,175,55,0.04)" stroke-width="0.5"/>
+                    <line x1="0" y1="150" x2="400" y2="150" stroke="rgba(212,175,55,0.04)" stroke-width="0.5"/>
+                    <!-- Main chart line — gold -->
+                    <path d="M0,140 C20,138 40,130 60,125 C80,120 100,110 120,95 C140,80 155,85 170,90 C185,95 200,75 220,60 C240,45 255,55 270,65 C290,75 310,50 330,40 C350,30 370,45 400,35" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" opacity="0.6">
+                        <animate attributeName="d" dur="8s" repeatCount="indefinite" values="
+                            M0,140 C20,138 40,130 60,125 C80,120 100,110 120,95 C140,80 155,85 170,90 C185,95 200,75 220,60 C240,45 255,55 270,65 C290,75 310,50 330,40 C350,30 370,45 400,35;
+                            M0,135 C20,130 40,125 60,130 C80,135 100,105 120,90 C140,75 155,80 170,85 C185,90 200,65 220,55 C240,50 255,60 270,70 C290,65 310,45 330,35 C350,40 370,50 400,40;
+                            M0,140 C20,138 40,130 60,125 C80,120 100,110 120,95 C140,80 155,85 170,90 C185,95 200,75 220,60 C240,45 255,55 270,65 C290,75 310,50 330,40 C350,30 370,45 400,35"/>
+                    </path>
+                    <!-- Fill under main line -->
+                    <path d="M0,140 C20,138 40,130 60,125 C80,120 100,110 120,95 C140,80 155,85 170,90 C185,95 200,75 220,60 C240,45 255,55 270,65 C290,75 310,50 330,40 C350,30 370,45 400,35 L400,200 L0,200 Z" fill="url(#goldFill)" opacity="0.15">
+                        <animate attributeName="d" dur="8s" repeatCount="indefinite" values="
+                            M0,140 C20,138 40,130 60,125 C80,120 100,110 120,95 C140,80 155,85 170,90 C185,95 200,75 220,60 C240,45 255,55 270,65 C290,75 310,50 330,40 C350,30 370,45 400,35 L400,200 L0,200 Z;
+                            M0,135 C20,130 40,125 60,130 C80,135 100,105 120,90 C140,75 155,80 170,85 C185,90 200,65 220,55 C240,50 255,60 270,70 C290,65 310,45 330,35 C350,40 370,50 400,40 L400,200 L0,200 Z;
+                            M0,140 C20,138 40,130 60,125 C80,120 100,110 120,95 C140,80 155,85 170,90 C185,95 200,75 220,60 C240,45 255,55 270,65 C290,75 310,50 330,40 C350,30 370,45 400,35 L400,200 L0,200 Z"/>
+                    </path>
+                    <!-- Second line — burgundy accent, lower -->
+                    <path d="M0,170 C30,165 60,155 90,150 C120,145 150,140 180,130 C210,120 230,125 260,120 C290,115 320,100 350,95 C370,90 390,95 400,90" fill="none" stroke="rgba(139,34,82,0.35)" stroke-width="1" opacity="0.5">
+                        <animate attributeName="d" dur="10s" repeatCount="indefinite" values="
+                            M0,170 C30,165 60,155 90,150 C120,145 150,140 180,130 C210,120 230,125 260,120 C290,115 320,100 350,95 C370,90 390,95 400,90;
+                            M0,165 C30,160 60,158 90,155 C120,150 150,135 180,125 C210,115 230,120 260,125 C290,120 320,105 350,100 C370,95 390,100 400,95;
+                            M0,170 C30,165 60,155 90,150 C120,145 150,140 180,130 C210,120 230,125 260,120 C290,115 320,100 350,95 C370,90 390,95 400,90"/>
+                    </path>
+                    <!-- Third line — faint, fast moving -->
+                    <path d="M0,160 C40,155 80,145 120,135 C160,125 200,115 240,105 C280,95 320,85 360,80 C380,78 400,82 400,80" fill="none" stroke="rgba(212,175,55,0.12)" stroke-width="0.8" stroke-dasharray="4 6">
+                        <animate attributeName="d" dur="6s" repeatCount="indefinite" values="
+                            M0,160 C40,155 80,145 120,135 C160,125 200,115 240,105 C280,95 320,85 360,80 C380,78 400,82 400,80;
+                            M0,155 C40,150 80,148 120,140 C160,130 200,110 240,100 C280,90 320,80 360,75 C380,72 400,78 400,75;
+                            M0,160 C40,155 80,145 120,135 C160,125 200,115 240,105 C280,95 320,85 360,80 C380,78 400,82 400,80"/>
+                    </path>
+                    <!-- Gradients -->
+                    <defs>
+                        <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#D4AF37" stop-opacity="0.3"/>
+                            <stop offset="50%" stop-color="#D4AF37" stop-opacity="0.8"/>
+                            <stop offset="100%" stop-color="#F4E4BA" stop-opacity="0.5"/>
+                        </linearGradient>
+                        <linearGradient id="goldFill" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#D4AF37" stop-opacity="0.3"/>
+                            <stop offset="100%" stop-color="#D4AF37" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <div class="balance-card fade-up fade-up-1">
             <div class="balance-label">Momentum Score</div>
             <div class="balance-row"><div class="balance-amount">78.5</div><div class="balance-currency">/ 100</div></div>
             <div class="balance-change up">▲ +3.2 จากสัปดาห์ก่อน</div>
