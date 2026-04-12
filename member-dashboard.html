@@ -54,6 +54,8 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .login-input{width:100%;padding:16px 20px;background:rgba(26,10,14,0.6);border:1.5px solid var(--gold-border);border-radius:var(--radius-sm);color:var(--gold-light);font-family:'Sarabun','Anuphan',sans-serif;font-size:16px;outline:none;transition:border-color .3s;backdrop-filter:blur(4px)}
 .login-input::placeholder{color:var(--text-light-muted)}.login-input:focus{border-color:var(--gold)}
 .login-otp-input{text-align:center;font-size:28px;letter-spacing:10px;font-weight:600;font-family:'DM Serif Display',serif}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--gold-border);background:transparent;transition:background .2s}
+.pin-dot.filled{background:var(--gold);border-color:var(--gold)}
 .login-btn{padding:16px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border:none;border-radius:var(--radius-sm);color:#1a0a0e;font-family:'Sarabun','Anuphan',sans-serif;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 4px 20px rgba(212,175,55,0.3);transition:transform .2s}.login-btn:active{transform:scale(.97)}
 .login-link{color:var(--text-light-muted);font-size:13px;text-align:center;margin-top:8px;cursor:pointer}.login-link span{color:var(--gold)}
 .login-step{display:none}.login-step.active{display:flex;flex-direction:column;gap:14px}
@@ -205,24 +207,52 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 
 <div class="login-screen" id="loginScreen">
     <div class="login-logo" style="font-size:18px;letter-spacing:2px">JPT</div>
-    <div class="login-title">Member Access</div>
-    <div class="login-subtitle">เข้าสู่ระบบด้วยอีเมลสมาชิก</div>
+    <div class="login-title" id="loginTitle">Member Access</div>
+    <div class="login-subtitle" id="loginSubtitle">กรุณาใส่ PIN 6 หลัก</div>
     <div class="install-banner" id="installBannerLogin" onclick="handleInstallClick()">
         <div class="install-banner-icon"><span class="jpt-icon" style="width:22px;height:22px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="8" x2="12" y2="14"/><polyline points="9 12 12 15 15 12"/><line x1="9" y1="18" x2="15" y2="18"/></svg></span></div>
         <div class="install-banner-text"><div class="install-banner-title">ติดตั้งแอป JP Trust</div><div class="install-banner-desc">เพิ่มไอคอนลงหน้าจอมือถือ</div></div>
         <button class="install-banner-btn">ติดตั้ง</button>
     </div>
     <div class="login-form">
-        <div class="login-step active" id="loginStep1">
+        <!-- Step: PIN Entry (มี PIN แล้ว) -->
+        <div class="login-step" id="stepPin">
+            <div style="display:flex;justify-content:center;gap:8px;margin-bottom:20px;" id="pinDots">
+                <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+                <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+            </div>
+            <input type="password" class="login-input login-otp-input" id="pinInput" placeholder="------" maxlength="6" inputmode="numeric" autocomplete="off">
+            <button class="login-btn" onclick="checkPIN()">เข้าสู่ระบบ</button>
+            <div class="login-link" id="pinError" style="color:#EA4335;display:none;">PIN ไม่ถูกต้อง</div>
+            <div class="login-link" onclick="showForgotPIN()">ลืม PIN? <span>ยืนยันด้วย OTP</span></div>
+        </div>
+
+        <!-- Step 1: Email for OTP (ครั้งแรก / ลืม PIN) -->
+        <div class="login-step" id="stepEmail">
             <input type="email" class="login-input" id="loginEmail" placeholder="กรอกอีเมลสมาชิก" autocomplete="email">
             <button class="login-btn" onclick="sendOTP()">ส่งรหัสยืนยัน</button>
             <div class="login-link">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
         </div>
-        <div class="login-step" id="loginStep2">
+
+        <!-- Step 2: OTP Verify -->
+        <div class="login-step" id="stepOTP">
             <div class="otp-sent-msg" id="otpMsg">ส่งรหัสไปยัง <span id="otpEmail"></span> แล้ว</div>
             <input type="text" class="login-input login-otp-input" id="loginOTP" placeholder="000000" maxlength="6" inputmode="numeric">
             <button class="login-btn" onclick="verifyOTP()">ยืนยันรหัส</button>
             <div class="login-link" onclick="backToEmail()">← เปลี่ยนอีเมล</div>
+        </div>
+
+        <!-- Step 3: Set New PIN -->
+        <div class="login-step" id="stepSetPin">
+            <input type="password" class="login-input login-otp-input" id="newPinInput" placeholder="------" maxlength="6" inputmode="numeric" autocomplete="off">
+            <button class="login-btn" onclick="setNewPIN()">ตั้ง PIN</button>
+        </div>
+
+        <!-- Step 4: Confirm PIN -->
+        <div class="login-step" id="stepConfirmPin">
+            <input type="password" class="login-input login-otp-input" id="confirmPinInput" placeholder="------" maxlength="6" inputmode="numeric" autocomplete="off">
+            <button class="login-btn" onclick="confirmPIN()">ยืนยัน PIN</button>
+            <div class="login-link" id="pinMismatch" style="color:#EA4335;display:none;">PIN ไม่ตรงกัน กรุณาลองใหม่</div>
         </div>
     </div>
 </div>
@@ -370,13 +400,120 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 
 <script>
 let isLoggedIn=false;let userSettings={name:'Joon',email:'joon@example.com',language:'th',darkMode:false,notifications:{momentum:true,weekly:false,price:true},risk:'medium',capital:'100000',broker:''};
-try{const s=localStorage.getItem('jpt_user');if(s)userSettings=JSON.parse(s);isLoggedIn=localStorage.getItem('jpt_logged_in')==='true'}catch(e){}
+let savedPIN=null;let tempPIN='';
+try{const s=localStorage.getItem('jpt_user');if(s)userSettings=JSON.parse(s);isLoggedIn=localStorage.getItem('jpt_logged_in')==='true';savedPIN=localStorage.getItem('jpt_pin')}catch(e){}
 function saveSettings(){try{localStorage.setItem('jpt_user',JSON.stringify(userSettings))}catch(e){}applySettings()}
-function applySettings(){const n=userSettings.name||'Member';var el;el=document.getElementById('displayName');if(el)el.textContent=n;el=document.getElementById('settingsName');if(el)el.textContent=n;el=document.getElementById('settingsEmail');if(el)el.textContent=userSettings.email;el=document.getElementById('settingNameVal');if(el)el.textContent=n;const r={low:'ต่ำ (Low)',medium:'ปานกลาง (Medium)',high:'สูง (High)'};el=document.getElementById('settingRisk');if(el)el.textContent=r[userSettings.risk]||'ปานกลาง';el=document.getElementById('settingCapital');if(el)el.textContent='฿'+Number(userSettings.capital||0).toLocaleString();el=document.getElementById('settingBroker');if(el)el.textContent=userSettings.broker||'ยังไม่ระบุ';const i=n.slice(0,2).toUpperCase();document.querySelectorAll('.avatar,.profile-avatar').forEach(el=>el.textContent=i)}
-function sendOTP(){const e=document.getElementById('loginEmail').value.trim();if(!e)return;userSettings.email=e;document.getElementById('otpEmail').textContent=e;document.getElementById('loginStep1').classList.remove('active');document.getElementById('loginStep2').classList.add('active');document.getElementById('loginOTP').focus()}
-function verifyOTP(){const o=document.getElementById('loginOTP').value.trim();if(o.length<6)return;isLoggedIn=true;try{localStorage.setItem('jpt_logged_in','true')}catch(e){}saveSettings();showApp()}
-function backToEmail(){document.getElementById('loginStep2').classList.remove('active');document.getElementById('loginStep1').classList.add('active');document.getElementById('loginEmail').focus()}
+
+// Show correct login step on load
+function initLoginScreen(){
+    document.querySelectorAll('.login-step').forEach(s=>s.classList.remove('active'));
+    if(savedPIN){
+        // Has PIN — show PIN entry
+        document.getElementById('stepPin').classList.add('active');
+        document.getElementById('loginTitle').textContent='ยินดีต้อนรับกลับ';
+        document.getElementById('loginSubtitle').textContent='กรุณาใส่ PIN 6 หลัก';
+        setTimeout(()=>{document.getElementById('pinInput').focus()},300);
+    } else {
+        // No PIN — show email OTP first
+        document.getElementById('stepEmail').classList.add('active');
+        document.getElementById('loginTitle').textContent='Member Access';
+        document.getElementById('loginSubtitle').textContent='เข้าสู่ระบบด้วยอีเมลสมาชิก';
+    }
+}
+
+// PIN dots animation
+function updatePinDots(inputId,dotsId){
+    var input=document.getElementById(inputId);
+    if(!input)return;
+    input.addEventListener('input',function(){
+        this.value=this.value.replace(/[^0-9]/g,'').slice(0,6);
+        var dots=document.querySelectorAll('#'+dotsId+' .pin-dot');
+        dots.forEach(function(d,i){d.classList.toggle('filled',i<input.value.length)});
+    });
+}
+
+// Check PIN
+function checkPIN(){
+    var pin=document.getElementById('pinInput').value.trim();
+    if(pin.length<6)return;
+    if(pin===savedPIN){
+        isLoggedIn=true;
+        try{localStorage.setItem('jpt_logged_in','true')}catch(e){}
+        saveSettings();showApp();
+    } else {
+        document.getElementById('pinError').style.display='block';
+        document.getElementById('pinInput').value='';
+        document.querySelectorAll('#pinDots .pin-dot').forEach(function(d){d.classList.remove('filled')});
+        setTimeout(function(){document.getElementById('pinError').style.display='none'},2000);
+    }
+}
+
+// Forgot PIN — go to OTP flow
+function showForgotPIN(){
+    document.querySelectorAll('.login-step').forEach(s=>s.classList.remove('active'));
+    document.getElementById('stepEmail').classList.add('active');
+    document.getElementById('loginTitle').textContent='ตั้ง PIN ใหม่';
+    document.getElementById('loginSubtitle').textContent='ยืนยันตัวตนด้วยอีเมล';
+}
+
+// Send OTP
+function sendOTP(){
+    var e=document.getElementById('loginEmail').value.trim();
+    if(!e)return;
+    userSettings.email=e;
+    document.getElementById('otpEmail').textContent=e;
+    document.querySelectorAll('.login-step').forEach(s=>s.classList.remove('active'));
+    document.getElementById('stepOTP').classList.add('active');
+    document.getElementById('loginSubtitle').textContent='กรุณาใส่รหัส OTP 6 หลัก';
+    document.getElementById('loginOTP').focus();
+}
+
+// Verify OTP → go to set PIN
+function verifyOTP(){
+    var o=document.getElementById('loginOTP').value.trim();
+    if(o.length<6)return;
+    // OTP accepted — now set PIN
+    document.querySelectorAll('.login-step').forEach(s=>s.classList.remove('active'));
+    document.getElementById('stepSetPin').classList.add('active');
+    document.getElementById('loginTitle').textContent='ตั้ง PIN';
+    document.getElementById('loginSubtitle').textContent='สร้าง PIN 6 หลักสำหรับเข้าแอป';
+    document.getElementById('newPinInput').focus();
+}
+
+// Set new PIN
+function setNewPIN(){
+    var pin=document.getElementById('newPinInput').value.trim();
+    if(pin.length<6)return;
+    tempPIN=pin;
+    document.querySelectorAll('.login-step').forEach(s=>s.classList.remove('active'));
+    document.getElementById('stepConfirmPin').classList.add('active');
+    document.getElementById('loginSubtitle').textContent='ยืนยัน PIN อีกครั้ง';
+    document.getElementById('confirmPinInput').focus();
+}
+
+// Confirm PIN
+function confirmPIN(){
+    var pin=document.getElementById('confirmPinInput').value.trim();
+    if(pin.length<6)return;
+    if(pin===tempPIN){
+        savedPIN=pin;
+        try{localStorage.setItem('jpt_pin',pin);localStorage.setItem('jpt_logged_in','true')}catch(e){}
+        isLoggedIn=true;
+        saveSettings();showApp();
+    } else {
+        document.getElementById('pinMismatch').style.display='block';
+        document.getElementById('confirmPinInput').value='';
+        setTimeout(function(){document.getElementById('pinMismatch').style.display='none'},2000);
+    }
+}
+
+function backToEmail(){
+    document.querySelectorAll('.login-step').forEach(s=>s.classList.remove('active'));
+    document.getElementById('stepEmail').classList.add('active');
+    document.getElementById('loginEmail').focus();
+}
 function showApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('active');applySettings()}
+function applySettings(){const n=userSettings.name||'Member';var el;el=document.getElementById('displayName');if(el)el.textContent=n;el=document.getElementById('settingsName');if(el)el.textContent=n;el=document.getElementById('settingsEmail');if(el)el.textContent=userSettings.email;el=document.getElementById('settingNameVal');if(el)el.textContent=n;const r={low:'ต่ำ (Low)',medium:'ปานกลาง (Medium)',high:'สูง (High)'};el=document.getElementById('settingRisk');if(el)el.textContent=r[userSettings.risk]||'ปานกลาง';el=document.getElementById('settingCapital');if(el)el.textContent='฿'+Number(userSettings.capital||0).toLocaleString();el=document.getElementById('settingBroker');if(el)el.textContent=userSettings.broker||'ยังไม่ระบุ';const i=n.slice(0,2).toUpperCase();document.querySelectorAll('.avatar,.profile-avatar').forEach(el=>el.textContent=i)}
 function doLogout(){isLoggedIn=false;try{localStorage.removeItem('jpt_logged_in')}catch(e){}location.reload()}
 function navigateTo(screen){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const t=document.getElementById('screen-'+screen);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const b=document.querySelector('.nav-item[data-screen="'+screen+'"]');if(b)b.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});t?.querySelectorAll('.fade-up').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''})}
 function openEditModal(field){const m=document.getElementById('editModal'),t=document.getElementById('modalTitle'),c=document.getElementById('modalContent');if(field==='name'){t.textContent='แก้ไขชื่อที่แสดง';c.innerHTML='<input class="modal-input" id="editValue" value="'+userSettings.name+'" placeholder="ชื่อของคุณ"><button class="modal-btn" onclick="userSettings.name=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}else if(field==='risk'){t.textContent='ระดับความเสี่ยง';c.innerHTML='<div style="display:flex;flex-direction:column;gap:8px"><button class="modal-btn" style="background:'+(userSettings.risk==='low'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='low'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'low\';saveSettings();closeModal();">ต่ำ (Low)</button><button class="modal-btn" style="background:'+(userSettings.risk==='medium'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='medium'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'medium\';saveSettings();closeModal();">ปานกลาง (Medium)</button><button class="modal-btn" style="background:'+(userSettings.risk==='high'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='high'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'high\';saveSettings();closeModal();">สูง (High)</button></div>'}else if(field==='capital'){t.textContent='ทุนเริ่มต้น (บาท)';c.innerHTML='<input class="modal-input" id="editValue" type="number" value="'+userSettings.capital+'" placeholder="100000"><button class="modal-btn" onclick="userSettings.capital=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}else if(field==='broker'){t.textContent='โบรกเกอร์ของคุณ';c.innerHTML='<input class="modal-input" id="editValue" value="'+userSettings.broker+'" placeholder="เช่น XM, Exness, IC Markets"><button class="modal-btn" onclick="userSettings.broker=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}m.classList.add('show')}
@@ -392,8 +529,14 @@ setTimeout(function(){
 },2200);
 
 if(isLoggedIn)showApp();
+else initLoginScreen();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
-document.getElementById('loginOTP')?.addEventListener('input',function(){this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)});
+// PIN input filters
+['pinInput','newPinInput','confirmPinInput','loginOTP'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.addEventListener('input',function(){this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)});
+});
+updatePinDots('pinInput','pinDots');
 let deferredPrompt=null;const ib=document.getElementById('installBanner'),ibl=document.getElementById('installBannerLogin');
 function showIB(){if(ib)ib.classList.add('show');if(ibl)ibl.classList.add('show')}function hideIB(){if(ib)ib.classList.remove('show');if(ibl)ibl.classList.remove('show')}
 function isStandalone(){return window.matchMedia('(display-mode:standalone)').matches||window.navigator.standalone===true}
