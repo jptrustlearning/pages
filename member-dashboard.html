@@ -435,7 +435,9 @@ window.addEventListener('appinstalled',()=>{hideIB();try{localStorage.setItem('j
         ];
     }
     function animate(t){ctx.clearRect(0,0,w,h);lines.forEach(l=>l.draw(t));requestAnimationFrame(animate)}
-    window.addEventListener('resize',resize);resize();initLines();requestAnimationFrame(animate);
+    window.addEventListener('resize',resize);
+    function startChart(){resize();if(w===0||h===0){setTimeout(startChart,200);return}initLines();requestAnimationFrame(animate)}
+    setTimeout(startChart,300);
 })();
 </script>
 </body></html>
