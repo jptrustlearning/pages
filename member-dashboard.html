@@ -406,7 +406,7 @@ var supabaseClient=(function(){
 })();
 let isLoggedIn=false;let userSettings={name:'Joon',email:'joon@example.com',language:'th',darkMode:false,notifications:{momentum:true,weekly:false,price:true},risk:'medium',capital:'100000',broker:''};
 let savedPIN=null;let tempPIN='';
-try{const s=localStorage.getItem('jpt_user');if(s)userSettings=JSON.parse(s);isLoggedIn=localStorage.getItem('jpt_logged_in')==='true';savedPIN=localStorage.getItem('jpt_pin')}catch(e){}
+try{const s=localStorage.getItem('jpt_user');if(s)userSettings=JSON.parse(s);savedPIN=localStorage.getItem('jpt_pin')}catch(e){}
 function saveSettings(){try{localStorage.setItem('jpt_user',JSON.stringify(userSettings))}catch(e){}applySettings()}
 
 // Show correct login step on load
