@@ -816,6 +816,85 @@
             margin-top: 4px;
         }
 
+        /* ===== INSTALL BANNER ===== */
+        .install-banner {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.04));
+            border: 1px solid rgba(212,175,55,0.25);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            animation: fadeUp 0.5s ease forwards;
+        }
+        .install-banner:active { transform: scale(0.98); }
+        .install-banner.show { display: flex; }
+
+        .install-banner-icon {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .install-banner-text { flex: 1; }
+        .install-banner-title { font-size: 14px; font-weight: 600; color: var(--gold-light); }
+        .install-banner-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+        .install-banner-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            border: none;
+            border-radius: 20px;
+            color: #0a0e17;
+            font-family: 'Anuphan', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .install-banner-close {
+            position: absolute;
+            top: 8px; right: 8px;
+            background: none; border: none;
+            color: var(--text-muted);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            line-height: 1;
+        }
+
+        /* iOS Install Guide */
+        .ios-guide {
+            padding: 20px;
+            text-align: center;
+        }
+        .ios-guide-step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .ios-guide-step:last-child { border-bottom: none; }
+        .ios-guide-num {
+            width: 28px; height: 28px;
+            background: var(--gold);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 700; color: #0a0e17;
+            flex-shrink: 0;
+        }
+        .ios-guide-text { font-size: 14px; color: var(--text-secondary); }
+
         /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar { width: 0; }
 
@@ -878,6 +957,16 @@
         <!-- ===== HOME SCREEN ===== -->
         <div class="screen active" id="screen-home">
             <div class="screen-content">
+
+                <!-- Install Banner -->
+                <div class="install-banner" id="installBanner" onclick="handleInstallClick()">
+                    <div class="install-banner-icon">📲</div>
+                    <div class="install-banner-text">
+                        <div class="install-banner-title">ติดตั้งแอป JP Trust</div>
+                        <div class="install-banner-desc">เพิ่มไอคอนลงหน้าจอมือถือ</div>
+                    </div>
+                    <button class="install-banner-btn">ติดตั้ง</button>
+                </div>
 
                 <!-- Balance Card -->
                 <div class="balance-card fade-up fade-up-1">
@@ -1471,6 +1560,111 @@
         // OTP input filter
         document.getElementById('loginOTP')?.addEventListener('input', function() {
             this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);
+        });
+        // ===== PWA INSTALL =====
+        let deferredPrompt = null;
+        const installBanner = document.getElementById('installBanner');
+
+        // Detect if already installed as PWA
+        function isStandalone() {
+            return window.matchMedia('(display-mode: standalone)').matches
+                || window.navigator.standalone === true;
+        }
+
+        // Check if install was dismissed
+        function wasDismissed() {
+            try { return localStorage.getItem('jpt_install_dismissed') === 'true'; } catch(e) { return false; }
+        }
+
+        // Chrome/Android: catch beforeinstallprompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (!isStandalone() && !wasDismissed()) {
+                installBanner.classList.add('show');
+            }
+        });
+
+        // If no beforeinstallprompt fired (iOS or first load), show banner with guide
+        setTimeout(() => {
+            if (!deferredPrompt && !isStandalone() && !wasDismissed()) {
+                // Detect mobile
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                if (isMobile) {
+                    installBanner.classList.add('show');
+                }
+            }
+        }, 3000);
+
+        function handleInstallClick() {
+            if (deferredPrompt) {
+                // Chrome/Android — trigger native prompt
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((result) => {
+                    if (result.outcome === 'accepted') {
+                        installBanner.classList.remove('show');
+                    }
+                    deferredPrompt = null;
+                });
+            } else {
+                // iOS or browser without beforeinstallprompt — show guide modal
+                const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+                const modal = document.getElementById('editModal');
+                const title = document.getElementById('modalTitle');
+                const content = document.getElementById('modalContent');
+
+                title.textContent = 'ติดตั้งแอป JP Trust';
+
+                if (isIOS) {
+                    content.innerHTML = `
+                        <div class="ios-guide">
+                            <div style="font-size:40px;margin-bottom:12px;">📲</div>
+                            <div style="font-size:14px;color:var(--text-secondary);margin-bottom:20px;">ทำตาม 3 ขั้นตอนนี้เพื่อเพิ่มแอปลงหน้าจอ</div>
+                            <div class="ios-guide-step">
+                                <div class="ios-guide-num">1</div>
+                                <div class="ios-guide-text">กดปุ่ม <strong style="color:var(--gold);">Share</strong> ↑ ด้านล่างของ Safari</div>
+                            </div>
+                            <div class="ios-guide-step">
+                                <div class="ios-guide-num">2</div>
+                                <div class="ios-guide-text">เลื่อนลงแล้วกด <strong style="color:var(--gold);">"Add to Home Screen"</strong></div>
+                            </div>
+                            <div class="ios-guide-step">
+                                <div class="ios-guide-num">3</div>
+                                <div class="ios-guide-text">กด <strong style="color:var(--gold);">"Add"</strong> — เสร็จ!</div>
+                            </div>
+                            <button class="modal-btn" style="margin-top:16px;" onclick="closeModal()">เข้าใจแล้ว</button>
+                        </div>
+                    `;
+                } else {
+                    content.innerHTML = `
+                        <div class="ios-guide">
+                            <div style="font-size:40px;margin-bottom:12px;">📲</div>
+                            <div style="font-size:14px;color:var(--text-secondary);margin-bottom:20px;">ทำตาม 3 ขั้นตอนนี้เพื่อเพิ่มแอปลงหน้าจอ</div>
+                            <div class="ios-guide-step">
+                                <div class="ios-guide-num">1</div>
+                                <div class="ios-guide-text">กดเมนู <strong style="color:var(--gold);">⋮</strong> มุมขวาบนของ Chrome</div>
+                            </div>
+                            <div class="ios-guide-step">
+                                <div class="ios-guide-num">2</div>
+                                <div class="ios-guide-text">กด <strong style="color:var(--gold);">"เพิ่มลงในหน้าจอหลัก"</strong></div>
+                            </div>
+                            <div class="ios-guide-step">
+                                <div class="ios-guide-num">3</div>
+                                <div class="ios-guide-text">กด <strong style="color:var(--gold);">"เพิ่ม"</strong> — เสร็จ!</div>
+                            </div>
+                            <button class="modal-btn" style="margin-top:16px;" onclick="closeModal()">เข้าใจแล้ว</button>
+                        </div>
+                    `;
+                }
+
+                modal.classList.add('show');
+            }
+        }
+
+        // Hide after install success
+        window.addEventListener('appinstalled', () => {
+            installBanner.classList.remove('show');
+            try { localStorage.setItem('jpt_install_dismissed', 'true'); } catch(e) {}
         });
     </script>
 
