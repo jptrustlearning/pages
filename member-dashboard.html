@@ -895,6 +895,80 @@
         }
         .ios-guide-text { font-size: 14px; color: var(--text-secondary); }
 
+        /* ===== IFRAME VIEWER ===== */
+        .iframe-screen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--bg-primary);
+            z-index: 9000;
+            display: none;
+            flex-direction: column;
+        }
+        .iframe-screen.show { display: flex; }
+
+        .iframe-topbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .iframe-back {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            color: var(--text-secondary);
+            font-size: 18px;
+        }
+        .iframe-back:active { background: var(--bg-card-hover); }
+
+        .iframe-title {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .iframe-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            color: var(--text-muted);
+            font-size: 14px;
+            gap: 10px;
+        }
+        .iframe-loading .sg-spinner {
+            display: inline-block;
+            width: 20px; height: 20px;
+            border: 2px solid rgba(212,175,55,0.2);
+            border-radius: 50%;
+            border-top-color: var(--gold);
+            animation: sg-spin 0.8s linear infinite;
+        }
+        @keyframes sg-spin { to { transform: rotate(360deg); } }
+
+        .iframe-container {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
         /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar { width: 0; }
 
@@ -1032,6 +1106,11 @@
                         <div class="dash-card-icon">🧪</div>
                         <div class="dash-card-title">Backtest Lab</div>
                         <div class="dash-card-desc">ทดสอบกลยุทธ์การเทรด</div>
+                    </div>
+                    <div class="dash-card" onclick="openIframe('S&P 500 Daily Scanner', 'https://jptrustlearning.github.io/pages/Free_scannerSP500%20(6).html')">
+                        <div class="dash-card-icon">🔍</div>
+                        <div class="dash-card-title">SP500 Scanner</div>
+                        <div class="dash-card-desc">สแกนหุ้น S&P 500</div>
                     </div>
                     <div class="dash-card" onclick="navigateTo('portfolio')">
                         <div class="dash-card-icon">💼</div>
@@ -1372,6 +1451,21 @@
             </div>
         </div>
 
+        <!-- ===== IFRAME VIEWER ===== -->
+        <div class="iframe-screen" id="iframeScreen">
+            <div class="iframe-topbar">
+                <div class="iframe-back" onclick="closeIframe()">←</div>
+                <div class="iframe-title" id="iframeTitle">Loading...</div>
+            </div>
+            <div class="iframe-loading" id="iframeLoading">
+                <div class="sg-spinner"></div>
+                <span>กำลังโหลด...</span>
+            </div>
+            <div class="iframe-container" id="iframeContainer" style="display:none;">
+                <iframe id="iframeContent" src="about:blank" allow="fullscreen"></iframe>
+            </div>
+        </div>
+
         <!-- ===== BOTTOM NAV ===== -->
         <nav class="bottom-nav">
             <button class="nav-item active" data-screen="home" onclick="navigateTo('home')">
@@ -1553,8 +1647,39 @@
         }
 
         function openNotifications() {
-            // Placeholder — could expand later
             alert('ยังไม่มีการแจ้งเตือนใหม่');
+        }
+
+        // ===== IFRAME VIEWER =====
+        function openIframe(title, url) {
+            const screen = document.getElementById('iframeScreen');
+            const titleEl = document.getElementById('iframeTitle');
+            const loading = document.getElementById('iframeLoading');
+            const container = document.getElementById('iframeContainer');
+            const iframe = document.getElementById('iframeContent');
+
+            titleEl.textContent = title;
+            loading.style.display = 'flex';
+            container.style.display = 'none';
+            iframe.src = 'about:blank';
+
+            screen.classList.add('show');
+
+            // Load iframe
+            setTimeout(() => {
+                iframe.src = url;
+                iframe.onload = function() {
+                    loading.style.display = 'none';
+                    container.style.display = 'block';
+                };
+            }, 100);
+        }
+
+        function closeIframe() {
+            const screen = document.getElementById('iframeScreen');
+            const iframe = document.getElementById('iframeContent');
+            screen.classList.remove('show');
+            iframe.src = 'about:blank';
         }
 
         // ===== INIT =====
