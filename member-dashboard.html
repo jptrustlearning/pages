@@ -172,11 +172,8 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .nav-label{font-size:10px;font-weight:500;color:var(--text-light-muted);font-family:'Sarabun','Anuphan',sans-serif}
 .nav-item.active svg{color:var(--gold)}.nav-item.active .nav-label{color:var(--gold)}
 .nav-item.active::before{content:'';position:absolute;top:-2px;left:50%;transform:translateX(-50%);width:24px;height:3px;background:var(--gold);border-radius:3px}
-/* Center Home button — same size as others */
+/* Center Home button */
 .nav-home{position:relative}
-.nav-home-circle{width:28px;height:28px;display:flex;align-items:center;justify-content:center}
-.nav-home-circle img{width:28px;height:28px;object-fit:contain;opacity:0.6;transition:opacity .2s}
-.nav-home.active .nav-home-circle img{opacity:1}
 .nav-home .nav-label{margin-top:4px}
 .page-header{padding:8px 20px 16px}.page-title{font-size:22px;font-weight:700;color:var(--text-dark)}.page-subtitle{font-size:13px;color:var(--text-dark-muted);margin-top:2px}
 .placeholder-hero{background:linear-gradient(160deg,var(--burgundy-dark),var(--burgundy-mid));padding:20px;border-radius:28px;margin:0 16px 16px;box-shadow:0 8px 32px rgba(26,10,14,0.4),0 0 0 1px rgba(212,175,55,0.08)}
@@ -319,7 +316,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
     <nav class="bottom-nav">
         <button class="nav-item" data-screen="portfolio" onclick="navigateTo('portfolio')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4h-4z"/></svg><span class="nav-label">Asset</span></button>
         <button class="nav-item" data-screen="weekly" onclick="navigateTo('weekly')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14H10"/><path d="M15 18H10"/><path d="M18 10H10"/></svg><span class="nav-label">News</span></button>
-        <button class="nav-item nav-home active" data-screen="home" onclick="navigateTo('home')"><div class="nav-home-circle"><img src="jpt-owl-logo.png" alt="Home" style="width:32px;height:32px;object-fit:contain;"></div><span class="nav-label">Home</span></button>
+        <button class="nav-item nav-home active" data-screen="home" onclick="navigateTo('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="11" r="2.5"/><circle cx="15" cy="11" r="2.5"/><path d="M7 9.5 L12 5 L17 9.5"/><path d="M6.5 13 Q8 18 12 20 Q16 18 17.5 13"/><path d="M4.5 12 Q4 10 6 8"/><path d="M19.5 12 Q20 10 18 8"/><circle cx="12" cy="15" r="0.8" fill="currentColor"/></svg><span class="nav-label">Home</span></button>
         <button class="nav-item" data-screen="backtest" onclick="navigateTo('backtest')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="7 14 10 10 13 13 17 9"/><circle cx="17" cy="9" r="1.5" fill="currentColor" opacity="0.6"/></svg><span class="nav-label">Backtest</span></button>
         <button class="nav-item" data-screen="settings" onclick="navigateTo('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="nav-label">Profile</span></button>
     </nav>
