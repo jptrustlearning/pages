@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JP Trust Learning — Member Dashboard</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#D4AF37">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="JP Trust">
+    <link rel="apple-touch-icon" href="pwa-icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="pwa-icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="384x384" href="pwa-icons/icon-384x384.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@200;300;400;500;600;700&family=Cinzel:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-card: #111827;
+            --bg-card-hover: #1a2235;
+            --bg-elevated: #1e293b;
+            --gold: #D4AF37;
+            --gold-dark: #B8860B;
+            --gold-light: #F4E4BA;
+            --gold-glow: rgba(212, 175, 55, 0.15);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --green: #22c55e;
+            --green-bg: rgba(34, 197, 94, 0.12);
+            --red: #ef4444;
+            --red-bg: rgba(239, 68, 68, 0.12);
+            --blue: #3b82f6;
+            --blue-bg: rgba(59, 130, 246, 0.12);
+            --border: rgba(255,255,255,0.06);
+            --radius: 16px;
+            --radius-sm: 12px;
+            --radius-xs: 8px;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        html, body {
+            font-family: 'Anuphan', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        /* ===== LOGIN SCREEN ===== */
+        .login-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-primary);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            transition: opacity 0.5s, transform 0.5s;
+        }
+        .login-screen.hidden {
+            opacity: 0;
+            transform: scale(1.05);
+            pointer-events: none;
+        }
+
+        .login-logo {
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Cinzel', serif;
+            font-size: 22px; font-weight: 700; color: #fff;
+            box-shadow: 0 0 40px var(--gold-glow), 0 0 80px rgba(212,175,55,0.08);
+            margin-bottom: 28px;
+        }
+
+        .login-title {
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            letter-spacing: 5px;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .login-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 36px;
+        }
+
+        .login-form {
+            width: 100%;
+            max-width: 380px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: 'Anuphan', sans-serif;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .login-input::placeholder { color: var(--text-muted); }
+        .login-input:focus { border-color: var(--gold); }
+
+        .login-otp-input {
+            text-align: center;
+            font-size: 28px;
+            letter-spacing: 10px;
+            font-weight: 600;
+            font-family: 'DM Serif Display', serif;
+        }
+
+        .login-btn {
+            padding: 16px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            border: none;
+            border-radius: var(--radius-sm);
+            color: #0a0e17;
+            font-family: 'Anuphan', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.3s;
+            box-shadow: 0 4px 20px rgba(212,175,55,0.3);
+        }
+        .login-btn:active { transform: scale(0.97); }
+
+        .login-link {
+            color: var(--text-muted);
+            font-size: 13px;
+            text-align: center;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+        .login-link span { color: var(--gold); }
+
+        .login-step { display: none; }
+        .login-step.active { display: flex; flex-direction: column; gap: 14px; }
+
+        .otp-sent-msg {
+            background: var(--green-bg);
+            color: var(--green);
+            padding: 12px 16px;
+            border-radius: var(--radius-xs);
+            font-size: 13px;
+            text-align: center;
+        }
+
+        /* ===== APP SHELL ===== */
+        .app {
+            display: none;
+            flex-direction: column;
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding-bottom: calc(72px + var(--safe-bottom));
+        }
+        .app.active { display: flex; }
+
+        /* ===== TOP BAR ===== */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-primary);
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Cinzel', serif;
+            font-size: 14px; font-weight: 700; color: #fff;
+        }
+
+        .greeting { font-size: 12px; color: var(--text-muted); font-weight: 400; }
+        .user-name { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+
+        .topbar-right {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+            position: relative;
+        }
+        .icon-btn:active { background: var(--bg-elevated); }
+        .icon-btn svg { width: 20px; height: 20px; color: var(--text-secondary); }
+
+        .notif-dot {
+            position: absolute;
+            top: 8px; right: 8px;
+            width: 8px; height: 8px;
+            background: var(--gold);
+            border-radius: 50%;
+            border: 2px solid var(--bg-primary);
+        }
+
+        /* ===== SCREENS ===== */
+        .screen { display: none; flex: 1; overflow-y: auto; }
+        .screen.active { display: block; }
+
+        .screen-content {
+            padding: 0 20px 24px;
+        }
+
+        /* ===== HOME SCREEN ===== */
+        /* Balance Card */
+        .balance-card {
+            background: linear-gradient(145deg, #1a2740, #111827 60%, #0f1520);
+            border: 1px solid rgba(212,175,55,0.12);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -30%; right: -20%;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .balance-label {
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            letter-spacing: 3px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .balance-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .balance-amount {
+            font-family: 'DM Serif Display', serif;
+            font-size: 38px;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .balance-currency {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .balance-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-top: 4px;
+        }
+        .balance-change.up { color: var(--green); background: var(--green-bg); }
+        .balance-change.down { color: var(--red); background: var(--red-bg); }
+
+        .member-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05));
+            border: 1px solid rgba(212,175,55,0.2);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--gold-light);
+            margin-top: 14px;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .quick-action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .quick-action:active { transform: scale(0.95); background: var(--bg-card-hover); }
+
+        .qa-icon {
+            width: 44px; height: 44px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+        }
+        .qa-icon.gold { background: var(--gold-glow); }
+        .qa-icon.blue { background: var(--blue-bg); }
+        .qa-icon.green { background: var(--green-bg); }
+        .qa-icon.red { background: var(--red-bg); }
+
+        .qa-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        /* Section */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .section-link {
+            font-size: 13px;
+            color: var(--gold);
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .dash-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: block;
+        }
+        .dash-card:active { transform: scale(0.97); background: var(--bg-card-hover); }
+
+        .dash-card-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .dash-card-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .dash-card-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .dash-card-value {
+            font-family: 'DM Serif Display', serif;
+            font-size: 22px;
+            color: var(--text-primary);
+            margin-top: 8px;
+        }
+
+        .dash-card-change {
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+        .dash-card-change.up { color: var(--green); }
+        .dash-card-change.down { color: var(--red); }
+
+        /* Recent Activity */
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin-bottom: 24px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: var(--bg-card);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .activity-item:first-child { border-radius: var(--radius-sm) var(--radius-sm) 4px 4px; }
+        .activity-item:last-child { border-radius: 4px 4px var(--radius-sm) var(--radius-sm); }
+        .activity-item:active { background: var(--bg-card-hover); }
+
+        .activity-icon {
+            width: 40px; height: 40px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .activity-info { flex: 1; min-width: 0; }
+        .activity-name { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+        .activity-time { font-size: 12px; color: var(--text-muted); }
+
+        .activity-value { text-align: right; }
+        .activity-score {
+            font-family: 'DM Serif Display', serif;
+            font-size: 16px;
+        }
+        .activity-score.up { color: var(--green); }
+        .activity-score.down { color: var(--red); }
+        .activity-score.neutral { color: var(--text-secondary); }
+        .activity-status { font-size: 11px; color: var(--text-muted); }
+
+        /* ===== PORTFOLIO SCREEN ===== */
+        .portfolio-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .port-stat {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            text-align: center;
+        }
+
+        .port-stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .port-stat-value {
+            font-family: 'DM Serif Display', serif;
+            font-size: 24px;
+            color: var(--text-primary);
+        }
+        .port-stat-value.green { color: var(--green); }
+
+        .port-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 10px;
+        }
+
+        .port-icon {
+            width: 44px; height: 44px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .port-info { flex: 1; }
+        .port-name { font-size: 14px; font-weight: 600; }
+        .port-detail { font-size: 12px; color: var(--text-muted); }
+
+        .port-values { text-align: right; }
+        .port-amount { font-family: 'DM Serif Display', serif; font-size: 16px; }
+        .port-pnl { font-size: 12px; font-weight: 500; }
+        .port-pnl.up { color: var(--green); }
+        .port-pnl.down { color: var(--red); }
+
+        /* ===== SETTINGS SCREEN ===== */
+        .settings-group {
+            margin-bottom: 24px;
+        }
+
+        .settings-group-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            padding-left: 4px;
+        }
+
+        .settings-list {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .settings-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .settings-item:last-child { border-bottom: none; }
+        .settings-item:active { background: var(--bg-card-hover); }
+
+        .settings-icon {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .settings-info { flex: 1; }
+        .settings-label { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+        .settings-desc { font-size: 12px; color: var(--text-muted); }
+
+        .settings-arrow { color: var(--text-muted); font-size: 18px; }
+
+        /* Toggle */
+        .toggle {
+            width: 48px; height: 28px;
+            background: var(--bg-elevated);
+            border-radius: 14px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+            flex-shrink: 0;
+        }
+        .toggle.on { background: var(--gold); }
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 3px; left: 3px;
+            width: 22px; height: 22px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+        .toggle.on::after { transform: translateX(20px); }
+
+        /* Profile Header */
+        .profile-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 0 28px;
+        }
+
+        .profile-avatar {
+            width: 72px; height: 72px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Cinzel', serif;
+            font-size: 24px; font-weight: 700; color: #fff;
+            margin-bottom: 14px;
+            box-shadow: 0 0 30px var(--gold-glow);
+        }
+
+        .profile-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .profile-email { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+
+        .profile-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05));
+            border: 1px solid rgba(212,175,55,0.25);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--gold-light);
+            font-weight: 500;
+        }
+
+        /* Logout */
+        .logout-btn {
+            width: 100%;
+            padding: 16px;
+            background: transparent;
+            border: 1.5px solid rgba(239,68,68,0.3);
+            border-radius: var(--radius-sm);
+            color: var(--red);
+            font-family: 'Anuphan', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 8px;
+        }
+        .logout-btn:active { background: var(--red-bg); }
+
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0; right: 0;
+            background: linear-gradient(180deg, rgba(10,14,23,0.95), rgba(10,14,23,0.99));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 calc(8px + var(--safe-bottom));
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+            position: relative;
+            border: none;
+            background: none;
+        }
+
+        .nav-item svg {
+            width: 22px; height: 22px;
+            color: var(--text-muted);
+            transition: color 0.2s;
+        }
+
+        .nav-label {
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: color 0.2s;
+            font-family: 'Anuphan', sans-serif;
+        }
+
+        .nav-item.active svg { color: var(--gold); }
+        .nav-item.active .nav-label { color: var(--gold); }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 3px;
+            background: var(--gold);
+            border-radius: 0 0 3px 3px;
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            padding: 8px 20px 16px;
+        }
+
+        .page-title {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .page-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-up {
+            animation: fadeUp 0.5s ease forwards;
+        }
+
+        .fade-up-1 { animation-delay: 0.05s; opacity: 0; }
+        .fade-up-2 { animation-delay: 0.1s; opacity: 0; }
+        .fade-up-3 { animation-delay: 0.15s; opacity: 0; }
+        .fade-up-4 { animation-delay: 0.2s; opacity: 0; }
+        .fade-up-5 { animation-delay: 0.25s; opacity: 0; }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            z-index: 5000;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        .modal-overlay.show { display: flex; }
+
+        .modal-sheet {
+            background: var(--bg-card);
+            border-radius: 20px 20px 0 0;
+            width: 100%;
+            max-width: 480px;
+            padding: 20px 20px calc(20px + var(--safe-bottom));
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-handle {
+            width: 40px; height: 4px;
+            background: var(--text-muted);
+            border-radius: 2px;
+            margin: 0 auto 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-primary);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-xs);
+            color: var(--text-primary);
+            font-family: 'Anuphan', sans-serif;
+            font-size: 15px;
+            outline: none;
+            margin-bottom: 12px;
+        }
+        .modal-input:focus { border-color: var(--gold); }
+
+        .modal-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            border: none;
+            border-radius: var(--radius-xs);
+            color: #0a0e17;
+            font-family: 'Anuphan', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 4px;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 0; }
+
+        /* ===== UTILITY ===== */
+        .text-gold { color: var(--gold); }
+        .text-green { color: var(--green); }
+        .text-red { color: var(--red); }
+        .mb-24 { margin-bottom: 24px; }
+    </style>
+</head>
+<body>
+
+    <!-- ===== LOGIN SCREEN ===== -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-logo">JP</div>
+        <div class="login-title">Member Access</div>
+        <div class="login-subtitle">เข้าสู่ระบบด้วยอีเมลสมาชิก</div>
+
+        <div class="login-form">
+            <!-- Step 1: Email -->
+            <div class="login-step active" id="loginStep1">
+                <input type="email" class="login-input" id="loginEmail" placeholder="กรอกอีเมลสมาชิก" autocomplete="email">
+                <button class="login-btn" onclick="sendOTP()">📧 ส่งรหัสยืนยัน</button>
+                <div class="login-link">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
+            </div>
+
+            <!-- Step 2: OTP -->
+            <div class="login-step" id="loginStep2">
+                <div class="otp-sent-msg" id="otpMsg">✅ ส่งรหัสไปยัง <span id="otpEmail"></span> แล้ว</div>
+                <input type="text" class="login-input login-otp-input" id="loginOTP" placeholder="000000" maxlength="6" inputmode="numeric">
+                <button class="login-btn" onclick="verifyOTP()">✅ ยืนยันรหัส</button>
+                <div class="login-link" onclick="backToEmail()">← เปลี่ยนอีเมล</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MAIN APP ===== -->
+    <div class="app" id="mainApp">
+
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <div class="avatar">JP</div>
+                <div>
+                    <div class="greeting">สวัสดี, ยินดีต้อนรับ</div>
+                    <div class="user-name" id="displayName">Joon</div>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="icon-btn" onclick="openNotifications()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                    <div class="notif-dot"></div>
+                </div>
+                <div class="icon-btn" onclick="navigateTo('settings')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== HOME SCREEN ===== -->
+        <div class="screen active" id="screen-home">
+            <div class="screen-content">
+
+                <!-- Balance Card -->
+                <div class="balance-card fade-up fade-up-1">
+                    <div class="balance-label">Momentum Score</div>
+                    <div class="balance-row">
+                        <div class="balance-amount">78.5</div>
+                        <div class="balance-currency">/ 100</div>
+                    </div>
+                    <div class="balance-change up">▲ +3.2 จากสัปดาห์ก่อน</div>
+                    <div class="member-badge">👑 Gold Member — หมดอายุ 30 พ.ค. 2026</div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions fade-up fade-up-2">
+                    <div class="quick-action" onclick="navigateTo('weekly')">
+                        <div class="qa-icon gold">📊</div>
+                        <div class="qa-label">Weekly<br>Momentum</div>
+                    </div>
+                    <div class="quick-action" onclick="navigateTo('sixmonth')">
+                        <div class="qa-icon blue">📈</div>
+                        <div class="qa-label">6M<br>Momentum</div>
+                    </div>
+                    <div class="quick-action" onclick="navigateTo('gold')">
+                        <div class="qa-icon gold">🥇</div>
+                        <div class="qa-label">Gold<br>Dashboard</div>
+                    </div>
+                    <div class="quick-action" onclick="navigateTo('bitcoin')">
+                        <div class="qa-icon green">₿</div>
+                        <div class="qa-label">Bitcoin<br>Analysis</div>
+                    </div>
+                </div>
+
+                <!-- Dashboards Grid -->
+                <div class="section-header fade-up fade-up-3">
+                    <div class="section-title">แดชบอร์ด</div>
+                    <div class="section-link">ดูทั้งหมด ›</div>
+                </div>
+
+                <div class="dashboard-grid fade-up fade-up-3">
+                    <div class="dash-card" onclick="navigateTo('gold')">
+                        <div class="dash-card-icon">🥇</div>
+                        <div class="dash-card-title">Gold XAU/USD</div>
+                        <div class="dash-card-value">2,485</div>
+                        <div class="dash-card-change up">▲ +1.2%</div>
+                    </div>
+                    <div class="dash-card" onclick="navigateTo('bitcoin')">
+                        <div class="dash-card-icon">₿</div>
+                        <div class="dash-card-title">Bitcoin BTC</div>
+                        <div class="dash-card-value">107,250</div>
+                        <div class="dash-card-change up">▲ +2.8%</div>
+                    </div>
+                    <div class="dash-card" onclick="navigateTo('backtest')">
+                        <div class="dash-card-icon">🧪</div>
+                        <div class="dash-card-title">Backtest Lab</div>
+                        <div class="dash-card-desc">ทดสอบกลยุทธ์การเทรด</div>
+                    </div>
+                    <div class="dash-card" onclick="navigateTo('portfolio')">
+                        <div class="dash-card-icon">💼</div>
+                        <div class="dash-card-title">Portfolio</div>
+                        <div class="dash-card-desc">จัดการพอร์ตการลงทุน</div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="section-header fade-up fade-up-4">
+                    <div class="section-title">กิจกรรมล่าสุด</div>
+                    <div class="section-link">ดูทั้งหมด ›</div>
+                </div>
+
+                <div class="activity-list fade-up fade-up-5">
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background:var(--gold-glow);">📊</div>
+                        <div class="activity-info">
+                            <div class="activity-name">Weekly Momentum Update</div>
+                            <div class="activity-time">วันนี้ 08:30</div>
+                        </div>
+                        <div class="activity-value">
+                            <div class="activity-score up">+3.2</div>
+                            <div class="activity-status">Bullish</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background:var(--green-bg);">🥇</div>
+                        <div class="activity-info">
+                            <div class="activity-name">Gold Signal — Buy Zone</div>
+                            <div class="activity-time">เมื่อวาน 15:45</div>
+                        </div>
+                        <div class="activity-value">
+                            <div class="activity-score up">2,480</div>
+                            <div class="activity-status">Active</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background:var(--blue-bg);">🧪</div>
+                        <div class="activity-info">
+                            <div class="activity-name">Backtest: EMA Cross</div>
+                            <div class="activity-time">11 เม.ย. 2026</div>
+                        </div>
+                        <div class="activity-value">
+                            <div class="activity-score neutral">68%</div>
+                            <div class="activity-status">Win Rate</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background:var(--red-bg);">₿</div>
+                        <div class="activity-info">
+                            <div class="activity-name">BTC Alert — Resistance</div>
+                            <div class="activity-time">10 เม.ย. 2026</div>
+                        </div>
+                        <div class="activity-value">
+                            <div class="activity-score down">108K</div>
+                            <div class="activity-status">Watch</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ===== PORTFOLIO SCREEN ===== -->
+        <div class="screen" id="screen-portfolio">
+            <div class="page-header">
+                <div class="page-title">Portfolio</div>
+                <div class="page-subtitle">จัดการพอร์ตการลงทุนของคุณ</div>
+            </div>
+            <div class="screen-content">
+                <div class="portfolio-summary fade-up fade-up-1">
+                    <div class="port-stat">
+                        <div class="port-stat-label">มูลค่ารวม</div>
+                        <div class="port-stat-value">฿285K</div>
+                    </div>
+                    <div class="port-stat">
+                        <div class="port-stat-label">กำไร/ขาดทุน</div>
+                        <div class="port-stat-value green">+12.4%</div>
+                    </div>
+                </div>
+
+                <div class="section-header"><div class="section-title">สินทรัพย์</div></div>
+
+                <div class="port-item fade-up fade-up-2">
+                    <div class="port-icon" style="background:var(--gold-glow);">🥇</div>
+                    <div class="port-info">
+                        <div class="port-name">Gold XAU/USD</div>
+                        <div class="port-detail">0.5 lots • Avg: 2,410</div>
+                    </div>
+                    <div class="port-values">
+                        <div class="port-amount">฿125,000</div>
+                        <div class="port-pnl up">+3.1% ▲</div>
+                    </div>
+                </div>
+
+                <div class="port-item fade-up fade-up-3">
+                    <div class="port-icon" style="background:var(--green-bg);">₿</div>
+                    <div class="port-info">
+                        <div class="port-name">Bitcoin BTC</div>
+                        <div class="port-detail">0.02 BTC • Avg: 95,200</div>
+                    </div>
+                    <div class="port-values">
+                        <div class="port-amount">฿72,000</div>
+                        <div class="port-pnl up">+12.6% ▲</div>
+                    </div>
+                </div>
+
+                <div class="port-item fade-up fade-up-4">
+                    <div class="port-icon" style="background:var(--blue-bg);">📈</div>
+                    <div class="port-info">
+                        <div class="port-name">S&P 500 ETF</div>
+                        <div class="port-detail">10 units • Avg: 5,820</div>
+                    </div>
+                    <div class="port-values">
+                        <div class="port-amount">฿88,000</div>
+                        <div class="port-pnl up">+5.8% ▲</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SETTINGS SCREEN ===== -->
+        <div class="screen" id="screen-settings">
+            <div class="screen-content">
+
+                <div class="profile-header">
+                    <div class="profile-avatar">JP</div>
+                    <div class="profile-name" id="settingsName">Joon</div>
+                    <div class="profile-email" id="settingsEmail">joon@example.com</div>
+                    <div class="profile-badge">👑 Gold Member</div>
+                </div>
+
+                <div class="settings-group">
+                    <div class="settings-group-title">การตั้งค่าทั่วไป</div>
+                    <div class="settings-list">
+                        <div class="settings-item" onclick="openEditModal('name')">
+                            <div class="settings-icon" style="background:var(--gold-glow);">👤</div>
+                            <div class="settings-info">
+                                <div class="settings-label">ชื่อที่แสดง</div>
+                                <div class="settings-desc" id="settingNameVal">Joon</div>
+                            </div>
+                            <div class="settings-arrow">›</div>
+                        </div>
+                        <div class="settings-item" onclick="openEditModal('language')">
+                            <div class="settings-icon" style="background:var(--blue-bg);">🌐</div>
+                            <div class="settings-info">
+                                <div class="settings-label">ภาษา</div>
+                                <div class="settings-desc">ไทย</div>
+                            </div>
+                            <div class="settings-arrow">›</div>
+                        </div>
+                        <div class="settings-item">
+                            <div class="settings-icon" style="background:var(--green-bg);">🌙</div>
+                            <div class="settings-info">
+                                <div class="settings-label">โหมดมืด</div>
+                                <div class="settings-desc">เปิดอยู่</div>
+                            </div>
+                            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <div class="settings-group-title">การแจ้งเตือน</div>
+                    <div class="settings-list">
+                        <div class="settings-item">
+                            <div class="settings-icon" style="background:var(--gold-glow);">🔔</div>
+                            <div class="settings-info">
+                                <div class="settings-label">Momentum Alerts</div>
+                                <div class="settings-desc">แจ้งเตือนเมื่อสัญญาณเปลี่ยน</div>
+                            </div>
+                            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                        </div>
+                        <div class="settings-item">
+                            <div class="settings-icon" style="background:var(--blue-bg);">📧</div>
+                            <div class="settings-info">
+                                <div class="settings-label">Email สรุปรายสัปดาห์</div>
+                                <div class="settings-desc">รับรายงานทุกวันจันทร์</div>
+                            </div>
+                            <div class="toggle" onclick="this.classList.toggle('on')"></div>
+                        </div>
+                        <div class="settings-item">
+                            <div class="settings-icon" style="background:var(--red-bg);">📈</div>
+                            <div class="settings-info">
+                                <div class="settings-label">Price Alerts</div>
+                                <div class="settings-desc">แจ้งเมื่อราคาถึงเป้า</div>
+                            </div>
+                            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <div class="settings-group-title">การเทรด</div>
+                    <div class="settings-list">
+                        <div class="settings-item" onclick="openEditModal('risk')">
+                            <div class="settings-icon" style="background:var(--red-bg);">⚡</div>
+                            <div class="settings-info">
+                                <div class="settings-label">ระดับความเสี่ยง</div>
+                                <div class="settings-desc" id="settingRisk">ปานกลาง (Medium)</div>
+                            </div>
+                            <div class="settings-arrow">›</div>
+                        </div>
+                        <div class="settings-item" onclick="openEditModal('capital')">
+                            <div class="settings-icon" style="background:var(--green-bg);">💰</div>
+                            <div class="settings-info">
+                                <div class="settings-label">ทุนเริ่มต้น</div>
+                                <div class="settings-desc" id="settingCapital">฿100,000</div>
+                            </div>
+                            <div class="settings-arrow">›</div>
+                        </div>
+                        <div class="settings-item" onclick="openEditModal('broker')">
+                            <div class="settings-icon" style="background:var(--gold-glow);">🏦</div>
+                            <div class="settings-info">
+                                <div class="settings-label">โบรกเกอร์</div>
+                                <div class="settings-desc" id="settingBroker">ยังไม่ระบุ</div>
+                            </div>
+                            <div class="settings-arrow">›</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <div class="settings-group-title">สมาชิก</div>
+                    <div class="settings-list">
+                        <div class="settings-item">
+                            <div class="settings-icon" style="background:var(--gold-glow);">👑</div>
+                            <div class="settings-info">
+                                <div class="settings-label">แผนสมาชิก</div>
+                                <div class="settings-desc">Gold — หมดอายุ 30 พ.ค. 2026</div>
+                            </div>
+                            <div class="settings-arrow">›</div>
+                        </div>
+                        <div class="settings-item">
+                            <div class="settings-icon" style="background:var(--blue-bg);">📝</div>
+                            <div class="settings-info">
+                                <div class="settings-label">ประวัติการใช้งาน</div>
+                                <div class="settings-desc">ดู Calibrate history</div>
+                            </div>
+                            <div class="settings-arrow">›</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="logout-btn" onclick="doLogout()">🚪 ออกจากระบบ</button>
+
+            </div>
+        </div>
+
+        <!-- ===== PLACEHOLDER SCREENS ===== -->
+        <div class="screen" id="screen-weekly">
+            <div class="page-header">
+                <div class="page-title">Weekly Momentum</div>
+                <div class="page-subtitle">สัญญาณรายสัปดาห์</div>
+            </div>
+            <div class="screen-content">
+                <div class="balance-card">
+                    <div class="balance-label" style="font-family:'Cinzel',serif">Weekly Score</div>
+                    <div class="balance-row">
+                        <div class="balance-amount">78.5</div>
+                        <div class="balance-currency">/ 100</div>
+                    </div>
+                    <div class="balance-change up">▲ Bullish — แนวโน้มขาขึ้น</div>
+                </div>
+                <div class="dash-card" style="margin-bottom:12px;padding:20px;">
+                    <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">ลิงก์แดชบอร์ดเต็มรูปแบบจะเพิ่มในภายหลัง</div>
+                    <div style="font-size:14px;color:var(--text-secondary);">หน้านี้จะเชื่อมต่อไปยังแดชบอร์ด Weekly Momentum ของคุณ</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-sixmonth">
+            <div class="page-header">
+                <div class="page-title">6M Momentum</div>
+                <div class="page-subtitle">สัญญาณ 6 เดือน</div>
+            </div>
+            <div class="screen-content">
+                <div class="balance-card">
+                    <div class="balance-label" style="font-family:'Cinzel',serif">6-Month Trend</div>
+                    <div class="balance-row">
+                        <div class="balance-amount">72.1</div>
+                        <div class="balance-currency">/ 100</div>
+                    </div>
+                    <div class="balance-change up">▲ Moderate Bullish</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-gold">
+            <div class="page-header">
+                <div class="page-title">Gold Dashboard</div>
+                <div class="page-subtitle">XAU/USD Analysis</div>
+            </div>
+            <div class="screen-content">
+                <div class="balance-card">
+                    <div class="balance-label" style="font-family:'Cinzel',serif">Gold Price</div>
+                    <div class="balance-row">
+                        <div class="balance-amount">2,485</div>
+                        <div class="balance-currency">USD</div>
+                    </div>
+                    <div class="balance-change up">▲ +1.2% วันนี้</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-bitcoin">
+            <div class="page-header">
+                <div class="page-title">Bitcoin Analysis</div>
+                <div class="page-subtitle">BTC/USD Dashboard</div>
+            </div>
+            <div class="screen-content">
+                <div class="balance-card">
+                    <div class="balance-label" style="font-family:'Cinzel',serif">Bitcoin Price</div>
+                    <div class="balance-row">
+                        <div class="balance-amount">107,250</div>
+                        <div class="balance-currency">USD</div>
+                    </div>
+                    <div class="balance-change up">▲ +2.8% วันนี้</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-backtest">
+            <div class="page-header">
+                <div class="page-title">Backtest Lab</div>
+                <div class="page-subtitle">ทดสอบกลยุทธ์การเทรด</div>
+            </div>
+            <div class="screen-content">
+                <div class="balance-card">
+                    <div class="balance-label" style="font-family:'Cinzel',serif">Latest Backtest</div>
+                    <div class="balance-row">
+                        <div class="balance-amount">68%</div>
+                        <div class="balance-currency">Win Rate</div>
+                    </div>
+                    <div class="balance-change up">EMA Cross Strategy</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== BOTTOM NAV ===== -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-screen="home" onclick="navigateTo('home')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span class="nav-label">หน้าแรก</span>
+            </button>
+            <button class="nav-item" data-screen="weekly" onclick="navigateTo('weekly')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                <span class="nav-label">Momentum</span>
+            </button>
+            <button class="nav-item" data-screen="gold" onclick="navigateTo('gold')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                <span class="nav-label">Gold</span>
+            </button>
+            <button class="nav-item" data-screen="portfolio" onclick="navigateTo('portfolio')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                <span class="nav-label">Portfolio</span>
+            </button>
+            <button class="nav-item" data-screen="settings" onclick="navigateTo('settings')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span class="nav-label">โปรไฟล์</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- ===== EDIT MODAL ===== -->
+    <div class="modal-overlay" id="editModal" onclick="closeModal(event)">
+        <div class="modal-sheet" onclick="event.stopPropagation()">
+            <div class="modal-handle"></div>
+            <div class="modal-title" id="modalTitle">แก้ไข</div>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // ===== STATE =====
+        let isLoggedIn = false;
+        let userSettings = {
+            name: 'Joon',
+            email: 'joon@example.com',
+            language: 'th',
+            darkMode: true,
+            notifications: { momentum: true, weekly: false, price: true },
+            risk: 'medium',
+            capital: '100000',
+            broker: ''
+        };
+
+        try {
+            const saved = localStorage.getItem('jpt_user');
+            if (saved) userSettings = JSON.parse(saved);
+            isLoggedIn = localStorage.getItem('jpt_logged_in') === 'true';
+        } catch(e) {}
+
+        function saveSettings() {
+            try { localStorage.setItem('jpt_user', JSON.stringify(userSettings)); } catch(e) {}
+            applySettings();
+        }
+
+        function applySettings() {
+            const name = userSettings.name || 'Member';
+            document.getElementById('displayName').textContent = name;
+            document.getElementById('settingsName').textContent = name;
+            document.getElementById('settingsEmail').textContent = userSettings.email;
+            document.getElementById('settingNameVal').textContent = name;
+
+            const riskLabels = { low: 'ต่ำ (Low)', medium: 'ปานกลาง (Medium)', high: 'สูง (High)' };
+            document.getElementById('settingRisk').textContent = riskLabels[userSettings.risk] || 'ปานกลาง';
+            document.getElementById('settingCapital').textContent = '฿' + Number(userSettings.capital || 0).toLocaleString();
+            document.getElementById('settingBroker').textContent = userSettings.broker || 'ยังไม่ระบุ';
+
+            const initials = name.slice(0, 2).toUpperCase();
+            document.querySelectorAll('.avatar, .profile-avatar').forEach(el => el.textContent = initials);
+        }
+
+        // ===== LOGIN =====
+        function sendOTP() {
+            const email = document.getElementById('loginEmail').value.trim();
+            if (!email) return;
+            userSettings.email = email;
+            document.getElementById('otpEmail').textContent = email;
+            document.getElementById('loginStep1').classList.remove('active');
+            document.getElementById('loginStep2').classList.add('active');
+            document.getElementById('loginOTP').focus();
+        }
+
+        function verifyOTP() {
+            const otp = document.getElementById('loginOTP').value.trim();
+            if (otp.length < 6) return;
+            isLoggedIn = true;
+            try { localStorage.setItem('jpt_logged_in', 'true'); } catch(e) {}
+            saveSettings();
+            showApp();
+        }
+
+        function backToEmail() {
+            document.getElementById('loginStep2').classList.remove('active');
+            document.getElementById('loginStep1').classList.add('active');
+            document.getElementById('loginEmail').focus();
+        }
+
+        function showApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.add('active');
+            applySettings();
+        }
+
+        function doLogout() {
+            isLoggedIn = false;
+            try { localStorage.removeItem('jpt_logged_in'); } catch(e) {}
+            location.reload();
+        }
+
+        // ===== NAVIGATION =====
+        function navigateTo(screen) {
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            // Show target
+            const target = document.getElementById('screen-' + screen);
+            if (target) target.classList.add('active');
+
+            // Update bottom nav
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            const navBtn = document.querySelector(`.nav-item[data-screen="${screen}"]`);
+            if (navBtn) navBtn.classList.add('active');
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Re-trigger animations
+            target?.querySelectorAll('.fade-up').forEach(el => {
+                el.style.animation = 'none';
+                el.offsetHeight; // reflow
+                el.style.animation = '';
+            });
+        }
+
+        // ===== MODAL =====
+        function openEditModal(field) {
+            const modal = document.getElementById('editModal');
+            const title = document.getElementById('modalTitle');
+            const content = document.getElementById('modalContent');
+
+            if (field === 'name') {
+                title.textContent = 'แก้ไขชื่อที่แสดง';
+                content.innerHTML = `
+                    <input class="modal-input" id="editValue" value="${userSettings.name}" placeholder="ชื่อของคุณ">
+                    <button class="modal-btn" onclick="userSettings.name=document.getElementById('editValue').value;saveSettings();closeModal();">บันทึก</button>
+                `;
+            } else if (field === 'risk') {
+                title.textContent = 'ระดับความเสี่ยง';
+                content.innerHTML = `
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                        <button class="modal-btn" style="background:${userSettings.risk==='low'?'var(--gold)':'var(--bg-primary)'};color:${userSettings.risk==='low'?'#0a0e17':'var(--text-secondary)'};" onclick="userSettings.risk='low';saveSettings();closeModal();">🟢 ต่ำ (Low)</button>
+                        <button class="modal-btn" style="background:${userSettings.risk==='medium'?'var(--gold)':'var(--bg-primary)'};color:${userSettings.risk==='medium'?'#0a0e17':'var(--text-secondary)'};" onclick="userSettings.risk='medium';saveSettings();closeModal();">🟡 ปานกลาง (Medium)</button>
+                        <button class="modal-btn" style="background:${userSettings.risk==='high'?'var(--gold)':'var(--bg-primary)'};color:${userSettings.risk==='high'?'#0a0e17':'var(--text-secondary)'};" onclick="userSettings.risk='high';saveSettings();closeModal();">🔴 สูง (High)</button>
+                    </div>
+                `;
+            } else if (field === 'capital') {
+                title.textContent = 'ทุนเริ่มต้น (บาท)';
+                content.innerHTML = `
+                    <input class="modal-input" id="editValue" type="number" value="${userSettings.capital}" placeholder="100000">
+                    <button class="modal-btn" onclick="userSettings.capital=document.getElementById('editValue').value;saveSettings();closeModal();">บันทึก</button>
+                `;
+            } else if (field === 'broker') {
+                title.textContent = 'โบรกเกอร์ของคุณ';
+                content.innerHTML = `
+                    <input class="modal-input" id="editValue" value="${userSettings.broker}" placeholder="เช่น XM, Exness, IC Markets">
+                    <button class="modal-btn" onclick="userSettings.broker=document.getElementById('editValue').value;saveSettings();closeModal();">บันทึก</button>
+                `;
+            }
+
+            modal.classList.add('show');
+        }
+
+        function closeModal(e) {
+            if (e && e.target !== e.currentTarget) return;
+            document.getElementById('editModal').classList.remove('show');
+        }
+
+        function openNotifications() {
+            // Placeholder — could expand later
+            alert('ยังไม่มีการแจ้งเตือนใหม่');
+        }
+
+        // ===== INIT =====
+        if (isLoggedIn) {
+            showApp();
+        }
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
+
+        // OTP input filter
+        document.getElementById('loginOTP')?.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);
+        });
+    </script>
+
+</body>
+</html>
