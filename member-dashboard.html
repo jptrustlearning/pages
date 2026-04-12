@@ -605,20 +605,37 @@ window.addEventListener('appinstalled',()=>{hideIB();try{localStorage.setItem('j
     }
     function initLines(){
         lines=[
-            new ChartLine(0.30,0.0006,28,'rgba(212,175,55,0.06)',1.5),
-            new ChartLine(0.40,0.0008,35,'rgba(212,175,55,0.09)',1.2),
-            new ChartLine(0.50,0.0005,40,'rgba(212,175,55,0.13)',1.8),
-            new ChartLine(0.55,0.0010,22,'rgba(184,134,11,0.07)',1.0),
-            new ChartLine(0.62,0.0007,32,'rgba(212,175,55,0.08)',1.4),
-            new ChartLine(0.72,0.0004,45,'rgba(212,175,55,0.06)',1.0),
-            new ChartLine(0.78,0.0009,18,'rgba(255,245,212,0.04)',0.8),
-            new ChartLine(0.45,0.0003,50,'rgba(114,47,55,0.05)',1.6),
-            new ChartLine(0.35,0.0011,15,'rgba(232,212,139,0.05)',0.7),
+            new ChartLine(0.30,0.0006,28,'rgba(212,175,55,0.25)',1.8),
+            new ChartLine(0.40,0.0008,35,'rgba(212,175,55,0.30)',1.5),
+            new ChartLine(0.50,0.0005,40,'rgba(212,175,55,0.35)',2.0),
+            new ChartLine(0.55,0.0010,22,'rgba(184,134,11,0.20)',1.2),
+            new ChartLine(0.62,0.0007,32,'rgba(212,175,55,0.22)',1.6),
+            new ChartLine(0.72,0.0004,45,'rgba(212,175,55,0.18)',1.2),
+            new ChartLine(0.78,0.0009,18,'rgba(255,245,212,0.15)',1.0),
+            new ChartLine(0.45,0.0003,50,'rgba(244,228,186,0.12)',1.8),
+            new ChartLine(0.35,0.0011,15,'rgba(232,212,139,0.18)',1.0),
         ];
     }
-    function animate(t){ctx.clearRect(0,0,w,h);lines.forEach(l=>l.draw(t));requestAnimationFrame(animate)}
+    // Gold fog clouds
+    let fogs=[];
+    class Fog{
+        constructor(){this.reset()}
+        reset(){this.x=-150-Math.random()*200;this.y=Math.random()*1;this.r=60+Math.random()*80;this.speed=0.15+Math.random()*0.25;this.alpha=0.04+Math.random()*0.06}
+        draw(t){
+            this.x+=this.speed;
+            if(this.x>w+200)this.reset();
+            const yy=h*this.y+Math.sin(t*0.0003+this.r)*15;
+            const g=ctx.createRadialGradient(this.x,yy,0,this.x,yy,this.r);
+            g.addColorStop(0,'rgba(212,175,55,'+this.alpha+')');
+            g.addColorStop(0.5,'rgba(244,228,186,'+(this.alpha*0.5)+')');
+            g.addColorStop(1,'rgba(212,175,55,0)');
+            ctx.fillStyle=g;ctx.fillRect(this.x-this.r,yy-this.r,this.r*2,this.r*2);
+        }
+    }
+    function initFogs(){fogs=[];for(let i=0;i<5;i++){const f=new Fog();f.x=Math.random()*800;fogs.push(f)}}
+    function animate(t){ctx.clearRect(0,0,w,h);fogs.forEach(f=>f.draw(t));lines.forEach(l=>l.draw(t));requestAnimationFrame(animate)}
     window.addEventListener('resize',resize);
-    function startChart(){resize();if(w===0||h===0){setTimeout(startChart,200);return}initLines();requestAnimationFrame(animate)}
+    function startChart(){resize();if(w===0||h===0){setTimeout(startChart,200);return}initLines();initFogs();requestAnimationFrame(animate)}
     setTimeout(startChart,300);
 })();
 </script>
