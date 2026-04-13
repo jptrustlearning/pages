@@ -102,6 +102,9 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .reward-card{width:auto;overflow:hidden;position:relative;border-radius:16px}
 .reward-card img{width:100%;display:block}
 .rc-member-name{position:absolute;left:20px;bottom:38%;font-family:'Anuphan',sans-serif;font-size:16px;font-weight:500;color:var(--text-light);letter-spacing:1px;text-shadow:0 1px 4px rgba(0,0,0,0.4)}
+.rc-points{position:absolute;right:20px;bottom:12px;text-align:right;text-shadow:0 1px 4px rgba(0,0,0,0.3)}
+.rc-points-num{font-family:'DM Serif Display',serif;font-size:28px;color:var(--gold-light);line-height:1}
+.rc-points-label{font-family:'Cinzel',serif;font-size:9px;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-top:2px}
 
 @media(max-width:360px){.rc-member-name{font-size:13px}}
 
@@ -278,6 +281,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             <img src="member-card-gold.png" alt="Gold Member Card" style="width:100%;display:block;">
             <canvas id="heroCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;"></canvas>
             <div class="rc-member-name" id="cardName">Joonstinn</div>
+            <div class="rc-points"><div class="rc-points-num" id="cardPoints">125</div><div class="rc-points-label">Points</div></div>
         </div>
         <div class="home-content">
             <div class="install-banner-home" id="installBanner" onclick="handleInstallClick()">
@@ -594,8 +598,11 @@ window.addEventListener('appinstalled',()=>{hideIB();try{localStorage.setItem('j
             this.offset=Math.random()*Math.PI*4;this.freq=0.003+Math.random()*0.004;this.freq2=0.001+Math.random()*0.002;
         }
         draw(t){
-            ctx.beginPath();ctx.strokeStyle=this.color;ctx.lineWidth=this.lineWidth;
             const baseY=h*this.yBase;
+            const shimmer=0.5+0.5*Math.sin(t*0.002+this.offset);
+            const alpha=parseFloat(this.color.match(/[\d.]+(?=\))/)[0])*shimmer;
+            const c=this.color.replace(/[\d.]+\)/,alpha.toFixed(3)+')');
+            ctx.beginPath();ctx.strokeStyle=c;ctx.lineWidth=this.lineWidth;
             for(let x=0;x<=w;x+=2){
                 const y=baseY+Math.sin(x*this.freq+t*this.speed+this.offset)*this.amplitude+Math.sin(x*this.freq2+t*this.speed*0.7+this.offset*1.3)*this.amplitude*0.5+Math.sin(x*this.freq*2.5+t*this.speed*1.4)*this.amplitude*0.2;
                 if(x===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
@@ -605,15 +612,11 @@ window.addEventListener('appinstalled',()=>{hideIB();try{localStorage.setItem('j
     }
     function initLines(){
         lines=[
-            new ChartLine(0.30,0.0006,28,'rgba(212,175,55,0.25)',1.8),
-            new ChartLine(0.40,0.0008,35,'rgba(212,175,55,0.30)',1.5),
-            new ChartLine(0.50,0.0005,40,'rgba(212,175,55,0.35)',2.0),
-            new ChartLine(0.55,0.0010,22,'rgba(184,134,11,0.20)',1.2),
-            new ChartLine(0.62,0.0007,32,'rgba(212,175,55,0.22)',1.6),
-            new ChartLine(0.72,0.0004,45,'rgba(212,175,55,0.18)',1.2),
-            new ChartLine(0.78,0.0009,18,'rgba(255,245,212,0.15)',1.0),
-            new ChartLine(0.45,0.0003,50,'rgba(244,228,186,0.12)',1.8),
-            new ChartLine(0.35,0.0011,15,'rgba(232,212,139,0.18)',1.0),
+            new ChartLine(0.30,0.0006,28,'rgba(212,175,55,0.20)',0.8),
+            new ChartLine(0.45,0.0008,35,'rgba(212,175,55,0.25)',1.0),
+            new ChartLine(0.55,0.0005,40,'rgba(244,228,186,0.22)',1.2),
+            new ChartLine(0.65,0.0010,22,'rgba(184,134,11,0.18)',0.8),
+            new ChartLine(0.75,0.0007,32,'rgba(212,175,55,0.15)',1.0),
         ];
     }
     // Gold fog clouds
