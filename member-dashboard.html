@@ -158,37 +158,37 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .time-chip:hover{background:rgba(212,175,55,0.1);color:#5A3D20}
 .time-chip.active{background:linear-gradient(135deg,#D4AF37,#B8860B);color:#fff;border-color:#B8860B;font-weight:600;box-shadow:0 2px 8px rgba(212,175,55,0.35)}
 
-/* News feed cards - dashboard card style (cream + wave + burgundy-gold icon) */
+/* News feed cards - dashboard card style (cream + wave), 2 per row */
 .news-batch-group{margin-bottom:28px}
 .news-batch-date{font-family:'Cinzel',serif;font-size:10.5px;letter-spacing:2.5px;color:var(--gold-deep,#8B6914);text-transform:uppercase;font-weight:600;padding:0 4px 10px 4px;margin-bottom:10px;border-bottom:1px solid rgba(212,175,55,0.3);display:flex;align-items:center;gap:10px}
 .news-batch-date::before{content:'◆';color:var(--gold,#D4AF37);font-size:9px}
+.news-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
-.news-dash-card{background:var(--cream-card,#F8F2E4);border:1px solid rgba(212,175,55,0.15);border-radius:var(--radius,16px);padding:16px;cursor:pointer;transition:all .2s;display:block;box-shadow:0 4px 16px rgba(114,47,55,0.1),0 1px 4px rgba(0,0,0,0.06);position:relative;overflow:hidden;margin-bottom:12px}
-.news-dash-card:last-child{margin-bottom:0}
+.news-dash-card{background:var(--cream-card,#F8F2E4);border:1px solid rgba(212,175,55,0.15);border-radius:var(--radius,16px);padding:14px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 4px 16px rgba(114,47,55,0.1),0 1px 4px rgba(0,0,0,0.06);position:relative;overflow:hidden;min-height:170px}
 .news-dash-card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:60%;background:linear-gradient(180deg,transparent 0%,rgba(237,225,200,0.3) 100%);pointer-events:none;border-radius:0 0 var(--radius,16px) var(--radius,16px);z-index:0}
-.news-dash-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:70px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 70' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'%3E%3Cpath d='M0,55 C20,50 40,40 70,35 C100,30 130,38 160,30 C180,25 195,32 200,28 L200,70 L0,70 Z' fill='rgba(237,228,208,0.35)'/%3E%3Cpath d='M0,60 C30,52 60,45 100,40 C140,35 170,42 200,36 L200,70 L0,70 Z' fill='rgba(237,228,208,0.25)'/%3E%3Cpath d='M0,45 C25,42 50,30 80,28 C110,26 140,35 170,22 C190,15 200,20 200,18 L200,70 L0,70 Z' fill='rgba(212,175,55,0.08)'/%3E%3Cpath d='M0,40 Q50,25 100,30 Q150,35 200,20' fill='none' stroke='rgba(212,175,55,0.15)' stroke-width='1.5'/%3E%3Cpath d='M0,50 Q60,38 120,42 Q180,46 200,35' fill='none' stroke='rgba(212,175,55,0.1)' stroke-width='1'/%3E%3C/svg%3E");background-size:100% 100%;border-radius:0 0 var(--radius,16px) var(--radius,16px);z-index:0}
+.news-dash-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:60px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 70' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'%3E%3Cpath d='M0,55 C20,50 40,40 70,35 C100,30 130,38 160,30 C180,25 195,32 200,28 L200,70 L0,70 Z' fill='rgba(237,228,208,0.35)'/%3E%3Cpath d='M0,60 C30,52 60,45 100,40 C140,35 170,42 200,36 L200,70 L0,70 Z' fill='rgba(237,228,208,0.25)'/%3E%3Cpath d='M0,45 C25,42 50,30 80,28 C110,26 140,35 170,22 C190,15 200,20 200,18 L200,70 L0,70 Z' fill='rgba(212,175,55,0.08)'/%3E%3Cpath d='M0,40 Q50,25 100,30 Q150,35 200,20' fill='none' stroke='rgba(212,175,55,0.15)' stroke-width='1.5'/%3E%3Cpath d='M0,50 Q60,38 120,42 Q180,46 200,35' fill='none' stroke='rgba(212,175,55,0.1)' stroke-width='1'/%3E%3C/svg%3E");background-size:100% 100%;border-radius:0 0 var(--radius,16px) var(--radius,16px);z-index:0}
 .news-dash-card>*{position:relative;z-index:1}
 .news-dash-card:active{transform:scale(.97)}
 
-.news-dash-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.news-dash-icon{flex-shrink:0;width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);display:flex;align-items:center;justify-content:center;color:#fff}
-.news-dash-icon .jpt-icon svg{width:18px;height:18px;color:#FFF0D4;stroke:#FFF0D4}
-.news-dash-meta{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px;font-size:11px;color:var(--text-dark-muted,#7A6F62);line-height:1.4}
-.news-dash-meta .news-src-inline{font-style:italic;font-weight:500;color:#8B6914}
-.news-pub-date{color:var(--text-dark-muted,#7A6F62);font-size:10.5px}
-.news-dash-title{font-size:14.5px;font-weight:600;color:var(--text-dark,#3D3228);line-height:1.5;margin-bottom:12px}
+.news-dash-title{font-size:13px;font-weight:600;color:var(--text-dark,#3D3228);line-height:1.45;margin-bottom:10px}
+.news-src-inline{display:inline;font-size:10.5px;font-weight:400;color:var(--text-dark-muted,#7A6F62);font-style:italic;letter-spacing:0.2px;line-height:1.4}
 
-.news-item-tickers{display:flex;flex-wrap:wrap;gap:6px}
-/* Ticker pill with star prefix */
-.news-ticker-sm{display:inline-flex;align-items:center;gap:4px;font-family:'Cinzel',serif;font-size:10.5px;letter-spacing:0.8px;padding:3px 9px;border-radius:10px;background:rgba(212,175,55,0.18);border:1px solid rgba(212,175,55,0.38);color:#8B6914;font-weight:600}
+.news-item-tickers{display:flex;flex-wrap:wrap;gap:4px;margin-top:auto}
+.news-ticker-sm{display:inline-flex;align-items:center;gap:3px;font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:0.5px;padding:2.5px 7px;border-radius:9px;background:rgba(212,175,55,0.18);border:1px solid rgba(212,175,55,0.38);color:#8B6914;font-weight:600}
 .news-ticker-sm.positive{background:rgba(46,125,50,0.13);border-color:rgba(46,125,50,0.42);color:#1B5E20}
 .news-ticker-sm.negative{background:rgba(195,58,78,0.13);border-color:rgba(195,58,78,0.42);color:#8B1F2F}
-.tk-star{font-size:11px;line-height:1}
+.tk-star{font-size:10px;line-height:1}
 .tk-star.positive{color:#2E7D32}
 .tk-star.negative{color:#C33A4E}
 .tk-star.neutral{color:#D4AF37}
+
 /* Empty/no-results states */
-.news-empty{text-align:center;padding:40px 20px;color:var(--text-dark-muted,#7A6F62);font-size:13px}
+.news-empty{text-align:center;padding:40px 20px;color:var(--text-dark-muted,#7A6F62);font-size:13px;grid-column:1/-1}
+
+/* On very narrow screens, fall back to 1 column */
+@media (max-width:360px){
+  .news-grid{grid-template-columns:1fr}
+}
 
 .activity-list{display:flex;flex-direction:column;gap:2px;margin-bottom:24px}
 .activity-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--cream-card);border-radius:var(--radius-sm);cursor:pointer;border:1px solid rgba(212,175,55,0.08)}
@@ -739,18 +739,16 @@ function renderNewsBatchCard(b){
       const star=s==='positive'?'<span class="tk-star positive">★</span>':s==='negative'?'<span class="tk-star negative">★</span>':'<span class="tk-star neutral">★</span>';
       return '<span class="news-ticker-sm '+s+'">'+star+'$'+escapeText(t.symbol)+'</span>';
     }).join('');
-    const iconSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="M2 15h6"/><path d="M5 12v6"/><polyline points="10 18 12 16 14 18 16 14"/></svg>';
-    const published=h.published?'<span class="news-pub-date">· '+escapeText(h.published)+'</span>':'';
+    const metaBits=[];
+    if(h.source)metaBits.push(escapeText(h.source));
+    if(h.published)metaBits.push(escapeText(h.published));
+    const metaLine=metaBits.length?' <span class="news-src-inline">— '+metaBits.join(' · ')+'</span>':'';
     return '<div class="news-dash-card" onclick="openNewsDetail(\''+safeFile+'\')">'
-      +'<div class="news-dash-header">'
-        +'<div class="news-dash-icon"><span class="jpt-icon">'+iconSvg+'</span></div>'
-        +'<div class="news-dash-meta"><span class="news-src-inline">'+escapeText(h.source||'')+'</span>'+published+'</div>'
-      +'</div>'
-      +'<div class="news-dash-title">'+escapeText(h.title)+'</div>'
+      +'<div class="news-dash-title">'+escapeText(h.title)+metaLine+'</div>'
       +'<div class="news-item-tickers">'+tickerPills+'</div>'
     +'</div>';
   }).join('');
-  return '<div class="news-batch-group">'+dateHeader+items+'</div>';
+  return '<div class="news-batch-group">'+dateHeader+'<div class="news-grid">'+items+'</div></div>';
 }
 // Support both old (string) and new (object with sentiment) ticker formats
 function normalizeTickers(tickers){
