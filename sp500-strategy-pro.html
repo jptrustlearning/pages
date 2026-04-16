@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SP500 Strategy Pro V22 (Auto Google Sheets)</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Modern Fonts: Outfit (Headings) + Inter (Body/Numbers) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Cinzel:wght@500;600;700&family=DM+Serif+Display&family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    /* === JP Trust brand palette (adapted from member-dashboard) === */
+    --bg: #1a0a0e;                                /* dark burgundy base */
+    --bg-card: rgba(244,228,186,0.04);            /* cream-gold glass */
+    --bg-card-hover: rgba(244,228,186,0.07);
+    --border: rgba(212,175,55,0.15);              /* gold border */
+    --text-main: #F4E4BA;                         /* cream-gold primary */
+    --text-muted: #C4B88A;                        /* muted cream */
+    --text-dark: #8B7D5E;                         /* faint label */
+    
+    /* Brand Accents */
+    --accent: #D4AF37;                            /* JP TRUST gold */
+    --accent-glow: rgba(212, 175, 55, 0.4); 
+    --green: #5BC48E;                             /* softer green */
+    --green-glow: rgba(91, 196, 142, 0.4);
+    --red: #D95F5F;                               /* softer red */
+    --red-glow: rgba(217, 95, 95, 0.4);
+    --yellow: #D4AF37;                            /* same as gold */
+    --burgundy: #722F37;
+    --gold-light: #F4E4BA;
+    --gold-deep: #B8860B;
+    
+    --font-heading: 'Outfit', 'Anuphan', sans-serif;
+    --font-body: 'Anuphan', 'Inter', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--bg);
+    background-image: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(212,175,55,0.10) 0%, transparent 60%),
+                      radial-gradient(ellipse 70% 55% at 80% 100%, rgba(114,47,55,0.35) 0%, transparent 55%),
+                      radial-gradient(ellipse 60% 50% at 20% 80%, rgba(139,42,53,0.2) 0%, transparent 50%);
+    background-attachment: fixed;
+    color: var(--text-main);
+    font-family: var(--font-body);
+    padding: 20px;
+    font-size: 14px;
+    overflow-x: hidden;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* --- HEADER --- */
+  header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    gap: 20px;
+  }
+
+  h1 {
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    letter-spacing: -0.02em;
+  }
+  h1::before {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 32px;
+    background: var(--accent);
+    border-radius: 4px;
+    box-shadow: 0 0 15px var(--accent);
+  }
+
+  /* --- BUTTON STYLES --- */
+  .upload-box {
+    display: flex; align-items: center; gap: 15px; flex-wrap: wrap;
+  }
+  .file-label {
+    color: var(--text-muted); font-weight: 500; font-size: 0.9rem;
+  }
+  .status-indicator {
+    display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.9rem;
+    padding: 8px 16px; border-radius: 50px; background: rgba(244,228,186,0.05);
+    border: 1px solid var(--border); transition: 0.3s;
+  }
+  .status-indicator.loading { color: var(--yellow); border-color: var(--yellow); background: rgba(212,175,55, 0.1); }
+  .status-indicator.success { color: var(--green); border-color: var(--green); background: rgba(91,196,142, 0.1); }
+  .status-indicator.error { color: var(--red); border-color: var(--red); background: rgba(217,95,95, 0.1); }
+
+  .btn-upload {
+    background: rgba(212,175,55, 0.1); border: 1px solid var(--accent);
+    color: var(--accent); padding: 10px 24px; border-radius: 50px;
+    cursor: pointer; font-weight: 600;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex; align-items: center; gap: 8px; white-space: nowrap;
+  }
+  .btn-upload:hover {
+    background: var(--accent); color: #1a0a0e;
+    transform: translateY(-2px); box-shadow: 0 4px 15px var(--accent-glow);
+  }
+  .btn-upload:active { transform: translateY(0) scale(0.96); }
+  input[type="file"] { display: none; }
+
+  /* Hidden by default, shown if fetch fails */
+  #manual-upload-container { display: none; }
+
+  .btn-run {
+    background: var(--accent); color: #1a0a0e; border: none;
+    font-weight: 700; padding: 12px 28px; border-radius: 50px;
+    cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 100%; font-family: var(--font-heading); letter-spacing: 0.02em;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+  .btn-run:hover {
+    filter: brightness(1.1); transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--accent-glow);
+  }
+  .btn-run:active { transform: translateY(0) scale(0.96); }
+
+  .metric-group {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .metric-btn {
+    background: var(--bg); border: 1px solid var(--border);
+    color: var(--text-muted); padding: 8px 20px; border-radius: 20px;
+    cursor: pointer; font-family: var(--font-body); font-size: 0.8rem;
+    font-weight: 600; transition: all 0.2s ease;
+  }
+  .metric-btn:hover {
+    border-color: var(--text-dark); color: var(--text-main); transform: translateY(-1px);
+  }
+  .metric-btn.active {
+    background: var(--accent); color: #1a0a0e; border-color: var(--accent);
+    box-shadow: 0 0 15px var(--accent-glow); font-weight: 700;
+  }
+
+  /* --- CARD STYLES --- */
+  .card-base {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px; position: relative; overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card-base:hover {
+    border-color: var(--accent);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px -5px var(--accent-glow);
+    transform: translateY(-4px); z-index: 2;
+  }
+
+  /* --- CONTROLS --- */
+  .strategy-controls {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px; align-items: center; margin-bottom: 30px;
+    background: linear-gradient(135deg, var(--bg-card) 0%, #1a0a0e 100%);
+  }
+  .control-group label {
+    display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-muted);
+    margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .weight-wrapper { display: flex; align-items: center; gap: 15px; font-weight: 600; }
+  .range-track {
+    flex-grow: 1; position: relative; height: 24px; display: flex; align-items: center;
+  }
+  input[type=range] {
+    -webkit-appearance: none; width: 100%; background: transparent; z-index: 2; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%;
+    background: #fff; border: 2px solid var(--accent); margin-top: -8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5); transition: transform 0.2s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+  input[type=range]::-webkit-slider-runnable-track {
+    width: 100%; height: 4px; background: var(--border); border-radius: 2px;
+  }
+  .track-fill {
+    position: absolute; top: 10px; left: 0; height: 4px; 
+    background: linear-gradient(90deg, var(--green), var(--accent)); 
+    border-radius: 2px; pointer-events: none; z-index: 1;
+  }
+  .w-ret { color: var(--green); }
+  .w-vol { color: var(--accent); }
+  .input-box {
+    background: var(--bg); border: 1px solid var(--border); color: #fff;
+    font-family: var(--font-body); font-size: 1rem; padding: 8px 12px;
+    border-radius: 8px; width: 100%; text-align: center; transition: 0.3s;
+    height: 42px;
+  }
+  .input-box:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+  select.input-box {
+    cursor: pointer; appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+  }
+
+  /* --- KPI GRID --- */
+  .kpi-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px; margin-bottom: 30px;
+  }
+  .kpi-card {
+    display: flex; flex-direction: column; justify-content: space-between; min-height: 120px;
+  }
+  .input-wrapper-kpi {
+    display: flex; align-items: baseline; gap: 4px;
+    font-family: var(--font-heading); font-size: 1.8rem; font-weight: 700; color: #fff;
+  }
+  .kpi-input {
+    background: transparent; border: none; border-bottom: 2px solid var(--border);
+    color: #fff; font-family: inherit; font-size: inherit; font-weight: inherit;
+    width: 100%; outline: none; transition: 0.3s; padding: 0;
+  }
+  .kpi-input:focus { border-color: var(--accent); }
+  .kpi-title {
+    color: var(--text-dark); font-size: 0.75rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;
+  }
+  .kpi-value {
+    font-family: var(--font-heading); font-size: 1.8rem; font-weight: 700; color: #fff; line-height: 1.1;
+  }
+  .kpi-sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; font-weight: 500; }
+  
+  .market-analyzer {
+    grid-column: span 2; background: linear-gradient(135deg, var(--bg-card) 0%, #2d1018 100%);
+  }
+  @media (max-width: 900px) { .market-analyzer { grid-column: span 1; } }
+  @media (max-width: 600px) { .market-analyzer { grid-column: 1 / -1; } }
+
+  .ma-header { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
+  .ma-stats-row {
+    display: flex; gap: 15px; font-size: 0.8rem; color: var(--text-muted);
+    background: rgba(0,0,0,0.2); padding: 6px 12px; border-radius: 20px;
+  }
+  .ma-stat-item span { color: #fff; font-weight: 700; }
+  .text-green { color: var(--green); text-shadow: 0 0 10px var(--green-glow); }
+  .text-red { color: var(--red); text-shadow: 0 0 10px var(--red-glow); }
+
+  /* --- TABS --- */
+  .tabs-container { margin-bottom: 30px; display: flex; flex-direction: column; }
+  .tabs-header {
+    display: flex; flex-wrap: wrap; background: rgba(0,0,0,0.15);
+    border-bottom: 1px solid var(--border); gap: 2px;
+  }
+  .tab-btn {
+    flex: 1; min-width: 140px; padding: 16px 20px; background: transparent;
+    border: none; color: var(--text-muted); font-family: var(--font-body);
+    font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+    border-bottom: 3px solid transparent;
+  }
+  .tab-btn:hover { background: rgba(244,228,186,0.04); color: var(--text-main); }
+  .tab-btn.active {
+    background: var(--bg-card); color: var(--accent); border-bottom-color: var(--accent);
+  }
+  .tab-content {
+    padding: 25px; display: none; min-height: 400px; animation: fadeIn 0.4s ease;
+  }
+  .tab-content.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  canvas { width: 100% !important; height: 100% !important; }
+
+  /* --- TABLES --- */
+  .opt-table-wrapper { overflow-x: auto; padding-bottom: 10px; }
+  .opt-table { width: 100%; min-width: 800px; border-spacing: 6px; border-collapse: separate; }
+  .opt-table th { font-size: 0.8rem; color: var(--text-muted); padding: 10px; font-weight: 600; }
+  .opt-table td {
+    padding: 12px; text-align: center; border-radius: 6px;
+    font-weight: 700; color: #fff; font-size: 0.9rem;
+    transition: transform 0.2s; cursor: default;
+  }
+  .opt-table td:hover { transform: scale(1.1); box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 10; }
+
+  .heatmap-wrapper { overflow-x: auto; }
+  table.simple-table { width: 100%; min-width: 600px; border-collapse: collapse; }
+  table.simple-table th { text-align: right; padding: 12px; color: var(--text-dark); font-weight: 600; border-bottom: 1px solid var(--border); }
+  table.simple-table th:first-child { text-align: left; }
+  table.simple-table td { text-align: right; padding: 12px; color: var(--text-muted); border-bottom: 1px solid rgba(51, 65, 85, 0.4); }
+  table.simple-table td:first-child { text-align: left; color: var(--accent); font-weight: 700; }
+  /* Hover effect for heatmap rows */
+  table.simple-table tr:hover td { opacity: 0.9; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px; }
+  .stat-box {
+    text-align: center; padding: 20px; background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border); border-radius: 12px; transition: 0.3s;
+  }
+  .stat-box:hover {
+    border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); transform: translateY(-3px);
+  }
+
+  .trade-log-container {
+    max-height: 500px; overflow-y: auto; padding-right: 5px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .trade-card {
+    display: grid; grid-template-columns: 140px 1fr; gap: 20px; padding: 15px;
+    border-radius: 8px; background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border); align-items: center; transition: 0.2s;
+  }
+  .trade-card:hover { border-color: var(--accent); background: rgba(255,255,255,0.04); }
+  @media (max-width: 600px) {
+    .trade-card { grid-template-columns: 1fr; gap: 10px; }
+    .trade-date-box { border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 8px; padding-right: 0; text-align: left; display: flex; justify-content: space-between; }
+  }
+  .stock-badge {
+    display: inline-block; background: rgba(52, 211, 153, 0.1); color: var(--green);
+    border: 1px solid rgba(52, 211, 153, 0.3); padding: 4px 10px; border-radius: 6px;
+    font-size: 0.8rem; font-weight: 700; margin: 2px; box-shadow: 0 0 5px var(--green-glow);
+  }
+
+  .hidden { display: none !important; }
+  .loading { text-align: center; padding: 50px; color: var(--text-muted); font-size: 1.2rem; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+  .badge-algo {
+    background: rgba(212,175,55, 0.1); color: var(--accent);
+    padding: 4px 8px; border-radius: 6px; font-size: 0.75rem;
+    border: 1px solid var(--accent); font-family: var(--font-body);
+    font-weight: 600; letter-spacing: 0.5px;
+  }
+  .opt-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <header>
+    <div>
+      <h1>S&P 500 STRATEGY <span class="badge-algo">PRO V22</span></h1>
+      <p style="color: var(--text-dark); font-size: 0.95rem; margin-top: 5px;">
+        Interactive Backtesting & Optimization Dashboard (Auto Google Sheets)
+      </p>
+    </div>
+    
+    <!-- Status & Upload Section -->
+    <div class="upload-box">
+      <!-- Status Indicator -->
+      <div id="data-status" class="status-indicator loading">
+        <span>●</span> CONNECTING TO CLOUD...
+      </div>
+
+      <!-- Manual Upload Fallback (Hidden initially) -->
+      <div id="manual-upload-container">
+        <label class="btn-upload">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          MANUAL UPLOAD
+          <input type="file" id="csvFile" accept=".csv">
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <div id="loading" class="hidden">/// INITIALIZING ENGINE...</div>
+
+  <div id="dashboard" class="hidden">
+    <!-- Strategy Controls (Card) -->
+    <div class="card-base strategy-controls">
+      <!-- 1. Ranking Weight -->
+      <div class="control-group" style="min-width: 250px;">
+        <label>RANKING WEIGHT</label>
+        <div class="weight-wrapper">
+          <div class="weight-val w-ret">Return <span id="val-ret">50</span>%</div>
+          <div class="range-track">
+            <div class="track-fill" id="track-fill" style="width: 50%;"></div>
+            <input type="range" id="weightSlider" class="weight-slider" min="0" max="100" value="50" step="10">
+          </div>
+          <div class="weight-val w-vol">Volume <span id="val-vol">50</span>%</div>
+        </div>
+      </div>
+
+      <!-- 2. Portfolio Size -->
+      <div class="control-group">
+        <label>PORTFOLIO SIZE</label>
+        <div class="top-n-wrapper" style="display:flex; align-items:center; gap:10px;">
+          <span style="color:var(--text-muted); font-weight:600;">TOP</span>
+          <input type="number" id="topNInput" class="input-box" value="15" min="1" max="50">
+          <span style="color:var(--text-muted); font-weight:600;">STOCKS</span>
+        </div>
+      </div>
+
+      <!-- 3. Start Year -->
+      <div class="control-group">
+        <label>START YEAR</label>
+        <select id="startYearSelect" class="input-box">
+          <!-- Populated by JS -->
+          <option value="2015">2015</option>
+        </select>
+      </div>
+
+      <!-- 4. Run Button -->
+      <div class="control-group" style="justify-self: end; width:100%; max-width:200px;">
+         <button class="btn-run" onclick="runBacktest()">RE-RUN SIM</button>
+      </div>
+    </div>
+
+    <!-- KPI Row -->
+    <div class="kpi-grid">
+      <!-- Initial Capital -->
+      <div class="card-base kpi-card">
+        <div>
+            <div class="kpi-title">Initial Capital</div>
+            <div class="input-wrapper-kpi">
+            <span class="currency-symbol">$</span>
+            <input type="number" id="initialCapitalInput" class="kpi-input" value="15000" step="1000">
+            </div>
+        </div>
+        <div class="kpi-sub">Editable (Auto Update)</div>
+      </div>
+      <!-- Final Equity -->
+      <div class="card-base kpi-card">
+        <div>
+            <div class="kpi-title">Final Equity</div>
+            <div class="kpi-value" id="kpi-final">$-</div>
+        </div>
+        <div class="kpi-sub" id="kpi-return">0.0%</div>
+      </div>
+      <!-- CAGR -->
+      <div class="card-base kpi-card">
+        <div>
+            <div class="kpi-title">CAGR</div>
+            <div class="kpi-value" id="kpi-cagr">0.0%</div>
+        </div>
+        <div class="kpi-sub">Compound Annual Growth</div>
+      </div>
+      <!-- NEW: Volatility -->
+      <div class="card-base kpi-card">
+        <div>
+            <div class="kpi-title">Strategy Vol</div>
+            <div class="kpi-value" id="kpi-strat-vol">0.0%</div>
+        </div>
+        <div class="kpi-sub">Annualized Std Dev</div>
+      </div>
+      <!-- NEW: Max DD -->
+      <div class="card-base kpi-card">
+        <div>
+            <div class="kpi-title">Max Drawdown</div>
+            <div class="kpi-value text-red" id="kpi-strat-dd">0.0%</div>
+        </div>
+        <div class="kpi-sub">Peak to Valley</div>
+      </div>
+      <!-- NEW: Sharpe -->
+      <div class="card-base kpi-card">
+        <div>
+            <div class="kpi-title">Sharpe Ratio</div>
+            <div class="kpi-value" id="kpi-strat-sharpe">0.00</div>
+        </div>
+        <div class="kpi-sub">Risk Adjusted Return</div>
+      </div>
+      
+      <!-- Market Analyzer -->
+      <div class="card-base kpi-card market-analyzer">
+        <div class="ma-header">
+          <div>
+            <div class="kpi-title" style="color: var(--accent);">MARKET BENCHMARK</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">S&P 500 Index</div>
+          </div>
+          <div class="ma-val-group">
+            <div class="ma-val" id="ma-return">0.0%</div>
+          </div>
+        </div>
+        <div class="ma-stats-row">
+          <div class="ma-stat-item">VOL: <span id="ma-vol">0.0%</span></div>
+          <div class="ma-stat-item">MAX DD: <span id="ma-dd" class="text-red">0.0%</span></div>
+        </div>
+        <div class="slider-container">
+          <input type="range" id="timeSlider" class="market-slider" min="1" max="15" step="1" value="5">
+          <div class="range-labels">
+            <span>1Y</span>
+            <span id="slider-val-disp" style="color:var(--accent); font-weight:700;">5Y</span>
+            <span>15Y</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHART TABS -->
+    <div class="card-base tabs-container" id="chart-tabs-container">
+      <div class="tabs-header">
+        <button class="tab-btn active" onclick="openChartTab(event, 'chart-equity')">EQUITY CURVE</button>
+        <button class="tab-btn" onclick="openChartTab(event, 'chart-dd')">DRAWDOWN</button>
+        <button class="tab-btn" onclick="openChartTab(event, 'chart-vs')">VS S&P500 (ANNUAL)</button>
+      </div>
+      
+      <div id="chart-equity" class="tab-content active" style="height: 400px;">
+        <canvas id="equityChart"></canvas>
+      </div>
+      <div id="chart-dd" class="tab-content" style="height: 400px;">
+        <canvas id="ddChart"></canvas>
+      </div>
+      <div id="chart-vs" class="tab-content" style="height: 400px;">
+        <canvas id="vsChart"></canvas>
+      </div>
+    </div>
+
+    <!-- BOTTOM TABS -->
+    <div class="card-base tabs-container" id="bottom-tabs-container">
+      <div class="tabs-header">
+        <button class="tab-btn active" onclick="openBottomTab(event, 'tab-opt')">SENSITIVITY</button>
+        <button class="tab-btn" onclick="openBottomTab(event, 'tab-heatmap')">RETURNS HEATMAP</button>
+        <button class="tab-btn" onclick="openBottomTab(event, 'tab-annual')">ANNUAL CHART</button>
+        <button class="tab-btn" onclick="openBottomTab(event, 'tab-stats')">STATISTICS</button>
+        <button class="tab-btn" onclick="openBottomTab(event, 'tab-trades')">TRADE LOG</button>
+      </div>
+
+      <!-- Tab 0: Optimization -->
+      <div id="tab-opt" class="tab-content active">
+        <div class="opt-controls">
+          <div class="metric-group">
+            <button class="metric-btn active" onclick="updateHeatmapMetric('cagr')">CAGR</button>
+            <button class="metric-btn" onclick="updateHeatmapMetric('sharpe')">SHARPE</button>
+            <button class="metric-btn" onclick="updateHeatmapMetric('dd')">MAX DD</button>
+            <button class="metric-btn" onclick="updateHeatmapMetric('win')">WIN RATE</button>
+          </div>
+          <button class="btn-run" style="font-size:0.8rem; padding:8px 20px; width:auto;" onclick="runOptimization()">RUN ANALYSIS</button>
+        </div>
+        <div id="opt-loading" style="display:none; text-align:center; padding:30px; color:var(--accent);">
+          /// SIMULATING MULTIPLE SCENARIOS...
+        </div>
+        <div class="opt-table-wrapper" id="opt-results">
+          <table class="opt-table">
+            <thead>
+               <tr>
+                 <th rowspan="2" class="y-axis-label">PORTFOLIO SIZE</th>
+                 <th colspan="11" style="border-bottom:1px solid var(--border)">WEIGHT RETURN % (VS VOLUME)</th>
+               </tr>
+               <tr>
+                 <th>0%</th><th>10%</th><th>20%</th><th>30%</th><th>40%</th><th>50%</th><th>60%</th><th>70%</th><th>80%</th><th>90%</th><th>100%</th>
+               </tr>
+            </thead>
+            <tbody id="optTableBody">
+              <tr><td colspan="12" style="color:var(--text-muted); padding:40px; font-weight:400;">Click "RUN ANALYSIS" to generate matrix</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab 1: Heatmap -->
+      <div id="tab-heatmap" class="tab-content">
+        <div class="heatmap-wrapper">
+          <table id="heatmapTable" class="simple-table">
+            <thead>
+              <tr>
+                <th>Year</th>
+                <th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>May</th><th>Jun</th>
+                <th>Jul</th><th>Aug</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dec</th>
+                <th>YTD</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab 2: Annual Chart -->
+      <div id="tab-annual" class="tab-content">
+        <div style="height: 350px; position: relative;">
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Tab 3: Detailed Stats -->
+      <div id="tab-stats" class="tab-content">
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-label">Sharpe Ratio</div>
+            <div class="stat-val" id="stat-sharpe">0.00</div>
+            <div class="stat-sub">Risk Adjusted</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Volatility</div>
+            <div class="stat-val" id="stat-vol">0.0%</div>
+            <div class="stat-sub">Annualized</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Max Drawdown</div>
+            <div class="stat-val text-red" id="stat-dd">0.0%</div>
+            <div class="stat-sub">Peak to Valley</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Win Rate</div>
+            <div class="stat-val text-green" id="stat-win">0%</div>
+            <div class="stat-sub">Positive Months</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Best Month</div>
+            <div class="stat-val text-green" id="stat-best">0.0%</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Worst Month</div>
+            <div class="stat-val text-red" id="stat-worst">0.0%</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Avg Monthly</div>
+            <div class="stat-val" id="stat-avg">0.0%</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Months Traded</div>
+            <div class="stat-val" id="stat-count">0</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Tab 4: Trade Log -->
+      <div id="tab-trades" class="tab-content">
+        <div id="tradeLogContainer" class="trade-log-container">
+          <!-- JS will populate -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// --- CONFIGURATION ---
+let CONFIG = {
+  initialCapital: 15000,
+  topN: 15,
+  lookbackWeeks: 26,
+  rebalanceMonths: [1, 7], // Feb(1), Aug(7)
+  weightRet: 0.5,
+  weightVol: 0.5,
+  startYear: 2015,
+  cloudCsvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS87yu93ePnICOiw3clCWFFsVooq9v9NLa-KFbiDydcMdhKePRC9IFDgaDvvjJnv_PNnfPPq1PXt2_Z/pub?output=csv'
+};
+
+// --- GLOBAL STATE ---
+let state = {
+  marketData: {},
+  sortedDates: [],
+  universeDaily: [],
+  equityCurve: [],
+  monthlyReturns: [],
+  tradeLog: [],
+  optResults: []
+};
+
+// --- DOM ELEMENTS ---
+const el = {
+  input: document.getElementById('csvFile'),
+  status: document.getElementById('data-status'),
+  manualUpload: document.getElementById('manual-upload-container'),
+  loading: document.getElementById('loading'),
+  dash: document.getElementById('dashboard'),
+  sliderMarket: document.getElementById('timeSlider'),
+  sliderValDisp: document.getElementById('slider-val-disp'),
+  
+  // Strategy Controls
+  sliderWeight: document.getElementById('weightSlider'),
+  fillWeight: document.getElementById('track-fill'),
+  valRet: document.getElementById('val-ret'),
+  valVol: document.getElementById('val-vol'),
+  inputTopN: document.getElementById('topNInput'),
+  inputInitCap: document.getElementById('initialCapitalInput'),
+  inputStartYear: document.getElementById('startYearSelect'),
+
+  // Opt
+  optTableBody: document.getElementById('optTableBody'),
+  optLoading: document.getElementById('opt-loading'),
+  optResults: document.getElementById('opt-results'),
+  
+  // Market Analyzer
+  maReturn: document.getElementById('ma-return'),
+  maVol: document.getElementById('ma-vol'),
+  maDd: document.getElementById('ma-dd')
+};
+
+// --- AUTO LOAD DATA ---
+document.addEventListener('DOMContentLoaded', () => {
+  if (CONFIG.cloudCsvUrl && CONFIG.cloudCsvUrl !== 'REPLACE_WITH_YOUR_RAW_CSV_URL') {
+      loadDataFromCloud();
+  } else {
+      // If no URL is set, just show waiting status
+      el.status.className = 'status-indicator error';
+      el.status.innerHTML = '<span>●</span> NO CLOUD LINK (USE UPLOAD)';
+      el.manualUpload.style.display = 'block';
+  }
+});
+
+async function loadDataFromCloud() {
+  const fileUrl = CONFIG.cloudCsvUrl;
+  
+  try {
+    const response = await fetch(fileUrl);
+    if (!response.ok) throw new Error('Network response was not ok');
+    
+    const csvText = await response.text();
+    processData(csvText);
+    
+    // Update UI Status
+    el.status.className = 'status-indicator success';
+    el.status.innerHTML = '<span>●</span> CLOUD DATA CONNECTED';
+    
+    setTimeout(() => {
+      runBacktest();
+      el.loading.classList.add('hidden');
+      el.dash.classList.remove('hidden');
+    }, 500);
+
+  } catch (error) {
+    console.error('Failed to load cloud data:', error);
+    
+    // Show Error & Fallback to Manual
+    el.status.className = 'status-indicator error';
+    el.status.innerHTML = '<span>●</span> CONNECTION FAILED (USE UPLOAD)';
+    el.manualUpload.style.display = 'block';
+  }
+}
+
+// --- EVENTS ---
+el.input.addEventListener('change', handleUpload);
+el.sliderMarket.addEventListener('input', updateMarketAnalyzer);
+el.sliderWeight.addEventListener('input', updateWeightsUI);
+el.sliderWeight.addEventListener('change', runBacktest);
+el.inputTopN.addEventListener('change', runBacktest);
+el.inputInitCap.addEventListener('change', runBacktest);
+el.inputStartYear.addEventListener('change', runBacktest);
+
+// --- TAB LOGIC ---
+function switchTab(evt, containerId, tabId) {
+  const container = document.getElementById(containerId);
+  const contents = container.querySelectorAll('.tab-content');
+  const btns = container.querySelectorAll('.tab-btn');
+  contents.forEach(c => c.classList.remove('active'));
+  btns.forEach(b => b.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  evt.currentTarget.classList.add('active');
+}
+
+window.openChartTab = function(evt, tabId) { switchTab(evt, 'chart-tabs-container', tabId); }
+window.openBottomTab = function(evt, tabId) { switchTab(evt, 'bottom-tabs-container', tabId); }
+
+let currentMetric = 'cagr';
+window.updateHeatmapMetric = function(metric) {
+  currentMetric = metric;
+  document.querySelectorAll('.metric-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  if(state.optResults.length > 0) renderOptimizationTable();
+}
+
+// --- LOGIC ---
+function updateWeightsUI() {
+  const retPct = parseInt(el.sliderWeight.value);
+  const volPct = 100 - retPct;
+  el.valRet.innerText = retPct; el.valVol.innerText = volPct;
+  el.fillWeight.style.width = retPct + '%';
+  CONFIG.weightRet = retPct / 100; CONFIG.weightVol = volPct / 100;
+}
+
+function handleUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  el.status.className = 'status-indicator loading';
+  el.status.innerHTML = '<span>●</span> PROCESSING FILE...';
+  
+  el.loading.classList.remove('hidden');
+  el.dash.classList.add('hidden');
+  
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    processData(evt.target.result);
+    el.status.className = 'status-indicator success';
+    el.status.innerHTML = '<span>●</span> LOCAL FILE LOADED';
+    
+    setTimeout(() => {
+      runBacktest();
+      el.loading.classList.add('hidden');
+      el.dash.classList.remove('hidden');
+    }, 300);
+  };
+  reader.readAsText(file);
+}
+
+function processData(csv) {
+  const lines = csv.trim().split('\n');
+  state.marketData = {};
+  const dateSet = new Set();
+  
+  for(let i=1; i<lines.length; i++) {
+    const row = lines[i].split(',');
+    if(row.length < 7) continue;
+    const ticker = row[0].trim();
+    const date = row[1].trim();
+    const close = parseFloat(row[5]);
+    const volume = parseFloat(row[6]);
+    if (!state.marketData[date]) state.marketData[date] = {};
+    state.marketData[date][ticker] = { c: close, v: volume };
+    dateSet.add(date);
+  }
+  state.sortedDates = Array.from(dateSet).sort();
+
+  // Populate Start Year Dropdown
+  const years = [...new Set(state.sortedDates.map(d => d.substring(0,4)))].sort();
+  // Filter only years >= 2015
+  const displayYears = years.filter(y => parseInt(y) >= 2015);
+  
+  el.inputStartYear.innerHTML = '';
+  displayYears.forEach(y => {
+    const opt = document.createElement('option');
+    opt.value = y;
+    opt.innerText = y;
+    if (parseInt(y) === 2015) opt.selected = true; // Default to 2015 if available
+    el.inputStartYear.appendChild(opt);
+  });
+}
+
+function simulateStrategy(wRet, nStocks) {
+  // Respect Start Year in Optimization
+  const startYear = parseInt(el.inputStartYear.value);
+  let startIndex = state.sortedDates.findIndex(d => d.startsWith(startYear.toString()));
+  if(startIndex === -1) startIndex = 0;
+
+  let cash = CONFIG.initialCapital;
+  let holdings = {};
+  let curve = [];
+  let wVol = 1 - wRet;
+
+  // Loop starts from selected year
+  for (let i = startIndex; i < state.sortedDates.length; i++) {
+    const dateStr = state.sortedDates[i];
+    const dateObj = new Date(dateStr);
+    const dayData = state.marketData[dateStr];
+    
+    let val = cash;
+    for (const [t, s] of Object.entries(holdings)) {
+      const p = dayData[t] ? dayData[t].c : (i>0?state.marketData[state.sortedDates[i-1]][t]?.c:0);
+      val += s * (p||0);
+    }
+    curve.push(val);
+
+    const isRebalance = CONFIG.rebalanceMonths.includes(dateObj.getMonth());
+    const isFirstWeek = dateObj.getDate() <= 7;
+
+    if (isRebalance && isFirstWeek && i > CONFIG.lookbackWeeks) {
+      const signalIdx = i - 1;
+      const startIdx = signalIdx - CONFIG.lookbackWeeks;
+      if (startIdx >= 0) {
+        const endD = state.sortedDates[signalIdx];
+        const startD = state.sortedDates[startIdx];
+        const tickers = Object.keys(state.marketData[endD]);
+        const stats = [];
+        tickers.forEach(t => {
+          if (state.marketData[startD][t]) {
+            const pEnd = state.marketData[endD][t].c;
+            const pStart = state.marketData[startD][t].c;
+            const ret = (pEnd - pStart) / pStart;
+            let vol = 0;
+            for(let k=startIdx; k<=signalIdx; k+=4) {
+               const d = state.sortedDates[k];
+               if(state.marketData[d][t]) vol += state.marketData[d][t].v;
+            }
+            stats.push({ ticker: t, ret, vol });
+          }
+        });
+        
+        stats.sort((a,b)=>b.ret - a.ret);
+        stats.forEach((s,k)=>s.rRet=k);
+        stats.sort((a,b)=>b.vol - a.vol);
+        stats.forEach((s,k)=>s.rVol=k);
+        stats.forEach(s => s.sc = (s.rRet*wRet) + (s.rVol*wVol));
+        stats.sort((a,b)=>a.sc - b.sc);
+
+        const selected = stats.slice(0, nStocks);
+        cash = val; holdings = {};
+        const alloc = cash / nStocks;
+        selected.forEach(st => {
+           if(dayData[st.ticker]) {
+             holdings[st.ticker] = alloc / dayData[st.ticker].c;
+             cash -= alloc;
+           }
+        });
+      }
+    }
+  }
+  
+  if (curve.length === 0) return { cagr:0, dd:0, sharpe:0, win:0 };
+
+  const start = curve[0];
+  const end = curve[curve.length-1];
+  const days = curve.length * 7; 
+  const cagr = Math.pow(end/start, 1/(days/365.25)) - 1;
+  let peak = -Infinity;
+  let maxDD = 0;
+  curve.forEach(v => {
+    if(v>peak) peak=v;
+    const d = (v-peak)/peak;
+    if(d<maxDD) maxDD=d;
+  });
+
+  const rets = [];
+  for(let i=1;i<curve.length;i++) rets.push((curve[i]-curve[i-1])/curve[i-1]);
+  const avg = rets.reduce((a,b)=>a+b,0)/rets.length;
+  const std = Math.sqrt(rets.reduce((a,b)=>a+Math.pow(b-avg,2),0)/rets.length);
+  const sharpe = std===0 ? 0 : (avg * 52) / (std * Math.sqrt(52));
+  const wins = rets.filter(r=>r>0).length;
+  const winRate = wins/rets.length;
+
+  return { cagr, dd: maxDD, sharpe, win: winRate };
+}
+
+window.runOptimization = function() {
+  if(state.sortedDates.length === 0) return;
+  el.optLoading.style.display = 'block';
+  el.optResults.style.display = 'none';
+
+  setTimeout(() => {
+    const results = [];
+    const stockSteps = [5, 10, 15, 20, 25, 30];
+    const weightSteps = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
+
+    stockSteps.forEach(n => {
+      const row = { n, cols: [] };
+      weightSteps.forEach(w => {
+         const res = simulateStrategy(w, n);
+         row.cols.push(res);
+      });
+      results.push(row);
+    });
+
+    state.optResults = results;
+    renderOptimizationTable();
+    el.optLoading.style.display = 'none';
+    el.optResults.style.display = 'block';
+  }, 100);
+}
+
+function renderOptimizationTable() {
+  el.optTableBody.innerHTML = '';
+  let vals = [];
+  state.optResults.forEach(row => row.cols.forEach(c => vals.push(c[currentMetric])));
+  let min = Math.min(...vals);
+  let max = Math.max(...vals);
+  
+  state.optResults.forEach(row => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td style="color:var(--accent); font-weight:bold;">${row.n}</td>`;
+    row.cols.forEach(col => {
+      const val = col[currentMetric];
+      let displayVal = (val * 100).toFixed(1) + '%';
+      if(currentMetric === 'sharpe') displayVal = val.toFixed(2);
+      
+      let norm = (val - min) / (max - min);
+      if(isNaN(norm)) norm = 0.5;
+      
+      let r, g, b;
+      if (norm < 0.5) {
+        // Red to Yellow
+        const t = norm * 2;
+        r = Math.round(248 + (250 - 248) * t);
+        g = Math.round(113 + (204 - 113) * t);
+        b = Math.round(113 + (21 - 113) * t);
+      } else {
+        // Yellow to Green
+        const t = (norm - 0.5) * 2;
+        r = Math.round(250 + (52 - 250) * t);
+        g = Math.round(204 + (211 - 204) * t);
+        b = Math.round(21 + (153 - 21) * t);
+      }
+      
+      const bgColor = `rgba(${r}, ${g}, ${b}, 0.25)`;
+      const textColor = `rgb(${r}, ${g}, ${b})`;
+      
+      tr.innerHTML += `<td style="background:${bgColor}; color:${textColor}">${displayVal}</td>`;
+    });
+    el.optTableBody.appendChild(tr);
+  });
+}
+
+function runBacktest() {
+  CONFIG.topN = parseInt(el.inputTopN.value) || 15;
+  CONFIG.initialCapital = parseFloat(el.inputInitCap.value) || 15000;
+  CONFIG.startYear = parseInt(el.inputStartYear.value) || 2015;
+
+  let cash = CONFIG.initialCapital;
+  let holdings = {}; 
+  let currentEquity = CONFIG.initialCapital;
+  state.equityCurve = [];
+  state.tradeLog = [];
+
+  // Filter Start Date
+  let startIndex = state.sortedDates.findIndex(d => d.startsWith(CONFIG.startYear.toString()));
+  if(startIndex === -1) startIndex = 0;
+
+  // Filter Universe Daily for Market Analyzer based on Start Year
+  if (state.sortedDates.length > 0) {
+     if (state.universeDaily.length === 0) {
+        state.universeDaily = state.sortedDates.map(d => {
+            const tickers = Object.keys(state.marketData[d]);
+            const avg = tickers.reduce((s, t) => s + state.marketData[d][t].c, 0) / (tickers.length || 1);
+            return { date: d, val: avg };
+        });
+     }
+  }
+
+  for (let i = startIndex; i < state.sortedDates.length; i++) {
+    const dateStr = state.sortedDates[i];
+    const dateObj = new Date(dateStr);
+    const dayData = state.marketData[dateStr];
+    let holdingsVal = 0;
+    for (const [t, shares] of Object.entries(holdings)) {
+      const price = dayData[t] ? dayData[t].c : (i>0 ? state.marketData[state.sortedDates[i-1]][t]?.c : 0);
+      holdingsVal += shares * (price || 0);
+    }
+    currentEquity = cash + holdingsVal;
+    state.equityCurve.push({ date: dateStr, equity: currentEquity });
+
+    const isRebalanceMonth = CONFIG.rebalanceMonths.includes(dateObj.getMonth());
+    const isFirstWeek = dateObj.getDate() <= 7;
+    
+    // Ensure lookback works even if i is near start of filtered period 
+    // (i is index in FULL sortedDates, so lookback logic works fine)
+    if (isRebalanceMonth && isFirstWeek && i > CONFIG.lookbackWeeks) {
+      const signalIdx = i - 1;
+      const startIdx = signalIdx - CONFIG.lookbackWeeks;
+      if (startIdx >= 0) {
+        const candidates = rankStocks(signalIdx, startIdx);
+        const selected = candidates.slice(0, CONFIG.topN);
+        state.tradeLog.push({ date: dateStr, equity: currentEquity, stocks: selected.map(s => s.ticker) });
+        cash = currentEquity; holdings = {};
+        const alloc = cash / CONFIG.topN;
+        selected.forEach(st => {
+          if (dayData[st.ticker]) {
+            holdings[st.ticker] = alloc / dayData[st.ticker].c;
+            cash -= alloc;
+          }
+        });
+      }
+    }
+  }
+  calculateStats();
+  renderAll();
+}
+
+function rankStocks(endIdx, startIdx) {
+  const endD = state.sortedDates[endIdx];
+  const startD = state.sortedDates[startIdx];
+  const tickers = Object.keys(state.marketData[endD]);
+  const stats = [];
+  tickers.forEach(t => {
+    if (state.marketData[startD][t]) {
+      const pEnd = state.marketData[endD][t].c;
+      const pStart = state.marketData[startD][t].c;
+      const ret = (pEnd - pStart) / pStart;
+      let vol = 0;
+      for(let k=startIdx; k<=endIdx; k++) {
+        const d = state.sortedDates[k];
+        if(state.marketData[d][t]) vol += state.marketData[d][t].v;
+      }
+      stats.push({ ticker: t, ret, vol });
+    }
+  });
+  stats.sort((a,b) => b.ret - a.ret);
+  stats.forEach((s,i) => s.rankRet = i);
+  stats.sort((a,b) => b.vol - a.vol);
+  stats.forEach((s,i) => s.rankVol = i);
+  stats.forEach(s => { s.score = (s.rankRet * CONFIG.weightRet) + (s.rankVol * CONFIG.weightVol); });
+  stats.sort((a,b) => a.score - b.score);
+  return stats;
+}
+
+function calculateStats() {
+  const curve = state.equityCurve;
+  if(curve.length === 0) return;
+
+  const start = curve[0].equity;
+  const end = curve[curve.length-1].equity;
+  const totalRet = (end - start) / start;
+  const days = (new Date(curve[curve.length-1].date) - new Date(curve[0].date)) / 86400000;
+  const cagr = days > 0 ? Math.pow(end/start, 1/(days/365.25)) - 1 : 0;
+
+  document.getElementById('kpi-final').innerText = '$' + Math.round(end).toLocaleString();
+  const retEl = document.getElementById('kpi-return');
+  retEl.innerText = (totalRet>=0?'+':'') + (totalRet*100).toFixed(1) + '%';
+  retEl.className = 'kpi-sub ' + (totalRet>=0?'text-green':'text-red');
+  const cagrEl = document.getElementById('kpi-cagr');
+  cagrEl.innerText = (cagr*100).toFixed(1) + '%';
+  cagrEl.className = 'kpi-value ' + (cagr>=0?'text-green':'text-red');
+  
+  const monthlyData = {};
+  state.equityCurve.forEach(e => monthlyData[e.date.substring(0,7)] = e.equity);
+  const months = Object.keys(monthlyData).sort();
+  state.monthlyReturns = [];
+  
+  for(let i=1; i<months.length; i++) {
+    const prev = monthlyData[months[i-1]];
+    const curr = monthlyData[months[i]];
+    state.monthlyReturns.push((curr - prev) / prev);
+  }
+
+  const mr = state.monthlyReturns;
+  if(mr.length > 0) {
+    const avgM = mr.reduce((a,b)=>a+b,0)/mr.length;
+    const stdM = Math.sqrt(mr.reduce((a,b)=>a+Math.pow(b-avgM,2),0)/mr.length);
+    const vol = stdM * Math.sqrt(12);
+    const sharpe = (avgM * 12) / vol;
+    const best = Math.max(...mr);
+    const worst = Math.min(...mr);
+    const wins = mr.filter(r => r > 0).length;
+    const winRate = wins / mr.length;
+    let peak = -Infinity;
+    let maxDD = 0;
+    state.equityCurve.forEach(e => {
+      if(e.equity > peak) peak = e.equity;
+      const dd = (e.equity - peak) / peak;
+      if(dd < maxDD) maxDD = dd;
+    });
+
+    const fmt = (n, p=1) => (n*100).toFixed(p)+'%';
+    document.getElementById('stat-sharpe').innerText = sharpe.toFixed(2);
+    document.getElementById('stat-vol').innerText = fmt(vol);
+    document.getElementById('stat-dd').innerText = fmt(maxDD);
+    document.getElementById('stat-win').innerText = fmt(winRate);
+    document.getElementById('stat-best').innerText = fmt(best);
+    document.getElementById('stat-worst').innerText = fmt(worst);
+    document.getElementById('stat-avg').innerText = fmt(avgM, 2);
+    document.getElementById('stat-count').innerText = mr.length;
+
+    document.getElementById('kpi-strat-vol').innerText = fmt(vol);
+    document.getElementById('kpi-strat-dd').innerText = fmt(maxDD);
+    document.getElementById('kpi-strat-sharpe').innerText = sharpe.toFixed(2);
+  }
+}
+
+let charts = {};
+
+function renderAll() {
+  renderEquityChart();
+  renderDDChart();
+  renderBarChart();
+  renderVsChart(); 
+  renderHeatmap();
+  renderTradeLog();
+  updateMarketAnalyzer();
+}
+
+function renderTradeLog() {
+  const container = document.getElementById('tradeLogContainer');
+  container.innerHTML = '';
+  const logs = [...state.tradeLog].reverse();
+  logs.forEach(log => {
+    const card = document.createElement('div');
+    card.className = 'trade-card';
+    const stocksHtml = log.stocks.map(s => `<span class="stock-badge">${s}</span>`).join('');
+    card.innerHTML = `
+      <div class="trade-date-box">
+        <div class="trade-date">${log.date}</div>
+        <div class="trade-equity">EQ: $${Math.round(log.equity).toLocaleString()}</div>
+      </div>
+      <div class="trade-stocks">${stocksHtml}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function renderEquityChart() {
+  const ctx = document.getElementById('equityChart').getContext('2d');
+  if(charts.eq) charts.eq.destroy();
+  Chart.defaults.font.family = 'Inter';
+  Chart.defaults.color = '#8B7D5E';
+  const grad = ctx.createLinearGradient(0,0,0,400);
+  grad.addColorStop(0, 'rgba(212,175,55, 0.6)'); // Increased opacity from 0.2 to 0.6
+  grad.addColorStop(1, 'rgba(212,175,55, 0.05)'); // Increased from 0 to 0.05 to keep it slightly visible at bottom
+  charts.eq = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: state.equityCurve.map(e => e.date),
+      datasets: [{
+        label: 'Equity', data: state.equityCurve.map(e => e.equity), borderColor: '#D4AF37', backgroundColor: grad, borderWidth: 2, pointRadius: 0, fill: true, tension: 0.2
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+      scales: { 
+        x: { 
+            display: true, 
+            grid: { display: false }, 
+            ticks: { 
+                color: '#8B7D5E', 
+                maxTicksLimit: 8, 
+                maxRotation: 0, 
+                autoSkip: true 
+            } 
+        }, 
+        y: { 
+            grid: { color: 'rgba(212,175,55,0.2)' }, 
+            ticks: { callback: v => '$'+v/1000+'k' } 
+        } 
+      }
+    }
+  });
+}
+
+function renderDDChart() {
+  const ctx = document.getElementById('ddChart').getContext('2d');
+  if(charts.dd) charts.dd.destroy();
+  
+  // Calculate DD
+  let peak = -Infinity;
+  const dds = state.equityCurve.map(e => {
+    if (e.equity > peak) peak = e.equity;
+    return ((e.equity - peak) / peak) * 100;
+  });
+
+  // Create Gradient
+  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+  gradient.addColorStop(0, 'rgba(212,175,55, 0.1)');   // Top - Yellow tint (faint)
+  gradient.addColorStop(0.5, 'rgba(251, 146, 60, 0.6)'); // Middle - Orange
+  gradient.addColorStop(1, 'rgba(185, 28, 28, 0.9)');    // Bottom - Deep Red
+
+  charts.dd = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: state.equityCurve.map(e => e.date),
+      datasets: [{ 
+        label: 'Max Drawdown',
+        data: dds, 
+        borderColor: '#D95F5F', 
+        backgroundColor: gradient, 
+        borderWidth: 2, 
+        pointRadius: 0, 
+        pointHoverRadius: 6,
+        pointBackgroundColor: '#D95F5F',
+        pointBorderColor: '#fff',
+        fill: true,
+        tension: 0.2
+      }]
+    },
+    options: {
+      responsive: true, 
+      maintainAspectRatio: false, 
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+      plugins: { 
+        legend: { display: false },
+        tooltip: {
+            enabled: true,
+            backgroundColor: 'rgba(30, 41, 59, 0.9)',
+            titleColor: '#fff',
+            bodyColor: '#D95F5F',
+            borderColor: 'rgba(217,95,95, 0.3)',
+            borderWidth: 1,
+            displayColors: false,
+            callbacks: {
+                label: function(context) {
+                    return `Drawdown: ${context.parsed.y.toFixed(2)}%`;
+                }
+            }
+        }
+      }, 
+      scales: { 
+        x: { 
+            display: true,
+            grid: { display: false, color: 'rgba(212,175,55,0.2)' },
+            ticks: { color: '#8B7D5E', maxTicksLimit: 8 }
+        }, 
+        y: { 
+            display: true,
+            position: 'right',
+            grid: { color: 'rgba(51, 65, 85, 0.5)', borderDash: [4, 4] },
+            ticks: { 
+                color: '#C4B88A',
+                callback: function(value) { return value + '%'; }
+            } 
+        } 
+      }
+    }
+  });
+}
+
+function renderVsChart() {
+  const dates = state.equityCurve.map(e => e.date);
+  const years = [...new Set(dates.map(d => d.substring(0,4)))].sort();
+  const strategyRets = [];
+  const marketRets = [];
+  let prevStrat = CONFIG.initialCapital;
+  
+  // Need to be careful about finding prevMarket when startYear changes
+  // Find index in universeDaily matching the first equityCurve date
+  let marketStartIndex = 0;
+  if (state.universeDaily.length > 0 && dates.length > 0) {
+     const startD = dates[0];
+     marketStartIndex = state.universeDaily.findIndex(u => u.date === startD);
+     if (marketStartIndex === -1) marketStartIndex = 0;
+  }
+  let prevMarket = state.universeDaily.length > 0 ? state.universeDaily[marketStartIndex].val : 0;
+  
+  years.forEach(y => {
+    const stratRelevant = state.equityCurve.filter(e => e.date.startsWith(y));
+    if(stratRelevant.length === 0) return;
+    const endStrat = stratRelevant[stratRelevant.length-1].equity;
+    const retS = ((endStrat - prevStrat) / prevStrat) * 100;
+    strategyRets.push(retS);
+    prevStrat = endStrat;
+
+    const mktRelevant = state.universeDaily.filter(e => e.date.startsWith(y));
+    if(mktRelevant.length === 0) { marketRets.push(0); return; }
+    const endMarket = mktRelevant[mktRelevant.length-1].val;
+    
+    // For the first year, we must ensure startMarket aligns with strat start
+    let startMarket = prevMarket; 
+    if (y === years[0]) {
+       // If mid-year start, simple return logic:
+       // prevMarket was set to the val at START of simulation.
+       // So (end - start) / start is correct.
+       startMarket = prevMarket; 
+    } else {
+       startMarket = prevMarket;
+    }
+
+    const retM = ((endMarket - startMarket) / startMarket) * 100;
+    marketRets.push(retM);
+    prevMarket = endMarket;
+  });
+
+  const ctx = document.getElementById('vsChart').getContext('2d');
+  if(charts.vs) charts.vs.destroy();
+  charts.vs = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: years,
+      datasets: [
+        { label: 'Strategy', data: strategyRets, backgroundColor: strategyRets.map(v => v>=0 ? '#5BC48E' : '#D95F5F'), borderRadius: 3 },
+        { label: 'S&P 500', data: marketRets, backgroundColor: '#722F37', borderRadius: 3 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { 
+        legend: { position: 'top', labels: { color: '#C4B88A', font:{family:'Anuphan, Inter, sans-serif'} } },
+        tooltip: {
+            callbacks: {
+                label: function(context) {
+                    let label = context.dataset.label || '';
+                    if (label) {
+                        label += ': ';
+                    }
+                    if (context.parsed.y !== null) {
+                        label += context.parsed.y.toFixed(1) + '%';
+                    }
+                    return label;
+                }
+            }
+        }
+      },
+      scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(212,175,55,0.2)' }, ticks: { callback: v => v+'%' } } }
+    }
+  });
+}
+
+function renderBarChart() {
+  const dates = state.equityCurve.map(e => e.date);
+  const years = [...new Set(dates.map(d => d.substring(0,4)))].sort();
+  const yearlyData = [];
+  let prevEnd = CONFIG.initialCapital;
+  years.forEach(y => {
+    const relevant = state.equityCurve.filter(e => e.date.startsWith(y));
+    if(relevant.length === 0) return;
+    const endVal = relevant[relevant.length-1].equity;
+    const ret = ((endVal - prevEnd) / prevEnd) * 100;
+    yearlyData.push({ year: y, ret: ret });
+    prevEnd = endVal;
+  });
+
+  const ctx = document.getElementById('barChart').getContext('2d');
+  if(charts.bar) charts.bar.destroy();
+
+  // Create Gradient for Green Bars (Deep Green Dimension)
+  const greenGradient = ctx.createLinearGradient(0, 0, 0, 400);
+  greenGradient.addColorStop(0, 'rgba(91,196,142, 1)');   // Top: Bright Green
+  greenGradient.addColorStop(0.6, 'rgba(34, 197, 94, 0.8)'); // Mid: Standard Green
+  greenGradient.addColorStop(1, 'rgba(20, 83, 45, 0.6)');    // Bottom: Deep Forest Green
+
+  // Custom Plugin for Data Labels
+  const dataLabelPlugin = {
+    id: 'dataLabel',
+    afterDatasetsDraw(chart, args, options) {
+      const { ctx } = chart;
+      ctx.save();
+      if(chart.data.datasets.length > 0) {
+        chart.data.datasets[0].data.forEach((datapoint, index) => {
+            const meta = chart.getDatasetMeta(0);
+            const bar = meta.data[index];
+            const value = datapoint;
+            
+            ctx.font = 'bold 11px Inter';
+            ctx.textAlign = 'center';
+            
+            if (value >= 0) {
+            ctx.fillStyle = '#5BC48E'; // Green text
+            ctx.fillText('+' + value.toFixed(1) + '%', bar.x, bar.y - 6);
+            } else {
+            ctx.fillStyle = '#D95F5F'; // Red text
+            ctx.fillText(value.toFixed(1) + '%', bar.x, bar.y + 14);
+            }
+        });
+      }
+      ctx.restore();
+    }
+  };
+
+  charts.bar = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: yearlyData.map(d => d.year),
+      datasets: [{
+        label: 'Strategy Return',
+        data: yearlyData.map(d => d.ret),
+        backgroundColor: yearlyData.map(d => d.ret >= 0 ? greenGradient : '#D95F5F'),
+        borderRadius: 4,
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, 
+      plugins: { 
+        legend: { 
+            display: true,
+            labels: { color: '#C4B88A', font: { family: 'Anuphan, Inter, sans-serif', size: 11 } } 
+        },
+        tooltip: {
+            enabled: false // Disable tooltip since we have labels
+        }
+      },
+      scales: { x: { grid: { display: false }, ticks: { color: '#C4B88A' } }, y: { grid: { color: 'rgba(212,175,55,0.2)' }, ticks: { color: '#8B7D5E', callback: v => v+'%' } } }
+    },
+    plugins: [dataLabelPlugin]
+  });
+}
+
+function updateMarketAnalyzer() {
+  if (state.universeDaily.length === 0) return;
+  const val = parseInt(el.sliderMarket.value);
+  el.sliderValDisp.innerText = val + "Y";
+  const years = val;
+  const last = state.universeDaily[state.universeDaily.length-1];
+  const endDate = new Date(last.date);
+  let startIdx = 0;
+  for(let i=state.universeDaily.length-1; i>=0; i--) {
+    const d = new Date(state.universeDaily[i].date);
+    if ((endDate - d)/(365.25*86400000) >= years) { startIdx = i; break; }
+  }
+  const startVal = state.universeDaily[startIdx].val;
+  const endVal = last.val;
+  const cagr = Math.pow(endVal/startVal, 1/Math.max((endDate - new Date(state.universeDaily[startIdx].date)) / (365.25*86400000), 0.5)) - 1;
+  el.maReturn.innerText = (cagr >=0 ? '+' : '') + (cagr * 100).toFixed(1) + '%';
+  el.maReturn.style.color = cagr >= 0 ? 'var(--accent)' : 'var(--red)';
+
+  const periodData = state.universeDaily.slice(startIdx);
+  const rets = [];
+  let peak = -Infinity;
+  let maxDD = 0;
+  for(let i=1; i<periodData.length; i++) {
+    const r = (periodData[i].val - periodData[i-1].val) / periodData[i-1].val;
+    rets.push(r);
+    if (periodData[i].val > peak) peak = periodData[i].val;
+    const d = (periodData[i].val - peak) / peak;
+    if (d < maxDD) maxDD = d;
+  }
+  const avg = rets.reduce((a,b)=>a+b,0)/rets.length;
+  const std = Math.sqrt(rets.reduce((a,b)=>a+Math.pow(b-avg,2),0)/rets.length);
+  const vol = std * Math.sqrt(52);
+  el.maVol.innerText = (vol * 100).toFixed(1) + '%';
+  el.maDd.innerText = (maxDD * 100).toFixed(1) + '%';
+}
+
+function renderHeatmap() {
+  const tbody = document.querySelector('#heatmapTable tbody');
+  tbody.innerHTML = '';
+  const years = [...new Set(state.equityCurve.map(e => e.date.substring(0,4)))].sort();
+  let prevYearEnd = CONFIG.initialCapital;
+  
+  years.forEach(y => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${y}</td>`;
+    let currentVal = prevYearEnd;
+    let yearStart = prevYearEnd;
+    
+    for(let m=1; m<=12; m++) {
+      const mStr = m.toString().padStart(2,'0');
+      const matches = state.equityCurve.filter(e => e.date.startsWith(`${y}-${mStr}`));
+      let val = '-', cls = '';
+      let style = ''; // For background color
+      
+      if(matches.length > 0) {
+        const monthEnd = matches[matches.length-1].equity;
+        const ret = ((monthEnd - currentVal)/currentVal)*100;
+        val = ret.toFixed(1);
+        cls = ret >= 0 ? 'text-green' : 'text-red';
+        
+        // Calculate Background Gradient based on return size
+        // +/- 10% saturation
+        let r, g, b, alpha;
+        const maxSat = 15; // 15% return gives max saturation
+        const intensity = Math.min(Math.abs(ret), maxSat) / maxSat;
+        
+        if(ret >= 0) {
+           // Green
+           r=52; g=211; b=153; alpha = 0.1 + (intensity * 0.5);
+        } else {
+           // Red
+           r=248; g=113; b=113; alpha = 0.1 + (intensity * 0.5);
+        }
+        
+        // Text color for readability - white if dark bg
+        const textColor = alpha > 0.4 ? '#fff' : (ret>=0 ? 'var(--green)' : 'var(--red)');
+        const weight = alpha > 0.3 ? '700' : '500';
+        
+        style = `background: rgba(${r}, ${g}, ${b}, ${alpha}); color: ${textColor}; font-weight:${weight};`;
+        
+        currentVal = monthEnd;
+      }
+      tr.innerHTML += `<td style="${style}">${val}</td>`;
+    }
+    const ytd = ((currentVal - yearStart)/yearStart)*100;
+    tr.innerHTML += `<td style="font-weight:700" class="${ytd>=0?'text-green':'text-red'}">${ytd.toFixed(1)}%</td>`;
+    prevYearEnd = currentVal;
+    tbody.appendChild(tr);
+  });
+}
+</script>
+</body>
+</html>
