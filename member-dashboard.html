@@ -711,7 +711,8 @@ function renderNewsFeed(){
   if(newsSearchQuery){
     const q=newsSearchQuery.toLowerCase().trim();
     filtered=filtered.map(b=>{
-      const matched=(b.headlines||[]).filter(h=>{
+      const tagged=(b.headlines||[]).map((h,i)=>Object.assign({},h,{_origIndex:i}));
+      const matched=tagged.filter(h=>{
         if((h.title||'').toLowerCase().includes(q))return true;
         if((h.source||'').toLowerCase().includes(q))return true;
         const tks=normalizeTickers(h.tickers);
@@ -732,7 +733,7 @@ function renderNewsFeed(){
 function renderNewsBatchCard(b){
   const safeFile=encodeURIComponent(b.file);
   const dateHeader='<div class="news-batch-date">'+escapeText(b.date_display||b.date||'')+'</div>';
-  const items=(b.headlines||[]).map((h)=>{
+  const items=(b.headlines||[]).map((h,idx)=>{
     const tickers=normalizeTickers(h.tickers);
     const tickerPills=tickers.map(t=>{
       const s=t.sentiment||'neutral';
@@ -743,7 +744,9 @@ function renderNewsBatchCard(b){
     if(h.source)metaBits.push(escapeText(h.source));
     if(h.published)metaBits.push(escapeText(h.published));
     const metaLine=metaBits.length?' <span class="news-src-inline">— '+metaBits.join(' · ')+'</span>':'';
-    return '<div class="news-dash-card" onclick="openNewsDetail(\''+safeFile+'\')">'
+    // Use original index (pre-filter) if available, otherwise the rendered idx
+    const originalIdx=(typeof h._origIndex==='number')?h._origIndex:idx;
+    return '<div class="news-dash-card" onclick="openNewsDetail(\''+safeFile+'\','+originalIdx+')">'
       +'<div class="news-dash-title">'+escapeText(h.title)+metaLine+'</div>'
       +'<div class="news-item-tickers">'+tickerPills+'</div>'
     +'</div>';
@@ -756,7 +759,11 @@ function normalizeTickers(tickers){
   return tickers.map(t=>typeof t==='string'?{symbol:t,sentiment:'neutral'}:{symbol:t.symbol||'',sentiment:t.sentiment||'neutral'});
 }
 function escapeText(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-function openNewsDetail(file){openIframe('📰 News Detail','news-detail.html?file='+file)}
+function openNewsDetail(file,idx){
+  let url='news-detail.html?file='+file;
+  if(typeof idx==='number'&&idx>=0)url+='&idx='+idx;
+  openIframe('📰 News Detail',url);
+}
 function filterNewsFeed(){
   const inp=document.getElementById('newsSearchInput');
   const clear=document.getElementById('newsSearchClear');

@@ -94,6 +94,13 @@ function getFileFromURL(){
   const params = new URLSearchParams(window.location.search);
   return params.get('file');
 }
+function getIdxFromURL(){
+  const params = new URLSearchParams(window.location.search);
+  const v = params.get('idx');
+  if(v === null) return -1;
+  const n = parseInt(v,10);
+  return isNaN(n) ? -1 : n;
+}
 
 // Minimal markdown renderer (headers, bold, italic, lists, hr, code, blockquote)
 function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
@@ -191,6 +198,24 @@ function normalizeTickersDetail(tickers){
   return tickers.map(t=>typeof t==='string'?{symbol:t,sentiment:'neutral'}:{symbol:t.symbol||'',sentiment:t.sentiment||'neutral'});
 }
 
+// Given wrapped HTML (h2 + .news-item repeated, separated by <hr>),
+// return only the n-th headline block (0-indexed)
+function extractSingleItem(html, idx){
+  // Split by h2 open; parts[0] is pre-h2 content, parts[1..] are headline chunks
+  const parts = html.split(/(?=<h2[>\s])/);
+  const headlineParts = parts.filter(p => /^<h2/.test(p));
+  if(idx < 0 || idx >= headlineParts.length){
+    return '<div class="error-box">ไม่พบข่าวนี้</div>';
+  }
+  let chunk = headlineParts[idx];
+  // Strip trailing <hr> if present (clean edge)
+  chunk = chunk.replace(/<hr\b[^>]*>(\s|&nbsp;|<br\s*\/?>)*$/i, '');
+  // Also strip any content after trailing <hr> onwards
+  const hrIdx = chunk.indexOf('<hr>');
+  if(hrIdx > -1) chunk = chunk.slice(0, hrIdx);
+  return chunk;
+}
+
 async function loadNews(){
   const file = getFileFromURL();
   const contentDiv = document.getElementById('content');
@@ -217,7 +242,14 @@ async function loadNews(){
     const md = await mdRes.text();
     let rendered = renderMarkdown(md);
     const headlines = batch && batch.headlines ? batch.headlines : [];
+    const idx = getIdxFromURL();
     rendered = wrapNewsItems(rendered, headlines);
+    if(idx >= 0){
+      rendered = extractSingleItem(rendered, idx);
+      if(batch && batch.headlines && batch.headlines[idx]){
+        document.getElementById('topbarTitle').textContent = batch.headlines[idx].title || 'News';
+      }
+    }
     contentDiv.innerHTML = '<div class="md-content">' + rendered + '</div>';
   } catch(err){
     contentDiv.innerHTML = '<div class="error-box">ไม่สามารถโหลดข่าวได้ — '+escapeHtml(err.message)+'</div>';
