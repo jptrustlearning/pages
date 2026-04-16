@@ -1,6 +1,45 @@
 {
-  "lastUpdated": "2026-04-16T18:30:00Z",
+  "lastUpdated": "2026-04-16T19:40:00Z",
   "batches": [
+    {
+      "file": "2026-04-16-1940.md",
+      "date": "2026-04-16T19:40:00Z",
+      "date_display": "16 เม.ย. 2026 · 19:40",
+      "summary": "ASML ดิ่งแม้ beat · Delta เตือน capacity · Monday.com โดน downgrade",
+      "tickers": ["ASML", "NVDA", "TSM", "DAL", "UAL", "MNDY"],
+      "headlines": [
+        {
+          "title": "ASML ดิ่ง −6% แม้ Beat Earnings + ยก Guidance — ตลาดกังวล China restrictions",
+          "tickers": [
+            {"symbol": "ASML", "sentiment": "negative"},
+            {"symbol": "NVDA", "sentiment": "neutral"},
+            {"symbol": "TSM", "sentiment": "neutral"}
+          ],
+          "source": "CNBC",
+          "published": "15 เม.ย. 2026"
+        },
+        {
+          "title": "Delta Air Lines เตือนลด Capacity + UAL ร่วง 21% ใน 6 วันจาก Jet Fuel Surge",
+          "tickers": [
+            {"symbol": "DAL", "sentiment": "negative"},
+            {"symbol": "UAL", "sentiment": "negative"},
+            {"symbol": "AAL", "sentiment": "neutral"}
+          ],
+          "source": "CNBC · Trefis",
+          "published": "14 เม.ย. 2026"
+        },
+        {
+          "title": "Monday.com โดน Downgrade หนัก — PT หั่นครึ่งจาก 5 Firm หลัง Guidance ผิดคาด",
+          "tickers": [
+            {"symbol": "MNDY", "sentiment": "negative"},
+            {"symbol": "CRM", "sentiment": "neutral"},
+            {"symbol": "NOW", "sentiment": "neutral"}
+          ],
+          "source": "Investing.com",
+          "published": "15 เม.ย. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-04-16-1830.md",
       "date": "2026-04-16T18:30:00Z",
