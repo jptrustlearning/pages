@@ -165,9 +165,12 @@ function wrapNewsItems(html, headlines){
     let segment, tail = '';
     if(hrIdx > -1){ segment = part.slice(0, hrIdx); tail = part.slice(hrIdx); }
     else segment = part;
-    // Inject source inline into h2 (append before </h2>)
-    if(source){
-      segment = segment.replace(/<\/h2>/, ' <span class="news-src-inline">— '+escapeHtml(source)+'</span></h2>');
+    // Inject source + published inline into h2 (append before </h2>)
+    const metaBits = [];
+    if(source) metaBits.push(escapeHtml(source));
+    if(head.published) metaBits.push(escapeHtml(head.published));
+    if(metaBits.length){
+      segment = segment.replace(/<\/h2>/, ' <span class="news-src-inline">— '+metaBits.join(' · ')+'</span></h2>');
     }
     // Build ticker pills row
     const pills = tickers.map(t=>{
