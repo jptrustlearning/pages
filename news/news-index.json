@@ -10,21 +10,30 @@
       "headlines": [
         {
           "title": "TSMC ขึ้นงบลงทุนปี 2026 แตะปลายช่วง $52–56B — demand AI ยังแรง",
-          "tickers": ["TSM", "NVDA", "AAPL"],
-          "source": "CNBC · Reuters",
-          "sentiment": "positive"
+          "tickers": [
+            {"symbol": "TSM", "sentiment": "positive"},
+            {"symbol": "NVDA", "sentiment": "positive"},
+            {"symbol": "AAPL", "sentiment": "positive"}
+          ],
+          "source": "CNBC · Reuters"
         },
         {
           "title": "Nike CEO + Tim Cook ซื้อหุ้นคนละ ~$1M — Insider vote of confidence",
-          "tickers": ["NKE", "AAPL"],
-          "source": "CNBC",
-          "sentiment": "positive"
+          "tickers": [
+            {"symbol": "NKE", "sentiment": "positive"},
+            {"symbol": "AAPL", "sentiment": "neutral"}
+          ],
+          "source": "CNBC"
         },
         {
           "title": "Big Banks Q1 Beat — Morgan Stanley +4.5%, BofA +1.8%",
-          "tickers": ["MS", "BAC", "JPM", "GS"],
-          "source": "CNBC · Yahoo Finance",
-          "sentiment": "positive"
+          "tickers": [
+            {"symbol": "MS", "sentiment": "positive"},
+            {"symbol": "BAC", "sentiment": "positive"},
+            {"symbol": "JPM", "sentiment": "neutral"},
+            {"symbol": "GS", "sentiment": "neutral"}
+          ],
+          "source": "CNBC · Yahoo Finance"
         }
       ]
     }

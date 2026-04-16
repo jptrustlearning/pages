@@ -24,13 +24,16 @@ body{font-family:'Anuphan',sans-serif;background:var(--bg);color:var(--text);lin
 .meta-card{padding:0 4px 14px 4px;margin-bottom:18px;border-bottom:1px solid var(--border)}
 .meta-date{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2.5px;color:var(--gold-deep);text-transform:uppercase;font-weight:600}
 .ticker-pill{font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;padding:4px 10px;border-radius:12px;background:linear-gradient(135deg,rgba(212,175,55,0.2),rgba(114,47,55,0.1));border:1px solid rgba(212,175,55,0.4);color:var(--maroon);font-weight:600}
-.md-content h2{font-size:18px;font-weight:700;color:var(--text-head);margin:0 0 14px 0;padding:16px 18px 14px 18px;line-height:1.4;background:linear-gradient(145deg,#FFFEF8,#F8F2E4);border:1px solid var(--border);border-left:4px solid var(--gold);border-radius:12px 12px 0 0;box-shadow:0 2px 10px rgba(114,47,55,0.06);display:flex;align-items:flex-start;gap:10px}
-.md-content h2.sentiment-positive{border-left-color:#2E7D32}
-.md-content h2.sentiment-negative{border-left-color:#C33A4E}
-.news-star{font-size:18px;line-height:1.4;flex-shrink:0;margin-top:1px}
-.news-star.positive{color:#2E7D32;filter:drop-shadow(0 0 3px rgba(46,125,50,0.35))}
-.news-star.negative{color:#C33A4E;filter:drop-shadow(0 0 3px rgba(195,58,78,0.35))}
-.news-star.neutral{color:var(--gold)}
+.md-content h2{font-size:18px;font-weight:700;color:var(--text-head);margin:0 0 14px 0;padding:14px 18px 12px 18px;line-height:1.45;background:linear-gradient(145deg,#FFFEF8,#F8F2E4);border:1px solid var(--border);border-left:4px solid var(--gold);border-radius:12px 12px 0 0;box-shadow:0 2px 10px rgba(114,47,55,0.06)}
+.md-content h2 .news-src-inline{font-size:11.5px;font-weight:400;color:var(--text-muted);font-style:italic;letter-spacing:0.2px;white-space:normal}
+.news-item-tickers{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.news-ticker-sm{display:inline-flex;align-items:center;gap:4px;font-family:'Cinzel',serif;font-size:10.5px;letter-spacing:0.8px;padding:3px 9px;border-radius:10px;background:rgba(212,175,55,0.18);border:1px solid rgba(212,175,55,0.38);color:#8B6914;font-weight:600}
+.news-ticker-sm.positive{background:rgba(46,125,50,0.13);border-color:rgba(46,125,50,0.42);color:#1B5E20}
+.news-ticker-sm.negative{background:rgba(195,58,78,0.13);border-color:rgba(195,58,78,0.42);color:#8B1F2F}
+.tk-star{font-size:11px;line-height:1}
+.tk-star.positive{color:#2E7D32}
+.tk-star.negative{color:#C33A4E}
+.tk-star.neutral{color:var(--gold)}
 .md-content h2:first-child{margin-top:0}
 /* Group content after h2 into visual card using negative margin trick */
 .md-content h3{font-size:15px;font-weight:600;color:var(--maroon);margin:18px 0 8px 0}
@@ -146,32 +149,43 @@ function inline(s){
   return s;
 }
 
-// Wrap each news item (h2 + content until next hr/h2/end) inside .news-item card
-// sentiments: array of 'positive'|'negative'|'neutral' per headline (in order)
-function wrapNewsItems(html, sentiments){
-  sentiments = sentiments || [];
+// Wrap each news item. headlines: array from batch with title, source, tickers
+function wrapNewsItems(html, headlines){
+  headlines = headlines || [];
   const parts = html.split(/(?=<h2[>\s])/);
   let out = '';
   let idx = 0;
   for(const part of parts){
     if(!/^<h2/.test(part)){ out += part; continue; }
-    const sentiment = sentiments[idx] || 'neutral';
+    const head = headlines[idx] || {};
     idx++;
-    const star = sentiment==='positive' ? '<span class="news-star positive">★</span>'
-               : sentiment==='negative' ? '<span class="news-star negative">★</span>'
-               : '<span class="news-star neutral">★</span>';
+    const tickers = normalizeTickersDetail(head.tickers);
+    const source = head.source || '';
     const hrIdx = part.indexOf('<hr>');
     let segment, tail = '';
     if(hrIdx > -1){ segment = part.slice(0, hrIdx); tail = part.slice(hrIdx); }
     else segment = part;
-    // Inject sentiment class + star into h2
-    segment = segment.replace(/^<h2([^>]*)>/, '<h2$1 class="news-h2 sentiment-'+sentiment+'">'+star+' ');
+    // Inject source inline into h2 (append before </h2>)
+    if(source){
+      segment = segment.replace(/<\/h2>/, ' <span class="news-src-inline">— '+escapeHtml(source)+'</span></h2>');
+    }
+    // Build ticker pills row
+    const pills = tickers.map(t=>{
+      const s=t.sentiment||'neutral';
+      const star = s==='positive'?'<span class="tk-star positive">★</span>':s==='negative'?'<span class="tk-star negative">★</span>':'<span class="tk-star neutral">★</span>';
+      return '<span class="news-ticker-sm '+s+'">'+star+'$'+escapeHtml(t.symbol)+'</span>';
+    }).join('');
     const h2Close = segment.indexOf('</h2>') + 5;
     const h2Tag = segment.slice(0, h2Close);
     const body = segment.slice(h2Close).trim();
-    out += h2Tag + (body ? '<div class="news-item sentiment-'+sentiment+'">' + body + '</div>' : '') + tail;
+    const tickersRow = pills ? '<div class="news-item-tickers">'+pills+'</div>' : '';
+    out += h2Tag + '<div class="news-item">' + tickersRow + (body||'') + '</div>' + tail;
   }
   return out;
+}
+function normalizeTickersDetail(tickers){
+  if(!tickers)return[];
+  return tickers.map(t=>typeof t==='string'?{symbol:t,sentiment:'neutral'}:{symbol:t.symbol||'',sentiment:t.sentiment||'neutral'});
 }
 
 async function loadNews(){
@@ -199,9 +213,8 @@ async function loadNews(){
     if(!mdRes.ok) throw new Error('Cannot fetch news file');
     const md = await mdRes.text();
     let rendered = renderMarkdown(md);
-    // Extract sentiment sequence from batch
-    const sentiments = batch && batch.headlines ? batch.headlines.map(h=>h.sentiment||'neutral') : [];
-    rendered = wrapNewsItems(rendered, sentiments);
+    const headlines = batch && batch.headlines ? batch.headlines : [];
+    rendered = wrapNewsItems(rendered, headlines);
     contentDiv.innerHTML = '<div class="md-content">' + rendered + '</div>';
   } catch(err){
     contentDiv.innerHTML = '<div class="error-box">ไม่สามารถโหลดข่าวได้ — '+escapeHtml(err.message)+'</div>';

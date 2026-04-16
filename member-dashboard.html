@@ -162,27 +162,20 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .news-batch-group{margin-bottom:28px}
 .news-batch-date{font-family:'Cinzel',serif;font-size:10.5px;letter-spacing:2.5px;color:var(--gold-deep,#8B6914);text-transform:uppercase;font-weight:600;padding:0 4px 10px 4px;margin-bottom:4px;border-bottom:1px solid rgba(212,175,55,0.3);display:flex;align-items:center;gap:10px}
 .news-batch-date::before{content:'◆';color:var(--gold,#D4AF37);font-size:9px}
-.news-item-card{background:linear-gradient(160deg,#FFFEF8 0%,#F8F2E4 100%);border:1px solid rgba(212,175,55,0.25);border-radius:14px;padding:14px 16px;cursor:pointer;transition:all .2s ease;margin-bottom:12px;box-shadow:0 3px 12px rgba(114,47,55,0.06);position:relative;overflow:hidden}
+.news-item-card{background:linear-gradient(160deg,#FFFEF8 0%,#F8F2E4 100%);border:1px solid rgba(212,175,55,0.25);border-radius:14px;padding:14px 16px;cursor:pointer;transition:all .2s ease;margin-bottom:12px;box-shadow:0 3px 12px rgba(114,47,55,0.06)}
 .news-item-card:last-child{margin-bottom:0}
 .news-item-card:active{transform:scale(.98)}
-.news-item-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#D4AF37,#8B6914);opacity:0.55}
-/* Sentiment-specific left borders */
-.news-item-card.sentiment-positive::before{background:linear-gradient(180deg,#2E7D32,#1B5E20)}
-.news-item-card.sentiment-negative::before{background:linear-gradient(180deg,#C33A4E,#8B1F2F)}
-.news-item-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.news-item-src{flex:1;font-size:11px;color:var(--text-dark-muted,#7A6F62);font-style:italic;letter-spacing:0.3px}
-.news-card-arrow{color:#722F37;font-size:16px;opacity:0.5;transition:all .2s}
-.news-item-card:hover .news-card-arrow{opacity:1;transform:translateX(3px)}
-.news-sentiment-star{font-size:15px;line-height:1;flex-shrink:0}
-.news-sentiment-star.positive{color:#2E7D32;filter:drop-shadow(0 0 3px rgba(46,125,50,0.35))}
-.news-sentiment-star.negative{color:#C33A4E;filter:drop-shadow(0 0 3px rgba(195,58,78,0.35))}
-.news-sentiment-star.neutral{color:#D4AF37}
 .news-item-title{font-size:14.5px;font-weight:600;color:var(--text-dark,#3D3228);line-height:1.5;margin-bottom:10px}
-.news-item-tickers{display:flex;flex-wrap:wrap;gap:5px}
-/* Ticker colors by sentiment */
-.news-ticker-sm{font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.8px;padding:2.5px 8px;border-radius:10px;background:rgba(212,175,55,0.18);border:1px solid rgba(212,175,55,0.38);color:#8B6914;font-weight:600}
+.news-src-inline{font-size:11px;font-weight:400;color:var(--text-dark-muted,#7A6F62);font-style:italic;letter-spacing:0.2px}
+.news-item-tickers{display:flex;flex-wrap:wrap;gap:6px}
+/* Ticker pill with star prefix */
+.news-ticker-sm{display:inline-flex;align-items:center;gap:4px;font-family:'Cinzel',serif;font-size:10.5px;letter-spacing:0.8px;padding:3px 9px;border-radius:10px;background:rgba(212,175,55,0.18);border:1px solid rgba(212,175,55,0.38);color:#8B6914;font-weight:600}
 .news-ticker-sm.positive{background:rgba(46,125,50,0.13);border-color:rgba(46,125,50,0.42);color:#1B5E20}
 .news-ticker-sm.negative{background:rgba(195,58,78,0.13);border-color:rgba(195,58,78,0.42);color:#8B1F2F}
+.tk-star{font-size:11px;line-height:1}
+.tk-star.positive{color:#2E7D32}
+.tk-star.negative{color:#C33A4E}
+.tk-star.neutral{color:#D4AF37}
 /* Empty/no-results states */
 .news-empty{text-align:center;padding:40px 20px;color:var(--text-dark-muted,#7A6F62);font-size:13px}
 
@@ -710,7 +703,8 @@ function renderNewsFeed(){
       const matched=(b.headlines||[]).filter(h=>{
         if((h.title||'').toLowerCase().includes(q))return true;
         if((h.source||'').toLowerCase().includes(q))return true;
-        if((h.tickers||[]).some(t=>t.toLowerCase().includes(q)))return true;
+        const tks=normalizeTickers(h.tickers);
+        if(tks.some(t=>(t.symbol||'').toLowerCase().includes(q)))return true;
         return false;
       });
       if(matched.length===0)return null;
@@ -728,16 +722,23 @@ function renderNewsBatchCard(b){
   const safeFile=encodeURIComponent(b.file);
   const dateHeader='<div class="news-batch-date">'+escapeText(b.date_display||b.date||'')+'</div>';
   const items=(b.headlines||[]).map((h)=>{
-    const sentiment=h.sentiment||'neutral';
-    const star=sentiment==='positive'?'<span class="news-sentiment-star positive" title="ข่าวบวก">★</span>':sentiment==='negative'?'<span class="news-sentiment-star negative" title="ข่าวลบ">★</span>':'<span class="news-sentiment-star neutral" title="กลาง">★</span>';
-    const ht=(h.tickers||[]).map(t=>'<span class="news-ticker-sm '+sentiment+'">$'+t+'</span>').join('');
-    return '<div class="news-item-card sentiment-'+sentiment+'" onclick="openNewsDetail(\''+safeFile+'\')">'
-      +'<div class="news-item-head">'+star+'<div class="news-item-src">'+escapeText(h.source||'')+'</div><div class="news-card-arrow">→</div></div>'
-      +'<div class="news-item-title">'+escapeText(h.title)+'</div>'
-      +'<div class="news-item-tickers">'+ht+'</div>'
+    const tickers=normalizeTickers(h.tickers);
+    const tickerPills=tickers.map(t=>{
+      const s=t.sentiment||'neutral';
+      const star=s==='positive'?'<span class="tk-star positive">★</span>':s==='negative'?'<span class="tk-star negative">★</span>':'<span class="tk-star neutral">★</span>';
+      return '<span class="news-ticker-sm '+s+'">'+star+'$'+escapeText(t.symbol)+'</span>';
+    }).join('');
+    return '<div class="news-item-card" onclick="openNewsDetail(\''+safeFile+'\')">'
+      +'<div class="news-item-title">'+escapeText(h.title)+' <span class="news-src-inline">— '+escapeText(h.source||'')+'</span></div>'
+      +'<div class="news-item-tickers">'+tickerPills+'</div>'
     +'</div>';
   }).join('');
   return '<div class="news-batch-group">'+dateHeader+items+'</div>';
+}
+// Support both old (string) and new (object with sentiment) ticker formats
+function normalizeTickers(tickers){
+  if(!tickers)return[];
+  return tickers.map(t=>typeof t==='string'?{symbol:t,sentiment:'neutral'}:{symbol:t.symbol||'',sentiment:t.sentiment||'neutral'});
 }
 function escapeText(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function openNewsDetail(file){openIframe('📰 News Detail','news-detail.html?file='+file)}
