@@ -698,60 +698,85 @@ async function loadNewsFeed(force){
 function renderNewsFeed(){
   const listEl=document.getElementById('newsFeedList');
   if(!listEl||!newsFeedCache)return;
-  const all=(newsFeedCache.batches||[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
-  // Time range filter
-  let filtered=all;
+  const allBatches=(newsFeedCache.batches||[]);
+  // Flatten every headline across all batches, enrich with {file, _origIndex, _pubDate}
+  let allHeadlines=[];
+  allBatches.forEach(b=>{
+    (b.headlines||[]).forEach((h,i)=>{
+      allHeadlines.push(Object.assign({},h,{
+        _file:b.file,
+        _origIndex:i,
+        _pubDate:parsePublishedDate(h.published)||new Date(b.date).getTime()
+      }));
+    });
+  });
+  // Time range filter based on _pubDate
   if(newsTimeRange!=='all'){
     const now=Date.now();
     const windows={today:24*3600*1000,week:7*24*3600*1000,month:30*24*3600*1000};
     const cutoff=now-(windows[newsTimeRange]||0);
-    filtered=filtered.filter(b=>new Date(b.date).getTime()>=cutoff);
+    allHeadlines=allHeadlines.filter(h=>h._pubDate>=cutoff);
   }
-  // Search filter — match against headline title, tickers, source
+  // Search filter
   if(newsSearchQuery){
     const q=newsSearchQuery.toLowerCase().trim();
-    filtered=filtered.map(b=>{
-      const tagged=(b.headlines||[]).map((h,i)=>Object.assign({},h,{_origIndex:i}));
-      const matched=tagged.filter(h=>{
-        if((h.title||'').toLowerCase().includes(q))return true;
-        if((h.source||'').toLowerCase().includes(q))return true;
-        const tks=normalizeTickers(h.tickers);
-        if(tks.some(t=>(t.symbol||'').toLowerCase().includes(q)))return true;
-        return false;
-      });
-      if(matched.length===0)return null;
-      return Object.assign({},b,{headlines:matched});
-    }).filter(Boolean);
+    allHeadlines=allHeadlines.filter(h=>{
+      if((h.title||'').toLowerCase().includes(q))return true;
+      if((h.source||'').toLowerCase().includes(q))return true;
+      const tks=normalizeTickers(h.tickers);
+      if(tks.some(t=>(t.symbol||'').toLowerCase().includes(q)))return true;
+      return false;
+    });
   }
-  if(filtered.length===0){
+  if(allHeadlines.length===0){
     const msg=newsSearchQuery?'ไม่พบข่าวที่ตรงกับ "'+newsSearchQuery+'"':'ยังไม่มีข่าวในช่วงเวลานี้';
     listEl.innerHTML='<div class="news-empty">'+msg+'</div>';
     return;
   }
-  listEl.innerHTML=filtered.map(b=>renderNewsBatchCard(b)).join('');
+  // Group by published date label (falls back to published string itself)
+  const groups={};
+  const groupOrder=[];
+  allHeadlines.forEach(h=>{
+    const key=h.published||'ไม่ระบุวันที่';
+    if(!(key in groups)){groups[key]=[];groupOrder.push({key,sortKey:h._pubDate});}
+    groups[key].push(h);
+  });
+  // Sort groups newest-first
+  groupOrder.sort((a,b)=>b.sortKey-a.sortKey);
+  listEl.innerHTML=groupOrder.map(g=>renderDateGroup(g.key,groups[g.key])).join('');
 }
-function renderNewsBatchCard(b){
-  const safeFile=encodeURIComponent(b.file);
-  const dateHeader='<div class="news-batch-date">'+escapeText(b.date_display||b.date||'')+'</div>';
-  const items=(b.headlines||[]).map((h,idx)=>{
-    const tickers=normalizeTickers(h.tickers);
-    const tickerPills=tickers.map(t=>{
-      const s=t.sentiment||'neutral';
-      const star=s==='positive'?'<span class="tk-star positive">★</span>':s==='negative'?'<span class="tk-star negative">★</span>':'<span class="tk-star neutral">★</span>';
-      return '<span class="news-ticker-sm '+s+'">'+star+'$'+escapeText(t.symbol)+'</span>';
-    }).join('');
-    const metaBits=[];
-    if(h.source)metaBits.push(escapeText(h.source));
-    if(h.published)metaBits.push(escapeText(h.published));
-    const metaLine=metaBits.length?' <span class="news-src-inline">— '+metaBits.join(' · ')+'</span>':'';
-    // Use original index (pre-filter) if available, otherwise the rendered idx
-    const originalIdx=(typeof h._origIndex==='number')?h._origIndex:idx;
-    return '<div class="news-dash-card" onclick="openNewsDetail(\''+safeFile+'\','+originalIdx+')">'
-      +'<div class="news-dash-title">'+escapeText(h.title)+metaLine+'</div>'
-      +'<div class="news-item-tickers">'+tickerPills+'</div>'
-    +'</div>';
+// Parse Thai-style published date like "16 เม.ย. 2026" into timestamp
+function parsePublishedDate(s){
+  if(!s)return 0;
+  const thaiMonths={'ม.ค.':0,'ก.พ.':1,'มี.ค.':2,'เม.ย.':3,'พ.ค.':4,'มิ.ย.':5,'ก.ค.':6,'ส.ค.':7,'ก.ย.':8,'ต.ค.':9,'พ.ย.':10,'ธ.ค.':11};
+  const m=s.match(/(\d{1,2})\s+(\S+)\s+(\d{4})/);
+  if(m){
+    const day=parseInt(m[1],10);
+    const mon=thaiMonths[m[2]];
+    const year=parseInt(m[3],10);
+    if(mon!==undefined)return new Date(year,mon,day).getTime();
+  }
+  const t=Date.parse(s);
+  return isNaN(t)?0:t;
+}
+function renderDateGroup(dateLabel,headlines){
+  const dateHeader='<div class="news-batch-date">'+escapeText(dateLabel)+'</div>';
+  const cards=headlines.map(h=>renderHeadlineCard(h)).join('');
+  return '<div class="news-batch-group">'+dateHeader+'<div class="news-grid">'+cards+'</div></div>';
+}
+function renderHeadlineCard(h){
+  const safeFile=encodeURIComponent(h._file||'');
+  const tickers=normalizeTickers(h.tickers);
+  const tickerPills=tickers.map(t=>{
+    const s=t.sentiment||'neutral';
+    const star=s==='positive'?'<span class="tk-star positive">★</span>':s==='negative'?'<span class="tk-star negative">★</span>':'<span class="tk-star neutral">★</span>';
+    return '<span class="news-ticker-sm '+s+'">'+star+'$'+escapeText(t.symbol)+'</span>';
   }).join('');
-  return '<div class="news-batch-group">'+dateHeader+'<div class="news-grid">'+items+'</div></div>';
+  const metaLine=h.source?' <span class="news-src-inline">— '+escapeText(h.source)+'</span>':'';
+  return '<div class="news-dash-card" onclick="openNewsDetail(\''+safeFile+'\','+(h._origIndex||0)+')">'
+    +'<div class="news-dash-title">'+escapeText(h.title)+metaLine+'</div>'
+    +'<div class="news-item-tickers">'+tickerPills+'</div>'
+  +'</div>';
 }
 // Support both old (string) and new (object with sentiment) ticker formats
 function normalizeTickers(tickers){
