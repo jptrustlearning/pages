@@ -24,7 +24,13 @@ body{font-family:'Anuphan',sans-serif;background:var(--bg);color:var(--text);lin
 .meta-card{padding:0 4px 14px 4px;margin-bottom:18px;border-bottom:1px solid var(--border)}
 .meta-date{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2.5px;color:var(--gold-deep);text-transform:uppercase;font-weight:600}
 .ticker-pill{font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;padding:4px 10px;border-radius:12px;background:linear-gradient(135deg,rgba(212,175,55,0.2),rgba(114,47,55,0.1));border:1px solid rgba(212,175,55,0.4);color:var(--maroon);font-weight:600}
-.md-content h2{font-size:18px;font-weight:700;color:var(--text-head);margin:0 0 14px 0;padding:16px 18px 14px 18px;line-height:1.4;background:linear-gradient(145deg,#FFFEF8,#F8F2E4);border:1px solid var(--border);border-left:4px solid var(--gold);border-radius:12px 12px 0 0;box-shadow:0 2px 10px rgba(114,47,55,0.06)}
+.md-content h2{font-size:18px;font-weight:700;color:var(--text-head);margin:0 0 14px 0;padding:16px 18px 14px 18px;line-height:1.4;background:linear-gradient(145deg,#FFFEF8,#F8F2E4);border:1px solid var(--border);border-left:4px solid var(--gold);border-radius:12px 12px 0 0;box-shadow:0 2px 10px rgba(114,47,55,0.06);display:flex;align-items:flex-start;gap:10px}
+.md-content h2.sentiment-positive{border-left-color:#2E7D32}
+.md-content h2.sentiment-negative{border-left-color:#C33A4E}
+.news-star{font-size:18px;line-height:1.4;flex-shrink:0;margin-top:1px}
+.news-star.positive{color:#2E7D32;filter:drop-shadow(0 0 3px rgba(46,125,50,0.35))}
+.news-star.negative{color:#C33A4E;filter:drop-shadow(0 0 3px rgba(195,58,78,0.35))}
+.news-star.neutral{color:var(--gold)}
 .md-content h2:first-child{margin-top:0}
 /* Group content after h2 into visual card using negative margin trick */
 .md-content h3{font-size:15px;font-weight:600;color:var(--maroon);margin:18px 0 8px 0}
@@ -141,28 +147,29 @@ function inline(s){
 }
 
 // Wrap each news item (h2 + content until next hr/h2/end) inside .news-item card
-function wrapNewsItems(html){
-  // Split by h2 opens; each chunk starts with h2 or is pre-h2 content
+// sentiments: array of 'positive'|'negative'|'neutral' per headline (in order)
+function wrapNewsItems(html, sentiments){
+  sentiments = sentiments || [];
   const parts = html.split(/(?=<h2[>\s])/);
   let out = '';
+  let idx = 0;
   for(const part of parts){
     if(!/^<h2/.test(part)){ out += part; continue; }
-    // Find boundary: next <hr>, or next <h2> (shouldn't happen after split), or end
+    const sentiment = sentiments[idx] || 'neutral';
+    idx++;
+    const star = sentiment==='positive' ? '<span class="news-star positive">★</span>'
+               : sentiment==='negative' ? '<span class="news-star negative">★</span>'
+               : '<span class="news-star neutral">★</span>';
     const hrIdx = part.indexOf('<hr>');
-    if(hrIdx > -1){
-      const headAndBody = part.slice(0, hrIdx);
-      const afterHr = part.slice(hrIdx);
-      // headAndBody has <h2>..</h2> + body content. Wrap body in .news-item.
-      const h2Close = headAndBody.indexOf('</h2>') + 5;
-      const h2Tag = headAndBody.slice(0, h2Close);
-      const body = headAndBody.slice(h2Close).trim();
-      out += h2Tag + (body ? '<div class="news-item">' + body + '</div>' : '') + afterHr;
-    } else {
-      const h2Close = part.indexOf('</h2>') + 5;
-      const h2Tag = part.slice(0, h2Close);
-      const body = part.slice(h2Close).trim();
-      out += h2Tag + (body ? '<div class="news-item">' + body + '</div>' : '');
-    }
+    let segment, tail = '';
+    if(hrIdx > -1){ segment = part.slice(0, hrIdx); tail = part.slice(hrIdx); }
+    else segment = part;
+    // Inject sentiment class + star into h2
+    segment = segment.replace(/^<h2([^>]*)>/, '<h2$1 class="news-h2 sentiment-'+sentiment+'">'+star+' ');
+    const h2Close = segment.indexOf('</h2>') + 5;
+    const h2Tag = segment.slice(0, h2Close);
+    const body = segment.slice(h2Close).trim();
+    out += h2Tag + (body ? '<div class="news-item sentiment-'+sentiment+'">' + body + '</div>' : '') + tail;
   }
   return out;
 }
@@ -192,8 +199,9 @@ async function loadNews(){
     if(!mdRes.ok) throw new Error('Cannot fetch news file');
     const md = await mdRes.text();
     let rendered = renderMarkdown(md);
-    // Wrap content between h2 and next hr (or end) in a .news-item card
-    rendered = wrapNewsItems(rendered);
+    // Extract sentiment sequence from batch
+    const sentiments = batch && batch.headlines ? batch.headlines.map(h=>h.sentiment||'neutral') : [];
+    rendered = wrapNewsItems(rendered, sentiments);
     contentDiv.innerHTML = '<div class="md-content">' + rendered + '</div>';
   } catch(err){
     contentDiv.innerHTML = '<div class="error-box">ไม่สามารถโหลดข่าวได้ — '+escapeHtml(err.message)+'</div>';

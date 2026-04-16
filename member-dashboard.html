@@ -142,6 +142,23 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .dash-card-change{font-size:12px;font-weight:500;margin-top:2px}.dash-card-change.up{color:var(--green)}
 
 /* ===== NEWS FEED CARDS ===== */
+/* Search header - replaces the balance-card hero */
+.news-search-header{padding:20px 20px 16px 20px;background:linear-gradient(180deg,#FFFEFB 0%,#FAF6ED 100%);border-bottom:1px solid rgba(212,175,55,0.2)}
+.news-search-title{font-family:'Cinzel',serif;font-size:13px;letter-spacing:3px;color:#722F37;text-transform:uppercase;font-weight:600;margin-bottom:12px;text-align:center}
+.news-search-box{position:relative;display:flex;align-items:center;background:#FFFEF8;border:1px solid rgba(212,175,55,0.35);border-radius:24px;padding:10px 14px;box-shadow:0 2px 8px rgba(114,47,55,0.06);transition:all .2s}
+.news-search-box:focus-within{border-color:#D4AF37;box-shadow:0 2px 14px rgba(212,175,55,0.25)}
+.news-search-icon{width:18px;height:18px;color:#8B6914;flex-shrink:0;margin-right:10px}
+.news-search-input{flex:1;border:none;outline:none;background:transparent;font-family:'Anuphan',sans-serif;font-size:14px;color:#3D3228;padding:2px 0}
+.news-search-input::placeholder{color:#A09585}
+.news-search-clear{background:rgba(114,47,55,0.08);border:none;width:22px;height:22px;border-radius:50%;color:#722F37;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.news-search-clear:hover{background:rgba(114,47,55,0.15)}
+.news-time-filter{display:flex;gap:6px;margin-top:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:2px 0}
+.news-time-filter::-webkit-scrollbar{display:none}
+.time-chip{flex-shrink:0;padding:7px 14px;border-radius:18px;border:1px solid rgba(212,175,55,0.3);background:rgba(255,254,248,0.6);color:#7A6F62;font-family:'Anuphan',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap}
+.time-chip:hover{background:rgba(212,175,55,0.1);color:#5A3D20}
+.time-chip.active{background:linear-gradient(135deg,#D4AF37,#B8860B);color:#fff;border-color:#B8860B;font-weight:600;box-shadow:0 2px 8px rgba(212,175,55,0.35)}
+
+/* News feed cards */
 .news-batch-group{margin-bottom:28px}
 .news-batch-date{font-family:'Cinzel',serif;font-size:10.5px;letter-spacing:2.5px;color:var(--gold-deep,#8B6914);text-transform:uppercase;font-weight:600;padding:0 4px 10px 4px;margin-bottom:4px;border-bottom:1px solid rgba(212,175,55,0.3);display:flex;align-items:center;gap:10px}
 .news-batch-date::before{content:'◆';color:var(--gold,#D4AF37);font-size:9px}
@@ -149,14 +166,25 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .news-item-card:last-child{margin-bottom:0}
 .news-item-card:active{transform:scale(.98)}
 .news-item-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#D4AF37,#8B6914);opacity:0.55}
+/* Sentiment-specific left borders */
+.news-item-card.sentiment-positive::before{background:linear-gradient(180deg,#2E7D32,#1B5E20)}
+.news-item-card.sentiment-negative::before{background:linear-gradient(180deg,#C33A4E,#8B1F2F)}
 .news-item-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .news-item-src{flex:1;font-size:11px;color:var(--text-dark-muted,#7A6F62);font-style:italic;letter-spacing:0.3px}
 .news-card-arrow{color:#722F37;font-size:16px;opacity:0.5;transition:all .2s}
 .news-item-card:hover .news-card-arrow{opacity:1;transform:translateX(3px)}
-.news-headline-num{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#D4AF37,#B8860B);color:#fff;font-family:'Cinzel',serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.news-sentiment-star{font-size:15px;line-height:1;flex-shrink:0}
+.news-sentiment-star.positive{color:#2E7D32;filter:drop-shadow(0 0 3px rgba(46,125,50,0.35))}
+.news-sentiment-star.negative{color:#C33A4E;filter:drop-shadow(0 0 3px rgba(195,58,78,0.35))}
+.news-sentiment-star.neutral{color:#D4AF37}
 .news-item-title{font-size:14.5px;font-weight:600;color:var(--text-dark,#3D3228);line-height:1.5;margin-bottom:10px}
 .news-item-tickers{display:flex;flex-wrap:wrap;gap:5px}
+/* Ticker colors by sentiment */
 .news-ticker-sm{font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.8px;padding:2.5px 8px;border-radius:10px;background:rgba(212,175,55,0.18);border:1px solid rgba(212,175,55,0.38);color:#8B6914;font-weight:600}
+.news-ticker-sm.positive{background:rgba(46,125,50,0.13);border-color:rgba(46,125,50,0.42);color:#1B5E20}
+.news-ticker-sm.negative{background:rgba(195,58,78,0.13);border-color:rgba(195,58,78,0.42);color:#8B1F2F}
+/* Empty/no-results states */
+.news-empty{text-align:center;padding:40px 20px;color:var(--text-dark-muted,#7A6F62);font-size:13px}
 
 .activity-list{display:flex;flex-direction:column;gap:2px;margin-bottom:24px}
 .activity-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--cream-card);border-radius:var(--radius-sm);cursor:pointer;border:1px solid rgba(212,175,55,0.08)}
@@ -409,17 +437,24 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
     </div></div>
 
     <div class="screen" id="screen-news">
-      <div class="placeholder-hero">
-        <div class="balance-card">
-          <div class="balance-label">📰 Market News</div>
-          <div class="balance-row"><div class="balance-amount" id="newsCount">—</div><div class="balance-currency">updates</div></div>
-          <div class="balance-change up">ข่าวเด็ด Wall Street · อัพเดทล่าสุด</div>
+      <div class="news-search-header">
+        <div class="news-search-title">📰 Market News</div>
+        <div class="news-search-box">
+          <svg class="news-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" class="news-search-input" id="newsSearchInput" placeholder="ค้นหาข่าว / ticker เช่น NVDA" oninput="filterNewsFeed()">
+          <button class="news-search-clear" id="newsSearchClear" onclick="clearNewsSearch()" style="display:none">✕</button>
+        </div>
+        <div class="news-time-filter">
+          <button class="time-chip active" data-range="all" onclick="setNewsTimeRange('all')">ทั้งหมด</button>
+          <button class="time-chip" data-range="today" onclick="setNewsTimeRange('today')">วันนี้</button>
+          <button class="time-chip" data-range="week" onclick="setNewsTimeRange('week')">7 วัน</button>
+          <button class="time-chip" data-range="month" onclick="setNewsTimeRange('month')">30 วัน</button>
         </div>
       </div>
       <div class="screen-content">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin:8px 4px 14px 4px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin:4px 4px 14px 4px">
           <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:2.5px;color:var(--gold-deep);text-transform:uppercase;font-weight:600">Latest Dispatches</div>
-          <button onclick="loadNewsFeed()" style="background:rgba(212,175,55,0.15);border:1px solid var(--jpt-gold-border,rgba(212,175,55,0.25));color:var(--jpt-maroon,#722F37);padding:6px 14px;border-radius:14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Anuphan',sans-serif">🔄 รีเฟรช</button>
+          <button onclick="loadNewsFeed()" style="background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.25);color:#722F37;padding:6px 14px;border-radius:14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Anuphan',sans-serif">🔄 รีเฟรช</button>
         </div>
         <div id="newsFeedList">
           <div style="text-align:center;padding:40px 20px;color:var(--text-dark-muted);font-size:13px">กำลังโหลดข่าว...</div>
@@ -640,31 +675,64 @@ function doLogout(){isLoggedIn=false;try{localStorage.removeItem('jpt_logged_in'
 function navigateTo(screen){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const t=document.getElementById('screen-'+screen);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const b=document.querySelector('.nav-item[data-screen="'+screen+'"]');if(b)b.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});t?.querySelectorAll('.fade-up').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''});if(screen==='news'){loadNewsFeed()}}
 const NEWS_INDEX_URL='https://raw.githubusercontent.com/jptrustlearning/pages/main/news/news-index.json';
 let newsFeedCache=null;
+let newsSearchQuery='';
+let newsTimeRange='all';
 async function loadNewsFeed(force){
   const listEl=document.getElementById('newsFeedList');
-  const countEl=document.getElementById('newsCount');
   if(!listEl)return;
-  listEl.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--text-dark-muted);font-size:13px">🔄 กำลังโหลดข่าว...</div>';
+  listEl.innerHTML='<div class="news-empty">🔄 กำลังโหลดข่าว...</div>';
   try{
-    const res=await fetch(NEWS_INDEX_URL+'?t='+Date.now(),{cache:'no-store'});
+    const res=await fetch('https://raw.githubusercontent.com/jptrustlearning/pages/main/news/news-index.json?t='+Date.now(),{cache:'no-store'});
     if(!res.ok)throw new Error('Index fetch failed');
     const data=await res.json();
     newsFeedCache=data;
-    const batches=(data.batches||[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
-    if(countEl)countEl.textContent=batches.length;
-    if(batches.length===0){listEl.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--text-dark-muted);font-size:13px">ยังไม่มีข่าว — พิมพ์คำว่า "อัพเดทข่าว" ให้ Claude รวบรวมข่าวใหม่ได้</div>';return}
-    listEl.innerHTML=batches.map(b=>renderNewsBatchCard(b)).join('');
+    renderNewsFeed();
   }catch(err){
     listEl.innerHTML='<div class="dash-card" style="padding:20px;text-align:center;color:#C33A4E;font-size:13px">ไม่สามารถโหลดข่าวได้<br><span style="font-size:11px;color:var(--text-dark-muted);margin-top:6px;display:block">'+(err.message||'Unknown error')+'</span></div>';
   }
 }
+function renderNewsFeed(){
+  const listEl=document.getElementById('newsFeedList');
+  if(!listEl||!newsFeedCache)return;
+  const all=(newsFeedCache.batches||[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+  // Time range filter
+  let filtered=all;
+  if(newsTimeRange!=='all'){
+    const now=Date.now();
+    const windows={today:24*3600*1000,week:7*24*3600*1000,month:30*24*3600*1000};
+    const cutoff=now-(windows[newsTimeRange]||0);
+    filtered=filtered.filter(b=>new Date(b.date).getTime()>=cutoff);
+  }
+  // Search filter — match against headline title, tickers, source
+  if(newsSearchQuery){
+    const q=newsSearchQuery.toLowerCase().trim();
+    filtered=filtered.map(b=>{
+      const matched=(b.headlines||[]).filter(h=>{
+        if((h.title||'').toLowerCase().includes(q))return true;
+        if((h.source||'').toLowerCase().includes(q))return true;
+        if((h.tickers||[]).some(t=>t.toLowerCase().includes(q)))return true;
+        return false;
+      });
+      if(matched.length===0)return null;
+      return Object.assign({},b,{headlines:matched});
+    }).filter(Boolean);
+  }
+  if(filtered.length===0){
+    const msg=newsSearchQuery?'ไม่พบข่าวที่ตรงกับ "'+newsSearchQuery+'"':'ยังไม่มีข่าวในช่วงเวลานี้';
+    listEl.innerHTML='<div class="news-empty">'+msg+'</div>';
+    return;
+  }
+  listEl.innerHTML=filtered.map(b=>renderNewsBatchCard(b)).join('');
+}
 function renderNewsBatchCard(b){
   const safeFile=encodeURIComponent(b.file);
   const dateHeader='<div class="news-batch-date">'+escapeText(b.date_display||b.date||'')+'</div>';
-  const items=(b.headlines||[]).map((h,i)=>{
-    const ht=(h.tickers||[]).map(t=>'<span class="news-ticker-sm">$'+t+'</span>').join('');
-    return '<div class="news-item-card" onclick="openNewsDetail(\''+safeFile+'\')">'
-      +'<div class="news-item-head"><div class="news-headline-num">'+(i+1)+'</div><div class="news-item-src">'+escapeText(h.source||'')+'</div><div class="news-card-arrow">→</div></div>'
+  const items=(b.headlines||[]).map((h)=>{
+    const sentiment=h.sentiment||'neutral';
+    const star=sentiment==='positive'?'<span class="news-sentiment-star positive" title="ข่าวบวก">★</span>':sentiment==='negative'?'<span class="news-sentiment-star negative" title="ข่าวลบ">★</span>':'<span class="news-sentiment-star neutral" title="กลาง">★</span>';
+    const ht=(h.tickers||[]).map(t=>'<span class="news-ticker-sm '+sentiment+'">$'+t+'</span>').join('');
+    return '<div class="news-item-card sentiment-'+sentiment+'" onclick="openNewsDetail(\''+safeFile+'\')">'
+      +'<div class="news-item-head">'+star+'<div class="news-item-src">'+escapeText(h.source||'')+'</div><div class="news-card-arrow">→</div></div>'
       +'<div class="news-item-title">'+escapeText(h.title)+'</div>'
       +'<div class="news-item-tickers">'+ht+'</div>'
     +'</div>';
@@ -673,6 +741,25 @@ function renderNewsBatchCard(b){
 }
 function escapeText(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function openNewsDetail(file){openIframe('📰 News Detail','news-detail.html?file='+file)}
+function filterNewsFeed(){
+  const inp=document.getElementById('newsSearchInput');
+  const clear=document.getElementById('newsSearchClear');
+  newsSearchQuery=inp?inp.value:'';
+  if(clear)clear.style.display=newsSearchQuery?'flex':'none';
+  if(newsFeedCache)renderNewsFeed();
+}
+function clearNewsSearch(){
+  const inp=document.getElementById('newsSearchInput');
+  if(inp)inp.value='';
+  newsSearchQuery='';
+  document.getElementById('newsSearchClear').style.display='none';
+  if(newsFeedCache)renderNewsFeed();
+}
+function setNewsTimeRange(range){
+  newsTimeRange=range;
+  document.querySelectorAll('.time-chip').forEach(c=>c.classList.toggle('active',c.dataset.range===range));
+  if(newsFeedCache)renderNewsFeed();
+}
 function openEditModal(field){const m=document.getElementById('editModal'),t=document.getElementById('modalTitle'),c=document.getElementById('modalContent');if(field==='name'){t.textContent='แก้ไขชื่อที่แสดง';c.innerHTML='<input class="modal-input" id="editValue" value="'+userSettings.name+'" placeholder="ชื่อของคุณ"><button class="modal-btn" onclick="userSettings.name=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}else if(field==='risk'){t.textContent='ระดับความเสี่ยง';c.innerHTML='<div style="display:flex;flex-direction:column;gap:8px"><button class="modal-btn" style="background:'+(userSettings.risk==='low'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='low'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'low\';saveSettings();closeModal();">ต่ำ (Low)</button><button class="modal-btn" style="background:'+(userSettings.risk==='medium'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='medium'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'medium\';saveSettings();closeModal();">ปานกลาง (Medium)</button><button class="modal-btn" style="background:'+(userSettings.risk==='high'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='high'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'high\';saveSettings();closeModal();">สูง (High)</button></div>'}else if(field==='capital'){t.textContent='ทุนเริ่มต้น (บาท)';c.innerHTML='<input class="modal-input" id="editValue" type="number" value="'+userSettings.capital+'" placeholder="100000"><button class="modal-btn" onclick="userSettings.capital=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}else if(field==='broker'){t.textContent='โบรกเกอร์ของคุณ';c.innerHTML='<input class="modal-input" id="editValue" value="'+userSettings.broker+'" placeholder="เช่น XM, Exness, IC Markets"><button class="modal-btn" onclick="userSettings.broker=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}m.classList.add('show')}
 function closeModal(e){if(e&&e.target!==e.currentTarget)return;document.getElementById('editModal').classList.remove('show')}
 function openNotifications(){alert('ยังไม่มีการแจ้งเตือนใหม่')}
