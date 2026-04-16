@@ -141,6 +141,27 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .dash-card-value{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text-dark);margin-top:8px}
 .dash-card-change{font-size:12px;font-weight:500;margin-top:2px}.dash-card-change.up{color:var(--green)}
 
+/* ===== NEWS FEED CARDS ===== */
+.news-card{background:linear-gradient(160deg,#FFFEF8 0%,#F8F2E4 100%);border:1px solid rgba(212,175,55,0.25);border-radius:16px;padding:16px 16px 14px 16px;cursor:pointer;transition:all .25s ease;margin-bottom:14px;box-shadow:0 3px 14px rgba(114,47,55,0.07);position:relative;overflow:hidden}
+.news-card:active{transform:scale(.98)}
+.news-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#D4AF37,#8B6914);opacity:0.6}
+.news-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.news-card-date{font-family:'Cinzel',serif;font-size:10.5px;letter-spacing:2px;color:var(--gold-deep,#8B6914);text-transform:uppercase;font-weight:600}
+.news-card-arrow{color:#722F37;font-size:18px;opacity:0.5;transition:all .2s}
+.news-card:hover .news-card-arrow{opacity:1;transform:translateX(3px)}
+.news-card-summary{font-size:14.5px;font-weight:600;color:var(--text-dark);line-height:1.5;margin-bottom:10px}
+.news-tickers-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.news-ticker{font-family:'Cinzel',serif;font-size:10.5px;letter-spacing:1px;padding:3px 9px;border-radius:11px;background:linear-gradient(135deg,rgba(212,175,55,0.22),rgba(114,47,55,0.08));border:1px solid rgba(212,175,55,0.4);color:#5A2B2F;font-weight:600}
+.news-ticker-sm{font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:0.8px;padding:2px 7px;border-radius:9px;background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.3);color:#8B6914;font-weight:600;margin-right:3px}
+.news-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(212,175,55,0.35),transparent);margin:6px 0 12px 0}
+.news-headline{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start}
+.news-headline:last-child{margin-bottom:0}
+.news-headline-num{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#D4AF37,#B8860B);color:#fff;font-family:'Cinzel',serif;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.news-headline-body{flex:1;min-width:0}
+.news-headline-title{font-size:13px;font-weight:500;color:var(--text-dark-sub,#5A3D20);line-height:1.45;margin-bottom:4px}
+.news-headline-meta{display:flex;flex-wrap:wrap;align-items:center;gap:3px}
+.news-src{font-size:10.5px;color:var(--text-dark-muted,#7A6F62);margin-left:4px;font-style:italic}
+
 .activity-list{display:flex;flex-direction:column;gap:2px;margin-bottom:24px}
 .activity-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--cream-card);border-radius:var(--radius-sm);cursor:pointer;border:1px solid rgba(212,175,55,0.08)}
 .activity-item:active{background:var(--cream-warm)}
@@ -391,7 +412,24 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
         <!-- Settings section moved to dedicated screen-settings (gear icon top-right) -->
     </div></div>
 
-    <div class="screen" id="screen-weekly"><div class="placeholder-hero"><div class="balance-card"><div class="balance-label">Weekly Score</div><div class="balance-row"><div class="balance-amount">78.5</div><div class="balance-currency">/ 100</div></div><div class="balance-change up">▲ Bullish — แนวโน้มขาขึ้น</div></div></div><div class="screen-content"><div class="dash-card" style="padding:20px"><div style="font-size:14px;color:var(--text-dark-muted)">หน้านี้จะเชื่อมต่อไปยังแดชบอร์ด Weekly Momentum</div></div></div></div>
+    <div class="screen" id="screen-news">
+      <div class="placeholder-hero">
+        <div class="balance-card">
+          <div class="balance-label">📰 Market News</div>
+          <div class="balance-row"><div class="balance-amount" id="newsCount">—</div><div class="balance-currency">updates</div></div>
+          <div class="balance-change up">ข่าวเด็ด Wall Street · อัพเดทล่าสุด</div>
+        </div>
+      </div>
+      <div class="screen-content">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin:8px 4px 14px 4px">
+          <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:2.5px;color:var(--gold-deep);text-transform:uppercase;font-weight:600">Latest Dispatches</div>
+          <button onclick="loadNewsFeed()" style="background:rgba(212,175,55,0.15);border:1px solid var(--jpt-gold-border,rgba(212,175,55,0.25));color:var(--jpt-maroon,#722F37);padding:6px 14px;border-radius:14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Anuphan',sans-serif">🔄 รีเฟรช</button>
+        </div>
+        <div id="newsFeedList">
+          <div style="text-align:center;padding:40px 20px;color:var(--text-dark-muted);font-size:13px">กำลังโหลดข่าว...</div>
+        </div>
+      </div>
+    </div>
     <div class="screen" id="screen-sixmonth"><div class="placeholder-hero"><div class="balance-card"><div class="balance-label">6-Month Trend</div><div class="balance-row"><div class="balance-amount">72.1</div><div class="balance-currency">/ 100</div></div><div class="balance-change up">▲ Moderate Bullish</div></div></div></div>
     <div class="screen" id="screen-gold"><div class="placeholder-hero"><div class="balance-card"><div class="balance-label">Gold Price</div><div class="balance-row"><div class="balance-amount">2,485</div><div class="balance-currency">USD</div></div><div class="balance-change up">▲ +1.2%</div></div></div></div>
     <div class="screen" id="screen-bitcoin"><div class="placeholder-hero"><div class="balance-card"><div class="balance-label">Bitcoin Price</div><div class="balance-row"><div class="balance-amount">107,250</div><div class="balance-currency">USD</div></div><div class="balance-change up">▲ +2.8%</div></div></div></div>
@@ -438,7 +476,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 
     <nav class="bottom-nav">
         <button class="nav-item" data-screen="portfolio" onclick="navigateTo('portfolio')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4h-4z"/></svg><span class="nav-label">Asset</span></button>
-        <button class="nav-item" data-screen="weekly" onclick="navigateTo('weekly')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14H10"/><path d="M15 18H10"/><path d="M18 10H10"/></svg><span class="nav-label">News</span></button>
+        <button class="nav-item" data-screen="news" onclick="navigateTo('news')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14H10"/><path d="M15 18H10"/><path d="M18 10H10"/></svg><span class="nav-label">News</span></button>
         <button class="nav-item nav-home active" data-screen="home" onclick="navigateTo('home')"><img class="nav-owl-img" src="jpt-owl-line.png" alt="Home"></button>
         <button class="nav-item" data-screen="lab" onclick="navigateTo('lab')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="7 14 10 10 13 13 17 9"/><circle cx="17" cy="9" r="1.5" fill="currentColor" opacity="0.6"/></svg><span class="nav-label">Lab</span></button>
         <button class="nav-item" data-screen="more" onclick="navigateTo('more')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="5" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.5" fill="currentColor" stroke="none"/></svg><span class="nav-label">More</span></button>
@@ -603,7 +641,38 @@ function backToEmail(){
 function showApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('active');applySettings()}
 function applySettings(){const n=userSettings.name||'Member';var el;el=document.getElementById('displayName');if(el)el.textContent=n;el=document.getElementById('settingsName');if(el)el.textContent=n;el=document.getElementById('settingsEmail');if(el)el.textContent=userSettings.email;el=document.getElementById('settingNameVal');if(el)el.textContent=n;const r={low:'ต่ำ (Low)',medium:'ปานกลาง (Medium)',high:'สูง (High)'};el=document.getElementById('settingRisk');if(el)el.textContent=r[userSettings.risk]||'ปานกลาง';el=document.getElementById('settingCapital');if(el)el.textContent='฿'+Number(userSettings.capital||0).toLocaleString();el=document.getElementById('settingBroker');if(el)el.textContent=userSettings.broker||'ยังไม่ระบุ';const i=n.slice(0,2).toUpperCase();document.querySelectorAll('.avatar,.profile-avatar').forEach(el=>el.textContent=i);el=document.getElementById('cardName');if(el)el.textContent=n}
 function doLogout(){isLoggedIn=false;try{localStorage.removeItem('jpt_logged_in');sessionStorage.removeItem('jpt_session_active')}catch(e){}location.reload()}
-function navigateTo(screen){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const t=document.getElementById('screen-'+screen);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const b=document.querySelector('.nav-item[data-screen="'+screen+'"]');if(b)b.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});t?.querySelectorAll('.fade-up').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''})}
+function navigateTo(screen){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const t=document.getElementById('screen-'+screen);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const b=document.querySelector('.nav-item[data-screen="'+screen+'"]');if(b)b.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});t?.querySelectorAll('.fade-up').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''});if(screen==='news'){loadNewsFeed()}}
+const NEWS_INDEX_URL='https://raw.githubusercontent.com/jptrustlearning/pages/main/news/news-index.json';
+let newsFeedCache=null;
+async function loadNewsFeed(force){
+  const listEl=document.getElementById('newsFeedList');
+  const countEl=document.getElementById('newsCount');
+  if(!listEl)return;
+  listEl.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--text-dark-muted);font-size:13px">🔄 กำลังโหลดข่าว...</div>';
+  try{
+    const res=await fetch(NEWS_INDEX_URL+'?t='+Date.now(),{cache:'no-store'});
+    if(!res.ok)throw new Error('Index fetch failed');
+    const data=await res.json();
+    newsFeedCache=data;
+    const batches=(data.batches||[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+    if(countEl)countEl.textContent=batches.length;
+    if(batches.length===0){listEl.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--text-dark-muted);font-size:13px">ยังไม่มีข่าว — พิมพ์คำว่า "อัพเดทข่าว" ให้ Claude รวบรวมข่าวใหม่ได้</div>';return}
+    listEl.innerHTML=batches.map(b=>renderNewsBatchCard(b)).join('');
+  }catch(err){
+    listEl.innerHTML='<div class="dash-card" style="padding:20px;text-align:center;color:#C33A4E;font-size:13px">ไม่สามารถโหลดข่าวได้<br><span style="font-size:11px;color:var(--text-dark-muted);margin-top:6px;display:block">'+(err.message||'Unknown error')+'</span></div>';
+  }
+}
+function renderNewsBatchCard(b){
+  const tickers=(b.tickers||[]).map(t=>'<span class="news-ticker">$'+t+'</span>').join('');
+  const headlines=(b.headlines||[]).map((h,i)=>{
+    const ht=(h.tickers||[]).map(t=>'<span class="news-ticker-sm">$'+t+'</span>').join('');
+    return '<div class="news-headline"><div class="news-headline-num">'+(i+1)+'</div><div class="news-headline-body"><div class="news-headline-title">'+escapeText(h.title)+'</div><div class="news-headline-meta">'+ht+'<span class="news-src">'+escapeText(h.source||'')+'</span></div></div></div>';
+  }).join('');
+  const safeFile=encodeURIComponent(b.file);
+  return '<div class="news-card" onclick="openNewsDetail(\''+safeFile+'\')"><div class="news-card-top"><div class="news-card-date">'+escapeText(b.date_display||b.date||'')+'</div><div class="news-card-arrow">→</div></div><div class="news-card-summary">'+escapeText(b.summary||'')+'</div><div class="news-tickers-row">'+tickers+'</div><div class="news-divider"></div>'+headlines+'</div>';
+}
+function escapeText(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function openNewsDetail(file){openIframe('📰 News Detail','news-detail.html?file='+file)}
 function openEditModal(field){const m=document.getElementById('editModal'),t=document.getElementById('modalTitle'),c=document.getElementById('modalContent');if(field==='name'){t.textContent='แก้ไขชื่อที่แสดง';c.innerHTML='<input class="modal-input" id="editValue" value="'+userSettings.name+'" placeholder="ชื่อของคุณ"><button class="modal-btn" onclick="userSettings.name=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}else if(field==='risk'){t.textContent='ระดับความเสี่ยง';c.innerHTML='<div style="display:flex;flex-direction:column;gap:8px"><button class="modal-btn" style="background:'+(userSettings.risk==='low'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='low'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'low\';saveSettings();closeModal();">ต่ำ (Low)</button><button class="modal-btn" style="background:'+(userSettings.risk==='medium'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='medium'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'medium\';saveSettings();closeModal();">ปานกลาง (Medium)</button><button class="modal-btn" style="background:'+(userSettings.risk==='high'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='high'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'high\';saveSettings();closeModal();">สูง (High)</button></div>'}else if(field==='capital'){t.textContent='ทุนเริ่มต้น (บาท)';c.innerHTML='<input class="modal-input" id="editValue" type="number" value="'+userSettings.capital+'" placeholder="100000"><button class="modal-btn" onclick="userSettings.capital=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}else if(field==='broker'){t.textContent='โบรกเกอร์ของคุณ';c.innerHTML='<input class="modal-input" id="editValue" value="'+userSettings.broker+'" placeholder="เช่น XM, Exness, IC Markets"><button class="modal-btn" onclick="userSettings.broker=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}m.classList.add('show')}
 function closeModal(e){if(e&&e.target!==e.currentTarget)return;document.getElementById('editModal').classList.remove('show')}
 function openNotifications(){alert('ยังไม่มีการแจ้งเตือนใหม่')}

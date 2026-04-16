@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>JP Trust · News Detail</title>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAF6ED; --bg-warm:#F5EFE0; --card:#FFFEF8;
+  --gold:#D4AF37; --gold-dark:#B8860B; --gold-deep:#8B6914; --gold-light:#F4E4BA;
+  --maroon:#722F37; --maroon-dark:#5A242C;
+  --text:#3D3228; --text-head:#5A3D20; --text-muted:#7A6F62;
+  --border:rgba(212,175,55,0.25);
+  --red:#C33A4E; --green:#2E7D32; --blue:#2B5F9B;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Anuphan',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:0 0 60px 0}
+.topbar{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,#FFFEFB 0%,#FAF6ED 100%);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 12px rgba(212,175,55,0.08)}
+.back-btn{width:38px;height:38px;border-radius:50%;background:rgba(212,175,55,0.12);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--maroon);font-size:18px;flex-shrink:0;transition:all .2s ease}
+.back-btn:hover{background:rgba(212,175,55,0.22)}
+.topbar-title{font-family:'Cinzel',serif;font-size:14px;font-weight:600;letter-spacing:2px;color:var(--maroon);text-transform:uppercase;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.container{max-width:720px;margin:0 auto;padding:24px 20px}
+.meta-card{background:linear-gradient(145deg,#FFFEF8,#F8F2E4);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:24px;box-shadow:0 2px 10px rgba(114,47,55,0.05)}
+.meta-date{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2.5px;color:var(--gold-deep);text-transform:uppercase;margin-bottom:8px}
+.meta-summary{font-size:15px;font-weight:500;color:var(--text-head)}
+.meta-tickers{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.ticker-pill{font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;padding:4px 10px;border-radius:12px;background:linear-gradient(135deg,rgba(212,175,55,0.2),rgba(114,47,55,0.1));border:1px solid rgba(212,175,55,0.4);color:var(--maroon);font-weight:600}
+.md-content h2{font-size:19px;font-weight:700;color:var(--text-head);margin:32px 0 14px 0;padding-bottom:10px;border-bottom:1px solid var(--border);line-height:1.4}
+.md-content h2:first-child{margin-top:0}
+.md-content h3{font-size:16px;font-weight:600;color:var(--maroon);margin:22px 0 10px 0}
+.md-content p{margin:0 0 14px 0;font-size:15px;color:var(--text)}
+.md-content strong{color:var(--text-head);font-weight:600}
+.md-content em{color:var(--gold-deep);font-style:normal;font-weight:500}
+.md-content ul{margin:0 0 14px 0;padding-left:22px}
+.md-content li{margin:6px 0;font-size:14.5px;color:var(--text)}
+.md-content code{background:rgba(212,175,55,0.15);padding:2px 7px;border-radius:6px;font-family:'Cinzel',serif;font-size:13px;color:var(--maroon);font-weight:600;letter-spacing:0.5px}
+.md-content hr{border:none;border-top:1px solid var(--border);margin:28px 0}
+.md-content a{color:var(--maroon);text-decoration:none;border-bottom:1px dashed rgba(114,47,55,0.4)}
+.md-content blockquote{border-left:3px solid var(--gold);padding:8px 14px;margin:14px 0;background:rgba(212,175,55,0.06);color:var(--text-head);font-style:italic;border-radius:0 8px 8px 0}
+.loading{text-align:center;padding:60px 20px;color:var(--text-muted)}
+.loading-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gold);margin:0 3px;animation:dot-bounce 1.4s infinite ease-in-out both}
+.loading-dot:nth-child(1){animation-delay:-.32s}
+.loading-dot:nth-child(2){animation-delay:-.16s}
+@keyframes dot-bounce{0%,80%,100%{transform:scale(0);opacity:0.5}40%{transform:scale(1);opacity:1}}
+.error-box{background:rgba(195,58,78,0.08);border:1px solid rgba(195,58,78,0.25);border-radius:12px;padding:18px;color:var(--red);text-align:center;margin:24px 0}
+.footer-stamp{margin-top:40px;padding-top:20px;border-top:1px solid var(--border);text-align:center;color:var(--text-muted);font-size:12px;font-family:'Cinzel',serif;letter-spacing:2px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="back-btn" onclick="goBack()">←</button>
+  <div class="topbar-title" id="topbarTitle">News Detail</div>
+</div>
+
+<div class="container">
+  <div id="metaCard" class="meta-card" style="display:none">
+    <div class="meta-date" id="metaDate"></div>
+    <div class="meta-summary" id="metaSummary"></div>
+    <div class="meta-tickers" id="metaTickers"></div>
+  </div>
+
+  <div id="content">
+    <div class="loading">
+      <div><span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span></div>
+      <div style="margin-top:14px;font-size:13px">กำลังโหลดข่าว...</div>
+    </div>
+  </div>
+
+  <div class="footer-stamp">JP TRUST · LEARNING</div>
+</div>
+
+<script>
+const GITHUB_BASE = 'https://raw.githubusercontent.com/jptrustlearning/pages/main/news/';
+const INDEX_URL = GITHUB_BASE + 'news-index.json';
+
+function goBack(){
+  if(window.history.length > 1) window.history.back();
+  else window.location.href = 'member-dashboard.html';
+}
+
+function getFileFromURL(){
+  const params = new URLSearchParams(window.location.search);
+  return params.get('file');
+}
+
+// Minimal markdown renderer (headers, bold, italic, lists, hr, code, blockquote)
+function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function renderMarkdown(md){
+  // Strip front matter
+  md = md.replace(/^---[\s\S]*?---\n/,'');
+  const lines = md.split('\n');
+  let html = '';
+  let inList = false;
+  let inPara = false;
+
+  function closePara(){ if(inPara){ html += '</p>'; inPara=false; } }
+  function closeList(){ if(inList){ html += '</ul>'; inList=false; } }
+
+  for(let raw of lines){
+    let line = raw.trimEnd();
+
+    if(/^---\s*$/.test(line)){ closePara(); closeList(); html += '<hr>'; continue; }
+    if(/^###\s+/.test(line)){ closePara(); closeList(); html += '<h3>'+inline(line.replace(/^###\s+/,''))+'</h3>'; continue; }
+    if(/^##\s+/.test(line)){ closePara(); closeList(); html += '<h2>'+inline(line.replace(/^##\s+/,''))+'</h2>'; continue; }
+    if(/^#\s+/.test(line)){ closePara(); closeList(); html += '<h2>'+inline(line.replace(/^#\s+/,''))+'</h2>'; continue; }
+    if(/^>\s+/.test(line)){ closePara(); closeList(); html += '<blockquote>'+inline(line.replace(/^>\s+/,''))+'</blockquote>'; continue; }
+    if(/^[-*]\s+/.test(line)){
+      closePara();
+      if(!inList){ html += '<ul>'; inList=true; }
+      html += '<li>'+inline(line.replace(/^[-*]\s+/,''))+'</li>';
+      continue;
+    }
+    if(line === ''){
+      closePara();
+      closeList();
+      continue;
+    }
+    closeList();
+    if(!inPara){ html += '<p>'; inPara=true; } else { html += ' '; }
+    html += inline(line);
+  }
+  closePara();
+  closeList();
+  return html;
+}
+
+function inline(s){
+  s = escapeHtml(s);
+  // code
+  s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+  // bold
+  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  // italic
+  s = s.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');
+  // links
+  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  return s;
+}
+
+async function loadNews(){
+  const file = getFileFromURL();
+  const contentDiv = document.getElementById('content');
+  if(!file){
+    contentDiv.innerHTML = '<div class="error-box">ไม่พบไฟล์ข่าวที่ระบุ</div>';
+    return;
+  }
+
+  try {
+    // Load index to get metadata
+    const indexRes = await fetch(INDEX_URL, {cache:'no-store'});
+    const indexData = await indexRes.json();
+    const batch = (indexData.batches || []).find(b => b.file === file);
+
+    if(batch){
+      document.getElementById('metaDate').textContent = batch.date_display || '';
+      document.getElementById('metaSummary').textContent = batch.summary || '';
+      const tickersEl = document.getElementById('metaTickers');
+      tickersEl.innerHTML = '';
+      (batch.tickers || []).forEach(t=>{
+        const pill = document.createElement('span');
+        pill.className = 'ticker-pill';
+        pill.textContent = '$' + t;
+        tickersEl.appendChild(pill);
+      });
+      document.getElementById('metaCard').style.display = 'block';
+      document.getElementById('topbarTitle').textContent = batch.date_display || 'News';
+    }
+
+    // Load MD content
+    const mdRes = await fetch(GITHUB_BASE + file, {cache:'no-store'});
+    if(!mdRes.ok) throw new Error('Cannot fetch news file');
+    const md = await mdRes.text();
+    contentDiv.innerHTML = '<div class="md-content">' + renderMarkdown(md) + '</div>';
+  } catch(err){
+    contentDiv.innerHTML = '<div class="error-box">ไม่สามารถโหลดข่าวได้ — '+escapeHtml(err.message)+'</div>';
+  }
+}
+
+loadNews();
+</script>
+
+</body>
+</html>
