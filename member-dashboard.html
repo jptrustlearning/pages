@@ -699,27 +699,106 @@ function showApp(){document.getElementById('loginScreen').classList.add('hidden'
 function applySettings(){const n=userSettings.name||'Member';var el;el=document.getElementById('displayName');if(el)el.textContent=n;el=document.getElementById('settingsName');if(el)el.textContent=n;el=document.getElementById('settingsEmail');if(el)el.textContent=userSettings.email;el=document.getElementById('settingNameVal');if(el)el.textContent=n;const r={low:'ต่ำ (Low)',medium:'ปานกลาง (Medium)',high:'สูง (High)'};el=document.getElementById('settingRisk');if(el)el.textContent=r[userSettings.risk]||'ปานกลาง';el=document.getElementById('settingCapital');if(el)el.textContent='฿'+Number(userSettings.capital||0).toLocaleString();el=document.getElementById('settingBroker');if(el)el.textContent=userSettings.broker||'ยังไม่ระบุ';const i=n.slice(0,2).toUpperCase();document.querySelectorAll('.avatar,.profile-avatar').forEach(el=>el.textContent=i);el=document.getElementById('cardName');if(el)el.textContent=n}
 function doLogout(){isLoggedIn=false;try{localStorage.removeItem('jpt_logged_in');sessionStorage.removeItem('jpt_session_active')}catch(e){}location.reload()}
 function navigateTo(screen){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const t=document.getElementById('screen-'+screen);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const b=document.querySelector('.nav-item[data-screen="'+screen+'"]');if(b)b.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});t?.querySelectorAll('.fade-up').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''});if(screen==='news'){loadNewsFeed()}}
-// ===== TICKER TAPE =====
-const TICKER_DATA=[
-  {symbol:'GOLD',price:'2,485',change:'+1.2%',dir:'up'},
-  {symbol:'S&P 500',price:'7,012',change:'+0.3%',dir:'up'},
-  {symbol:'BITCOIN',price:'107,250',change:'+2.8%',dir:'up'},
-  {symbol:'NASDAQ',price:'24,118',change:'+0.1%',dir:'flat'},
-  {symbol:'DXY',price:'102.85',change:'−0.2%',dir:'down'},
-  {symbol:'OIL WTI',price:'89.40',change:'−1.1%',dir:'down'},
-  {symbol:'10Y UST',price:'4.28%',change:'+0.02',dir:'up'},
-  {symbol:'VIX',price:'15.62',change:'−3.5%',dir:'down'}
+// ===== TICKER TAPE — live prices =====
+// Sources:
+//   gold-api.com (CORS ✅, no key, no rate limit): XAU, XAG, XPT, BTC, ETH
+//   stooq.com CSV (CORS ok from most browsers): ^spx, ^ndx, cl.f, ^vix, dx.y.b
+// Fetch resilient: if one source fails, others still render. Fallbacks used.
+const TICKER_STATIC_FALLBACK=[
+  {symbol:'GOLD',price:'—',change:'—',dir:'flat',group:'metal'},
+  {symbol:'S&P 500',price:'—',change:'—',dir:'flat',group:'index'},
+  {symbol:'BITCOIN',price:'—',change:'—',dir:'flat',group:'crypto'},
+  {symbol:'NASDAQ',price:'—',change:'—',dir:'flat',group:'index'},
+  {symbol:'DXY',price:'—',change:'—',dir:'flat',group:'fx'},
+  {symbol:'OIL WTI',price:'—',change:'—',dir:'flat',group:'commodity'},
+  {symbol:'SILVER',price:'—',change:'—',dir:'flat',group:'metal'},
+  {symbol:'VIX',price:'—',change:'—',dir:'flat',group:'index'}
 ];
+function formatPrice(n,digits){
+  if(n===null||n===undefined||isNaN(n))return '—';
+  return Number(n).toLocaleString('en-US',{minimumFractionDigits:digits,maximumFractionDigits:digits});
+}
+function dirOf(ch){if(ch===null||ch===undefined||isNaN(ch))return 'flat';if(ch>0.02)return 'up';if(ch<-0.02)return 'down';return 'flat'}
+function chgLabel(ch){if(ch===null||ch===undefined||isNaN(ch))return '—';const s=ch>=0?'+':'−';return s+Math.abs(ch).toFixed(2)+'%'}
+
+// gold-api.com fetcher — returns {price, prev_close} where available
+async function fetchGoldApi(sym){
+  try{
+    const r=await fetch('https://api.gold-api.com/price/'+sym,{cache:'no-store'});
+    if(!r.ok)return null;
+    const j=await r.json();
+    return {price:Number(j.price),prev:null};
+  }catch(e){return null}
+}
+
+// Stooq CSV: https://stooq.com/q/l/?s=SYM&f=sd2t2ohlcv&h&e=csv
+// Returns {price, prev} — we derive change from open (best effort since realtime prev not free)
+async function fetchStooq(sym){
+  try{
+    const r=await fetch('https://stooq.com/q/l/?s='+encodeURIComponent(sym)+'&f=sd2t2ohlc&h&e=csv',{cache:'no-store'});
+    if(!r.ok)return null;
+    const text=await r.text();
+    const lines=text.trim().split('\n');
+    if(lines.length<2)return null;
+    const cols=lines[1].split(',');
+    // Symbol,Date,Time,Open,High,Low,Close
+    const open=parseFloat(cols[3]);
+    const close=parseFloat(cols[6]);
+    if(isNaN(close)||isNaN(open))return null;
+    return {price:close,prev:open};
+  }catch(e){return null}
+}
+
+async function fetchLivePrices(){
+  // Launch all in parallel, tolerate individual failures
+  const tasks=[
+    {key:'GOLD',label:'GOLD',digits:2,p:fetchGoldApi('XAU')},
+    {key:'SILVER',label:'SILVER',digits:2,p:fetchGoldApi('XAG')},
+    {key:'BTC',label:'BITCOIN',digits:0,p:fetchGoldApi('BTC')},
+    {key:'ETH',label:'ETHEREUM',digits:0,p:fetchGoldApi('ETH')},
+    {key:'SPX',label:'S&P 500',digits:2,p:fetchStooq('^spx')},
+    {key:'NDX',label:'NASDAQ',digits:2,p:fetchStooq('^ndx')},
+    {key:'DXY',label:'DXY',digits:2,p:fetchStooq('dx.y.b')},
+    {key:'OIL',label:'OIL WTI',digits:2,p:fetchStooq('cl.f')},
+    {key:'VIX',label:'VIX',digits:2,p:fetchStooq('^vix')}
+  ];
+  const results=await Promise.allSettled(tasks.map(t=>t.p));
+  const out=[];
+  results.forEach((r,i)=>{
+    const t=tasks[i];
+    if(r.status==='fulfilled'&&r.value){
+      const price=r.value.price;
+      const prev=r.value.prev;
+      const chg=(prev&&prev>0)?((price-prev)/prev*100):null;
+      out.push({symbol:t.label,price:formatPrice(price,t.digits),change:chgLabel(chg),dir:dirOf(chg)});
+    }
+  });
+  return out;
+}
+
 function renderTickerTape(){
   const track=document.getElementById('tickerTapeTrack');
   if(!track)return;
+  // Show placeholder immediately with static fallback symbols
+  renderTickerItems(track,TICKER_STATIC_FALLBACK);
+  // Then fetch live and replace
+  fetchLivePrices().then(items=>{
+    if(items&&items.length){renderTickerItems(track,items)}
+  });
+  // Auto-refresh every 60s
+  if(!window._tickerInterval){
+    window._tickerInterval=setInterval(()=>{
+      fetchLivePrices().then(items=>{if(items&&items.length)renderTickerItems(track,items)});
+    },60000);
+  }
+}
+function renderTickerItems(track,items){
   const arrowUp='▲',arrowDown='▼',arrowFlat='●';
   const itemHTML=t=>{
     const arr=t.dir==='up'?arrowUp:t.dir==='down'?arrowDown:arrowFlat;
     return '<span class="ticker-item"><span class="ticker-symbol">'+t.symbol+'</span><span class="ticker-price">'+t.price+'</span><span class="ticker-change '+t.dir+'">'+arr+' '+t.change+'</span></span>';
   };
-  // Duplicate for seamless loop (translateX -50% at end)
-  const once=TICKER_DATA.map(itemHTML).join('');
+  const once=items.map(itemHTML).join('');
   track.innerHTML=once+once;
 }
 
