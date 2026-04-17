@@ -158,22 +158,11 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .time-chip:hover{background:rgba(212,175,55,0.1);color:#5A3D20}
 .time-chip.active{background:linear-gradient(135deg,#D4AF37,#B8860B);color:#fff;border-color:#B8860B;font-weight:600;box-shadow:0 2px 8px rgba(212,175,55,0.35)}
 
-/* ===== TICKER TAPE — scrolling live prices ===== */
-.ticker-tape{position:relative;background:linear-gradient(90deg,#1a0a0e 0%,#2d1018 50%,#1a0a0e 100%);border:1px solid rgba(212,175,55,0.35);border-radius:14px;padding:11px 0;margin:4px 0 18px 0;overflow:hidden;box-shadow:0 4px 18px rgba(114,47,55,0.18),inset 0 0 25px rgba(212,175,55,0.08)}
-.ticker-tape::before,.ticker-tape::after{content:'';position:absolute;top:0;bottom:0;width:36px;z-index:2;pointer-events:none}
-.ticker-tape::before{left:0;background:linear-gradient(90deg,#1a0a0e 0%,transparent 100%)}
-.ticker-tape::after{right:0;background:linear-gradient(270deg,#1a0a0e 0%,transparent 100%)}
-.ticker-tape-track{display:inline-flex;gap:0;animation:ticker-scroll 40s linear infinite;white-space:nowrap;will-change:transform}
-.ticker-tape:hover .ticker-tape-track{animation-play-state:paused}
-@keyframes ticker-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.ticker-item{display:inline-flex;align-items:center;gap:8px;padding:0 22px;position:relative;font-family:'Anuphan',sans-serif}
-.ticker-item+.ticker-item::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:4px;height:4px;border-radius:50%;background:rgba(212,175,55,0.5)}
-.ticker-symbol{font-family:'Cinzel',serif;font-size:11.5px;letter-spacing:1.8px;color:#F4E4BA;font-weight:600}
-.ticker-price{font-family:'DM Serif Display',serif;font-size:16px;color:#fff;font-weight:400;letter-spacing:0.3px}
-.ticker-change{font-size:11.5px;font-weight:600;padding:2.5px 8px;border-radius:10px;letter-spacing:0.3px}
-.ticker-change.up{color:#7FD39C;background:rgba(46,125,50,0.18);border:1px solid rgba(46,125,50,0.35)}
-.ticker-change.down{color:#FF8A9B;background:rgba(195,58,78,0.18);border:1px solid rgba(195,58,78,0.4)}
-.ticker-change.flat{color:#D4AF37;background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.3)}
+/* ===== TRADINGVIEW TICKER TAPE ===== */
+.ticker-tape-wrapper{background:#0a0e17;border:1px solid rgba(212,175,55,0.35);border-radius:14px;margin:4px 0 18px 0;overflow:hidden;box-shadow:0 4px 18px rgba(114,47,55,0.18)}
+.ticker-tape-wrapper .tradingview-widget-container{width:100%}
+/* Hide TradingView copyright link (keep minimal branding compliance via tiny footer style) */
+.ticker-tape-wrapper .tradingview-widget-copyright{display:none}
 
 /* News feed cards - dashboard card style (cream + wave), 2 per row */
 .news-batch-group{margin-bottom:28px}
@@ -371,10 +360,11 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                 <div class="quick-action" onclick="openIframe('Gold Momentum Dashboard','https://jptrustlearning.github.io/pages/gold-momentum-app.html')"><div class="qa-icon bg-gold"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span></div><div class="qa-label">Gold<br>Dashboard</div></div>
                 <div class="quick-action" onclick="openIframe('BTC Momentum Dashboard','https://jptrustlearning.github.io/pages/btc-momentum.html')"><div class="qa-icon bg-green"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 8h5a3 3 0 0 1 0 6H9V8z"/><path d="M9 14h5.5a3 3 0 0 1 0 6H9v-6z"/><line x1="11" y1="5" x2="11" y2="8"/><line x1="13" y1="5" x2="13" y2="8"/><line x1="11" y1="20" x2="11" y2="23"/><line x1="13" y1="20" x2="13" y2="23"/><line x1="7" y1="8" x2="9" y2="8"/><line x1="7" y1="14" x2="9" y2="14"/><line x1="7" y1="20" x2="9" y2="20"/></svg></span></div><div class="qa-label">Bitcoin<br>Analysis</div></div>
             </div>
-            <div class="ticker-tape fade-up fade-up-2" id="tickerTape">
-                <div class="ticker-tape-track" id="tickerTapeTrack">
-                    <!-- Rendered by JS -->
-                </div>
+            <!-- TradingView Ticker Tape Widget -->
+            <div class="ticker-tape-wrapper fade-up fade-up-2">
+              <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+              </div>
             </div>
             <div class="section-header fade-up fade-up-3"><div class="section-title">แดชบอร์ด</div><div class="section-link">ดูทั้งหมด ›</div></div>
             <div class="dashboard-grid fade-up fade-up-3">
@@ -699,107 +689,41 @@ function showApp(){document.getElementById('loginScreen').classList.add('hidden'
 function applySettings(){const n=userSettings.name||'Member';var el;el=document.getElementById('displayName');if(el)el.textContent=n;el=document.getElementById('settingsName');if(el)el.textContent=n;el=document.getElementById('settingsEmail');if(el)el.textContent=userSettings.email;el=document.getElementById('settingNameVal');if(el)el.textContent=n;const r={low:'ต่ำ (Low)',medium:'ปานกลาง (Medium)',high:'สูง (High)'};el=document.getElementById('settingRisk');if(el)el.textContent=r[userSettings.risk]||'ปานกลาง';el=document.getElementById('settingCapital');if(el)el.textContent='฿'+Number(userSettings.capital||0).toLocaleString();el=document.getElementById('settingBroker');if(el)el.textContent=userSettings.broker||'ยังไม่ระบุ';const i=n.slice(0,2).toUpperCase();document.querySelectorAll('.avatar,.profile-avatar').forEach(el=>el.textContent=i);el=document.getElementById('cardName');if(el)el.textContent=n}
 function doLogout(){isLoggedIn=false;try{localStorage.removeItem('jpt_logged_in');sessionStorage.removeItem('jpt_session_active')}catch(e){}location.reload()}
 function navigateTo(screen){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const t=document.getElementById('screen-'+screen);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const b=document.querySelector('.nav-item[data-screen="'+screen+'"]');if(b)b.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});t?.querySelectorAll('.fade-up').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''});if(screen==='news'){loadNewsFeed()}}
-// ===== TICKER TAPE — live prices =====
-// Sources:
-//   gold-api.com (CORS ✅, no key, no rate limit): XAU, XAG, XPT, BTC, ETH
-//   stooq.com CSV (CORS ok from most browsers): ^spx, ^ndx, cl.f, ^vix, dx.y.b
-// Fetch resilient: if one source fails, others still render. Fallbacks used.
-const TICKER_STATIC_FALLBACK=[
-  {symbol:'GOLD',price:'—',change:'—',dir:'flat',group:'metal'},
-  {symbol:'S&P 500',price:'—',change:'—',dir:'flat',group:'index'},
-  {symbol:'BITCOIN',price:'—',change:'—',dir:'flat',group:'crypto'},
-  {symbol:'NASDAQ',price:'—',change:'—',dir:'flat',group:'index'},
-  {symbol:'DXY',price:'—',change:'—',dir:'flat',group:'fx'},
-  {symbol:'OIL WTI',price:'—',change:'—',dir:'flat',group:'commodity'},
-  {symbol:'SILVER',price:'—',change:'—',dir:'flat',group:'metal'},
-  {symbol:'VIX',price:'—',change:'—',dir:'flat',group:'index'}
-];
-function formatPrice(n,digits){
-  if(n===null||n===undefined||isNaN(n))return '—';
-  return Number(n).toLocaleString('en-US',{minimumFractionDigits:digits,maximumFractionDigits:digits});
-}
-function dirOf(ch){if(ch===null||ch===undefined||isNaN(ch))return 'flat';if(ch>0.02)return 'up';if(ch<-0.02)return 'down';return 'flat'}
-function chgLabel(ch){if(ch===null||ch===undefined||isNaN(ch))return '—';const s=ch>=0?'+':'−';return s+Math.abs(ch).toFixed(2)+'%'}
-
-// gold-api.com fetcher — returns {price, prev_close} where available
-async function fetchGoldApi(sym){
-  try{
-    const r=await fetch('https://api.gold-api.com/price/'+sym,{cache:'no-store'});
-    if(!r.ok)return null;
-    const j=await r.json();
-    return {price:Number(j.price),prev:null};
-  }catch(e){return null}
-}
-
-// Stooq CSV: https://stooq.com/q/l/?s=SYM&f=sd2t2ohlcv&h&e=csv
-// Returns {price, prev} — we derive change from open (best effort since realtime prev not free)
-async function fetchStooq(sym){
-  try{
-    const r=await fetch('https://stooq.com/q/l/?s='+encodeURIComponent(sym)+'&f=sd2t2ohlc&h&e=csv',{cache:'no-store'});
-    if(!r.ok)return null;
-    const text=await r.text();
-    const lines=text.trim().split('\n');
-    if(lines.length<2)return null;
-    const cols=lines[1].split(',');
-    // Symbol,Date,Time,Open,High,Low,Close
-    const open=parseFloat(cols[3]);
-    const close=parseFloat(cols[6]);
-    if(isNaN(close)||isNaN(open))return null;
-    return {price:close,prev:open};
-  }catch(e){return null}
-}
-
-async function fetchLivePrices(){
-  // Launch all in parallel, tolerate individual failures
-  const tasks=[
-    {key:'GOLD',label:'GOLD',digits:2,p:fetchGoldApi('XAU')},
-    {key:'SILVER',label:'SILVER',digits:2,p:fetchGoldApi('XAG')},
-    {key:'BTC',label:'BITCOIN',digits:0,p:fetchGoldApi('BTC')},
-    {key:'ETH',label:'ETHEREUM',digits:0,p:fetchGoldApi('ETH')},
-    {key:'SPX',label:'S&P 500',digits:2,p:fetchStooq('^spx')},
-    {key:'NDX',label:'NASDAQ',digits:2,p:fetchStooq('^ndx')},
-    {key:'DXY',label:'DXY',digits:2,p:fetchStooq('dx.y.b')},
-    {key:'OIL',label:'OIL WTI',digits:2,p:fetchStooq('cl.f')},
-    {key:'VIX',label:'VIX',digits:2,p:fetchStooq('^vix')}
-  ];
-  const results=await Promise.allSettled(tasks.map(t=>t.p));
-  const out=[];
-  results.forEach((r,i)=>{
-    const t=tasks[i];
-    if(r.status==='fulfilled'&&r.value){
-      const price=r.value.price;
-      const prev=r.value.prev;
-      const chg=(prev&&prev>0)?((price-prev)/prev*100):null;
-      out.push({symbol:t.label,price:formatPrice(price,t.digits),change:chgLabel(chg),dir:dirOf(chg)});
-    }
-  });
-  return out;
-}
-
+// ===== TRADINGVIEW TICKER TAPE =====
+// Free embed widget — real-time prices, no API key, auto-updating
 function renderTickerTape(){
-  const track=document.getElementById('tickerTapeTrack');
-  if(!track)return;
-  // Show placeholder immediately with static fallback symbols
-  renderTickerItems(track,TICKER_STATIC_FALLBACK);
-  // Then fetch live and replace
-  fetchLivePrices().then(items=>{
-    if(items&&items.length){renderTickerItems(track,items)}
-  });
-  // Auto-refresh every 60s
-  if(!window._tickerInterval){
-    window._tickerInterval=setInterval(()=>{
-      fetchLivePrices().then(items=>{if(items&&items.length)renderTickerItems(track,items)});
-    },60000);
-  }
-}
-function renderTickerItems(track,items){
-  const arrowUp='▲',arrowDown='▼',arrowFlat='●';
-  const itemHTML=t=>{
-    const arr=t.dir==='up'?arrowUp:t.dir==='down'?arrowDown:arrowFlat;
-    return '<span class="ticker-item"><span class="ticker-symbol">'+t.symbol+'</span><span class="ticker-price">'+t.price+'</span><span class="ticker-change '+t.dir+'">'+arr+' '+t.change+'</span></span>';
+  const wrapper=document.querySelector('.ticker-tape-wrapper .tradingview-widget-container__widget');
+  if(!wrapper)return;
+  // Only inject once
+  if(wrapper.dataset.tvLoaded==='1')return;
+  wrapper.dataset.tvLoaded='1';
+
+  const config={
+    "symbols":[
+      {"description":"Gold","proName":"OANDA:XAUUSD"},
+      {"description":"S&P 500","proName":"SP:SPX"},
+      {"description":"Bitcoin","proName":"BINANCE:BTCUSDT"},
+      {"description":"Nasdaq 100","proName":"NASDAQ:NDX"},
+      {"description":"Dow Jones","proName":"DJ:DJI"},
+      {"description":"US Dollar","proName":"TVC:DXY"},
+      {"description":"Oil WTI","proName":"TVC:USOIL"},
+      {"description":"Silver","proName":"OANDA:XAGUSD"},
+      {"description":"Ethereum","proName":"BINANCE:ETHUSDT"},
+      {"description":"VIX","proName":"TVC:VIX"},
+      {"description":"10Y Treasury","proName":"TVC:US10Y"}
+    ],
+    "showSymbolLogo":true,
+    "isTransparent":false,
+    "displayMode":"adaptive",
+    "colorTheme":"dark",
+    "locale":"en"
   };
-  const once=items.map(itemHTML).join('');
-  track.innerHTML=once+once;
+  const script=document.createElement('script');
+  script.type='text/javascript';
+  script.src='https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
+  script.async=true;
+  script.innerHTML=JSON.stringify(config);
+  wrapper.parentElement.appendChild(script);
 }
 
 const NEWS_INDEX_URL='https://raw.githubusercontent.com/jptrustlearning/pages/main/news/news-index.json';
