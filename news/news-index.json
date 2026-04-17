@@ -1,6 +1,66 @@
 {
-  "lastUpdated": "2026-04-17T15:30:00Z",
+  "lastUpdated": "2026-04-17T22:00:00Z",
   "batches": [
+    {
+      "file": "2026-04-17-2200.md",
+      "date": "2026-04-17T22:00:00Z",
+      "date_display": "17 เม.ย. 2026 · 22:00",
+      "summary": "S&P 500 แตะ 7,041 · TFC รายงาน Q1 · BIRD ร่วง 36% · VIX ต่ำสุด · AI Software Rebound",
+      "tickers": ["SPY", "QQQ", "VIX", "TFC", "BIRD", "NOW", "SNPS", "PANW"],
+      "headlines": [
+        {
+          "title": "S&P 500 พุ่งสู่ 7,041 — สัปดาห์ที่ 3 ติดต่อกันขึ้นเกิน 3% นักลงทุนรายย่อยเริ่มไล่ตาม",
+          "tickers": [
+            {"symbol": "SPY", "sentiment": "positive"},
+            {"symbol": "QQQ", "sentiment": "positive"},
+            {"symbol": "IWM", "sentiment": "positive"}
+          ],
+          "source": "Bloomberg · CNBC",
+          "published": "17 เม.ย. 2026"
+        },
+        {
+          "title": "Truist Financial (TFC) รายงาน Q1 — Super-Regional Bank โชว์ความแข็งแกร่ง",
+          "tickers": [
+            {"symbol": "TFC", "sentiment": "positive"},
+            {"symbol": "USB", "sentiment": "neutral"},
+            {"symbol": "PNC", "sentiment": "neutral"}
+          ],
+          "source": "Benzinga · PR Newswire",
+          "published": "17 เม.ย. 2026"
+        },
+        {
+          "title": "BIRD ร่วง 36% วันเดียว — AI Pivot Mania จาก +582% พังเร็วทันที",
+          "tickers": [
+            {"symbol": "BIRD", "sentiment": "negative"},
+            {"symbol": "MYSE", "sentiment": "negative"},
+            {"symbol": "BBAI", "sentiment": "neutral"}
+          ],
+          "source": "Bloomberg · Benzinga",
+          "published": "17 เม.ย. 2026"
+        },
+        {
+          "title": "VIX ร่วงสู่ 17.48 — ต่ำสุดในรอบหลายเดือน ตลาดเข้าโหมด Complacency",
+          "tickers": [
+            {"symbol": "VIX", "sentiment": "negative"},
+            {"symbol": "UVXY", "sentiment": "neutral"},
+            {"symbol": "SPY", "sentiment": "neutral"}
+          ],
+          "source": "FXEmpire · Yahoo Finance",
+          "published": "17 เม.ย. 2026"
+        },
+        {
+          "title": "AI-Native Software Stocks Rebound — ServiceNow +7.3%, Synopsys, Palo Alto โดนซื้อกลับ",
+          "tickers": [
+            {"symbol": "NOW", "sentiment": "positive"},
+            {"symbol": "SNPS", "sentiment": "positive"},
+            {"symbol": "PANW", "sentiment": "positive"},
+            {"symbol": "ORCL", "sentiment": "positive"}
+          ],
+          "source": "CNBC · Hightower Advisors",
+          "published": "17 เม.ย. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-04-17-1530.md",
       "date": "2026-04-17T15:30:00Z",
