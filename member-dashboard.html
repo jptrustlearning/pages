@@ -179,6 +179,8 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .time-chip{flex-shrink:0;padding:7px 14px;border-radius:18px;border:1px solid rgba(212,175,55,0.3);background:rgba(255,254,248,0.6);color:#7A6F62;font-family:'Anuphan',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap}
 .time-chip:hover{background:rgba(212,175,55,0.1);color:#5A3D20}
 .time-chip.active{background:linear-gradient(135deg,#D4AF37,#B8860B);color:#fff;border-color:#B8860B;font-weight:600;box-shadow:0 2px 8px rgba(212,175,55,0.35)}
+.time-chip-custom{border-style:dashed;border-color:rgba(212,175,55,0.5);background:rgba(255,254,248,0.4)}
+.time-chip-custom.active{border-style:solid}
 
 /* ===== TRADINGVIEW TICKER TAPE ===== */
 .ticker-tape-wrapper{background:#0a0e17;border:1px solid rgba(212,175,55,0.35);border-radius:14px;margin:4px 0 18px 0;overflow:hidden;box-shadow:0 4px 18px rgba(114,47,55,0.18);position:relative}
@@ -489,10 +491,11 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
           <button class="news-search-clear" id="newsSearchClear" onclick="clearNewsSearch()" style="display:none">✕</button>
         </div>
         <div class="news-time-filter">
-          <button class="time-chip active" data-range="all" onclick="setNewsTimeRange('all')">ทั้งหมด</button>
+          <button class="time-chip active" data-range="3day" onclick="setNewsTimeRange('3day')">3 วันล่าสุด</button>
           <button class="time-chip" data-range="today" onclick="setNewsTimeRange('today')">วันนี้</button>
           <button class="time-chip" data-range="week" onclick="setNewsTimeRange('week')">7 วัน</button>
           <button class="time-chip" data-range="month" onclick="setNewsTimeRange('month')">30 วัน</button>
+          <button class="time-chip time-chip-custom" data-range="custom" onclick="openCustomDateModal()" id="customDateChip">📅 ช่วงเวลาเอง</button>
         </div>
       </div>
       <div class="screen-content">
@@ -559,6 +562,24 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 </div>
 
 <div class="modal-overlay" id="editModal" onclick="closeModal(event)"><div class="modal-sheet" onclick="event.stopPropagation()"><div class="modal-handle"></div><div class="modal-title" id="modalTitle">แก้ไข</div><div id="modalContent"></div></div></div>
+
+<div class="modal-overlay" id="dateRangeModal" onclick="closeDateModal(event)"><div class="modal-sheet" onclick="event.stopPropagation()"><div class="modal-handle"></div><div class="modal-title">📅 เลือกช่วงเวลา</div>
+  <div style="padding:8px 4px 4px 4px">
+    <div style="margin-bottom:18px">
+      <label style="display:block;font-size:12px;font-weight:600;color:var(--text-dark-sub,#5A3D20);margin-bottom:6px;letter-spacing:0.5px">วันที่เริ่มต้น</label>
+      <input type="date" id="dateRangeStart" style="width:100%;padding:12px 14px;border:1.5px solid rgba(212,175,55,0.4);border-radius:12px;font-family:'Anuphan',sans-serif;font-size:15px;background:var(--cream-card,#FFFEF8);color:var(--text-dark,#3D3228);outline:none;box-sizing:border-box">
+    </div>
+    <div style="margin-bottom:22px">
+      <label style="display:block;font-size:12px;font-weight:600;color:var(--text-dark-sub,#5A3D20);margin-bottom:6px;letter-spacing:0.5px">วันที่สิ้นสุด</label>
+      <input type="date" id="dateRangeEnd" style="width:100%;padding:12px 14px;border:1.5px solid rgba(212,175,55,0.4);border-radius:12px;font-family:'Anuphan',sans-serif;font-size:15px;background:var(--cream-card,#FFFEF8);color:var(--text-dark,#3D3228);outline:none;box-sizing:border-box">
+    </div>
+    <div id="dateRangeError" style="color:#C33A4E;font-size:12px;margin-bottom:12px;min-height:16px;text-align:center"></div>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeDateModal()" style="flex:1;padding:13px;border:1.5px solid rgba(114,47,55,0.3);border-radius:12px;background:transparent;color:#722F37;font-family:'Anuphan',sans-serif;font-size:14px;font-weight:600;cursor:pointer">ยกเลิก</button>
+      <button onclick="applyDateRange()" style="flex:1.3;padding:13px;border:none;border-radius:12px;background:linear-gradient(135deg,#D4AF37 0%,#B8860B 100%);color:#fff;font-family:'Anuphan',sans-serif;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 3px 10px rgba(212,175,55,0.35)">ใช้ช่วงเวลานี้</button>
+    </div>
+  </div>
+</div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -844,7 +865,9 @@ function renderTickerTape(){
 const NEWS_INDEX_URL='https://raw.githubusercontent.com/jptrustlearning/pages/main/news/news-index.json';
 let newsFeedCache=null;
 let newsSearchQuery='';
-let newsTimeRange='all';
+let newsTimeRange='3day';
+let newsCustomStart=null;
+let newsCustomEnd=null;
 async function loadNewsFeed(force){
   const listEl=document.getElementById('newsFeedList');
   if(!listEl)return;
@@ -875,11 +898,16 @@ function renderNewsFeed(){
     });
   });
   // Time range filter based on _pubDate
-  if(newsTimeRange!=='all'){
-    const now=Date.now();
-    const windows={today:24*3600*1000,week:7*24*3600*1000,month:30*24*3600*1000};
-    const cutoff=now-(windows[newsTimeRange]||0);
-    allHeadlines=allHeadlines.filter(h=>h._pubDate>=cutoff);
+  // NOTE: when user has an active search query, we ignore time filter (show all matches)
+  if(!newsSearchQuery && newsTimeRange!=='all'){
+    if(newsTimeRange==='custom' && newsCustomStart && newsCustomEnd){
+      allHeadlines=allHeadlines.filter(h=>h._pubDate>=newsCustomStart && h._pubDate<=newsCustomEnd);
+    }else{
+      const now=Date.now();
+      const windows={today:24*3600*1000,'3day':3*24*3600*1000,week:7*24*3600*1000,month:30*24*3600*1000};
+      const cutoff=now-(windows[newsTimeRange]||0);
+      allHeadlines=allHeadlines.filter(h=>h._pubDate>=cutoff);
+    }
   }
   // Search filter
   if(newsSearchQuery){
@@ -969,7 +997,51 @@ function clearNewsSearch(){
 }
 function setNewsTimeRange(range){
   newsTimeRange=range;
+  if(range!=='custom'){newsCustomStart=null;newsCustomEnd=null}
   document.querySelectorAll('.time-chip').forEach(c=>c.classList.toggle('active',c.dataset.range===range));
+  // Reset custom chip label when switching away
+  const chip=document.getElementById('customDateChip');
+  if(chip && range!=='custom')chip.textContent='📅 ช่วงเวลาเอง';
+  if(newsFeedCache)renderNewsFeed();
+}
+function openCustomDateModal(){
+  const m=document.getElementById('dateRangeModal');
+  const err=document.getElementById('dateRangeError');
+  const startEl=document.getElementById('dateRangeStart');
+  const endEl=document.getElementById('dateRangeEnd');
+  if(err)err.textContent='';
+  // Pre-fill with last-used or sensible defaults (last 7 days)
+  const fmt=d=>d.toISOString().slice(0,10);
+  const today=new Date();
+  const weekAgo=new Date(today.getTime()-7*24*3600*1000);
+  if(newsCustomStart && startEl)startEl.value=fmt(new Date(newsCustomStart));
+  else if(startEl && !startEl.value)startEl.value=fmt(weekAgo);
+  if(newsCustomEnd && endEl)endEl.value=fmt(new Date(newsCustomEnd));
+  else if(endEl && !endEl.value)endEl.value=fmt(today);
+  m.classList.add('show');
+}
+function closeDateModal(e){
+  if(e&&e.target!==e.currentTarget)return;
+  document.getElementById('dateRangeModal').classList.remove('show');
+}
+function applyDateRange(){
+  const startEl=document.getElementById('dateRangeStart');
+  const endEl=document.getElementById('dateRangeEnd');
+  const err=document.getElementById('dateRangeError');
+  const chip=document.getElementById('customDateChip');
+  if(!startEl.value||!endEl.value){err.textContent='กรุณาเลือกวันที่ให้ครบ';return}
+  const start=new Date(startEl.value+'T00:00:00').getTime();
+  const end=new Date(endEl.value+'T23:59:59').getTime();
+  if(start>end){err.textContent='วันที่เริ่มต้นต้องมาก่อนวันที่สิ้นสุด';return}
+  newsCustomStart=start;
+  newsCustomEnd=end;
+  newsTimeRange='custom';
+  // Update chip label to show selected range
+  const thaiMonthsShort=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const fmt=ts=>{const d=new Date(ts);return d.getDate()+' '+thaiMonthsShort[d.getMonth()]};
+  if(chip)chip.textContent='📅 '+fmt(start)+' – '+fmt(end);
+  document.querySelectorAll('.time-chip').forEach(c=>c.classList.toggle('active',c.dataset.range==='custom'));
+  closeDateModal();
   if(newsFeedCache)renderNewsFeed();
 }
 function openEditModal(field){const m=document.getElementById('editModal'),t=document.getElementById('modalTitle'),c=document.getElementById('modalContent');if(field==='name'){t.textContent='แก้ไขชื่อที่แสดง';c.innerHTML='<input class="modal-input" id="editValue" value="'+userSettings.name+'" placeholder="ชื่อของคุณ"><button class="modal-btn" onclick="userSettings.name=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}else if(field==='risk'){t.textContent='ระดับความเสี่ยง';c.innerHTML='<div style="display:flex;flex-direction:column;gap:8px"><button class="modal-btn" style="background:'+(userSettings.risk==='low'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='low'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'low\';saveSettings();closeModal();">ต่ำ (Low)</button><button class="modal-btn" style="background:'+(userSettings.risk==='medium'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='medium'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'medium\';saveSettings();closeModal();">ปานกลาง (Medium)</button><button class="modal-btn" style="background:'+(userSettings.risk==='high'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='high'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'high\';saveSettings();closeModal();">สูง (High)</button></div>'}else if(field==='capital'){t.textContent='ทุนเริ่มต้น (บาท)';c.innerHTML='<input class="modal-input" id="editValue" type="number" value="'+userSettings.capital+'" placeholder="100000"><button class="modal-btn" onclick="userSettings.capital=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}else if(field==='broker'){t.textContent='โบรกเกอร์ของคุณ';c.innerHTML='<input class="modal-input" id="editValue" value="'+userSettings.broker+'" placeholder="เช่น XM, Exness, IC Markets"><button class="modal-btn" onclick="userSettings.broker=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}m.classList.add('show')}
