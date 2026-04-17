@@ -1,6 +1,46 @@
 {
-  "lastUpdated": "2026-04-17T02:30:00Z",
+  "lastUpdated": "2026-04-17T08:00:00Z",
   "batches": [
+    {
+      "file": "2026-04-17-0800.md",
+      "date": "2026-04-17T08:00:00Z",
+      "date_display": "17 เม.ย. 2026 · 08:00",
+      "summary": "Iran 10-day ceasefire · PepsiCo beat · QDEL crash vs MYSE AI pivot mania",
+      "tickers": ["USO", "DAL", "UAL", "LMT", "PEP", "GOOGL", "QDEL", "MYSE"],
+      "headlines": [
+        {
+          "title": "Trump ประกาศ 10-Day Ceasefire กับ Iran — Oil ร่วง 1.6%, Airlines เด้งกลับ",
+          "tickers": [
+            {"symbol": "USO", "sentiment": "negative"},
+            {"symbol": "DAL", "sentiment": "positive"},
+            {"symbol": "UAL", "sentiment": "positive"},
+            {"symbol": "LMT", "sentiment": "negative"}
+          ],
+          "source": "Bloomberg · Reuters",
+          "published": "17 เม.ย. 2026"
+        },
+        {
+          "title": "PepsiCo Q1 Beat — รายได้เหนือคาด + Google โดน EU Commission Preliminary Findings",
+          "tickers": [
+            {"symbol": "PEP", "sentiment": "positive"},
+            {"symbol": "GOOGL", "sentiment": "negative"},
+            {"symbol": "KO", "sentiment": "neutral"}
+          ],
+          "source": "Reuters · Investing.com",
+          "published": "16 เม.ย. 2026"
+        },
+        {
+          "title": "QuidelOrtho ร่วง 20% + Myseum พุ่ง 255% จาก AI Pivot — Bifurcated Tape",
+          "tickers": [
+            {"symbol": "QDEL", "sentiment": "negative"},
+            {"symbol": "MYSE", "sentiment": "positive"},
+            {"symbol": "LH", "sentiment": "neutral"}
+          ],
+          "source": "Benzinga · StockMarketWatch",
+          "published": "16 เม.ย. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-04-17-0230.md",
       "date": "2026-04-17T02:30:00Z",
