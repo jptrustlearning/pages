@@ -141,6 +141,24 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .dash-card-value{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text-dark);margin-top:8px}
 .dash-card-change{font-size:12px;font-weight:500;margin-top:2px}.dash-card-change.up{color:var(--green)}
 
+/* ===== SIGNAL CARD (Gold / BTC — replaces price with Buy/Sell score + bias) ===== */
+.signal-card .signal-scores{display:flex;gap:10px;margin-top:10px;margin-bottom:8px}
+.signal-card .signal-score{flex:1;display:flex;flex-direction:column;gap:1px;padding:7px 8px;border-radius:10px;text-align:center}
+.signal-card .signal-score.buy{background:rgba(46,125,50,0.13);border:1px solid rgba(46,125,50,0.3)}
+.signal-card .signal-score.sell{background:rgba(195,58,78,0.13);border:1px solid rgba(195,58,78,0.3)}
+.signal-card .ss-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;font-weight:700;opacity:.7}
+.signal-card .signal-score.buy .ss-label{color:#1B5E20}
+.signal-card .signal-score.sell .ss-label{color:#8B1F2F}
+.signal-card .ss-val{font-family:'DM Serif Display',serif;font-size:21px;font-weight:400;line-height:1.1;color:var(--text-dark,#3D3228);margin-top:1px}
+.signal-card .ss-delta{font-size:10px;font-weight:600;margin-top:1px;min-height:13px}
+.signal-card .ss-delta.up{color:#1B5E20}
+.signal-card .ss-delta.down{color:#8B1F2F}
+.signal-card .ss-delta.flat{color:var(--text-dark-muted,#7A6F62)}
+.signal-card .signal-bias{font-size:11px;font-weight:600;color:var(--text-dark-sub,#5A3D20);line-height:1.35;padding:6px 8px;border-radius:8px;background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.22);text-align:center;min-height:30px;display:flex;align-items:center;justify-content:center}
+.signal-card .signal-bias.bullish{background:rgba(46,125,50,0.1);border-color:rgba(46,125,50,0.28);color:#1B5E20}
+.signal-card .signal-bias.bearish{background:rgba(195,58,78,0.1);border-color:rgba(195,58,78,0.3);color:#8B1F2F}
+.signal-card .signal-bias.tug{background:rgba(212,175,55,0.13);border-color:rgba(212,175,55,0.32);color:#8B6914}
+
 /* ===== NEWS FEED CARDS ===== */
 /* Search header - replaces the balance-card hero */
 .news-search-header{padding:20px 20px 16px 20px;background:linear-gradient(180deg,#FFFEFB 0%,#FAF6ED 100%);border-bottom:1px solid rgba(212,175,55,0.2)}
@@ -374,8 +392,8 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             </div>
             <div class="section-header fade-up fade-up-3"><div class="section-title">แดชบอร์ด</div><div class="section-link">ดูทั้งหมด ›</div></div>
             <div class="dashboard-grid fade-up fade-up-3">
-                <div class="dash-card" onclick="openIframe('Gold Momentum Dashboard','https://jptrustlearning.github.io/pages/gold-momentum-app.html')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span></div><div class="dash-card-title">Gold XAU/USD</div><div class="dash-card-value">2,485</div><div class="dash-card-change up">▲ +1.2%</div></div>
-                <div class="dash-card" onclick="openIframe('BTC Momentum Dashboard','https://jptrustlearning.github.io/pages/btc-momentum.html')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 8h5a3 3 0 0 1 0 6H9V8z"/><path d="M9 14h5.5a3 3 0 0 1 0 6H9v-6z"/><line x1="11" y1="5" x2="11" y2="8"/><line x1="13" y1="5" x2="13" y2="8"/><line x1="11" y1="20" x2="11" y2="23"/><line x1="13" y1="20" x2="13" y2="23"/><line x1="7" y1="8" x2="9" y2="8"/><line x1="7" y1="14" x2="9" y2="14"/><line x1="7" y1="20" x2="9" y2="20"/></svg></span></div><div class="dash-card-title">Bitcoin BTC</div><div class="dash-card-value">107,250</div><div class="dash-card-change up">▲ +2.8%</div></div>
+                <div class="dash-card signal-card" id="signalCardGold" onclick="openIframe('Gold Momentum Dashboard','https://jptrustlearning.github.io/pages/gold-momentum-app.html')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span></div><div class="dash-card-title">Gold XAU/USD</div><div class="signal-scores"><div class="signal-score buy"><div class="ss-label">BUY</div><div class="ss-val" id="goldBuyScore">—</div><div class="ss-delta" id="goldBuyDelta">—</div></div><div class="signal-score sell"><div class="ss-label">SELL</div><div class="ss-val" id="goldSellScore">—</div><div class="ss-delta" id="goldSellDelta">—</div></div></div><div class="signal-bias" id="goldBias">— Loading —</div></div>
+                <div class="dash-card signal-card" id="signalCardBTC" onclick="openIframe('BTC Momentum Dashboard','https://jptrustlearning.github.io/pages/btc-momentum.html')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 8h5a3 3 0 0 1 0 6H9V8z"/><path d="M9 14h5.5a3 3 0 0 1 0 6H9v-6z"/><line x1="11" y1="5" x2="11" y2="8"/><line x1="13" y1="5" x2="13" y2="8"/><line x1="11" y1="20" x2="11" y2="23"/><line x1="13" y1="20" x2="13" y2="23"/><line x1="7" y1="8" x2="9" y2="8"/><line x1="7" y1="14" x2="9" y2="14"/><line x1="7" y1="20" x2="9" y2="20"/></svg></span></div><div class="dash-card-title">Bitcoin BTC</div><div class="signal-scores"><div class="signal-score buy"><div class="ss-label">BUY</div><div class="ss-val" id="btcBuyScore">—</div><div class="ss-delta" id="btcBuyDelta">—</div></div><div class="signal-score sell"><div class="ss-label">SELL</div><div class="ss-val" id="btcSellScore">—</div><div class="ss-delta" id="btcSellDelta">—</div></div></div><div class="signal-bias" id="btcBias">— Loading —</div></div>
                 <div class="dash-card" onclick="navigateTo('lab')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="7 14 10 10 13 13 17 9"/><line x1="17" y1="9" x2="17" y2="13"/><line x1="13" y1="9" x2="17" y2="9"/></svg></span></div><div class="dash-card-title">Backtest Lab</div><div class="dash-card-desc">ทดสอบกลยุทธ์การเทรด</div></div>
                 <div class="dash-card" onclick="openIframe('S&P 500 Daily Scanner','https://jptrustlearning.github.io/pages/Free_scannerSP500%20(6).html')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16" y1="16" x2="21" y2="21"/><line x1="8" y1="11" x2="14" y2="11"/><line x1="11" y1="8" x2="11" y2="14"/></svg></span></div><div class="dash-card-title">SP500 Scanner</div><div class="dash-card-desc">สแกนหุ้น S&P 500</div></div>
                 <div class="dash-card" onclick="openIframe('Newstum — News + Momentum','https://jptrustlearning.github.io/pages/sp500-newstum.html')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="M2 15h6"/><path d="M5 12v6"/><polyline points="10 18 12 16 14 18 16 14"/></svg></span></div><div class="dash-card-title">Newstum</div><div class="dash-card-desc">News + Momentum Score</div></div>
@@ -691,7 +709,79 @@ function backToEmail(){
     document.getElementById('stepEmail').classList.add('active');
     document.getElementById('loginEmail').focus();
 }
-function showApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('active');applySettings();renderTickerTape()}
+function showApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('active');applySettings();renderTickerTape();loadSignalCards()}
+
+// ===== SIGNAL CARDS (Gold + BTC) — fetch latest row of momentum CSVs =====
+function parseCSV(text){
+  const lines=text.trim().split(/\r?\n/);
+  if(lines.length<2)return[];
+  const headers=lines[0].split(',').map(h=>h.trim());
+  return lines.slice(1).map(line=>{
+    const cols=line.split(',');
+    const row={};
+    headers.forEach((h,i)=>{row[h]=(cols[i]||'').trim()});
+    return row;
+  });
+}
+async function fetchCSV(url){
+  try{
+    const r=await fetch(url+'?t='+Date.now(),{cache:'no-store'});
+    if(!r.ok)return null;
+    const text=await r.text();
+    return parseCSV(text);
+  }catch(e){return null}
+}
+function lastRow(rows){return rows&&rows.length?rows[rows.length-1]:null}
+
+function biasLabel(combinedSignal){
+  // Combined_Signal values: Full Bullish, Bullish Dominant, Tug, Bearish Dominant, Full Bearish
+  if(!combinedSignal)return{text:'—',cls:''};
+  const s=combinedSignal.toLowerCase();
+  if(s.includes('full bullish'))return{text:'🟢 '+combinedSignal,cls:'bullish'};
+  if(s.includes('bullish'))return{text:'🟢 '+combinedSignal,cls:'bullish'};
+  if(s.includes('full bearish'))return{text:'🔴 '+combinedSignal,cls:'bearish'};
+  if(s.includes('bearish'))return{text:'🔴 '+combinedSignal,cls:'bearish'};
+  if(s.includes('tug'))return{text:'🟡 '+combinedSignal,cls:'tug'};
+  return{text:combinedSignal,cls:''};
+}
+function fmtDelta(val){
+  if(val===null||val===undefined||isNaN(val))return{text:'—',cls:'flat'};
+  const n=parseFloat(val);
+  if(Math.abs(n)<0.05)return{text:'±0.0',cls:'flat'};
+  const s=n>0?'▲ +':'▼ −';
+  return{text:s+Math.abs(n).toFixed(1),cls:n>0?'up':'down'};
+}
+async function loadSignalCard(prefix,buyUrl,sellUrl,netUrl){
+  const [buyRows,sellRows,netRows]=await Promise.all([fetchCSV(buyUrl),fetchCSV(sellUrl),fetchCSV(netUrl)]);
+  const buy=lastRow(buyRows),sell=lastRow(sellRows),net=lastRow(netRows);
+  const buyScore=buy?parseFloat(buy.Net_Score_Avg||0):null;
+  const sellScore=sell?parseFloat(sell.Net_Score_Avg||0):null;
+  const buyBD1=buy?parseFloat(buy.Net_Score_BD1||0):null;
+  const sellBD1=sell?parseFloat(sell.Net_Score_BD1||0):null;
+  const buyDelta=net&&net.Buy_Delta?parseFloat(net.Buy_Delta):(buyScore!==null&&buyBD1!==null?buyScore-buyBD1:null);
+  const sellDelta=net&&net.Sell_Delta?parseFloat(net.Sell_Delta):(sellScore!==null&&sellBD1!==null?sellScore-sellBD1:null);
+  const combined=net?net.Combined_Signal:'';
+
+  const setText=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
+  const setDelta=(id,d)=>{const e=document.getElementById(id);if(e){e.textContent=d.text;e.className='ss-delta '+d.cls}};
+  const setBias=(id,b)=>{const e=document.getElementById(id);if(e){e.textContent=b.text;e.className='signal-bias '+b.cls}};
+
+  setText(prefix+'BuyScore',buyScore!==null?buyScore.toFixed(1):'—');
+  setText(prefix+'SellScore',sellScore!==null?sellScore.toFixed(1):'—');
+  setDelta(prefix+'BuyDelta',fmtDelta(buyDelta));
+  setDelta(prefix+'SellDelta',fmtDelta(sellDelta));
+  setBias(prefix+'Bias',biasLabel(combined));
+}
+function loadSignalCards(){
+  loadSignalCard('gold',
+    'https://raw.githubusercontent.com/jptrustlearning/gold/main/output_momentum_gold.csv',
+    'https://raw.githubusercontent.com/jptrustlearning/gold/main/output_momentum_gold_sell.csv',
+    'https://raw.githubusercontent.com/jptrustlearning/gold/main/output_momentum_gold_net.csv');
+  loadSignalCard('btc',
+    'https://raw.githubusercontent.com/jptrustlearning/btc/main/output_momentum_btc.csv',
+    'https://raw.githubusercontent.com/jptrustlearning/btc/main/output_momentum_btc_sell.csv',
+    'https://raw.githubusercontent.com/jptrustlearning/btc/main/output_momentum_btc_net.csv');
+}
 function applySettings(){const n=userSettings.name||'Member';var el;el=document.getElementById('displayName');if(el)el.textContent=n;el=document.getElementById('settingsName');if(el)el.textContent=n;el=document.getElementById('settingsEmail');if(el)el.textContent=userSettings.email;el=document.getElementById('settingNameVal');if(el)el.textContent=n;const r={low:'ต่ำ (Low)',medium:'ปานกลาง (Medium)',high:'สูง (High)'};el=document.getElementById('settingRisk');if(el)el.textContent=r[userSettings.risk]||'ปานกลาง';el=document.getElementById('settingCapital');if(el)el.textContent='฿'+Number(userSettings.capital||0).toLocaleString();el=document.getElementById('settingBroker');if(el)el.textContent=userSettings.broker||'ยังไม่ระบุ';const i=n.slice(0,2).toUpperCase();document.querySelectorAll('.avatar,.profile-avatar').forEach(el=>el.textContent=i);el=document.getElementById('cardName');if(el)el.textContent=n}
 function doLogout(){isLoggedIn=false;try{localStorage.removeItem('jpt_logged_in');sessionStorage.removeItem('jpt_session_active')}catch(e){}location.reload()}
 function navigateTo(screen){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const t=document.getElementById('screen-'+screen);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const b=document.querySelector('.nav-item[data-screen="'+screen+'"]');if(b)b.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});t?.querySelectorAll('.fade-up').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''});if(screen==='news'){loadNewsFeed()}}
