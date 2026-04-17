@@ -158,6 +158,23 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .time-chip:hover{background:rgba(212,175,55,0.1);color:#5A3D20}
 .time-chip.active{background:linear-gradient(135deg,#D4AF37,#B8860B);color:#fff;border-color:#B8860B;font-weight:600;box-shadow:0 2px 8px rgba(212,175,55,0.35)}
 
+/* ===== TICKER TAPE — scrolling live prices ===== */
+.ticker-tape{position:relative;background:linear-gradient(90deg,#1a0a0e 0%,#2d1018 50%,#1a0a0e 100%);border:1px solid rgba(212,175,55,0.35);border-radius:14px;padding:11px 0;margin:4px 0 18px 0;overflow:hidden;box-shadow:0 4px 18px rgba(114,47,55,0.18),inset 0 0 25px rgba(212,175,55,0.08)}
+.ticker-tape::before,.ticker-tape::after{content:'';position:absolute;top:0;bottom:0;width:36px;z-index:2;pointer-events:none}
+.ticker-tape::before{left:0;background:linear-gradient(90deg,#1a0a0e 0%,transparent 100%)}
+.ticker-tape::after{right:0;background:linear-gradient(270deg,#1a0a0e 0%,transparent 100%)}
+.ticker-tape-track{display:inline-flex;gap:0;animation:ticker-scroll 40s linear infinite;white-space:nowrap;will-change:transform}
+.ticker-tape:hover .ticker-tape-track{animation-play-state:paused}
+@keyframes ticker-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ticker-item{display:inline-flex;align-items:center;gap:8px;padding:0 22px;position:relative;font-family:'Anuphan',sans-serif}
+.ticker-item+.ticker-item::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:4px;height:4px;border-radius:50%;background:rgba(212,175,55,0.5)}
+.ticker-symbol{font-family:'Cinzel',serif;font-size:11.5px;letter-spacing:1.8px;color:#F4E4BA;font-weight:600}
+.ticker-price{font-family:'DM Serif Display',serif;font-size:16px;color:#fff;font-weight:400;letter-spacing:0.3px}
+.ticker-change{font-size:11.5px;font-weight:600;padding:2.5px 8px;border-radius:10px;letter-spacing:0.3px}
+.ticker-change.up{color:#7FD39C;background:rgba(46,125,50,0.18);border:1px solid rgba(46,125,50,0.35)}
+.ticker-change.down{color:#FF8A9B;background:rgba(195,58,78,0.18);border:1px solid rgba(195,58,78,0.4)}
+.ticker-change.flat{color:#D4AF37;background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.3)}
+
 /* News feed cards - dashboard card style (cream + wave), 2 per row */
 .news-batch-group{margin-bottom:28px}
 .news-batch-date{font-family:'Cinzel',serif;font-size:10.5px;letter-spacing:2.5px;color:var(--gold-deep,#8B6914);text-transform:uppercase;font-weight:600;padding:0 4px 10px 4px;margin-bottom:10px;border-bottom:1px solid rgba(212,175,55,0.3);display:flex;align-items:center;gap:10px}
@@ -353,6 +370,11 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                 <div class="quick-action" onclick="openIframe('SP500 Strategy Pro — 6M Momentum','https://jptrustlearning.github.io/pages/sp500-strategy-pro.html')"><div class="qa-icon bg-blue"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg></span></div><div class="qa-label">6M<br>Momentum</div></div>
                 <div class="quick-action" onclick="openIframe('Gold Momentum Dashboard','https://jptrustlearning.github.io/pages/gold-momentum-app.html')"><div class="qa-icon bg-gold"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span></div><div class="qa-label">Gold<br>Dashboard</div></div>
                 <div class="quick-action" onclick="openIframe('BTC Momentum Dashboard','https://jptrustlearning.github.io/pages/btc-momentum.html')"><div class="qa-icon bg-green"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 8h5a3 3 0 0 1 0 6H9V8z"/><path d="M9 14h5.5a3 3 0 0 1 0 6H9v-6z"/><line x1="11" y1="5" x2="11" y2="8"/><line x1="13" y1="5" x2="13" y2="8"/><line x1="11" y1="20" x2="11" y2="23"/><line x1="13" y1="20" x2="13" y2="23"/><line x1="7" y1="8" x2="9" y2="8"/><line x1="7" y1="14" x2="9" y2="14"/><line x1="7" y1="20" x2="9" y2="20"/></svg></span></div><div class="qa-label">Bitcoin<br>Analysis</div></div>
+            </div>
+            <div class="ticker-tape fade-up fade-up-2" id="tickerTape">
+                <div class="ticker-tape-track" id="tickerTapeTrack">
+                    <!-- Rendered by JS -->
+                </div>
             </div>
             <div class="section-header fade-up fade-up-3"><div class="section-title">แดชบอร์ด</div><div class="section-link">ดูทั้งหมด ›</div></div>
             <div class="dashboard-grid fade-up fade-up-3">
@@ -673,10 +695,34 @@ function backToEmail(){
     document.getElementById('stepEmail').classList.add('active');
     document.getElementById('loginEmail').focus();
 }
-function showApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('active');applySettings()}
+function showApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('active');applySettings();renderTickerTape()}
 function applySettings(){const n=userSettings.name||'Member';var el;el=document.getElementById('displayName');if(el)el.textContent=n;el=document.getElementById('settingsName');if(el)el.textContent=n;el=document.getElementById('settingsEmail');if(el)el.textContent=userSettings.email;el=document.getElementById('settingNameVal');if(el)el.textContent=n;const r={low:'ต่ำ (Low)',medium:'ปานกลาง (Medium)',high:'สูง (High)'};el=document.getElementById('settingRisk');if(el)el.textContent=r[userSettings.risk]||'ปานกลาง';el=document.getElementById('settingCapital');if(el)el.textContent='฿'+Number(userSettings.capital||0).toLocaleString();el=document.getElementById('settingBroker');if(el)el.textContent=userSettings.broker||'ยังไม่ระบุ';const i=n.slice(0,2).toUpperCase();document.querySelectorAll('.avatar,.profile-avatar').forEach(el=>el.textContent=i);el=document.getElementById('cardName');if(el)el.textContent=n}
 function doLogout(){isLoggedIn=false;try{localStorage.removeItem('jpt_logged_in');sessionStorage.removeItem('jpt_session_active')}catch(e){}location.reload()}
 function navigateTo(screen){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const t=document.getElementById('screen-'+screen);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const b=document.querySelector('.nav-item[data-screen="'+screen+'"]');if(b)b.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});t?.querySelectorAll('.fade-up').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''});if(screen==='news'){loadNewsFeed()}}
+// ===== TICKER TAPE =====
+const TICKER_DATA=[
+  {symbol:'GOLD',price:'2,485',change:'+1.2%',dir:'up'},
+  {symbol:'S&P 500',price:'7,012',change:'+0.3%',dir:'up'},
+  {symbol:'BITCOIN',price:'107,250',change:'+2.8%',dir:'up'},
+  {symbol:'NASDAQ',price:'24,118',change:'+0.1%',dir:'flat'},
+  {symbol:'DXY',price:'102.85',change:'−0.2%',dir:'down'},
+  {symbol:'OIL WTI',price:'89.40',change:'−1.1%',dir:'down'},
+  {symbol:'10Y UST',price:'4.28%',change:'+0.02',dir:'up'},
+  {symbol:'VIX',price:'15.62',change:'−3.5%',dir:'down'}
+];
+function renderTickerTape(){
+  const track=document.getElementById('tickerTapeTrack');
+  if(!track)return;
+  const arrowUp='▲',arrowDown='▼',arrowFlat='●';
+  const itemHTML=t=>{
+    const arr=t.dir==='up'?arrowUp:t.dir==='down'?arrowDown:arrowFlat;
+    return '<span class="ticker-item"><span class="ticker-symbol">'+t.symbol+'</span><span class="ticker-price">'+t.price+'</span><span class="ticker-change '+t.dir+'">'+arr+' '+t.change+'</span></span>';
+  };
+  // Duplicate for seamless loop (translateX -50% at end)
+  const once=TICKER_DATA.map(itemHTML).join('');
+  track.innerHTML=once+once;
+}
+
 const NEWS_INDEX_URL='https://raw.githubusercontent.com/jptrustlearning/pages/main/news/news-index.json';
 let newsFeedCache=null;
 let newsSearchQuery='';
