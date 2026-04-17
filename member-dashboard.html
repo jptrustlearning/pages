@@ -159,10 +159,15 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .time-chip.active{background:linear-gradient(135deg,#D4AF37,#B8860B);color:#fff;border-color:#B8860B;font-weight:600;box-shadow:0 2px 8px rgba(212,175,55,0.35)}
 
 /* ===== TRADINGVIEW TICKER TAPE ===== */
-.ticker-tape-wrapper{background:#0a0e17;border:1px solid rgba(212,175,55,0.35);border-radius:14px;margin:4px 0 18px 0;overflow:hidden;box-shadow:0 4px 18px rgba(114,47,55,0.18)}
+.ticker-tape-wrapper{background:#0a0e17;border:1px solid rgba(212,175,55,0.35);border-radius:14px;margin:4px 0 18px 0;overflow:hidden;box-shadow:0 4px 18px rgba(114,47,55,0.18);position:relative}
 .ticker-tape-wrapper .tradingview-widget-container{width:100%}
 /* Hide TradingView copyright link (keep minimal branding compliance via tiny footer style) */
 .ticker-tape-wrapper .tradingview-widget-copyright{display:none}
+/* JP Trust owl badge overlay — covers TV logo at right edge, blocks click to tradingview.com */
+.ticker-owl-badge{position:absolute;top:0;right:0;bottom:0;width:52px;display:flex;align-items:center;justify-content:center;background:linear-gradient(270deg,#0a0e17 35%,rgba(10,14,23,0.85) 85%,transparent 100%);z-index:5;pointer-events:auto;cursor:default}
+.ticker-owl-badge img{width:28px;height:28px;opacity:0.85;filter:drop-shadow(0 0 6px rgba(212,175,55,0.4))}
+/* Extra safety: disable all pointer events on TV widget iframe (only owl overlay catches clicks) */
+.ticker-tape-wrapper iframe{pointer-events:none !important}
 
 /* News feed cards - dashboard card style (cream + wave), 2 per row */
 .news-batch-group{margin-bottom:28px}
@@ -365,6 +370,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
               <div class="tradingview-widget-container">
                 <div class="tradingview-widget-container__widget"></div>
               </div>
+              <div class="ticker-owl-badge" onclick="event.stopPropagation();return false"><img src="jpt-owl-line.png" alt="JP Trust"></div>
             </div>
             <div class="section-header fade-up fade-up-3"><div class="section-title">แดชบอร์ด</div><div class="section-link">ดูทั้งหมด ›</div></div>
             <div class="dashboard-grid fade-up fade-up-3">
@@ -708,9 +714,9 @@ function renderTickerTape(){
       {"description":"Ethereum","proName":"BINANCE:ETHUSDT"},
       {"description":"Silver","proName":"OANDA:XAGUSD"},
       {"description":"Oil WTI","proName":"TVC:USOIL"},
-      {"description":"US Dollar","proName":"TVC:DXY"},
+      {"description":"US Dollar","proName":"CAPITALCOM:DXY"},
       {"description":"VIX","proName":"CAPITALCOM:VIX"},
-      {"description":"US 10Y","proName":"CBOT:ZN1!"}
+      {"description":"20Y Bonds","proName":"NASDAQ:TLT"}
     ],
     "showSymbolLogo":true,
     "isTransparent":false,
