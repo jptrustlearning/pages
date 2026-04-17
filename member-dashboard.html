@@ -188,8 +188,13 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 /* Hide TradingView copyright link (keep minimal branding compliance via tiny footer style) */
 .ticker-tape-wrapper .tradingview-widget-copyright{display:none}
 /* JP Trust owl badge overlay — covers TV logo at right edge, blocks click to tradingview.com */
-.ticker-owl-badge{position:absolute;top:0;right:0;bottom:0;width:52px;display:flex;align-items:center;justify-content:center;background:linear-gradient(270deg,#0a0e17 35%,rgba(10,14,23,0.85) 85%,transparent 100%);z-index:5;pointer-events:auto;cursor:default}
-.ticker-owl-badge img{width:28px;height:28px;opacity:0.85;filter:drop-shadow(0 0 6px rgba(212,175,55,0.4))}
+.ticker-owl-badge{position:absolute;top:0;right:0;bottom:0;width:52px;display:flex;align-items:center;justify-content:center;background:linear-gradient(270deg,#0a0e17 35%,rgba(10,14,23,0.85) 85%,transparent 100%);z-index:5;pointer-events:auto;cursor:default;gap:6px}
+.ticker-live-text{font-family:'Cinzel',serif;font-size:12px;font-weight:700;letter-spacing:2px;color:#FFFFFF;writing-mode:vertical-rl;transform:rotate(180deg);text-shadow:0 0 4px rgba(255,255,255,0.3)}
+.ticker-live-dot{width:8px;height:8px;border-radius:50%;background:#00E676;box-shadow:0 0 8px #00E676,0 0 12px rgba(0,230,118,0.6);animation:ticker-live-blink 1.2s ease-in-out infinite}
+@keyframes ticker-live-blink{
+  0%,100%{background:#00E676;box-shadow:0 0 8px #00E676,0 0 12px rgba(0,230,118,0.6);opacity:1}
+  50%{background:#1B5E20;box-shadow:0 0 4px rgba(27,94,32,0.5);opacity:0.5}
+}
 /* Extra safety: disable all pointer events on TV widget iframe (only owl overlay catches clicks) */
 .ticker-tape-wrapper iframe{pointer-events:none !important}
 
@@ -394,7 +399,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
               <div class="tradingview-widget-container">
                 <div class="tradingview-widget-container__widget"></div>
               </div>
-              <div class="ticker-owl-badge" onclick="event.stopPropagation();return false"><img src="jpt-owl-line.png" alt="JP Trust"></div>
+              <div class="ticker-owl-badge" onclick="event.stopPropagation();return false"><span class="ticker-live-dot"></span><span class="ticker-live-text">LIVE</span></div>
             </div>
             <div class="section-header fade-up fade-up-3"><div class="section-title">แดชบอร์ด</div><div class="section-link">ดูทั้งหมด ›</div></div>
             <div class="dashboard-grid fade-up fade-up-3">
