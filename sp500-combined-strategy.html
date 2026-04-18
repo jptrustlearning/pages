@@ -68,7 +68,7 @@ body {
 header {
   position:relative;
   margin:-4px -4px 24px;
-  padding:22px 24px 20px;
+  padding:20px 22px 18px;
   border-radius:22px;
   background:
     radial-gradient(ellipse 80% 55% at 85% 20%, rgba(212,175,55,0.22), transparent 60%),
@@ -79,29 +79,28 @@ header {
     0 0 0 1px rgba(212,175,55,0.18),
     inset 0 1px 0 rgba(212,175,55,0.12);
   overflow:hidden;
-  /* Stack vertically: LAB label + title on top, status row below */
-  display:flex; flex-direction:column; align-items:stretch; gap:14px;
+  /* Vertical stack: label → title → status row */
+  display:flex; flex-direction:column; align-items:stretch;
 }
-/* subtle shimmering gold line across the top */
 header::before {
   content:''; position:absolute; top:0; left:0; right:0; height:1.5px;
   background:linear-gradient(90deg, transparent, rgba(212,175,55,0.6), rgba(244,228,186,0.9), rgba(212,175,55,0.6), transparent);
   z-index:3;
 }
-/* decorative corner ornament */
 header::after {
-  content:''; position:absolute; top:-40px; right:-40px;
-  width:180px; height:180px; border-radius:50%;
+  content:''; position:absolute; top:-50px; right:-50px;
+  width:200px; height:200px; border-radius:50%;
   background:radial-gradient(circle, rgba(212,175,55,0.14), transparent 60%);
   pointer-events:none;
 }
 header > * { position:relative; z-index:2; }
 
+/* Row 1 — Small Cinzel label */
 .subtitle-lab {
   font-family:'Cinzel','Anuphan',serif;
   font-size:0.66rem; font-weight:600; color:#D4AF37;
   letter-spacing:3.5px; text-transform:uppercase;
-  margin:0 0 10px;
+  margin-bottom:12px;
   text-shadow:0 1px 2px rgba(0,0,0,0.5);
   display:flex; align-items:center; gap:10px;
 }
@@ -109,23 +108,36 @@ header > * { position:relative; z-index:2; }
   content:''; flex:1; height:1px; max-width:60px;
   background:linear-gradient(90deg, rgba(212,175,55,0.5), transparent);
 }
+
+/* Row 2 — DM Serif Title */
+.header-title-wrap {
+  padding-left:14px;
+  position:relative;
+  margin-bottom:14px;
+}
+.header-title-wrap::before {
+  content:''; position:absolute; left:0; top:4px; bottom:4px;
+  width:4px;
+  background:linear-gradient(180deg, #D4AF37 0%, #8B2252 100%);
+  border-radius:3px;
+  box-shadow:0 0 12px rgba(212,175,55,0.4);
+}
 h1 {
-  font-family:'DM Serif Display', 'Sarabun', serif; font-size:1.55rem; font-weight:400;
+  font-family:'DM Serif Display','Sarabun','Anuphan',serif;
+  font-weight:400;
+  font-size:1.5rem; line-height:1.25;
   color:#F4E4BA;
   margin:0;
   letter-spacing:0.005em;
-  line-height:1.2;
-  text-shadow:0 1px 3px rgba(0,0,0,0.5);
+  text-shadow:0 1px 3px rgba(0,0,0,0.55);
 }
-.header-title-wrap { flex:1; min-width:0; }
-.header-title-wrap::before {
-  content:''; position:absolute; left:0; top:18px; bottom:18px;
-  width:4px;
-  background:linear-gradient(180deg, #D4AF37 0%, #8B2252 100%);
-  border-radius:0 3px 3px 0;
-  box-shadow:0 0 12px rgba(212,175,55,0.4);
+.h1-amp {
+  color:#D4AF37;
+  font-style:italic;
+  font-family:'DM Serif Display',serif;
+  margin:0 0.08em;
 }
-.header-title-wrap { padding-left:14px; position:relative; }
+
 .subtitle { color:rgba(244,228,186,0.55); font-size:0.76rem; margin-top:6px; line-height:1.55; }
 
 .badge {
@@ -135,19 +147,27 @@ h1 {
 }
 .badge-dh { background:rgba(158,63,53,0.25); color:#F4C8B8; border-color:rgba(200,90,74,0.45); }
 
-.status-box { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+/* Row 3 — Status */
+.status-box {
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  padding-left:14px;
+}
 .status-indicator {
-  display:flex; align-items:center; gap:7px; font-weight:600; font-size:0.72rem;
-  padding:6px 14px; border-radius:50px;
-  background:rgba(255,255,255,0.08); color:#F4E4BA;
-  border:1px solid rgba(244,228,186,0.18);
+  display:inline-flex; align-items:center; gap:7px; font-weight:500; font-size:0.7rem;
+  padding:5px 13px; border-radius:50px;
+  background:rgba(255,255,255,0.06); color:#F4E4BA;
+  border:1px solid rgba(244,228,186,0.16);
   transition:all 0.3s ease;
   backdrop-filter:blur(6px);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,0.08);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);
+  font-family:'Cinzel','Anuphan',serif;
+  letter-spacing:0.8px;
+  white-space:nowrap;
+  text-transform:uppercase;
 }
-.status-indicator.loading { color:#F4E4BA; border-color:rgba(212,175,55,0.4); background:rgba(212,175,55,0.1); }
+.status-indicator.loading { color:#F4E4BA; border-color:rgba(212,175,55,0.35); background:rgba(212,175,55,0.08); }
 .status-indicator.loading span:first-child { color:#D4AF37; animation:statusBlink 1.2s ease-in-out infinite; }
-.status-indicator.success { color:#7FEBA8; border-color:rgba(127,235,168,0.35); background:rgba(46,159,95,0.12); }
+.status-indicator.success { color:#7FEBA8; border-color:rgba(127,235,168,0.35); background:rgba(46,159,95,0.1); }
 .status-indicator.success span:first-child { color:#7FEBA8; }
 .status-indicator.error { color:rgba(244,228,186,0.6); border-color:rgba(122,111,98,0.3); background:rgba(0,0,0,0.2); }
 @keyframes statusBlink { 0%, 100% { opacity:1; } 50% { opacity:0.3; } }
@@ -157,17 +177,24 @@ input[type="file"] { display:none; }
   background:linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
   border:1px solid rgba(244,228,186,0.3);
   color:#1a0a0e;
-  padding:8px 18px; border-radius:50px; cursor:pointer; font-weight:700;
-  transition:all 0.3s ease; display:flex; align-items:center; gap:8px; font-size:0.76rem;
+  padding:7px 16px; border-radius:50px; cursor:pointer; font-weight:700;
+  transition:all 0.3s ease; display:flex; align-items:center; gap:8px; font-size:0.72rem;
   box-shadow:0 3px 12px rgba(212,175,55,0.35);
-  letter-spacing:0.3px;
+  letter-spacing:0.8px;
+  font-family:'Cinzel','Anuphan',serif;
+  text-transform:uppercase;
 }
 .btn-upload:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(212,175,55,0.5); }
 
 @media (max-width:600px) {
   header { padding:18px 18px 16px; margin:-4px -2px 20px; border-radius:18px; }
-  h1 { font-size:1.35rem; }
-  .subtitle-lab { font-size:0.6rem; letter-spacing:2.8px; margin-bottom:8px; }
+  .subtitle-lab { font-size:0.62rem; letter-spacing:3px; margin-bottom:10px; }
+  .header-title-wrap { margin-bottom:12px; padding-left:12px; }
+  .status-box { padding-left:12px; }
+  h1 { font-size:1.25rem; }
+}
+@media (max-width:400px) {
+  h1 { font-size:1.12rem; line-height:1.3; }
 }
 
 /* CARDS — Glassmorphism */
