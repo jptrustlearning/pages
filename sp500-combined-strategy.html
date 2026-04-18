@@ -321,8 +321,278 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
 .open-badge { display:inline-block; background:rgba(212,175,55,0.1); color:var(--yellow); border:1px solid rgba(212,175,55,0.25); padding:2px 7px; border-radius:var(--radius-xs); font-size:0.62rem; font-weight:700; margin-left:4px; }
 
 .hidden { display:none!important; }
-.loading-text { text-align:center; padding:60px 20px; color:var(--text-dark); font-size:1rem; animation:pulse 1.8s ease infinite; font-weight:500; }
-@keyframes pulse { 0%{opacity:0.3} 50%{opacity:1} 100%{opacity:0.3} }
+
+/* ===== OWL LOADER WITH PROGRESS RING ===== */
+.owl-loader-wrap {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:60px 20px; min-height:420px; gap:28px;
+}
+.owl-loader-stage {
+  position:relative; width:200px; height:200px;
+  display:flex; align-items:center; justify-content:center;
+}
+.owl-loader-ring {
+  position:absolute; inset:0; width:100%; height:100%;
+  transform:rotate(-90deg); filter:drop-shadow(0 0 12px rgba(212,175,55,0.35));
+}
+.owl-loader-ring-bg { fill:none; stroke:rgba(212,175,55,0.15); stroke-width:4; }
+.owl-loader-ring-fg {
+  fill:none; stroke:url(#owlRingGrad); stroke-width:4; stroke-linecap:round;
+  stroke-dasharray:565.48; stroke-dashoffset:565.48;
+  transition:stroke-dashoffset 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+.owl-loader-img {
+  width:130px; height:130px; object-fit:contain;
+  animation:owlFloat 2.8s ease-in-out infinite;
+  filter:drop-shadow(0 4px 16px rgba(212,175,55,0.4));
+}
+@keyframes owlFloat {
+  0%, 100% { transform:translateY(0); }
+  50% { transform:translateY(-8px); }
+}
+.owl-loader-text {
+  font-family:var(--font-heading); font-size:0.95rem; font-weight:600;
+  color:var(--accent); letter-spacing:3px; text-align:center;
+  text-transform:uppercase;
+}
+.owl-loader-subtext {
+  font-family:var(--font-body); font-size:0.82rem;
+  color:var(--text-muted); text-align:center; margin-top:-18px;
+  letter-spacing:0.5px;
+}
+.owl-loader-pct {
+  font-family:var(--font-heading); font-size:1.75rem; font-weight:700;
+  color:var(--gold-light); letter-spacing:1px;
+  position:absolute; bottom:-6px; left:50%; transform:translateX(-50%);
+  text-shadow:0 2px 12px rgba(212,175,55,0.5);
+}
+
+/* ===== STRATEGY DIAGRAM ===== */
+.strategy-diagram {
+  background:linear-gradient(135deg, rgba(212,175,55,0.06), rgba(114,47,55,0.08));
+  border:1px solid var(--border); border-radius:var(--radius);
+  padding:28px 24px; margin-bottom:28px; position:relative; overflow:hidden;
+}
+.strategy-diagram::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg, transparent, var(--accent), var(--orange), var(--accent), transparent);
+}
+.diagram-title {
+  font-family:var(--font-heading); font-size:0.78rem; font-weight:700;
+  color:var(--accent); letter-spacing:3px; text-transform:uppercase;
+  text-align:center; margin-bottom:22px;
+}
+.diagram-title::before, .diagram-title::after {
+  content:'◆'; color:var(--border-hover); margin:0 10px; font-size:0.7rem;
+}
+.diagram-flow {
+  display:grid; grid-template-columns:repeat(4, 1fr); gap:12px;
+  align-items:stretch; position:relative;
+}
+.diagram-step {
+  background:rgba(244,228,186,0.04); border:1px solid var(--border);
+  border-radius:var(--radius-sm); padding:18px 14px; text-align:center;
+  position:relative; transition:all 0.3s ease;
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+}
+.diagram-step:hover {
+  border-color:var(--border-hover); transform:translateY(-3px);
+  box-shadow:0 8px 24px rgba(212,175,55,0.12);
+}
+.diagram-step-num {
+  width:32px; height:32px; border-radius:50%;
+  background:linear-gradient(135deg, var(--accent), var(--gold-deep));
+  color:var(--bg); font-family:var(--font-heading); font-size:0.85rem;
+  font-weight:800; display:flex; align-items:center; justify-content:center;
+  box-shadow:0 2px 10px rgba(212,175,55,0.35);
+}
+.diagram-step-icon { font-size:1.6rem; line-height:1; }
+.diagram-step-day {
+  font-family:var(--font-heading); font-size:0.72rem; font-weight:700;
+  color:var(--accent); letter-spacing:2px; text-transform:uppercase;
+}
+.diagram-step-title {
+  font-family:var(--font-body); font-size:0.88rem; font-weight:600;
+  color:var(--text-main); line-height:1.35;
+}
+.diagram-step-desc {
+  font-size:0.72rem; color:var(--text-muted); line-height:1.5;
+}
+.diagram-step-arrow {
+  position:absolute; right:-10px; top:50%; transform:translateY(-50%);
+  color:var(--accent); font-size:1.2rem; z-index:2;
+  background:var(--bg); width:22px; height:22px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--border-hover);
+}
+.diagram-step:last-child .diagram-step-arrow { display:none; }
+.diagram-legend {
+  display:flex; flex-wrap:wrap; justify-content:center; gap:18px;
+  margin-top:20px; padding-top:16px; border-top:1px dashed var(--border);
+  font-size:0.75rem; color:var(--text-muted);
+}
+.diagram-legend-item { display:flex; align-items:center; gap:6px; }
+.diagram-legend-dot { width:8px; height:8px; border-radius:50%; }
+@media (max-width:900px) {
+  .diagram-flow { grid-template-columns:repeat(2, 1fr); }
+  .diagram-step:nth-child(2) .diagram-step-arrow { display:none; }
+}
+@media (max-width:500px) {
+  .diagram-flow { grid-template-columns:1fr; gap:10px; }
+  .diagram-step-arrow { display:none !important; }
+  .strategy-diagram { padding:22px 16px; }
+}
+
+/* ===== FLOATING ACTION BUTTONS ===== */
+.fab-stack {
+  position:fixed; bottom:24px; right:24px; z-index:100;
+  display:flex; flex-direction:column; gap:14px; align-items:flex-end;
+}
+.fab {
+  width:58px; height:58px; border-radius:50%; border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.3rem; color:var(--bg); position:relative;
+  transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:0 8px 24px rgba(0,0,0,0.4), 0 0 0 0 rgba(212,175,55,0.4);
+}
+.fab:hover { transform:scale(1.08) translateY(-2px); }
+.fab:active { transform:scale(0.95); }
+.fab-primary {
+  background:linear-gradient(135deg, var(--accent), var(--gold-deep));
+  box-shadow:0 8px 24px rgba(212,175,55,0.35), 0 0 0 0 rgba(212,175,55,0.4);
+  animation:fabPulse 2.8s infinite;
+}
+@keyframes fabPulse {
+  0%, 100% { box-shadow:0 8px 24px rgba(212,175,55,0.35), 0 0 0 0 rgba(212,175,55,0.4); }
+  50% { box-shadow:0 8px 24px rgba(212,175,55,0.5), 0 0 0 12px rgba(212,175,55,0); }
+}
+.fab-secondary {
+  background:linear-gradient(135deg, var(--burgundy), var(--burgundy-light));
+  color:var(--gold-light);
+  box-shadow:0 8px 24px rgba(114,47,55,0.4);
+}
+.fab-tooltip {
+  position:absolute; right:calc(100% + 14px); top:50%; transform:translateY(-50%);
+  background:rgba(26,10,14,0.95); color:var(--gold-light);
+  padding:8px 14px; border-radius:var(--radius-sm); font-size:0.78rem;
+  font-weight:600; white-space:nowrap; pointer-events:none;
+  opacity:0; transition:opacity 0.2s ease;
+  border:1px solid var(--border); backdrop-filter:blur(8px);
+  letter-spacing:0.3px;
+}
+.fab-tooltip::after {
+  content:''; position:absolute; left:100%; top:50%; transform:translateY(-50%);
+  border:6px solid transparent; border-left-color:rgba(26,10,14,0.95);
+}
+.fab:hover .fab-tooltip { opacity:1; }
+
+/* ===== SETTINGS SLIDE-IN PANEL ===== */
+.panel-backdrop {
+  position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:200;
+  backdrop-filter:blur(4px); opacity:0; pointer-events:none;
+  transition:opacity 0.3s ease;
+}
+.panel-backdrop.open { opacity:1; pointer-events:auto; }
+.settings-panel {
+  position:fixed; top:0; right:-620px; bottom:0; width:600px; max-width:92vw;
+  background:linear-gradient(180deg, #1a0a0e 0%, #2d1018 100%);
+  border-left:1px solid var(--border-hover); z-index:201;
+  overflow-y:auto; transition:right 0.35s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:-20px 0 60px rgba(0,0,0,0.5);
+}
+.settings-panel.open { right:0; }
+.panel-header {
+  position:sticky; top:0; z-index:5;
+  background:linear-gradient(180deg, rgba(26,10,14,0.98), rgba(26,10,14,0.92));
+  backdrop-filter:blur(12px);
+  padding:20px 24px; border-bottom:1px solid var(--border);
+  display:flex; justify-content:space-between; align-items:center; gap:16px;
+}
+.panel-title {
+  font-family:var(--font-heading); font-size:1rem; font-weight:700;
+  color:var(--gold-light); letter-spacing:1px; display:flex; align-items:center; gap:10px;
+}
+.panel-title::before {
+  content:''; width:4px; height:22px;
+  background:linear-gradient(180deg, var(--accent), var(--orange));
+  border-radius:2px;
+}
+.panel-close {
+  width:36px; height:36px; border-radius:50%; border:1px solid var(--border);
+  background:var(--bg-glass); color:var(--text-main);
+  cursor:pointer; font-size:1.1rem;
+  display:flex; align-items:center; justify-content:center;
+  transition:all 0.2s ease;
+}
+.panel-close:hover { background:rgba(217,95,95,0.15); border-color:var(--red); color:var(--red); }
+.panel-body { padding:20px 24px 120px; }
+.panel-footer {
+  position:sticky; bottom:0; z-index:5;
+  background:linear-gradient(0deg, rgba(26,10,14,1) 60%, rgba(26,10,14,0.85));
+  backdrop-filter:blur(12px);
+  padding:16px 24px; border-top:1px solid var(--border);
+  display:flex; gap:12px;
+}
+.btn-run-backtest {
+  flex:1; padding:14px 20px; border-radius:var(--radius-sm); border:none;
+  background:linear-gradient(135deg, var(--accent), var(--gold-deep));
+  color:var(--bg); font-family:var(--font-heading); font-size:0.9rem;
+  font-weight:800; letter-spacing:1.5px; cursor:pointer;
+  transition:all 0.25s ease;
+  box-shadow:0 4px 20px rgba(212,175,55,0.35);
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  text-transform:uppercase;
+}
+.btn-run-backtest:hover {
+  transform:translateY(-2px);
+  box-shadow:0 8px 28px rgba(212,175,55,0.5);
+}
+.btn-run-backtest:active { transform:translateY(0); }
+.btn-cancel {
+  padding:14px 22px; border-radius:var(--radius-sm);
+  background:var(--bg-glass); border:1px solid var(--border); color:var(--text-main);
+  font-family:var(--font-heading); font-size:0.82rem; font-weight:600;
+  letter-spacing:1px; cursor:pointer; transition:all 0.2s ease;
+}
+.btn-cancel:hover { background:rgba(217,95,95,0.08); border-color:var(--red); color:var(--red); }
+
+/* ===== ABOUT MODAL ===== */
+.about-modal {
+  position:fixed; inset:0; z-index:210; display:none;
+  align-items:center; justify-content:center; padding:20px;
+  background:rgba(0,0,0,0.7); backdrop-filter:blur(6px);
+}
+.about-modal.open { display:flex; }
+.about-modal-content {
+  background:linear-gradient(145deg, #1a0a0e, #2d1018);
+  border:1px solid var(--border-hover); border-radius:var(--radius);
+  max-width:640px; width:100%; max-height:85vh; overflow-y:auto;
+  padding:32px; position:relative;
+  box-shadow:0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(212,175,55,0.15);
+}
+.about-modal h2 {
+  font-family:var(--font-heading); color:var(--gold-light);
+  font-size:1.3rem; margin-bottom:8px; letter-spacing:0.5px;
+}
+.about-modal .about-sub {
+  color:var(--text-muted); font-size:0.85rem; margin-bottom:20px;
+  padding-bottom:16px; border-bottom:1px solid var(--border);
+}
+.about-modal p { color:var(--text-main); line-height:1.8; margin-bottom:14px; font-size:0.88rem; }
+.about-modal .about-highlight {
+  background:rgba(212,175,55,0.08); border-left:3px solid var(--accent);
+  padding:12px 16px; border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+  margin:14px 0; font-size:0.85rem;
+}
+
+@media (max-width:600px) {
+  .fab-stack { bottom:16px; right:16px; gap:10px; }
+  .fab { width:52px; height:52px; font-size:1.2rem; }
+  .fab-tooltip { display:none; }
+  .settings-panel { width:100%; max-width:100%; }
+  .panel-body { padding:16px 18px 120px; }
+  .panel-footer { padding:14px 18px; }
+}
 
 /* P&L BREAKDOWN BAR */
 .pnl-breakdown { display:flex; height:6px; border-radius:3px; overflow:hidden; margin-top:8px; gap:2px; }
@@ -391,209 +661,72 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
     <strong>Confirmation:</strong> DH picks ที่อยู่ใน Momentum Top 20% จะถูก tag "Confirmed ★".
   </div>
 
-  <div id="loading-screen" class="hidden"><div class="loading-text">/// INITIALIZING COMBINED ENGINE...</div></div>
+  <!-- OWL LOADER -->
+  <div id="loading-screen">
+    <div class="owl-loader-wrap">
+      <div class="owl-loader-stage">
+        <svg class="owl-loader-ring" viewBox="0 0 200 200">
+          <defs>
+            <linearGradient id="owlRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#D4AF37"/>
+              <stop offset="50%" stop-color="#F4E4BA"/>
+              <stop offset="100%" stop-color="#C85A4A"/>
+            </linearGradient>
+          </defs>
+          <circle class="owl-loader-ring-bg" cx="100" cy="100" r="90"/>
+          <circle id="owlLoaderRingFg" class="owl-loader-ring-fg" cx="100" cy="100" r="90"/>
+        </svg>
+        <img src="jpt-owl-logo.png" alt="JP Trust" class="owl-loader-img">
+        <div id="owlLoaderPct" class="owl-loader-pct">0%</div>
+      </div>
+      <div>
+        <div class="owl-loader-text">Initializing Combined Engine</div>
+        <div class="owl-loader-subtext" style="margin-top:10px;">กำลังโหลดข้อมูล S&amp;P 500 · Momentum + Dark Horse</div>
+      </div>
+    </div>
+  </div>
 
   <div id="dashboard" class="hidden">
-    <!-- Controls Card -->
-    <div class="card" style="margin-bottom:28px;">
-      <!-- Allocation Mode -->
-      <div class="control-group" style="margin-bottom:18px;">
-        <label>CAPITAL ALLOCATION MODE</label>
-        <div class="alloc-toggle">
-          <button class="alloc-btn" onclick="setAllocMode('split')">MODE A: แยกงบ</button>
-          <button class="alloc-btn active" onclick="setAllocMode('dynamic')">MODE B: งบเดียว ปรับสัดส่วน</button>
+    <!-- Strategy Diagram -->
+    <div class="strategy-diagram">
+      <div class="diagram-title">วงจรการเทรดของกลยุทธ์</div>
+      <div class="diagram-flow">
+        <div class="diagram-step">
+          <div class="diagram-step-num">1</div>
+          <div class="diagram-step-icon">🔍</div>
+          <div class="diagram-step-day">ศุกร์</div>
+          <div class="diagram-step-title">สแกนสัญญาณ</div>
+          <div class="diagram-step-desc">วิเคราะห์หุ้นทั้งหมดจากวันทำการสุดท้าย หาตัวที่เข้าเงื่อนไข Momentum &amp; Dark Horse</div>
+          <div class="diagram-step-arrow">→</div>
         </div>
-        <div class="alloc-detail" id="allocDetail"></div>
-        <!-- Mode B Dynamic Sliders -->
-        <div id="dynamicAllocPanel" style="margin-top:12px;">
-          <div class="threshold-box" style="background:linear-gradient(135deg, rgba(212,175,55,0.06), rgba(200,90,74,0.06)); border-color:rgba(212,175,55,0.2);">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-              <!-- Bull Market Allocation -->
-              <div>
-                <div class="threshold-labels">
-                  <div class="threshold-label" style="color:var(--green);"><span class="dot" style="background:var(--green);"></span>BULL MARKET (Price > EMA)</div>
-                </div>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
-                  <span style="font-size:0.72rem;color:var(--accent);font-weight:700;">MOM</span>
-                  <div class="threshold-val" style="color:var(--accent);" id="bullMomDisp">10%</div>
-                  <span style="font-size:0.72rem;color:var(--text-dark);">:</span>
-                  <div class="threshold-val" style="color:var(--orange);" id="bullDhDisp">90%</div>
-                  <span style="font-size:0.72rem;color:var(--orange);font-weight:700;">DH</span>
-                </div>
-                <input type="range" id="bullMomSlider" min="0" max="100" step="10" value="10" style="margin-top:6px;">
-              </div>
-              <!-- Sideways / Dip Allocation -->
-              <div>
-                <div class="threshold-labels">
-                  <div class="threshold-label" style="color:var(--purple);"><span class="dot" style="background:var(--purple);"></span>SIDEWAYS / DIP (Price ≤ EMA)</div>
-                </div>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
-                  <span style="font-size:0.72rem;color:var(--accent);font-weight:700;">MOM</span>
-                  <div class="threshold-val" style="color:var(--accent);" id="sideMomDisp">30%</div>
-                  <span style="font-size:0.72rem;color:var(--text-dark);">:</span>
-                  <div class="threshold-val" style="color:var(--orange);" id="sideDhDisp">70%</div>
-                  <span style="font-size:0.72rem;color:var(--orange);font-weight:700;">DH</span>
-                </div>
-                <input type="range" id="sideMomSlider" min="0" max="100" step="10" value="30" style="margin-top:6px;">
-              </div>
-            </div>
-            <div style="font-size:0.7rem;color:var(--text-dark);margin-top:10px;font-style:italic;">งบรวม $<span id="dynCapDisp">100</span> ต่อสัปดาห์ — จัดสัดส่วน Momentum : Dark Horse ตาม regime ของตลาด (ต้องเปิด Regime Filter ด้วย)</div>
-          </div>
+        <div class="diagram-step">
+          <div class="diagram-step-num">2</div>
+          <div class="diagram-step-icon">💰</div>
+          <div class="diagram-step-day">จันทร์</div>
+          <div class="diagram-step-title">ซื้อที่ราคาเปิด</div>
+          <div class="diagram-step-desc">เข้าตำแหน่งที่ Open ของวันทำการแรก แบ่งงบตามสัดส่วนที่ตั้งไว้ (Momentum : Dark Horse)</div>
+          <div class="diagram-step-arrow">→</div>
+        </div>
+        <div class="diagram-step">
+          <div class="diagram-step-num">3</div>
+          <div class="diagram-step-icon">⏳</div>
+          <div class="diagram-step-day">ถือ N สัปดาห์</div>
+          <div class="diagram-step-title">ถือพร้อม Stoploss</div>
+          <div class="diagram-step-desc">ถือครองตามระยะเวลาที่กำหนด มี Stoploss ต่อหุ้นคอยป้องกันถ้าราคาตกเกินกำหนด</div>
+          <div class="diagram-step-arrow">→</div>
+        </div>
+        <div class="diagram-step">
+          <div class="diagram-step-num">4</div>
+          <div class="diagram-step-icon">🏁</div>
+          <div class="diagram-step-day">จันทร์ถัดไป</div>
+          <div class="diagram-step-title">ขายที่ราคาเปิด</div>
+          <div class="diagram-step-desc">ออกตำแหน่งที่ Open ของวันทำการแรก ปิดรอบ — พร้อมเริ่มสแกนสัญญาณใหม่ต่อไป</div>
+          <div class="diagram-step-arrow">→</div>
         </div>
       </div>
-
-      <!-- Momentum Controls -->
-      <div class="section-label mom"><span>MOMENTUM SETTINGS</span><div class="line"></div></div>
-      <div class="controls-grid">
-        <div class="control-group">
-          <label>PORTFOLIO SIZE</label>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="color:var(--text-muted);font-weight:600;font-size:0.82rem;">TOP</span>
-            <input type="number" id="momTopN" class="input-box" value="5" min="1" max="50">
-            <span style="color:var(--text-muted);font-weight:600;font-size:0.82rem;">STOCKS</span>
-          </div>
-        </div>
-        <div class="control-group">
-          <label>HOLDING PERIOD</label>
-          <select id="momHoldWeeks" class="input-box">
-            <option value="1">1 Week</option>
-            <option value="2">2 Weeks</option>
-            <option value="3">3 Weeks</option>
-            <option value="4" selected>4 Weeks</option>
-            <option value="5">5 Weeks</option>
-            <option value="6">6 Weeks</option>
-            <option value="8">8 Weeks</option>
-            <option value="10">10 Weeks</option>
-            <option value="12">12 Weeks</option>
-            <option value="15">15 Weeks</option>
-          </select>
-        </div>
-        <div class="control-group">
-          <label>ROC LOOKBACK</label>
-          <select id="momRocLookback" class="input-box">
-            <option value="8" selected>8 Weeks</option>
-            <option value="12">12 Weeks</option>
-            <option value="16">16 Weeks</option>
-            <option value="20">20 Weeks</option>
-          </select>
-        </div>
-        <div class="control-group">
-          <label>RSI CEILING</label>
-          <input type="number" id="momRsiCeiling" class="input-box" value="80" min="50" max="100">
-        </div>
-      </div>
-
-      <!-- Dark Horse Controls -->
-      <div class="section-label dh"><span>DARK HORSE SETTINGS</span><div class="line"></div></div>
-      <div class="controls-grid">
-        <div class="control-group">
-          <label>MAX PICKS / ROUND</label>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="color:var(--text-muted);font-weight:600;font-size:0.82rem;">TOP</span>
-            <input type="number" id="dhTopN" class="input-box" value="10" min="1" max="30">
-            <span style="color:var(--text-muted);font-weight:600;font-size:0.82rem;">STOCKS</span>
-          </div>
-        </div>
-        <div class="control-group">
-          <label>HOLDING PERIOD</label>
-          <select id="dhHoldWeeks" class="input-box" style="border-color:rgba(200,90,74,0.3);">
-            <option value="1">1 Week</option>
-            <option value="2">2 Weeks</option>
-            <option value="3">3 Weeks</option>
-            <option value="4" selected>4 Weeks</option>
-            <option value="5">5 Weeks</option>
-            <option value="6">6 Weeks</option>
-            <option value="8">8 Weeks</option>
-            <option value="10">10 Weeks</option>
-            <option value="12">12 Weeks</option>
-            <option value="15">15 Weeks</option>
-          </select>
-        </div>
-        <div class="control-group" style="grid-column:span 3;">
-          <label>DARK HORSE FILTERS</label>
-          <div class="threshold-box">
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
-              <div>
-                <div class="threshold-labels">
-                  <div class="threshold-label" style="color:var(--orange);"><span class="dot" style="background:var(--orange);"></span>MIN 5D RETURN</div>
-                  <div class="threshold-val" style="color:var(--orange);" id="minRetDisp">2%</div>
-                </div>
-                <input type="range" id="minRetSlider" min="2" max="30" step="1" value="2" style="margin-top:6px;">
-              </div>
-              <div>
-                <div class="threshold-labels">
-                  <div class="threshold-label" style="color:var(--purple);"><span class="dot" style="background:var(--purple);"></span>VOL SURGE (×)</div>
-                  <div class="threshold-val" style="color:var(--purple);" id="volSurgeDisp">2.5×</div>
-                </div>
-                <input type="range" id="volSurgeSlider" min="10" max="60" step="5" value="25" style="margin-top:6px;">
-              </div>
-              <div>
-                <div class="threshold-labels">
-                  <div class="threshold-label" style="color:var(--blue);"><span class="dot" style="background:var(--blue);"></span>OBSCURITY (WKS)</div>
-                  <div class="threshold-val" style="color:var(--blue);" id="obscurityDisp">4w</div>
-                </div>
-                <input type="range" id="obscuritySlider" min="4" max="20" step="1" value="4" style="margin-top:6px;">
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="control-group" style="grid-column:span 3;">
-          <label>OBSCURITY THRESHOLD — WAS OUTSIDE TOP N RANK</label>
-          <div class="threshold-box" style="background:linear-gradient(135deg, rgba(96,165,250,0.06), rgba(167,139,250,0.06)); border-color:rgba(96,165,250,0.2);">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-              <div>
-                <div class="threshold-labels">
-                  <div class="threshold-label" style="color:var(--blue);"><span class="dot" style="background:var(--blue);"></span>MUST HAVE BEEN OUTSIDE TOP</div>
-                  <div class="threshold-val" style="color:var(--blue);" id="rankOutDisp">30</div>
-                </div>
-                <input type="range" id="rankOutSlider" min="30" max="300" step="10" value="30" style="margin-top:6px;">
-              </div>
-              <div>
-                <div class="threshold-labels">
-                  <div class="threshold-label" style="color:var(--green);"><span class="dot" style="background:var(--green);"></span>NOW MUST BE IN TOP</div>
-                  <div class="threshold-val" style="color:var(--green);" id="rankInDisp">10</div>
-                </div>
-                <input type="range" id="rankInSlider" min="10" max="150" step="5" value="10" style="margin-top:6px;">
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Shared Controls -->
-      <div class="section-label combined"><span>SHARED SETTINGS</span><div class="line"></div></div>
-      <div class="controls-grid">
-        <div class="control-group">
-          <label>START YEAR</label>
-          <select id="startYearSelect" class="input-box"><option value="2022">2022</option></select>
-        </div>
-        <div class="control-group">
-          <label>PER STOCK STOPLOSS</label>
-          <div class="threshold-box" style="background:linear-gradient(135deg, rgba(217,95,95,0.06), rgba(200,90,74,0.04)); border-color:rgba(217,95,95,0.2);">
-            <div class="threshold-labels">
-              <div class="threshold-label" style="color:var(--red);"><span class="dot" style="background:var(--red);"></span>SL (BOTH STRATEGIES)</div>
-              <div class="threshold-val" style="color:var(--red);" id="stoplossDisp">-15%</div>
-            </div>
-            <input type="range" id="stoplossSlider" min="0" max="30" step="1" value="15" style="margin-top:6px;">
-            <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--text-dark);margin-top:4px;">
-              <span>OFF</span><span>-5%</span><span>-10%</span><span>-15%</span><span>-20%</span><span>-30%</span>
-            </div>
-          </div>
-        </div>
-        <div class="control-group" style="grid-column:span 2;">
-          <label>MARKET REGIME FILTER (BOTH STRATEGIES)</label>
-          <div class="regime-filter-box active" id="regimeBox">
-            <div class="regime-header">
-              <span class="regime-status on" id="regimeStatus">● ON</span>
-              <span class="regime-value" id="regimeValue">EMA 30W</span>
-            </div>
-            <input type="range" id="regimeSlider" min="0" max="30" step="1" value="30">
-            <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--text-dark);margin-top:4px;">
-              <span>OFF</span><span>4W</span><span>10W</span><span>16W</span><span>20W</span><span>30W</span>
-            </div>
-            <div class="regime-hint" id="regimeHint">Skip entry when market < EMA 30W (both strategies)</div>
-          </div>
-        </div>
+      <div class="diagram-legend">
+        <div class="diagram-legend-item"><span class="diagram-legend-dot" style="background:var(--accent);"></span>Momentum — หุ้นที่วิ่งแรงต่อเนื่อง + EMA aligned + Volume</div>
+        <div class="diagram-legend-item"><span class="diagram-legend-dot" style="background:var(--orange);"></span>Dark Horse — หุ้นเงียบมานาน แล้วโผล่พร้อม Volume พุ่ง</div>
       </div>
     </div>
 
@@ -793,6 +926,268 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
   </div>
 </div>
 
+
+<!-- ===== FLOATING ACTION BUTTONS ===== -->
+<div class="fab-stack">
+  <button class="fab fab-secondary" onclick="openAboutModal()" aria-label="เกี่ยวกับกลยุทธ์">
+    <span style="font-size:1.5rem;line-height:1;">🦉</span>
+    <span class="fab-tooltip">เกี่ยวกับกลยุทธ์</span>
+  </button>
+  <button class="fab fab-primary" onclick="openSettingsPanel()" aria-label="ตั้งค่าแบ็คเทส">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <span class="fab-tooltip">ตั้งค่าแบ็คเทส</span>
+  </button>
+</div>
+
+<!-- ===== SETTINGS SLIDE-IN PANEL ===== -->
+<div id="panelBackdrop" class="panel-backdrop" onclick="closeSettingsPanel()"></div>
+<aside id="settingsPanel" class="settings-panel" aria-label="Backtest Settings">
+  <div class="panel-header">
+    <div class="panel-title">⚙️ ตั้งค่าแบ็คเทส</div>
+    <button class="panel-close" onclick="closeSettingsPanel()" aria-label="ปิด">✕</button>
+  </div>
+  <div class="panel-body">
+      <!-- Allocation Mode -->
+      <div class="control-group" style="margin-bottom:18px;">
+        <label>CAPITAL ALLOCATION MODE</label>
+        <div class="alloc-toggle">
+          <button class="alloc-btn" onclick="setAllocMode('split')">MODE A: แยกงบ</button>
+          <button class="alloc-btn active" onclick="setAllocMode('dynamic')">MODE B: งบเดียว ปรับสัดส่วน</button>
+        </div>
+        <div class="alloc-detail" id="allocDetail"></div>
+        <!-- Mode B Dynamic Sliders -->
+        <div id="dynamicAllocPanel" style="margin-top:12px;">
+          <div class="threshold-box" style="background:linear-gradient(135deg, rgba(212,175,55,0.06), rgba(200,90,74,0.06)); border-color:rgba(212,175,55,0.2);">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+              <!-- Bull Market Allocation -->
+              <div>
+                <div class="threshold-labels">
+                  <div class="threshold-label" style="color:var(--green);"><span class="dot" style="background:var(--green);"></span>BULL MARKET (Price > EMA)</div>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+                  <span style="font-size:0.72rem;color:var(--accent);font-weight:700;">MOM</span>
+                  <div class="threshold-val" style="color:var(--accent);" id="bullMomDisp">10%</div>
+                  <span style="font-size:0.72rem;color:var(--text-dark);">:</span>
+                  <div class="threshold-val" style="color:var(--orange);" id="bullDhDisp">90%</div>
+                  <span style="font-size:0.72rem;color:var(--orange);font-weight:700;">DH</span>
+                </div>
+                <input type="range" id="bullMomSlider" min="0" max="100" step="10" value="10" style="margin-top:6px;">
+              </div>
+              <!-- Sideways / Dip Allocation -->
+              <div>
+                <div class="threshold-labels">
+                  <div class="threshold-label" style="color:var(--purple);"><span class="dot" style="background:var(--purple);"></span>SIDEWAYS / DIP (Price ≤ EMA)</div>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+                  <span style="font-size:0.72rem;color:var(--accent);font-weight:700;">MOM</span>
+                  <div class="threshold-val" style="color:var(--accent);" id="sideMomDisp">30%</div>
+                  <span style="font-size:0.72rem;color:var(--text-dark);">:</span>
+                  <div class="threshold-val" style="color:var(--orange);" id="sideDhDisp">70%</div>
+                  <span style="font-size:0.72rem;color:var(--orange);font-weight:700;">DH</span>
+                </div>
+                <input type="range" id="sideMomSlider" min="0" max="100" step="10" value="30" style="margin-top:6px;">
+              </div>
+            </div>
+            <div style="font-size:0.7rem;color:var(--text-dark);margin-top:10px;font-style:italic;">งบรวม $<span id="dynCapDisp">100</span> ต่อสัปดาห์ — จัดสัดส่วน Momentum : Dark Horse ตาม regime ของตลาด (ต้องเปิด Regime Filter ด้วย)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Momentum Controls -->
+      <div class="section-label mom"><span>MOMENTUM SETTINGS</span><div class="line"></div></div>
+      <div class="controls-grid">
+        <div class="control-group">
+          <label>PORTFOLIO SIZE</label>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="color:var(--text-muted);font-weight:600;font-size:0.82rem;">TOP</span>
+            <input type="number" id="momTopN" class="input-box" value="5" min="1" max="50">
+            <span style="color:var(--text-muted);font-weight:600;font-size:0.82rem;">STOCKS</span>
+          </div>
+        </div>
+        <div class="control-group">
+          <label>HOLDING PERIOD</label>
+          <select id="momHoldWeeks" class="input-box">
+            <option value="1">1 Week</option>
+            <option value="2">2 Weeks</option>
+            <option value="3">3 Weeks</option>
+            <option value="4" selected>4 Weeks</option>
+            <option value="5">5 Weeks</option>
+            <option value="6">6 Weeks</option>
+            <option value="8">8 Weeks</option>
+            <option value="10">10 Weeks</option>
+            <option value="12">12 Weeks</option>
+            <option value="15">15 Weeks</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label>ROC LOOKBACK</label>
+          <select id="momRocLookback" class="input-box">
+            <option value="8" selected>8 Weeks</option>
+            <option value="12">12 Weeks</option>
+            <option value="16">16 Weeks</option>
+            <option value="20">20 Weeks</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label>RSI CEILING</label>
+          <input type="number" id="momRsiCeiling" class="input-box" value="80" min="50" max="100">
+        </div>
+      </div>
+
+      <!-- Dark Horse Controls -->
+      <div class="section-label dh"><span>DARK HORSE SETTINGS</span><div class="line"></div></div>
+      <div class="controls-grid">
+        <div class="control-group">
+          <label>MAX PICKS / ROUND</label>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="color:var(--text-muted);font-weight:600;font-size:0.82rem;">TOP</span>
+            <input type="number" id="dhTopN" class="input-box" value="10" min="1" max="30">
+            <span style="color:var(--text-muted);font-weight:600;font-size:0.82rem;">STOCKS</span>
+          </div>
+        </div>
+        <div class="control-group">
+          <label>HOLDING PERIOD</label>
+          <select id="dhHoldWeeks" class="input-box" style="border-color:rgba(200,90,74,0.3);">
+            <option value="1">1 Week</option>
+            <option value="2">2 Weeks</option>
+            <option value="3">3 Weeks</option>
+            <option value="4" selected>4 Weeks</option>
+            <option value="5">5 Weeks</option>
+            <option value="6">6 Weeks</option>
+            <option value="8">8 Weeks</option>
+            <option value="10">10 Weeks</option>
+            <option value="12">12 Weeks</option>
+            <option value="15">15 Weeks</option>
+          </select>
+        </div>
+        <div class="control-group" style="grid-column:span 3;">
+          <label>DARK HORSE FILTERS</label>
+          <div class="threshold-box">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+              <div>
+                <div class="threshold-labels">
+                  <div class="threshold-label" style="color:var(--orange);"><span class="dot" style="background:var(--orange);"></span>MIN 5D RETURN</div>
+                  <div class="threshold-val" style="color:var(--orange);" id="minRetDisp">2%</div>
+                </div>
+                <input type="range" id="minRetSlider" min="2" max="30" step="1" value="2" style="margin-top:6px;">
+              </div>
+              <div>
+                <div class="threshold-labels">
+                  <div class="threshold-label" style="color:var(--purple);"><span class="dot" style="background:var(--purple);"></span>VOL SURGE (×)</div>
+                  <div class="threshold-val" style="color:var(--purple);" id="volSurgeDisp">2.5×</div>
+                </div>
+                <input type="range" id="volSurgeSlider" min="10" max="60" step="5" value="25" style="margin-top:6px;">
+              </div>
+              <div>
+                <div class="threshold-labels">
+                  <div class="threshold-label" style="color:var(--blue);"><span class="dot" style="background:var(--blue);"></span>OBSCURITY (WKS)</div>
+                  <div class="threshold-val" style="color:var(--blue);" id="obscurityDisp">4w</div>
+                </div>
+                <input type="range" id="obscuritySlider" min="4" max="20" step="1" value="4" style="margin-top:6px;">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="control-group" style="grid-column:span 3;">
+          <label>OBSCURITY THRESHOLD — WAS OUTSIDE TOP N RANK</label>
+          <div class="threshold-box" style="background:linear-gradient(135deg, rgba(96,165,250,0.06), rgba(167,139,250,0.06)); border-color:rgba(96,165,250,0.2);">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <div>
+                <div class="threshold-labels">
+                  <div class="threshold-label" style="color:var(--blue);"><span class="dot" style="background:var(--blue);"></span>MUST HAVE BEEN OUTSIDE TOP</div>
+                  <div class="threshold-val" style="color:var(--blue);" id="rankOutDisp">30</div>
+                </div>
+                <input type="range" id="rankOutSlider" min="30" max="300" step="10" value="30" style="margin-top:6px;">
+              </div>
+              <div>
+                <div class="threshold-labels">
+                  <div class="threshold-label" style="color:var(--green);"><span class="dot" style="background:var(--green);"></span>NOW MUST BE IN TOP</div>
+                  <div class="threshold-val" style="color:var(--green);" id="rankInDisp">10</div>
+                </div>
+                <input type="range" id="rankInSlider" min="10" max="150" step="5" value="10" style="margin-top:6px;">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shared Controls -->
+      <div class="section-label combined"><span>SHARED SETTINGS</span><div class="line"></div></div>
+      <div class="controls-grid">
+        <div class="control-group">
+          <label>START YEAR</label>
+          <select id="startYearSelect" class="input-box"><option value="2022">2022</option></select>
+        </div>
+        <div class="control-group">
+          <label>PER STOCK STOPLOSS</label>
+          <div class="threshold-box" style="background:linear-gradient(135deg, rgba(217,95,95,0.06), rgba(200,90,74,0.04)); border-color:rgba(217,95,95,0.2);">
+            <div class="threshold-labels">
+              <div class="threshold-label" style="color:var(--red);"><span class="dot" style="background:var(--red);"></span>SL (BOTH STRATEGIES)</div>
+              <div class="threshold-val" style="color:var(--red);" id="stoplossDisp">-15%</div>
+            </div>
+            <input type="range" id="stoplossSlider" min="0" max="30" step="1" value="15" style="margin-top:6px;">
+            <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--text-dark);margin-top:4px;">
+              <span>OFF</span><span>-5%</span><span>-10%</span><span>-15%</span><span>-20%</span><span>-30%</span>
+            </div>
+          </div>
+        </div>
+        <div class="control-group" style="grid-column:span 2;">
+          <label>MARKET REGIME FILTER (BOTH STRATEGIES)</label>
+          <div class="regime-filter-box off" id="regimeBox">
+            <div class="regime-header">
+              <span class="regime-status off" id="regimeStatus">● OFF</span>
+              <span class="regime-value off" id="regimeValue">No Filter</span>
+            </div>
+            <input type="range" id="regimeSlider" min="0" max="30" step="1" value="0">
+            <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--text-dark);margin-top:4px;">
+              <span>OFF</span><span>4W</span><span>10W</span><span>16W</span><span>20W</span><span>30W</span>
+            </div>
+            <div class="regime-hint" id="regimeHint">Buy every week regardless of market condition</div>
+          </div>
+        </div>
+      </div>
+  </div>
+  <div class="panel-footer">
+    <button class="btn-cancel" onclick="closeSettingsPanel()">ยกเลิก</button>
+    <button id="runBacktestBtn" class="btn-run-backtest" onclick="runBacktestFromPanel()">
+      <span style="font-size:1.1rem;">▶</span> รันแบ็คเทส
+    </button>
+  </div>
+</aside>
+
+<!-- ===== ABOUT MODAL ===== -->
+<div id="aboutModal" class="about-modal" onclick="if(event.target===this) closeAboutModal()">
+  <div class="about-modal-content">
+    <button class="panel-close" onclick="closeAboutModal()" style="position:absolute;top:16px;right:16px;" aria-label="ปิด">✕</button>
+    <h2>🦉 Combined Strategy</h2>
+    <div class="about-sub">Momentum + Dark Horse — เทรดรายสัปดาห์บนหุ้น S&amp;P 500</div>
+    <p><strong style="color:var(--accent);">Momentum:</strong> คัดหุ้นที่วิ่งแรงต่อเนื่องใน Top 20% ของตลาด โดยต้องผ่านเงื่อนไข EMA aligned (EMA10 > EMA20), Volume สูงกว่าค่าเฉลี่ย, RSI ไม่ overbought (&lt; 80), และมี Relative Strength เหนือ Market benchmark</p>
+    <p><strong style="color:var(--orange);">Dark Horse:</strong> คัดหุ้นที่ "เงียบมานาน แล้วโผล่" — ต้องเคยอยู่นอก Top 30 มาอย่างน้อย N สัปดาห์ แล้วกระโดดเข้า Top 10 พร้อม Volume Explosion (×2.5 เทียบกับค่าเฉลี่ย) และ return 5 วันแรง</p>
+    <div class="about-highlight">
+      <strong>Confirmation ★:</strong> ถ้า Dark Horse ตัวนั้นอยู่ใน Momentum Top 20% ด้วย จะถูก tag "Confirmed" — หมายถึงมีทั้งแรงเงียบ+แรงวิ่ง ซ้อนกันทั้งสองกลยุทธ์
+    </div>
+    <p><strong style="color:var(--gold-light);">Workflow:</strong> ทุกวันศุกร์สแกนสัญญาณ → ซื้อราคา Open วันจันทร์ → ถือตามจำนวนสัปดาห์ที่กำหนด → ขายราคา Open จันทร์ถัดไป — มี Per Stock Stoploss ทั้งสองกลยุทธ์, เมื่อโดน SL จะออกที่ Open วันถัดไป</p>
+    <p><strong style="color:var(--green);">Allocation Mode:</strong></p>
+    <p style="margin-left:12px;"><strong>A — แยกงบ:</strong> ให้แต่ละกลยุทธ์งบแยก ถือพร้อมกันได้ทั้งสอง</p>
+    <p style="margin-left:12px;"><strong>B — งบเดียว ปรับสัดส่วน:</strong> ใช้งบก้อนเดียว แล้วแบ่งสัดส่วน Mom:DH ตาม Market Regime (ต้องเปิด Regime Filter)</p>
+    <div class="about-highlight" style="background:rgba(200,90,74,0.08);border-left-color:var(--orange);">
+      <strong>Regime Filter:</strong> เมื่อเปิดใช้ จะ <em>skip</em> การเข้าตำแหน่งในสัปดาห์ที่ตลาดต่ำกว่า EMA — ช่วยหลีกเลี่ยงการซื้อในตลาดขาลง แต่จะทำให้จำนวน trade น้อยลงด้วย
+    </div>
+  </div>
+</div>
+
+<!-- ===== RUN BUTTON DIRTY STATE ===== -->
+<style>
+.btn-run-dirty {
+  animation:runDirtyPulse 1.4s ease-in-out infinite !important;
+  background:linear-gradient(135deg, #C85A4A, #D4AF37) !important;
+}
+@keyframes runDirtyPulse {
+  0%, 100% { box-shadow:0 4px 20px rgba(200,90,74,0.4); }
+  50% { box-shadow:0 6px 28px rgba(200,90,74,0.7), 0 0 0 4px rgba(200,90,74,0.15); }
+}
+</style>
+
 <script>
 // ====== CONFIG ======
 const CLOUD_URL = 'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_sp500_daily.csv';
@@ -800,9 +1195,9 @@ const CLOUD_URL = 'https://raw.githubusercontent.com/jptrustlearning/sp500/main/
 let CONFIG = {
   capital: 100,
   allocMode: 'dynamic',
-  startYear: 2015,
+  startYear: 2021,
   stoploss: 15,
-  regimeEma: 30,
+  regimeEma: 0,
   // Momentum
   momTopN: 5, momHoldWeeks: 4, momRocLookback: 8, momRsiCeiling: 80,
   // Dark Horse
@@ -839,11 +1234,77 @@ document.addEventListener('DOMContentLoaded', () => { loadCloudData(); });
 el.input.addEventListener('change', handleUpload);
 document.getElementById('timeSlider').addEventListener('input', updateMarket);
 
-// ====== AUTO-RUN ======
+// ====== MANUAL RUN — mark settings dirty ======
+let settingsDirty = false;
 function scheduleBacktest() {
   if(!dataLoaded) return;
-  clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(() => { runCombinedBacktest(); }, 200);
+  settingsDirty = true;
+  const btn = document.getElementById('runBacktestBtn');
+  if(btn) {
+    btn.classList.add('btn-run-dirty');
+    btn.innerHTML = '<span style="font-size:1.1rem;">▶</span> รันแบ็คเทสใหม่';
+  }
+}
+
+function runBacktestFromPanel() {
+  // Close panel, show loader, run, then show dashboard
+  closeSettingsPanel();
+  const loader = document.getElementById('loading-screen');
+  const dash = document.getElementById('dashboard');
+  if(loader) {
+    loader.classList.remove('hidden');
+    updateOwlProgress(0);
+  }
+  if(dash) dash.classList.add('hidden');
+  // Animate progress bar while compute runs (compute is fast — so animate over ~900ms)
+  let pct = 0;
+  const progInterval = setInterval(() => {
+    pct = Math.min(pct + 6 + Math.random() * 8, 92);
+    updateOwlProgress(pct);
+  }, 50);
+  setTimeout(() => {
+    runCombinedBacktest();
+    clearInterval(progInterval);
+    updateOwlProgress(100);
+    setTimeout(() => {
+      if(loader) loader.classList.add('hidden');
+      if(dash) dash.classList.remove('hidden');
+      settingsDirty = false;
+      const btn = document.getElementById('runBacktestBtn');
+      if(btn) {
+        btn.classList.remove('btn-run-dirty');
+        btn.innerHTML = '<span style="font-size:1.1rem;">▶</span> รันแบ็คเทส';
+      }
+    }, 350);
+  }, 950);
+}
+
+function openSettingsPanel() {
+  document.getElementById('settingsPanel').classList.add('open');
+  document.getElementById('panelBackdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSettingsPanel() {
+  document.getElementById('settingsPanel').classList.remove('open');
+  document.getElementById('panelBackdrop').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function openAboutModal() {
+  document.getElementById('aboutModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeAboutModal() {
+  document.getElementById('aboutModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function updateOwlProgress(pct) {
+  const ring = document.getElementById('owlLoaderRingFg');
+  const txt = document.getElementById('owlLoaderPct');
+  if(ring) {
+    const circ = 565.48;
+    ring.style.strokeDashoffset = circ * (1 - pct / 100);
+  }
+  if(txt) txt.textContent = Math.round(pct) + '%';
 }
 
 // Bind all controls
@@ -951,12 +1412,22 @@ function handleUpload(e) {
 }
 
 async function loadCloudData() {
+  // Kickoff progress animation — grows steadily from 0 toward 70% during fetch
+  let fetchPct = 0;
+  const fetchInterval = setInterval(() => {
+    fetchPct = Math.min(fetchPct + 2 + Math.random() * 3, 70);
+    updateOwlProgress(fetchPct);
+  }, 80);
   try {
     const res = await fetch(CLOUD_URL); if(!res.ok) throw new Error('fetch fail');
-    const csv = await res.text(); processCSV(csv);
+    const csv = await res.text();
+    clearInterval(fetchInterval);
+    updateOwlProgress(75);
+    processCSV(csv);
     el.status.className='status-indicator success'; el.status.innerHTML='<span>●</span> GITHUB DATA LOADED';
     postLoad();
   } catch(e) {
+    clearInterval(fetchInterval);
     console.error(e);
     el.status.className='status-indicator error'; el.status.innerHTML='<span>●</span> CONNECT FAILED';
     el.manualUpload.style.display='block';
@@ -965,7 +1436,16 @@ async function loadCloudData() {
 
 function postLoad() {
   dataLoaded = true;
-  setTimeout(() => { runCombinedBacktest(); el.loading.classList.add('hidden'); el.dash.classList.remove('hidden'); }, 300);
+  // Animate ring from ~75% to 100% (data just loaded), then render
+  updateOwlProgress(80);
+  setTimeout(() => {
+    updateOwlProgress(100);
+    setTimeout(() => {
+      runCombinedBacktest();
+      el.loading.classList.add('hidden');
+      el.dash.classList.remove('hidden');
+    }, 300);
+  }, 250);
 }
 
 // ====== DATA PROCESSING ======
@@ -1072,6 +1552,9 @@ function processCSV(csv) {
   const years = [...new Set(state.sortedDates.map(d=>d.substring(0,4)))].sort();
   const sel = document.getElementById('startYearSelect'); sel.innerHTML='';
   years.forEach(y => { const opt=document.createElement('option'); opt.value=y; opt.innerText=y; sel.appendChild(opt); });
+  // Default to 2021 if available, else earliest year
+  if(years.includes('2021')) { sel.value = '2021'; }
+  else if(years.length) { sel.value = years[0]; }
   console.timeEnd('processCSV');
 }
 
