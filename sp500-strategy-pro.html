@@ -1624,14 +1624,14 @@
               <div class="rss-stat-sub">ผลตอบแทนเฉลี่ย / เดือน</div>
             </div>
             <div class="rss-stat">
-              <div class="rss-stat-label">Best Month</div>
+              <div class="rss-stat-label">Best Round</div>
               <div class="rss-stat-val text-green" id="stat-best">0.0%</div>
-              <div class="rss-stat-sub">เดือนที่กำไรสูงสุด</div>
+              <div class="rss-stat-sub">รอบที่กำไรสูงสุด</div>
             </div>
             <div class="rss-stat">
-              <div class="rss-stat-label">Worst Month</div>
+              <div class="rss-stat-label">Worst Round</div>
               <div class="rss-stat-val text-red" id="stat-worst">0.0%</div>
-              <div class="rss-stat-sub">เดือนที่ขาดทุนสูงสุด</div>
+              <div class="rss-stat-sub">รอบที่ขาดทุนสูงสุด</div>
             </div>
           </div>
           <div class="rss-tab-narrative" id="rssProfit">กำลังคำนวณ...</div>
@@ -1643,7 +1643,7 @@
             <div class="rss-stat">
               <div class="rss-stat-label">Win Rate</div>
               <div class="rss-stat-val text-green" id="stat-win">0%</div>
-              <div class="rss-stat-sub">สัดส่วนเดือนที่กำไร</div>
+              <div class="rss-stat-sub">สัดส่วนรอบที่กำไร</div>
             </div>
             <div class="rss-stat">
               <div class="rss-stat-label">Profit Factor</div>
@@ -1846,14 +1846,14 @@
           <div class="stat-box">
             <div class="stat-label">Win Rate</div>
             <div class="stat-val text-green" id="stat-win">0%</div>
-            <div class="stat-sub">Positive Months</div>
+            <div class="stat-sub">Positive Rounds</div>
           </div>
           <div class="stat-box">
-            <div class="stat-label">Best Month</div>
+            <div class="stat-label">Best Round</div>
             <div class="stat-val text-green" id="stat-best">0.0%</div>
           </div>
           <div class="stat-box">
-            <div class="stat-label">Worst Month</div>
+            <div class="stat-label">Worst Round</div>
             <div class="stat-val text-red" id="stat-worst">0.0%</div>
           </div>
           <div class="stat-box">
@@ -1861,7 +1861,7 @@
             <div class="stat-val" id="stat-avg">0.0%</div>
           </div>
           <div class="stat-box">
-            <div class="stat-label">Months Traded</div>
+            <div class="stat-label">Rounds Completed</div>
             <div class="stat-val" id="stat-count">0</div>
           </div>
         </div>
@@ -2591,10 +2591,29 @@ function calculateStats() {
     const stdM = Math.sqrt(mr.reduce((a,b)=>a+Math.pow(b-avgM,2),0)/mr.length);
     const vol = stdM * Math.sqrt(12);
     const sharpe = (avgM * 12) / vol;
-    const best = Math.max(...mr);
-    const worst = Math.min(...mr);
-    const wins = mr.filter(r => r > 0).length;
-    const winRate = wins / mr.length;
+
+    // === ROUND-BASED win rate + best/worst (Joon request) ===
+    // 6M strategy holds for 6 months per round — it makes sense to measure success
+    // per rebalance ROUND (was it profitable?), not per calendar month.
+    const roundReturns = [];
+    const logs = state.tradeLog || [];
+    for (let k = 0; k < logs.length - 1; k++) {
+      const prev = logs[k].equity;
+      const curr = logs[k+1].equity;
+      if (prev > 0) roundReturns.push((curr - prev) / prev);
+    }
+    // If there's an open final round, compare to latest equity (unrealized)
+    if (logs.length > 0 && state.equityCurve.length > 0) {
+      const openEntry = logs[logs.length - 1].equity;
+      const latestEq = state.equityCurve[state.equityCurve.length - 1].equity;
+      if (openEntry > 0) roundReturns.push((latestEq - openEntry) / openEntry);
+    }
+
+    const roundWins = roundReturns.filter(r => r > 0).length;
+    const winRate = roundReturns.length > 0 ? roundWins / roundReturns.length : 0;
+    const best = roundReturns.length > 0 ? Math.max(...roundReturns) : 0;
+    const worst = roundReturns.length > 0 ? Math.min(...roundReturns) : 0;
+
     let peak = -Infinity;
     let maxDD = 0;
     state.equityCurve.forEach(e => {
@@ -2611,7 +2630,7 @@ function calculateStats() {
     document.getElementById('stat-best').innerText = fmt(best);
     document.getElementById('stat-worst').innerText = fmt(worst);
     document.getElementById('stat-avg').innerText = fmt(avgM, 2);
-    document.getElementById('stat-count').innerText = mr.length;
+    document.getElementById('stat-count').innerText = roundReturns.length;
 
     // === Mirror to top-level KPI + stat IDs ===
     document.getElementById('kpi-strat-vol').innerText = fmt(vol);
@@ -2627,9 +2646,9 @@ function calculateStats() {
     const benchVol = document.getElementById('bench-strat-vol');
     if (benchVol) benchVol.innerText = fmt(vol);
 
-    // === NEW: Profit Factor from monthly returns ===
-    const grossWin = mr.filter(r => r > 0).reduce((s,r) => s + r, 0);
-    const grossLoss = Math.abs(mr.filter(r => r < 0).reduce((s,r) => s + r, 0));
+    // === Profit Factor from ROUND returns (not monthly) — consistent with win rate ===
+    const grossWin = roundReturns.filter(r => r > 0).reduce((s,r) => s + r, 0);
+    const grossLoss = Math.abs(roundReturns.filter(r => r < 0).reduce((s,r) => s + r, 0));
     const pf = grossLoss > 0 ? grossWin / grossLoss : (grossWin > 0 ? 999 : 0);
 
     // === NEW: Total Rebalances from tradeLog ===
@@ -2715,11 +2734,11 @@ function calculateStats() {
     const profitNarr = document.getElementById('rssProfit');
     if (profitNarr) {
       profitNarr.innerHTML = `<strong>กลยุทธ์ทำกำไรรวม ${(totalRet*100).toFixed(1)}%</strong> ในช่วง ${yearsStr} ปี ` +
-        `(เฉลี่ย ${fmt(cagr)}/ปี) &middot; เดือนดีที่สุดกำไร <strong>${fmt(best)}</strong> &middot; เดือนแย่ที่สุดขาดทุน <strong>${fmt(worst)}</strong>`;
+        `(เฉลี่ย ${fmt(cagr)}/ปี) &middot; รอบที่ดีที่สุดกำไร <strong>${fmt(best)}</strong> &middot; รอบที่แย่ที่สุดขาดทุน <strong>${fmt(worst)}</strong>`;
     }
     const accNarr = document.getElementById('rssAccuracy');
     if (accNarr) {
-      accNarr.innerHTML = `Win Rate <strong>${fmt(winRate)}</strong> (${wins}/${mr.length} เดือนกำไร) &middot; ` +
+      accNarr.innerHTML = `Win Rate <strong>${fmt(winRate)}</strong> (${roundWins}/${roundReturns.length} รอบกำไร) &middot; ` +
         `Profit Factor <strong>${pf.toFixed(2)}</strong> — ทุก \$1 ที่ขาดทุน กลยุทธ์ทำเงินกลับมา \$${pf.toFixed(2)} &middot; ` +
         `ปรับพอร์ต <strong>${totalRebalCount}</strong> รอบตลอดการทดสอบ`;
     }
