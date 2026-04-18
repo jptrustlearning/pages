@@ -1,6 +1,66 @@
 {
-  "lastUpdated": "2026-04-18T09:00:00Z",
+  "lastUpdated": "2026-04-18T15:00:00Z",
   "batches": [
+    {
+      "file": "2026-04-18-1500.md",
+      "date": "2026-04-18T15:00:00Z",
+      "date_display": "18 เม.ย. 2026 · 15:00",
+      "summary": "BTC ทะลุ 78,000 · Tesla AI5 ไม่ใส่รถ · ทอง 4,849 · ตลาดเอเชียผสม · สัปดาห์หน้าจับตา 5 เหตุการณ์",
+      "tickers": ["BTC", "ETH", "TSLA", "GLD", "IBIT", "NVDA"],
+      "headlines": [
+        {
+          "title": "Bitcoin ทะลุ 78,000 ดอลลาร์ครั้งแรก — ขึ้น 5% ใน 24 ชั่วโมง หลังข่าวฮอร์มุซเปิด",
+          "tickers": [
+            {"symbol": "BTC", "sentiment": "positive"},
+            {"symbol": "ETH", "sentiment": "positive"},
+            {"symbol": "IBIT", "sentiment": "positive"}
+          ],
+          "source": "CoinDesk · CoinGecko",
+          "published": "18 เม.ย. 2026"
+        },
+        {
+          "title": "Tesla ประกาศ tape-out ชิป AI5 — แต่ Musk บอก ไม่ใส่รถเรา เปลี่ยนเป้าไปที่ Optimus",
+          "tickers": [
+            {"symbol": "TSLA", "sentiment": "neutral"},
+            {"symbol": "NVDA", "sentiment": "neutral"},
+            {"symbol": "TSM", "sentiment": "positive"}
+          ],
+          "source": "Electrek · Teslarati",
+          "published": "15 เม.ย. 2026"
+        },
+        {
+          "title": "ทองคำปิดสัปดาห์ที่ 4,849 — ขึ้น 4 สัปดาห์ติด แม้ตลาดเสี่ยงกลับมา",
+          "tickers": [
+            {"symbol": "GLD", "sentiment": "positive"},
+            {"symbol": "GDX", "sentiment": "positive"},
+            {"symbol": "NEM", "sentiment": "positive"}
+          ],
+          "source": "Bloomberg · Kitco",
+          "published": "18 เม.ย. 2026"
+        },
+        {
+          "title": "ตลาดเอเชีย-ญี่ปุ่นผสม — Nikkei ร่วง 1.75% แต่ทั่วเอเชียเริ่มตามสหรัฐฯ",
+          "tickers": [
+            {"symbol": "EWJ", "sentiment": "negative"},
+            {"symbol": "FXI", "sentiment": "neutral"},
+            {"symbol": "THD", "sentiment": "neutral"}
+          ],
+          "source": "CNBC Asia · Reuters",
+          "published": "17 เม.ย. 2026"
+        },
+        {
+          "title": "มองสัปดาห์ถัดไป — 5 เหตุการณ์ใหญ่ที่ต้องจับตา (20-24 เม.ย.)",
+          "tickers": [
+            {"symbol": "TSLA", "sentiment": "neutral"},
+            {"symbol": "GOOGL", "sentiment": "neutral"},
+            {"symbol": "INTC", "sentiment": "neutral"},
+            {"symbol": "SPY", "sentiment": "neutral"}
+          ],
+          "source": "JP Trust Learning",
+          "published": "18 เม.ย. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-04-18-0900.md",
       "date": "2026-04-18T09:00:00Z",
