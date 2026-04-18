@@ -84,8 +84,10 @@ h1::before {
   transition:all 0.3s ease; backdrop-filter:blur(12px);
 }
 .status-indicator.loading { color:var(--yellow); border-color:rgba(212,175,55,0.3); }
+.status-indicator.loading span:first-child { animation:statusBlink 1.2s ease-in-out infinite; }
 .status-indicator.success { color:var(--green); border-color:rgba(91,196,142,0.3); }
-.status-indicator.error { color:var(--red); border-color:rgba(217,95,95,0.3); }
+.status-indicator.error { color:var(--text-dark); border-color:rgba(139,125,94,0.3); background:rgba(139,125,94,0.06); }
+@keyframes statusBlink { 0%, 100% { opacity:1; } 50% { opacity:0.3; } }
 input[type="file"] { display:none; }
 #manual-upload-container { display:none; }
 .btn-upload {
@@ -355,6 +357,16 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
   font-family:var(--font-heading); font-size:0.95rem; font-weight:600;
   color:var(--accent); letter-spacing:3px; text-align:center;
   text-transform:uppercase;
+}
+.loader-dots-left, .loader-dots-right {
+  display:inline-block; color:var(--gold-light);
+  animation:loaderDotsBlink 1.4s ease-in-out infinite;
+  letter-spacing:2px;
+}
+.loader-dots-right { animation-delay:0.7s; }
+@keyframes loaderDotsBlink {
+  0%, 100% { opacity:0.15; transform:translateY(0); }
+  50% { opacity:1; transform:translateY(-2px); }
 }
 .owl-loader-subtext {
   font-family:var(--font-body); font-size:0.82rem;
@@ -640,7 +652,7 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
       <h1>S&amp;P 500 Weekly Momentum &amp; Dark-Horse</h1>
     </div>
     <div class="status-box">
-      <div id="data-status" class="status-indicator loading"><span>●</span> CONNECTING...</div>
+      <div id="data-status" class="status-indicator loading"><span>●</span> Connecting</div>
       <div id="manual-upload-container">
         <label class="btn-upload">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -669,7 +681,7 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
         <img src="jpt-owl-logo.png" alt="JP Trust" class="owl-loader-img">
         <div id="owlLoaderPct" class="owl-loader-pct">0%</div>
       </div>
-      <div class="owl-loader-text">Initializing</div>
+      <div class="owl-loader-text"><span class="loader-dots-left">...</span> Initializing <span class="loader-dots-right">...</span></div>
     </div>
   </div>
 
@@ -1392,9 +1404,9 @@ document.getElementById('sideMomSlider').addEventListener('input', function() {
 
 function handleUpload(e) {
   const file = e.target.files[0]; if(!file) return;
-  el.status.className = 'status-indicator loading'; el.status.innerHTML = '<span>●</span> PROCESSING...';
+  el.status.className = 'status-indicator loading'; el.status.innerHTML = '<span>●</span> Connecting';
   const reader = new FileReader();
-  reader.onload = (evt) => { processCSV(evt.target.result); el.status.className='status-indicator success'; el.status.innerHTML='<span>●</span> LOCAL FILE'; postLoad(); };
+  reader.onload = (evt) => { processCSV(evt.target.result); el.status.className='status-indicator success'; el.status.innerHTML='<span>●</span> Connected'; postLoad(); };
   reader.readAsText(file);
 }
 
@@ -1411,12 +1423,12 @@ async function loadCloudData() {
     clearInterval(fetchInterval);
     updateOwlProgress(75);
     processCSV(csv);
-    el.status.className='status-indicator success'; el.status.innerHTML='<span>●</span> GITHUB DATA LOADED';
+    el.status.className='status-indicator success'; el.status.innerHTML='<span>●</span> Connected';
     postLoad();
   } catch(e) {
     clearInterval(fetchInterval);
     console.error(e);
-    el.status.className='status-indicator error'; el.status.innerHTML='<span>●</span> CONNECT FAILED';
+    el.status.className='status-indicator error'; el.status.innerHTML='<span>●</span> Failed';
     el.manualUpload.style.display='block';
   }
 }
