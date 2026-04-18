@@ -967,7 +967,7 @@ function renderHeadlineCard(h){
   const tickerPills=tickers.map(t=>{
     const s=t.sentiment||'neutral';
     const star=s==='positive'?'<span class="tk-star positive">★</span>':s==='negative'?'<span class="tk-star negative">★</span>':'<span class="tk-star neutral">★</span>';
-    return '<span class="news-ticker-sm '+s+'">'+star+'$'+escapeText(t.symbol)+'</span>';
+    return '<span class="news-ticker-sm '+s+'">'+star+escapeText(t.symbol)+'</span>';
   }).join('');
   const metaLine=h.source?' <span class="news-src-inline">— '+escapeText(h.source)+'</span>':'';
   return '<div class="news-dash-card" onclick="openNewsDetail(\''+safeFile+'\','+(h._origIndex||0)+')">'

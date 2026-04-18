@@ -183,7 +183,7 @@ function wrapNewsItems(html, headlines){
     const pills = tickers.map(t=>{
       const s=t.sentiment||'neutral';
       const star = s==='positive'?'<span class="tk-star positive">★</span>':s==='negative'?'<span class="tk-star negative">★</span>':'<span class="tk-star neutral">★</span>';
-      return '<span class="news-ticker-sm '+s+'">'+star+'$'+escapeHtml(t.symbol)+'</span>';
+      return '<span class="news-ticker-sm '+s+'">'+star+escapeHtml(t.symbol)+'</span>';
     }).join('');
     const h2Close = segment.indexOf('</h2>') + 5;
     const h2Tag = segment.slice(0, h2Close);
