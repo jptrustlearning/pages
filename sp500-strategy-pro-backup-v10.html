@@ -2444,68 +2444,6 @@ function runBacktest() {
       }
     }
   }
-
-  // =========================================================
-  // PHASE 7 v2: PENDING SIGNAL — wrapped in try-catch to never break render
-  // =========================================================
-  state.pendingSignal = null;
-  try {
-    if (state.sortedDates.length > CONFIG.lookbackWeeks + 5) {
-      const lastIdx = state.sortedDates.length - 1;
-      const lastDate = state.sortedDates[lastIdx];
-      const lastDateObj = new Date(lastDate);
-      const lastMonth = lastDateObj.getMonth();
-      const lastYear  = lastDateObj.getFullYear();
-
-      const sortedRebalMonths = [...CONFIG.rebalanceMonths].sort((a,b) => a-b);
-      let nextRebalMonth = -1;
-      let nextRebalYear = lastYear;
-
-      for (const m of sortedRebalMonths) {
-        if (m > lastMonth || (m === lastMonth && lastDateObj.getDate() > 7)) {
-          nextRebalMonth = m;
-          break;
-        }
-      }
-      if (nextRebalMonth === -1) {
-        nextRebalMonth = sortedRebalMonths[0];
-        nextRebalYear = lastYear + 1;
-      }
-
-      const monthsThNames = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-      const nextRebalLabel = monthsThNames[nextRebalMonth] + ' ' + (nextRebalYear + 543);
-      const nextRebalDate = new Date(nextRebalYear, nextRebalMonth, 1);
-      const daysUntil = Math.max(0, Math.ceil((nextRebalDate - lastDateObj) / 86400000));
-
-      const signalIdx = lastIdx;
-      const startIdx = signalIdx - CONFIG.lookbackWeeks;
-      if (startIdx >= 0 && state.sortedDates[signalIdx] && state.sortedDates[startIdx] && state.marketData[state.sortedDates[signalIdx]] && state.marketData[state.sortedDates[startIdx]]) {
-        const candidates = rankStocks(signalIdx, startIdx);
-        if (candidates && candidates.length > 0) {
-          const picks = candidates.slice(0, CONFIG.topN);
-          const lastEquity = state.equityCurve.length > 0
-            ? state.equityCurve[state.equityCurve.length - 1].equity
-            : CONFIG.initialCapital;
-
-          state.pendingSignal = {
-            signalDate: lastDate,
-            nextRebalLabel: nextRebalLabel,
-            daysUntil: daysUntil,
-            capital: lastEquity,
-            picks: picks.map(p => ({
-              ticker: p.ticker || '?',
-              ret: typeof p.ret === 'number' ? p.ret : 0,
-              score: typeof p.score === 'number' ? p.score : 0
-            }))
-          };
-        }
-      }
-    }
-  } catch (err) {
-    console.warn('Pending signal computation failed:', err);
-    state.pendingSignal = null;
-  }
-
   calculateStats();
   renderAll();
 }
@@ -2901,49 +2839,6 @@ function renderTradeLog() {
 
   // Build trade records with P&L (close of next rebalance, or still open)
   const logs = [...state.tradeLog];  // in entry order
-
-  // Phase 7 v2: Pending signal card (top of page 1)
-  try {
-    if (state.pendingSignal && (!window._tradeLogPage || window._tradeLogPage === 1)) {
-      const ps = state.pendingSignal;
-      const card = document.createElement('div');
-      card.className = 'trade-card';
-      card.style.borderColor = 'rgba(46,159,95,0.5)';
-      card.style.background = 'linear-gradient(135deg, rgba(91,196,142,0.08), rgba(255,254,248,1))';
-      card.style.boxShadow = '0 0 24px rgba(91,196,142,0.18)';
-
-      const perStock = ps.picks.length > 0 ? ps.capital / ps.picks.length : 0;
-      const daysLabel = ps.daysUntil > 0
-        ? 'อีก <strong>' + ps.daysUntil + ' วัน</strong>'
-        : 'เร็วๆ นี้';
-
-      let headerHtml = '<div class="trade-header"><div>' +
-        '<div class="trade-date" style="color:#2E9F5F;">' +
-        'NEXT REBALANCE — Signal ' + ps.signalDate +
-        '<span style="display:inline-block;background:rgba(46,159,95,0.15);color:#2E9F5F;border:1px solid rgba(46,159,95,0.4);padding:2px 10px;border-radius:5px;font-family:\'Cinzel\',\'Anuphan\',serif;font-size:0.62rem;font-weight:700;letter-spacing:1.5px;margin-left:6px;">PENDING</span>' +
-        '</div>' +
-        '<div class="trade-summary">' +
-        'ซื้อรวม <strong>' + ps.picks.length + ' ตัว</strong> · งบ <strong>$' + Math.round(ps.capital).toLocaleString() + '</strong>' +
-        ' · รอ rebalance รอบ <strong>' + ps.nextRebalLabel + '</strong> (' + daysLabel + ')' +
-        '</div></div></div>';
-
-      const badges = ps.picks.map(p => {
-        const retPct = (p.ret * 100).toFixed(1);
-        return '<span class="stock-badge" style="border-color:rgba(212,175,55,0.4);color:var(--gold-deep);background:rgba(212,175,55,0.08);">' +
-          p.ticker + ' ' + retPct + '%</span>';
-      }).join('');
-
-      const sectionHtml = '<div class="trade-section">' +
-        '<div class="trade-section-label mom">MOMENTUM — ' + ps.picks.length + ' ตัว ' +
-        '<span class="alloc-info">· $' + Math.round(ps.capital).toLocaleString() + ' รวม · $' + perStock.toFixed(0) + '/ตัว · hold 6M</span>' +
-        '</div><div>' + badges + '</div></div>';
-
-      card.innerHTML = headerHtml + sectionHtml;
-      container.appendChild(card);
-    }
-  } catch (err) {
-    console.warn('Pending card render failed:', err);
-  }
   const records = logs.map((log, i) => {
     const isOpen = (i === logs.length - 1);  // last one = currently held
     let pnl = 0, pnlPct = 0, exitDate = null, stockRets = [];
@@ -2986,8 +2881,7 @@ function renderTradeLog() {
   if (totalPages > 1) {
     const pagBar = document.createElement('div');
     pagBar.className = 'trade-log-pagination';
-    const pendingMsg = state.pendingSignal ? ' · <span style="color:#2E9F5F;">+1 รอบรอ</span>' : '';
-    let pagHtml = '<div class="tlp-info"><strong>' + records.length + '</strong> รอบ' + pendingMsg + ' · หน้า <strong>' + page + '</strong>/' + totalPages + '</div>';
+    let pagHtml = `<div class="tlp-info"><strong>${records.length}</strong> รอบ · หน้า <strong>${page}</strong>/${totalPages}</div>`;
     pagHtml += `<button class="tlp-btn nav" onclick="gotoTradeLogPage(1)" ${page===1?'disabled':''}>«</button>`;
     pagHtml += `<button class="tlp-btn nav" onclick="gotoTradeLogPage(${page-1})" ${page===1?'disabled':''}>‹</button>`;
     const pages = [];
