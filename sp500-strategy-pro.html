@@ -3072,10 +3072,15 @@ function renderTradeLog() {
       <div>${r.stockRets.map(s => {
         const cls = s.ret >= 0 ? '' : ' loss';
         const pctTxt = ` ${(s.ret*100).toFixed(1)}%`;
+        const priceInfo = (s.entryPrice && s.latestPrice)
+          ? ` ($${s.entryPrice.toFixed(0)}→$${s.latestPrice.toFixed(0)})`
+          : '';
         const tooltip = (s.entryPrice && s.latestPrice)
           ? `title="entry $${s.entryPrice.toFixed(2)} → latest $${s.latestPrice.toFixed(2)}"`
           : '';
-        return `<span class="stock-badge${cls}" ${tooltip}>${s.ticker}${pctTxt}</span>`;
+        // For OPEN positions, show price change inline so Joon can verify on mobile
+        const displayPct = r.isOpen ? `${pctTxt}${priceInfo}` : pctTxt;
+        return `<span class="stock-badge${cls}" ${tooltip}>${s.ticker}${displayPct}</span>`;
       }).join('')}</div>
     </div>`;
 
