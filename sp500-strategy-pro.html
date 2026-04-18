@@ -1907,6 +1907,8 @@ function simulateStrategy(wRet, nStocks) {
   let curve = [];
   let wVol = 1 - wRet;
 
+  let lastRebalancedMonth = -1;  // track to prevent duplicate rebalances in same month
+
   // Loop starts from selected year
   for (let i = startIndex; i < state.sortedDates.length; i++) {
     const dateStr = state.sortedDates[i];
@@ -1920,10 +1922,12 @@ function simulateStrategy(wRet, nStocks) {
     }
     curve.push(val);
 
+    const currentMonthKey = dateObj.getFullYear() * 12 + dateObj.getMonth();
     const isRebalance = CONFIG.rebalanceMonths.includes(dateObj.getMonth());
     const isFirstWeek = dateObj.getDate() <= 7;
+    const notAlreadyRebalanced = currentMonthKey !== lastRebalancedMonth;
 
-    if (isRebalance && isFirstWeek && i > CONFIG.lookbackWeeks) {
+    if (isRebalance && isFirstWeek && notAlreadyRebalanced && i > CONFIG.lookbackWeeks) {
       const signalIdx = i - 1;
       const startIdx = signalIdx - CONFIG.lookbackWeeks;
       if (startIdx >= 0) {
@@ -1961,6 +1965,7 @@ function simulateStrategy(wRet, nStocks) {
              cash -= alloc;
            }
         });
+        lastRebalancedMonth = currentMonthKey;  // prevent duplicate rebalance this month
       }
     }
   }
@@ -2084,6 +2089,8 @@ function runBacktest() {
      }
   }
 
+  let lastRebalancedMonth = -1;  // track to prevent duplicate rebalances in same month
+
   for (let i = startIndex; i < state.sortedDates.length; i++) {
     const dateStr = state.sortedDates[i];
     const dateObj = new Date(dateStr);
@@ -2096,12 +2103,14 @@ function runBacktest() {
     currentEquity = cash + holdingsVal;
     state.equityCurve.push({ date: dateStr, equity: currentEquity });
 
+    const currentMonthKey = dateObj.getFullYear() * 12 + dateObj.getMonth();
     const isRebalanceMonth = CONFIG.rebalanceMonths.includes(dateObj.getMonth());
     const isFirstWeek = dateObj.getDate() <= 7;
-    
+    const notAlreadyRebalanced = currentMonthKey !== lastRebalancedMonth;
+
     // Ensure lookback works even if i is near start of filtered period 
     // (i is index in FULL sortedDates, so lookback logic works fine)
-    if (isRebalanceMonth && isFirstWeek && i > CONFIG.lookbackWeeks) {
+    if (isRebalanceMonth && isFirstWeek && notAlreadyRebalanced && i > CONFIG.lookbackWeeks) {
       const signalIdx = i - 1;
       const startIdx = signalIdx - CONFIG.lookbackWeeks;
       if (startIdx >= 0) {
@@ -2116,6 +2125,7 @@ function runBacktest() {
             cash -= alloc;
           }
         });
+        lastRebalancedMonth = currentMonthKey;  // prevent duplicate rebalance this month
       }
     }
   }
