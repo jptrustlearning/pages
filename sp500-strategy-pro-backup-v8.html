@@ -1159,148 +1159,6 @@
     .rss-stat { padding: 10px 12px 8px; }
   }
 
-
-  /* ============================================================
-     PHASE 6: Weekly-style trade log + pagination
-  ============================================================ */
-
-  /* Override old trade-card design */
-  .trade-log-container {
-    max-height: 700px; overflow-y: auto; padding-right: 4px;
-    display: flex; flex-direction: column; gap: 10px;
-  }
-  .trade-log-container::-webkit-scrollbar { width: 3px; }
-  .trade-log-container::-webkit-scrollbar-track { background: transparent; }
-  .trade-log-container::-webkit-scrollbar-thumb { background: rgba(114,47,55,0.2); border-radius: 2px; }
-
-  /* Completely redefine .trade-card to match Weekly (not grid-cols: 140px 1fr) */
-  .trade-card {
-    display: block !important;
-    grid-template-columns: none !important;
-    padding: 16px !important;
-    border-radius: 12px;
-    background: var(--cream-card);
-    border: 1px solid var(--border);
-    transition: all 0.25s ease;
-    box-shadow: 0 2px 8px rgba(114,47,55,0.06);
-    gap: 0 !important;
-  }
-  .trade-card:hover {
-    border-color: var(--border-hover); background: #fff;
-    box-shadow: 0 4px 14px rgba(114,47,55,0.1);
-  }
-  .trade-card.latest-signal {
-    border-color: rgba(212,175,55,0.55);
-    background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(255,254,248,1));
-    box-shadow: 0 4px 20px rgba(212,175,55,0.15);
-  }
-  .trade-header {
-    display: flex; justify-content: space-between; align-items: center;
-    flex-wrap: wrap; gap: 8px; margin-bottom: 10px;
-  }
-  .trade-date {
-    font-family: 'Cinzel','Anuphan',serif; font-weight: 700;
-    font-size: 0.88rem; color: var(--text-dark);
-  }
-  .trade-summary {
-    font-family: 'Sarabun','Anuphan',sans-serif;
-    font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;
-  }
-  .trade-summary strong { color: var(--text-dark); font-weight: 700; }
-  .trade-section {
-    margin-top: 8px; padding-top: 8px;
-    border-top: 1px solid rgba(212,175,55,0.15);
-  }
-  .trade-section-label {
-    font-family: 'Cinzel','Anuphan',serif;
-    font-size: 0.68rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 1.5px;
-    margin-bottom: 6px;
-    display: flex; align-items: center; flex-wrap: wrap; gap: 5px;
-  }
-  .trade-section-label.mom { color: var(--gold-deep); }
-  .trade-section-label .alloc-info {
-    font-family: 'Sarabun','Anuphan',sans-serif;
-    font-weight: 500; color: var(--text-muted); font-size: 0.7rem;
-    text-transform: none; letter-spacing: 0;
-  }
-  .stock-badge {
-    display: inline-block;
-    background: rgba(46,159,95,0.08); color: var(--green);
-    border: 1px solid rgba(46,159,95,0.25);
-    padding: 4px 10px; border-radius: 6px;
-    font-family: 'Sarabun','Anuphan',sans-serif;
-    font-size: 0.72rem; font-weight: 700; margin: 2px;
-    transition: all 0.2s ease;
-  }
-  .stock-badge:hover { transform: scale(1.05); }
-  .stock-badge.loss {
-    background: rgba(193,69,69,0.06); color: var(--red);
-    border-color: rgba(193,69,69,0.25);
-  }
-  .open-badge {
-    display: inline-block;
-    background: rgba(212,175,55,0.12); color: var(--gold-deep);
-    border: 1px solid rgba(212,175,55,0.3);
-    padding: 2px 8px; border-radius: 5px;
-    font-family: 'Cinzel','Anuphan',serif;
-    font-size: 0.62rem; font-weight: 700;
-    letter-spacing: 1px; margin-left: 6px;
-  }
-
-  /* Pagination */
-  .trade-log-pagination {
-    position: sticky; top: -1px; z-index: 5;
-    display: flex; align-items: center; justify-content: center;
-    flex-wrap: wrap; gap: 4px; padding: 10px 12px;
-    background: linear-gradient(180deg, rgba(255,254,248,0.98), rgba(255,254,248,0.95));
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--border); border-radius: 12px;
-    margin-bottom: 4px;
-    box-shadow: 0 3px 12px rgba(114,47,55,0.08);
-  }
-  .tlp-info {
-    font-family: 'Sarabun','Anuphan',sans-serif;
-    font-size: 0.72rem; color: var(--text-muted);
-    margin-right: auto; padding-left: 6px; letter-spacing: 0.02em;
-  }
-  .tlp-info strong { color: var(--burgundy); font-weight: 700; }
-  .tlp-btn {
-    min-width: 32px; height: 32px; padding: 0 8px;
-    background: var(--cream-card); border: 1px solid var(--border);
-    border-radius: 7px;
-    font-family: 'DM Serif Display','Sarabun',serif;
-    font-size: 0.88rem; font-weight: 400;
-    color: var(--text-dark); cursor: pointer;
-    transition: all 0.15s ease;
-    display: inline-flex; align-items: center; justify-content: center;
-  }
-  .tlp-btn:hover:not(:disabled):not(.active) {
-    background: rgba(212,175,55,0.12); border-color: var(--border-hover);
-    color: var(--burgundy);
-  }
-  .tlp-btn:active:not(:disabled) { transform: scale(0.93); }
-  .tlp-btn.active {
-    background: linear-gradient(135deg, #722F37, #8B2252, #D4AF37);
-    color: #FFF5E1; border-color: transparent;
-    box-shadow: 0 2px 8px rgba(139,34,82,0.3);
-    font-weight: 500;
-  }
-  .tlp-btn.nav {
-    font-family: 'Sarabun','Anuphan',sans-serif;
-    font-weight: 700; color: var(--gold-deep);
-  }
-  .tlp-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-  .tlp-dots {
-    color: var(--text-muted); padding: 0 4px; font-size: 0.9rem;
-    display: inline-flex; align-items: flex-end;
-  }
-  @media (max-width: 500px) {
-    .trade-log-pagination { padding: 8px; gap: 3px; }
-    .tlp-info { display: none; }
-    .tlp-btn { min-width: 28px; height: 28px; font-size: 0.8rem; padding: 0 5px; }
-  }
-
 </style>
 </head>
 <body>
@@ -1570,21 +1428,13 @@
     <!-- CHART TABS -->
     <div class="card-base tabs-container" id="chart-tabs-container">
       <div class="tabs-header">
-        <button class="tab-btn active" onclick="openChartTab(event, 'chart-equity')">CUMULATIVE P&L</button>
-        <button class="tab-btn" onclick="openChartTab(event, 'chart-rounds')">ROUND RETURNS</button>
-        <button class="tab-btn" onclick="openChartTab(event, 'chart-dist')">DISTRIBUTION</button>
+        <button class="tab-btn active" onclick="openChartTab(event, 'chart-equity')">EQUITY CURVE</button>
         <button class="tab-btn" onclick="openChartTab(event, 'chart-dd')">DRAWDOWN</button>
-        <button class="tab-btn" onclick="openChartTab(event, 'chart-vs')">VS S&P500</button>
+        <button class="tab-btn" onclick="openChartTab(event, 'chart-vs')">VS S&P500 (ANNUAL)</button>
       </div>
       
       <div id="chart-equity" class="tab-content active" style="height: 400px;">
         <canvas id="equityChart"></canvas>
-      </div>
-      <div id="chart-rounds" class="tab-content" style="height: 400px;">
-        <canvas id="roundsChart"></canvas>
-      </div>
-      <div id="chart-dist" class="tab-content" style="height: 400px;">
-        <canvas id="distChart"></canvas>
       </div>
       <div id="chart-dd" class="tab-content" style="height: 400px;">
         <canvas id="ddChart"></canvas>
@@ -1597,16 +1447,15 @@
     <!-- BOTTOM TABS -->
     <div class="card-base tabs-container" id="bottom-tabs-container">
       <div class="tabs-header">
-        <button class="tab-btn active" onclick="openBottomTab(event, 'tab-trades')">TRADE LOG</button>
-        <button class="tab-btn" onclick="openBottomTab(event, 'tab-yearly')">YEARLY SUMMARY</button>
-        <button class="tab-btn" onclick="openBottomTab(event, 'tab-heatmap')">MONTHLY HEATMAP</button>
-        <button class="tab-btn" onclick="openBottomTab(event, 'tab-stats')">STATISTICS</button>
-        <button class="tab-btn" onclick="openBottomTab(event, 'tab-opt')">SENSITIVITY</button>
+        <button class="tab-btn active" onclick="openBottomTab(event, 'tab-opt')">SENSITIVITY</button>
+        <button class="tab-btn" onclick="openBottomTab(event, 'tab-heatmap')">RETURNS HEATMAP</button>
         <button class="tab-btn" onclick="openBottomTab(event, 'tab-annual')">ANNUAL CHART</button>
+        <button class="tab-btn" onclick="openBottomTab(event, 'tab-stats')">STATISTICS</button>
+        <button class="tab-btn" onclick="openBottomTab(event, 'tab-trades')">TRADE LOG</button>
       </div>
 
       <!-- Tab 0: Optimization -->
-      <div id="tab-opt" class="tab-content">
+      <div id="tab-opt" class="tab-content active">
         <div class="opt-controls">
           <div class="metric-group">
             <button class="metric-btn active" onclick="updateHeatmapMetric('cagr')">CAGR</button>
@@ -1633,26 +1482,6 @@
             <tbody id="optTableBody">
               <tr><td colspan="12" style="color:var(--text-muted); padding:40px; font-weight:400;">Click "RUN ANALYSIS" to generate matrix</td></tr>
             </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Tab: Yearly Summary (NEW in Phase 6) -->
-      <div id="tab-yearly" class="tab-content">
-        <div class="heatmap-wrapper">
-          <table id="yearlyTable" class="simple-table">
-            <thead><tr>
-              <th style="text-align:left;">Year</th>
-              <th>Rounds</th>
-              <th>Wins</th>
-              <th>Losses</th>
-              <th>Win Rate</th>
-              <th>P&L</th>
-              <th>Best</th>
-              <th>Worst</th>
-            </tr></thead>
-            <tbody id="yearlyBody"></tbody>
-            <tfoot id="yearlyFoot"></tfoot>
           </table>
         </div>
       </div>
@@ -1724,7 +1553,7 @@
       </div>
       
       <!-- Tab 4: Trade Log -->
-      <div id="tab-trades" class="tab-content active">
+      <div id="tab-trades" class="tab-content">
         <div id="tradeLogContainer" class="trade-log-container">
           <!-- JS will populate -->
         </div>
@@ -2521,170 +2350,12 @@ function calculateStats() {
 
 let charts = {};
 
-
-
-// === PHASE 6: ROUND RETURNS CHART (bar chart of per-round P&L%) ===
-function renderRoundsChart() {
-  const canvas = document.getElementById('roundsChart');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  if (charts.rounds) charts.rounds.destroy();
-
-  // Build closed rounds array from tradeLog
-  const logs = state.tradeLog || [];
-  const closed = [];
-  for (let i = 0; i < logs.length - 1; i++) {
-    const pnl = logs[i+1].equity - logs[i].equity;
-    const pct = logs[i].equity > 0 ? (pnl / logs[i].equity) * 100 : 0;
-    closed.push({ date: logs[i].date, pct });
-  }
-
-  charts.rounds = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: closed.map((r, i) => '#' + (i + 1)),
-      datasets: [{
-        label: 'Round Return %',
-        data: closed.map(r => r.pct),
-        backgroundColor: closed.map(r => r.pct >= 0 ? 'rgba(212,175,55,0.7)' : 'rgba(193,69,69,0.55)'),
-        borderRadius: 2
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: c => closed[c.dataIndex].date + ': ' + c.parsed.y.toFixed(2) + '%' } }
-      },
-      scales: {
-        x: { grid: { display: false }, ticks: { maxTicksLimit: 30, font: { size: 9 } } },
-        y: { grid: { color: 'rgba(212,175,55,0.08)' }, ticks: { callback: v => v + '%' } }
-      }
-    }
-  });
-}
-
-// === PHASE 6: DISTRIBUTION CHART (histogram of per-round returns) ===
-function renderDistChart() {
-  const canvas = document.getElementById('distChart');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  if (charts.dist) charts.dist.destroy();
-
-  const logs = state.tradeLog || [];
-  const rets = [];
-  for (let i = 0; i < logs.length - 1; i++) {
-    const pnl = logs[i+1].equity - logs[i].equity;
-    const pct = logs[i].equity > 0 ? (pnl / logs[i].equity) * 100 : 0;
-    rets.push(pct);
-  }
-  if (rets.length === 0) return;
-
-  const minR = Math.floor(Math.min(...rets));
-  const maxR = Math.ceil(Math.max(...rets));
-  // Bin width adaptive: 5% if wide range, 1% if narrow
-  const rangeR = maxR - minR;
-  const binSize = rangeR > 30 ? 5 : (rangeR > 10 ? 2 : 1);
-  const bins = [];
-  for (let b = minR; b <= maxR; b += binSize) {
-    bins.push({ label: b + '%', min: b, max: b + binSize, count: 0 });
-  }
-  rets.forEach(r => {
-    const bin = bins.find(b => r >= b.min && r < b.max);
-    if (bin) bin.count++;
-    else if (r >= bins[bins.length-1].min) bins[bins.length-1].count++;
-  });
-
-  charts.dist = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: bins.map(b => b.label),
-      datasets: [{
-        label: 'Frequency',
-        data: bins.map(b => b.count),
-        backgroundColor: bins.map(b => b.min >= 0 ? 'rgba(46,159,95,0.6)' : 'rgba(193,69,69,0.55)'),
-        borderRadius: 2
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { display: false } },
-        y: { grid: { color: 'rgba(212,175,55,0.08)' }, ticks: { stepSize: 1 } }
-      }
-    }
-  });
-}
-
-// === PHASE 6: YEARLY SUMMARY TABLE ===
-function renderYearly() {
-  const tbody = document.getElementById('yearlyBody');
-  const tfoot = document.getElementById('yearlyFoot');
-  if (!tbody || !tfoot) return;
-  tbody.innerHTML = ''; tfoot.innerHTML = '';
-
-  const logs = state.tradeLog || [];
-  if (logs.length < 2) return;
-
-  // Group closed rounds by YEAR (year of entry)
-  const yearMap = {};
-  for (let i = 0; i < logs.length - 1; i++) {
-    const year = logs[i].date.substring(0, 4);
-    const pnl = logs[i+1].equity - logs[i].equity;
-    const pct = logs[i].equity > 0 ? (pnl / logs[i].equity) * 100 : 0;
-    if (!yearMap[year]) yearMap[year] = [];
-    yearMap[year].push({ pnl, pct });
-  }
-
-  let gRounds = 0, gWins = 0, gPnl = 0;
-  const years = Object.keys(yearMap).sort();
-
-  years.forEach(y => {
-    const rounds = yearMap[y];
-    const wins = rounds.filter(r => r.pct > 0).length;
-    const losses = rounds.length - wins;
-    const winRate = rounds.length > 0 ? (wins / rounds.length * 100) : 0;
-    const pnl = rounds.reduce((s, r) => s + r.pnl, 0);
-    const best = Math.max(...rounds.map(r => r.pct));
-    const worst = Math.min(...rounds.map(r => r.pct));
-    gRounds += rounds.length; gWins += wins; gPnl += pnl;
-
-    const pnlCls = pnl >= 0 ? 'text-green' : 'text-red';
-    tbody.innerHTML += `<tr>
-      <td style="text-align:left;color:var(--gold-deep);font-weight:700;">${y}</td>
-      <td>${rounds.length}</td>
-      <td class="text-green">${wins}</td>
-      <td class="text-red">${losses}</td>
-      <td>${winRate.toFixed(0)}%</td>
-      <td class="${pnlCls}"><strong>$${Math.round(pnl).toLocaleString()}</strong></td>
-      <td class="text-green">+${best.toFixed(1)}%</td>
-      <td class="text-red">${worst.toFixed(1)}%</td>
-    </tr>`;
-  });
-
-  const gWinRate = gRounds > 0 ? (gWins / gRounds * 100) : 0;
-  const gPnlCls = gPnl >= 0 ? 'text-green' : 'text-red';
-  tfoot.innerHTML = `<tr style="font-weight:700;background:rgba(212,175,55,0.08);">
-    <td style="text-align:left;">TOTAL</td>
-    <td>${gRounds}</td>
-    <td class="text-green">${gWins}</td>
-    <td class="text-red">${gRounds - gWins}</td>
-    <td>${gWinRate.toFixed(0)}%</td>
-    <td class="${gPnlCls}"><strong>$${Math.round(gPnl).toLocaleString()}</strong></td>
-    <td>—</td><td>—</td>
-  </tr>`;
-}
-
 function renderAll() {
   renderEquityChart();
-  renderRoundsChart();   // Phase 6
-  renderDistChart();     // Phase 6
   renderDDChart();
   renderBarChart();
   renderVsChart(); 
   renderHeatmap();
-  renderYearly();        // Phase 6
   renderTradeLog();
   updateMarketAnalyzer();
 }
@@ -2692,109 +2363,21 @@ function renderAll() {
 function renderTradeLog() {
   const container = document.getElementById('tradeLogContainer');
   container.innerHTML = '';
-
-  // Build trade records with P&L (close of next rebalance, or still open)
-  const logs = [...state.tradeLog];  // in entry order
-  const records = logs.map((log, i) => {
-    const isOpen = (i === logs.length - 1);  // last one = currently held
-    let pnl = 0, pnlPct = 0, exitDate = null, stockRets = [];
-    if (!isOpen) {
-      const nextLog = logs[i+1];
-      exitDate = nextLog.date;
-      // Per-stock returns from entry to exit using marketData
-      stockRets = log.stocks.map(t => {
-        const entryPrice = state.marketData[log.date]?.[t]?.c;
-        const exitPrice  = state.marketData[nextLog.date]?.[t]?.c;
-        if (entryPrice && exitPrice) {
-          const ret = (exitPrice - entryPrice) / entryPrice;
-          return { ticker: t, ret };
-        }
-        return { ticker: t, ret: 0 };
-      });
-      // Equity-weighted P&L from equity delta (most accurate)
-      pnl = nextLog.equity - log.equity;
-      pnlPct = log.equity > 0 ? (pnl / log.equity) * 100 : 0;
-    } else {
-      stockRets = log.stocks.map(t => ({ ticker: t, ret: 0 }));
-    }
-    return { ...log, isOpen, exitDate, pnl, pnlPct, stockRets };
-  }).reverse();  // display newest first
-
-  if (records.length === 0) {
-    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">No trades yet — run a backtest first</div>';
-    return;
-  }
-
-  // === Pagination ===
-  const PAGE_SIZE = 15;
-  const totalPages = Math.max(1, Math.ceil(records.length / PAGE_SIZE));
-  if (!window._tradeLogPage || window._tradeLogPage > totalPages) window._tradeLogPage = 1;
-  const page = window._tradeLogPage;
-  const startIdx = (page - 1) * PAGE_SIZE;
-  const pageRecords = records.slice(startIdx, startIdx + PAGE_SIZE);
-
-  // === Build pagination bar ===
-  if (totalPages > 1) {
-    const pagBar = document.createElement('div');
-    pagBar.className = 'trade-log-pagination';
-    let pagHtml = `<div class="tlp-info"><strong>${records.length}</strong> รอบ · หน้า <strong>${page}</strong>/${totalPages}</div>`;
-    pagHtml += `<button class="tlp-btn nav" onclick="gotoTradeLogPage(1)" ${page===1?'disabled':''}>«</button>`;
-    pagHtml += `<button class="tlp-btn nav" onclick="gotoTradeLogPage(${page-1})" ${page===1?'disabled':''}>‹</button>`;
-    const pages = [];
-    pages.push(1);
-    if (page > 3) pages.push('...');
-    for (let p = Math.max(2, page-1); p <= Math.min(totalPages-1, page+1); p++) pages.push(p);
-    if (page < totalPages - 2) pages.push('...');
-    if (totalPages > 1) pages.push(totalPages);
-    pages.forEach(p => {
-      if (p === '...') pagHtml += `<span class="tlp-dots">…</span>`;
-      else pagHtml += `<button class="tlp-btn ${p===page?'active':''}" onclick="gotoTradeLogPage(${p})">${p}</button>`;
-    });
-    pagHtml += `<button class="tlp-btn nav" onclick="gotoTradeLogPage(${page+1})" ${page===totalPages?'disabled':''}>›</button>`;
-    pagHtml += `<button class="tlp-btn nav" onclick="gotoTradeLogPage(${totalPages})" ${page===totalPages?'disabled':''}>»</button>`;
-    pagBar.innerHTML = pagHtml;
-    container.appendChild(pagBar);
-  }
-
-  // === Render cards ===
-  pageRecords.forEach((r, idx) => {
-    const isLatest = (startIdx + idx === 0);  // newest = page 1 idx 0
+  const logs = [...state.tradeLog].reverse();
+  logs.forEach(log => {
     const card = document.createElement('div');
-    card.className = 'trade-card' + (isLatest && r.isOpen ? ' latest-signal' : '');
-    const retCls = r.pnl >= 0 ? 'text-green' : 'text-red';
-    const allocPerStock = r.stocks.length > 0 ? r.equity / r.stocks.length : 0;
-    const holdLabel = r.isOpen ? 'open' : (r.exitDate || '—');
-
-    let header = `<div class="trade-header"><div>
-      <div class="trade-date">${r.date}${r.isOpen ? ' <span class="open-badge">OPEN</span>' : ''}</div>
-      <div class="trade-summary">ซื้อรวม <strong>${r.stocks.length} ตัว</strong> · ใช้เงิน <strong>$${Math.round(r.equity).toLocaleString()}</strong>`;
-    if (!r.isOpen) {
-      header += ` · P&L: <span class="${retCls}"><strong>$${Math.round(r.pnl).toLocaleString()}</strong> (${r.pnlPct>=0?'+':''}${r.pnlPct.toFixed(2)}%)</span>`;
-    }
-    header += `</div></div></div>`;
-
-    const section = `<div class="trade-section">
-      <div class="trade-section-label mom">MOMENTUM — ${r.stocks.length} ตัว
-        <span class="alloc-info">· $${Math.round(r.equity).toLocaleString()} รวม · $${allocPerStock.toFixed(0)}/ตัว · 6M → ${holdLabel}</span>
+    card.className = 'trade-card';
+    const stocksHtml = log.stocks.map(s => `<span class="stock-badge">${s}</span>`).join('');
+    card.innerHTML = `
+      <div class="trade-date-box">
+        <div class="trade-date">${log.date}</div>
+        <div class="trade-equity">EQ: $${Math.round(log.equity).toLocaleString()}</div>
       </div>
-      <div>${r.stockRets.map(s => {
-        const cls = s.ret >= 0 ? '' : ' loss';
-        const pctTxt = r.isOpen ? '' : ` ${(s.ret*100).toFixed(1)}%`;
-        return `<span class="stock-badge${cls}">${s.ticker}${pctTxt}</span>`;
-      }).join('')}</div>
-    </div>`;
-
-    card.innerHTML = header + section;
+      <div class="trade-stocks">${stocksHtml}</div>
+    `;
     container.appendChild(card);
   });
 }
-
-window.gotoTradeLogPage = function(p) {
-  window._tradeLogPage = p;
-  renderTradeLog();
-  const container = document.getElementById('tradeLogContainer');
-  if (container) container.scrollTop = 0;
-};
 
 function renderEquityChart() {
   const ctx = document.getElementById('equityChart').getContext('2d');
