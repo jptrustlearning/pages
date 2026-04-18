@@ -293,6 +293,158 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height
 .upz-star.dim{color:var(--border2)}
 .upz-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border2)}
 .upz-atr-badge{font-size:.82rem;padding:5px 12px;border-radius:6px;background:rgba(96,165,250,.12);color:var(--blue);font-weight:600}
+
+/* ══════════════════════════════════════════════ */
+/* ★ SENTIMENT INFINITY (Buy vs Sell)            */
+/* ══════════════════════════════════════════════ */
+.sentiment-infinity-card{
+  background:linear-gradient(160deg,#FFFEF8 0%,#FAF4E2 100%);
+  border:1px solid var(--border2);border-radius:20px;
+  padding:20px 16px 22px;position:relative;overflow:hidden;
+  box-shadow:0 8px 40px rgba(114,47,55,.06),inset 0 1px 0 rgba(255,255,255,.8);
+  margin-bottom:14px;
+}
+[data-theme="dark"] .sentiment-infinity-card{background:linear-gradient(160deg,var(--card) 0%,var(--bg2) 100%);box-shadow:none}
+.sentiment-infinity-card::before{
+  content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 35% 55% at 22% 45%,rgba(52,168,83,.12) 0%,transparent 65%),
+    radial-gradient(ellipse 35% 55% at 78% 45%,rgba(234,67,53,.12) 0%,transparent 65%),
+    radial-gradient(ellipse 15% 35% at 50% 50%,rgba(212,175,55,.20) 0%,transparent 70%);
+}
+.sentiment-infinity-card > *{position:relative;z-index:1}
+.infinity-wrap{position:relative;width:100%;aspect-ratio:2/1;margin:0 auto;max-width:700px}
+.infinity-wrap svg{width:100%;height:100%;display:block;overflow:visible}
+
+.infinity-loop-text{
+  position:absolute;text-align:center;z-index:3;pointer-events:none;
+  top:50%;transform:translate(-50%,-50%);
+}
+.infinity-loop-text.buy{left:22.86%}
+.infinity-loop-text.sell{left:77.14%}
+.infinity-loop-text .lt-big{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(2.6rem,7vw,4.4rem);line-height:1;font-weight:400;
+}
+.infinity-loop-text.buy .lt-big{color:#1E7E34;text-shadow:0 0 24px rgba(52,168,83,.4)}
+.infinity-loop-text.sell .lt-big{color:#B3261E;text-shadow:0 0 24px rgba(234,67,53,.4)}
+[data-theme="dark"] .infinity-loop-text.buy .lt-big{color:var(--emerald)}
+[data-theme="dark"] .infinity-loop-text.sell .lt-big{color:var(--red)}
+.infinity-loop-text .lt-cap{
+  font-family:'Cinzel',serif;font-size:.72rem;font-weight:600;
+  letter-spacing:3px;color:var(--text3);margin-top:6px;
+}
+.infinity-loop-text .lt-tier{
+  font-size:.7rem;font-weight:700;letter-spacing:.5px;margin-top:2px;
+}
+.infinity-loop-text.buy .lt-tier{color:#1E7E34}
+.infinity-loop-text.sell .lt-tier{color:#B3261E}
+[data-theme="dark"] .infinity-loop-text.buy .lt-tier{color:var(--emerald)}
+[data-theme="dark"] .infinity-loop-text.sell .lt-tier{color:var(--red)}
+.infinity-loop-text .lt-delta{
+  font-size:.68rem;font-weight:600;color:var(--text3);margin-top:3px;
+}
+.infinity-loop-text .lt-delta .dv.pos{color:var(--emerald)}
+.infinity-loop-text .lt-delta .dv.neg{color:var(--red)}
+
+/* NET BIAS below infinity — plain text style */
+.net-summary{
+  text-align:center;margin-top:6px;padding:8px 16px;
+  font-family:'Cinzel',serif;font-size:.82rem;letter-spacing:2px;
+  text-transform:uppercase;color:var(--text2);font-weight:600;
+}
+.net-summary .nb-val{
+  font-family:'DM Serif Display',serif;font-size:1.4rem;letter-spacing:0;
+  vertical-align:-2px;margin:0 6px;
+}
+.net-summary .nb-val.positive{color:#1E7E34}
+.net-summary .nb-val.negative{color:#B3261E}
+.net-summary .nb-val.neutral{color:var(--gold2)}
+[data-theme="dark"] .net-summary .nb-val.positive{color:var(--emerald)}
+[data-theme="dark"] .net-summary .nb-val.negative{color:var(--red)}
+.net-summary .nb-tier{color:var(--text3);font-size:.72rem;margin-left:6px}
+
+/* BIAS + ACTION bar */
+.sentiment-combo-bar{
+  display:flex;align-items:center;gap:12px;
+  background:rgba(212,175,55,.06);border:1px solid var(--border);
+  border-radius:14px;padding:12px 16px;margin-top:12px;flex-wrap:wrap;
+}
+.sentiment-combo-bar .combo-icon{font-size:1.4rem;filter:drop-shadow(0 2px 4px rgba(0,0,0,.1))}
+.sentiment-combo-bar .combo-label{font-weight:700;font-size:.92rem;color:var(--text)}
+.sentiment-combo-bar .combo-thai{font-size:.78rem;color:var(--text2);flex:1;min-width:120px}
+.sentiment-combo-bar .combo-action{margin-left:auto;padding:6px 18px;border-radius:8px;font-weight:800;font-size:.82rem;letter-spacing:2px}
+
+/* Split meter */
+.sentiment-split{
+  display:flex;align-items:center;gap:10px;margin-top:10px;
+  font-size:.72rem;color:var(--text3);font-weight:600;
+  letter-spacing:1px;text-transform:uppercase;
+}
+.sentiment-split .split-track{
+  flex:1;height:6px;background:rgba(0,0,0,.04);border-radius:3px;
+  overflow:hidden;display:flex;border:1px solid var(--border);
+}
+.sentiment-split .split-buy{background:linear-gradient(90deg,var(--emerald),#5DD190);transition:width 1s cubic-bezier(.4,0,.2,1)}
+.sentiment-split .split-sell{background:linear-gradient(90deg,#F87171,var(--red));transition:width 1s cubic-bezier(.4,0,.2,1)}
+
+/* ══════════════════════════════════════════════ */
+/* ★ AI SMART ANALYSIS BOX                        */
+/* ══════════════════════════════════════════════ */
+.ai-analysis-card{
+  background:linear-gradient(160deg,#FFFEF8 0%,#F8F2E4 100%);
+  border:1px solid var(--border2);border-radius:16px;
+  padding:18px 20px;position:relative;overflow:hidden;
+  box-shadow:0 4px 20px rgba(114,47,55,.06);
+}
+[data-theme="dark"] .ai-analysis-card{background:var(--card);box-shadow:none}
+.ai-analysis-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,transparent,var(--gold),#E8D48B,var(--gold),transparent);
+  opacity:.8;
+}
+.ai-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px dashed var(--border2)}
+.ai-badge{
+  display:inline-flex;align-items:center;gap:6px;padding:4px 12px;
+  background:linear-gradient(135deg,var(--gold-dim),rgba(232,185,49,.15));
+  border:1px solid var(--border2);border-radius:50px;
+  font-family:'Cinzel',serif;font-size:.68rem;letter-spacing:2px;
+  color:var(--gold2);font-weight:700;text-transform:uppercase;
+}
+.ai-badge .ai-pulse{
+  width:6px;height:6px;border-radius:50%;background:var(--gold);
+  box-shadow:0 0 6px var(--gold);
+  animation:aipulse 2s ease-in-out infinite;
+}
+@keyframes aipulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.ai-title{
+  font-family:'Sarabun','Anuphan',sans-serif;font-weight:700;
+  font-size:.92rem;color:var(--text);flex:1;
+}
+.ai-timestamp{font-size:.72rem;color:var(--text3);font-weight:500}
+
+.ai-body{font-size:.88rem;line-height:1.75;color:var(--text2)}
+.ai-section{margin-bottom:12px}
+.ai-section:last-child{margin-bottom:0}
+.ai-section-label{
+  display:inline-block;font-family:'Cinzel',serif;font-size:.68rem;
+  letter-spacing:1.5px;color:var(--gold2);font-weight:700;
+  text-transform:uppercase;margin-bottom:4px;
+}
+.ai-body strong{color:var(--text);font-weight:700}
+.ai-body .ai-hl-pos{color:var(--emerald);font-weight:700}
+.ai-body .ai-hl-neg{color:var(--red);font-weight:700}
+.ai-body .ai-hl-gold{color:var(--gold2);font-weight:700}
+[data-theme="dark"] .ai-body .ai-hl-gold{color:var(--gold)}
+.ai-verdict{
+  margin-top:14px;padding:12px 16px;
+  background:rgba(212,175,55,.08);border:1px solid var(--border2);
+  border-left:3px solid var(--gold);border-radius:8px;
+  font-size:.9rem;color:var(--text);line-height:1.7;
+}
+.ai-verdict strong{color:var(--gold2)}
+[data-theme="dark"] .ai-verdict strong{color:var(--gold)}
+
 body{padding-bottom:80px !important}
 </style>
 </head>
@@ -1625,65 +1777,386 @@ function switchMethTab(tab){
   }
 }
 
-// ── Net Bias Section ──
+// ══════════════════════════════════════════════════════════
+// ★ Sentiment Infinity (Buy vs Sell gauge rings)           ★
+// ══════════════════════════════════════════════════════════
+let __infinityAnim = null;
+
 function renderNetBias(){
   const el=document.getElementById('netBiasSection');
   if(!DN||!DS){el.innerHTML='<div style="padding:20px;text-align:center;color:var(--text3)">Net Bias data not available</div>';return;}
   const buyS=parseFloat(DN.Buy_Score),sellS=parseFloat(DN.Sell_Score),nb=parseFloat(DN.Net_Bias);
-  const bt=DN.Bias_Tier,sa=DN.Scenario_Action,ss=DN.Scenario_Signal,si=DN.Scenario_Icon,sz=DN.Scenario_Zone;
+  const bt=DN.Bias_Tier,sa=DN.Scenario_Action,ss=DN.Scenario_Signal,si=DN.Scenario_Icon;
   const sd=DN.Scenario_Detail,sth=DN.Scenario_Thai;
+  const buyDelta=parseFloat(DN.Buy_Delta||0),sellDelta=parseFloat(DN.Sell_Delta||0);
   const actionCls=sa==='BUY'?'buy':sa==='SELL'?'sell':'hold';
-  // Compute Combined Signal (same logic as hero & tier)
-  let comboLabel='',comboClr='';
-  if(buyS>=75&&sellS<45&&nb>=20){comboLabel='Full Bullish Confirmed';comboClr='var(--emerald)';}
-  else if(buyS>=60&&sellS<45&&nb>=20){comboLabel='Bullish Dominant';comboClr='#8BD4B0';}
-  else if(sellS>=75&&buyS<45&&nb<=-20){comboLabel='Full Bearish Confirmed';comboClr='var(--red)';}
-  else if(sellS>=60&&buyS<45&&nb<=-20){comboLabel='Bearish Dominant';comboClr='#F87171';}
-  else if(buyS>=55&&sellS>=55&&Math.abs(nb)<20){comboLabel='Tug of War';comboClr='var(--gold)';}
-  else if(buyS>=55&&sellS<55&&nb>0){comboLabel='Lean Bullish';comboClr='#8BD4B0';}
-  else if(sellS>=55&&buyS<55&&nb<0){comboLabel='Lean Bearish';comboClr='#F87171';}
-  else if(buyS<55&&sellS<55){comboLabel='Dead Zone';comboClr='var(--text3)';}
-  else{comboLabel='Mixed Signal';comboClr='var(--text3)';}
-  const zoneBg=comboLabel.includes('Bullish')?'var(--emerald-dim)':comboLabel.includes('Bearish')?'var(--red-dim)':comboLabel.includes('Tug')?'var(--gold-dim)':'rgba(0,0,0,.03)';
-  const zoneBorder=comboLabel.includes('Bullish')?'rgba(52,211,153,.25)':comboLabel.includes('Bearish')?'rgba(248,113,113,.25)':'rgba(232,185,49,.25)';
-  const buyPct=Math.max(5,(buyS+sellS>0)?buyS/(buyS+sellS)*100:50);
+  const actionBg=sa==='BUY'?'var(--emerald)':sa==='SELL'?'var(--red)':'var(--gold)';
+  const actionShadow=sa==='BUY'?'rgba(52,168,83,.4)':sa==='SELL'?'rgba(234,67,53,.4)':'rgba(212,175,55,.4)';
+
+  let comboLabel='';
+  if(buyS>=75&&sellS<45&&nb>=20)comboLabel='Full Bullish Confirmed';
+  else if(buyS>=60&&sellS<45&&nb>=20)comboLabel='Bullish Dominant';
+  else if(sellS>=75&&buyS<45&&nb<=-20)comboLabel='Full Bearish Confirmed';
+  else if(sellS>=60&&buyS<45&&nb<=-20)comboLabel='Bearish Dominant';
+  else if(buyS>=55&&sellS>=55&&Math.abs(nb)<20)comboLabel='Tug of War';
+  else if(buyS>=55&&sellS<55&&nb>0)comboLabel='Lean Bullish';
+  else if(sellS>=55&&buyS<55&&nb<0)comboLabel='Lean Bearish';
+  else if(buyS<55&&sellS<55)comboLabel='Dead Zone';
+  else comboLabel='Mixed Signal';
+
+  const tierStr=v=>v>=75?'VERY STRONG':v>=60?'STRONG':v>=45?'MODERATE':v>=30?'WEAK':'VERY WEAK';
+  const absNet=Math.abs(nb);
+  let netTier;
+  if(absNet>=40)netTier=nb>0?'— STRONG BULLISH':'— STRONG BEARISH';
+  else if(absNet>=20)netTier=nb>0?'— LEAN BULLISH':'— LEAN BEARISH';
+  else if(absNet>=5)netTier=nb>0?'— TILT UP':'— TILT DOWN';
+  else netTier='— NEUTRAL';
+
+  const nbCls=nb>5?'positive':nb<-5?'negative':'neutral';
+  const total=buyS+sellS;
+  const buyPct=total>0?(buyS/total)*100:50;
   const sellPct=100-buyPct;
+
   el.innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px">
-      <div style="background:var(--emerald-dim);border:1px solid rgba(52,211,153,.2);border-radius:12px;padding:18px;text-align:center">
-        <div style="font-size:.82rem;color:var(--emerald);text-transform:uppercase;letter-spacing:1.5px;font-weight:700">Buy Score</div>
-        <div style="font-family:var(--font-h);font-size:2rem;color:var(--emerald)">${buyS.toFixed(1)}</div>
-        <div style="font-size:.85rem;color:var(--text3)">${DN.Buy_Tier} | Δ ${parseFloat(DN.Buy_Delta)>=0?'+':''}${parseFloat(DN.Buy_Delta).toFixed(1)}</div>
+    <div class="sentiment-infinity-card">
+      <div class="infinity-wrap">
+        <svg viewBox="0 0 700 360" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient id="inf-buyGrad" x1="100%" y1="0%" x2="0%" y2="0%">
+              <stop offset="0%" stop-color="#5DD190" stop-opacity=".95"/>
+              <stop offset="50%" stop-color="#34A853" stop-opacity="1"/>
+              <stop offset="100%" stop-color="#1E7E34" stop-opacity="1"/>
+            </linearGradient>
+            <linearGradient id="inf-sellGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#F87171" stop-opacity="1"/>
+              <stop offset="50%" stop-color="#EA4335" stop-opacity="1"/>
+              <stop offset="100%" stop-color="#B3261E" stop-opacity=".95"/>
+            </linearGradient>
+            <radialGradient id="inf-goldCross" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#FFF2C4" stop-opacity="1"/>
+              <stop offset="40%" stop-color="#F5D76E" stop-opacity=".95"/>
+              <stop offset="80%" stop-color="#D4AF37" stop-opacity=".5"/>
+              <stop offset="100%" stop-color="#B8860B" stop-opacity="0"/>
+            </radialGradient>
+            <filter id="inf-glowBuy" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="8" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <filter id="inf-glowSell" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="8" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <filter id="inf-glowGold" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <circle cx="160" cy="180" r="140" fill="none" stroke="rgba(120,115,105,.22)" stroke-width="44" stroke-linecap="round"/>
+          <circle id="inf-buyFill" cx="160" cy="180" r="140" fill="none" stroke="url(#inf-buyGrad)" stroke-width="44" stroke-linecap="round" filter="url(#inf-glowBuy)" transform="rotate(-90 160 180)"/>
+          <circle cx="540" cy="180" r="140" fill="none" stroke="rgba(120,115,105,.22)" stroke-width="44" stroke-linecap="round"/>
+          <circle id="inf-sellFill" cx="540" cy="180" r="140" fill="none" stroke="url(#inf-sellGrad)" stroke-width="44" stroke-linecap="round" filter="url(#inf-glowSell)" transform="rotate(-90 540 180)"/>
+          <circle cx="350" cy="180" r="36" fill="url(#inf-goldCross)" filter="url(#inf-glowGold)"/>
+          <circle cx="350" cy="180" r="18" fill="#F5D76E" opacity=".75"/>
+          <circle cx="350" cy="180" r="9" fill="#FFFEF8"/>
+          <circle cx="350" cy="180" r="36" fill="none" stroke="#D4AF37" stroke-width="2" opacity=".6">
+            <animate attributeName="r" values="36;52;36" dur="2.8s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values=".6;0;.6" dur="2.8s" repeatCount="indefinite"/>
+          </circle>
+          <g id="inf-buyParticles"></g>
+          <g id="inf-sellParticles"></g>
+          <g id="inf-buyComet"></g>
+          <g id="inf-sellComet"></g>
+        </svg>
+        <div class="infinity-loop-text buy">
+          <div class="lt-big">${Math.round(buyS)}</div>
+          <div class="lt-cap">BUY</div>
+          <div class="lt-tier">${tierStr(buyS)}</div>
+          <div class="lt-delta">Δ <span class="dv ${buyDelta>=0?'pos':'neg'}">${buyDelta>=0?'+':''}${buyDelta.toFixed(1)}</span></div>
+        </div>
+        <div class="infinity-loop-text sell">
+          <div class="lt-big">${Math.round(sellS)}</div>
+          <div class="lt-cap">SELL</div>
+          <div class="lt-tier">${tierStr(sellS)}</div>
+          <div class="lt-delta">Δ <span class="dv ${sellDelta>=0?'pos':'neg'}">${sellDelta>=0?'+':''}${sellDelta.toFixed(1)}</span></div>
+        </div>
       </div>
-      <div style="background:${zoneBg};border:1px solid ${zoneBorder};border-radius:12px;padding:18px;text-align:center">
-        <div style="font-size:.82rem;color:${comboClr};text-transform:uppercase;letter-spacing:1.5px;font-weight:700">Net Bias</div>
-        <div style="font-family:var(--font-h);font-size:2rem;color:${nb>=0?'var(--emerald)':'var(--red)'}">${nb>=0?'+':''}${nb.toFixed(1)}</div>
-        <div style="font-size:.85rem;color:${comboClr}">${bt}</div>
+      <div class="net-summary">
+        NET BIAS <span class="nb-val ${nbCls}">${nb>=0?'+':''}${nb.toFixed(0)}</span>
+        <span class="nb-tier">${netTier}</span>
       </div>
-      <div style="background:var(--red-dim);border:1px solid rgba(248,113,113,.2);border-radius:12px;padding:18px;text-align:center">
-        <div style="font-size:.82rem;color:var(--red);text-transform:uppercase;letter-spacing:1.5px;font-weight:700">Sell Score</div>
-        <div style="font-family:var(--font-h);font-size:2rem;color:var(--red)">${sellS.toFixed(1)}</div>
-        <div style="font-size:.85rem;color:var(--text3)">${DN.Sell_Tier} | Δ ${parseFloat(DN.Sell_Delta)>=0?'+':''}${parseFloat(DN.Sell_Delta).toFixed(1)}</div>
+      <div class="sentiment-combo-bar">
+        <span class="combo-icon">${si||'📊'}</span>
+        <div style="flex:1;min-width:120px">
+          <div class="combo-label">${ss||comboLabel}</div>
+          <div class="combo-thai">${sth||''}</div>
+        </div>
+        <span class="combo-action ${actionCls}" style="background:${actionBg};color:#fff;box-shadow:0 0 16px ${actionShadow}">${sa}</span>
+      </div>
+      <div class="sentiment-split">
+        <span style="color:var(--emerald)">${Math.round(buyPct)}%</span>
+        <div class="split-track">
+          <div class="split-buy" style="width:${buyPct}%"></div>
+          <div class="split-sell" style="width:${sellPct}%"></div>
+        </div>
+        <span style="color:var(--red)">${Math.round(sellPct)}%</span>
       </div>
     </div>
-    <div style="margin-bottom:16px">
-      <div style="display:flex;justify-content:space-between;font-size:.82rem;color:var(--text3);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:1px">
-        <span style="color:var(--emerald)">BUY ${buyPct.toFixed(0)}%</span><span style="color:var(--red)">SELL ${sellPct.toFixed(0)}%</span>
+    <div id="aiAnalysisSection"></div>`;
+
+  initInfinityAnimation(buyS, sellS);
+  renderAIAnalysis();
+}
+
+function initInfinityAnimation(buyScore, sellScore){
+  if(__infinityAnim){ __infinityAnim.stop = true; __infinityAnim = null; }
+
+  const buyFill = document.getElementById('inf-buyFill');
+  const sellFill = document.getElementById('inf-sellFill');
+  if(!buyFill || !sellFill) return;
+
+  const buyCenter = {x: 160, y: 180, r: 140};
+  const sellCenter = {x: 540, y: 180, r: 140};
+  const buyLen = 2 * Math.PI * buyCenter.r;
+  const sellLen = 2 * Math.PI * sellCenter.r;
+
+  buyFill.style.strokeDasharray = buyLen;
+  sellFill.style.strokeDasharray = sellLen;
+  buyFill.style.strokeDashoffset = buyLen;
+  sellFill.style.strokeDashoffset = sellLen;
+  buyFill.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)';
+  sellFill.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)';
+  requestAnimationFrame(() => {
+    buyFill.style.strokeDashoffset = buyLen * (1 - buyScore/100);
+    sellFill.style.strokeDashoffset = sellLen * (1 - sellScore/100);
+  });
+
+  function pointOnCircle(c, angleDeg){
+    const rad = (angleDeg - 90) * Math.PI / 180;
+    return {x: c.x + c.r * Math.cos(rad), y: c.y + c.r * Math.sin(rad)};
+  }
+
+  const buyPG = document.getElementById('inf-buyParticles');
+  const sellPG = document.getElementById('inf-sellParticles');
+  const buyCG = document.getElementById('inf-buyComet');
+  const sellCG = document.getElementById('inf-sellComet');
+
+  const N = 10;
+  const buyParticles = [], sellParticles = [];
+  for(let i=0; i<N; i++){
+    const cb = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    cb.setAttribute('r', 3.5); cb.setAttribute('fill', '#FFFEF8');
+    buyPG.appendChild(cb);
+    buyParticles.push({el:cb, offset: i/N});
+
+    const cs = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    cs.setAttribute('r', 3.5); cs.setAttribute('fill', '#FFFEF8');
+    sellPG.appendChild(cs);
+    sellParticles.push({el:cs, offset: i/N});
+  }
+
+  const buyComet = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  buyComet.setAttribute('r', 8); buyComet.setAttribute('fill', '#FFFEF8');
+  buyComet.setAttribute('filter', 'url(#inf-glowBuy)');
+  buyCG.appendChild(buyComet);
+
+  const sellComet = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  sellComet.setAttribute('r', 8); sellComet.setAttribute('fill', '#FFFEF8');
+  sellComet.setAttribute('filter', 'url(#inf-glowSell)');
+  sellCG.appendChild(sellComet);
+
+  const anim = {stop: false};
+  __infinityAnim = anim;
+  let tPrev = performance.now();
+  let cometPhase = 0;
+
+  function tick(now){
+    if(anim.stop) return;
+    const dt = (now - tPrev) / 1000;
+    tPrev = now;
+    cometPhase += dt;
+
+    const buyVel = 0.04 + (buyScore/100) * 0.22;
+    const sellVel = 0.04 + (sellScore/100) * 0.22;
+
+    buyParticles.forEach(p => {
+      p.offset = (p.offset + buyVel * dt) % 1;
+      const pt = pointOnCircle(buyCenter, p.offset * 360);
+      p.el.setAttribute('cx', pt.x); p.el.setAttribute('cy', pt.y);
+      const t = buyScore/100;
+      const inFilled = p.offset < t;
+      const fi = Math.min(1, p.offset * 8);
+      const fo = t > 0 ? Math.min(1, (t - p.offset) * 8) : 0;
+      p.el.setAttribute('opacity', inFilled ? Math.max(0, Math.min(fi, fo)) * .95 : 0);
+    });
+    sellParticles.forEach(p => {
+      p.offset = (p.offset + sellVel * dt) % 1;
+      const pt = pointOnCircle(sellCenter, p.offset * 360);
+      p.el.setAttribute('cx', pt.x); p.el.setAttribute('cy', pt.y);
+      const t = sellScore/100;
+      const inFilled = p.offset < t;
+      const fi = Math.min(1, p.offset * 8);
+      const fo = t > 0 ? Math.min(1, (t - p.offset) * 8) : 0;
+      p.el.setAttribute('opacity', inFilled ? Math.max(0, Math.min(fi, fo)) * .95 : 0);
+    });
+
+    if(buyScore/100 > 0.02){
+      const bp = pointOnCircle(buyCenter, (buyScore/100) * 360);
+      buyComet.setAttribute('cx', bp.x); buyComet.setAttribute('cy', bp.y);
+      const pulse = .7 + Math.sin(cometPhase * 4) * .3;
+      buyComet.setAttribute('r', 6 + pulse * 4);
+      buyComet.setAttribute('opacity', .95);
+    } else { buyComet.setAttribute('opacity', 0); }
+
+    if(sellScore/100 > 0.02){
+      const sp = pointOnCircle(sellCenter, (sellScore/100) * 360);
+      sellComet.setAttribute('cx', sp.x); sellComet.setAttribute('cy', sp.y);
+      const pulse = .7 + Math.sin(cometPhase * 4 + Math.PI) * .3;
+      sellComet.setAttribute('r', 6 + pulse * 4);
+      sellComet.setAttribute('opacity', .95);
+    } else { sellComet.setAttribute('opacity', 0); }
+
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+// ══════════════════════════════════════════════════════════
+// ★ AI Smart Analysis — synthesizes all dashboard data     ★
+// ══════════════════════════════════════════════════════════
+function renderAIAnalysis(){
+  const el = document.getElementById('aiAnalysisSection');
+  if(!el) return;
+  if(!D || !DN || !DS){
+    el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3)">Analysis loading...</div>';
+    return;
+  }
+
+  const buyS = parseFloat(DN.Buy_Score), sellS = parseFloat(DN.Sell_Score);
+  const nb = parseFloat(DN.Net_Bias);
+  const buyDelta = parseFloat(DN.Buy_Delta||0), sellDelta = parseFloat(DN.Sell_Delta||0);
+  const price = parseFloat(D.Price||0);
+  const z50 = parseFloat(D.Z_Score_50d||0);
+  const voRatio = parseFloat(D.Vol_Ratio||1);
+  const gc = D.Golden_Cross||'';
+  const exBuy = D.Exhaust_Scenario||'None', exBuyAct = D.Exhaust_Action||'';
+  const exSell = DS.Exhaust_Scenario||'None', exSellAct = DS.Exhaust_Action||'';
+  const dxy = D.DXY_Signal||'', vix = D.VIX_Signal||'';
+  const sigAction = DN.Scenario_Action||'';
+  const pivotPos = D.Pivot_Position||'';
+  const warnings = D.Warning_Flags||'';
+
+  const hlPos = (t) => `<span class="ai-hl-pos">${t}</span>`;
+  const hlNeg = (t) => `<span class="ai-hl-neg">${t}</span>`;
+  const hlGold = (t) => `<span class="ai-hl-gold">${t}</span>`;
+
+  // Momentum
+  let momentumText = '';
+  if(buyS >= 75 && sellS < 45){
+    momentumText = `แรงซื้อ${hlPos('แข็งมาก')} (${buyS.toFixed(0)}/100) ขณะที่แรงขาย${hlNeg('อ่อน')} (${sellS.toFixed(0)}/100) — แรงซื้อมีอำนาจเหนือตลาดเกือบทั้งหมด`;
+  } else if(sellS >= 75 && buyS < 45){
+    momentumText = `แรงขาย${hlNeg('แข็งมาก')} (${sellS.toFixed(0)}/100) ขณะที่แรงซื้อ${hlPos('อ่อน')} (${buyS.toFixed(0)}/100) — แรงขายครอบงำตลาด`;
+  } else if(buyS >= 55 && sellS >= 55){
+    momentumText = `ทั้งแรงซื้อ (${buyS.toFixed(0)}) และแรงขาย (${sellS.toFixed(0)}) ${hlGold('มีแรงทั้งสองฝั่ง')} — ตลาดกำลังชักเย่อ รอฝั่งใดชนะก่อน`;
+  } else if(buyS < 45 && sellS < 45){
+    momentumText = `ทั้งแรงซื้อและแรงขาย${hlGold('อ่อนพร้อมกัน')} (Buy ${buyS.toFixed(0)} / Sell ${sellS.toFixed(0)}) — ตลาด${hlGold('ไม่มีทิศทางชัดเจน')} อยู่ใน Dead Zone`;
+  } else if(buyS > sellS){
+    momentumText = `แรงซื้อ (${buyS.toFixed(0)}) ${hlPos('สูงกว่า')}แรงขาย (${sellS.toFixed(0)}) — เอียงขาขึ้นแต่ยังไม่แข็งพอจะยืนยัน`;
+  } else {
+    momentumText = `แรงขาย (${sellS.toFixed(0)}) ${hlNeg('สูงกว่า')}แรงซื้อ (${buyS.toFixed(0)}) — เอียงขาลง ควรระวัง`;
+  }
+  if(Math.abs(buyDelta) > 2 || Math.abs(sellDelta) > 2){
+    const d = [];
+    if(buyDelta > 2) d.push(`Buy ${hlPos('กำลังเร่ง +'+buyDelta.toFixed(1))}`);
+    else if(buyDelta < -2) d.push(`Buy ${hlNeg('กำลังชะลอ '+buyDelta.toFixed(1))}`);
+    if(sellDelta > 2) d.push(`Sell ${hlNeg('กำลังเร่ง +'+sellDelta.toFixed(1))}`);
+    else if(sellDelta < -2) d.push(`Sell ${hlPos('กำลังชะลอ '+sellDelta.toFixed(1))}`);
+    if(d.length) momentumText += ` • โมเมนตัม 5 วันล่าสุด: ${d.join(', ')}`;
+  }
+
+  // Context
+  const ctx = [];
+  if(z50 >= 2.0) ctx.push(`Z-Score 50 วัน ${hlGold(z50.toFixed(2))} — ราคาอยู่ใน${hlNeg('เขต Overbought')} ระวัง mean-reversion`);
+  else if(z50 <= -2.0) ctx.push(`Z-Score 50 วัน ${hlGold(z50.toFixed(2))} — ราคาอยู่ใน${hlPos('เขต Oversold')} มีโอกาสเด้งกลับ`);
+  else if(Math.abs(z50) < 0.5) ctx.push(`Z-Score ${z50.toFixed(2)} — ราคา${hlGold('อยู่ในเขตกลาง')} ยังไม่ extreme`);
+
+  if(pivotPos){
+    const pp = pivotPos.toLowerCase();
+    if(pp.includes('above r1') || pp.includes('r2') || pp.includes('r3')) ctx.push(`ราคา ${price>0?'$'+price.toFixed(2):''} อยู่${hlPos('เหนือแนวต้าน')} (${pivotPos})`);
+    else if(pp.includes('below s1') || pp.includes('s2') || pp.includes('s3')) ctx.push(`ราคา ${price>0?'$'+price.toFixed(2):''} อยู่${hlNeg('ใต้แนวรับ')} (${pivotPos})`);
+    else if(pp.includes('pp')) ctx.push(`ราคาอยู่ใกล้ Pivot Point (${pivotPos})`);
+  }
+
+  if(voRatio >= 1.5) ctx.push(`ปริมาณการซื้อขาย ${hlGold(voRatio.toFixed(2)+'x')} ค่าเฉลี่ย — ${hlPos('volume confirm')}`);
+  else if(voRatio < 0.7) ctx.push(`ปริมาณการซื้อขายต่ำ (${voRatio.toFixed(2)}x) — ${hlNeg('ขาดการยืนยัน')}`);
+
+  if(gc && gc !== 'None' && gc.toLowerCase() !== 'neutral'){
+    if(gc.toLowerCase().includes('golden') || gc.toLowerCase().includes('bullish')) ctx.push(`${hlPos(gc)} MA alignment`);
+    else if(gc.toLowerCase().includes('death') || gc.toLowerCase().includes('bearish')) ctx.push(`${hlNeg(gc)} MA alignment`);
+  }
+  const contextText = ctx.length ? ctx.join(' • ') : 'บริบทการตลาดยังอยู่ในเขตกลาง ไม่มีสัญญาณ extreme';
+
+  // Signals/Macro
+  const warnParts = [];
+  if(exBuy && exBuy !== 'None' && exBuy !== '') warnParts.push(`⚡ Buy-side: ${hlGold(exBuy)}${exBuyAct?' → '+exBuyAct:''}`);
+  if(exSell && exSell !== 'None' && exSell !== '') warnParts.push(`⚡ Sell-side: ${hlGold(exSell)}${exSellAct?' → '+exSellAct:''}`);
+  if(dxy && dxy.toLowerCase() !== 'neutral' && dxy !== ''){
+    const isNeg = dxy.toLowerCase().includes('strong') || dxy.toLowerCase().includes('up');
+    warnParts.push(`DXY: ${isNeg?hlNeg(dxy):hlPos(dxy)} (กระทบทอง)`);
+  }
+  if(vix && vix.toLowerCase() !== 'neutral' && vix !== ''){
+    const isHigh = vix.toLowerCase().includes('high') || vix.toLowerCase().includes('spike');
+    warnParts.push(`VIX: ${isHigh?hlGold(vix):hlPos(vix)}`);
+  }
+  if(warnings && warnings !== 'None' && warnings !== '') warnParts.push(`⚠️ ${hlNeg(warnings)}`);
+
+  // Verdict
+  let verdict = '';
+  const icon = sigAction==='BUY'?'🟢':sigAction==='SELL'?'🔴':'🟡';
+  if(sigAction === 'BUY'){
+    if(buyS >= 75 && sellS < 45 && nb >= 20){
+      verdict = `${icon} <strong>เข้าได้</strong> — สัญญาณซื้อครบเงื่อนไข (Full Bullish Confirmed): แรงซื้อแข็งมาก + แรงขายอ่อน + Net Bias +${nb.toFixed(0)} ยืนยัน. `;
+      if(z50 >= 2.0) verdict += `${hlGold('ข้อควรระวัง:')} Z-Score สูง อาจพักตัวได้ ควรตั้ง stop-loss ที่${hlGold('แนวรับล่าสุด')}`;
+      else verdict += `ช่องเสี่ยง/รีเทิร์นเอื้อฝั่งขาขึ้น — ถือจนกว่าจะเห็นสัญญาณ exhaustion`;
+    } else {
+      verdict = `${icon} <strong>เข้าได้แต่ระวัง</strong> — ${DN.Scenario_Signal||'สัญญาณซื้อ'}. แรงซื้อ (${buyS.toFixed(0)}) vs แรงขาย (${sellS.toFixed(0)}) ${buyS-sellS<30?hlGold('ยังใกล้เคียงกัน'):'ห่างพอ'} ควรขนาด position ให้พอดี`;
+    }
+  } else if(sigAction === 'SELL'){
+    if(sellS >= 75 && buyS < 45 && nb <= -20){
+      verdict = `${icon} <strong>ขายหรือหลีกเลี่ยง</strong> — สัญญาณขายครบเงื่อนไข (Full Bearish Confirmed): แรงขายแข็งมาก + แรงซื้อหมด + Net Bias ${nb.toFixed(0)} ยืนยัน. `;
+      if(z50 <= -2.0) verdict += `${hlGold('ข้อควรระวัง:')} Z-Score ต่ำ อาจเห็น oversold bounce ไม่ควรไล่ short ช่วงนี้`;
+      else verdict += `ควรขายล็อตเดิมหรืออย่าเข้า long — รอฝั่งขายหมดแรงก่อน`;
+    } else {
+      verdict = `${icon} <strong>ระวังขาลง</strong> — ${DN.Scenario_Signal||'สัญญาณขาย'}. แรงขาย (${sellS.toFixed(0)}) vs แรงซื้อ (${buyS.toFixed(0)}) ${sellS-buyS<30?hlGold('ยังไม่ extreme'):'ชัด'} ยังไม่ควรเข้า long`;
+    }
+  } else {
+    if(buyS >= 55 && sellS >= 55){
+      verdict = `${icon} <strong>ถือมือไว้</strong> — ${hlGold('Tug of War')}: ทั้ง Buy (${buyS.toFixed(0)}) และ Sell (${sellS.toFixed(0)}) แข็งพร้อมกัน ยังไม่ชัดว่าใครชนะ. รอ Delta แยกทางกัน (ฝั่งนึงเร่ง ฝั่งนึงชะลอ) ก่อนเข้า position ใหม่`;
+    } else if(buyS < 45 && sellS < 45){
+      verdict = `${icon} <strong>รออยู่ข้างสนาม</strong> — ${hlGold('Dead Zone')}: ทั้งสองฝั่งอ่อน (Buy ${buyS.toFixed(0)} / Sell ${sellS.toFixed(0)}). ตลาดไม่มีทิศทาง อย่าเข้า position ใหม่ รอ breakout ชัดๆ`;
+    } else {
+      verdict = `${icon} <strong>รอสัญญาณชัดเจน</strong> — ${DN.Scenario_Signal||'Mixed'}. Net Bias ${nb>=0?'+':''}${nb.toFixed(0)} ${Math.abs(nb)<20?hlGold('ยังไม่ extreme'):''}. ${exBuy!=='None'||exSell!=='None'?'มีสัญญาณ exhaustion เตือน':'ให้ตัวเลขพัฒนาอีก 1-2 วัน'}`;
+    }
+  }
+
+  const now = new Date();
+  const timeStr = now.toLocaleString('th-TH',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'short'});
+
+  el.innerHTML = `
+    <div class="ai-analysis-card">
+      <div class="ai-header">
+        <div class="ai-badge"><span class="ai-pulse"></span>AI Analysis</div>
+        <div class="ai-title">สรุปวิเคราะห์อัจฉริยะ</div>
+        <div class="ai-timestamp">${timeStr}</div>
       </div>
-      <div style="height:12px;background:rgba(0,0,0,.04);border-radius:6px;overflow:hidden;display:flex">
-        <div style="width:${buyPct}%;background:linear-gradient(90deg,var(--emerald),#34D399);border-radius:6px 0 0 6px;transition:width .8s"></div>
-        <div style="width:${sellPct}%;background:linear-gradient(90deg,#F87171,var(--red));border-radius:0 6px 6px 0;transition:width .8s"></div>
+      <div class="ai-body">
+        <div class="ai-section">
+          <div class="ai-section-label">◆ Momentum</div>
+          <div>${momentumText}</div>
+        </div>
+        <div class="ai-section">
+          <div class="ai-section-label">◆ Market Context</div>
+          <div>${contextText}</div>
+        </div>
+        ${warnParts.length ? `
+        <div class="ai-section">
+          <div class="ai-section-label">◆ Signals &amp; Macro</div>
+          <div>${warnParts.join(' • ')}</div>
+        </div>` : ''}
+        <div class="ai-verdict">
+          <strong>VERDICT:</strong> ${verdict}
+        </div>
       </div>
-    </div>
-    <div style="padding:16px 20px;background:${zoneBg};border:1px solid ${zoneBorder};border-radius:12px">
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <span style="font-size:1.3rem">${si}</span>
-        <span style="font-weight:700;font-size:.92rem">${ss}</span>
-        <span style="font-size:.78rem;color:var(--text2)">${sth}</span>
-        <span class="sc-action ${actionCls}" style="margin-left:auto;padding:5px 16px;border-radius:6px;font-size:.85rem;font-weight:800;letter-spacing:1.5px">${sa}</span>
-      </div>
-      <div style="font-size:.78rem;color:var(--text2);margin-top:8px;line-height:1.6">${sd}</div>
-      <div style="font-size:.82rem;color:var(--text3);margin-top:6px"><strong style="color:${comboClr}">${comboLabel}</strong> | ${DN.Scenario_Cond}</div>
     </div>`;
 }
 
