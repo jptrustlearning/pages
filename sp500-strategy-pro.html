@@ -967,8 +967,8 @@
     color: #FFF5E1;
     box-shadow: 0 2px 8px rgba(139,34,82,0.25);
   }
-  .rss-tab-pane { display: none; animation: rssTabFade 0.3s ease; }
-  .rss-tab-pane.active { display: block; }
+  .rss-tab-pane { display: none !important; animation: rssTabFade 0.3s ease; }
+  .rss-tab-pane.active { display: block !important; }
   @keyframes rssTabFade {
     from { opacity: 0; transform: translateY(4px); }
     to { opacity: 1; transform: translateY(0); }
@@ -1153,11 +1153,6 @@
         <div class="rsc-title-row">
           <div class="rsc-label">สรุปผลการแบ็คเทส</div>
           <div class="rsc-subtitle" id="rscPeriod">กำลังคำนวณ...</div>
-          <div class="rss-capital-inline">
-            <span class="rci-dollar">$</span>
-            <input type="number" id="initialCapitalInput" value="15000" step="1000" aria-label="Initial Capital">
-            <span class="rci-label">ทุนเริ่มต้น · แก้ได้</span>
-          </div>
         </div>
         <div class="rsc-hero-metric">
           <div class="rsc-hero-label">กำไรรวม</div>
@@ -1514,7 +1509,16 @@
 
     <div class="section-label"><span>📦 พอร์ตการลงทุน</span><div class="line"></div></div>
 
-    <!-- 2. Portfolio Size -->
+    <!-- 0. Initial Capital (moved from hero card) -->
+    <div class="control-group">
+      <label>INITIAL CAPITAL — ทุนเริ่มต้น</label>
+      <div class="top-n-wrapper" style="display:flex; align-items:center; gap:10px;">
+        <span style="color:var(--gold-deep); font-weight:700; font-family:'DM Serif Display',serif; font-size:1.1rem;">$</span>
+        <input type="number" id="initialCapitalInput" class="input-box" value="15000" step="1000" min="100">
+      </div>
+      <span class="hint">ทุนเริ่มต้นที่ใช้ทดสอบกลยุทธ์ · ค่า default $15,000 · สามารถเปลี่ยนเพื่อดูผลกำไรสเกลตามที่วางแผนจริง</span>
+    </div>
+
     <div class="control-group">
       <label>PORTFOLIO SIZE — จำนวนหุ้นต่อรอบ</label>
       <div class="top-n-wrapper" style="display:flex; align-items:center; gap:10px;">
@@ -2609,7 +2613,7 @@ function updateOwlProgress(pct) {
 // === PHASE 4: 4-tab summary switcher ===
 window.switchStatsTab = function(tab) {
   document.querySelectorAll('.rss-tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.rss-tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.rss-tab-pane').forEach(p => p.classList.remove('active'));
   const btn = document.querySelector(`.rss-tab-btn[data-tab="${tab}"]`);
   const panel = document.getElementById('rss-pane-' + tab);
   if (btn) btn.classList.add('active');
