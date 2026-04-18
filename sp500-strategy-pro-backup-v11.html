@@ -2212,31 +2212,28 @@ function processData(csv) {
 }
 
 function simulateStrategy(wRet, nStocks) {
-  // SENSITIVITY SIMULATOR — MUST use identical logic as runBacktest so grid cell with
-  // (wRet=CONFIG.weightRet, nStocks=CONFIG.topN) returns same CAGR/DD/Sharpe as main run.
-  //
-  // Calls the SAME rankStocks() as runBacktest, just with overridden weight + topN.
-
+  // Respect Start Year in Optimization
   const startYear = parseInt(el.inputStartYear.value);
   let startIndex = state.sortedDates.findIndex(d => d.startsWith(startYear.toString()));
-  if (startIndex === -1) startIndex = 0;
+  if(startIndex === -1) startIndex = 0;
 
   let cash = CONFIG.initialCapital;
   let holdings = {};
   let curve = [];
+  let wVol = 1 - wRet;
 
-  let lastRebalancedMonth = -1;
+  let lastRebalancedMonth = -1;  // track to prevent duplicate rebalances in same month
 
+  // Loop starts from selected year
   for (let i = startIndex; i < state.sortedDates.length; i++) {
     const dateStr = state.sortedDates[i];
     const dateObj = new Date(dateStr);
     const dayData = state.marketData[dateStr];
-
-    // Mark-to-market equity
+    
     let val = cash;
-    for (const [t, shares] of Object.entries(holdings)) {
-      const p = dayData[t] ? dayData[t].c : (i>0 ? state.marketData[state.sortedDates[i-1]][t]?.c : 0);
-      val += shares * (p || 0);
+    for (const [t, s] of Object.entries(holdings)) {
+      const p = dayData[t] ? dayData[t].c : (i>0?state.marketData[state.sortedDates[i-1]][t]?.c:0);
+      val += s * (p||0);
     }
     curve.push(val);
 
@@ -2249,67 +2246,66 @@ function simulateStrategy(wRet, nStocks) {
       const signalIdx = i - 1;
       const startIdx = signalIdx - CONFIG.lookbackWeeks;
       if (startIdx >= 0) {
-        // USE SHARED rankStocks (with override weight) — identical to runBacktest
-        const candidates = rankStocks(signalIdx, startIdx, wRet);
-        const selected = candidates.slice(0, nStocks);
-
-        cash = val;
-        holdings = {};
-        const alloc = cash / nStocks;
-        selected.forEach(st => {
-          if (dayData[st.ticker]) {
-            holdings[st.ticker] = alloc / dayData[st.ticker].c;
-            cash -= alloc;
+        const endD = state.sortedDates[signalIdx];
+        const startD = state.sortedDates[startIdx];
+        const tickers = Object.keys(state.marketData[endD]);
+        const stats = [];
+        tickers.forEach(t => {
+          if (state.marketData[startD][t]) {
+            const pEnd = state.marketData[endD][t].c;
+            const pStart = state.marketData[startD][t].c;
+            const ret = (pEnd - pStart) / pStart;
+            let vol = 0;
+            for(let k=startIdx; k<=signalIdx; k+=4) {
+               const d = state.sortedDates[k];
+               if(state.marketData[d][t]) vol += state.marketData[d][t].v;
+            }
+            stats.push({ ticker: t, ret, vol });
           }
         });
-        lastRebalancedMonth = currentMonthKey;
+        
+        stats.sort((a,b)=>b.ret - a.ret);
+        stats.forEach((s,k)=>s.rRet=k);
+        stats.sort((a,b)=>b.vol - a.vol);
+        stats.forEach((s,k)=>s.rVol=k);
+        stats.forEach(s => s.sc = (s.rRet*wRet) + (s.rVol*wVol));
+        stats.sort((a,b)=>a.sc - b.sc);
+
+        const selected = stats.slice(0, nStocks);
+        cash = val; holdings = {};
+        const alloc = cash / nStocks;
+        selected.forEach(st => {
+           if(dayData[st.ticker]) {
+             holdings[st.ticker] = alloc / dayData[st.ticker].c;
+             cash -= alloc;
+           }
+        });
+        lastRebalancedMonth = currentMonthKey;  // prevent duplicate rebalance this month
       }
     }
   }
+  
+  if (curve.length === 0) return { cagr:0, dd:0, sharpe:0, win:0 };
 
-  if (curve.length === 0) return { cagr: 0, dd: 0, sharpe: 0, win: 0 };
-
-  // === Metrics (calculated identically to runBacktest's calculateStats) ===
   const start = curve[0];
-  const end = curve[curve.length - 1];
-
-  // CAGR: use actual calendar days between first/last dates (not curve.length * 7)
-  const firstDate = new Date(state.sortedDates[startIndex]);
-  const lastDate = new Date(state.sortedDates[state.sortedDates.length - 1]);
-  const days = (lastDate - firstDate) / 86400000;
-  const cagr = days > 0 ? Math.pow(end / start, 1 / (days / 365.25)) - 1 : 0;
-
-  // Max drawdown
+  const end = curve[curve.length-1];
+  const days = curve.length * 7; 
+  const cagr = Math.pow(end/start, 1/(days/365.25)) - 1;
   let peak = -Infinity;
   let maxDD = 0;
   curve.forEach(v => {
-    if (v > peak) peak = v;
-    const d = (v - peak) / peak;
-    if (d < maxDD) maxDD = d;
+    if(v>peak) peak=v;
+    const d = (v-peak)/peak;
+    if(d<maxDD) maxDD=d;
   });
 
-  // Sharpe: use MONTHLY returns (same as calculateStats / main dashboard)
-  // Aggregate curve into monthly end-of-month equity
-  const monthlyByKey = {};
-  curve.forEach((v, idx) => {
-    const d = state.sortedDates[startIndex + idx];
-    if (d) monthlyByKey[d.substring(0,7)] = v;
-  });
-  const monthKeys = Object.keys(monthlyByKey).sort();
-  const monthlyRets = [];
-  for (let i = 1; i < monthKeys.length; i++) {
-    const prev = monthlyByKey[monthKeys[i-1]];
-    const curr = monthlyByKey[monthKeys[i]];
-    if (prev > 0) monthlyRets.push((curr - prev) / prev);
-  }
-  const avgM = monthlyRets.length > 0 ? monthlyRets.reduce((a,b) => a+b, 0) / monthlyRets.length : 0;
-  const varM = monthlyRets.length > 0 ? monthlyRets.reduce((a,b) => a + Math.pow(b-avgM, 2), 0) / monthlyRets.length : 0;
-  const stdM = Math.sqrt(varM);
-  const volAnn = stdM * Math.sqrt(12);  // annualized vol
-  const sharpe = volAnn === 0 ? 0 : (avgM * 12) / volAnn;
-
-  const wins = monthlyRets.filter(r => r > 0).length;
-  const winRate = monthlyRets.length > 0 ? wins / monthlyRets.length : 0;
+  const rets = [];
+  for(let i=1;i<curve.length;i++) rets.push((curve[i]-curve[i-1])/curve[i-1]);
+  const avg = rets.reduce((a,b)=>a+b,0)/rets.length;
+  const std = Math.sqrt(rets.reduce((a,b)=>a+Math.pow(b-avg,2),0)/rets.length);
+  const sharpe = std===0 ? 0 : (avg * 52) / (std * Math.sqrt(52));
+  const wins = rets.filter(r=>r>0).length;
+  const winRate = wins/rets.length;
 
   return { cagr, dd: maxDD, sharpe, win: winRate };
 }
@@ -2514,22 +2510,7 @@ function runBacktest() {
   renderAll();
 }
 
-function rankStocks(endIdx, startIdx, weightRetOverride) {
-  // SHARED ranking function — used by both runBacktest (main) AND simulateStrategy (sensitivity grid).
-  // Logic MUST be identical across both code paths.
-  //
-  // Method:
-  // 1. For each ticker with data at both start and end date:
-  //    - return = (priceEnd - priceStart) / priceStart   [total return over lookback period]
-  //    - volume = SUM of daily volume across ALL trading days in [startIdx, endIdx]  [full daily sum, no sampling]
-  // 2. Rank tickers by return (descending) → rankRet: 0 = highest return
-  // 3. Rank tickers by volume (descending) → rankVol: 0 = highest volume
-  // 4. Composite score = rankRet × weightRet + rankVol × weightVol   [lower = better]
-  // 5. Sort ascending by score, return full list. Caller takes slice(0, topN).
-
-  const wRet = (typeof weightRetOverride === 'number') ? weightRetOverride : CONFIG.weightRet;
-  const wVol = 1 - wRet;
-
+function rankStocks(endIdx, startIdx) {
   const endD = state.sortedDates[endIdx];
   const startD = state.sortedDates[startIdx];
   const tickers = Object.keys(state.marketData[endD]);
@@ -2540,9 +2521,9 @@ function rankStocks(endIdx, startIdx, weightRetOverride) {
       const pStart = state.marketData[startD][t].c;
       const ret = (pEnd - pStart) / pStart;
       let vol = 0;
-      for (let k = startIdx; k <= endIdx; k++) {
+      for(let k=startIdx; k<=endIdx; k++) {
         const d = state.sortedDates[k];
-        if (state.marketData[d][t]) vol += state.marketData[d][t].v;
+        if(state.marketData[d][t]) vol += state.marketData[d][t].v;
       }
       stats.push({ ticker: t, ret, vol });
     }
@@ -2551,7 +2532,7 @@ function rankStocks(endIdx, startIdx, weightRetOverride) {
   stats.forEach((s,i) => s.rankRet = i);
   stats.sort((a,b) => b.vol - a.vol);
   stats.forEach((s,i) => s.rankVol = i);
-  stats.forEach(s => { s.score = (s.rankRet * wRet) + (s.rankVol * wVol); });
+  stats.forEach(s => { s.score = (s.rankRet * CONFIG.weightRet) + (s.rankVol * CONFIG.weightVol); });
   stats.sort((a,b) => a.score - b.score);
   return stats;
 }
