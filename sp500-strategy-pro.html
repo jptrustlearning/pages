@@ -3066,7 +3066,7 @@ function renderTradeLog() {
       </div>
       <div>${r.stockRets.map(s => {
         const cls = s.ret >= 0 ? '' : ' loss';
-        const pctTxt = r.isOpen ? '' : ` ${(s.ret*100).toFixed(1)}%`;
+        const pctTxt = ` ${(s.ret*100).toFixed(1)}%`;  // show for both closed AND open (Phase 7.5 fix)
         return `<span class="stock-badge${cls}">${s.ticker}${pctTxt}</span>`;
       }).join('')}</div>
     </div>`;
