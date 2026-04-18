@@ -903,7 +903,7 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
 }
 .rss-compare-stat {
   position:relative;
-  padding-top:42px;  /* pill height ~28px + gap so the big number isn't covered */
+  padding-top:38px;  /* pill is now ~24px tall + 14px gap */
 }
 .rss-compare-stat .rss-stat-th {
   font-family:'Sarabun','Anuphan',sans-serif;
@@ -914,13 +914,12 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
 }
 .rss-compare-tag {
   position:absolute; top:0; left:0;
-  padding:5px 12px 5px 13px;
-  font-family:'Cinzel','Anuphan',serif;
-  font-size:0.62rem; font-weight:700; letter-spacing:1.2px;
-  text-transform:uppercase;
+  padding:4px 10px;
+  font-family:'Sarabun','Anuphan',sans-serif;
+  font-size:0.6rem; font-weight:600; letter-spacing:0.4px;
   border-radius:var(--radius-sm) 0 var(--radius-sm) 0;
   color:#FFF5E1;
-  z-index:2;
+  z-index:3;
   box-shadow:0 2px 6px rgba(114,47,55,0.2);
 }
 .rss-compare-tag.strat {
