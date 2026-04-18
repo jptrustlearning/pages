@@ -913,10 +913,13 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
   line-height:1.4;
 }
 .rss-compare-tag {
-  /* NO absolute — sits in normal flow as first block inside card */
-  display:inline-block;
-  /* Break out to left/top edges using negative margins matching card padding */
-  margin:-12px 0 10px -14px;
+  /* Sits in normal flow as first element inside .rss-stat card.
+     Negative margins cancel out the card's padding (12px top, 14px left)
+     PLUS the card's 1px border, so the pill sits flush against the
+     card's rounded top-left corner. */
+  display:block;  /* full block so it breaks its own line */
+  width:fit-content;
+  margin:-13px 0 10px -15px;
   padding:5px 12px 5px 13px;
   font-family:'Cinzel','Anuphan',serif;
   font-size:0.62rem; font-weight:700; letter-spacing:1.2px;
@@ -924,6 +927,10 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
   border-radius:var(--radius-sm) 0 var(--radius-sm) 0;
   color:#FFF5E1;
   box-shadow:0 2px 6px rgba(114,47,55,0.2);
+}
+/* Mobile: card padding shrinks to 10px/12px, so match it */
+@media (max-width:500px) {
+  .rss-compare-tag { margin:-11px 0 8px -13px; }
 }
 .rss-compare-tag.strat {
   background:linear-gradient(135deg, #722F37 0%, #8B2252 55%, #D4AF37 100%);
