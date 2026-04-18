@@ -138,85 +138,91 @@ input[type="file"] { display:none; }
 
 /* CONTROLS */
 .controls-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:14px; align-items:end; margin-bottom:20px; }
+.control-group { margin-bottom:14px; }
 .control-group label {
-  display:block; font-size:0.62rem; font-weight:700; color:var(--text-dark);
-  margin-bottom:8px; text-transform:uppercase; letter-spacing:0.08em;
+  display:block; font-size:0.7rem; font-weight:700; color:var(--gold-deep);
+  margin-bottom:6px; text-transform:uppercase; letter-spacing:0.12em;
+  font-family:'Cinzel','Anuphan',serif;
 }
+.control-group .hint {
+  display:block; font-size:0.75rem; color:var(--text-muted);
+  margin-top:6px; line-height:1.55;
+  font-family:'Sarabun','Anuphan',sans-serif;
+}
+.control-group .hint strong { color:var(--burgundy); font-weight:600; }
 .input-box {
-  background:rgba(0,0,0,0.3); border:1px solid var(--border); color:var(--text-dark);
-  font-family:var(--font-body); font-size:0.88rem; padding:10px 12px;
-  border-radius:var(--radius-sm); width:100%; text-align:center; transition:all 0.3s ease; height:42px;
+  background:var(--cream-card); border:1.5px solid rgba(212,175,55,0.35); color:var(--text-dark);
+  font-family:'Sarabun','Anuphan',sans-serif; font-size:0.92rem; font-weight:500;
+  padding:10px 14px; border-radius:var(--radius-sm); width:100%;
+  text-align:center; transition:all 0.25s ease; height:44px;
+  box-shadow:inset 0 1px 3px rgba(114,47,55,0.04);
 }
-.input-box:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(212,175,55,0.12); }
+.input-box:focus {
+  outline:none; border-color:var(--gold); background:#fff;
+  box-shadow:0 0 0 3px rgba(212,175,55,0.2), inset 0 1px 3px rgba(114,47,55,0.04);
+}
 select.input-box {
   cursor:pointer; appearance:none;
-  background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b6259' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'/%3e%3c/svg%3e");
-  background-repeat:no-repeat; background-position:right 12px center; background-size:12px;
+  padding-right:36px;
+  background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238B6914' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'/%3e%3c/svg%3e");
+  background-repeat:no-repeat; background-position:right 14px center; background-size:14px;
 }
+select.input-box:hover { border-color:var(--border-hover); }
 
 /* SECTION DIVIDERS */
-.section-label { display:flex; align-items:center; gap:10px; margin:12px 0 14px; }
-.section-label span { font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; white-space:nowrap; }
-.section-label .line { flex:1; height:1px; background:var(--border); }
-.section-label.mom span { color:var(--accent); }
-.section-label.dh span { color:var(--orange); }
-.section-label.combined span { color:var(--green); }
+.section-label { display:flex; align-items:center; gap:12px; margin:22px 0 14px; }
+.section-label span {
+  font-family:'Cinzel','Anuphan',serif;
+  font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.16em; white-space:nowrap;
+  padding:3px 12px; border-radius:20px;
+}
+.section-label .line { flex:1; height:1px; background:linear-gradient(90deg, var(--border-hover), transparent); }
+.section-label.mom span { color:var(--gold-deep); background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.3); }
+.section-label.dh span { color:var(--orange); background:rgba(158,63,53,0.08); border:1px solid rgba(158,63,53,0.25); }
+.section-label.combined span { color:var(--green); background:rgba(46,159,95,0.08); border:1px solid rgba(46,159,95,0.3); }
 
-/* THRESHOLD SLIDERS */
+/* THRESHOLD BOX (container for grouped settings) */
 .threshold-box {
-  background:rgba(0,0,0,0.2); border:1px solid var(--border); border-radius:var(--radius-sm);
+  background:var(--cream-card); border:1px solid var(--border); border-radius:var(--radius-sm);
   padding:14px 16px; transition:all 0.3s ease;
+  box-shadow:0 2px 8px rgba(114,47,55,0.04);
 }
 .threshold-box:hover { border-color:var(--border-hover); }
 .threshold-labels { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
-.threshold-label { font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; display:flex; align-items:center; gap:5px; }
+.threshold-label { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; display:flex; align-items:center; gap:6px; font-family:'Cinzel','Anuphan',serif; }
 .threshold-label .dot { width:7px; height:7px; border-radius:50%; }
-.threshold-val { font-family:var(--font-heading); font-size:1rem; font-weight:700; min-width:36px; text-align:center; }
+.threshold-val { font-family:var(--font-number); font-size:1.05rem; font-weight:400; min-width:36px; text-align:center; }
 
-/* Range sliders — premium style */
-input[type=range] { -webkit-appearance:none; width:100%; background:transparent; cursor:pointer; height:20px; }
-input[type=range]::-webkit-slider-runnable-track { width:100%; height:3px; background:rgba(244,228,186,0.10); border-radius:2px; }
-input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance:none; height:20px; width:20px; border-radius:50%;
-  background:var(--accent); border:3px solid var(--bg); margin-top:-9px;
-  box-shadow:0 0 0 2px rgba(212,175,55,0.3), 0 2px 8px rgba(0,0,0,0.4);
-  transition:transform 0.15s ease, box-shadow 0.15s ease;
-}
-input[type=range]::-webkit-slider-thumb:hover {
-  transform:scale(1.2);
-  box-shadow:0 0 0 4px rgba(212,175,55,0.2), 0 4px 12px rgba(0,0,0,0.5);
-}
-input[type=range]:active::-webkit-slider-thumb { transform:scale(1.1); }
+/* Range sliders kept for charts tab slider only — not used in panel anymore */
 
 /* ALLOCATION MODE TOGGLE */
-.alloc-toggle { display:flex; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:var(--radius-sm); overflow:hidden; }
+.alloc-toggle { display:flex; background:var(--cream-deep); border:1px solid var(--border); border-radius:var(--radius-sm); overflow:hidden; padding:3px; gap:3px; }
 .alloc-btn {
-  flex:1; padding:12px 14px; background:transparent; border:none; color:var(--text-dark);
-  font-family:var(--font-body); font-size:0.75rem; font-weight:600; cursor:pointer;
+  flex:1; padding:11px 14px; background:transparent; border:none; color:var(--text-muted);
+  font-family:'Sarabun','Anuphan',sans-serif; font-size:0.82rem; font-weight:600; cursor:pointer;
   transition:all 0.25s ease; text-align:center; position:relative;
+  border-radius:var(--radius-xs);
 }
-.alloc-btn:hover { color:var(--text-muted); }
+.alloc-btn:hover:not(.active) { color:var(--burgundy); background:rgba(255,255,255,0.5); }
 .alloc-btn.active {
-  color:var(--accent); background:rgba(212,175,55,0.08);
+  color:#FFF5E1;
+  background:linear-gradient(135deg, #722F37, #8B2252, #D4AF37);
+  box-shadow:0 2px 8px rgba(139,34,82,0.25);
 }
-.alloc-btn.active::after {
-  content:''; position:absolute; bottom:0; left:15%; right:15%; height:2px;
-  background:var(--accent); border-radius:1px;
-}
-.alloc-detail { font-size:0.7rem; color:var(--text-dark); margin-top:8px; padding:8px 12px; background:rgba(0,0,0,0.15); border-radius:var(--radius-xs); min-height:32px; }
+.alloc-detail { font-size:0.78rem; color:var(--text-muted); margin-top:10px; padding:10px 12px; background:rgba(212,175,55,0.08); border-radius:var(--radius-xs); min-height:32px; line-height:1.55; }
 
 /* REGIME */
-.regime-filter-box { background:rgba(0,0,0,0.2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 16px 10px; transition:all 0.3s ease; }
+.regime-filter-box { background:var(--cream-card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px 16px 12px; transition:all 0.3s ease; box-shadow:0 2px 8px rgba(114,47,55,0.04); }
 .regime-filter-box:hover { border-color:var(--border-hover); }
-.regime-filter-box.active { border-color:rgba(212,175,55,0.4); box-shadow:0 0 20px rgba(212,175,55,0.08); }
-.regime-filter-box.off { opacity:0.6; }
-.regime-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
-.regime-status { font-size:0.7rem; font-weight:700; letter-spacing:0.5px; padding:3px 10px; border-radius:20px; }
-.regime-status.on { color:var(--accent); background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.25); }
-.regime-status.off { color:var(--text-dark); background:rgba(244,228,186,0.04); border:1px solid var(--border); }
-.regime-value { font-family:var(--font-heading); font-size:1.05rem; font-weight:700; color:var(--text-dark); }
-.regime-value.off { color:var(--text-dark); }
-.regime-hint { font-size:0.68rem; color:var(--text-dark); margin-top:8px; font-style:italic; }
+.regime-filter-box.active { border-color:rgba(212,175,55,0.55); box-shadow:0 3px 14px rgba(212,175,55,0.15); }
+.regime-filter-box.off { opacity:0.75; }
+.regime-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.regime-status { font-size:0.72rem; font-weight:700; letter-spacing:0.5px; padding:4px 12px; border-radius:20px; font-family:'Cinzel','Anuphan',serif; }
+.regime-status.on { color:var(--green); background:rgba(46,159,95,0.1); border:1px solid rgba(46,159,95,0.35); }
+.regime-status.off { color:var(--text-muted); background:rgba(122,111,98,0.08); border:1px solid rgba(122,111,98,0.2); }
+.regime-value { font-family:var(--font-number); font-size:1.05rem; font-weight:400; color:var(--text-dark); }
+.regime-value.off { color:var(--text-muted); font-size:0.88rem; font-family:'Sarabun','Anuphan',sans-serif; }
+.regime-hint { font-size:0.75rem; color:var(--text-muted); margin-top:8px; line-height:1.5; }
 
 /* KPI */
 .kpi-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(145px,1fr)); gap:12px; margin-bottom:24px; }
@@ -696,66 +702,68 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
 .panel-backdrop.open { opacity:1; pointer-events:auto; }
 .settings-panel {
   position:fixed; top:0; right:-620px; bottom:0; width:600px; max-width:92vw;
-  background:linear-gradient(180deg, #1a0a0e 0%, #2d1018 100%);
-  border-left:1px solid var(--border-hover); z-index:201;
+  background:linear-gradient(180deg, #FAF6ED 0%, #F5EFE0 100%);
+  border-left:1px solid rgba(212,175,55,0.3); z-index:201;
   overflow-y:auto; transition:right 0.35s cubic-bezier(0.4,0,0.2,1);
-  box-shadow:-20px 0 60px rgba(0,0,0,0.5);
+  box-shadow:-20px 0 60px rgba(114,47,55,0.18);
 }
 .settings-panel.open { right:0; }
 .panel-header {
   position:sticky; top:0; z-index:5;
-  background:linear-gradient(180deg, rgba(26,10,14,0.98), rgba(26,10,14,0.92));
-  backdrop-filter:blur(12px);
-  padding:20px 24px; border-bottom:1px solid var(--border);
+  background:linear-gradient(180deg, rgba(255,254,248,0.98), rgba(250,246,237,0.94));
+  backdrop-filter:blur(14px);
+  padding:20px 24px; border-bottom:1px solid rgba(212,175,55,0.3);
   display:flex; justify-content:space-between; align-items:center; gap:16px;
+  box-shadow:0 3px 12px rgba(114,47,55,0.06);
 }
 .panel-title {
-  font-family:var(--font-heading); font-size:1rem; font-weight:700;
-  color:var(--gold-light); letter-spacing:1px; display:flex; align-items:center; gap:10px;
+  font-family:'Sarabun','Anuphan',sans-serif; font-size:1rem; font-weight:700;
+  color:var(--text-dark); letter-spacing:0.02em; display:flex; align-items:center; gap:10px;
 }
 .panel-title::before {
   content:''; width:4px; height:22px;
-  background:linear-gradient(180deg, var(--accent), var(--orange));
+  background:linear-gradient(180deg, var(--burgundy), var(--gold));
   border-radius:2px;
 }
 .panel-close {
   width:36px; height:36px; border-radius:50%; border:1px solid var(--border);
-  background:var(--bg-glass); color:var(--text-main);
+  background:var(--cream-card); color:var(--text-dark);
   cursor:pointer; font-size:1.1rem;
   display:flex; align-items:center; justify-content:center;
   transition:all 0.2s ease;
+  box-shadow:0 2px 6px rgba(114,47,55,0.06);
 }
-.panel-close:hover { background:rgba(217,95,95,0.15); border-color:var(--red); color:var(--red); }
+.panel-close:hover { background:rgba(193,69,69,0.08); border-color:var(--red); color:var(--red); }
 .panel-body { padding:20px 24px 120px; }
 .panel-footer {
   position:sticky; bottom:0; z-index:5;
-  background:linear-gradient(0deg, rgba(26,10,14,1) 60%, rgba(26,10,14,0.85));
-  backdrop-filter:blur(12px);
-  padding:16px 24px; border-top:1px solid var(--border);
+  background:linear-gradient(0deg, rgba(250,246,237,1) 60%, rgba(250,246,237,0.88));
+  backdrop-filter:blur(14px);
+  padding:16px 24px; border-top:1px solid rgba(212,175,55,0.3);
   display:flex; gap:12px;
+  box-shadow:0 -3px 12px rgba(114,47,55,0.06);
 }
 .btn-run-backtest {
   flex:1; padding:14px 20px; border-radius:var(--radius-sm); border:none;
-  background:linear-gradient(135deg, var(--accent), var(--gold-deep));
-  color:var(--bg); font-family:var(--font-heading); font-size:0.9rem;
-  font-weight:800; letter-spacing:1.5px; cursor:pointer;
+  background:linear-gradient(135deg, #722F37 0%, #8B2252 55%, #D4AF37 100%);
+  color:#FFF5E1; font-family:'Sarabun','Anuphan',sans-serif; font-size:0.95rem;
+  font-weight:700; letter-spacing:0.5px; cursor:pointer;
   transition:all 0.25s ease;
-  box-shadow:0 4px 20px rgba(212,175,55,0.35);
+  box-shadow:0 4px 16px rgba(139,34,82,0.3);
   display:flex; align-items:center; justify-content:center; gap:10px;
-  text-transform:uppercase;
 }
 .btn-run-backtest:hover {
   transform:translateY(-2px);
-  box-shadow:0 8px 28px rgba(212,175,55,0.5);
+  box-shadow:0 8px 24px rgba(139,34,82,0.4);
 }
 .btn-run-backtest:active { transform:translateY(0); }
 .btn-cancel {
   padding:14px 22px; border-radius:var(--radius-sm);
-  background:var(--bg-glass); border:1px solid var(--border); color:var(--text-main);
-  font-family:var(--font-heading); font-size:0.82rem; font-weight:600;
-  letter-spacing:1px; cursor:pointer; transition:all 0.2s ease;
+  background:var(--cream-card); border:1px solid var(--border); color:var(--text-muted);
+  font-family:'Sarabun','Anuphan',sans-serif; font-size:0.88rem; font-weight:600;
+  letter-spacing:0.3px; cursor:pointer; transition:all 0.2s ease;
 }
-.btn-cancel:hover { background:rgba(217,95,95,0.08); border-color:var(--red); color:var(--red); }
+.btn-cancel:hover { background:rgba(193,69,69,0.06); border-color:var(--red); color:var(--red); }
 
 /* ===== ABOUT MODAL ===== */
 .about-modal {
@@ -920,13 +928,7 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
     <!-- KPI -->
     <div class="kpi-grid">
       <div class="card kpi-card">
-        <div>
-          <div class="kpi-title">CAPITAL PER ROUND</div>
-          <div class="input-wrapper-kpi">
-            <span style="color:var(--text-dark)">$</span>
-            <input type="number" id="capitalInput" class="kpi-input" value="100" step="100">
-          </div>
-        </div>
+        <div><div class="kpi-title">CAPITAL PER ROUND</div><div class="kpi-value" id="kpi-capital-display">$100</div></div>
         <div class="kpi-sub" id="capitalSub">Per strategy per round</div>
       </div>
       <div class="card kpi-card">
@@ -1131,205 +1133,287 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
     <button class="panel-close" onclick="closeSettingsPanel()" aria-label="ปิด">✕</button>
   </div>
   <div class="panel-body">
-      <!-- Allocation Mode -->
-      <div class="control-group" style="margin-bottom:18px;">
-        <label>CAPITAL ALLOCATION MODE</label>
+
+      <!-- ════════ CAPITAL ════════ -->
+      <div class="section-label combined"><span>💰 เงินทุน</span><div class="line"></div></div>
+
+      <div class="control-group">
+        <label>งบทุนต่อรอบ (Capital per Round)</label>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="color:var(--text-muted);font-weight:600;font-size:0.95rem;font-family:var(--font-number);">$</span>
+          <input type="number" id="capitalInput" class="input-box" value="100" step="100" style="text-align:left;padding-left:14px;">
+        </div>
+        <span class="hint">จำนวนเงินที่ลงทุนต่อ <strong>1 รอบ</strong> (1 รอบ = 1 สัปดาห์) ใช้ตัวเลขเล็ก ๆ เช่น $100 เพื่อวัด ROI บน margin ทดสอบ หรือเปลี่ยนเป็น $10,000 เพื่อประมาณกำไรจริง</span>
+      </div>
+
+      <div class="control-group">
+        <label>รูปแบบการแบ่งงบ (Allocation Mode)</label>
         <div class="alloc-toggle">
-          <button class="alloc-btn" onclick="setAllocMode('split')">MODE A: แยกงบ</button>
-          <button class="alloc-btn active" onclick="setAllocMode('dynamic')">MODE B: งบเดียว ปรับสัดส่วน</button>
+          <button class="alloc-btn" onclick="setAllocMode('split')">A — แยกงบ 2 กระเป๋า</button>
+          <button class="alloc-btn active" onclick="setAllocMode('dynamic')">B — งบเดียว ปรับสัดส่วน</button>
         </div>
         <div class="alloc-detail" id="allocDetail"></div>
-        <!-- Mode B Dynamic Sliders -->
+        <span class="hint"><strong>A:</strong> Momentum และ Dark Horse มีงบคนละกระเป๋า ลงพร้อมกันได้เต็มทั้งคู่ · <strong>B:</strong> มีงบรวมก้อนเดียว แบ่งสัดส่วนให้ 2 กลยุทธ์ตามภาวะตลาด (ต้องเปิด Regime Filter ด้วย)</span>
+
+        <!-- Mode B Dynamic Dropdowns -->
         <div id="dynamicAllocPanel" style="margin-top:12px;">
-          <div class="threshold-box" style="background:linear-gradient(135deg, rgba(212,175,55,0.06), rgba(200,90,74,0.06)); border-color:rgba(212,175,55,0.2);">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-              <!-- Bull Market Allocation -->
-              <div>
-                <div class="threshold-labels">
-                  <div class="threshold-label" style="color:var(--green);"><span class="dot" style="background:var(--green);"></span>BULL MARKET (Price > EMA)</div>
-                </div>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
-                  <span style="font-size:0.72rem;color:var(--accent);font-weight:700;">MOM</span>
-                  <div class="threshold-val" style="color:var(--accent);" id="bullMomDisp">10%</div>
-                  <span style="font-size:0.72rem;color:var(--text-dark);">:</span>
-                  <div class="threshold-val" style="color:var(--orange);" id="bullDhDisp">90%</div>
-                  <span style="font-size:0.72rem;color:var(--orange);font-weight:700;">DH</span>
-                </div>
-                <input type="range" id="bullMomSlider" min="0" max="100" step="10" value="10" style="margin-top:6px;">
-              </div>
-              <!-- Sideways / Dip Allocation -->
-              <div>
-                <div class="threshold-labels">
-                  <div class="threshold-label" style="color:var(--purple);"><span class="dot" style="background:var(--purple);"></span>SIDEWAYS / DIP (Price ≤ EMA)</div>
-                </div>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
-                  <span style="font-size:0.72rem;color:var(--accent);font-weight:700;">MOM</span>
-                  <div class="threshold-val" style="color:var(--accent);" id="sideMomDisp">30%</div>
-                  <span style="font-size:0.72rem;color:var(--text-dark);">:</span>
-                  <div class="threshold-val" style="color:var(--orange);" id="sideDhDisp">70%</div>
-                  <span style="font-size:0.72rem;color:var(--orange);font-weight:700;">DH</span>
-                </div>
-                <input type="range" id="sideMomSlider" min="0" max="100" step="10" value="30" style="margin-top:6px;">
-              </div>
-            </div>
-            <div style="font-size:0.7rem;color:var(--text-dark);margin-top:10px;font-style:italic;">งบรวม $<span id="dynCapDisp">100</span> ต่อสัปดาห์ — จัดสัดส่วน Momentum : Dark Horse ตาม regime ของตลาด (ต้องเปิด Regime Filter ด้วย)</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Momentum Controls -->
-      <div class="section-label mom"><span>MOMENTUM SETTINGS</span><div class="line"></div></div>
-      <div class="controls-grid">
-        <div class="control-group">
-          <label>PORTFOLIO SIZE</label>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="color:var(--text-muted);font-weight:600;font-size:0.82rem;">TOP</span>
-            <input type="number" id="momTopN" class="input-box" value="5" min="1" max="50">
-            <span style="color:var(--text-muted);font-weight:600;font-size:0.82rem;">STOCKS</span>
-          </div>
-        </div>
-        <div class="control-group">
-          <label>HOLDING PERIOD</label>
-          <select id="momHoldWeeks" class="input-box">
-            <option value="1">1 Week</option>
-            <option value="2">2 Weeks</option>
-            <option value="3">3 Weeks</option>
-            <option value="4" selected>4 Weeks</option>
-            <option value="5">5 Weeks</option>
-            <option value="6">6 Weeks</option>
-            <option value="8">8 Weeks</option>
-            <option value="10">10 Weeks</option>
-            <option value="12">12 Weeks</option>
-            <option value="15">15 Weeks</option>
-          </select>
-        </div>
-        <div class="control-group">
-          <label>ROC LOOKBACK</label>
-          <select id="momRocLookback" class="input-box">
-            <option value="8" selected>8 Weeks</option>
-            <option value="12">12 Weeks</option>
-            <option value="16">16 Weeks</option>
-            <option value="20">20 Weeks</option>
-          </select>
-        </div>
-        <div class="control-group">
-          <label>RSI CEILING</label>
-          <input type="number" id="momRsiCeiling" class="input-box" value="80" min="50" max="100">
-        </div>
-      </div>
-
-      <!-- Dark Horse Controls -->
-      <div class="section-label dh"><span>DARK HORSE SETTINGS</span><div class="line"></div></div>
-      <div class="controls-grid">
-        <div class="control-group">
-          <label>MAX PICKS / ROUND</label>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="color:var(--text-muted);font-weight:600;font-size:0.82rem;">TOP</span>
-            <input type="number" id="dhTopN" class="input-box" value="10" min="1" max="30">
-            <span style="color:var(--text-muted);font-weight:600;font-size:0.82rem;">STOCKS</span>
-          </div>
-        </div>
-        <div class="control-group">
-          <label>HOLDING PERIOD</label>
-          <select id="dhHoldWeeks" class="input-box" style="border-color:rgba(200,90,74,0.3);">
-            <option value="1">1 Week</option>
-            <option value="2">2 Weeks</option>
-            <option value="3">3 Weeks</option>
-            <option value="4" selected>4 Weeks</option>
-            <option value="5">5 Weeks</option>
-            <option value="6">6 Weeks</option>
-            <option value="8">8 Weeks</option>
-            <option value="10">10 Weeks</option>
-            <option value="12">12 Weeks</option>
-            <option value="15">15 Weeks</option>
-          </select>
-        </div>
-        <div class="control-group" style="grid-column:span 3;">
-          <label>DARK HORSE FILTERS</label>
-          <div class="threshold-box">
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
-              <div>
-                <div class="threshold-labels">
-                  <div class="threshold-label" style="color:var(--orange);"><span class="dot" style="background:var(--orange);"></span>MIN 5D RETURN</div>
-                  <div class="threshold-val" style="color:var(--orange);" id="minRetDisp">2%</div>
-                </div>
-                <input type="range" id="minRetSlider" min="2" max="30" step="1" value="2" style="margin-top:6px;">
-              </div>
-              <div>
-                <div class="threshold-labels">
-                  <div class="threshold-label" style="color:var(--purple);"><span class="dot" style="background:var(--purple);"></span>VOL SURGE (×)</div>
-                  <div class="threshold-val" style="color:var(--purple);" id="volSurgeDisp">2.5×</div>
-                </div>
-                <input type="range" id="volSurgeSlider" min="10" max="60" step="5" value="25" style="margin-top:6px;">
-              </div>
-              <div>
-                <div class="threshold-labels">
-                  <div class="threshold-label" style="color:var(--blue);"><span class="dot" style="background:var(--blue);"></span>OBSCURITY (WKS)</div>
-                  <div class="threshold-val" style="color:var(--blue);" id="obscurityDisp">4w</div>
-                </div>
-                <input type="range" id="obscuritySlider" min="4" max="20" step="1" value="4" style="margin-top:6px;">
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="control-group" style="grid-column:span 3;">
-          <label>OBSCURITY THRESHOLD — WAS OUTSIDE TOP N RANK</label>
-          <div class="threshold-box" style="background:linear-gradient(135deg, rgba(96,165,250,0.06), rgba(167,139,250,0.06)); border-color:rgba(96,165,250,0.2);">
+          <div class="threshold-box" style="background:linear-gradient(135deg, rgba(46,159,95,0.06), rgba(212,175,55,0.06));">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
               <div>
-                <div class="threshold-labels">
-                  <div class="threshold-label" style="color:var(--blue);"><span class="dot" style="background:var(--blue);"></span>MUST HAVE BEEN OUTSIDE TOP</div>
-                  <div class="threshold-val" style="color:var(--blue);" id="rankOutDisp">30</div>
-                </div>
-                <input type="range" id="rankOutSlider" min="30" max="300" step="10" value="30" style="margin-top:6px;">
+                <div class="threshold-label" style="color:var(--green);margin-bottom:8px;"><span class="dot" style="background:var(--green);"></span>ตลาด BULL (Price &gt; EMA)</div>
+                <select id="bullMomSelect" class="input-box">
+                  <option value="0">Mom 0% : DH 100%</option>
+                  <option value="10" selected>Mom 10% : DH 90%</option>
+                  <option value="20">Mom 20% : DH 80%</option>
+                  <option value="30">Mom 30% : DH 70%</option>
+                  <option value="40">Mom 40% : DH 60%</option>
+                  <option value="50">Mom 50% : DH 50%</option>
+                  <option value="60">Mom 60% : DH 40%</option>
+                  <option value="70">Mom 70% : DH 30%</option>
+                  <option value="80">Mom 80% : DH 20%</option>
+                  <option value="90">Mom 90% : DH 10%</option>
+                  <option value="100">Mom 100% : DH 0%</option>
+                </select>
               </div>
               <div>
-                <div class="threshold-labels">
-                  <div class="threshold-label" style="color:var(--green);"><span class="dot" style="background:var(--green);"></span>NOW MUST BE IN TOP</div>
-                  <div class="threshold-val" style="color:var(--green);" id="rankInDisp">10</div>
-                </div>
-                <input type="range" id="rankInSlider" min="10" max="150" step="5" value="10" style="margin-top:6px;">
+                <div class="threshold-label" style="color:var(--burgundy);margin-bottom:8px;"><span class="dot" style="background:var(--burgundy);"></span>ตลาด SIDEWAYS / DIP</div>
+                <select id="sideMomSelect" class="input-box">
+                  <option value="0">Mom 0% : DH 100%</option>
+                  <option value="10">Mom 10% : DH 90%</option>
+                  <option value="20">Mom 20% : DH 80%</option>
+                  <option value="30" selected>Mom 30% : DH 70%</option>
+                  <option value="40">Mom 40% : DH 60%</option>
+                  <option value="50">Mom 50% : DH 50%</option>
+                  <option value="60">Mom 60% : DH 40%</option>
+                  <option value="70">Mom 70% : DH 30%</option>
+                  <option value="80">Mom 80% : DH 20%</option>
+                  <option value="90">Mom 90% : DH 10%</option>
+                  <option value="100">Mom 100% : DH 0%</option>
+                </select>
               </div>
             </div>
+            <span class="hint" style="margin-top:10px;display:block;">งบรวม <strong>$<span id="dynCapDisp">100</span></strong>/สัปดาห์ — ช่วงตลาดขาขึ้นเน้น Dark Horse มากกว่า เพราะหุ้นเงียบมีโอกาสโผล่ได้แรง · ช่วงตลาด sideways เน้น Momentum เพราะสัญญาณชัดกว่า</span>
           </div>
         </div>
       </div>
 
-      <!-- Shared Controls -->
-      <div class="section-label combined"><span>SHARED SETTINGS</span><div class="line"></div></div>
+      <!-- ════════ MOMENTUM ════════ -->
+      <div class="section-label mom"><span>📈 Momentum — หุ้นวิ่งแรง</span><div class="line"></div></div>
+
       <div class="controls-grid">
         <div class="control-group">
-          <label>START YEAR</label>
-          <select id="startYearSelect" class="input-box"><option value="2022">2022</option></select>
+          <label>จำนวนหุ้นต่อรอบ (Portfolio Size)</label>
+          <select id="momTopN" class="input-box">
+            <option value="1">Top 1 ตัว</option>
+            <option value="2">Top 2 ตัว</option>
+            <option value="3">Top 3 ตัว</option>
+            <option value="5" selected>Top 5 ตัว</option>
+            <option value="7">Top 7 ตัว</option>
+            <option value="10">Top 10 ตัว</option>
+            <option value="15">Top 15 ตัว</option>
+            <option value="20">Top 20 ตัว</option>
+          </select>
+          <span class="hint">ซื้อหุ้น <strong>อันดับ Top N</strong> จากการจัดอันดับ Momentum · น้อยตัว = เสี่ยงกระจุก แต่กำไรตัวเดียววิ่งจะหนัก · เยอะตัว = กระจายความเสี่ยงแต่ผลตอบแทนเจือจาง</span>
         </div>
+
         <div class="control-group">
-          <label>PER STOCK STOPLOSS</label>
-          <div class="threshold-box" style="background:linear-gradient(135deg, rgba(217,95,95,0.06), rgba(200,90,74,0.04)); border-color:rgba(217,95,95,0.2);">
-            <div class="threshold-labels">
-              <div class="threshold-label" style="color:var(--red);"><span class="dot" style="background:var(--red);"></span>SL (BOTH STRATEGIES)</div>
-              <div class="threshold-val" style="color:var(--red);" id="stoplossDisp">-15%</div>
-            </div>
-            <input type="range" id="stoplossSlider" min="0" max="30" step="1" value="15" style="margin-top:6px;">
-            <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--text-dark);margin-top:4px;">
-              <span>OFF</span><span>-5%</span><span>-10%</span><span>-15%</span><span>-20%</span><span>-30%</span>
-            </div>
-          </div>
+          <label>ระยะเวลาถือ (Holding Period)</label>
+          <select id="momHoldWeeks" class="input-box">
+            <option value="1">1 สัปดาห์</option>
+            <option value="2">2 สัปดาห์</option>
+            <option value="3">3 สัปดาห์</option>
+            <option value="4" selected>4 สัปดาห์</option>
+            <option value="5">5 สัปดาห์</option>
+            <option value="6">6 สัปดาห์</option>
+            <option value="8">8 สัปดาห์</option>
+            <option value="10">10 สัปดาห์</option>
+            <option value="12">12 สัปดาห์</option>
+            <option value="15">15 สัปดาห์</option>
+          </select>
+          <span class="hint">ถือหุ้นนานกี่สัปดาห์ก่อนขาย · สั้น (1-3W) = เทรดบ่อย ตามแรงส่งต้น · ยาว (8W+) = ให้เทรนด์วิ่งเต็ม แต่เสี่ยงเจอ reversal</span>
         </div>
-        <div class="control-group" style="grid-column:span 2;">
-          <label>MARKET REGIME FILTER (BOTH STRATEGIES)</label>
-          <div class="regime-filter-box off" id="regimeBox">
-            <div class="regime-header">
-              <span class="regime-status off" id="regimeStatus">● OFF</span>
-              <span class="regime-value off" id="regimeValue">No Filter</span>
-            </div>
-            <input type="range" id="regimeSlider" min="0" max="30" step="1" value="0">
-            <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--text-dark);margin-top:4px;">
-              <span>OFF</span><span>4W</span><span>10W</span><span>16W</span><span>20W</span><span>30W</span>
-            </div>
-            <div class="regime-hint" id="regimeHint">Buy every week regardless of market condition</div>
-          </div>
+
+        <div class="control-group">
+          <label>ROC Lookback (ดูราคาย้อนหลัง)</label>
+          <select id="momRocLookback" class="input-box">
+            <option value="4">4 สัปดาห์ (~1 เดือน)</option>
+            <option value="8" selected>8 สัปดาห์ (~2 เดือน)</option>
+            <option value="12">12 สัปดาห์ (~3 เดือน)</option>
+            <option value="16">16 สัปดาห์ (~4 เดือน)</option>
+            <option value="20">20 สัปดาห์ (~5 เดือน)</option>
+            <option value="26">26 สัปดาห์ (~6 เดือน)</option>
+          </select>
+          <span class="hint">จัดอันดับหุ้นด้วย <strong>Rate of Change</strong> (ROC) เทียบราคาปัจจุบันกับราคาในอดีต · ช่วงสั้นจับแรงวิ่งเร็ว · ช่วงยาวจับเทรนด์มั่นคง</span>
+        </div>
+
+        <div class="control-group">
+          <label>RSI Ceiling (กันซื้อจุดสูง)</label>
+          <select id="momRsiCeiling" class="input-box">
+            <option value="60">60 (ปลอดภัยมาก)</option>
+            <option value="70">70 (ปานกลาง)</option>
+            <option value="75">75</option>
+            <option value="80" selected>80 (ค่าเริ่มต้น)</option>
+            <option value="85">85</option>
+            <option value="90">90 (ผ่อนปรน)</option>
+            <option value="100">ปิดเงื่อนไขนี้</option>
+          </select>
+          <span class="hint">ข้ามหุ้นที่ RSI สูงกว่านี้ เพื่อกันซื้อหุ้น <strong>overbought</strong> (ร้อนเกิน) · ต่ำกว่า = กรองเข้มขึ้น จำนวนหุ้นน้อยลง · สูงกว่า = ยอมรับหุ้นที่ร้อนแรงได้</span>
         </div>
       </div>
+
+      <!-- ════════ DARK HORSE ════════ -->
+      <div class="section-label dh"><span>🐎 Dark Horse — หุ้นม้ามืด</span><div class="line"></div></div>
+
+      <div class="controls-grid">
+        <div class="control-group">
+          <label>จำนวนหุ้นสูงสุดต่อรอบ</label>
+          <select id="dhTopN" class="input-box">
+            <option value="1">1 ตัว</option>
+            <option value="3">3 ตัว</option>
+            <option value="5">5 ตัว</option>
+            <option value="7">7 ตัว</option>
+            <option value="10" selected>10 ตัว</option>
+            <option value="15">15 ตัว</option>
+            <option value="20">20 ตัว</option>
+            <option value="30">30 ตัว</option>
+          </select>
+          <span class="hint">จำนวน Dark Horse สูงสุดที่จะซื้อในรอบเดียว (ถ้ามีสัญญาณไม่ถึง จะซื้อเท่าที่มี) · ม้ามืดเกิดน้อย แต่วิ่งแรง — ถือหลายตัวเพื่อกระจายความเสี่ยง</span>
+        </div>
+
+        <div class="control-group">
+          <label>ระยะเวลาถือ (Holding Period)</label>
+          <select id="dhHoldWeeks" class="input-box">
+            <option value="1">1 สัปดาห์</option>
+            <option value="2">2 สัปดาห์</option>
+            <option value="3">3 สัปดาห์</option>
+            <option value="4" selected>4 สัปดาห์</option>
+            <option value="5">5 สัปดาห์</option>
+            <option value="6">6 สัปดาห์</option>
+            <option value="8">8 สัปดาห์</option>
+            <option value="10">10 สัปดาห์</option>
+            <option value="12">12 สัปดาห์</option>
+            <option value="15">15 สัปดาห์</option>
+          </select>
+          <span class="hint">ถือ Dark Horse นานแค่ไหน · หุ้นม้ามืดมักวิ่งแรงในช่วง 1-2 เดือนแรกแล้วอาจย่อ · ยาวเกินอาจทำให้กำไรลดลง</span>
+        </div>
+
+        <div class="control-group">
+          <label>Min 5-Day Return (แรงวิ่ง 5 วัน)</label>
+          <select id="minRetSelect" class="input-box">
+            <option value="2" selected>2% ขึ้นไป (ผ่อนปรน)</option>
+            <option value="3">3% ขึ้นไป</option>
+            <option value="5">5% ขึ้นไป</option>
+            <option value="7">7% ขึ้นไป</option>
+            <option value="10">10% ขึ้นไป</option>
+            <option value="15">15% ขึ้นไป (เข้ม)</option>
+            <option value="20">20% ขึ้นไป (เข้มมาก)</option>
+          </select>
+          <span class="hint">หุ้นต้องวิ่งอย่างน้อยกี่ % ใน <strong>5 วันทำการล่าสุด</strong> ถึงจะเข้าข่าย · ค่าต่ำ = เจอสัญญาณเยอะแต่คละคุณภาพ · ค่าสูง = เจอน้อยแต่คัดมา</span>
+        </div>
+
+        <div class="control-group">
+          <label>Volume Surge (ปริมาณเทรดพุ่ง)</label>
+          <select id="volSurgeSelect" class="input-box">
+            <option value="15">1.5× ค่าเฉลี่ย</option>
+            <option value="20">2.0× ค่าเฉลี่ย</option>
+            <option value="25" selected>2.5× ค่าเฉลี่ย (ค่าเริ่มต้น)</option>
+            <option value="30">3.0× ค่าเฉลี่ย</option>
+            <option value="40">4.0× ค่าเฉลี่ย</option>
+            <option value="50">5.0× ค่าเฉลี่ย (เข้ม)</option>
+            <option value="60">6.0× ค่าเฉลี่ย</option>
+          </select>
+          <span class="hint">Volume สัปดาห์ล่าสุดต้องสูงกว่าค่าเฉลี่ยกี่เท่า · เป็นเครื่องยืนยันว่ามีเงินรายใหญ่กำลังเข้าจริง ไม่ใช่แค่รายย่อยไล่ราคา</span>
+        </div>
+
+        <div class="control-group">
+          <label>Obscurity Period (ช่วง "เงียบ")</label>
+          <select id="obscuritySelect" class="input-box">
+            <option value="4" selected>4 สัปดาห์ (~1 เดือน)</option>
+            <option value="6">6 สัปดาห์</option>
+            <option value="8">8 สัปดาห์ (~2 เดือน)</option>
+            <option value="12">12 สัปดาห์ (~3 เดือน)</option>
+            <option value="16">16 สัปดาห์ (~4 เดือน)</option>
+            <option value="20">20 สัปดาห์ (~5 เดือน)</option>
+          </select>
+          <span class="hint">หุ้นต้อง "เงียบ" มาอย่างน้อยกี่สัปดาห์ก่อนจะโผล่ · ช่วงยาว = สัญญาณจริงเป็นการเปลี่ยนแปลงพื้นฐาน · ช่วงสั้น = อาจเป็นแค่ bounce ชั่วคราว</span>
+        </div>
+
+        <div class="control-group">
+          <label>"เงียบ" หมายถึงอยู่นอก Top N</label>
+          <select id="rankOutSelect" class="input-box">
+            <option value="30" selected>นอก Top 30</option>
+            <option value="50">นอก Top 50</option>
+            <option value="75">นอก Top 75</option>
+            <option value="100">นอก Top 100</option>
+            <option value="150">นอก Top 150</option>
+            <option value="200">นอก Top 200</option>
+            <option value="300">นอก Top 300</option>
+          </select>
+          <span class="hint">ในช่วง Obscurity Period ด้านบน หุ้นต้องเคยอยู่ <strong>นอก Top N</strong> (ไม่ใช่ผู้นำตลาด) · ยิ่ง N เล็ก = เข้มขึ้น หุ้นต้องยิ่งเงียบ</span>
+        </div>
+
+        <div class="control-group">
+          <label>ตอนนี้ต้องโผล่เข้า Top N</label>
+          <select id="rankInSelect" class="input-box">
+            <option value="10" selected>Top 10 (โผล่แรง)</option>
+            <option value="20">Top 20</option>
+            <option value="30">Top 30</option>
+            <option value="50">Top 50</option>
+            <option value="75">Top 75</option>
+            <option value="100">Top 100</option>
+            <option value="150">Top 150</option>
+          </select>
+          <span class="hint">สัปดาห์ปัจจุบัน หุ้นต้องขึ้นมาอยู่ใน <strong>Top N</strong> ของ Momentum · ยิ่ง N เล็ก = เข้มขึ้น ต้องโผล่แรงจริง ๆ ถึงจะนับ</span>
+        </div>
+      </div>
+
+      <!-- ════════ SHARED ════════ -->
+      <div class="section-label combined"><span>🛡️ ความปลอดภัยและขอบเขต</span><div class="line"></div></div>
+
+      <div class="controls-grid">
+        <div class="control-group">
+          <label>ปีเริ่มต้นของการแบ็คเทส</label>
+          <select id="startYearSelect" class="input-box"><option value="2021">2021</option></select>
+          <span class="hint">แบ็คเทสตั้งแต่ปีนี้จนถึงปัจจุบัน · ยิ่งเริ่มเก่า = ข้อมูลเยอะ แต่สภาพตลาดอาจเปลี่ยน · เริ่มใกล้ = สะท้อนสภาพตลาดปัจจุบันมากกว่า</span>
+        </div>
+
+        <div class="control-group">
+          <label>Stoploss ต่อหุ้น (Per Stock SL)</label>
+          <select id="stoplossSelect" class="input-box">
+            <option value="0">ปิด (ไม่ใช้ SL)</option>
+            <option value="5">-5% (เข้มมาก)</option>
+            <option value="8">-8%</option>
+            <option value="10">-10%</option>
+            <option value="12">-12%</option>
+            <option value="15" selected>-15% (ค่าเริ่มต้น)</option>
+            <option value="20">-20%</option>
+            <option value="25">-25%</option>
+            <option value="30">-30% (ผ่อนปรน)</option>
+          </select>
+          <span class="hint">ถ้าหุ้นตัวไหนลบมากกว่านี้ระหว่างถือ → <strong>ขายตัวนั้นทันที</strong>ที่ Open วันถัดไป (ตัวอื่น ๆ ในพอร์ตถือต่อ) · เข้ม = ตัดขาดทุนเร็ว แต่อาจโดน whipsaw · ผ่อน = ให้โอกาสเด้งกลับ</span>
+        </div>
+
+        <div class="control-group" style="grid-column:span 2;">
+          <label>Market Regime Filter</label>
+          <select id="regimeSelect" class="input-box">
+            <option value="0" selected>ปิด — เทรดทุกสัปดาห์</option>
+            <option value="4">EMA 4W (ตามเทรนด์สั้น)</option>
+            <option value="10">EMA 10W</option>
+            <option value="16">EMA 16W</option>
+            <option value="20">EMA 20W</option>
+            <option value="30">EMA 30W (ตามเทรนด์ยาว)</option>
+          </select>
+          <div class="regime-filter-box off" id="regimeBox" style="margin-top:10px;">
+            <div class="regime-header">
+              <span class="regime-status off" id="regimeStatus">● ปิด</span>
+              <span class="regime-value off" id="regimeValue">ไม่กรอง</span>
+            </div>
+            <div class="regime-hint" id="regimeHint">ซื้อทุกสัปดาห์ที่มีสัญญาณ โดยไม่สนว่าตลาดรวมเป็นอย่างไร</div>
+          </div>
+          <span class="hint">เปิด Filter นี้จะ <strong>ข้ามรอบ</strong>สัปดาห์ที่ SPY ต่ำกว่า EMA ระยะที่เลือก (ตลาดขาลง) · ช่วยหลีกเลี่ยงช่วงตลาดหมี แต่ทำให้ trade น้อยลงและอาจพลาด rebound</span>
+        </div>
+      </div>
+
   </div>
   <div class="panel-footer">
     <button class="btn-cancel" onclick="closeSettingsPanel()">ยกเลิก</button>
@@ -1536,44 +1620,43 @@ function updateOwlProgress(pct) {
 
 // Bind all controls
 ['momTopN','momHoldWeeks','momRocLookback','momRsiCeiling',
- 'dhTopN','startYearSelect','capitalInput','regimeSlider','stoplossSlider'].forEach(id => {
+ 'dhTopN','startYearSelect','capitalInput','regimeSelect','stoplossSelect'].forEach(id => {
   const e = document.getElementById(id);
   e.addEventListener('change', scheduleBacktest);
   e.addEventListener('input', scheduleBacktest);
 });
 
 // DH threshold sliders
-document.getElementById('minRetSlider').addEventListener('input', function() {
+// Dark Horse dropdowns
+document.getElementById('minRetSelect').addEventListener('change', function() {
   CONFIG.dhMinReturn5D = parseInt(this.value);
-  document.getElementById('minRetDisp').textContent = CONFIG.dhMinReturn5D + '%';
   scheduleBacktest();
 });
-document.getElementById('volSurgeSlider').addEventListener('input', function() {
+document.getElementById('volSurgeSelect').addEventListener('change', function() {
   CONFIG.dhVolSurge = parseInt(this.value) / 10;
-  document.getElementById('volSurgeDisp').textContent = CONFIG.dhVolSurge.toFixed(1) + '×';
   scheduleBacktest();
 });
-document.getElementById('obscuritySlider').addEventListener('input', function() {
+document.getElementById('obscuritySelect').addEventListener('change', function() {
   CONFIG.dhObscurityWeeks = parseInt(this.value);
-  document.getElementById('obscurityDisp').textContent = CONFIG.dhObscurityWeeks + 'w';
   scheduleBacktest();
 });
-document.getElementById('rankOutSlider').addEventListener('input', function() {
+document.getElementById('rankOutSelect').addEventListener('change', function() {
   CONFIG.dhRankOutside = parseInt(this.value);
-  document.getElementById('rankOutDisp').textContent = CONFIG.dhRankOutside;
   scheduleBacktest();
 });
-document.getElementById('rankInSlider').addEventListener('input', function() {
+document.getElementById('rankInSelect').addEventListener('change', function() {
   CONFIG.dhRankNow = parseInt(this.value);
-  document.getElementById('rankInDisp').textContent = CONFIG.dhRankNow;
   scheduleBacktest();
 });
-document.getElementById('stoplossSlider').addEventListener('input', function() {
+
+// Stoploss dropdown
+document.getElementById('stoplossSelect').addEventListener('change', function() {
   CONFIG.stoploss = parseInt(this.value);
-  document.getElementById('stoplossDisp').textContent = CONFIG.stoploss === 0 ? 'OFF' : '-' + CONFIG.stoploss + '%';
-  document.getElementById('stoplossDisp').style.color = CONFIG.stoploss === 0 ? 'var(--text-muted)' : 'var(--red)';
+  scheduleBacktest();
 });
-document.getElementById('regimeSlider').addEventListener('input', function() {
+
+// Regime dropdown
+document.getElementById('regimeSelect').addEventListener('change', function() {
   const val = parseInt(this.value);
   CONFIG.regimeEma = val;
   const statusEl = document.getElementById('regimeStatus');
@@ -1581,18 +1664,21 @@ document.getElementById('regimeSlider').addEventListener('input', function() {
   const hintEl = document.getElementById('regimeHint');
   const box = document.getElementById('regimeBox');
   if(val === 0) {
-    statusEl.textContent = '● OFF'; statusEl.className = 'regime-status off';
-    valueEl.textContent = 'No Filter'; valueEl.className = 'regime-value off';
-    hintEl.textContent = 'Buy every week regardless of market condition';
+    statusEl.textContent = '● ปิด'; statusEl.className = 'regime-status off';
+    valueEl.textContent = 'ไม่กรอง'; valueEl.className = 'regime-value off';
+    hintEl.textContent = 'ซื้อทุกสัปดาห์ที่มีสัญญาณ โดยไม่สนว่าตลาดรวมเป็นอย่างไร';
     box.className = 'regime-filter-box off';
   } else {
-    statusEl.textContent = '● ON'; statusEl.className = 'regime-status on';
+    statusEl.textContent = '● เปิด'; statusEl.className = 'regime-status on';
     valueEl.textContent = 'EMA ' + val + 'W'; valueEl.className = 'regime-value';
-    hintEl.textContent = 'Skip entry when market < EMA ' + val + 'W (both strategies)';
+    hintEl.textContent = 'ข้ามรอบสัปดาห์ที่ SPY อยู่ต่ำกว่า EMA ' + val + 'W (ตลาดขาลง)';
     box.className = 'regime-filter-box active';
   }
+  scheduleBacktest();
 });
 
+// Momentum Top N (changed to select)
+document.getElementById('momTopN').addEventListener('change', scheduleBacktest);
 // DH Hold Weeks select
 document.getElementById('dhHoldWeeks').addEventListener('change', scheduleBacktest);
 
@@ -1604,7 +1690,7 @@ function setAllocMode(mode) {
   const detail = document.getElementById('allocDetail');
   const dynPanel = document.getElementById('dynamicAllocPanel');
   if(mode === 'split') {
-    detail.textContent = '$' + CONFIG.capital + ' Momentum + $' + CONFIG.capital + ' Dark Horse ลงพร้อมกันทุกสัปดาห์ที่มี signal (ทุนรวม $' + (CONFIG.capital*2) + '/สัปดาห์)';
+    detail.textContent = 'Momentum $' + CONFIG.capital + ' + Dark Horse $' + CONFIG.capital + ' ลงพร้อมกันทุกสัปดาห์ที่มีสัญญาณ (ใช้งบรวม $' + (CONFIG.capital*2) + '/สัปดาห์)';
     dynPanel.style.display = 'none';
   } else {
     detail.textContent = '';
@@ -1614,19 +1700,13 @@ function setAllocMode(mode) {
   scheduleBacktest();
 }
 
-// Dynamic allocation sliders
-document.getElementById('bullMomSlider').addEventListener('input', function() {
-  const v = parseInt(this.value);
-  CONFIG.bullMomPct = v;
-  document.getElementById('bullMomDisp').textContent = v + '%';
-  document.getElementById('bullDhDisp').textContent = (100 - v) + '%';
+// Dynamic allocation dropdowns
+document.getElementById('bullMomSelect').addEventListener('change', function() {
+  CONFIG.bullMomPct = parseInt(this.value);
   scheduleBacktest();
 });
-document.getElementById('sideMomSlider').addEventListener('input', function() {
-  const v = parseInt(this.value);
-  CONFIG.sideMomPct = v;
-  document.getElementById('sideMomDisp').textContent = v + '%';
-  document.getElementById('sideDhDisp').textContent = (100 - v) + '%';
+document.getElementById('sideMomSelect').addEventListener('change', function() {
+  CONFIG.sideMomPct = parseInt(this.value);
   scheduleBacktest();
 });
 
@@ -2291,6 +2371,8 @@ function updateKPIs() {
   const slTotal = closed.reduce((s,r) => s + (r.slHits || 0), 0);
 
   // KPI display
+  const capDisp = document.getElementById('kpi-capital-display');
+  if(capDisp) capDisp.innerText = '$' + CONFIG.capital.toLocaleString();
   document.getElementById('kpi-pnl').innerText = '$' + Math.round(totalPnl).toLocaleString();
   document.getElementById('kpi-pnl').className = 'kpi-value ' + (totalPnl>=0?'text-green':'text-red');
   document.getElementById('kpi-pnl-sub').innerText = 'Mom $' + Math.round(momPnl).toLocaleString() + ' + DH $' + Math.round(dhPnl).toLocaleString();
