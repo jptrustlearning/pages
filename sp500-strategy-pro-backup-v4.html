@@ -1068,123 +1068,6 @@
   </div>
 </div>
 
-
-
-<!-- ============================================================
-     PHASE 3: FAB + SETTINGS PANEL + ABOUT MODAL
-============================================================ -->
-
-<!-- FLOATING ACTION BUTTONS -->
-<div class="fab-stack">
-  <button class="fab fab-secondary" onclick="openAboutModal()" aria-label="เกี่ยวกับกลยุทธ์">
-    <img src="jpt-owl-line.png" alt="owl" style="width:30px;height:30px;object-fit:contain;filter:brightness(0) invert(1) drop-shadow(0 1px 2px rgba(0,0,0,0.3));">
-    <span class="fab-tooltip">เกี่ยวกับกลยุทธ์</span>
-  </button>
-  <button class="fab fab-primary" onclick="openSettingsPanel()" aria-label="ตั้งค่าแบ็คเทส">
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg>
-    <span class="fab-tooltip">ตั้งค่าแบ็คเทส</span>
-  </button>
-</div>
-
-<!-- SETTINGS PANEL BACKDROP -->
-<div id="panelBackdrop" class="panel-backdrop" onclick="closeSettingsPanel()"></div>
-
-<!-- SETTINGS SLIDE-IN PANEL -->
-<aside id="settingsPanel" class="settings-panel" aria-label="Backtest Settings">
-  <div class="panel-header">
-    <div class="panel-title">⚙️ ตั้งค่าแบ็คเทส</div>
-    <button class="panel-close" onclick="closeSettingsPanel()" aria-label="ปิด">✕</button>
-  </div>
-  <div class="panel-body">
-
-    <div class="section-label"><span>📊 การจัดอันดับหุ้น</span><div class="line"></div></div>
-
-    <!-- 1. Ranking Weight -->
-    <div class="control-group">
-      <label>RANKING WEIGHT — น้ำหนักการจัดอันดับ</label>
-      <div class="weight-wrapper">
-        <div class="weight-val w-ret">Return <span id="val-ret">50</span>%</div>
-        <div class="range-track">
-          <div class="track-fill" id="track-fill" style="width: 50%;"></div>
-          <input type="range" id="weightSlider" class="weight-slider" min="0" max="100" value="50" step="10">
-        </div>
-        <div class="weight-val w-vol">Volume <span id="val-vol">50</span>%</div>
-      </div>
-      <span class="hint">ปรับสัดส่วนระหว่าง <strong>ผลตอบแทน 6 เดือน</strong> กับ <strong>Volume</strong> ในการจัดอันดับหุ้น · ซ้ายมากขึ้น = เน้นกำไรล้วน ๆ · ขวามากขึ้น = เน้นหุ้นที่มีสภาพคล่องสูง</span>
-    </div>
-
-    <div class="section-label"><span>📦 พอร์ตการลงทุน</span><div class="line"></div></div>
-
-    <!-- 2. Portfolio Size -->
-    <div class="control-group">
-      <label>PORTFOLIO SIZE — จำนวนหุ้นต่อรอบ</label>
-      <div class="top-n-wrapper" style="display:flex; align-items:center; gap:10px;">
-        <span style="color:var(--text-muted); font-weight:600;">TOP</span>
-        <input type="number" id="topNInput" class="input-box" value="15" min="1" max="50" style="max-width:120px;">
-        <span style="color:var(--text-muted); font-weight:600;">STOCKS</span>
-      </div>
-      <span class="hint">ซื้อหุ้น <strong>อันดับ Top N</strong> จากการจัดอันดับ · น้อยตัว (5-10) = เสี่ยงกระจุก แต่กำไรตัวเดียววิ่งจะหนัก · เยอะตัว (20-30) = กระจายความเสี่ยงแต่ผลตอบแทนเจือจาง</span>
-    </div>
-
-    <!-- 3. Start Year -->
-    <div class="control-group">
-      <label>START YEAR — ปีเริ่มแบ็คเทส</label>
-      <select id="startYearSelect" class="input-box">
-        <option value="2015">2015</option>
-      </select>
-      <span class="hint">เลือกปีเริ่มทดสอบย้อนหลัง · ยิ่งนาน = data มากขึ้น แต่ต้องเจอ bear market หลายครั้ง · สั้นก็เห็นผลเฉพาะ bull regime</span>
-    </div>
-
-  </div>
-  <div class="panel-footer">
-    <button class="btn-cancel" onclick="closeSettingsPanel()">ยกเลิก</button>
-    <button class="btn-run-backtest" onclick="runBacktest(); closeSettingsPanel();">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      RUN BACKTEST
-    </button>
-  </div>
-</aside>
-
-<!-- ABOUT MODAL -->
-<div id="aboutModal" class="about-modal" onclick="if(event.target===this)closeAboutModal()">
-  <div class="about-modal-content">
-    <button class="panel-close" onclick="closeAboutModal()" aria-label="ปิด">✕</button>
-    <h2>📈 Strategy Pro V22</h2>
-    <div class="about-sub">Long-term momentum backtesting — 6-month return ranking across the S&amp;P 500 universe</div>
-
-    <div class="about-philosophy">
-      <div class="philosophy-label">Trading Philosophy</div>
-      <div class="philosophy-text">
-        <strong>กลยุทธ์โมเมนตัม 6 เดือน</strong> มุ่งเน้นหุ้นที่แสดงแนวโน้มแข็งแกร่งในระยะยาว · แทนที่จะพยายามเดาจุดกลับตัว เราปล่อยให้ <strong>ผู้ชนะวิ่งต่อ</strong> และตัดขาดทุนเมื่อ trend หายไป
-      </div>
-      <div class="philosophy-signature">Rules Over Emotions · Data-Driven</div>
-    </div>
-
-    <div class="about-pillars">
-      <div class="about-pillar ret">
-        <div class="pillar-header">
-          <span class="pillar-icon">📊</span>
-          <span class="pillar-title">RETURN</span>
-        </div>
-        <div class="pillar-subtitle">ผลตอบแทน 6 เดือน</div>
-        <div class="pillar-desc">จัดอันดับหุ้นตามผลตอบแทนในช่วง 6 เดือนที่ผ่านมา · หุ้นที่ขึ้นแรงต่อเนื่องมักจะ<strong>วิ่งต่อในระยะใกล้</strong></div>
-      </div>
-      <div class="about-pillar vol">
-        <div class="pillar-header">
-          <span class="pillar-icon">💎</span>
-          <span class="pillar-title">VOLUME</span>
-        </div>
-        <div class="pillar-subtitle">สภาพคล่องตลาด</div>
-        <div class="pillar-desc">ตัวกรองสำคัญเพื่อหลีกเลี่ยงหุ้นที่ <strong>เทรดน้อย</strong> · สภาพคล่องสูง = จุดเข้าออกดี ไม่เจอ slippage</div>
-      </div>
-    </div>
-
-    <p>กลยุทธ์นี้ <strong>Re-balance ทุกไตรมาส</strong> (ม.ค. / เม.ย. / ก.ค. / ต.ค.) โดยใช้ราคาปิดของวันสุดท้ายในเดือนก่อนหน้าเป็นสัญญาณ · ทุกครั้งที่ re-balance จะ<strong>ขายของเก่าหมด</strong>แล้ว<strong>ซื้อ Top N ใหม่</strong>ตามอันดับปัจจุบัน</p>
-
-    <p>ปรับ <strong>Ranking Weight</strong> เพื่อสร้างกลยุทธ์ที่เข้ากับสไตล์คุณ · ปรับ <strong>Portfolio Size</strong> เพื่อสมดุลระหว่างความเสี่ยงกับ upside · ปรับ <strong>Start Year</strong> เพื่อดูผลในรอบเวลาต่าง ๆ</p>
-  </div>
-</div>
-
 <script>
 // --- CONFIGURATION ---
 let CONFIG = {
@@ -2154,6 +2037,121 @@ function updateOwlProgress(pct) {
 
 </script>
 
+
+<!-- ============================================================
+     PHASE 3: FAB + SETTINGS PANEL + ABOUT MODAL
+============================================================ -->
+
+<!-- FLOATING ACTION BUTTONS -->
+<div class="fab-stack">
+  <button class="fab fab-secondary" onclick="openAboutModal()" aria-label="เกี่ยวกับกลยุทธ์">
+    <img src="jpt-owl-line.png" alt="owl" style="width:30px;height:30px;object-fit:contain;filter:brightness(0) invert(1) drop-shadow(0 1px 2px rgba(0,0,0,0.3));">
+    <span class="fab-tooltip">เกี่ยวกับกลยุทธ์</span>
+  </button>
+  <button class="fab fab-primary" onclick="openSettingsPanel()" aria-label="ตั้งค่าแบ็คเทส">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg>
+    <span class="fab-tooltip">ตั้งค่าแบ็คเทส</span>
+  </button>
+</div>
+
+<!-- SETTINGS PANEL BACKDROP -->
+<div id="panelBackdrop" class="panel-backdrop" onclick="closeSettingsPanel()"></div>
+
+<!-- SETTINGS SLIDE-IN PANEL -->
+<aside id="settingsPanel" class="settings-panel" aria-label="Backtest Settings">
+  <div class="panel-header">
+    <div class="panel-title">⚙️ ตั้งค่าแบ็คเทส</div>
+    <button class="panel-close" onclick="closeSettingsPanel()" aria-label="ปิด">✕</button>
+  </div>
+  <div class="panel-body">
+
+    <div class="section-label"><span>📊 การจัดอันดับหุ้น</span><div class="line"></div></div>
+
+    <!-- 1. Ranking Weight -->
+    <div class="control-group">
+      <label>RANKING WEIGHT — น้ำหนักการจัดอันดับ</label>
+      <div class="weight-wrapper">
+        <div class="weight-val w-ret">Return <span id="val-ret">50</span>%</div>
+        <div class="range-track">
+          <div class="track-fill" id="track-fill" style="width: 50%;"></div>
+          <input type="range" id="weightSlider" class="weight-slider" min="0" max="100" value="50" step="10">
+        </div>
+        <div class="weight-val w-vol">Volume <span id="val-vol">50</span>%</div>
+      </div>
+      <span class="hint">ปรับสัดส่วนระหว่าง <strong>ผลตอบแทน 6 เดือน</strong> กับ <strong>Volume</strong> ในการจัดอันดับหุ้น · ซ้ายมากขึ้น = เน้นกำไรล้วน ๆ · ขวามากขึ้น = เน้นหุ้นที่มีสภาพคล่องสูง</span>
+    </div>
+
+    <div class="section-label"><span>📦 พอร์ตการลงทุน</span><div class="line"></div></div>
+
+    <!-- 2. Portfolio Size -->
+    <div class="control-group">
+      <label>PORTFOLIO SIZE — จำนวนหุ้นต่อรอบ</label>
+      <div class="top-n-wrapper" style="display:flex; align-items:center; gap:10px;">
+        <span style="color:var(--text-muted); font-weight:600;">TOP</span>
+        <input type="number" id="topNInput" class="input-box" value="15" min="1" max="50" style="max-width:120px;">
+        <span style="color:var(--text-muted); font-weight:600;">STOCKS</span>
+      </div>
+      <span class="hint">ซื้อหุ้น <strong>อันดับ Top N</strong> จากการจัดอันดับ · น้อยตัว (5-10) = เสี่ยงกระจุก แต่กำไรตัวเดียววิ่งจะหนัก · เยอะตัว (20-30) = กระจายความเสี่ยงแต่ผลตอบแทนเจือจาง</span>
+    </div>
+
+    <!-- 3. Start Year -->
+    <div class="control-group">
+      <label>START YEAR — ปีเริ่มแบ็คเทส</label>
+      <select id="startYearSelect" class="input-box">
+        <option value="2015">2015</option>
+      </select>
+      <span class="hint">เลือกปีเริ่มทดสอบย้อนหลัง · ยิ่งนาน = data มากขึ้น แต่ต้องเจอ bear market หลายครั้ง · สั้นก็เห็นผลเฉพาะ bull regime</span>
+    </div>
+
+  </div>
+  <div class="panel-footer">
+    <button class="btn-cancel" onclick="closeSettingsPanel()">ยกเลิก</button>
+    <button class="btn-run-backtest" onclick="runBacktest(); closeSettingsPanel();">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      RUN BACKTEST
+    </button>
+  </div>
+</aside>
+
+<!-- ABOUT MODAL -->
+<div id="aboutModal" class="about-modal" onclick="if(event.target===this)closeAboutModal()">
+  <div class="about-modal-content">
+    <button class="panel-close" onclick="closeAboutModal()" aria-label="ปิด">✕</button>
+    <h2>📈 Strategy Pro V22</h2>
+    <div class="about-sub">Long-term momentum backtesting — 6-month return ranking across the S&amp;P 500 universe</div>
+
+    <div class="about-philosophy">
+      <div class="philosophy-label">Trading Philosophy</div>
+      <div class="philosophy-text">
+        <strong>กลยุทธ์โมเมนตัม 6 เดือน</strong> มุ่งเน้นหุ้นที่แสดงแนวโน้มแข็งแกร่งในระยะยาว · แทนที่จะพยายามเดาจุดกลับตัว เราปล่อยให้ <strong>ผู้ชนะวิ่งต่อ</strong> และตัดขาดทุนเมื่อ trend หายไป
+      </div>
+      <div class="philosophy-signature">Rules Over Emotions · Data-Driven</div>
+    </div>
+
+    <div class="about-pillars">
+      <div class="about-pillar ret">
+        <div class="pillar-header">
+          <span class="pillar-icon">📊</span>
+          <span class="pillar-title">RETURN</span>
+        </div>
+        <div class="pillar-subtitle">ผลตอบแทน 6 เดือน</div>
+        <div class="pillar-desc">จัดอันดับหุ้นตามผลตอบแทนในช่วง 6 เดือนที่ผ่านมา · หุ้นที่ขึ้นแรงต่อเนื่องมักจะ<strong>วิ่งต่อในระยะใกล้</strong></div>
+      </div>
+      <div class="about-pillar vol">
+        <div class="pillar-header">
+          <span class="pillar-icon">💎</span>
+          <span class="pillar-title">VOLUME</span>
+        </div>
+        <div class="pillar-subtitle">สภาพคล่องตลาด</div>
+        <div class="pillar-desc">ตัวกรองสำคัญเพื่อหลีกเลี่ยงหุ้นที่ <strong>เทรดน้อย</strong> · สภาพคล่องสูง = จุดเข้าออกดี ไม่เจอ slippage</div>
+      </div>
+    </div>
+
+    <p>กลยุทธ์นี้ <strong>Re-balance ทุกไตรมาส</strong> (ม.ค. / เม.ย. / ก.ค. / ต.ค.) โดยใช้ราคาปิดของวันสุดท้ายในเดือนก่อนหน้าเป็นสัญญาณ · ทุกครั้งที่ re-balance จะ<strong>ขายของเก่าหมด</strong>แล้ว<strong>ซื้อ Top N ใหม่</strong>ตามอันดับปัจจุบัน</p>
+
+    <p>ปรับ <strong>Ranking Weight</strong> เพื่อสร้างกลยุทธ์ที่เข้ากับสไตล์คุณ · ปรับ <strong>Portfolio Size</strong> เพื่อสมดุลระหว่างความเสี่ยงกับ upside · ปรับ <strong>Start Year</strong> เพื่อดูผลในรอบเวลาต่าง ๆ</p>
+  </div>
+</div>
 
 </body>
 </html>
