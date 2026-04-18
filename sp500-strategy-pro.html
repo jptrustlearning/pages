@@ -2983,7 +2983,22 @@ function renderTradeLog() {
       pnl = nextLog.equity - log.equity;
       pnlPct = log.equity > 0 ? (pnl / log.equity) * 100 : 0;
     } else {
-      stockRets = log.stocks.map(t => ({ ticker: t, ret: 0 }));
+      // === OPEN POSITION: compute UNREALIZED P&L using latest close price ===
+      const latestDate = state.sortedDates[state.sortedDates.length - 1];
+      exitDate = latestDate;  // show latest available date as "mark-to-market date"
+      stockRets = log.stocks.map(t => {
+        const entryPrice = state.marketData[log.date]?.[t]?.c;
+        const latestPrice = state.marketData[latestDate]?.[t]?.c;
+        if (entryPrice && latestPrice) {
+          const ret = (latestPrice - entryPrice) / entryPrice;
+          return { ticker: t, ret };
+        }
+        return { ticker: t, ret: 0 };
+      });
+      // Unrealized P&L: weighted by equal alloc (same as position entry)
+      const allocPerStock = log.stocks.length > 0 ? log.equity / log.stocks.length : 0;
+      pnl = stockRets.reduce((sum, s) => sum + (allocPerStock * s.ret), 0);
+      pnlPct = log.equity > 0 ? (pnl / log.equity) * 100 : 0;
     }
     return { ...log, isOpen, exitDate, pnl, pnlPct, stockRets };
   }).reverse();  // display newest first
@@ -3032,13 +3047,16 @@ function renderTradeLog() {
     card.className = 'trade-card' + (isLatest && r.isOpen ? ' latest-signal' : '');
     const retCls = r.pnl >= 0 ? 'text-green' : 'text-red';
     const allocPerStock = r.stocks.length > 0 ? r.equity / r.stocks.length : 0;
-    const holdLabel = r.isOpen ? 'open' : (r.exitDate || '—');
+    const holdLabel = r.isOpen ? ('open → ราคา ' + r.exitDate) : (r.exitDate || '—');
 
     let header = `<div class="trade-header"><div>
       <div class="trade-date">${r.date}${r.isOpen ? ' <span class="open-badge">OPEN</span>' : ''}</div>
       <div class="trade-summary">ซื้อรวม <strong>${r.stocks.length} ตัว</strong> · ใช้เงิน <strong>$${Math.round(r.equity).toLocaleString()}</strong>`;
     if (!r.isOpen) {
       header += ` · P&L: <span class="${retCls}"><strong>$${Math.round(r.pnl).toLocaleString()}</strong> (${r.pnlPct>=0?'+':''}${r.pnlPct.toFixed(2)}%)</span>`;
+    } else {
+      // OPEN position: show unrealized P&L with "ล่าสุด" label
+      header += ` · <span style="color:var(--gold-deep);font-weight:600;">ล่าสุด:</span> <span class="${retCls}"><strong>$${Math.round(r.pnl).toLocaleString()}</strong> (${r.pnlPct>=0?'+':''}${r.pnlPct.toFixed(2)}%)</span>`;
     }
     header += `</div></div></div>`;
 
