@@ -605,19 +605,22 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
 .fab:hover { transform:scale(1.08) translateY(-2px); }
 .fab:active { transform:scale(0.95); }
 .fab-primary {
-  background:linear-gradient(135deg, var(--accent), var(--gold-deep));
-  box-shadow:0 8px 24px rgba(212,175,55,0.35), 0 0 0 0 rgba(212,175,55,0.4);
+  background:linear-gradient(135deg, #722F37 0%, #8B2252 55%, #D4AF37 100%);
+  color:#FFF5E1;
+  box-shadow:0 8px 24px rgba(139,34,82,0.35), 0 0 0 0 rgba(212,175,55,0.4);
   animation:fabPulse 2.8s infinite;
 }
 @keyframes fabPulse {
-  0%, 100% { box-shadow:0 8px 24px rgba(212,175,55,0.35), 0 0 0 0 rgba(212,175,55,0.4); }
-  50% { box-shadow:0 8px 24px rgba(212,175,55,0.5), 0 0 0 12px rgba(212,175,55,0); }
+  0%, 100% { box-shadow:0 8px 24px rgba(139,34,82,0.35), 0 0 0 0 rgba(212,175,55,0.4); }
+  50% { box-shadow:0 8px 24px rgba(139,34,82,0.5), 0 0 0 12px rgba(212,175,55,0); }
 }
 .fab-secondary {
-  background:linear-gradient(135deg, var(--burgundy), var(--burgundy-light));
-  color:var(--gold-light);
-  box-shadow:0 8px 24px rgba(114,47,55,0.4);
+  background:linear-gradient(135deg, #722F37 0%, #8B2252 55%, #D4AF37 100%);
+  color:#FFF5E1;
+  box-shadow:0 8px 24px rgba(139,34,82,0.35);
 }
+.fab svg { stroke:#FFF5E1 !important; color:#FFF5E1 !important; }
+.fab-primary svg, .fab-secondary svg { filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3)); }
 .fab-tooltip {
   position:absolute; right:calc(100% + 14px); top:50%; transform:translateY(-50%);
   background:rgba(26,10,14,0.95); color:var(--gold-light);
@@ -1060,11 +1063,11 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
 <!-- ===== FLOATING ACTION BUTTONS ===== -->
 <div class="fab-stack">
   <button class="fab fab-secondary" onclick="openAboutModal()" aria-label="เกี่ยวกับกลยุทธ์">
-    <span style="font-size:1.5rem;line-height:1;">🦉</span>
+    <img src="jpt-owl-line.png" alt="owl" style="width:30px;height:30px;object-fit:contain;filter:brightness(0) invert(1) drop-shadow(0 1px 2px rgba(0,0,0,0.3));">
     <span class="fab-tooltip">เกี่ยวกับกลยุทธ์</span>
   </button>
-  <button class="fab fab-primary" onclick="openSettingsPanel()" aria-label="ตั้งค่าแบ็คเทส">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  <button class="fab fab-primary" onclick="openSettingsPanel()" aria-label="ตั้งค่าแบ็คเทส (ห้องแล็บ)">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg>
     <span class="fab-tooltip">ตั้งค่าแบ็คเทส</span>
   </button>
 </div>
