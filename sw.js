@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jptrust-member-v1';
+const CACHE_NAME = 'jptrust-member-v2';  // bumped 2026-04-18 18:45 to force-refresh stale PWA caches
 const ASSETS = [
   './',
   './member-dashboard.html',
@@ -27,7 +27,15 @@ self.addEventListener('activate', event => {
 });
 
 // Fetch — network first, fallback to cache
+// EXCEPT: news files are always fetched fresh (never cached), so new batches show immediately
 self.addEventListener('fetch', event => {
+  const url = event.request.url;
+  const isNews = url.includes('/news/') || url.includes('news-index.json');
+  if (isNews) {
+    // Always go to network for news — no cache fallback
+    event.respondWith(fetch(event.request, {cache: 'no-store'}));
+    return;
+  }
   event.respondWith(
     fetch(event.request)
       .then(response => {
