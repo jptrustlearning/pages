@@ -526,20 +526,21 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
 }
 .rsc-metric {
   background:var(--cream-card); border:1.5px solid rgba(212,175,55,0.45);
-  border-radius:var(--radius-sm); padding:14px 14px 12px;
+  border-radius:var(--radius-sm); padding:14px 14px 18px;
   transition:all 0.3s ease;
   box-shadow:0 4px 14px rgba(114,47,55,0.08), 0 1px 4px rgba(114,47,55,0.05), inset 0 0 0 1px rgba(255,255,255,0.6);
   position:relative; overflow:hidden;
+  min-height:118px;
 }
 .rsc-metric::before {
-  content:''; position:absolute; bottom:0; left:0; right:0; height:60%;
-  background:linear-gradient(180deg, transparent 0%, rgba(237,225,200,0.35) 100%);
+  content:''; position:absolute; bottom:0; left:0; right:0; height:65%;
+  background:linear-gradient(180deg, transparent 0%, rgba(232,220,192,0.6) 100%);
   pointer-events:none; border-radius:0 0 var(--radius-sm) var(--radius-sm); z-index:0;
 }
 .rsc-metric::after {
-  content:''; position:absolute; bottom:0; left:0; right:0; height:58px;
+  content:''; position:absolute; bottom:0; left:0; right:0; height:72px;
   pointer-events:none; z-index:0;
-  background:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 70' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'%3E%3Cpath d='M0,55 C20,50 40,40 70,35 C100,30 130,38 160,30 C180,25 195,32 200,28 L200,70 L0,70 Z' fill='rgba(237,228,208,0.4)'/%3E%3Cpath d='M0,60 C30,52 60,45 100,40 C140,35 170,42 200,36 L200,70 L0,70 Z' fill='rgba(237,228,208,0.3)'/%3E%3Cpath d='M0,45 C25,42 50,30 80,28 C110,26 140,35 170,22 C190,15 200,20 200,18 L200,70 L0,70 Z' fill='rgba(212,175,55,0.1)'/%3E%3Cpath d='M0,40 Q50,25 100,30 Q150,35 200,20' fill='none' stroke='rgba(212,175,55,0.18)' stroke-width='1.5'/%3E%3Cpath d='M0,50 Q60,38 120,42 Q180,46 200,35' fill='none' stroke='rgba(212,175,55,0.12)' stroke-width='1'/%3E%3C/svg%3E");
+  background:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 70' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'%3E%3Cpath d='M0,55 C20,50 40,40 70,35 C100,30 130,38 160,30 C180,25 195,32 200,28 L200,70 L0,70 Z' fill='rgba(218,195,148,0.55)'/%3E%3Cpath d='M0,60 C30,52 60,45 100,40 C140,35 170,42 200,36 L200,70 L0,70 Z' fill='rgba(232,220,192,0.85)'/%3E%3Cpath d='M0,45 C25,42 50,30 80,28 C110,26 140,35 170,22 C190,15 200,20 200,18 L200,70 L0,70 Z' fill='rgba(212,175,55,0.22)'/%3E%3Cpath d='M0,40 Q50,25 100,30 Q150,35 200,20' fill='none' stroke='rgba(184,134,11,0.4)' stroke-width='1.5'/%3E%3Cpath d='M0,50 Q60,38 120,42 Q180,46 200,35' fill='none' stroke='rgba(184,134,11,0.3)' stroke-width='1'/%3E%3C/svg%3E");
   background-size:100% 100%;
   border-radius:0 0 var(--radius-sm) var(--radius-sm);
 }
