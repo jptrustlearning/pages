@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jptrust-member-v2';  // bumped 2026-04-18 18:45 to force-refresh stale PWA caches
+const CACHE_NAME = 'jptrust-member-v3';  // bumped 2026-04-18 to force-refresh after sp500-strategy-pro luxe overhaul
 const ASSETS = [
   './',
   './member-dashboard.html',

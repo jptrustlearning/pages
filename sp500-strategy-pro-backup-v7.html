@@ -1096,6 +1096,69 @@
     color: var(--gold-deep); font-weight: 400;
   }
 
+
+  /* ============================================================
+     PHASE 4.6: Weekly-exact CSS additions
+  ============================================================ */
+
+  /* Hero color states */
+  .rsc-hero-value.positive { color: var(--green); }
+  .rsc-hero-value.negative { color: var(--red); }
+
+  /* Bench header box (เทียบผลกับตลาด) */
+  .rss-bench-header {
+    padding: 14px 18px;
+    background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(114,47,55,0.04));
+    border: 1px solid rgba(212,175,55,0.3);
+    border-radius: 12px;
+    margin-bottom: 14px;
+  }
+  .rss-bench-label {
+    font-family: 'Cinzel','Anuphan',serif;
+    font-size: 0.82rem; font-weight: 700;
+    color: var(--gold-deep);
+    letter-spacing: 2.5px; text-transform: uppercase;
+  }
+  .rss-bench-period {
+    font-family: 'Sarabun','Anuphan',sans-serif;
+    font-size: 0.78rem; color: var(--text-muted);
+    margin-top: 4px;
+  }
+  .rss-bench-note, .ma-note {
+    font-family: 'Sarabun','Anuphan',sans-serif;
+    font-size: 0.75rem; color: var(--text-muted);
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.5);
+    border-left: 2px solid var(--border);
+    border-radius: 0 8px 8px 0;
+    line-height: 1.55;
+  }
+
+  /* Global card-bottom narrative (big Thai summary) */
+  .rsc-narrative {
+    margin-top: 18px;
+    padding: 16px 18px;
+    background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(114,47,55,0.05));
+    border-left: 3px solid var(--burgundy);
+    border-radius: 0 12px 12px 0;
+    font-family: 'Sarabun','Anuphan',sans-serif;
+    font-size: 0.88rem; color: var(--text-main);
+    line-height: 1.75;
+    position: relative; z-index: 1;
+  }
+  .rsc-narrative strong { color: var(--burgundy); font-weight: 700; }
+  .rsc-narrative .text-green { color: var(--green); }
+  .rsc-narrative .text-red { color: var(--red); }
+
+  /* 2-column compare grid on mobile (Weekly keeps 1fr 1fr at all widths) */
+  .rss-compare-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  }
+  @media (max-width: 400px) {
+    .rss-compare-grid { gap: 6px; }
+    .rss-stat { padding: 10px 12px 8px; }
+  }
+
 </style>
 </head>
 <body>
@@ -1146,7 +1209,7 @@
   <div id="dashboard" class="hidden">
 
     <!-- ═══════════════════════════════════════════════════════════
-         RESULTS SUMMARY CARD (4-tab structure, ported from weekly)
+         RESULTS SUMMARY CARD (Weekly-style 4-metric + 4-tab)
     ═══════════════════════════════════════════════════════════ -->
     <div class="results-summary-card">
       <div class="rsc-header">
@@ -1156,175 +1219,212 @@
         </div>
         <div class="rsc-hero-metric">
           <div class="rsc-hero-label">กำไรรวม</div>
-          <div class="rsc-hero-value" id="kpi-final">$-</div>
-          <div class="rsc-hero-sub" id="kpi-return">+0.0%</div>
+          <div class="rsc-hero-value" id="rscTotalPnl">$0</div>
+          <div class="rsc-hero-sub" id="rscMonthlyAvg">ตกเฉลี่ย $0 / เดือน · จากงบตั้งต้น $0</div>
         </div>
       </div>
 
-      <!-- 4-metric quick row -->
+      <!-- 4 KPI pillars (Weekly format) -->
       <div class="rsc-metrics-grid">
         <div class="rsc-metric">
-          <div class="rsc-metric-label">CAGR</div>
-          <div class="rsc-metric-value" id="kpi-cagr">0.0%</div>
-          <div class="rsc-metric-desc">อัตราเติบโตต่อปีทบต้น</div>
+          <div class="rsc-metric-label">Annualized Return</div>
+          <div class="rsc-metric-value" id="rscAnnRoi">0.0%</div>
+          <div class="rsc-metric-desc">ผลตอบแทนเฉลี่ยต่อปีจากเงินลงทุน</div>
         </div>
         <div class="rsc-metric">
-          <div class="rsc-metric-label">Sharpe</div>
-          <div class="rsc-metric-value" id="kpi-strat-sharpe">0.00</div>
-          <div class="rsc-metric-desc">ผลตอบแทนต่อหน่วยความเสี่ยง</div>
+          <div class="rsc-metric-label">Sharpe Ratio</div>
+          <div class="rsc-metric-value" id="rscSharpe">—</div>
+          <div class="rsc-metric-desc" id="rscSharpeDesc">กำไรต่อหน่วยความเสี่ยง — สูงกว่า 1 ถือว่าดี</div>
         </div>
         <div class="rsc-metric">
-          <div class="rsc-metric-label">Profit Factor</div>
-          <div class="rsc-metric-value" id="kpi-pf">0.00</div>
-          <div class="rsc-metric-desc">กำไรรวม ÷ ขาดทุนรวม</div>
+          <div class="rsc-metric-label">Alpha</div>
+          <div class="rsc-metric-value" id="rscAlpha">—</div>
+          <div class="rsc-metric-desc" id="rscAlphaDesc">ผลตอบแทนส่วนที่เอาชนะตลาด หลังหักความเสี่ยง</div>
         </div>
         <div class="rsc-metric">
-          <div class="rsc-metric-label">Max DD</div>
-          <div class="rsc-metric-value text-red" id="kpi-strat-dd">0.0%</div>
-          <div class="rsc-metric-desc">ขาดทุนหนักสุดจากยอดสูง</div>
+          <div class="rsc-metric-label">Max Drawdown</div>
+          <div class="rsc-metric-value" id="rscMaxDD" style="color:var(--red);">0.0%</div>
+          <div class="rsc-metric-desc">ขาดทุนรอบที่หนักที่สุด — เอาไว้วัดความอดทนที่ต้องมี</div>
         </div>
       </div>
 
-      <!-- 4 stats tabs -->
+      <!-- ═══ 4 DETAIL STATS TABS ═══ -->
       <div class="rss-stats-tabs">
         <div class="rss-tabs-header">
-          <button class="rss-tab-btn active" data-tab="bench" onclick="switchStatsTab('bench')">เทียบตลาด</button>
-          <button class="rss-tab-btn" data-tab="profit" onclick="switchStatsTab('profit')">กำไร</button>
-          <button class="rss-tab-btn" data-tab="accuracy" onclick="switchStatsTab('accuracy')">ความแม่น</button>
-          <button class="rss-tab-btn" data-tab="risk" onclick="switchStatsTab('risk')">ความเสี่ยง</button>
+          <button class="rss-tab-btn active" data-tab="bench" onclick="switchStatsTab('bench')">
+            <span class="rss-tab-label">เทียบตลาด</span>
+          </button>
+          <button class="rss-tab-btn" data-tab="profit" onclick="switchStatsTab('profit')">
+            <span class="rss-tab-label">กำไร</span>
+          </button>
+          <button class="rss-tab-btn" data-tab="accuracy" onclick="switchStatsTab('accuracy')">
+            <span class="rss-tab-label">ความแม่น</span>
+          </button>
+          <button class="rss-tab-btn" data-tab="risk" onclick="switchStatsTab('risk')">
+            <span class="rss-tab-label">ความเสี่ยง</span>
+          </button>
         </div>
 
-        <!-- TAB 1: เทียบตลาด (Strategy vs SP500, side-by-side) -->
+        <!-- TAB 1: เทียบตลาด (2×2 bench compare) -->
         <div id="rss-pane-bench" class="rss-tab-pane active">
+          <div class="rss-bench-header">
+            <div>
+              <div class="rss-bench-label">เทียบผลกับตลาด</div>
+              <div class="rss-bench-period" id="ma-period">S&amp;P 500 Universe · 10Y Rolling</div>
+            </div>
+          </div>
           <div class="rss-compare-grid">
+            <!-- Row 1: Annualized Return -->
             <div class="rss-stat rss-compare-stat rss-strat">
               <div class="rss-compare-tag strat">กลยุทธ์</div>
-              <div class="rss-stat-label">CAGR</div>
-              <div class="rss-stat-th">ผลตอบแทนต่อปีทบต้น (Strategy)</div>
-              <div class="rss-stat-val" id="bench-strat-cagr" style="margin-bottom:10px;">0.0%</div>
-              <div class="rss-stat-label">Volatility</div>
-              <div class="rss-stat-th">ความผันผวนรายปี</div>
-              <div class="rss-stat-val" id="bench-strat-vol">0.0%</div>
+              <div class="rss-stat-val" id="rssBenchStratReturn">—</div>
+              <div class="rss-stat-sub">Annualized Return</div>
+              <div class="rss-stat-th">ผลตอบแทนต่อปี</div>
             </div>
             <div class="rss-stat rss-compare-stat rss-mkt">
               <div class="rss-compare-tag mkt">ตลาด SP500</div>
-              <div class="rss-stat-label">CAGR</div>
-              <div class="rss-stat-th">ผลตอบแทนต่อปีทบต้น (Market)</div>
-              <div class="rss-stat-val" id="ma-return" style="margin-bottom:10px;">0.0%</div>
-              <div class="rss-stat-label">Volatility</div>
-              <div class="rss-stat-th">ความผันผวนรายปี</div>
-              <div class="rss-stat-val"><span id="ma-vol">0.0%</span></div>
+              <div class="rss-stat-val" id="ma-return">—</div>
+              <div class="rss-stat-sub">Annualized Return</div>
+              <div class="rss-stat-th">ผลตอบแทนต่อปี</div>
+            </div>
+            <!-- Row 2: Volatility -->
+            <div class="rss-stat rss-compare-stat rss-strat">
+              <div class="rss-compare-tag strat">กลยุทธ์</div>
+              <div class="rss-stat-val" id="rssBenchStratVol">—</div>
+              <div class="rss-stat-sub">Annualized Volatility</div>
+              <div class="rss-stat-th">ความผันผวนต่อปี</div>
+            </div>
+            <div class="rss-stat rss-compare-stat rss-mkt">
+              <div class="rss-compare-tag mkt">ตลาด SP500</div>
+              <div class="rss-stat-val" id="ma-vol">—</div>
+              <div class="rss-stat-sub">Annualized Volatility</div>
+              <div class="rss-stat-th">ความผันผวนต่อปี</div>
             </div>
           </div>
-          <!-- Market period slider -->
+          <div class="ma-note rss-bench-note" id="ma-note" style="margin-top:12px;">—</div>
+          <div class="rss-tab-narrative" id="rssBench">กำลังคำนวณ...</div>
+          <!-- period slider -->
           <div class="rss-bench-slider-wrap">
             <div class="rss-bench-slider-header">
-              <span class="rss-bench-label">ช่วงเวลาเทียบตลาด</span>
-              <span class="rss-bench-val" id="slider-val-disp">5Y</span>
+              <span class="rss-bench-label">ปรับช่วงเวลา</span>
+              <span class="rss-bench-val" id="slider-val-disp">10Y</span>
             </div>
-            <input type="range" id="timeSlider" class="market-slider" min="1" max="15" step="1" value="5" style="width:100%;">
+            <input type="range" id="timeSlider" class="market-slider" min="1" max="15" step="1" value="10" style="width:100%;">
             <div class="range-labels"><span>1Y</span><span>15Y</span></div>
-          </div>
-          <div class="rss-tab-narrative">
-            <strong>Market DD:</strong> <span id="ma-dd" class="text-red">0.0%</span> &middot; เปรียบเทียบกลยุทธ์กับ S&amp;P 500 universe average (ค่าเฉลี่ยราคาหุ้นทั้งหมดในชุดข้อมูล) ตลอดช่วงเวลาที่เลือก
           </div>
         </div>
 
-        <!-- TAB 2: กำไร (Profit) -->
+        <!-- TAB 2: กำไร -->
         <div id="rss-pane-profit" class="rss-tab-pane">
           <div class="rss-stat-grid">
             <div class="rss-stat">
               <div class="rss-stat-label">Final Equity</div>
-              <div class="rss-stat-th">มูลค่าพอร์ตสุดท้าย</div>
               <div class="rss-stat-val" id="stat-final-mirror">$-</div>
+              <div class="rss-stat-sub">มูลค่าพอร์ตสุดท้าย</div>
             </div>
             <div class="rss-stat">
               <div class="rss-stat-label">Total Return</div>
-              <div class="rss-stat-th">ผลตอบแทนรวมสะสม</div>
               <div class="rss-stat-val" id="stat-total-return">+0.0%</div>
+              <div class="rss-stat-sub">ผลตอบแทนรวมสะสม</div>
             </div>
             <div class="rss-stat">
               <div class="rss-stat-label">CAGR</div>
-              <div class="rss-stat-th">ผลตอบแทนต่อปีทบต้น</div>
-              <div class="rss-stat-val" id="stat-cagr-mirror">0.0%</div>
+              <div class="rss-stat-val" id="kpi-cagr">0.0%</div>
+              <div class="rss-stat-sub">ผลตอบแทนต่อปีทบต้น</div>
             </div>
             <div class="rss-stat">
               <div class="rss-stat-label">Avg Monthly</div>
-              <div class="rss-stat-th">ผลตอบแทนเฉลี่ยต่อเดือน</div>
               <div class="rss-stat-val" id="stat-avg">0.00%</div>
+              <div class="rss-stat-sub">ผลตอบแทนเฉลี่ย / เดือน</div>
             </div>
             <div class="rss-stat">
               <div class="rss-stat-label">Best Month</div>
-              <div class="rss-stat-th">เดือนที่กำไรสูงสุด</div>
               <div class="rss-stat-val text-green" id="stat-best">0.0%</div>
+              <div class="rss-stat-sub">เดือนที่กำไรสูงสุด</div>
             </div>
             <div class="rss-stat">
               <div class="rss-stat-label">Worst Month</div>
-              <div class="rss-stat-th">เดือนที่ขาดทุนสูงสุด</div>
               <div class="rss-stat-val text-red" id="stat-worst">0.0%</div>
+              <div class="rss-stat-sub">เดือนที่ขาดทุนสูงสุด</div>
             </div>
           </div>
           <div class="rss-tab-narrative" id="rssProfit">กำลังคำนวณ...</div>
         </div>
 
-        <!-- TAB 3: ความแม่น (Accuracy) -->
+        <!-- TAB 3: ความแม่น -->
         <div id="rss-pane-accuracy" class="rss-tab-pane">
           <div class="rss-stat-grid">
             <div class="rss-stat">
               <div class="rss-stat-label">Win Rate</div>
-              <div class="rss-stat-th">สัดส่วนเดือนที่กำไร</div>
-              <div class="rss-stat-val text-green" id="stat-win">0.0%</div>
+              <div class="rss-stat-val text-green" id="stat-win">0%</div>
+              <div class="rss-stat-sub">สัดส่วนเดือนที่กำไร</div>
             </div>
             <div class="rss-stat">
               <div class="rss-stat-label">Profit Factor</div>
-              <div class="rss-stat-th">กำไรรวม ÷ ขาดทุนรวม</div>
               <div class="rss-stat-val" id="stat-pf">0.00</div>
+              <div class="rss-stat-sub">กำไรรวม ÷ ขาดทุนรวม</div>
             </div>
             <div class="rss-stat">
               <div class="rss-stat-label">Total Months</div>
-              <div class="rss-stat-th">จำนวนเดือนทั้งหมด</div>
               <div class="rss-stat-val" id="stat-count">0</div>
+              <div class="rss-stat-sub">จำนวนเดือนทั้งหมด</div>
             </div>
             <div class="rss-stat">
               <div class="rss-stat-label">Rebalances</div>
-              <div class="rss-stat-th">จำนวนรอบปรับพอร์ต</div>
               <div class="rss-stat-val" id="stat-rebal">0</div>
+              <div class="rss-stat-sub">รอบการปรับพอร์ต</div>
             </div>
           </div>
           <div class="rss-tab-narrative" id="rssAccuracy">กำลังคำนวณ...</div>
         </div>
 
-        <!-- TAB 4: ความเสี่ยง (Risk) -->
+        <!-- TAB 4: ความเสี่ยง -->
         <div id="rss-pane-risk" class="rss-tab-pane">
           <div class="rss-stat-grid">
             <div class="rss-stat">
               <div class="rss-stat-label">Strategy Vol</div>
-              <div class="rss-stat-th">ความผันผวนกลยุทธ์</div>
               <div class="rss-stat-val" id="kpi-strat-vol">0.0%</div>
+              <div class="rss-stat-sub">ความผันผวนกลยุทธ์</div>
             </div>
             <div class="rss-stat">
               <div class="rss-stat-label">Sharpe Ratio</div>
-              <div class="rss-stat-th">ผลตอบแทน ÷ ความเสี่ยง</div>
               <div class="rss-stat-val" id="stat-sharpe">0.00</div>
+              <div class="rss-stat-sub">ผลตอบแทน ÷ ความเสี่ยง</div>
             </div>
             <div class="rss-stat">
               <div class="rss-stat-label">Max Drawdown</div>
-              <div class="rss-stat-th">ขาดทุนหนักสุดจากยอดสูง</div>
               <div class="rss-stat-val text-red" id="stat-dd">0.0%</div>
+              <div class="rss-stat-sub">ขาดทุนหนักสุดจากยอดสูง</div>
             </div>
             <div class="rss-stat">
-              <div class="rss-stat-label">Market DD</div>
-              <div class="rss-stat-th">Max DD ของ SP500 (ช่วงเดียวกัน)</div>
+              <div class="rss-stat-label">Market Max DD</div>
               <div class="rss-stat-val text-red" id="stat-ma-dd">0.0%</div>
+              <div class="rss-stat-sub">ขาดทุนหนักสุดของ SP500</div>
             </div>
           </div>
           <div class="rss-tab-narrative" id="rssRisk">กำลังคำนวณ...</div>
         </div>
+
+      </div>
+
+      <div class="rsc-narrative" id="rscNarrative">
+        กำลังสรุปผลตอบแทน...
       </div>
     </div>
 
 
-
+    <!-- Hidden KPI mirrors (preserve IDs for legacy JS refs; not rendered) -->
+    <div style="display:none;" aria-hidden="true">
+      <span id="kpi-final">$-</span>
+      <span id="kpi-return">+0.0%</span>
+      <span id="kpi-strat-dd">0.0%</span>
+      <span id="kpi-strat-sharpe">0.00</span>
+      <span id="kpi-pf">0.00</span>
+      <span id="bench-strat-cagr">0.0%</span>
+      <span id="bench-strat-vol">0.0%</span>
+      <span id="stat-cagr-mirror">0.0%</span>
+      <span id="ma-dd">0.0%</span>
+    </div>
     <!-- CHART TABS -->
     <div class="card-base tabs-container" id="chart-tabs-container">
       <div class="tabs-header">
@@ -2139,26 +2239,101 @@ function calculateStats() {
     document.getElementById('stat-cagr-mirror').innerText = fmt(cagr);
     document.getElementById('stat-cagr-mirror').className = 'rss-stat-val ' + (cagr>=0?'text-green':'text-red');
 
-    // === Narratives ===
-    const years = (days / 365.25).toFixed(1);
-    document.getElementById('rscPeriod').innerText = `ช่วง ${curve[0].date} → ${curve[curve.length-1].date} (${years} ปี)`;
+    // === Weekly-style: populate top-card metrics ===
+    const years = (days / 365.25);
+    const yearsStr = years.toFixed(1);
+    const absPnl = end - start;
+    const monthlyAvgUsd = (end - start) / Math.max(months.length - 1, 1);
+    const pnlSign = absPnl >= 0 ? '+' : '-';
+    const pnlClass = absPnl >= 0 ? 'positive' : 'negative';
 
+    // Format Thai date
+    const formatDateThai = (isoDate) => {
+      const d = new Date(isoDate);
+      const months_th = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+      return `${d.getDate()} ${months_th[d.getMonth()]} ${d.getFullYear() + 543}`;
+    };
+    const startDateTh = formatDateThai(curve[0].date);
+    const endDateTh = formatDateThai(curve[curve.length-1].date);
+    const totalRebalCount = state.tradeLog ? state.tradeLog.length : 0;
+
+    document.getElementById('rscPeriod').innerText = `${startDateTh} → ${endDateTh} · ${totalRebalCount} รอบ · ${yearsStr} ปี`;
+
+    const heroPnl = document.getElementById('rscTotalPnl');
+    heroPnl.innerText = pnlSign + '$' + Math.abs(Math.round(absPnl)).toLocaleString();
+    heroPnl.className = 'rsc-hero-value ' + pnlClass;
+
+    const avgMonthSign = monthlyAvgUsd >= 0 ? '+' : '-';
+    document.getElementById('rscMonthlyAvg').innerHTML = 
+      `ตกเฉลี่ย <strong>${avgMonthSign}$${Math.abs(Math.round(monthlyAvgUsd)).toLocaleString()}</strong> / เดือน &middot; จากงบตั้งต้น <strong>$${Math.round(start).toLocaleString()}</strong>`;
+
+    // === 4 top metrics ===
+    const annRoi = document.getElementById('rscAnnRoi');
+    annRoi.innerText = (cagr >= 0 ? '+' : '') + fmt(cagr);
+    annRoi.style.color = cagr >= 0 ? 'var(--green)' : 'var(--red)';
+
+    const rscSh = document.getElementById('rscSharpe');
+    rscSh.innerText = sharpe.toFixed(2);
+    const rscShDesc = document.getElementById('rscSharpeDesc');
+    if (sharpe >= 1.5) rscShDesc.innerText = 'ยอดเยี่ยม — กำไรคุ้มกับความเสี่ยงมาก';
+    else if (sharpe >= 1) rscShDesc.innerText = 'ดี — กำไรคุ้มเสี่ยงในระดับที่ยอมรับได้';
+    else if (sharpe >= 0.5) rscShDesc.innerText = 'พอใช้ — กำไรยังไม่ชัดกว่าเสี่ยงมาก';
+    else rscShDesc.innerText = 'ต่ำ — ความเสี่ยงสูงเมื่อเทียบกำไร';
+
+    document.getElementById('rscMaxDD').innerText = fmt(maxDD);
+
+    // === Mirror to other legacy IDs ===
+    document.getElementById('kpi-strat-vol').innerText = fmt(vol);
+    document.getElementById('kpi-strat-dd').innerText = fmt(maxDD);
+    document.getElementById('kpi-strat-sharpe').innerText = sharpe.toFixed(2);
+    document.getElementById('kpi-pf').innerText = pf.toFixed(2);
+    document.getElementById('stat-pf').innerText = pf.toFixed(2);
+    document.getElementById('stat-rebal').innerText = totalRebalCount;
+    document.getElementById('kpi-cagr').innerText = fmt(cagr);
+    document.getElementById('stat-final-mirror').innerText = '$' + Math.round(end).toLocaleString();
+    document.getElementById('stat-total-return').innerText = (totalRet>=0?'+':'') + (totalRet*100).toFixed(1) + '%';
+    document.getElementById('stat-total-return').className = 'rss-stat-val ' + (totalRet>=0?'text-green':'text-red');
+    document.getElementById('kpi-final').innerText = '$' + Math.round(end).toLocaleString();
+    document.getElementById('kpi-return').innerText = (totalRet>=0?'+':'') + (totalRet*100).toFixed(1) + '%';
+
+    // === Bench tab: strategy side ===
+    const benchStratRet = document.getElementById('rssBenchStratReturn');
+    if (benchStratRet) {
+      benchStratRet.innerText = (cagr >= 0 ? '+' : '') + fmt(cagr);
+      benchStratRet.className = 'rss-stat-val ' + (cagr >= 0 ? 'text-green' : 'text-red');
+    }
+    const benchStratVol = document.getElementById('rssBenchStratVol');
+    if (benchStratVol) benchStratVol.innerText = fmt(vol);
+
+    // === Tab narratives ===
     const profitNarr = document.getElementById('rssProfit');
     if (profitNarr) {
-      profitNarr.innerHTML = `<strong>กลยุทธ์ทำกำไรรวม ${(totalRet*100).toFixed(1)}%</strong> ในช่วง ${years} ปี ` +
-        `(เฉลี่ย ${fmt(cagr)}/ปี) &middot; เดือนดีที่สุดกำไร ${fmt(best)} &middot; เดือนแย่ที่สุดขาดทุน ${fmt(worst)}`;
+      profitNarr.innerHTML = `<strong>กลยุทธ์ทำกำไรรวม ${(totalRet*100).toFixed(1)}%</strong> ในช่วง ${yearsStr} ปี ` +
+        `(เฉลี่ย ${fmt(cagr)}/ปี) &middot; เดือนดีที่สุดกำไร <strong>${fmt(best)}</strong> &middot; เดือนแย่ที่สุดขาดทุน <strong>${fmt(worst)}</strong>`;
     }
     const accNarr = document.getElementById('rssAccuracy');
     if (accNarr) {
       accNarr.innerHTML = `Win Rate <strong>${fmt(winRate)}</strong> (${wins}/${mr.length} เดือนกำไร) &middot; ` +
-        `Profit Factor <strong>${pf.toFixed(2)}</strong> หมายถึงทุก \$1 ที่ขาดทุน กลยุทธ์ทำเงินกลับมา \$${pf.toFixed(2)} &middot; ` +
-        `ปรับพอร์ต <strong>${totalRebal}</strong> รอบตลอดการทดสอบ`;
+        `Profit Factor <strong>${pf.toFixed(2)}</strong> — ทุก \$1 ที่ขาดทุน กลยุทธ์ทำเงินกลับมา \$${pf.toFixed(2)} &middot; ` +
+        `ปรับพอร์ต <strong>${totalRebalCount}</strong> รอบตลอดการทดสอบ`;
     }
     const riskNarr = document.getElementById('rssRisk');
     if (riskNarr) {
       riskNarr.innerHTML = `ความผันผวนรายปี <strong>${fmt(vol)}</strong> (Sharpe ${sharpe.toFixed(2)}) &middot; ` +
-        `Max Drawdown <strong class="text-red">${fmt(maxDD)}</strong> — คือจุดที่พอร์ตเคยลดจากจุดสูงสุดมากที่สุด ` +
+        `Max Drawdown <strong class="text-red">${fmt(maxDD)}</strong> — จุดที่พอร์ตเคยลดจากจุดสูงสุดมากที่สุด ` +
         `ต้องเตรียมใจรับได้ถ้าจะเล่นกลยุทธ์นี้`;
+    }
+
+    // store for bench tab narrative (computed by updateMarketAnalyzer)
+    state._lastStratCagr = cagr;
+    state._lastStratVol = vol;
+    state._lastTotalRet = totalRet;
+    state._lastPnl = absPnl;
+    state._lastYears = years;
+
+    // Call updateMarketAnalyzer to refresh bench tab with current strategy metrics
+    if (typeof updateMarketAnalyzer === 'function' && state.universeDaily && state.universeDaily.length > 0) {
+      updateMarketAnalyzer();
     }
   }
 }
@@ -2505,9 +2680,78 @@ function updateMarketAnalyzer() {
   const vol = std * Math.sqrt(52);
   el.maVol.innerText = (vol * 100).toFixed(1) + '%';
   el.maDd.innerText = (maxDD * 100).toFixed(1) + '%';
-  // Mirror market DD to risk tab
+
+  // === PHASE 4.6: Bench tab enrichment ===
   const statMaDd = document.getElementById('stat-ma-dd');
   if (statMaDd) statMaDd.innerText = (maxDD * 100).toFixed(1) + '%';
+
+  // ma-period header
+  const maPeriod = document.getElementById('ma-period');
+  if (maPeriod) {
+    const endDate = new Date(state.universeDaily[state.universeDaily.length-1].date);
+    const startDate = new Date(state.universeDaily[startIdx].date);
+    const fmtMonthTh = (d) => {
+      const months_th = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+      return `${months_th[d.getMonth()]} ${d.getFullYear()+543}`;
+    };
+    maPeriod.innerText = `${fmtMonthTh(startDate)} → ${fmtMonthTh(endDate)} · ${years}Y · Equal-weighted avg`;
+  }
+
+  // Alpha: strategy annual return − market annual return
+  const stratCagr = state._lastStratCagr || 0;
+  const alpha = stratCagr - cagr;
+  const rscAlpha = document.getElementById('rscAlpha');
+  if (rscAlpha) {
+    rscAlpha.innerText = (alpha >= 0 ? '+' : '') + (alpha * 100).toFixed(2) + '%';
+    rscAlpha.style.color = alpha >= 0 ? 'var(--green)' : 'var(--red)';
+  }
+  const rscAlphaDesc = document.getElementById('rscAlphaDesc');
+  if (rscAlphaDesc) {
+    if (alpha >= 0.1) rscAlphaDesc.innerText = 'เอาชนะตลาดได้ชัดเจน';
+    else if (alpha >= 0.02) rscAlphaDesc.innerText = 'ชนะตลาดได้เล็กน้อย';
+    else if (alpha >= -0.02) rscAlphaDesc.innerText = 'ใกล้เคียงกับตลาด';
+    else rscAlphaDesc.innerText = 'แพ้ตลาดช่วงนี้';
+  }
+
+  // Bench narrative (long Thai narrative about strategy vs market)
+  const stratVol = state._lastStratVol || 0;
+  const rssBench = document.getElementById('rssBench');
+  if (rssBench && state._lastYears) {
+    const yrsStr = state._lastYears.toFixed(1);
+    const volRatio = stratVol / Math.max(vol, 0.0001);
+    let verdict, volComment;
+    if (alpha >= 0.05) verdict = 'ชนะตลาดอย่างขาดลอย';
+    else if (alpha >= 0.01) verdict = 'ชนะตลาด';
+    else if (alpha >= -0.01) verdict = 'เสมอตลาด';
+    else verdict = 'แพ้ตลาด';
+    if (volRatio > 1.5) volComment = `แต่ <strong>ผันผวนสูงกว่าตลาดมาก</strong> (${(stratVol*100).toFixed(1)}% vs ${(vol*100).toFixed(1)}%) — ต้องใจแข็งพอรับได้`;
+    else if (volRatio > 1.2) volComment = `ผันผวนสูงกว่าตลาดพอสมควร (${(stratVol*100).toFixed(1)}% vs ${(vol*100).toFixed(1)}%)`;
+    else volComment = `ผันผวนใกล้เคียงตลาด (${(stratVol*100).toFixed(1)}% vs ${(vol*100).toFixed(1)}%)`;
+
+    rssBench.innerHTML = `ในช่วง <strong>${yrsStr} ปี</strong> ที่แบ็คเทส: <strong>${verdict}</strong> — ` +
+      `ผลตอบแทนต่อปีสูงกว่า SP500 ถึง <strong class="${alpha>=0?'text-green':'text-red'}">${alpha>=0?'+':''}${(alpha*100).toFixed(1)}%</strong> ` +
+      `${volComment}. <strong>สรุป:</strong> ${alpha>=0.05 ? 'ผลตอบแทนสูงกว่ามาก แต่ต้องแลกกับความผันผวนที่สูงขึ้น — ต้องประเมินว่ารับได้ไหม' : (alpha>=0 ? 'ทำผลได้ดีกว่าตลาดเล็กน้อย' : 'ทำผลได้ต่ำกว่าตลาด — อาจต้องปรับกลยุทธ์')}`;
+  }
+
+  // ma-note (short summary)
+  const maNote = document.getElementById('ma-note');
+  if (maNote) {
+    maNote.innerHTML = `Market proxy = Equal-weighted avg ของหุ้น SP500 ทั้งหมดในชุดข้อมูล (ไม่ใช่ SPY ตัวจริง แต่ใช้เป็น benchmark เทียบได้)`;
+  }
+
+  // Global rscNarrative at bottom of card
+  const rscNarrative = document.getElementById('rscNarrative');
+  if (rscNarrative && state._lastPnl !== undefined) {
+    const pnl = state._lastPnl;
+    const yrs = state._lastYears.toFixed(1);
+    const startYr = document.getElementById('startYearSelect') ? document.getElementById('startYearSelect').value : CONFIG.startYear;
+    const topN = CONFIG.topN;
+    const wRet = parseInt(document.getElementById('weightSlider').value);
+    rscNarrative.innerHTML = `ด้วยการตั้งค่า <strong>Top ${topN} หุ้น</strong> · น้ำหนัก Return ${wRet}% / Volume ${100-wRet}% · ` +
+      `ตั้งแต่ปี ${startYr} ทำกำไรรวม <strong class="${pnl>=0?'text-green':'text-red'}">${pnl>=0?'+':''}$${Math.abs(Math.round(pnl)).toLocaleString()}</strong> ` +
+      `คิดเป็น <strong>${stratCagr>=0?'+':''}${(stratCagr*100).toFixed(1)}% ต่อปี</strong> ตลอด ${yrs} ปี · ` +
+      `Max Drawdown <strong class="text-red">${(state.equityCurve.length > 0 ? '' : '')}</strong>`;
+  }
 }
 
 function renderHeatmap() {
