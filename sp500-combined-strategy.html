@@ -795,29 +795,202 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
 .about-modal {
   position:fixed; inset:0; z-index:210; display:none;
   align-items:center; justify-content:center; padding:20px;
-  background:rgba(0,0,0,0.7); backdrop-filter:blur(6px);
+  background:rgba(10,5,8,0.78); backdrop-filter:blur(8px);
 }
 .about-modal.open { display:flex; }
 .about-modal-content {
-  background:linear-gradient(145deg, #1a0a0e, #2d1018);
-  border:1px solid var(--border-hover); border-radius:var(--radius);
-  max-width:640px; width:100%; max-height:85vh; overflow-y:auto;
+  background:linear-gradient(160deg, #1a0a0e 0%, #2d1018 50%, #3a1520 100%);
+  background-image:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(212,175,55,0.12), transparent 60%),
+    radial-gradient(ellipse 70% 55% at 80% 90%, rgba(139,34,82,0.25), transparent 60%),
+    linear-gradient(160deg, #1a0a0e 0%, #2d1018 50%, #3a1520 100%);
+  border:1px solid rgba(212,175,55,0.35); border-radius:var(--radius);
+  max-width:680px; width:100%; max-height:85vh; overflow-y:auto;
   padding:32px; position:relative;
-  box-shadow:0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(212,175,55,0.15);
+  box-shadow:0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(212,175,55,0.2);
 }
+/* Scrollbar for modal */
+.about-modal-content::-webkit-scrollbar { width:6px; }
+.about-modal-content::-webkit-scrollbar-track { background:rgba(0,0,0,0.2); border-radius:3px; }
+.about-modal-content::-webkit-scrollbar-thumb { background:rgba(212,175,55,0.35); border-radius:3px; }
 .about-modal h2 {
-  font-family:var(--font-heading); color:var(--gold-light);
-  font-size:1.3rem; margin-bottom:8px; letter-spacing:0.5px;
+  font-family:'Cinzel','Anuphan',serif; color:#F4E4BA;
+  font-size:1.35rem; margin-bottom:8px; letter-spacing:1.5px; font-weight:700;
+  display:flex; align-items:center; gap:12px;
 }
 .about-modal .about-sub {
-  color:var(--text-muted); font-size:0.85rem; margin-bottom:20px;
-  padding-bottom:16px; border-bottom:1px solid var(--border);
+  color:#C4B88A; font-size:0.9rem; margin-bottom:22px;
+  padding-bottom:18px; border-bottom:1px solid rgba(212,175,55,0.2);
+  font-family:'Sarabun','Anuphan',sans-serif; line-height:1.55;
 }
-.about-modal p { color:var(--text-main); line-height:1.8; margin-bottom:14px; font-size:0.88rem; }
+.about-modal p {
+  color:#E8E4DC; line-height:1.85; margin-bottom:14px; font-size:0.9rem;
+  font-family:'Sarabun','Anuphan',sans-serif;
+}
+.about-modal strong { color:#F4E4BA; font-weight:700; }
+
+/* ===== TRADING PHILOSOPHY SECTION ===== */
+.about-philosophy {
+  background:linear-gradient(145deg, rgba(244,228,186,0.08), rgba(212,175,55,0.04));
+  border:1px solid rgba(212,175,55,0.25); border-radius:var(--radius);
+  padding:22px 24px; margin-bottom:24px; position:relative;
+}
+.about-philosophy::before {
+  content:'"'; position:absolute; top:-10px; left:18px;
+  font-family:'DM Serif Display',serif; font-size:4rem; line-height:1;
+  color:rgba(212,175,55,0.4);
+}
+.philosophy-label {
+  font-family:'Cinzel','Anuphan',serif; font-size:0.68rem; font-weight:700;
+  color:#D4AF37; letter-spacing:3.5px; text-transform:uppercase;
+  margin-bottom:12px; padding-left:32px;
+}
+.philosophy-text {
+  font-family:'Sarabun','Anuphan',sans-serif; font-size:0.92rem;
+  color:#F4E4BA; line-height:1.9; font-weight:300;
+}
+.philosophy-text strong { color:#FFE9A3; font-weight:600; }
+.philosophy-signature {
+  margin-top:16px; padding-top:14px;
+  border-top:1px dashed rgba(212,175,55,0.25);
+  font-family:'Cinzel','Anuphan',serif; font-size:0.68rem;
+  color:#B8860B; letter-spacing:2.5px; text-transform:uppercase;
+  text-align:right;
+}
+
+/* ===== STRATEGY PILLARS (2-up: Momentum + Dark Horse) ===== */
+.about-pillars {
+  display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0 22px;
+}
+.about-pillar {
+  background:linear-gradient(145deg, rgba(244,228,186,0.09), rgba(244,228,186,0.03));
+  border:1px solid rgba(212,175,55,0.3); border-radius:var(--radius-sm);
+  padding:18px 18px 16px; position:relative;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.about-pillar.mom { border-top:3px solid #D4AF37; }
+.about-pillar.dh { border-top:3px solid #C85A4A; }
+.pillar-header {
+  display:flex; align-items:center; gap:10px; margin-bottom:10px;
+}
+.pillar-icon {
+  font-size:1.4rem;
+}
+.pillar-title {
+  font-family:'Cinzel','Anuphan',serif; font-size:0.95rem; font-weight:700;
+  letter-spacing:1.5px;
+}
+.about-pillar.mom .pillar-title { color:#F4E4BA; }
+.about-pillar.dh .pillar-title { color:#F4C8B8; }
+.pillar-subtitle {
+  font-family:'Sarabun','Anuphan',sans-serif; font-size:0.75rem;
+  color:#C4B88A; margin-bottom:10px; font-style:italic;
+}
+.pillar-desc {
+  font-family:'Sarabun','Anuphan',sans-serif; font-size:0.83rem;
+  color:#E8E4DC; line-height:1.7;
+}
+@media (max-width:500px) {
+  .about-pillars { grid-template-columns:1fr; }
+}
+
+/* ===== Override .strategy-diagram styles WITHIN the about modal ===== */
+.about-modal .strategy-diagram {
+  background:linear-gradient(145deg, rgba(244,228,186,0.05), rgba(212,175,55,0.02));
+  border:1px solid rgba(212,175,55,0.25);
+}
+.about-modal .diagram-title {
+  color:#D4AF37;
+  font-family:'Cinzel','Anuphan',serif;
+}
+.about-modal .diagram-title::before,
+.about-modal .diagram-title::after {
+  color:rgba(212,175,55,0.5);
+}
+.about-modal .diagram-step {
+  background:linear-gradient(145deg, #FFFEF8 0%, #F5EFE0 100%);
+  border:1.5px solid rgba(212,175,55,0.4);
+  box-shadow:0 4px 14px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.7);
+}
+.about-modal .diagram-step:hover {
+  border-color:#D4AF37;
+  box-shadow:0 8px 22px rgba(0,0,0,0.35), 0 0 0 1px rgba(212,175,55,0.3);
+  transform:translateY(-3px);
+}
+.about-modal .diagram-step-day {
+  color:#8B6914;
+  font-family:'Cinzel','Anuphan',serif;
+}
+.about-modal .diagram-step-title {
+  color:#3D3228;
+  font-family:'Sarabun','Anuphan',sans-serif; font-weight:700;
+}
+.about-modal .diagram-step-desc {
+  color:#5A3D20;
+  font-family:'Sarabun','Anuphan',sans-serif;
+}
+.about-modal .diagram-step-num {
+  background:linear-gradient(135deg, #D4AF37, #B8860B);
+  color:#fff;
+  font-family:'DM Serif Display',serif; font-weight:400;
+  box-shadow:0 3px 12px rgba(212,175,55,0.5);
+}
+.about-modal .diagram-step-arrow {
+  background:#2d1018;
+  color:#D4AF37;
+  border:1px solid rgba(212,175,55,0.5);
+}
+.about-modal .diagram-legend {
+  color:#C4B88A; border-top-color:rgba(212,175,55,0.2);
+  font-family:'Sarabun','Anuphan',sans-serif;
+}
+
 .about-modal .about-highlight {
-  background:rgba(212,175,55,0.08); border-left:3px solid var(--accent);
-  padding:12px 16px; border-radius:0 var(--radius-sm) var(--radius-sm) 0;
-  margin:14px 0; font-size:0.85rem;
+  background:rgba(212,175,55,0.1);
+  border-left:3px solid #D4AF37;
+  padding:13px 17px; border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+  margin:16px 0; font-size:0.88rem;
+  color:#F4E4BA;
+  font-family:'Sarabun','Anuphan',sans-serif;
+}
+.about-modal .about-highlight strong { color:#FFE9A3; }
+
+.about-modal .panel-close {
+  background:rgba(244,228,186,0.1);
+  border:1px solid rgba(212,175,55,0.3);
+  color:#F4E4BA;
+}
+.about-modal .panel-close:hover {
+  background:rgba(193,69,69,0.2);
+  border-color:#D95F5F;
+  color:#FFA8A8;
+}
+
+/* ===== Allocation Section in modal ===== */
+.about-section-label {
+  font-family:'Cinzel','Anuphan',serif; font-size:0.72rem; font-weight:700;
+  color:#D4AF37; letter-spacing:3px; text-transform:uppercase;
+  margin:22px 0 10px; display:flex; align-items:center; gap:10px;
+}
+.about-section-label::after {
+  content:''; flex:1; height:1px;
+  background:linear-gradient(90deg, rgba(212,175,55,0.4), transparent);
+}
+.about-mode-item {
+  background:rgba(244,228,186,0.05);
+  border:1px solid rgba(212,175,55,0.2);
+  border-radius:var(--radius-sm);
+  padding:12px 16px; margin-bottom:8px;
+  font-family:'Sarabun','Anuphan',sans-serif; font-size:0.86rem;
+  color:#E8E4DC; line-height:1.65;
+}
+.about-mode-item strong { color:#F4E4BA; font-weight:700; }
+.about-mode-item .mode-badge {
+  display:inline-block; min-width:28px; text-align:center;
+  padding:3px 10px; background:linear-gradient(135deg, #D4AF37, #B8860B);
+  color:#1a0a0e; font-family:'Cinzel','Anuphan',serif; font-weight:700;
+  font-size:0.72rem; border-radius:var(--radius-xs); margin-right:8px;
+  letter-spacing:1px;
 }
 
 @media (max-width:600px) {
@@ -1454,13 +1627,55 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
 <!-- ===== ABOUT MODAL ===== -->
 <div id="aboutModal" class="about-modal" onclick="if(event.target===this) closeAboutModal()">
   <div class="about-modal-content">
-    <button class="panel-close" onclick="closeAboutModal()" style="position:absolute;top:16px;right:16px;" aria-label="ปิด">✕</button>
+    <button class="panel-close" onclick="closeAboutModal()" style="position:absolute;top:18px;right:18px;" aria-label="ปิด">✕</button>
     <h2>🦉 Combined Strategy</h2>
-    <div class="about-sub">Momentum + Dark Horse — เทรดรายสัปดาห์บนหุ้น S&amp;P 500</div>
+    <div class="about-sub">Momentum &amp; Dark Horse — เทรดรายสัปดาห์บนหุ้น S&amp;P 500 ด้วยหลักการที่สมดุลระหว่างผลตอบแทนและความเสี่ยง</div>
 
-    <!-- Strategy Flow Diagram -->
-    <div class="strategy-diagram" style="margin:8px 0 4px;">
-      <div class="diagram-title">วงจรการเทรดของกลยุทธ์</div>
+    <!-- ═══ TRADING PHILOSOPHY ═══ -->
+    <div class="about-philosophy">
+      <div class="philosophy-label">ปรัชญาการเทรด</div>
+      <div class="philosophy-text">
+        เราเชื่อว่า <strong>ตลาดไม่ได้สุ่มทั้งหมด</strong> — มันมี "ร่องรอย" ของการเคลื่อนย้ายเงินทุนที่อ่านได้ด้วยข้อมูล<br><br>
+        กลยุทธ์นี้ผสาน <strong>2 มุมมอง</strong> ที่เสริมกัน: <strong>Momentum</strong> — ตามแรงส่งของหุ้นที่ตลาดยอมรับแล้ว ความเสี่ยงต่ำแต่ upside จำกัด · <strong>Dark Horse</strong> — จับสัญญาณหุ้นที่กำลังเปลี่ยนเฟสจาก "ถูกละเลย" สู่ "ถูกค้นพบ" ความเสี่ยงสูงขึ้น แต่ให้ upside มหาศาลถ้าจังหวะถูก<br><br>
+        <strong>Risk-First Mindset:</strong> ทุก position มี Stoploss ต่อตัว · ทุกรอบจำกัดเวลาถือ · ทุกสัปดาห์คัดกรองด้วยเงื่อนไขหลายชั้น — เรายอม <strong>พลาดโอกาส</strong> ดีกว่า <strong>เสียทุนหนัก</strong>
+      </div>
+      <div class="philosophy-signature">— Rules over Emotions</div>
+    </div>
+
+    <!-- ═══ TWO PILLARS ═══ -->
+    <div class="about-section-label">สองกลยุทธ์ที่เสริมกัน</div>
+    <div class="about-pillars">
+      <div class="about-pillar mom">
+        <div class="pillar-header">
+          <span class="pillar-icon">📈</span>
+          <span class="pillar-title">Momentum</span>
+        </div>
+        <div class="pillar-subtitle">หุ้นนำตลาดที่วิ่งแล้ว</div>
+        <div class="pillar-desc">
+          คัดหุ้นใน <strong>Top 20%</strong> ของตลาดที่ผ่านเงื่อนไข — EMA10 &gt; EMA20, Volume สูงกว่าค่าเฉลี่ย, RSI &lt; 80 (ไม่ overbought), และมี <strong>Relative Strength</strong> เหนือ SPY<br><br>
+          <em>ปรัชญา:</em> "ผู้ชนะยังคงชนะ" — ไม่สนใจเหตุผลว่าทำไมมันวิ่ง สนใจแค่ว่ามันยังวิ่งอยู่
+        </div>
+      </div>
+      <div class="about-pillar dh">
+        <div class="pillar-header">
+          <span class="pillar-icon">🐎</span>
+          <span class="pillar-title">Dark Horse</span>
+        </div>
+        <div class="pillar-subtitle">ม้ามืดที่เพิ่งโผล่</div>
+        <div class="pillar-desc">
+          จับหุ้นที่ <strong>"เงียบมานาน แล้วโผล่"</strong> — เคยอยู่นอก Top 30 อย่างน้อย 4 สัปดาห์ แล้วกระโดดเข้า Top 10 พร้อม <strong>Volume ×2.5</strong> และ return 5 วันแรง<br><br>
+          <em>ปรัชญา:</em> "จับจังหวะก่อนตลาดค้นพบ" — upside สูง แต่ต้องกระจายและจำกัดความเสี่ยง
+        </div>
+      </div>
+    </div>
+
+    <div class="about-highlight">
+      <strong>★ Confirmation:</strong> ถ้า Dark Horse ตัวนั้นอยู่ใน Momentum Top 20% ด้วย จะถูก tag "<strong>Confirmed</strong>" — หมายถึงมีทั้ง <em>แรงเงียบก่อนโผล่</em> + <em>แรงวิ่งต่อเนื่อง</em> ซ้อนกันทั้งสองกลยุทธ์ → สัญญาณคุณภาพสูงสุด
+    </div>
+
+    <!-- ═══ TRADING CYCLE DIAGRAM ═══ -->
+    <div class="about-section-label">วงจรการเทรด</div>
+    <div class="strategy-diagram" style="margin:0 0 10px;padding:22px 20px;">
       <div class="diagram-flow">
         <div class="diagram-step">
           <div class="diagram-step-num">1</div>
@@ -1495,22 +1710,21 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
           <div class="diagram-step-arrow">→</div>
         </div>
       </div>
-      <div class="diagram-legend">
-        <div class="diagram-legend-item"><span class="diagram-legend-dot" style="background:var(--accent);"></span>Momentum — หุ้นที่วิ่งแรงต่อเนื่อง + EMA aligned + Volume</div>
-        <div class="diagram-legend-item"><span class="diagram-legend-dot" style="background:var(--orange);"></span>Dark Horse — หุ้นเงียบมานาน แล้วโผล่พร้อม Volume พุ่ง</div>
-      </div>
     </div>
 
-    <p><strong style="color:var(--accent);">Momentum:</strong> คัดหุ้นที่วิ่งแรงต่อเนื่องใน Top 20% ของตลาด โดยต้องผ่านเงื่อนไข EMA aligned (EMA10 &gt; EMA20), Volume สูงกว่าค่าเฉลี่ย, RSI ไม่ overbought (&lt; 80), และมี Relative Strength เหนือ Market benchmark</p>
-    <p><strong style="color:var(--orange);">Dark Horse:</strong> คัดหุ้นที่ "เงียบมานาน แล้วโผล่" — ต้องเคยอยู่นอก Top 30 มาอย่างน้อย N สัปดาห์ แล้วกระโดดเข้า Top 10 พร้อม Volume Explosion (×2.5 เทียบกับค่าเฉลี่ย) และ return 5 วันแรง</p>
-    <div class="about-highlight">
-      <strong>Confirmation ★:</strong> ถ้า Dark Horse ตัวนั้นอยู่ใน Momentum Top 20% ด้วย จะถูก tag "Confirmed" — หมายถึงมีทั้งแรงเงียบ+แรงวิ่ง ซ้อนกันทั้งสองกลยุทธ์
+    <!-- ═══ ALLOCATION + REGIME ═══ -->
+    <div class="about-section-label">การจัดสรรเงินทุน</div>
+    <div class="about-mode-item">
+      <span class="mode-badge">A</span>
+      <strong>แยกงบ 2 กระเป๋า</strong> — Momentum และ Dark Horse มีงบคนละกระเป๋า ลงพร้อมกันได้เต็มทั้งคู่ทุกสัปดาห์ที่มีสัญญาณ เหมาะกับการวัดประสิทธิภาพของแต่ละกลยุทธ์แบบอิสระ
     </div>
-    <p><strong style="color:var(--green);">Allocation Mode:</strong></p>
-    <p style="margin-left:12px;"><strong>A — แยกงบ:</strong> ให้แต่ละกลยุทธ์งบแยก ถือพร้อมกันได้ทั้งสอง</p>
-    <p style="margin-left:12px;"><strong>B — งบเดียว ปรับสัดส่วน:</strong> ใช้งบก้อนเดียว แล้วแบ่งสัดส่วน Mom:DH ตาม Market Regime (ต้องเปิด Regime Filter)</p>
-    <div class="about-highlight" style="background:rgba(200,90,74,0.08);border-left-color:var(--orange);">
-      <strong>Regime Filter:</strong> เมื่อเปิดใช้ จะ <em>skip</em> การเข้าตำแหน่งในสัปดาห์ที่ตลาดต่ำกว่า EMA — ช่วยหลีกเลี่ยงการซื้อในตลาดขาลง แต่จะทำให้จำนวน trade น้อยลงด้วย
+    <div class="about-mode-item">
+      <span class="mode-badge">B</span>
+      <strong>งบเดียว ปรับสัดส่วน</strong> — มีงบรวมก้อนเดียว แบ่งสัดส่วน Momentum : Dark Horse ตาม <em>ภาวะตลาด</em> (ตลาด bull เน้น DH · ตลาด sideways เน้น Mom) — ต้องเปิด Regime Filter ด้วย
+    </div>
+
+    <div class="about-highlight" style="background:rgba(193,69,69,0.12);border-left-color:#D95F5F;">
+      <strong>🛡️ Regime Filter (Optional):</strong> เมื่อเปิดใช้ จะ <em>ข้ามรอบ</em>สัปดาห์ที่ SPY ต่ำกว่า EMA (ตลาดขาลง) — เป็นการกันตัวออกจาก bear market แต่แลกด้วยการ <strong>พลาด rebound</strong> ต้นรอบใหม่ · ปิดไว้จะเทรดทุกสัปดาห์ไม่ว่าตลาดจะเป็นอย่างไร
     </div>
   </div>
 </div>
