@@ -279,26 +279,52 @@
   .text-red { color: var(--red); }
 
   /* --- TABS --- */
-  .tabs-container { margin-bottom: 30px; display: flex; flex-direction: column; }
+  .tabs-container { margin-bottom: 24px; display: flex; flex-direction: column; }
   .tabs-header {
-    display: flex; flex-wrap: wrap; background: var(--cream-warm);
-    border-bottom: 1px solid var(--border); gap: 2px;
+    display: flex; flex-wrap: wrap;
+    background: var(--cream-deep);
+    padding: 4px;
+    border-radius: 14px;
+    gap: 3px;
+    margin-bottom: 0;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
   }
   .tab-btn {
-    flex: 1; min-width: 140px; padding: 16px 20px; background: transparent;
-    border: none; color: var(--text-muted); font-family: var(--font-body);
-    font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
-    border-bottom: 3px solid transparent;
+    flex: 1; min-width: 80px; padding: 10px 8px;
+    background: transparent; border: none;
+    color: var(--text-muted);
+    font-family: 'Cinzel','Anuphan',serif;
+    font-size: 0.68rem; font-weight: 600;
+    letter-spacing: 2px; text-transform: uppercase;
+    cursor: pointer; transition: all 0.25s ease;
+    border-radius: 8px;
+    white-space: nowrap;
   }
-  .tab-btn:hover { background: rgba(212,175,55,0.08); color: var(--text-dark); }
+  .tab-btn:hover:not(.active) {
+    color: var(--burgundy);
+    background: rgba(255,255,255,0.5);
+  }
   .tab-btn.active {
-    background: var(--bg-card); color: var(--gold-deep); border-bottom-color: var(--accent);
+    background: var(--cream-card);
+    color: var(--burgundy);
+    box-shadow: 0 2px 6px rgba(114,47,55,0.12);
   }
   .tab-content {
-    padding: 25px; display: none; min-height: 400px; animation: fadeIn 0.4s ease;
+    padding: 20px; display: none; min-height: 350px;
+    animation: tabSlide 0.35s ease;
+    border: 1px solid var(--border); border-top: none;
+    border-bottom-left-radius: 14px;
+    border-bottom-right-radius: 14px;
+    background: var(--cream-card);
   }
   .tab-content.active { display: block; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes tabSlide {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
   canvas { width: 100% !important; height: 100% !important; }
 
@@ -1299,6 +1325,106 @@
     .trade-log-pagination { padding: 8px; gap: 3px; }
     .tlp-info { display: none; }
     .tlp-btn { min-width: 28px; height: 28px; font-size: 0.8rem; padding: 0 5px; }
+  }
+
+
+  /* ============================================================
+     PHASE 6.5: Weekly-style tabs (override Phase 2 .tab-btn)
+  ============================================================ */
+  .tabs-container { margin-bottom: 24px; display: flex; flex-direction: column; }
+
+  /* Override Phase 2 tabs-header */
+  .tabs-container .tabs-header {
+    display: flex !important; flex-wrap: wrap !important;
+    background: var(--cream-deep) !important;
+    padding: 4px !important; gap: 3px !important;
+    border-radius: 12px !important;
+    border: 1px solid var(--border) !important;
+    border-bottom: none !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Override Phase 2 tab-btn (rewrite sizing + fonts to match Weekly) */
+  .tabs-container .tab-btn {
+    flex: 1 !important;
+    min-width: 80px !important;
+    padding: 10px 8px !important;
+    background: transparent !important;
+    border: none !important;
+    color: var(--text-muted) !important;
+    font-family: 'Cinzel','Anuphan',serif !important;
+    font-size: 0.68rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    border-radius: 8px !important;
+    border-bottom: none !important;  /* kill the 3px underline */
+    white-space: nowrap;  /* keep "CUMULATIVE P&L" on one line */
+    line-height: 1.3;
+  }
+  .tabs-container .tab-btn:hover {
+    color: var(--burgundy) !important;
+    background: rgba(255,255,255,0.5) !important;
+  }
+  .tabs-container .tab-btn.active {
+    background: var(--cream-card) !important;
+    color: var(--burgundy) !important;
+    box-shadow: 0 2px 6px rgba(114,47,55,0.12) !important;
+    border-bottom-color: transparent !important;
+  }
+
+  /* Tab content: add border + rounded bottom like Weekly */
+  .tabs-container .tab-content {
+    padding: 20px !important;
+    display: none;
+    min-height: 350px;
+    animation: tabSlide 0.35s ease;
+    border: 1px solid var(--border);
+    border-top: none;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    background: var(--cream-card);
+  }
+  .tabs-container .tab-content.active { display: block !important; }
+  @keyframes tabSlide {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* The .card-base wrapper around tabs-container — remove double border/padding */
+  .card-base.tabs-container {
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+  .card-base.tabs-container:hover {
+    box-shadow: none !important;
+    transform: none !important;
+    border: none !important;
+  }
+
+  /* Mobile tweaks (compact tabs) */
+  @media (max-width: 500px) {
+    .tabs-container .tab-btn {
+      min-width: 60px !important;
+      padding: 8px 6px !important;
+      font-size: 0.6rem !important;
+      letter-spacing: 1.5px !important;
+    }
+    .tabs-container .tab-content { padding: 14px !important; min-height: 300px; }
+  }
+  @media (max-width: 380px) {
+    .tabs-container .tab-btn {
+      font-size: 0.55rem !important;
+      letter-spacing: 1px !important;
+      padding: 7px 4px !important;
+    }
   }
 
 </style>
