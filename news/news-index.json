@@ -1,6 +1,69 @@
 {
-  "lastUpdated": "2026-04-17T22:00:00Z",
+  "lastUpdated": "2026-04-18T09:00:00Z",
   "batches": [
+    {
+      "file": "2026-04-18-0900.md",
+      "date": "2026-04-18T09:00:00Z",
+      "date_display": "18 เม.ย. 2026 · 09:00",
+      "summary": "Dow +1,005 จุด · Netflix ร่วง 9.7% · น้ำมันดิ่ง 7.86% · เจรจา US-Iran สุดสัปดาห์ · BTC 77,172",
+      "tickers": ["SPY", "DJI", "NFLX", "USO", "BTC", "GLD"],
+      "headlines": [
+        {
+          "title": "อิหร่านประกาศเปิดช่องแคบฮอร์มุซเต็มที่ — Dow พุ่ง 1,005 จุด S&P ทะลุ 7,126",
+          "tickers": [
+            {"symbol": "SPY", "sentiment": "positive"},
+            {"symbol": "DIA", "sentiment": "positive"},
+            {"symbol": "QQQ", "sentiment": "positive"},
+            {"symbol": "USO", "sentiment": "negative"}
+          ],
+          "source": "CNBC · Reuters",
+          "published": "18 เม.ย. 2026"
+        },
+        {
+          "title": "Netflix ร่วง 9.7% ในวันเดียว — Reed Hastings ประกาศลาออกจากบอร์ด จบยุค 29 ปี",
+          "tickers": [
+            {"symbol": "NFLX", "sentiment": "negative"},
+            {"symbol": "WBD", "sentiment": "neutral"},
+            {"symbol": "PSKY", "sentiment": "neutral"}
+          ],
+          "source": "Yahoo Finance · CNBC",
+          "published": "17 เม.ย. 2026"
+        },
+        {
+          "title": "ราคาน้ำมันดิ่งหนัก 7.86% ในวันเดียว — VIX ต่ำสุด 7 สัปดาห์ ตลาดหมุนกลับเข้าหุ้นเทค",
+          "tickers": [
+            {"symbol": "USO", "sentiment": "negative"},
+            {"symbol": "VIX", "sentiment": "negative"},
+            {"symbol": "XOM", "sentiment": "negative"},
+            {"symbol": "QQQ", "sentiment": "positive"}
+          ],
+          "source": "Bloomberg · Motley Fool",
+          "published": "17 เม.ย. 2026"
+        },
+        {
+          "title": "สุดสัปดาห์ 18-19 เม.ย. — การเจรจา US-Iran เข้มข้น ช่องแคบฮอร์มุซเป็นตัวชี้ชะตา",
+          "tickers": [
+            {"symbol": "TSLA", "sentiment": "neutral"},
+            {"symbol": "GOOGL", "sentiment": "neutral"},
+            {"symbol": "IBM", "sentiment": "neutral"},
+            {"symbol": "BA", "sentiment": "neutral"}
+          ],
+          "source": "CNBC · Reuters",
+          "published": "18 เม.ย. 2026"
+        },
+        {
+          "title": "Bitcoin ทะลุ 77,172 ดอลลาร์ — ทองคำ 4,849 ยังแข็งแกร่ง ทั้งคู่ได้ประโยชน์จากปัจจัยต่างกัน",
+          "tickers": [
+            {"symbol": "BTC", "sentiment": "positive"},
+            {"symbol": "IBIT", "sentiment": "positive"},
+            {"symbol": "GLD", "sentiment": "positive"},
+            {"symbol": "MSBT", "sentiment": "positive"}
+          ],
+          "source": "CoinDesk · JP Morgan",
+          "published": "18 เม.ย. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-04-17-2200.md",
       "date": "2026-04-17T22:00:00Z",
