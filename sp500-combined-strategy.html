@@ -305,6 +305,57 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
 .trade-log-container::-webkit-scrollbar { width:3px; }
 .trade-log-container::-webkit-scrollbar-track { background:transparent; }
 .trade-log-container::-webkit-scrollbar-thumb { background:rgba(114,47,55,0.2); border-radius:2px; }
+
+/* ===== TRADE LOG PAGINATION (sticky) ===== */
+.trade-log-pagination {
+  position:sticky; top:-1px; z-index:5;
+  display:flex; align-items:center; justify-content:center; flex-wrap:wrap;
+  gap:4px; padding:10px 12px;
+  background:linear-gradient(180deg, rgba(255,254,248,0.98) 0%, rgba(255,254,248,0.95) 100%);
+  backdrop-filter:blur(10px);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  margin-bottom:4px;
+  box-shadow:0 3px 12px rgba(114,47,55,0.08);
+}
+.tlp-info {
+  font-family:var(--font-body); font-size:0.72rem; color:var(--text-muted);
+  margin-right:auto; padding-left:6px; letter-spacing:0.02em;
+}
+.tlp-info strong { color:var(--burgundy); font-weight:700; }
+.tlp-btn {
+  min-width:32px; height:32px; padding:0 8px;
+  background:var(--cream-card); border:1px solid var(--border);
+  border-radius:var(--radius-xs);
+  font-family:var(--font-number); font-size:0.88rem; font-weight:400;
+  color:var(--text-dark); cursor:pointer;
+  transition:all 0.15s ease;
+  display:inline-flex; align-items:center; justify-content:center;
+}
+.tlp-btn:hover:not(:disabled):not(.active) {
+  background:rgba(212,175,55,0.12); border-color:var(--border-hover);
+  color:var(--burgundy);
+}
+.tlp-btn:active:not(:disabled) { transform:scale(0.93); }
+.tlp-btn.active {
+  background:linear-gradient(135deg, #722F37, #8B2252, #D4AF37);
+  color:#FFF5E1; border-color:transparent;
+  box-shadow:0 2px 8px rgba(139,34,82,0.3);
+  font-weight:500;
+}
+.tlp-btn.nav { font-family:var(--font-body); font-weight:700; color:var(--gold-deep); }
+.tlp-btn:disabled {
+  opacity:0.35; cursor:not-allowed;
+}
+.tlp-dots {
+  color:var(--text-muted); padding:0 4px; font-size:0.9rem;
+  display:inline-flex; align-items:flex-end;
+}
+@media (max-width:500px) {
+  .trade-log-pagination { padding:8px; gap:3px; }
+  .tlp-info { display:none; }
+  .tlp-btn { min-width:28px; height:28px; font-size:0.8rem; padding:0 5px; }
+}
 .trade-card {
   padding:16px; border-radius:var(--radius-sm); background:var(--cream-card);
   border:1px solid var(--border); transition:all 0.25s ease;
@@ -1964,6 +2015,7 @@ function applyStoploss(ticker, entryPrice, entryIdx, maxHoldDays, useOpen) {
 // ====== COMBINED BACKTEST ======
 function runCombinedBacktest() {
   console.time('combined-backtest');
+  window._tradeLogPage = 1; // reset pagination on every new backtest
   CONFIG.capital = parseFloat(document.getElementById('capitalInput').value) || 100;
   CONFIG.momTopN = parseInt(document.getElementById('momTopN').value) || 5;
   CONFIG.momHoldWeeks = parseInt(document.getElementById('momHoldWeeks').value) || 4;
@@ -2774,12 +2826,66 @@ function renderHeatmap() {
   });
 }
 
+// Pagination state (reset on every new backtest render)
+window._tradeLogPage = window._tradeLogPage || 1;
+const TRADE_LOG_PAGE_SIZE = 10;
+
+function tlpGoTo(page) {
+  window._tradeLogPage = page;
+  renderTradeLog();
+  // Scroll trade log container back to top so user sees the new page
+  const container = document.getElementById('tradeLogContainer');
+  if(container) container.scrollTop = 0;
+}
+
+function buildPaginationBar(currentPage, totalPages, totalWeeks) {
+  // Build number buttons with ellipsis: « ‹ 1 … 3 4 [5] 6 7 … 12 › »
+  const maxButtons = 5; // how many numeric buttons to show around current
+  let html = '<div class="trade-log-pagination">';
+  const pageFrom = (currentPage - 1) * TRADE_LOG_PAGE_SIZE + 1;
+  const pageTo = Math.min(currentPage * TRADE_LOG_PAGE_SIZE, totalWeeks);
+  html += '<div class="tlp-info">แสดง <strong>' + pageFrom + '-' + pageTo + '</strong> จาก <strong>' + totalWeeks + '</strong> รอบ</div>';
+
+  // « First
+  html += '<button class="tlp-btn nav" ' + (currentPage === 1 ? 'disabled' : 'onclick="tlpGoTo(1)"') + ' title="หน้าแรก">«</button>';
+  // ‹ Prev
+  html += '<button class="tlp-btn nav" ' + (currentPage === 1 ? 'disabled' : 'onclick="tlpGoTo(' + (currentPage-1) + ')"') + ' title="ก่อนหน้า">‹</button>';
+
+  // Determine numeric window
+  let start = Math.max(1, currentPage - Math.floor(maxButtons/2));
+  let end = Math.min(totalPages, start + maxButtons - 1);
+  if(end - start + 1 < maxButtons) start = Math.max(1, end - maxButtons + 1);
+
+  // Leading "1 …"
+  if(start > 1) {
+    html += '<button class="tlp-btn" onclick="tlpGoTo(1)">1</button>';
+    if(start > 2) html += '<span class="tlp-dots">…</span>';
+  }
+  // Numeric buttons
+  for(let p = start; p <= end; p++) {
+    html += '<button class="tlp-btn' + (p === currentPage ? ' active' : '') + '" onclick="tlpGoTo(' + p + ')">' + p + '</button>';
+  }
+  // Trailing "… last"
+  if(end < totalPages) {
+    if(end < totalPages - 1) html += '<span class="tlp-dots">…</span>';
+    html += '<button class="tlp-btn" onclick="tlpGoTo(' + totalPages + ')">' + totalPages + '</button>';
+  }
+
+  // › Next
+  html += '<button class="tlp-btn nav" ' + (currentPage === totalPages ? 'disabled' : 'onclick="tlpGoTo(' + (currentPage+1) + ')"') + ' title="ถัดไป">›</button>';
+  // » Last
+  html += '<button class="tlp-btn nav" ' + (currentPage === totalPages ? 'disabled' : 'onclick="tlpGoTo(' + totalPages + ')"') + ' title="หน้าสุดท้าย">»</button>';
+
+  html += '</div>';
+  return html;
+}
+
 function renderTradeLog() {
   const container = document.getElementById('tradeLogContainer');
   container.innerHTML='';
 
-  // ===== PENDING SIGNAL CARD (top of log) =====
-  if(state.pendingSignal) {
+  // ===== PENDING SIGNAL CARD (top of log, always visible on page 1) =====
+  if(state.pendingSignal && window._tradeLogPage === 1) {
     const ps = state.pendingSignal;
     const card = document.createElement('div');
     card.className = 'trade-card';
@@ -2829,12 +2935,33 @@ function renderTradeLog() {
   });
 
   const weeks = Object.keys(weekMap).sort().reverse();
+  const totalWeeks = weeks.length;
+  const totalPages = Math.max(1, Math.ceil(totalWeeks / TRADE_LOG_PAGE_SIZE));
 
-  weeks.forEach((weekDate, idx) => {
+  // Clamp current page to valid range
+  if(window._tradeLogPage > totalPages) window._tradeLogPage = totalPages;
+  if(window._tradeLogPage < 1) window._tradeLogPage = 1;
+  const currentPage = window._tradeLogPage;
+
+  // Insert sticky pagination bar BEFORE trade cards (only when >1 page)
+  if(totalPages > 1) {
+    const paginationWrap = document.createElement('div');
+    paginationWrap.innerHTML = buildPaginationBar(currentPage, totalPages, totalWeeks);
+    container.appendChild(paginationWrap.firstElementChild);
+  }
+
+  // Slice weeks for current page
+  const pageStart = (currentPage - 1) * TRADE_LOG_PAGE_SIZE;
+  const pageEnd = pageStart + TRADE_LOG_PAGE_SIZE;
+  const pageWeeks = weeks.slice(pageStart, pageEnd);
+
+  pageWeeks.forEach((weekDate, pageIdx) => {
     const wk = weekMap[weekDate];
     const momR = wk.mom;
     const dhR = wk.dh;
-    const isLatest = (idx === 0);
+    // 'Latest' highlight: the first week across ALL weeks (page 1, idx 0)
+    const globalIdx = pageStart + pageIdx;
+    const isLatest = (globalIdx === 0);
 
     // Combined stats for this week
     let totalPnl = 0, totalCapital = 0, totalStocks = 0;
