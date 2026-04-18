@@ -7,7 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@200;300;400;500;600;700&family=Cinzel:wght@400;500;600;700&family=DM+Serif+Display&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
   /* === JP Trust brand palette (adapted from member-dashboard) === */
@@ -36,9 +36,10 @@
   --orange-glow: rgba(200,90,74,0.22);
   --purple: #B88FC2;                          /* dusty rose-gold, brand-neutral */
   --blue: #7AA8C9;                            /* muted steel blue */
-  --font-heading: 'Outfit', 'Anuphan', sans-serif;
-  --font-body: 'Anuphan', 'Inter', sans-serif;
-  --font-thai: 'Anuphan', sans-serif;
+  --font-heading: 'Cinzel', 'Anuphan', serif;
+  --font-body: 'Sarabun', 'Anuphan', sans-serif;
+  --font-thai: 'Anuphan', 'Sarabun', sans-serif;
+  --font-number: 'DM Serif Display', serif;
   --radius: 16px;
   --radius-sm: 10px;
   --radius-xs: 6px;
@@ -212,9 +213,9 @@ input[type=range]:active::-webkit-slider-thumb { transform:scale(1.1); }
   background:var(--bg-card) !important; backdrop-filter:blur(20px);
 }
 .kpi-title { color:var(--text-dark); font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px; }
-.kpi-value { font-family:var(--font-heading); font-size:1.5rem; font-weight:700; color:#F4E4BA; line-height:1.1; }
+.kpi-value { font-family:var(--font-number); font-size:1.7rem; font-weight:400; color:#F4E4BA; line-height:1.1; letter-spacing:-0.01em; }
 .kpi-sub { font-size:0.7rem; color:var(--text-muted); margin-top:8px; font-weight:500; }
-.input-wrapper-kpi { display:flex; align-items:baseline; gap:4px; font-family:var(--font-heading); font-size:1.5rem; font-weight:700; color:#F4E4BA; }
+.input-wrapper-kpi { display:flex; align-items:baseline; gap:4px; font-family:var(--font-number); font-size:1.6rem; font-weight:400; color:#F4E4BA; }
 .kpi-input {
   background:transparent; border:none; border-bottom:2px solid var(--border);
   color:#F4E4BA; font-family:inherit; font-size:inherit; font-weight:inherit;
@@ -283,7 +284,7 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
 }
 .stat-box:hover { border-color:rgba(212,175,55,0.3); transform:translateY(-1px); box-shadow:0 4px 16px rgba(0,0,0,0.3); }
 .stat-label { font-size:0.62rem; color:var(--text-dark); font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px; }
-.stat-val { font-family:var(--font-heading); font-size:1.2rem; font-weight:700; color:#F4E4BA; }
+.stat-val { font-family:var(--font-number); font-size:1.35rem; font-weight:400; color:#F4E4BA; letter-spacing:-0.01em; }
 .stat-sub { font-size:0.65rem; color:var(--text-dark); margin-top:4px; }
 
 /* TRADE LOG — Card stack */
@@ -374,8 +375,8 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
   letter-spacing:0.5px;
 }
 .owl-loader-pct {
-  font-family:var(--font-heading); font-size:1.55rem; font-weight:700;
-  color:var(--gold-light); letter-spacing:1px;
+  font-family:var(--font-number); font-size:1.75rem; font-weight:400;
+  color:var(--gold-light); letter-spacing:0;
   position:absolute; left:50%; top:62%; transform:translate(-50%, -50%);
   text-shadow:0 2px 12px rgba(212,175,55,0.6);
 }
@@ -454,6 +455,107 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
   .diagram-flow { grid-template-columns:1fr; gap:10px; }
   .diagram-step-arrow { display:none !important; }
   .strategy-diagram { padding:22px 16px; }
+}
+
+/* ===== RESULTS SUMMARY CARD ===== */
+.results-summary-card {
+  background:linear-gradient(135deg, rgba(114,47,55,0.35) 0%, rgba(26,10,14,0.6) 50%, rgba(200,90,74,0.15) 100%);
+  border:1px solid var(--border-hover); border-radius:var(--radius);
+  padding:26px 26px 22px; margin-bottom:28px; position:relative; overflow:hidden;
+  box-shadow:0 8px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(212,175,55,0.08);
+}
+.results-summary-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg, transparent, var(--accent), var(--gold-light), var(--accent), transparent);
+}
+.results-summary-card::after {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(ellipse 60% 50% at 100% 0%, rgba(212,175,55,0.12), transparent 60%),
+             radial-gradient(ellipse 50% 40% at 0% 100%, rgba(200,90,74,0.1), transparent 60%);
+}
+.rsc-header {
+  display:grid; grid-template-columns:1fr auto; gap:20px; align-items:center;
+  padding-bottom:20px; margin-bottom:20px; border-bottom:1px dashed var(--border);
+  position:relative; z-index:1;
+}
+.rsc-title-row { display:flex; flex-direction:column; gap:6px; }
+.rsc-label {
+  font-family:var(--font-heading); font-size:0.72rem; font-weight:600;
+  color:var(--accent); letter-spacing:4px; text-transform:uppercase;
+}
+.rsc-subtitle {
+  font-family:var(--font-body); font-size:0.78rem; color:var(--text-muted);
+  line-height:1.5;
+}
+.rsc-hero-metric {
+  text-align:right; display:flex; flex-direction:column; gap:2px; min-width:0;
+}
+.rsc-hero-label {
+  font-family:var(--font-heading); font-size:0.65rem; font-weight:500;
+  color:var(--text-muted); letter-spacing:3px; text-transform:uppercase;
+}
+.rsc-hero-value {
+  font-family:var(--font-number); font-size:2.4rem; font-weight:400;
+  color:var(--gold-light); line-height:1.1; letter-spacing:-0.02em;
+  text-shadow:0 2px 16px rgba(212,175,55,0.25);
+}
+.rsc-hero-value.positive { color:var(--green); text-shadow:0 2px 16px rgba(91,196,142,0.3); }
+.rsc-hero-value.negative { color:var(--red); text-shadow:0 2px 16px rgba(217,95,95,0.3); }
+.rsc-hero-sub {
+  font-family:var(--font-body); font-size:0.78rem; color:var(--text-main);
+  font-weight:500; line-height:1.5;
+}
+
+.rsc-metrics-grid {
+  display:grid; grid-template-columns:repeat(4, 1fr); gap:12px;
+  position:relative; z-index:1;
+}
+.rsc-metric {
+  background:rgba(244,228,186,0.04); border:1px solid var(--border);
+  border-radius:var(--radius-sm); padding:14px 14px 12px;
+  transition:all 0.3s ease;
+}
+.rsc-metric:hover {
+  border-color:var(--border-hover);
+  background:rgba(244,228,186,0.06);
+}
+.rsc-metric-label {
+  font-family:var(--font-heading); font-size:0.65rem; font-weight:500;
+  color:var(--text-muted); letter-spacing:2px; text-transform:uppercase;
+  margin-bottom:6px;
+}
+.rsc-metric-value {
+  font-family:var(--font-number); font-size:1.5rem; font-weight:400;
+  color:var(--gold-light); line-height:1.1; letter-spacing:-0.01em;
+  margin-bottom:6px;
+}
+.rsc-metric-desc {
+  font-family:var(--font-body); font-size:0.72rem; color:var(--text-muted);
+  line-height:1.5;
+}
+
+.rsc-narrative {
+  margin-top:20px; padding:16px 18px; position:relative; z-index:1;
+  background:rgba(244,228,186,0.04); border-left:3px solid var(--accent);
+  border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+  font-family:var(--font-body); font-size:0.88rem; color:var(--text-main);
+  line-height:1.75;
+}
+.rsc-narrative strong { color:var(--gold-light); font-weight:600; }
+.rsc-narrative .rsc-num { font-family:var(--font-number); color:var(--gold-light); font-size:1.02em; }
+.rsc-narrative .rsc-num.pos { color:var(--green); }
+.rsc-narrative .rsc-num.neg { color:var(--red); }
+
+@media (max-width:900px) {
+  .rsc-metrics-grid { grid-template-columns:repeat(2, 1fr); }
+  .rsc-header { grid-template-columns:1fr; gap:12px; }
+  .rsc-hero-metric { text-align:left; }
+}
+@media (max-width:500px) {
+  .results-summary-card { padding:20px 18px 18px; }
+  .rsc-hero-value { font-size:2rem; }
+  .rsc-metric-value { font-size:1.3rem; }
+  .rsc-narrative { font-size:0.84rem; padding:14px 16px; }
 }
 
 /* ===== FLOATING ACTION BUTTONS ===== */
@@ -686,46 +788,45 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
   </div>
 
   <div id="dashboard" class="hidden">
-    <!-- Strategy Diagram -->
-    <div class="strategy-diagram">
-      <div class="diagram-title">วงจรการเทรดของกลยุทธ์</div>
-      <div class="diagram-flow">
-        <div class="diagram-step">
-          <div class="diagram-step-num">1</div>
-          <div class="diagram-step-icon">🔍</div>
-          <div class="diagram-step-day">ศุกร์</div>
-          <div class="diagram-step-title">สแกนสัญญาณ</div>
-          <div class="diagram-step-desc">วิเคราะห์หุ้นทั้งหมดจากวันทำการสุดท้าย หาตัวที่เข้าเงื่อนไข Momentum &amp; Dark Horse</div>
-          <div class="diagram-step-arrow">→</div>
+    <!-- RESULTS NARRATIVE SUMMARY CARD -->
+    <div class="results-summary-card">
+      <div class="rsc-header">
+        <div class="rsc-title-row">
+          <div class="rsc-label">สรุปผลการแบ็คเทส</div>
+          <div class="rsc-subtitle" id="rscPeriod">กำลังคำนวณ...</div>
         </div>
-        <div class="diagram-step">
-          <div class="diagram-step-num">2</div>
-          <div class="diagram-step-icon">💰</div>
-          <div class="diagram-step-day">จันทร์</div>
-          <div class="diagram-step-title">ซื้อที่ราคาเปิด</div>
-          <div class="diagram-step-desc">เข้าตำแหน่งที่ Open ของวันทำการแรก แบ่งงบตามสัดส่วนที่ตั้งไว้ (Momentum : Dark Horse)</div>
-          <div class="diagram-step-arrow">→</div>
-        </div>
-        <div class="diagram-step">
-          <div class="diagram-step-num">3</div>
-          <div class="diagram-step-icon">⏳</div>
-          <div class="diagram-step-day">ถือ N สัปดาห์</div>
-          <div class="diagram-step-title">ถือพร้อม Stoploss</div>
-          <div class="diagram-step-desc">ถือครองตามระยะเวลาที่กำหนด มี Stoploss ต่อหุ้นคอยป้องกันถ้าราคาตกเกินกำหนด</div>
-          <div class="diagram-step-arrow">→</div>
-        </div>
-        <div class="diagram-step">
-          <div class="diagram-step-num">4</div>
-          <div class="diagram-step-icon">🏁</div>
-          <div class="diagram-step-day">จันทร์ถัดไป</div>
-          <div class="diagram-step-title">ขายที่ราคาเปิด</div>
-          <div class="diagram-step-desc">ออกตำแหน่งที่ Open ของวันทำการแรก ปิดรอบ — พร้อมเริ่มสแกนสัญญาณใหม่ต่อไป</div>
-          <div class="diagram-step-arrow">→</div>
+        <div class="rsc-hero-metric">
+          <div class="rsc-hero-label">กำไรรวม</div>
+          <div class="rsc-hero-value" id="rscTotalPnl">$0</div>
+          <div class="rsc-hero-sub" id="rscMonthlyAvg">ตกเฉลี่ย $0 / เดือน · จากงบตั้งต้น $0</div>
         </div>
       </div>
-      <div class="diagram-legend">
-        <div class="diagram-legend-item"><span class="diagram-legend-dot" style="background:var(--accent);"></span>Momentum — หุ้นที่วิ่งแรงต่อเนื่อง + EMA aligned + Volume</div>
-        <div class="diagram-legend-item"><span class="diagram-legend-dot" style="background:var(--orange);"></span>Dark Horse — หุ้นเงียบมานาน แล้วโผล่พร้อม Volume พุ่ง</div>
+
+      <div class="rsc-metrics-grid">
+        <div class="rsc-metric">
+          <div class="rsc-metric-label">Annualized Return</div>
+          <div class="rsc-metric-value" id="rscAnnRoi">0.0%</div>
+          <div class="rsc-metric-desc">ผลตอบแทนเฉลี่ยต่อปีจากเงินลงทุน</div>
+        </div>
+        <div class="rsc-metric">
+          <div class="rsc-metric-label">Sharpe Ratio</div>
+          <div class="rsc-metric-value" id="rscSharpe">—</div>
+          <div class="rsc-metric-desc" id="rscSharpeDesc">กำไรต่อหน่วยความเสี่ยง — สูงกว่า 1 ถือว่าดี</div>
+        </div>
+        <div class="rsc-metric">
+          <div class="rsc-metric-label">Alpha</div>
+          <div class="rsc-metric-value" id="rscAlpha">—</div>
+          <div class="rsc-metric-desc" id="rscAlphaDesc">ผลตอบแทนส่วนที่เอาชนะตลาด หลังหักความเสี่ยง</div>
+        </div>
+        <div class="rsc-metric">
+          <div class="rsc-metric-label">Max Drawdown</div>
+          <div class="rsc-metric-value" id="rscMaxDD" style="color:var(--red);">0.0%</div>
+          <div class="rsc-metric-desc">ขาดทุนรอบที่หนักที่สุด — เอาไว้วัดความอดทนที่ต้องมี</div>
+        </div>
+      </div>
+
+      <div class="rsc-narrative" id="rscNarrative">
+        กำลังสรุปผลตอบแทน...
       </div>
     </div>
 
@@ -1160,12 +1261,55 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
     <button class="panel-close" onclick="closeAboutModal()" style="position:absolute;top:16px;right:16px;" aria-label="ปิด">✕</button>
     <h2>🦉 Combined Strategy</h2>
     <div class="about-sub">Momentum + Dark Horse — เทรดรายสัปดาห์บนหุ้น S&amp;P 500</div>
-    <p><strong style="color:var(--accent);">Momentum:</strong> คัดหุ้นที่วิ่งแรงต่อเนื่องใน Top 20% ของตลาด โดยต้องผ่านเงื่อนไข EMA aligned (EMA10 > EMA20), Volume สูงกว่าค่าเฉลี่ย, RSI ไม่ overbought (&lt; 80), และมี Relative Strength เหนือ Market benchmark</p>
+
+    <!-- Strategy Flow Diagram -->
+    <div class="strategy-diagram" style="margin:8px 0 4px;">
+      <div class="diagram-title">วงจรการเทรดของกลยุทธ์</div>
+      <div class="diagram-flow">
+        <div class="diagram-step">
+          <div class="diagram-step-num">1</div>
+          <div class="diagram-step-icon">🔍</div>
+          <div class="diagram-step-day">ศุกร์</div>
+          <div class="diagram-step-title">สแกนสัญญาณ</div>
+          <div class="diagram-step-desc">วิเคราะห์หุ้นทั้งหมดจากวันทำการสุดท้าย หาตัวที่เข้าเงื่อนไข Momentum &amp; Dark Horse</div>
+          <div class="diagram-step-arrow">→</div>
+        </div>
+        <div class="diagram-step">
+          <div class="diagram-step-num">2</div>
+          <div class="diagram-step-icon">💰</div>
+          <div class="diagram-step-day">จันทร์</div>
+          <div class="diagram-step-title">ซื้อที่ราคาเปิด</div>
+          <div class="diagram-step-desc">เข้าตำแหน่งที่ Open ของวันทำการแรก แบ่งงบตามสัดส่วนที่ตั้งไว้ (Momentum : Dark Horse)</div>
+          <div class="diagram-step-arrow">→</div>
+        </div>
+        <div class="diagram-step">
+          <div class="diagram-step-num">3</div>
+          <div class="diagram-step-icon">⏳</div>
+          <div class="diagram-step-day">ถือ N สัปดาห์</div>
+          <div class="diagram-step-title">ถือพร้อม Stoploss</div>
+          <div class="diagram-step-desc">ถือครองตามระยะเวลาที่กำหนด มี Stoploss ต่อหุ้นคอยป้องกันถ้าราคาตกเกินกำหนด</div>
+          <div class="diagram-step-arrow">→</div>
+        </div>
+        <div class="diagram-step">
+          <div class="diagram-step-num">4</div>
+          <div class="diagram-step-icon">🏁</div>
+          <div class="diagram-step-day">จันทร์ถัดไป</div>
+          <div class="diagram-step-title">ขายที่ราคาเปิด</div>
+          <div class="diagram-step-desc">ออกตำแหน่งที่ Open ของวันทำการแรก ปิดรอบ — พร้อมเริ่มสแกนสัญญาณใหม่ต่อไป</div>
+          <div class="diagram-step-arrow">→</div>
+        </div>
+      </div>
+      <div class="diagram-legend">
+        <div class="diagram-legend-item"><span class="diagram-legend-dot" style="background:var(--accent);"></span>Momentum — หุ้นที่วิ่งแรงต่อเนื่อง + EMA aligned + Volume</div>
+        <div class="diagram-legend-item"><span class="diagram-legend-dot" style="background:var(--orange);"></span>Dark Horse — หุ้นเงียบมานาน แล้วโผล่พร้อม Volume พุ่ง</div>
+      </div>
+    </div>
+
+    <p><strong style="color:var(--accent);">Momentum:</strong> คัดหุ้นที่วิ่งแรงต่อเนื่องใน Top 20% ของตลาด โดยต้องผ่านเงื่อนไข EMA aligned (EMA10 &gt; EMA20), Volume สูงกว่าค่าเฉลี่ย, RSI ไม่ overbought (&lt; 80), และมี Relative Strength เหนือ Market benchmark</p>
     <p><strong style="color:var(--orange);">Dark Horse:</strong> คัดหุ้นที่ "เงียบมานาน แล้วโผล่" — ต้องเคยอยู่นอก Top 30 มาอย่างน้อย N สัปดาห์ แล้วกระโดดเข้า Top 10 พร้อม Volume Explosion (×2.5 เทียบกับค่าเฉลี่ย) และ return 5 วันแรง</p>
     <div class="about-highlight">
       <strong>Confirmation ★:</strong> ถ้า Dark Horse ตัวนั้นอยู่ใน Momentum Top 20% ด้วย จะถูก tag "Confirmed" — หมายถึงมีทั้งแรงเงียบ+แรงวิ่ง ซ้อนกันทั้งสองกลยุทธ์
     </div>
-    <p><strong style="color:var(--gold-light);">Workflow:</strong> ทุกวันศุกร์สแกนสัญญาณ → ซื้อราคา Open วันจันทร์ → ถือตามจำนวนสัปดาห์ที่กำหนด → ขายราคา Open จันทร์ถัดไป — มี Per Stock Stoploss ทั้งสองกลยุทธ์, เมื่อโดน SL จะออกที่ Open วันถัดไป</p>
     <p><strong style="color:var(--green);">Allocation Mode:</strong></p>
     <p style="margin-left:12px;"><strong>A — แยกงบ:</strong> ให้แต่ละกลยุทธ์งบแยก ถือพร้อมกันได้ทั้งสอง</p>
     <p style="margin-left:12px;"><strong>B — งบเดียว ปรับสัดส่วน:</strong> ใช้งบก้อนเดียว แล้วแบ่งสัดส่วน Mom:DH ตาม Market Regime (ต้องเปิด Regime Filter)</p>
@@ -2154,10 +2298,130 @@ function updateKPIs() {
   computeAlphaMetrics(closed);
 }
 
+// ====== RESULTS SUMMARY CARD ======
+function updateResultsSummary() {
+  const closed = state.allResults.filter(r => !r.isOpen);
+  const rsPeriod = document.getElementById('rscPeriod');
+  const rsHero = document.getElementById('rscTotalPnl');
+  const rsMonthly = document.getElementById('rscMonthlyAvg');
+  const rsAnn = document.getElementById('rscAnnRoi');
+  const rsSharpe = document.getElementById('rscSharpe');
+  const rsSharpeDesc = document.getElementById('rscSharpeDesc');
+  const rsAlpha = document.getElementById('rscAlpha');
+  const rsAlphaDesc = document.getElementById('rscAlphaDesc');
+  const rsDD = document.getElementById('rscMaxDD');
+  const rsNarr = document.getElementById('rscNarrative');
+  if(!rsHero || !rsNarr) return;
+
+  if(closed.length < 2) {
+    rsPeriod.innerText = 'ยังไม่มีรอบที่ปิด';
+    rsHero.innerText = '$0';
+    rsMonthly.innerText = '—';
+    rsAnn.innerText = '—';
+    rsSharpe.innerText = '—';
+    rsAlpha.innerText = '—';
+    rsDD.innerText = '—';
+    rsNarr.innerText = 'ปรับพารามิเตอร์แล้วกด ▶ รันแบ็คเทส เพื่อดูผลลัพธ์';
+    return;
+  }
+
+  const totalPnl = closed.reduce((s,r) => s + r.pnl, 0);
+  const firstDate = closed[0].entryDate;
+  const lastDate = closed[closed.length-1].exitDate || closed[closed.length-1].entryDate;
+  const daySpan = (new Date(lastDate) - new Date(firstDate)) / 86400000;
+  const yearsSpan = Math.max(daySpan / 365.25, 0.5);
+  const monthsSpan = Math.max(daySpan / 30.44, 1);
+
+  // Capital deployed (same formula as updateKPIs)
+  const capitalDeployed = CONFIG.allocMode === 'split'
+    ? (CONFIG.momHoldWeeks + CONFIG.dhHoldWeeks) * CONFIG.capital
+    : Math.max(CONFIG.momHoldWeeks, CONFIG.dhHoldWeeks) * CONFIG.capital;
+
+  const roiOnDeployed = capitalDeployed > 0 ? (totalPnl / capitalDeployed) * 100 : 0;
+  const annualizedRoi = capitalDeployed > 0 ? (roiOnDeployed / yearsSpan) : 0;
+  const avgPerMonth = totalPnl / monthsSpan;
+
+  const rets = closed.map(r => r.retPct);
+  const maxLoss = rets.length > 0 ? Math.min(...rets) : 0;
+  const winRate = rets.length > 0 ? (rets.filter(r=>r>0).length / rets.length * 100) : 0;
+
+  const m = window._lastMetrics || {};
+  const sharpe = (typeof m.sharpe === 'number' && isFinite(m.sharpe)) ? m.sharpe : null;
+  const alpha = (typeof m.alpha === 'number' && isFinite(m.alpha)) ? m.alpha : null;
+
+  // Format dates Thai-style (B.E. +543 would be too much — use Gregorian)
+  const fmtDate = (d) => {
+    const dt = new Date(d);
+    const m = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    return dt.getDate() + ' ' + m[dt.getMonth()] + ' ' + dt.getFullYear();
+  };
+  rsPeriod.innerText = fmtDate(firstDate) + ' → ' + fmtDate(lastDate) +
+    ' · ' + closed.length + ' รอบ · ' + yearsSpan.toFixed(1) + ' ปี';
+
+  // Hero
+  const posNeg = totalPnl >= 0 ? 'positive' : 'negative';
+  rsHero.className = 'rsc-hero-value ' + posNeg;
+  rsHero.innerText = (totalPnl>=0 ? '+' : '-') + '$' + Math.abs(Math.round(totalPnl)).toLocaleString();
+  rsMonthly.innerHTML = 'ตกเฉลี่ย <strong>' + (avgPerMonth>=0?'+':'-') + '$' + Math.abs(avgPerMonth).toFixed(0) +
+    '</strong> / เดือน · จากงบตั้งต้น <strong>$' + capitalDeployed.toLocaleString() + '</strong>';
+
+  // Annualized
+  rsAnn.innerText = (annualizedRoi>=0?'+':'') + annualizedRoi.toFixed(1) + '%';
+  rsAnn.style.color = annualizedRoi >= 0 ? 'var(--green)' : 'var(--red)';
+
+  // Sharpe
+  if(sharpe !== null) {
+    rsSharpe.innerText = sharpe.toFixed(2);
+    rsSharpe.style.color = sharpe > 1 ? 'var(--green)' : sharpe > 0.5 ? 'var(--accent)' : 'var(--red)';
+    rsSharpeDesc.innerText = sharpe > 1.5 ? 'ดีมาก — กำไรคุ้มเสี่ยงสูง'
+      : sharpe > 1 ? 'ดี — กำไรต่อหน่วยความเสี่ยงใช้ได้'
+      : sharpe > 0.5 ? 'พอใช้ — กำไรยังไม่ชัดกว่าเสี่ยงมาก'
+      : 'ต่ำ — ความเสี่ยงสูงกว่ากำไร';
+  } else {
+    rsSharpe.innerText = '—';
+    rsSharpeDesc.innerText = 'ต้องมีอย่างน้อย 10 รอบถึงจะวัดได้';
+  }
+
+  // Alpha
+  if(alpha !== null) {
+    rsAlpha.innerText = (alpha>=0?'+':'') + (alpha*100).toFixed(2) + '%';
+    rsAlpha.style.color = alpha > 0 ? 'var(--green)' : 'var(--red)';
+    rsAlphaDesc.innerText = alpha > 0.05 ? 'เอาชนะตลาดได้ชัดเจน'
+      : alpha > 0 ? 'พอเอาชนะตลาดได้'
+      : 'ยังไม่เอาชนะตลาด';
+  } else {
+    rsAlpha.innerText = '—';
+    rsAlphaDesc.innerText = 'ต้องมีอย่างน้อย 10 รอบถึงจะวัดได้';
+  }
+
+  // Max DD
+  rsDD.innerText = maxLoss.toFixed(1) + '%';
+
+  // Narrative — Thai prose summarizing parameters + outcome
+  const modeText = CONFIG.allocMode === 'split' ? 'แยกงบ' : 'งบเดียวปรับสัดส่วน';
+  const regimeText = CONFIG.regimeEma > 0 ? ('กรอง Regime ที่ EMA ' + CONFIG.regimeEma + 'W') : 'ไม่กรอง regime';
+  const slText = CONFIG.stoploss > 0 ? ('SL -' + CONFIG.stoploss + '%') : 'ไม่ใช้ SL';
+  const spanCls = (v) => v >= 0 ? 'rsc-num pos' : 'rsc-num neg';
+  const sign = (v) => v >= 0 ? '+' : '';
+
+  rsNarr.innerHTML =
+    'ด้วยการตั้งค่า <strong>' + modeText + '</strong> · งบ <span class="rsc-num">$' + CONFIG.capital + '</span>/รอบ · ' +
+    'Momentum Top <span class="rsc-num">' + CONFIG.momTopN + '</span> ถือ <span class="rsc-num">' + CONFIG.momHoldWeeks + 'W</span> · ' +
+    'Dark Horse Top <span class="rsc-num">' + CONFIG.dhTopN + '</span> ถือ <span class="rsc-num">' + CONFIG.dhHoldWeeks + 'W</span> · ' +
+    regimeText + ' · ' + slText +
+    ' — ตั้งแต่ปี <span class="rsc-num">' + CONFIG.startYear + '</span> ทำกำไรรวม <span class="' + spanCls(totalPnl) + '">' + sign(totalPnl) + '$' + Math.abs(Math.round(totalPnl)).toLocaleString() + '</span> ' +
+    'คิดเป็น <span class="' + spanCls(annualizedRoi) + '">' + sign(annualizedRoi) + annualizedRoi.toFixed(1) + '%</span> ต่อปี · ' +
+    'ชนะ <span class="rsc-num">' + winRate.toFixed(0) + '%</span> ของรอบทั้งหมด · ' +
+    'โดนดรอว์ดาวน์หนักสุด <span class="rsc-num neg">' + maxLoss.toFixed(1) + '%</span> ในหนึ่งรอบ' +
+    (sharpe !== null ? ' · Sharpe <span class="rsc-num">' + sharpe.toFixed(2) + '</span>' : '') + '.';
+}
+
 // ====== ALPHA & RISK ANALYSIS ======
 function computeAlphaMetrics(closedResults) {
   if(closedResults.length < 10) {
     document.getElementById('alphaAnalysis').innerHTML = 'ต้องมีอย่างน้อย 10 rounds ถึงจะวิเคราะห์ alpha ได้';
+    window._lastMetrics = {};
+    if(typeof updateResultsSummary === 'function') updateResultsSummary();
     return;
   }
 
@@ -2298,6 +2562,10 @@ function computeAlphaMetrics(closedResults) {
 
   document.getElementById('stat-pvol').innerText = (portVolAnn*100).toFixed(1) + '%';
   document.getElementById('stat-mvol').innerText = (mktVolAnn*100).toFixed(1) + '%';
+
+  // Stash metrics for summary card
+  window._lastMetrics = { beta, alpha, sharpe, ir, sortino, r2, portVolAnn, mktVolAnn };
+  if(typeof updateResultsSummary === 'function') updateResultsSummary();
 
   // Generate analysis text
   let analysis = '';
