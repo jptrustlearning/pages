@@ -673,6 +673,159 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
   .rsc-narrative { font-size:0.84rem; padding:14px 16px; }
 }
 
+/* ═══════════ RSS (RESULTS SUMMARY STATS) TABS ═══════════ */
+.rss-stats-tabs {
+  margin-top:22px; padding-top:20px;
+  border-top:1px dashed rgba(212,175,55,0.3);
+  position:relative; z-index:1;
+}
+.rss-tabs-header {
+  display:grid; grid-template-columns:repeat(4, 1fr); gap:6px;
+  background:rgba(255,255,255,0.4);
+  border:1px solid rgba(212,175,55,0.25);
+  border-radius:var(--radius-sm);
+  padding:4px;
+  margin-bottom:14px;
+  box-shadow:inset 0 1px 3px rgba(114,47,55,0.05);
+}
+.rss-tab-btn {
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  padding:10px 8px;
+  background:transparent; border:none; cursor:pointer;
+  border-radius:var(--radius-xs);
+  font-family:'Sarabun','Anuphan',sans-serif;
+  font-size:0.78rem; font-weight:600;
+  color:var(--text-muted);
+  transition:all 0.2s ease;
+  white-space:nowrap;
+}
+.rss-tab-btn:hover:not(.active) {
+  color:var(--burgundy);
+  background:rgba(255,255,255,0.6);
+}
+.rss-tab-btn.active {
+  background:linear-gradient(135deg, #722F37 0%, #8B2252 55%, #D4AF37 100%);
+  color:#FFF5E1;
+  box-shadow:0 2px 8px rgba(139,34,82,0.25);
+}
+.rss-tab-icon { font-size:1rem; line-height:1; }
+.rss-tab-label { font-size:0.8rem; }
+
+.rss-tab-pane { display:none; animation:rssTabFade 0.3s ease; }
+.rss-tab-pane.active { display:block; }
+@keyframes rssTabFade {
+  from { opacity:0; transform:translateY(4px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+.rss-stat-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));
+  gap:10px;
+  margin-bottom:14px;
+}
+.rss-stat {
+  background:var(--cream-card);
+  border:1px solid rgba(212,175,55,0.3);
+  border-radius:var(--radius-sm);
+  padding:12px 14px 10px;
+  position:relative; overflow:hidden;
+  transition:all 0.2s ease;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,0.5);
+}
+.rss-stat::before {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:100%;
+  background:linear-gradient(180deg, transparent 40%, rgba(237,225,200,0.5) 100%);
+  pointer-events:none; z-index:0;
+}
+.rss-stat:hover {
+  border-color:var(--border-hover);
+  transform:translateY(-1px);
+  box-shadow:0 4px 12px rgba(114,47,55,0.08);
+}
+.rss-stat > * { position:relative; z-index:1; }
+.rss-stat-label {
+  font-family:'Cinzel','Anuphan',serif;
+  font-size:0.62rem; font-weight:600;
+  color:var(--gold-deep);
+  letter-spacing:1.8px; text-transform:uppercase;
+  margin-bottom:5px;
+}
+.rss-stat-val {
+  font-family:'DM Serif Display', serif;
+  font-size:1.25rem; font-weight:400;
+  color:var(--text-dark); line-height:1.1;
+  letter-spacing:-0.01em;
+  margin-bottom:4px;
+}
+.rss-stat-sub {
+  font-family:'Sarabun','Anuphan',sans-serif;
+  font-size:0.7rem; color:var(--text-muted);
+  line-height:1.4;
+}
+
+.rss-tab-narrative {
+  margin-top:12px;
+  padding:12px 14px;
+  background:rgba(212,175,55,0.08);
+  border-left:3px solid var(--accent);
+  border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+  font-family:'Sarabun','Anuphan',sans-serif;
+  font-size:0.82rem; color:var(--text-main);
+  line-height:1.7;
+}
+.rss-tab-narrative strong { color:var(--burgundy); font-weight:700; }
+.rss-tab-narrative .rss-num {
+  font-family:'DM Serif Display',serif;
+  color:var(--text-dark); font-size:1.02em;
+}
+.rss-tab-narrative .rss-num.pos { color:var(--green); }
+.rss-tab-narrative .rss-num.neg { color:var(--red); }
+
+/* SPY Benchmark header row */
+.rss-bench-header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:14px 16px; margin-bottom:12px;
+  background:linear-gradient(135deg, rgba(212,175,55,0.08), rgba(114,47,55,0.04));
+  border:1px solid rgba(212,175,55,0.3);
+  border-radius:var(--radius-sm);
+}
+.rss-bench-label {
+  font-family:'Cinzel','Anuphan',serif;
+  font-size:0.72rem; font-weight:700;
+  color:var(--gold-deep);
+  letter-spacing:2.5px; text-transform:uppercase;
+}
+.rss-bench-period {
+  font-family:'Sarabun','Anuphan',sans-serif;
+  font-size:0.78rem; color:var(--text-muted);
+  margin-top:2px;
+}
+.rss-bench-return {
+  font-family:'DM Serif Display',serif;
+  font-size:1.75rem; font-weight:400;
+  color:var(--green); line-height:1;
+  letter-spacing:-0.02em;
+}
+.rss-bench-note {
+  font-family:'Sarabun','Anuphan',sans-serif;
+  font-size:0.72rem; color:var(--text-muted);
+  padding:8px 12px; background:rgba(255,255,255,0.5);
+  border-radius:var(--radius-xs);
+  letter-spacing:0.02em;
+}
+
+@media (max-width:500px) {
+  .rss-tabs-header { gap:4px; padding:3px; }
+  .rss-tab-btn { padding:8px 4px; }
+  .rss-tab-label { font-size:0.72rem; }
+  .rss-stat-grid { grid-template-columns:1fr 1fr; gap:8px; }
+  .rss-stat { padding:10px 12px 9px; }
+  .rss-stat-val { font-size:1.15rem; }
+  .rss-bench-return { font-size:1.5rem; }
+  .rss-bench-header { flex-wrap:wrap; gap:10px; }
+}
+
 /* ===== FLOATING ACTION BUTTONS ===== */
 .fab-stack {
   position:fixed; bottom:24px; right:24px; z-index:100;
@@ -1121,82 +1274,145 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
         </div>
       </div>
 
+      <!-- ═══ DETAIL STATS TABS ═══ -->
+      <div class="rss-stats-tabs">
+        <div class="rss-tabs-header">
+          <button class="rss-tab-btn active" data-tab="profit" onclick="switchStatsTab('profit')">
+            <span class="rss-tab-icon">💰</span>
+            <span class="rss-tab-label">กำไร</span>
+          </button>
+          <button class="rss-tab-btn" data-tab="accuracy" onclick="switchStatsTab('accuracy')">
+            <span class="rss-tab-icon">🎯</span>
+            <span class="rss-tab-label">ความแม่น</span>
+          </button>
+          <button class="rss-tab-btn" data-tab="risk" onclick="switchStatsTab('risk')">
+            <span class="rss-tab-icon">⚠️</span>
+            <span class="rss-tab-label">ความเสี่ยง</span>
+          </button>
+          <button class="rss-tab-btn" data-tab="bench" onclick="switchStatsTab('bench')">
+            <span class="rss-tab-icon">📊</span>
+            <span class="rss-tab-label">SPY</span>
+          </button>
+        </div>
+
+        <!-- TAB 1: PROFIT & RETURNS -->
+        <div id="rss-tab-profit" class="rss-tab-pane active">
+          <div class="rss-stat-grid">
+            <div class="rss-stat">
+              <div class="rss-stat-label">Combined P&amp;L</div>
+              <div class="rss-stat-val" id="kpi-pnl">$0</div>
+              <div class="pnl-breakdown" style="margin:6px 0 4px;"><div class="pnl-bar-mom" id="pnlBarMom" style="width:50%;"></div><div class="pnl-bar-dh" id="pnlBarDh" style="width:50%;"></div></div>
+              <div class="rss-stat-sub" id="kpi-pnl-sub">Mom $0 + DH $0</div>
+            </div>
+            <div class="rss-stat">
+              <div class="rss-stat-label">Capital per Round</div>
+              <div class="rss-stat-val" id="kpi-capital-display">$100</div>
+              <div class="rss-stat-sub">งบลงทุน/รอบ</div>
+            </div>
+            <div class="rss-stat">
+              <div class="rss-stat-label">Capital Deployed</div>
+              <div class="rss-stat-val" id="kpi-deployed">$0</div>
+              <div class="rss-stat-sub" id="kpi-deployed-sub">เงินที่ต้องหมุนจริง</div>
+            </div>
+            <div class="rss-stat">
+              <div class="rss-stat-label">ROI on Deployed</div>
+              <div class="rss-stat-val" id="kpi-roi" style="color:var(--gold-deep);">0.0%</div>
+              <div class="rss-stat-sub" id="kpi-roi-sub">P&amp;L ÷ Deployed</div>
+            </div>
+            <div class="rss-stat">
+              <div class="rss-stat-label">Annualized ROI</div>
+              <div class="rss-stat-val" id="kpi-annroi" style="color:var(--gold-deep);">0.0%</div>
+              <div class="rss-stat-sub" id="kpi-annroi-sub">ROI ÷ จำนวนปี</div>
+            </div>
+            <div class="rss-stat">
+              <div class="rss-stat-label">Avg Return / Round</div>
+              <div class="rss-stat-val" id="kpi-avg">0.0%</div>
+              <div class="rss-stat-sub" id="kpi-avg-sub">Combined weighted avg</div>
+            </div>
+          </div>
+          <div class="rss-tab-narrative" id="rssProfit">กำลังคำนวณ...</div>
+        </div>
+
+        <!-- TAB 2: ACCURACY -->
+        <div id="rss-tab-accuracy" class="rss-tab-pane">
+          <div class="rss-stat-grid">
+            <div class="rss-stat">
+              <div class="rss-stat-label">Win Rate</div>
+              <div class="rss-stat-val text-green" id="kpi-win">0%</div>
+              <div class="rss-stat-sub" id="kpi-win-sub">รอบที่ได้กำไร</div>
+            </div>
+            <div class="rss-stat">
+              <div class="rss-stat-label">Profit Factor</div>
+              <div class="rss-stat-val" style="color:var(--gold-deep);" id="kpi-pf">0.00</div>
+              <div class="rss-stat-sub">Gross Wins ÷ Gross Losses</div>
+            </div>
+            <div class="rss-stat">
+              <div class="rss-stat-label">Total Rounds</div>
+              <div class="rss-stat-val" id="kpi-rounds">0</div>
+              <div class="rss-stat-sub" id="kpi-rounds-sub">Mom 0 + DH 0</div>
+            </div>
+            <div class="rss-stat">
+              <div class="rss-stat-label">Confirmed DH</div>
+              <div class="rss-stat-val text-green" id="kpi-confirmed">0</div>
+              <div class="rss-stat-sub" id="kpi-confirmed-sub">DH ที่อยู่ใน Mom Top 20%</div>
+            </div>
+          </div>
+          <div class="rss-tab-narrative" id="rssAccuracy">กำลังคำนวณ...</div>
+        </div>
+
+        <!-- TAB 3: RISK -->
+        <div id="rss-tab-risk" class="rss-tab-pane">
+          <div class="rss-stat-grid">
+            <div class="rss-stat">
+              <div class="rss-stat-label">Max Drawdown (Round)</div>
+              <div class="rss-stat-val text-red" id="kpi-maxdd">0.0%</div>
+              <div class="rss-stat-sub" id="kpi-maxdd-sub">ขาดทุนรอบหนักที่สุด</div>
+            </div>
+            <div class="rss-stat">
+              <div class="rss-stat-label">Max Consec Losses</div>
+              <div class="rss-stat-val text-red" id="kpi-consec">0</div>
+              <div class="rss-stat-sub">สตรีกแพ้ติดต่อนานที่สุด</div>
+            </div>
+            <div class="rss-stat">
+              <div class="rss-stat-label">Skipped Weeks</div>
+              <div class="rss-stat-val" style="color:var(--text-muted);" id="kpi-skipped">0</div>
+              <div class="rss-stat-sub">รอบที่ Regime Filter ข้าม</div>
+            </div>
+          </div>
+          <div class="rss-tab-narrative" id="rssRisk">กำลังคำนวณ...</div>
+        </div>
+
+        <!-- TAB 4: SPY BENCHMARK -->
+        <div id="rss-tab-bench" class="rss-tab-pane">
+          <div class="rss-bench-header">
+            <div>
+              <div class="rss-bench-label">SPY BENCHMARK</div>
+              <div class="rss-bench-period" id="ma-period">10Y Rolling · SPDR S&amp;P 500 ETF</div>
+            </div>
+            <div class="rss-bench-return" id="ma-return">0.0%</div>
+          </div>
+          <div class="rss-stat-grid" style="grid-template-columns:repeat(2,1fr);">
+            <div class="rss-stat">
+              <div class="rss-stat-label">Volatility (Ann.)</div>
+              <div class="rss-stat-val" id="ma-vol">0.0%</div>
+              <div class="rss-stat-sub">ความผันผวนต่อปี</div>
+            </div>
+            <div class="rss-stat">
+              <div class="rss-stat-label">Max Drawdown</div>
+              <div class="rss-stat-val text-red" id="ma-dd">0.0%</div>
+              <div class="rss-stat-sub">ขาดทุนที่ลึกที่สุด</div>
+            </div>
+          </div>
+          <div class="ma-note rss-bench-note" id="ma-note" style="margin-top:12px;">—</div>
+          <div class="rss-tab-narrative" id="rssBench">กำลังคำนวณ...</div>
+        </div>
+      </div>
+
       <div class="rsc-narrative" id="rscNarrative">
         กำลังสรุปผลตอบแทน...
       </div>
     </div>
 
-    <!-- KPI -->
-    <div class="kpi-grid">
-      <div class="card kpi-card">
-        <div><div class="kpi-title">CAPITAL PER ROUND</div><div class="kpi-value" id="kpi-capital-display">$100</div></div>
-        <div class="kpi-sub" id="capitalSub">Per strategy per round</div>
-      </div>
-      <div class="card kpi-card">
-        <div><div class="kpi-title">COMBINED P&L</div><div class="kpi-value" id="kpi-pnl">$0</div></div>
-        <div class="pnl-breakdown"><div class="pnl-bar-mom" id="pnlBarMom" style="width:50%;"></div><div class="pnl-bar-dh" id="pnlBarDh" style="width:50%;"></div></div>
-        <div class="kpi-sub" id="kpi-pnl-sub">Mom $0 + DH $0</div>
-      </div>
-      <div class="card kpi-card">
-        <div><div class="kpi-title">CAPITAL DEPLOYED</div><div class="kpi-value" id="kpi-deployed">$0</div></div>
-        <div class="kpi-sub" id="kpi-deployed-sub">เงินที่ต้องหมุนจริง</div>
-      </div>
-      <div class="card kpi-card">
-        <div><div class="kpi-title">ROI ON DEPLOYED</div><div class="kpi-value" id="kpi-roi" style="color:var(--accent);">0.0%</div></div>
-        <div class="kpi-sub" id="kpi-roi-sub">P&L ÷ Deployed</div>
-      </div>
-      <div class="card kpi-card">
-        <div><div class="kpi-title">ANNUALIZED ROI</div><div class="kpi-value" id="kpi-annroi" style="color:var(--accent);">0.0%</div></div>
-        <div class="kpi-sub" id="kpi-annroi-sub">ROI ÷ จำนวนปี</div>
-      </div>
-      <div class="card kpi-card">
-        <div><div class="kpi-title">AVG RETURN / ROUND</div><div class="kpi-value" id="kpi-avg">0.0%</div></div>
-        <div class="kpi-sub" id="kpi-avg-sub">Combined weighted avg</div>
-      </div>
-      <div class="card kpi-card">
-        <div><div class="kpi-title">WIN RATE</div><div class="kpi-value text-green" id="kpi-win">0%</div></div>
-        <div class="kpi-sub" id="kpi-win-sub">Positive rounds</div>
-      </div>
-      <div class="card kpi-card">
-        <div><div class="kpi-title">MAX DD (ROUND)</div><div class="kpi-value text-red" id="kpi-maxdd">0.0%</div></div>
-        <div class="kpi-sub" id="kpi-maxdd-sub">Worst single round</div>
-      </div>
-      <div class="card kpi-card">
-        <div><div class="kpi-title">PROFIT FACTOR</div><div class="kpi-value" style="color:var(--accent);" id="kpi-pf">0.00</div></div>
-        <div class="kpi-sub">Gross Wins ÷ Gross Losses</div>
-      </div>
-      <div class="card kpi-card">
-        <div><div class="kpi-title">MAX CONSEC LOSSES</div><div class="kpi-value text-red" id="kpi-consec">0</div></div>
-        <div class="kpi-sub">Worst losing streak</div>
-      </div>
-      <div class="card kpi-card">
-        <div><div class="kpi-title">TOTAL ROUNDS</div><div class="kpi-value" id="kpi-rounds">0</div></div>
-        <div class="kpi-sub" id="kpi-rounds-sub">Mom 0 + DH 0</div>
-      </div>
-      <div class="card kpi-card">
-        <div><div class="kpi-title">CONFIRMED DH</div><div class="kpi-value text-green" id="kpi-confirmed">0</div></div>
-        <div class="kpi-sub" id="kpi-confirmed-sub">DH picks also in Mom Top 20%</div>
-      </div>
-      <div class="card kpi-card">
-        <div><div class="kpi-title">SKIPPED WEEKS</div><div class="kpi-value" style="color:var(--text-dark);" id="kpi-skipped">0</div></div>
-        <div class="kpi-sub">Regime filter blocked</div>
-      </div>
-      <!-- SPY Benchmark -->
-      <div class="card kpi-card market-analyzer">
-        <div class="ma-header">
-          <div>
-            <div class="kpi-title" style="color:var(--accent);">SPY BENCHMARK</div>
-            <div style="font-size:0.78rem;color:var(--text-muted);" id="ma-period">10Y Rolling · SPDR S&amp;P 500 ETF</div>
-          </div>
-          <div><div class="kpi-value" id="ma-return" style="font-size:1.3rem;">0.0%</div></div>
-        </div>
-        <div class="ma-stats-row">
-          <div class="ma-stat-item">VOL: <span id="ma-vol">0.0%</span></div>
-          <div class="ma-stat-item">MAX DD: <span id="ma-dd" class="text-red">0.0%</span></div>
-        </div>
-        <div class="ma-note" id="ma-note" style="font-size:0.68rem;color:var(--text-muted);margin-top:10px;letter-spacing:0.02em;">—</div>
-      </div>
-    </div>
 
     <!-- Chart Tabs -->
     <div class="card tabs-container">
@@ -1786,6 +2002,128 @@ const el = {
 document.addEventListener('DOMContentLoaded', () => { loadCloudData(); });
 el.input.addEventListener('change', handleUpload);
 // timeSlider removed — benchmark is fixed at 10Y
+
+// ====== RESULTS SUMMARY STATS TABS ======
+function switchStatsTab(tab) {
+  document.querySelectorAll('.rss-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.rss-tab-pane').forEach(p => p.classList.toggle('active', p.id === 'rss-tab-' + tab));
+}
+
+function updateStatsTabNarratives() {
+  const closed = state.allResults.filter(r => !r.isOpen);
+  if(closed.length < 2) {
+    ['rssProfit','rssAccuracy','rssRisk','rssBench'].forEach(id => {
+      const el = document.getElementById(id);
+      if(el) el.textContent = 'ต้องมีรอบที่ปิดแล้วอย่างน้อย 2 รอบถึงจะวิเคราะห์ได้';
+    });
+    return;
+  }
+
+  const momClosed = closed.filter(r => r.type === 'mom');
+  const dhClosed = closed.filter(r => r.type === 'dh');
+  const totalPnl = closed.reduce((s,r) => s + r.pnl, 0);
+  const momPnl = momClosed.reduce((s,r) => s + r.pnl, 0);
+  const dhPnl = dhClosed.reduce((s,r) => s + r.pnl, 0);
+  const rets = closed.map(r => r.retPct);
+  const wins = rets.filter(r => r > 0).length;
+  const winRate = rets.length ? (wins / rets.length * 100) : 0;
+  const maxLoss = rets.length ? Math.min(...rets) : 0;
+  const maxWin = rets.length ? Math.max(...rets) : 0;
+  const avg = rets.length ? rets.reduce((a,b) => a+b, 0) / rets.length : 0;
+
+  // Profit factor
+  const winsArr = rets.filter(r => r > 0);
+  const lossArr = rets.filter(r => r < 0);
+  const totalWins = winsArr.reduce((a,b) => a+b, 0);
+  const totalLosses = Math.abs(lossArr.reduce((a,b) => a+b, 0));
+  const pf = totalLosses > 0 ? totalWins/totalLosses : (totalWins > 0 ? 999 : 0);
+
+  // Consec losses
+  let maxConsec = 0, curConsec = 0;
+  closed.forEach(r => {
+    if(r.retPct < 0) { curConsec++; maxConsec = Math.max(maxConsec, curConsec); }
+    else curConsec = 0;
+  });
+
+  const confirmedTotal = dhClosed.reduce((s,r) => s + (r.confirmedCount || 0), 0);
+
+  // Capital & ROI
+  const capitalDeployed = CONFIG.allocMode === 'split'
+    ? (CONFIG.momHoldWeeks + CONFIG.dhHoldWeeks) * CONFIG.capital
+    : Math.max(CONFIG.momHoldWeeks, CONFIG.dhHoldWeeks) * CONFIG.capital;
+  const roiOnDeployed = capitalDeployed > 0 ? (totalPnl / capitalDeployed) * 100 : 0;
+  const firstDate = closed[0].entryDate;
+  const lastDate = closed[closed.length-1].exitDate || closed[closed.length-1].entryDate;
+  const daySpan = (new Date(lastDate) - new Date(firstDate)) / 86400000;
+  const yearsSpan = Math.max(daySpan / 365.25, 0.5);
+  const annualizedRoi = yearsSpan > 0 ? (roiOnDeployed / yearsSpan) : 0;
+
+  const sign = v => (v >= 0 ? '+' : '');
+  const spanCls = v => v >= 0 ? 'rss-num pos' : 'rss-num neg';
+  const momShare = (momPnl+dhPnl) !== 0 ? (momPnl / (momPnl+dhPnl) * 100) : 0;
+
+  // ========== TAB 1: PROFIT ==========
+  const profitNarr = document.getElementById('rssProfit');
+  if(profitNarr) {
+    const deployedMethod = CONFIG.allocMode === 'split'
+      ? 'แยกงบ Momentum ' + CONFIG.momHoldWeeks + 'W × $' + CONFIG.capital + ' + Dark Horse ' + CONFIG.dhHoldWeeks + 'W × $' + CONFIG.capital
+      : 'งบเดียว ' + Math.max(CONFIG.momHoldWeeks, CONFIG.dhHoldWeeks) + ' slots × $' + CONFIG.capital;
+    profitNarr.innerHTML = 'ลงทุน <strong>$' + capitalDeployed.toLocaleString() + '</strong> (' + deployedMethod + ') แล้วได้ผลกำไรรวม <span class="' + spanCls(totalPnl) + '">' + sign(totalPnl) + '$' + Math.abs(Math.round(totalPnl)).toLocaleString() + '</span> คิดเป็น <span class="' + spanCls(roiOnDeployed) + '">' + sign(roiOnDeployed) + roiOnDeployed.toFixed(1) + '%</span> บนเงินลงทุน · ' +
+      'เฉลี่ยต่อปี <span class="' + spanCls(annualizedRoi) + '">' + sign(annualizedRoi) + annualizedRoi.toFixed(1) + '%</span> · ' +
+      (momPnl > dhPnl ? ('Momentum เป็นตัวสร้างกำไรหลัก (<strong>' + momShare.toFixed(0) + '%</strong> ของกำไรรวม)') : dhPnl > 0 ? ('Dark Horse เป็นตัวสร้างกำไรหลัก (<strong>' + (100-momShare).toFixed(0) + '%</strong> ของกำไรรวม)') : 'ทั้งสองกลยุทธ์สร้างกำไรใกล้กัน');
+  }
+
+  // ========== TAB 2: ACCURACY ==========
+  const accNarr = document.getElementById('rssAccuracy');
+  if(accNarr) {
+    let winQuality = winRate >= 60 ? 'แม่นยำสูง' : winRate >= 55 ? 'แม่นยำระดับดี' : winRate >= 50 ? 'แม่นยำระดับพอใช้' : 'แม่นยำต่ำ';
+    let pfQuality = pf >= 2 ? ' และ Profit Factor ' + pf.toFixed(2) + ' แปลว่า <strong>ได้ $' + pf.toFixed(1) + ' ต่อทุก $1 ที่เสีย</strong>' :
+                    pf >= 1.5 ? ' และ Profit Factor ' + pf.toFixed(2) + ' = กำไรรวมเป็น <strong>' + pf.toFixed(1) + ' เท่า</strong>ของขาดทุนรวม' :
+                    pf >= 1.2 ? ' · Profit Factor ' + pf.toFixed(2) + ' ยังพอรับได้' :
+                    ' · Profit Factor ' + pf.toFixed(2) + ' <strong>ต่ำ</strong> — ควรทบทวนเงื่อนไข';
+    let confirmedLine = confirmedTotal > 0
+      ? ' · มี <strong>' + confirmedTotal + ' สัญญาณ Confirmed ★</strong> (Dark Horse ที่ติด Momentum Top 20% ด้วย — สัญญาณคุณภาพสูงสุด)'
+      : ' · ยังไม่มี Confirmed signal ในช่วงนี้';
+    accNarr.innerHTML = 'เทรดทั้งหมด <strong>' + closed.length + ' รอบ</strong> (Mom ' + momClosed.length + ' + DH ' + dhClosed.length + ') · ชนะ <span class="rss-num pos">' + winRate.toFixed(0) + '%</span> → ' + winQuality + pfQuality + confirmedLine;
+  }
+
+  // ========== TAB 3: RISK ==========
+  const riskNarr = document.getElementById('rssRisk');
+  if(riskNarr) {
+    const ddCls = Math.abs(maxLoss) >= 30 ? 'neg' : Math.abs(maxLoss) >= 20 ? 'neg' : '';
+    const ddLevel = Math.abs(maxLoss) >= 30 ? 'หนักมาก — ต้องใจแข็งพอรับได้'
+                  : Math.abs(maxLoss) >= 20 ? 'พอสมควร — เตรียมใจได้'
+                  : Math.abs(maxLoss) >= 10 ? 'ระดับปกติของตลาดหุ้น'
+                  : 'ต่ำ — ระบบควบคุมความเสี่ยงได้ดี';
+    const consecNote = maxConsec >= 10 ? ' · เคยแพ้ติดกัน <strong>' + maxConsec + ' รอบ</strong> ซึ่งถือว่ายาว ต้องใจเย็นเวลาเจอ'
+                     : maxConsec >= 5 ? ' · สตรีกแพ้ยาวสุด <strong>' + maxConsec + ' รอบ</strong> ถือว่าปกติ'
+                     : ' · สตรีกแพ้ยาวสุดแค่ <strong>' + maxConsec + ' รอบ</strong> ดีมาก';
+    const skippedNote = state.skippedDates.length > 0
+      ? ' · Regime Filter ข้าม <strong>' + state.skippedDates.length + ' สัปดาห์</strong> (ตลาดต่ำกว่า EMA ' + CONFIG.regimeEma + 'W)'
+      : (CONFIG.regimeEma > 0 ? ' · Regime Filter เปิดอยู่แต่ไม่ได้ข้ามรอบไหนเลย (ตลาดสูงกว่า EMA ตลอด)' : ' · ไม่เปิด Regime Filter — เทรดทุกสัปดาห์');
+    riskNarr.innerHTML = 'ดรอว์ดาวน์หนักสุดในรอบเดียว <span class="rss-num ' + ddCls + '">' + maxLoss.toFixed(1) + '%</span> — ' + ddLevel + consecNote + skippedNote;
+  }
+
+  // ========== TAB 4: SPY BENCHMARK ==========
+  const benchNarr = document.getElementById('rssBench');
+  if(benchNarr) {
+    // Parse SPY metrics (already in DOM by updateMarket())
+    const spyReturn = parseFloat((document.getElementById('ma-return').innerText || '0').replace(/[^0-9.\-]/g, '')) || 0;
+    const spyVol = parseFloat((document.getElementById('ma-vol').innerText || '0').replace(/[^0-9.\-]/g, '')) || 0;
+    const spyDD = parseFloat((document.getElementById('ma-dd').innerText || '0').replace(/[^0-9.\-]/g, '')) || 0;
+    const beatBy = annualizedRoi - spyReturn;
+    const beatCls = beatBy >= 0 ? 'rss-num pos' : 'rss-num neg';
+    const beatVerdict = beatBy >= 10 ? '<strong>เอาชนะตลาดอย่างชัดเจน</strong> — ผลตอบแทนต่อปีสูงกว่า SPY ถึง <span class="' + beatCls + '">' + sign(beatBy) + beatBy.toFixed(1) + '%</span>'
+                       : beatBy >= 3 ? '<strong>เอาชนะตลาดได้</strong> — สูงกว่า SPY <span class="' + beatCls + '">' + sign(beatBy) + beatBy.toFixed(1) + '%</span> ต่อปี'
+                       : beatBy >= 0 ? 'ชนะตลาดนิดหน่อย (<span class="' + beatCls + '">' + sign(beatBy) + beatBy.toFixed(1) + '%</span>)'
+                       : '<strong>ยังไม่ชนะตลาด</strong> — ต่ำกว่า SPY <span class="rss-num neg">' + beatBy.toFixed(1) + '%</span> ต่อปี';
+    const ddCompareDH = Math.abs(maxLoss) - Math.abs(spyDD);
+    const ddCompare = ddCompareDH < -5 ? ' · และ <strong>ดรอว์ดาวน์น้อยกว่า</strong> SPY (กลยุทธ์เรา -' + Math.abs(maxLoss).toFixed(1) + '% vs SPY ' + spyDD.toFixed(1) + '%)'
+                    : ddCompareDH > 5 ? ' · แต่ดรอว์ดาวน์<strong>หนักกว่า</strong> SPY (เรา -' + Math.abs(maxLoss).toFixed(1) + '% vs SPY ' + spyDD.toFixed(1) + '%)'
+                    : ' · ดรอว์ดาวน์ใกล้เคียงกับ SPY';
+    benchNarr.innerHTML = 'SPY ETF 10Y ให้ผลตอบแทน <span class="rss-num">+' + spyReturn.toFixed(1) + '%</span> ต่อปี · ' + beatVerdict + ddCompare;
+  }
+}
 
 // ====== MANUAL RUN — mark settings dirty ======
 let settingsDirty = false;
@@ -2705,6 +3043,9 @@ function updateKPIs() {
 
   // Alpha analysis
   computeAlphaMetrics(closed);
+
+  // Update stats tabs narratives
+  if(typeof updateStatsTabNarratives === 'function') updateStatsTabNarratives();
 }
 
 // ====== RESULTS SUMMARY CARD ======
