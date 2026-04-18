@@ -1,19 +1,162 @@
 {
-  "lastUpdated": "2026-04-18T15:00:00Z",
+  "lastUpdated": "2026-04-18T18:30:00Z",
   "batches": [
+    {
+      "file": "2026-04-18-1830.md",
+      "date": "2026-04-18T18:30:00Z",
+      "date_display": "18 เม.ย. 2026 · 18:30",
+      "summary": "S&P 500 ทะลุ 7,126 จุดสูงสุด · Netflix หลังตลาด −3% · น้ำมันร่วง −9.41% · NVIDIA 20 พ.ค. · Alphabet/Intel 23 เม.ย. · Warsh hearing 21 เม.ย.",
+      "tickers": [
+        "SPY",
+        "DIA",
+        "QQQ",
+        "NVDA",
+        "NFLX",
+        "GOOGL",
+        "INTC",
+        "TSLA",
+        "BTC",
+        "USO",
+        "GLD"
+      ],
+      "headlines": [
+        {
+          "title": "S&P 500 ปิดสัปดาห์ที่จุดสูงสุดใหม่ 7,126 — ทำ all-time high ครั้งที่ 8 ของปี 2026",
+          "tickers": [
+            {
+              "symbol": "SPY",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DIA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "Yahoo Finance · Motley Fool",
+          "published": "18 เม.ย. 2026"
+        },
+        {
+          "title": "Netflix รายงาน Q1 เหนือคาด — แต่หุ้นร่วงหลังตลาด 3% เพราะค่าเฉลี่ยต่อผู้ใช้ต่ำ",
+          "tickers": [
+            {
+              "symbol": "NFLX",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DIS",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "CNBC · Yahoo Finance",
+          "published": "18 เม.ย. 2026"
+        },
+        {
+          "title": "ช่องแคบฮอร์มุซเปิดกลับมา — น้ำมันร่วงหนัก −9.41% สัปดาห์ ปิด 82.59 ดอลลาร์",
+          "tickers": [
+            {
+              "symbol": "USO",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "XLE",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "JETS",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "CNBC · 24/7 Wall St",
+          "published": "18 เม.ย. 2026"
+        },
+        {
+          "title": "NVIDIA จ่อรายงานไตรมาส 1 — 20 พ.ค. เป้าหมายราคาพุ่ง 200+",
+          "tickers": [
+            {
+              "symbol": "NVDA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SMH",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "24/7 Wall St · Yahoo Finance",
+          "published": "18 เม.ย. 2026"
+        },
+        {
+          "title": "Alphabet + Intel จ่อรายงานสัปดาห์หน้า — พฤหัส 23 เม.ย.",
+          "tickers": [
+            {
+              "symbol": "GOOGL",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "INTC",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "Yahoo Finance",
+          "published": "18 เม.ย. 2026"
+        },
+        {
+          "title": "Warsh vs Powell — ไต่สวนวุฒิสภา วันอังคาร 21 เม.ย. ชี้ทิศทาง Fed ถึงสิ้นปี",
+          "tickers": [
+            {
+              "symbol": "GLD",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "XLF",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "Yahoo Finance · CNBC",
+          "published": "18 เม.ย. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-04-18-1500.md",
       "date": "2026-04-18T15:00:00Z",
       "date_display": "18 เม.ย. 2026 · 15:00",
       "summary": "BTC ทะลุ 78,000 · Tesla AI5 ไม่ใส่รถ · ทอง 4,849 · ตลาดเอเชียผสม · สัปดาห์หน้าจับตา 5 เหตุการณ์",
-      "tickers": ["BTC", "ETH", "TSLA", "GLD", "IBIT", "NVDA"],
+      "tickers": [
+        "BTC",
+        "ETH",
+        "TSLA",
+        "GLD",
+        "IBIT",
+        "NVDA"
+      ],
       "headlines": [
         {
           "title": "Bitcoin ทะลุ 78,000 ดอลลาร์ครั้งแรก — ขึ้น 5% ใน 24 ชั่วโมง หลังข่าวฮอร์มุซเปิด",
           "tickers": [
-            {"symbol": "BTC", "sentiment": "positive"},
-            {"symbol": "ETH", "sentiment": "positive"},
-            {"symbol": "IBIT", "sentiment": "positive"}
+            {
+              "symbol": "BTC",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "ETH",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "IBIT",
+              "sentiment": "positive"
+            }
           ],
           "source": "CoinDesk · CoinGecko",
           "published": "18 เม.ย. 2026"
@@ -21,9 +164,18 @@
         {
           "title": "Tesla ประกาศ tape-out ชิป AI5 — แต่ Musk บอก ไม่ใส่รถเรา เปลี่ยนเป้าไปที่ Optimus",
           "tickers": [
-            {"symbol": "TSLA", "sentiment": "neutral"},
-            {"symbol": "NVDA", "sentiment": "neutral"},
-            {"symbol": "TSM", "sentiment": "positive"}
+            {
+              "symbol": "TSLA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "TSM",
+              "sentiment": "positive"
+            }
           ],
           "source": "Electrek · Teslarati",
           "published": "15 เม.ย. 2026"
@@ -31,9 +183,18 @@
         {
           "title": "ทองคำปิดสัปดาห์ที่ 4,849 — ขึ้น 4 สัปดาห์ติด แม้ตลาดเสี่ยงกลับมา",
           "tickers": [
-            {"symbol": "GLD", "sentiment": "positive"},
-            {"symbol": "GDX", "sentiment": "positive"},
-            {"symbol": "NEM", "sentiment": "positive"}
+            {
+              "symbol": "GLD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "GDX",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "NEM",
+              "sentiment": "positive"
+            }
           ],
           "source": "Bloomberg · Kitco",
           "published": "18 เม.ย. 2026"
@@ -41,9 +202,18 @@
         {
           "title": "ตลาดเอเชีย-ญี่ปุ่นผสม — Nikkei ร่วง 1.75% แต่ทั่วเอเชียเริ่มตามสหรัฐฯ",
           "tickers": [
-            {"symbol": "EWJ", "sentiment": "negative"},
-            {"symbol": "FXI", "sentiment": "neutral"},
-            {"symbol": "THD", "sentiment": "neutral"}
+            {
+              "symbol": "EWJ",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "FXI",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "THD",
+              "sentiment": "neutral"
+            }
           ],
           "source": "CNBC Asia · Reuters",
           "published": "17 เม.ย. 2026"
@@ -51,10 +221,22 @@
         {
           "title": "มองสัปดาห์ถัดไป — 5 เหตุการณ์ใหญ่ที่ต้องจับตา (20-24 เม.ย.)",
           "tickers": [
-            {"symbol": "TSLA", "sentiment": "neutral"},
-            {"symbol": "GOOGL", "sentiment": "neutral"},
-            {"symbol": "INTC", "sentiment": "neutral"},
-            {"symbol": "SPY", "sentiment": "neutral"}
+            {
+              "symbol": "TSLA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "GOOGL",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "INTC",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "SPY",
+              "sentiment": "neutral"
+            }
           ],
           "source": "JP Trust Learning",
           "published": "18 เม.ย. 2026"
@@ -66,15 +248,34 @@
       "date": "2026-04-18T09:00:00Z",
       "date_display": "18 เม.ย. 2026 · 09:00",
       "summary": "Dow +1,005 จุด · Netflix ร่วง 9.7% · น้ำมันดิ่ง 7.86% · เจรจา US-Iran สุดสัปดาห์ · BTC 77,172",
-      "tickers": ["SPY", "DJI", "NFLX", "USO", "BTC", "GLD"],
+      "tickers": [
+        "SPY",
+        "DJI",
+        "NFLX",
+        "USO",
+        "BTC",
+        "GLD"
+      ],
       "headlines": [
         {
           "title": "อิหร่านประกาศเปิดช่องแคบฮอร์มุซเต็มที่ — Dow พุ่ง 1,005 จุด S&P ทะลุ 7,126",
           "tickers": [
-            {"symbol": "SPY", "sentiment": "positive"},
-            {"symbol": "DIA", "sentiment": "positive"},
-            {"symbol": "QQQ", "sentiment": "positive"},
-            {"symbol": "USO", "sentiment": "negative"}
+            {
+              "symbol": "SPY",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DIA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "USO",
+              "sentiment": "negative"
+            }
           ],
           "source": "CNBC · Reuters",
           "published": "18 เม.ย. 2026"
@@ -82,9 +283,18 @@
         {
           "title": "Netflix ร่วง 9.7% ในวันเดียว — Reed Hastings ประกาศลาออกจากบอร์ด จบยุค 29 ปี",
           "tickers": [
-            {"symbol": "NFLX", "sentiment": "negative"},
-            {"symbol": "WBD", "sentiment": "neutral"},
-            {"symbol": "PSKY", "sentiment": "neutral"}
+            {
+              "symbol": "NFLX",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "WBD",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "PSKY",
+              "sentiment": "neutral"
+            }
           ],
           "source": "Yahoo Finance · CNBC",
           "published": "17 เม.ย. 2026"
@@ -92,10 +302,22 @@
         {
           "title": "ราคาน้ำมันดิ่งหนัก 7.86% ในวันเดียว — VIX ต่ำสุด 7 สัปดาห์ ตลาดหมุนกลับเข้าหุ้นเทค",
           "tickers": [
-            {"symbol": "USO", "sentiment": "negative"},
-            {"symbol": "VIX", "sentiment": "negative"},
-            {"symbol": "XOM", "sentiment": "negative"},
-            {"symbol": "QQQ", "sentiment": "positive"}
+            {
+              "symbol": "USO",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "VIX",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "XOM",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "positive"
+            }
           ],
           "source": "Bloomberg · Motley Fool",
           "published": "17 เม.ย. 2026"
@@ -103,10 +325,22 @@
         {
           "title": "สุดสัปดาห์ 18-19 เม.ย. — การเจรจา US-Iran เข้มข้น ช่องแคบฮอร์มุซเป็นตัวชี้ชะตา",
           "tickers": [
-            {"symbol": "TSLA", "sentiment": "neutral"},
-            {"symbol": "GOOGL", "sentiment": "neutral"},
-            {"symbol": "IBM", "sentiment": "neutral"},
-            {"symbol": "BA", "sentiment": "neutral"}
+            {
+              "symbol": "TSLA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "GOOGL",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "IBM",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "BA",
+              "sentiment": "neutral"
+            }
           ],
           "source": "CNBC · Reuters",
           "published": "18 เม.ย. 2026"
@@ -114,10 +348,22 @@
         {
           "title": "Bitcoin ทะลุ 77,172 ดอลลาร์ — ทองคำ 4,849 ยังแข็งแกร่ง ทั้งคู่ได้ประโยชน์จากปัจจัยต่างกัน",
           "tickers": [
-            {"symbol": "BTC", "sentiment": "positive"},
-            {"symbol": "IBIT", "sentiment": "positive"},
-            {"symbol": "GLD", "sentiment": "positive"},
-            {"symbol": "MSBT", "sentiment": "positive"}
+            {
+              "symbol": "BTC",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "IBIT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "GLD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "MSBT",
+              "sentiment": "positive"
+            }
           ],
           "source": "CoinDesk · JP Morgan",
           "published": "18 เม.ย. 2026"
@@ -129,14 +375,32 @@
       "date": "2026-04-17T22:00:00Z",
       "date_display": "17 เม.ย. 2026 · 22:00",
       "summary": "S&P 500 แตะ 7,041 · TFC รายงานไตรมาส 1 · BIRD ร่วง 36% · VIX ต่ำสุด · ซอฟต์แวร์ AI ดีดกลับ",
-      "tickers": ["SPY", "QQQ", "VIX", "TFC", "BIRD", "NOW", "SNPS", "PANW"],
+      "tickers": [
+        "SPY",
+        "QQQ",
+        "VIX",
+        "TFC",
+        "BIRD",
+        "NOW",
+        "SNPS",
+        "PANW"
+      ],
       "headlines": [
         {
           "title": "ดัชนี S&P 500 พุ่งแตะ 7,041 — ขึ้นสัปดาห์ที่ 3 ติด นักลงทุนรายย่อยเริ่มไล่ซื้อ",
           "tickers": [
-            {"symbol": "SPY", "sentiment": "positive"},
-            {"symbol": "QQQ", "sentiment": "positive"},
-            {"symbol": "IWM", "sentiment": "positive"}
+            {
+              "symbol": "SPY",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "IWM",
+              "sentiment": "positive"
+            }
           ],
           "source": "Bloomberg · CNBC",
           "published": "17 เม.ย. 2026"
@@ -144,9 +408,18 @@
         {
           "title": "Truist Financial (TFC) รายงานผลประกอบการไตรมาส 1 — ธนาคารภูมิภาคขนาดใหญ่โชว์ความแข็งแกร่ง",
           "tickers": [
-            {"symbol": "TFC", "sentiment": "positive"},
-            {"symbol": "USB", "sentiment": "neutral"},
-            {"symbol": "PNC", "sentiment": "neutral"}
+            {
+              "symbol": "TFC",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "USB",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "PNC",
+              "sentiment": "neutral"
+            }
           ],
           "source": "Benzinga · PR Newswire",
           "published": "17 เม.ย. 2026"
@@ -154,9 +427,18 @@
         {
           "title": "BIRD ร่วง 36% ในวันเดียว — กระแสเบนเข็มสู่ AI จาก +582% พังเร็วทันที",
           "tickers": [
-            {"symbol": "BIRD", "sentiment": "negative"},
-            {"symbol": "MYSE", "sentiment": "negative"},
-            {"symbol": "BBAI", "sentiment": "neutral"}
+            {
+              "symbol": "BIRD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "MYSE",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "BBAI",
+              "sentiment": "neutral"
+            }
           ],
           "source": "Bloomberg · Benzinga",
           "published": "17 เม.ย. 2026"
@@ -164,9 +446,18 @@
         {
           "title": "ดัชนีความกลัว VIX ร่วงสู่ 17.48 — ต่ำสุดในรอบหลายเดือน ตลาดประมาทความเสี่ยง",
           "tickers": [
-            {"symbol": "VIX", "sentiment": "negative"},
-            {"symbol": "UVXY", "sentiment": "neutral"},
-            {"symbol": "SPY", "sentiment": "neutral"}
+            {
+              "symbol": "VIX",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "UVXY",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "SPY",
+              "sentiment": "neutral"
+            }
           ],
           "source": "FXEmpire · Yahoo Finance",
           "published": "17 เม.ย. 2026"
@@ -174,10 +465,22 @@
         {
           "title": "หุ้นซอฟต์แวร์ AI ดีดตัวกลับ — ServiceNow +7.3%, Synopsys, Palo Alto นักลงทุนเริ่มซื้อคืน",
           "tickers": [
-            {"symbol": "NOW", "sentiment": "positive"},
-            {"symbol": "SNPS", "sentiment": "positive"},
-            {"symbol": "PANW", "sentiment": "positive"},
-            {"symbol": "ORCL", "sentiment": "positive"}
+            {
+              "symbol": "NOW",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SNPS",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PANW",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "ORCL",
+              "sentiment": "positive"
+            }
           ],
           "source": "CNBC · Hightower Advisors",
           "published": "17 เม.ย. 2026"
@@ -189,14 +492,30 @@
       "date": "2026-04-17T15:30:00Z",
       "date_display": "17 เม.ย. 2026 · 15:30",
       "summary": "ทองแตะ 4,793 สัปดาห์ที่ 4 · Bitcoin ทดสอบ 76,800 · Warsh hearing 21 เม.ย.",
-      "tickers": ["GLD", "IAU", "BTC", "MSBT", "IBIT", "XAU"],
+      "tickers": [
+        "GLD",
+        "IAU",
+        "BTC",
+        "MSBT",
+        "IBIT",
+        "XAU"
+      ],
       "headlines": [
         {
           "title": "ทองคำยืน 4,793 ดอลลาร์ — สัปดาห์ที่ 4 ติดต่อกันที่เป็นบวก หลังอิหร่านยอมเงื่อนไขหยุดยิง",
           "tickers": [
-            {"symbol": "GLD", "sentiment": "positive"},
-            {"symbol": "IAU", "sentiment": "positive"},
-            {"symbol": "GDX", "sentiment": "positive"}
+            {
+              "symbol": "GLD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "IAU",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "GDX",
+              "sentiment": "positive"
+            }
           ],
           "source": "Trading Economics · JP Morgan",
           "published": "17 เม.ย. 2026"
@@ -204,10 +523,22 @@
         {
           "title": "Bitcoin แตะ 76,800 ดอลลาร์ — เงินจาก ETF ดัน แต่ผู้ถือรายใหญ่เริ่มขาย",
           "tickers": [
-            {"symbol": "BTC", "sentiment": "neutral"},
-            {"symbol": "IBIT", "sentiment": "positive"},
-            {"symbol": "MSBT", "sentiment": "positive"},
-            {"symbol": "COIN", "sentiment": "neutral"}
+            {
+              "symbol": "BTC",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "IBIT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "MSBT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "COIN",
+              "sentiment": "neutral"
+            }
           ],
           "source": "CoinDesk · CryptoQuant",
           "published": "17 เม.ย. 2026"
@@ -215,10 +546,22 @@
         {
           "title": "ทรัมป์-พาวเวลล์ Showdown — การยืนยัน Warsh 21 เม.ย. เป็นตัวชี้ชะตาตลาด",
           "tickers": [
-            {"symbol": "GLD", "sentiment": "positive"},
-            {"symbol": "TLT", "sentiment": "negative"},
-            {"symbol": "DXY", "sentiment": "negative"},
-            {"symbol": "BTC", "sentiment": "positive"}
+            {
+              "symbol": "GLD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "TLT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DXY",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "BTC",
+              "sentiment": "positive"
+            }
           ],
           "source": "CNBC · NBC News · CBS",
           "published": "16 เม.ย. 2026"
@@ -230,15 +573,36 @@
       "date": "2026-04-17T08:00:00Z",
       "date_display": "17 เม.ย. 2026 · 08:00",
       "summary": "หยุดยิงอิหร่าน 10 วัน · PepsiCo เหนือคาด · QDEL ร่วง vs MYSE เบนเข็ม AI",
-      "tickers": ["USO", "DAL", "UAL", "LMT", "PEP", "GOOGL", "QDEL", "MYSE"],
+      "tickers": [
+        "USO",
+        "DAL",
+        "UAL",
+        "LMT",
+        "PEP",
+        "GOOGL",
+        "QDEL",
+        "MYSE"
+      ],
       "headlines": [
         {
           "title": "ทรัมป์ประกาศหยุดยิง 10 วันกับอิหร่าน — น้ำมันร่วง 1.6%, หุ้นสายการบินเด้งกลับ",
           "tickers": [
-            {"symbol": "USO", "sentiment": "negative"},
-            {"symbol": "DAL", "sentiment": "positive"},
-            {"symbol": "UAL", "sentiment": "positive"},
-            {"symbol": "LMT", "sentiment": "negative"}
+            {
+              "symbol": "USO",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DAL",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "UAL",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "LMT",
+              "sentiment": "negative"
+            }
           ],
           "source": "Bloomberg · Reuters",
           "published": "17 เม.ย. 2026"
@@ -246,9 +610,18 @@
         {
           "title": "PepsiCo ไตรมาส 1 เหนือคาด — ยืนยันเป้าหมายทั้งปี + Google โดน EU ส่งผลตรวจสอบเบื้องต้น",
           "tickers": [
-            {"symbol": "PEP", "sentiment": "positive"},
-            {"symbol": "GOOGL", "sentiment": "negative"},
-            {"symbol": "KO", "sentiment": "neutral"}
+            {
+              "symbol": "PEP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "GOOGL",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "KO",
+              "sentiment": "neutral"
+            }
           ],
           "source": "Reuters · Investing.com",
           "published": "16 เม.ย. 2026"
@@ -256,9 +629,18 @@
         {
           "title": "QuidelOrtho ร่วง 20% + Myseum พุ่ง 255% จากการเบนเข็มสู่ AI — ตลาดแตกสองขั้ว",
           "tickers": [
-            {"symbol": "QDEL", "sentiment": "negative"},
-            {"symbol": "MYSE", "sentiment": "positive"},
-            {"symbol": "LH", "sentiment": "neutral"}
+            {
+              "symbol": "QDEL",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "MYSE",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "LH",
+              "sentiment": "neutral"
+            }
           ],
           "source": "Benzinga · StockMarketWatch",
           "published": "16 เม.ย. 2026"
@@ -270,14 +652,29 @@
       "date": "2026-04-17T02:30:00Z",
       "date_display": "17 เม.ย. 2026 · 02:30",
       "summary": "Netflix คาดการณ์อ่อน · AMD พุ่งตาม TSMC · Tesla +7.6% จากชิป AI5",
-      "tickers": ["NFLX", "AMD", "TSM", "TSLA", "NVDA"],
+      "tickers": [
+        "NFLX",
+        "AMD",
+        "TSM",
+        "TSLA",
+        "NVDA"
+      ],
       "headlines": [
         {
           "title": "Netflix ไตรมาส 1 เหนือคาด แต่หุ้นกลับร่วง — คาดการณ์อ่อน + ผู้ร่วมก่อตั้งลาออก",
           "tickers": [
-            {"symbol": "NFLX", "sentiment": "negative"},
-            {"symbol": "DIS", "sentiment": "neutral"},
-            {"symbol": "WBD", "sentiment": "neutral"}
+            {
+              "symbol": "NFLX",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DIS",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "WBD",
+              "sentiment": "neutral"
+            }
           ],
           "source": "Benzinga",
           "published": "16 เม.ย. 2026"
@@ -285,10 +682,22 @@
         {
           "title": "AMD พุ่งตามหลังคาดการณ์ TSMC สดใส — Bernstein ปรับเป้าราคาขึ้น",
           "tickers": [
-            {"symbol": "AMD", "sentiment": "positive"},
-            {"symbol": "TSM", "sentiment": "positive"},
-            {"symbol": "NVDA", "sentiment": "positive"},
-            {"symbol": "ASML", "sentiment": "neutral"}
+            {
+              "symbol": "AMD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "TSM",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "ASML",
+              "sentiment": "neutral"
+            }
           ],
           "source": "Benzinga",
           "published": "16 เม.ย. 2026"
@@ -296,9 +705,18 @@
         {
           "title": "Tesla พุ่ง 7.6% ในวันเดียว — ยืนยันเสร็จการออกแบบชิป AI5 + UBS ปรับอันดับขึ้น",
           "tickers": [
-            {"symbol": "TSLA", "sentiment": "positive"},
-            {"symbol": "NVDA", "sentiment": "neutral"},
-            {"symbol": "INTC", "sentiment": "positive"}
+            {
+              "symbol": "TSLA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "INTC",
+              "sentiment": "positive"
+            }
           ],
           "source": "CNBC",
           "published": "15 เม.ย. 2026"
@@ -310,14 +728,30 @@
       "date": "2026-04-16T19:40:00Z",
       "date_display": "16 เม.ย. 2026 · 19:40",
       "summary": "ASML ดิ่งแม้ผลดี · Delta เตือนลดกำลังการบิน · Monday.com โดนปรับลดอันดับ",
-      "tickers": ["ASML", "NVDA", "TSM", "DAL", "UAL", "MNDY"],
+      "tickers": [
+        "ASML",
+        "NVDA",
+        "TSM",
+        "DAL",
+        "UAL",
+        "MNDY"
+      ],
       "headlines": [
         {
           "title": "ASML ดิ่ง 6% แม้ผลประกอบการและคาดการณ์ดี — ตลาดกังวลข้อจำกัดจากจีน",
           "tickers": [
-            {"symbol": "ASML", "sentiment": "negative"},
-            {"symbol": "NVDA", "sentiment": "neutral"},
-            {"symbol": "TSM", "sentiment": "neutral"}
+            {
+              "symbol": "ASML",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "TSM",
+              "sentiment": "neutral"
+            }
           ],
           "source": "CNBC",
           "published": "15 เม.ย. 2026"
@@ -325,9 +759,18 @@
         {
           "title": "Delta Air Lines เตือนลดกำลังการบิน + UAL ร่วง 21% ใน 6 วันจากราคาเชื้อเพลิงพุ่ง",
           "tickers": [
-            {"symbol": "DAL", "sentiment": "negative"},
-            {"symbol": "UAL", "sentiment": "negative"},
-            {"symbol": "AAL", "sentiment": "neutral"}
+            {
+              "symbol": "DAL",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "UAL",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AAL",
+              "sentiment": "neutral"
+            }
           ],
           "source": "CNBC · Trefis",
           "published": "14 เม.ย. 2026"
@@ -335,9 +778,18 @@
         {
           "title": "Monday.com โดนปรับลดอันดับหนัก — 5 บริษัทลดเป้าราคาครึ่งหนึ่งหลังคาดการณ์ผิดคาด",
           "tickers": [
-            {"symbol": "MNDY", "sentiment": "negative"},
-            {"symbol": "CRM", "sentiment": "neutral"},
-            {"symbol": "NOW", "sentiment": "neutral"}
+            {
+              "symbol": "MNDY",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "CRM",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "NOW",
+              "sentiment": "neutral"
+            }
           ],
           "source": "Investing.com",
           "published": "15 เม.ย. 2026"
@@ -349,14 +801,30 @@
       "date": "2026-04-16T18:30:00Z",
       "date_display": "16 เม.ย. 2026 · 18:30",
       "summary": "TSMC เพิ่มงบลงทุน · Nike ผู้บริหารซื้อหุ้น · ธนาคารใหญ่ผลดี",
-      "tickers": ["TSM", "NVDA", "NKE", "AAPL", "MS", "BAC"],
+      "tickers": [
+        "TSM",
+        "NVDA",
+        "NKE",
+        "AAPL",
+        "MS",
+        "BAC"
+      ],
       "headlines": [
         {
           "title": "TSMC เพิ่มงบลงทุนปี 2026 แตะปลายช่วง 52-56 พันล้านดอลลาร์ — ความต้องการ AI ยังแรง",
           "tickers": [
-            {"symbol": "TSM", "sentiment": "positive"},
-            {"symbol": "NVDA", "sentiment": "positive"},
-            {"symbol": "AAPL", "sentiment": "positive"}
+            {
+              "symbol": "TSM",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AAPL",
+              "sentiment": "positive"
+            }
           ],
           "source": "CNBC · Reuters",
           "published": "16 เม.ย. 2026"
@@ -364,8 +832,14 @@
         {
           "title": "CEO Nike + Tim Cook ซื้อหุ้นคนละประมาณ 1 ล้านดอลลาร์ — สัญญาณความเชื่อมั่นจากผู้บริหาร",
           "tickers": [
-            {"symbol": "NKE", "sentiment": "positive"},
-            {"symbol": "AAPL", "sentiment": "neutral"}
+            {
+              "symbol": "NKE",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AAPL",
+              "sentiment": "neutral"
+            }
           ],
           "source": "CNBC",
           "published": "16 เม.ย. 2026"
@@ -373,10 +847,22 @@
         {
           "title": "ธนาคารใหญ่ทุกเจ้ารายงานไตรมาส 1 เหนือคาด — Morgan Stanley +4.5%, BofA +1.8%",
           "tickers": [
-            {"symbol": "MS", "sentiment": "positive"},
-            {"symbol": "BAC", "sentiment": "positive"},
-            {"symbol": "JPM", "sentiment": "neutral"},
-            {"symbol": "GS", "sentiment": "neutral"}
+            {
+              "symbol": "MS",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "BAC",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "JPM",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "GS",
+              "sentiment": "neutral"
+            }
           ],
           "source": "CNBC · Yahoo Finance",
           "published": "15 เม.ย. 2026"
