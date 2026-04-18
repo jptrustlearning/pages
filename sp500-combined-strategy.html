@@ -64,50 +64,101 @@ body {
 }
 .container { max-width:1440px; margin:0 auto; }
 
-/* HEADER */
+/* HEADER — luxurious hero card (burgundy → black → gold) */
 header {
+  position:relative;
+  margin:-4px -4px 24px;
+  padding:24px 24px 22px;
+  border-radius:22px;
+  background:
+    radial-gradient(ellipse 80% 55% at 85% 20%, rgba(212,175,55,0.22), transparent 60%),
+    radial-gradient(ellipse 70% 60% at 15% 90%, rgba(139,34,82,0.35), transparent 65%),
+    linear-gradient(145deg, #0f0507 0%, #1a0a0e 25%, #2d1018 55%, #1a0a0e 85%, #0a0305 100%);
+  box-shadow:
+    0 10px 34px rgba(26,10,14,0.45),
+    0 0 0 1px rgba(212,175,55,0.18),
+    inset 0 1px 0 rgba(212,175,55,0.12);
+  overflow:hidden;
   display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center;
-  margin-bottom:24px; padding:16px 0 20px; border-bottom:1px solid var(--border); gap:12px;
+  gap:14px;
 }
+/* subtle shimmering gold line across the top */
+header::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1.5px;
+  background:linear-gradient(90deg, transparent, rgba(212,175,55,0.6), rgba(244,228,186,0.9), rgba(212,175,55,0.6), transparent);
+}
+/* decorative corner ornament */
+header::after {
+  content:''; position:absolute; top:-40px; right:-40px;
+  width:180px; height:180px; border-radius:50%;
+  background:radial-gradient(circle, rgba(212,175,55,0.14), transparent 60%);
+  pointer-events:none;
+}
+header > * { position:relative; z-index:2; }
+
 h1 {
-  font-family:'Sarabun','Anuphan',sans-serif; font-size:1.35rem; font-weight:700;
-  color:var(--text-dark);
-  display:flex; align-items:center; gap:10px; letter-spacing:-0.01em;
+  font-family:'Sarabun','Anuphan',sans-serif; font-size:1.18rem; font-weight:700;
+  color:#F4E4BA;
+  display:flex; align-items:center; gap:12px; letter-spacing:0.01em;
+  margin:0;
+  text-shadow:0 1px 2px rgba(0,0,0,0.4);
 }
 h1::before {
-  content:''; display:block; width:4px; height:28px;
-  background:linear-gradient(180deg, var(--burgundy), var(--gold));
-  border-radius:2px;
+  content:''; display:block; width:5px; height:30px;
+  background:linear-gradient(180deg, #D4AF37 0%, #8B2252 100%);
+  border-radius:3px;
+  box-shadow:0 0 12px rgba(212,175,55,0.4);
 }
+.subtitle-lab {
+  font-family:'Cinzel','Anuphan',serif;
+  font-size:0.65rem; font-weight:600; color:#D4AF37;
+  letter-spacing:3px; text-transform:uppercase;
+  margin-bottom:6px;
+  text-shadow:0 1px 2px rgba(0,0,0,0.5);
+}
+.header-title-wrap { flex:1; min-width:0; }
+.subtitle { color:rgba(244,228,186,0.55); font-size:0.76rem; margin-top:6px; line-height:1.55; }
+
 .badge {
-  background:rgba(212,175,55,0.15); color:var(--gold-deep); padding:3px 8px;
-  border-radius:var(--radius-xs); font-size:0.65rem; border:1px solid rgba(212,175,55,0.35);
-  font-weight:700; letter-spacing:0.5px;
+  background:rgba(212,175,55,0.2); color:#F4E4BA; padding:3px 9px;
+  border-radius:var(--radius-xs); font-size:0.62rem; border:1px solid rgba(212,175,55,0.45);
+  font-weight:700; letter-spacing:0.8px;
 }
-.badge-dh { background:rgba(158,63,53,0.12); color:var(--orange); border-color:rgba(158,63,53,0.3); }
-.subtitle { color:var(--text-muted); font-size:0.78rem; margin-top:4px; line-height:1.5; }
+.badge-dh { background:rgba(158,63,53,0.25); color:#F4C8B8; border-color:rgba(200,90,74,0.45); }
+
 .status-box { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
 .status-indicator {
-  display:flex; align-items:center; gap:6px; font-weight:600; font-size:0.75rem;
+  display:flex; align-items:center; gap:7px; font-weight:600; font-size:0.72rem;
   padding:6px 14px; border-radius:50px;
-  background:var(--cream-card); border:1px solid var(--border);
+  background:rgba(255,255,255,0.08); color:#F4E4BA;
+  border:1px solid rgba(244,228,186,0.18);
   transition:all 0.3s ease;
-  box-shadow:0 2px 8px rgba(114,47,55,0.08);
+  backdrop-filter:blur(6px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.08);
 }
-.status-indicator.loading { color:var(--gold-deep); border-color:rgba(139,105,20,0.35); }
-.status-indicator.loading span:first-child { animation:statusBlink 1.2s ease-in-out infinite; }
-.status-indicator.success { color:var(--green); border-color:rgba(46,159,95,0.35); }
-.status-indicator.error { color:var(--text-muted); border-color:rgba(122,111,98,0.3); background:rgba(122,111,98,0.06); }
+.status-indicator.loading { color:#F4E4BA; border-color:rgba(212,175,55,0.4); background:rgba(212,175,55,0.1); }
+.status-indicator.loading span:first-child { color:#D4AF37; animation:statusBlink 1.2s ease-in-out infinite; }
+.status-indicator.success { color:#7FEBA8; border-color:rgba(127,235,168,0.35); background:rgba(46,159,95,0.12); }
+.status-indicator.success span:first-child { color:#7FEBA8; }
+.status-indicator.error { color:rgba(244,228,186,0.6); border-color:rgba(122,111,98,0.3); background:rgba(0,0,0,0.2); }
 @keyframes statusBlink { 0%, 100% { opacity:1; } 50% { opacity:0.3; } }
 input[type="file"] { display:none; }
 #manual-upload-container { display:none; }
 .btn-upload {
-  background:var(--cream-card); border:1px solid rgba(212,175,55,0.4); color:var(--gold-deep);
-  padding:8px 18px; border-radius:50px; cursor:pointer; font-weight:600;
-  transition:all 0.3s ease; display:flex; align-items:center; gap:8px; font-size:0.78rem;
-  box-shadow:0 2px 8px rgba(114,47,55,0.08);
+  background:linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
+  border:1px solid rgba(244,228,186,0.3);
+  color:#1a0a0e;
+  padding:8px 18px; border-radius:50px; cursor:pointer; font-weight:700;
+  transition:all 0.3s ease; display:flex; align-items:center; gap:8px; font-size:0.76rem;
+  box-shadow:0 3px 12px rgba(212,175,55,0.35);
+  letter-spacing:0.3px;
 }
-.btn-upload:hover { background:var(--gold); color:#fff; transform:scale(1.03); box-shadow:0 4px 20px var(--accent-glow); }
+.btn-upload:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(212,175,55,0.5); }
+
+@media (max-width:600px) {
+  header { padding:20px 18px 18px; margin:-4px -2px 20px; border-radius:18px; }
+  h1 { font-size:1rem; }
+}
 
 /* CARDS — Glassmorphism */
 .card {
@@ -1247,7 +1298,8 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
 <body>
 <div class="container">
   <header>
-    <div>
+    <div class="header-title-wrap">
+      <div class="subtitle-lab">LAB · Weekly Strategy</div>
       <h1>S&amp;P 500 Weekly Momentum &amp; Dark-Horse</h1>
     </div>
     <div class="status-box">
