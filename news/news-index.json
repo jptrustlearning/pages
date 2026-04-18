@@ -5,72 +5,75 @@
       "file": "2026-04-18-1830.md",
       "date": "2026-04-18T18:30:00Z",
       "date_display": "18 เม.ย. 2026 · 18:30",
-      "summary": "S&P 500 ทะลุ 7,126 จุดสูงสุด · Netflix หลังตลาด −3% · น้ำมันร่วง −9.41% · NVIDIA 20 พ.ค. · Alphabet/Intel 23 เม.ย. · Warsh hearing 21 เม.ย.",
+      "summary": "Russell 2000 +2.11% · TSMC กำไร +58% · พันธบัตร 10Y 3.82% · NVIDIA 20 พ.ค. · Alphabet/Intel 23 เม.ย. · Warsh hearing 21 เม.ย.",
       "tickers": [
-        "SPY",
-        "DIA",
-        "QQQ",
+        "IWM",
+        "VBR",
         "NVDA",
-        "NFLX",
         "GOOGL",
         "INTC",
-        "TSLA",
-        "BTC",
-        "USO",
-        "GLD"
+        "TSM",
+        "QQQ",
+        "GLD",
+        "XLF",
+        "TLT"
       ],
       "headlines": [
         {
-          "title": "S&P 500 ปิดสัปดาห์ที่จุดสูงสุดใหม่ 7,126 — ทำ all-time high ครั้งที่ 8 ของปี 2026",
+          "title": "Russell 2000 พุ่ง +2.11% วันศุกร์ — Great Rotation ดันหุ้นกลางเล็ก แซง S&P 500 ปี 2026",
           "tickers": [
             {
-              "symbol": "SPY",
+              "symbol": "IWM",
               "sentiment": "positive"
             },
             {
-              "symbol": "DIA",
+              "symbol": "VBR",
               "sentiment": "positive"
             },
             {
-              "symbol": "QQQ",
+              "symbol": "IJR",
               "sentiment": "positive"
             }
           ],
-          "source": "Yahoo Finance · Motley Fool",
+          "source": "Trade Ideas · FinancialContent",
           "published": "18 เม.ย. 2026"
         },
         {
-          "title": "Netflix รายงาน Q1 เหนือคาด — แต่หุ้นร่วงหลังตลาด 3% เพราะค่าเฉลี่ยต่อผู้ใช้ต่ำ",
+          "title": "TSMC ทำสถิติกำไรไตรมาส 1 พุ่ง +58% — คาดรายได้ปี 2026 โต 30%+ จากความต้องการ AI",
           "tickers": [
             {
-              "symbol": "NFLX",
-              "sentiment": "negative"
+              "symbol": "TSM",
+              "sentiment": "positive"
             },
             {
-              "symbol": "DIS",
-              "sentiment": "neutral"
-            }
-          ],
-          "source": "CNBC · Yahoo Finance",
-          "published": "18 เม.ย. 2026"
-        },
-        {
-          "title": "ช่องแคบฮอร์มุซเปิดกลับมา — น้ำมันร่วงหนัก −9.41% สัปดาห์ ปิด 82.59 ดอลลาร์",
-          "tickers": [
-            {
-              "symbol": "USO",
-              "sentiment": "negative"
+              "symbol": "NVDA",
+              "sentiment": "positive"
             },
             {
-              "symbol": "XLE",
-              "sentiment": "negative"
-            },
-            {
-              "symbol": "JETS",
+              "symbol": "SMH",
               "sentiment": "positive"
             }
           ],
-          "source": "CNBC · 24/7 Wall St",
+          "source": "CNBC · Seeking Alpha",
+          "published": "18 เม.ย. 2026"
+        },
+        {
+          "title": "ผลตอบแทนพันธบัตร 10 ปี สหรัฐฯ ลงสู่ 3.82% — ต่ำสุดในรอบ 5 เดือน สัญญาณผ่อนคลาย",
+          "tickers": [
+            {
+              "symbol": "TLT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "IEF",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "XLF",
+              "sentiment": "negative"
+            }
+          ],
+          "source": "Yahoo Finance · CNBC",
           "published": "18 เม.ย. 2026"
         },
         {
