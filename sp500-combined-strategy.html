@@ -335,16 +335,17 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
   position:absolute; inset:0; width:100%; height:100%;
   transform:rotate(-90deg); filter:drop-shadow(0 0 12px rgba(212,175,55,0.35));
 }
-.owl-loader-ring-bg { fill:none; stroke:rgba(212,175,55,0.15); stroke-width:4; }
+.owl-loader-ring-bg { fill:none; stroke:rgba(212,175,55,0.18); stroke-width:8; }
 .owl-loader-ring-fg {
-  fill:none; stroke:url(#owlRingGrad); stroke-width:4; stroke-linecap:round;
+  fill:none; stroke:url(#owlRingGrad); stroke-width:8; stroke-linecap:round;
   stroke-dasharray:565.48; stroke-dashoffset:565.48;
   transition:stroke-dashoffset 0.35s cubic-bezier(0.4,0,0.2,1);
 }
 .owl-loader-img {
-  width:130px; height:130px; object-fit:contain;
+  width:100px; height:100px; object-fit:contain;
   animation:owlFloat 2.8s ease-in-out infinite;
   filter:drop-shadow(0 4px 16px rgba(212,175,55,0.4));
+  margin-top:-22px;
 }
 @keyframes owlFloat {
   0%, 100% { transform:translateY(0); }
@@ -361,10 +362,10 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
   letter-spacing:0.5px;
 }
 .owl-loader-pct {
-  font-family:var(--font-heading); font-size:1.75rem; font-weight:700;
+  font-family:var(--font-heading); font-size:1.55rem; font-weight:700;
   color:var(--gold-light); letter-spacing:1px;
-  position:absolute; bottom:-6px; left:50%; transform:translateX(-50%);
-  text-shadow:0 2px 12px rgba(212,175,55,0.5);
+  position:absolute; left:50%; top:62%; transform:translate(-50%, -50%);
+  text-shadow:0 2px 12px rgba(212,175,55,0.6);
 }
 
 /* ===== STRATEGY DIAGRAM ===== */
@@ -636,8 +637,7 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
 <div class="container">
   <header>
     <div>
-      <h1>COMBINED STRATEGY <span class="badge">MOMENTUM</span> <span class="badge badge-dh">DARK HORSE</span></h1>
-      <p class="subtitle">Signal วันศุกร์ → ซื้อ Open วันจันทร์ → Hold N วัน/สัปดาห์ → ขาย Open — Per Stock SL — Regime Filter — Confirmation</p>
+      <h1>S&amp;P 500 Weekly Momentum &amp; Dark-Horse</h1>
     </div>
     <div class="status-box">
       <div id="data-status" class="status-indicator loading"><span>●</span> CONNECTING...</div>
@@ -650,16 +650,6 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
       </div>
     </div>
   </header>
-
-  <!-- Strategy Info -->
-  <div class="strategy-info">
-    <strong>Combined Strategy:</strong> ทุกสัปดาห์ดูสัญญาณจากวันทำการสุดท้าย (ศุกร์) แล้วซื้อราคา Open วันทำการแรก (จันทร์):
-    <span class="tag">Momentum</span> (ROC Top 20%, RS vs Market, EMA aligned, Volume, RSI &lt; 80 → hold N weeks → ขาย Open จันทร์) +
-    <span class="tag tag-dh">Dark Horse</span> (5D Surge + Volume Explosion + Previously Obscure → hold N days → ขาย Open).
-    <strong>Per Stock SL</strong> ทั้งคู่ — ออกที่ Open วันถัดจากวันโดน SL.
-    <strong>Regime Filter:</strong> skip entry เมื่อ Market &lt; EMA.
-    <strong>Confirmation:</strong> DH picks ที่อยู่ใน Momentum Top 20% จะถูก tag "Confirmed ★".
-  </div>
 
   <!-- OWL LOADER -->
   <div id="loading-screen">
@@ -679,10 +669,7 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
         <img src="jpt-owl-logo.png" alt="JP Trust" class="owl-loader-img">
         <div id="owlLoaderPct" class="owl-loader-pct">0%</div>
       </div>
-      <div>
-        <div class="owl-loader-text">Initializing Combined Engine</div>
-        <div class="owl-loader-subtext" style="margin-top:10px;">กำลังโหลดข้อมูล S&amp;P 500 · Momentum + Dark Horse</div>
-      </div>
+      <div class="owl-loader-text">Initializing</div>
     </div>
   </div>
 
