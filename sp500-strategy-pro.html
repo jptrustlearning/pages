@@ -2991,15 +2991,10 @@ function renderTradeLog() {
         const latestPrice = state.marketData[latestDate]?.[t]?.c;
         if (entryPrice && latestPrice) {
           const ret = (latestPrice - entryPrice) / entryPrice;
-          return { ticker: t, ret, entryPrice, latestPrice };  // include prices for debug
+          return { ticker: t, ret };
         }
-        return { ticker: t, ret: 0, entryPrice: null, latestPrice: null };
+        return { ticker: t, ret: 0 };
       });
-      // DEBUG: log MU specifically so Joon can inspect
-      const muDbg = stockRets.find(s => s.ticker === 'MU');
-      if (muDbg) {
-        console.log(`[DEBUG MU] entry=${log.date} @$${muDbg.entryPrice} → latest=${latestDate} @$${muDbg.latestPrice} → ret=${(muDbg.ret*100).toFixed(2)}%`);
-      }
       // Unrealized P&L: weighted by equal alloc (same as position entry)
       const allocPerStock = log.stocks.length > 0 ? log.equity / log.stocks.length : 0;
       pnl = stockRets.reduce((sum, s) => sum + (allocPerStock * s.ret), 0);
@@ -3072,15 +3067,7 @@ function renderTradeLog() {
       <div>${r.stockRets.map(s => {
         const cls = s.ret >= 0 ? '' : ' loss';
         const pctTxt = ` ${(s.ret*100).toFixed(1)}%`;
-        const priceInfo = (s.entryPrice && s.latestPrice)
-          ? ` ($${s.entryPrice.toFixed(0)}→$${s.latestPrice.toFixed(0)})`
-          : '';
-        const tooltip = (s.entryPrice && s.latestPrice)
-          ? `title="entry $${s.entryPrice.toFixed(2)} → latest $${s.latestPrice.toFixed(2)}"`
-          : '';
-        // For OPEN positions, show price change inline so Joon can verify on mobile
-        const displayPct = r.isOpen ? `${pctTxt}${priceInfo}` : pctTxt;
-        return `<span class="stock-badge${cls}" ${tooltip}>${s.ticker}${displayPct}</span>`;
+        return `<span class="stock-badge${cls}">${s.ticker}${pctTxt}</span>`;
       }).join('')}</div>
     </div>`;
 
@@ -3094,32 +3081,6 @@ window.gotoTradeLogPage = function(p) {
   renderTradeLog();
   const container = document.getElementById('tradeLogContainer');
   if (container) container.scrollTop = 0;
-};
-
-// === DEBUG: Run debugStock('MU') in DevTools console to inspect price history ===
-window.debugStock = function(ticker) {
-  if (!state.marketData || state.sortedDates.length === 0) {
-    console.log('No data loaded yet');
-    return;
-  }
-  console.log(`\n=== Price history for ${ticker} ===`);
-  const firstDate = state.sortedDates[0];
-  const lastDate = state.sortedDates[state.sortedDates.length - 1];
-  const firstPrice = state.marketData[firstDate]?.[ticker]?.c;
-  const lastPrice = state.marketData[lastDate]?.[ticker]?.c;
-  console.log(`  First date (${firstDate}): $${firstPrice ?? 'N/A'}`);
-  console.log(`  Last date  (${lastDate}): $${lastPrice ?? 'N/A'}`);
-  if (firstPrice && lastPrice) {
-    console.log(`  Total return: ${((lastPrice/firstPrice - 1) * 100).toFixed(1)}%`);
-  }
-  // Show price at each rebalance date
-  console.log(`\n  Price at each rebalance date:`);
-  state.tradeLog.forEach(log => {
-    const p = state.marketData[log.date]?.[ticker]?.c;
-    const inRebalance = log.stocks.includes(ticker) ? ' ← SELECTED' : '';
-    console.log(`    ${log.date}: $${p ?? 'N/A'}${inRebalance}`);
-  });
-  console.log(`    ${lastDate}: $${lastPrice ?? 'N/A'} (LATEST)`);
 };
 
 function renderEquityChart() {
