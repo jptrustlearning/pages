@@ -104,15 +104,15 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .member-badge .jpt-icon svg{width:14px;height:14px;color:var(--gold)}
 
 /* Reward Card */
-.reward-card{width:auto;overflow:hidden;position:relative;border-radius:16px}
+.reward-card{width:auto;overflow:hidden;position:relative;border-radius:16px;container-type:inline-size}
 .reward-card img{width:100%;display:block}
-.rc-member-name{position:absolute;left:20px;bottom:38%;font-family:'Anuphan',sans-serif;font-size:16px;font-weight:500;color:var(--text-light);letter-spacing:1px;text-shadow:0 1px 4px rgba(0,0,0,0.4)}
-.rc-points{position:absolute;right:22%;top:clamp(8px,3vw,18px);transform:translateX(50%);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;width:clamp(72px,22vw,110px);height:clamp(72px,22vw,110px)}
+.rc-member-name{position:absolute;left:5%;bottom:38%;font-family:'Anuphan',sans-serif;font-size:4.5cqw;font-weight:500;color:var(--text-light);letter-spacing:1px;text-shadow:0 1px 4px rgba(0,0,0,0.4)}
+.rc-points{position:absolute;right:22%;top:6%;transform:translateX(50%);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;width:22%;aspect-ratio:1}
 .rc-points-ring{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;border:1.5px solid transparent;border-top-color:rgba(212,175,55,0.7);border-right-color:rgba(244,228,186,0.3);animation:pointsSpin 3s linear infinite;filter:drop-shadow(0 0 4px rgba(212,175,55,0.4))}
-.rc-points-ring2{position:absolute;inset:clamp(4px,1.2vw,7px);border-radius:50%;border:1px solid transparent;border-bottom-color:rgba(244,228,186,0.5);border-left-color:rgba(212,175,55,0.2);animation:pointsSpin 5s linear infinite reverse;filter:drop-shadow(0 0 3px rgba(212,175,55,0.3))}
+.rc-points-ring2{position:absolute;inset:7%;border-radius:50%;border:1px solid transparent;border-bottom-color:rgba(244,228,186,0.5);border-left-color:rgba(212,175,55,0.2);animation:pointsSpin 5s linear infinite reverse;filter:drop-shadow(0 0 3px rgba(212,175,55,0.3))}
 .rc-points-glow{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,0.12) 0%,rgba(212,175,55,0.04) 50%,transparent 70%);animation:pointsPulse 2.5s ease-in-out infinite}
-.rc-points-num{font-family:'DM Serif Display',serif;font-size:clamp(22px,7vw,40px);color:var(--gold-light);line-height:1;position:relative;z-index:1;text-shadow:0 0 13px rgba(212,175,55,0.55)}
-.rc-points-label{font-family:'Cinzel',serif;font-size:clamp(7px,1.8vw,10px);color:var(--gold);letter-spacing:clamp(1.5px,0.5vw,2.5px);text-transform:uppercase;margin-top:clamp(1px,0.5vw,3px);position:relative;z-index:1;opacity:0.85}
+.rc-points-num{font-family:'DM Serif Display',serif;font-size:8cqw;color:var(--gold-light);line-height:1;position:relative;z-index:1;text-shadow:0 0 13px rgba(212,175,55,0.55)}
+.rc-points-label{font-family:'Cinzel',serif;font-size:2.2cqw;color:var(--gold);letter-spacing:0.25em;text-transform:uppercase;margin-top:1%;position:relative;z-index:1;opacity:0.85}
 @keyframes pointsSpin{to{transform:rotate(360deg)}}
 @keyframes pointsPulse{0%,100%{opacity:0.6;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
 
