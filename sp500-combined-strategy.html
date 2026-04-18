@@ -150,13 +150,13 @@ h1 {
 /* Row 3 — Status */
 .status-box {
   display:flex; align-items:center; gap:10px; flex-wrap:wrap;
-  padding-left:26px;  /* indent like a paragraph under the title */
+  padding-left:36px;  /* deeper paragraph indent — visually nests under title */
 }
 .status-indicator {
-  display:inline-flex; align-items:center; gap:6px;
+  display:inline-flex; align-items:center; gap:5px;
   font-family:'Anuphan','Sarabun',sans-serif;
-  font-size:0.62rem; font-weight:500;
-  padding:4px 11px; border-radius:50px;
+  font-size:0.56rem; font-weight:500;
+  padding:3px 10px; border-radius:50px;
   background:rgba(255,255,255,0.06); color:#F4E4BA;
   border:1px solid rgba(244,228,186,0.16);
   transition:all 0.3s ease;
@@ -191,7 +191,8 @@ input[type="file"] { display:none; }
   header { padding:18px 18px 16px; margin:-4px -2px 20px; border-radius:18px; }
   .subtitle-lab { font-size:0.62rem; letter-spacing:3px; margin-bottom:10px; }
   .header-title-wrap { margin-bottom:12px; padding-left:12px; }
-  .status-box { padding-left:22px; }
+  .status-box { padding-left:30px; }
+  .status-indicator { font-size:0.52rem; padding:3px 9px; }
   h1 { font-size:1.25rem; }
 }
 @media (max-width:400px) {
