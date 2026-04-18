@@ -362,496 +362,82 @@
     font-weight: 600; letter-spacing: 0.5px;
   }
   .opt-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
-
-  /* ============================================================
-     PHASE 3: LUXE HERO + FAB + SETTINGS PANEL + OWL LOADER + ABOUT MODAL
-     (ported from sp500-combined-strategy.html, adapted for 6M)
-  ============================================================ */
-
-  /* --- LUXE HERO (override Phase 2 flex header) --- */
-  header {
-    position:relative !important;
-    margin:-4px -4px 24px;
-    padding:20px 22px 18px;
-    border-radius:22px;
-    background:
-      radial-gradient(ellipse 80% 55% at 85% 20%, rgba(212,175,55,0.22), transparent 60%),
-      radial-gradient(ellipse 70% 60% at 15% 90%, rgba(139,34,82,0.35), transparent 65%),
-      linear-gradient(145deg, #0f0507 0%, #1a0a0e 25%, #2d1018 55%, #1a0a0e 85%, #0a0305 100%) !important;
-    box-shadow:
-      0 10px 34px rgba(26,10,14,0.45),
-      0 0 0 1px rgba(212,175,55,0.18),
-      inset 0 1px 0 rgba(212,175,55,0.12);
-    overflow:hidden;
-    border-bottom:none !important;
-    display:flex !important; flex-direction:column; align-items:stretch;
-    gap:0 !important;
-  }
-  header::before {
-    content:''; position:absolute; top:0; left:0; right:0; height:1.5px;
-    background:linear-gradient(90deg, transparent, rgba(212,175,55,0.6), rgba(244,228,186,0.9), rgba(212,175,55,0.6), transparent);
-    z-index:3;
-  }
-  header::after {
-    content:''; position:absolute; top:-50px; right:-50px;
-    width:200px; height:200px; border-radius:50%;
-    background:radial-gradient(circle, rgba(212,175,55,0.14), transparent 60%);
-    pointer-events:none;
-  }
-  header > * { position:relative; z-index:2; }
-
-  .subtitle-lab {
-    font-family:'Cinzel','Anuphan',serif;
-    font-size:0.66rem; font-weight:600; color:#D4AF37;
-    letter-spacing:3.5px; text-transform:uppercase;
-    margin-bottom:12px;
-    text-shadow:0 1px 2px rgba(0,0,0,0.5);
-    display:flex; align-items:center; gap:10px;
-  }
-  .subtitle-lab::after {
-    content:''; flex:1; height:1px; max-width:60px;
-    background:linear-gradient(90deg, rgba(212,175,55,0.5), transparent);
-  }
-  .header-title-wrap {
-    padding-left:36px;
-    position:relative;
-    margin-bottom:14px;
-  }
-  .header-title-wrap::before {
-    content:''; position:absolute; left:22px; top:4px; bottom:4px;
-    width:4px;
-    background:linear-gradient(180deg, #D4AF37 0%, #8B2252 100%);
-    border-radius:3px;
-    box-shadow:0 0 12px rgba(212,175,55,0.4);
-  }
-  header h1 {
-    font-family:'DM Serif Display','Sarabun','Anuphan',serif !important;
-    font-weight:400 !important;
-    font-size:1.5rem !important; line-height:1.25 !important;
-    color:#F4E4BA !important;
-    margin:0 !important;
-    letter-spacing:0.005em !important;
-    text-shadow:0 1px 3px rgba(0,0,0,0.55);
-    display:block !important;
-    gap:0 !important;
-  }
-  header h1::before {
-    display:none !important;
-  }
-  .h1-amp {
-    color:#D4AF37; font-style:italic;
-    font-family:'DM Serif Display',serif; margin:0 0.08em;
-  }
-  .header-subtitle {
-    color:rgba(244,228,186,0.55); font-size:0.76rem; margin-top:6px; line-height:1.55;
-    padding-left:36px;
-  }
-  .status-box {
-    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
-    padding-left:36px;
-  }
-  header .status-indicator {
-    display:inline-flex; align-items:center; gap:5px;
-    font-family:'Anuphan','Sarabun',sans-serif;
-    font-size:0.56rem; font-weight:500;
-    padding:3px 10px; border-radius:50px;
-    background:rgba(255,255,255,0.06); color:#F4E4BA !important;
-    border:1px solid rgba(244,228,186,0.16);
-    transition:all 0.3s ease;
-    backdrop-filter:blur(6px);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);
-    letter-spacing:0.3px;
-    white-space:nowrap;
-    text-transform:none;
-  }
-  header .status-indicator.loading { color:#F4E4BA !important; border-color:rgba(212,175,55,0.35); background:rgba(212,175,55,0.08); }
-  header .status-indicator.loading span:first-child { color:#D4AF37; animation:statusBlink 1.2s ease-in-out infinite; }
-  header .status-indicator.success { color:#7FEBA8 !important; border-color:rgba(127,235,168,0.35); background:rgba(46,159,95,0.1); }
-  header .status-indicator.success span:first-child { color:#7FEBA8; }
-  header .status-indicator.error { color:rgba(244,228,186,0.6) !important; border-color:rgba(122,111,98,0.3); background:rgba(0,0,0,0.2); }
-  @keyframes statusBlink { 0%, 100% { opacity:1; } 50% { opacity:0.3; } }
-  header .btn-upload {
-    background:linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
-    border:1px solid rgba(244,228,186,0.3);
-    color:#1a0a0e;
-    padding:7px 16px; border-radius:50px; cursor:pointer; font-weight:700;
-    transition:all 0.3s ease; display:flex; align-items:center; gap:8px; font-size:0.72rem;
-    box-shadow:0 3px 12px rgba(212,175,55,0.35);
-    letter-spacing:0.8px;
-    font-family:'Cinzel','Anuphan',serif;
-    text-transform:uppercase;
-  }
-  header .btn-upload:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(212,175,55,0.5); }
-
-  @media (max-width:600px) {
-    header { padding:18px 18px 16px; margin:-4px -2px 20px; border-radius:18px; }
-    .subtitle-lab { font-size:0.62rem; letter-spacing:3px; margin-bottom:10px; }
-    .header-title-wrap { margin-bottom:12px; padding-left:30px; }
-    .header-title-wrap::before { left:18px; }
-    .status-box, .header-subtitle { padding-left:30px; }
-    header h1 { font-size:1.25rem !important; }
-  }
-  @media (max-width:400px) { header h1 { font-size:1.12rem !important; line-height:1.3 !important; } }
-
-  /* --- OWL LOADER --- */
-  #loading-screen {
-    display:flex; align-items:center; justify-content:center; min-height:60vh;
-  }
-  .owl-loader-wrap {
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    padding:60px 20px; min-height:420px; gap:28px;
-  }
-  .owl-loader-stage {
-    position:relative; width:200px; height:200px;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .owl-loader-ring {
-    position:absolute; inset:0; width:100%; height:100%;
-    transform:rotate(-90deg);
-    filter:drop-shadow(0 0 10px rgba(46,159,95,0.3)) drop-shadow(0 0 14px rgba(212,175,55,0.25));
-  }
-  .owl-loader-ring-bg { fill:none; stroke:rgba(139,105,20,0.25); stroke-width:8; }
-  .owl-loader-ring-fg {
-    fill:none; stroke:url(#owlRingGrad); stroke-width:8; stroke-linecap:round;
-    stroke-dasharray:565.48; stroke-dashoffset:565.48;
-    transition:stroke-dashoffset 0.35s cubic-bezier(0.4,0,0.2,1);
-  }
-  .owl-loader-img {
-    width:100px; height:100px; object-fit:contain;
-    animation:owlFloat 2.8s ease-in-out infinite;
-    filter:drop-shadow(0 4px 12px rgba(46,159,95,0.25)) drop-shadow(0 2px 8px rgba(212,175,55,0.3));
-    margin-top:-22px;
-  }
-  @keyframes owlFloat {
-    0%, 100% { transform:translateY(0); }
-    50% { transform:translateY(-8px); }
-  }
-  .owl-loader-text {
-    font-family:var(--font-heading); font-size:0.95rem; font-weight:700;
-    color:var(--gold-deep); letter-spacing:3px; text-align:center;
-    text-transform:uppercase;
-  }
-  .loader-dots-left, .loader-dots-right {
-    display:inline-block; color:var(--green);
-    animation:loaderDotsBlink 1.4s ease-in-out infinite;
-    letter-spacing:2px; font-weight:700;
-  }
-  .loader-dots-right { animation-delay:0.7s; }
-  @keyframes loaderDotsBlink {
-    0%, 100% { opacity:0.25; transform:translateY(0); }
-    50% { opacity:1; transform:translateY(-2px); }
-  }
-  .owl-loader-pct {
-    font-family:var(--font-number); font-size:1.75rem; font-weight:400;
-    color:var(--burgundy); letter-spacing:0;
-    position:absolute; left:50%; top:62%; transform:translate(-50%, -50%);
-    text-shadow:0 1px 6px rgba(255,254,248,0.8);
-  }
-
-  /* --- FAB STACK --- */
-  .fab-stack {
-    position:fixed; bottom:24px; right:24px; z-index:100;
-    display:flex; flex-direction:column; gap:14px; align-items:flex-end;
-  }
-  .fab {
-    width:58px; height:58px; border-radius:50%; border:none; cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
-    font-size:1.3rem; color:var(--bg); position:relative;
-    transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
-    box-shadow:0 8px 24px rgba(0,0,0,0.25), 0 0 0 0 rgba(212,175,55,0.4);
-  }
-  .fab:hover { transform:scale(1.08) translateY(-2px); }
-  .fab:active { transform:scale(0.95); }
-  .fab-primary {
-    background:linear-gradient(135deg, #722F37 0%, #8B2252 55%, #D4AF37 100%);
-    color:#FFF5E1;
-    box-shadow:0 8px 24px rgba(139,34,82,0.35), 0 0 0 0 rgba(212,175,55,0.4);
-    animation:fabPulse 2.8s infinite;
-  }
-  @keyframes fabPulse {
-    0%, 100% { box-shadow:0 8px 24px rgba(139,34,82,0.35), 0 0 0 0 rgba(212,175,55,0.4); }
-    50% { box-shadow:0 8px 24px rgba(139,34,82,0.5), 0 0 0 12px rgba(212,175,55,0); }
-  }
-  .fab-secondary {
-    background:linear-gradient(135deg, #722F37 0%, #8B2252 55%, #D4AF37 100%);
-    color:#FFF5E1;
-    box-shadow:0 8px 24px rgba(139,34,82,0.35);
-  }
-  .fab svg { stroke:#FFF5E1 !important; color:#FFF5E1 !important; }
-  .fab-primary svg, .fab-secondary svg { filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3)); }
-  .fab-tooltip {
-    position:absolute; right:calc(100% + 14px); top:50%; transform:translateY(-50%);
-    background:rgba(26,10,14,0.95); color:var(--gold-light);
-    padding:8px 14px; border-radius:10px; font-size:0.78rem;
-    font-weight:600; white-space:nowrap; pointer-events:none;
-    opacity:0; transition:opacity 0.2s ease;
-    border:1px solid var(--border); backdrop-filter:blur(8px);
-    letter-spacing:0.3px;
-  }
-  .fab-tooltip::after {
-    content:''; position:absolute; left:100%; top:50%; transform:translateY(-50%);
-    border:6px solid transparent; border-left-color:rgba(26,10,14,0.95);
-  }
-  .fab:hover .fab-tooltip { opacity:1; }
-
-  /* --- SETTINGS SLIDE-IN PANEL --- */
-  .panel-backdrop {
-    position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:200;
-    backdrop-filter:blur(4px); opacity:0; pointer-events:none;
-    transition:opacity 0.3s ease;
-  }
-  .panel-backdrop.open { opacity:1; pointer-events:auto; }
-  .settings-panel {
-    position:fixed; top:0; right:-620px; bottom:0; width:600px; max-width:92vw;
-    background:linear-gradient(180deg, #FAF6ED 0%, #F5EFE0 100%);
-    border-left:1px solid rgba(212,175,55,0.3); z-index:201;
-    overflow-y:auto; transition:right 0.35s cubic-bezier(0.4,0,0.2,1);
-    box-shadow:-20px 0 60px rgba(114,47,55,0.18);
-  }
-  .settings-panel.open { right:0; }
-  .panel-header {
-    position:sticky; top:0; z-index:5;
-    background:linear-gradient(180deg, rgba(255,254,248,0.98), rgba(250,246,237,0.94));
-    backdrop-filter:blur(14px);
-    padding:20px 24px; border-bottom:1px solid rgba(212,175,55,0.3);
-    display:flex; justify-content:space-between; align-items:center; gap:16px;
-    box-shadow:0 3px 12px rgba(114,47,55,0.06);
-  }
-  .panel-title {
-    font-family:'Sarabun','Anuphan',sans-serif; font-size:1rem; font-weight:700;
-    color:var(--text-dark); letter-spacing:0.02em; display:flex; align-items:center; gap:10px;
-  }
-  .panel-title::before {
-    content:''; width:4px; height:22px;
-    background:linear-gradient(180deg, var(--burgundy), var(--gold));
-    border-radius:2px;
-  }
-  .panel-close {
-    width:36px; height:36px; border-radius:50%; border:1px solid var(--border);
-    background:var(--cream-card); color:var(--text-dark);
-    cursor:pointer; font-size:1.1rem;
-    display:flex; align-items:center; justify-content:center;
-    transition:all 0.2s ease;
-    box-shadow:0 2px 6px rgba(114,47,55,0.06);
-  }
-  .panel-close:hover { background:rgba(193,69,69,0.08); border-color:var(--red); color:var(--red); }
-  .panel-body { padding:20px 24px 120px; }
-  .panel-footer {
-    position:sticky; bottom:0; z-index:5;
-    background:linear-gradient(0deg, rgba(250,246,237,1) 60%, rgba(250,246,237,0.88));
-    backdrop-filter:blur(14px);
-    padding:16px 24px; border-top:1px solid rgba(212,175,55,0.3);
-    display:flex; gap:12px;
-    box-shadow:0 -3px 12px rgba(114,47,55,0.06);
-  }
-  .btn-run-backtest {
-    flex:1; padding:14px 20px; border-radius:12px; border:none;
-    background:linear-gradient(135deg, #722F37 0%, #8B2252 55%, #D4AF37 100%);
-    color:#FFF5E1; font-family:'Sarabun','Anuphan',sans-serif; font-size:0.95rem;
-    font-weight:700; letter-spacing:0.5px; cursor:pointer;
-    transition:all 0.25s ease;
-    box-shadow:0 4px 16px rgba(139,34,82,0.3);
-    display:flex; align-items:center; justify-content:center; gap:10px;
-  }
-  .btn-run-backtest:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(139,34,82,0.4); }
-  .btn-cancel {
-    padding:14px 22px; border-radius:12px;
-    background:var(--cream-card); border:1px solid var(--border); color:var(--text-muted);
-    font-family:'Sarabun','Anuphan',sans-serif; font-size:0.88rem; font-weight:600;
-    letter-spacing:0.3px; cursor:pointer; transition:all 0.2s ease;
-  }
-  .btn-cancel:hover { background:rgba(193,69,69,0.06); border-color:var(--red); color:var(--red); }
-
-  .section-label {
-    display:flex; align-items:center; gap:12px;
-    margin:24px 0 12px; font-family:'Cinzel','Anuphan',serif;
-    font-size:0.78rem; font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
-    color:var(--gold-deep);
-  }
-  .section-label .line { flex:1; height:1px; background:linear-gradient(90deg, var(--border), transparent); }
-
-  .panel-body .control-group {
-    background:var(--cream-card); border:1px solid var(--border); border-radius:12px;
-    padding:16px 18px 14px; margin-bottom:14px; transition:all 0.2s ease;
-  }
-  .panel-body .control-group:hover {
-    border-color:var(--border-hover); transform:translateY(-2px);
-    box-shadow:0 6px 18px rgba(114,47,55,0.08);
-  }
-  .panel-body .control-group label {
-    display:block; font-family:'Sarabun','Anuphan',sans-serif;
-    font-size:0.82rem; font-weight:700; color:var(--text-dark);
-    margin-bottom:10px; letter-spacing:0.02em; text-transform:none;
-  }
-  .panel-body .hint {
-    display:block; font-family:'Sarabun','Anuphan',sans-serif;
-    font-size:0.74rem; color:var(--text-muted); line-height:1.55;
-    margin-top:10px; padding-top:10px;
-    border-top:1px dashed rgba(212,175,55,0.3);
-  }
-  .panel-body .hint strong { color:var(--gold-deep); font-weight:700; }
-
-  /* --- ABOUT MODAL --- */
-  .about-modal {
-    position:fixed; inset:0; z-index:210; display:none;
-    align-items:center; justify-content:center; padding:20px;
-    background:rgba(10,5,8,0.78); backdrop-filter:blur(8px);
-  }
-  .about-modal.open { display:flex; }
-  .about-modal-content {
-    background:linear-gradient(160deg, #1a0a0e 0%, #2d1018 50%, #3a1520 100%);
-    background-image:
-      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(212,175,55,0.12), transparent 60%),
-      radial-gradient(ellipse 70% 55% at 80% 90%, rgba(139,34,82,0.25), transparent 60%),
-      linear-gradient(160deg, #1a0a0e 0%, #2d1018 50%, #3a1520 100%);
-    border:1px solid rgba(212,175,55,0.35); border-radius:16px;
-    max-width:680px; width:100%; max-height:85vh; overflow-y:auto;
-    padding:32px; position:relative;
-    box-shadow:0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(212,175,55,0.2);
-  }
-  .about-modal-content::-webkit-scrollbar { width:6px; }
-  .about-modal-content::-webkit-scrollbar-track { background:rgba(0,0,0,0.2); border-radius:3px; }
-  .about-modal-content::-webkit-scrollbar-thumb { background:rgba(212,175,55,0.35); border-radius:3px; }
-  .about-modal h2 {
-    font-family:'Cinzel','Anuphan',serif; color:#F4E4BA;
-    font-size:1.35rem; margin-bottom:8px; letter-spacing:1.5px; font-weight:700;
-    display:flex; align-items:center; gap:12px;
-  }
-  .about-modal .about-sub {
-    color:#C4B88A; font-size:0.9rem; margin-bottom:22px;
-    padding-bottom:18px; border-bottom:1px solid rgba(212,175,55,0.2);
-    font-family:'Sarabun','Anuphan',sans-serif; line-height:1.55;
-  }
-  .about-modal p {
-    color:#E8E4DC; line-height:1.85; margin-bottom:14px; font-size:0.9rem;
-    font-family:'Sarabun','Anuphan',sans-serif;
-  }
-  .about-modal strong { color:#F4E4BA; font-weight:700; }
-  .about-philosophy {
-    background:linear-gradient(145deg, rgba(244,228,186,0.08), rgba(212,175,55,0.04));
-    border:1px solid rgba(212,175,55,0.25); border-radius:16px;
-    padding:22px 24px; margin-bottom:24px; position:relative;
-  }
-  .about-philosophy::before {
-    content:'"'; position:absolute; top:-10px; left:18px;
-    font-family:'DM Serif Display',serif; font-size:4rem; line-height:1;
-    color:rgba(212,175,55,0.4);
-  }
-  .philosophy-label {
-    font-family:'Cinzel','Anuphan',serif; font-size:0.68rem; font-weight:700;
-    color:#D4AF37; letter-spacing:3.5px; text-transform:uppercase;
-    margin-bottom:12px; padding-left:32px;
-  }
-  .philosophy-text {
-    font-family:'Sarabun','Anuphan',sans-serif; font-size:0.92rem;
-    color:#F4E4BA; line-height:1.9; font-weight:300;
-  }
-  .philosophy-text strong { color:#FFE9A3; font-weight:600; }
-  .philosophy-signature {
-    margin-top:16px; padding-top:14px;
-    border-top:1px dashed rgba(212,175,55,0.25);
-    font-family:'Cinzel','Anuphan',serif; font-size:0.68rem;
-    color:#B8860B; letter-spacing:2.5px; text-transform:uppercase;
-    text-align:right;
-  }
-  .about-pillars {
-    display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0 22px;
-  }
-  .about-pillar {
-    background:linear-gradient(145deg, rgba(244,228,186,0.09), rgba(244,228,186,0.03));
-    border:1px solid rgba(212,175,55,0.3); border-radius:12px;
-    padding:18px 18px 16px; position:relative;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.05);
-  }
-  .about-pillar.ret { border-top:3px solid #2E9F5F; }
-  .about-pillar.vol { border-top:3px solid #D4AF37; }
-  .pillar-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
-  .pillar-icon { font-size:1.4rem; }
-  .pillar-title {
-    font-family:'Cinzel','Anuphan',serif; font-size:0.95rem; font-weight:700;
-    letter-spacing:1.5px;
-  }
-  .about-pillar.ret .pillar-title { color:#9DE8B8; }
-  .about-pillar.vol .pillar-title { color:#F4E4BA; }
-  .pillar-subtitle {
-    font-family:'Sarabun','Anuphan',sans-serif; font-size:0.75rem;
-    color:#C4B88A; margin-bottom:10px; font-style:italic;
-  }
-  .pillar-desc {
-    font-family:'Sarabun','Anuphan',sans-serif; font-size:0.83rem;
-    color:#E8E4DC; line-height:1.7;
-  }
-  @media (max-width:500px) { .about-pillars { grid-template-columns:1fr; } }
-  .about-modal .panel-close {
-    background:rgba(244,228,186,0.1);
-    border:1px solid rgba(212,175,55,0.3);
-    color:#F4E4BA;
-    position:absolute; top:18px; right:18px;
-  }
-  .about-modal .panel-close:hover {
-    background:rgba(193,69,69,0.2);
-    border-color:#D95F5F;
-    color:#FFA8A8;
-  }
-
-  @media (max-width:600px) {
-    .fab-stack { bottom:16px; right:16px; gap:10px; }
-    .fab { width:52px; height:52px; font-size:1.2rem; }
-    .fab-tooltip { display:none; }
-    .settings-panel { width:100%; max-width:100%; }
-    .panel-body { padding:16px 18px 120px; }
-    .panel-footer { padding:14px 18px; }
-  }
-
 </style>
 </head>
 <body>
 
 <div class="container">
-  <!-- Luxe Hero Header -->
+  <!-- Header -->
   <header>
-    <div class="subtitle-lab">LAB · 6-Month Momentum</div>
-    <div class="header-title-wrap">
-      <h1>S&amp;P 500 Strategy <span class="h1-amp">&amp;</span> Pro V22</h1>
-      <div class="header-subtitle">Interactive Backtesting &amp; Optimization · Return × Volume Ranking</div>
+    <div>
+      <h1>S&P 500 STRATEGY <span class="badge-algo">PRO V22</span></h1>
+      <p style="color: var(--text-dark); font-size: 0.95rem; margin-top: 5px;">
+        Interactive Backtesting & Optimization Dashboard (Auto Google Sheets)
+      </p>
     </div>
-    <div class="status-box">
-      <div id="data-status" class="status-indicator loading"><span>●</span> Connecting</div>
+    
+    <!-- Status & Upload Section -->
+    <div class="upload-box">
+      <!-- Status Indicator -->
+      <div id="data-status" class="status-indicator loading">
+        <span>●</span> CONNECTING TO CLOUD...
+      </div>
+
+      <!-- Manual Upload Fallback (Hidden initially) -->
       <div id="manual-upload-container">
         <label class="btn-upload">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          UPLOAD CSV
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          MANUAL UPLOAD
           <input type="file" id="csvFile" accept=".csv">
         </label>
       </div>
     </div>
   </header>
 
-  <!-- OWL LOADER -->
-  <div id="loading">
-    <div class="owl-loader-wrap">
-      <div class="owl-loader-stage">
-        <svg class="owl-loader-ring" viewBox="0 0 200 200">
-          <defs>
-            <linearGradient id="owlRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#2E9F5F"/>
-              <stop offset="40%" stop-color="#5BC48E"/>
-              <stop offset="75%" stop-color="#D4AF37"/>
-              <stop offset="100%" stop-color="#8B6914"/>
-            </linearGradient>
-          </defs>
-          <circle class="owl-loader-ring-bg" cx="100" cy="100" r="90"/>
-          <circle id="owlLoaderRingFg" class="owl-loader-ring-fg" cx="100" cy="100" r="90"/>
-        </svg>
-        <img src="jpt-owl-logo.png" alt="JP Trust" class="owl-loader-img">
-        <div id="owlLoaderPct" class="owl-loader-pct">0%</div>
-      </div>
-      <div class="owl-loader-text"><span class="loader-dots-left">...</span> Initializing <span class="loader-dots-right">...</span></div>
-    </div>
-  </div>
+  <div id="loading" class="hidden">/// INITIALIZING ENGINE...</div>
 
   <div id="dashboard" class="hidden">
-        <!-- KPI Row -->
+    <!-- Strategy Controls (Card) -->
+    <div class="card-base strategy-controls">
+      <!-- 1. Ranking Weight -->
+      <div class="control-group" style="min-width: 250px;">
+        <label>RANKING WEIGHT</label>
+        <div class="weight-wrapper">
+          <div class="weight-val w-ret">Return <span id="val-ret">50</span>%</div>
+          <div class="range-track">
+            <div class="track-fill" id="track-fill" style="width: 50%;"></div>
+            <input type="range" id="weightSlider" class="weight-slider" min="0" max="100" value="50" step="10">
+          </div>
+          <div class="weight-val w-vol">Volume <span id="val-vol">50</span>%</div>
+        </div>
+      </div>
+
+      <!-- 2. Portfolio Size -->
+      <div class="control-group">
+        <label>PORTFOLIO SIZE</label>
+        <div class="top-n-wrapper" style="display:flex; align-items:center; gap:10px;">
+          <span style="color:var(--text-muted); font-weight:600;">TOP</span>
+          <input type="number" id="topNInput" class="input-box" value="15" min="1" max="50">
+          <span style="color:var(--text-muted); font-weight:600;">STOCKS</span>
+        </div>
+      </div>
+
+      <!-- 3. Start Year -->
+      <div class="control-group">
+        <label>START YEAR</label>
+        <select id="startYearSelect" class="input-box">
+          <!-- Populated by JS -->
+          <option value="2015">2015</option>
+        </select>
+      </div>
+
+      <!-- 4. Run Button -->
+      <div class="control-group" style="justify-self: end; width:100%; max-width:200px;">
+         <button class="btn-run" onclick="runBacktest()">RE-RUN SIM</button>
+      </div>
+    </div>
+
+    <!-- KPI Row -->
     <div class="kpi-grid">
       <!-- Initial Capital -->
       <div class="card-base kpi-card">
@@ -1137,43 +723,29 @@ document.addEventListener('DOMContentLoaded', () => {
 async function loadDataFromCloud() {
   const fileUrl = CONFIG.cloudCsvUrl;
   
-  // Kickoff progress animation — grows from 0 toward 70% during fetch
-  let fetchPct = 0;
-  const fetchInterval = setInterval(() => {
-    fetchPct = Math.min(fetchPct + 2 + Math.random() * 3, 70);
-    if (typeof updateOwlProgress === 'function') updateOwlProgress(fetchPct);
-  }, 80);
-
   try {
     const response = await fetch(fileUrl);
     if (!response.ok) throw new Error('Network response was not ok');
     
     const csvText = await response.text();
-    clearInterval(fetchInterval);
-    if (typeof updateOwlProgress === 'function') updateOwlProgress(80);
     processData(csvText);
-    if (typeof updateOwlProgress === 'function') updateOwlProgress(95);
     
     // Update UI Status
     el.status.className = 'status-indicator success';
-    el.status.innerHTML = '<span>●</span> Connected';
+    el.status.innerHTML = '<span>●</span> CLOUD DATA CONNECTED';
     
     setTimeout(() => {
-      if (typeof updateOwlProgress === 'function') updateOwlProgress(100);
-      setTimeout(() => {
-        runBacktest();
-        el.loading.classList.add('hidden');
-        el.dash.classList.remove('hidden');
-      }, 250);
-    }, 300);
+      runBacktest();
+      el.loading.classList.add('hidden');
+      el.dash.classList.remove('hidden');
+    }, 500);
 
   } catch (error) {
-    clearInterval(fetchInterval);
     console.error('Failed to load cloud data:', error);
     
     // Show Error & Fallback to Manual
     el.status.className = 'status-indicator error';
-    el.status.innerHTML = '<span>●</span> Upload CSV';
+    el.status.innerHTML = '<span>●</span> CONNECTION FAILED (USE UPLOAD)';
     el.manualUpload.style.display = 'block';
   }
 }
@@ -1991,167 +1563,6 @@ function renderHeatmap() {
     tbody.appendChild(tr);
   });
 }
-
-
-// ============================================================
-// PHASE 3: SETTINGS PANEL + ABOUT MODAL + OWL PROGRESS
-// ============================================================
-
-function openSettingsPanel() {
-  document.getElementById('settingsPanel').classList.add('open');
-  document.getElementById('panelBackdrop').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeSettingsPanel() {
-  document.getElementById('settingsPanel').classList.remove('open');
-  document.getElementById('panelBackdrop').classList.remove('open');
-  document.body.style.overflow = '';
-}
-function openAboutModal() {
-  document.getElementById('aboutModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeAboutModal() {
-  document.getElementById('aboutModal').classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-// ESC key closes panels/modals
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    closeSettingsPanel();
-    closeAboutModal();
-  }
-});
-
-// Owl loader progress ring (2πr ≈ 565.48 with r=90)
-function updateOwlProgress(pct) {
-  const ring = document.getElementById('owlLoaderRingFg');
-  const label = document.getElementById('owlLoaderPct');
-  if (!ring || !label) return;
-  const clamped = Math.max(0, Math.min(100, pct));
-  const circumference = 565.48;
-  ring.style.strokeDashoffset = circumference * (1 - clamped / 100);
-  label.textContent = Math.round(clamped) + '%';
-}
-
 </script>
-
-
-<!-- ============================================================
-     PHASE 3: FAB + SETTINGS PANEL + ABOUT MODAL
-============================================================ -->
-
-<!-- FLOATING ACTION BUTTONS -->
-<div class="fab-stack">
-  <button class="fab fab-secondary" onclick="openAboutModal()" aria-label="เกี่ยวกับกลยุทธ์">
-    <img src="jpt-owl-line.png" alt="owl" style="width:30px;height:30px;object-fit:contain;filter:brightness(0) invert(1) drop-shadow(0 1px 2px rgba(0,0,0,0.3));">
-    <span class="fab-tooltip">เกี่ยวกับกลยุทธ์</span>
-  </button>
-  <button class="fab fab-primary" onclick="openSettingsPanel()" aria-label="ตั้งค่าแบ็คเทส">
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg>
-    <span class="fab-tooltip">ตั้งค่าแบ็คเทส</span>
-  </button>
-</div>
-
-<!-- SETTINGS PANEL BACKDROP -->
-<div id="panelBackdrop" class="panel-backdrop" onclick="closeSettingsPanel()"></div>
-
-<!-- SETTINGS SLIDE-IN PANEL -->
-<aside id="settingsPanel" class="settings-panel" aria-label="Backtest Settings">
-  <div class="panel-header">
-    <div class="panel-title">⚙️ ตั้งค่าแบ็คเทส</div>
-    <button class="panel-close" onclick="closeSettingsPanel()" aria-label="ปิด">✕</button>
-  </div>
-  <div class="panel-body">
-
-    <div class="section-label"><span>📊 การจัดอันดับหุ้น</span><div class="line"></div></div>
-
-    <!-- 1. Ranking Weight -->
-    <div class="control-group">
-      <label>RANKING WEIGHT — น้ำหนักการจัดอันดับ</label>
-      <div class="weight-wrapper">
-        <div class="weight-val w-ret">Return <span id="val-ret">50</span>%</div>
-        <div class="range-track">
-          <div class="track-fill" id="track-fill" style="width: 50%;"></div>
-          <input type="range" id="weightSlider" class="weight-slider" min="0" max="100" value="50" step="10">
-        </div>
-        <div class="weight-val w-vol">Volume <span id="val-vol">50</span>%</div>
-      </div>
-      <span class="hint">ปรับสัดส่วนระหว่าง <strong>ผลตอบแทน 6 เดือน</strong> กับ <strong>Volume</strong> ในการจัดอันดับหุ้น · ซ้ายมากขึ้น = เน้นกำไรล้วน ๆ · ขวามากขึ้น = เน้นหุ้นที่มีสภาพคล่องสูง</span>
-    </div>
-
-    <div class="section-label"><span>📦 พอร์ตการลงทุน</span><div class="line"></div></div>
-
-    <!-- 2. Portfolio Size -->
-    <div class="control-group">
-      <label>PORTFOLIO SIZE — จำนวนหุ้นต่อรอบ</label>
-      <div class="top-n-wrapper" style="display:flex; align-items:center; gap:10px;">
-        <span style="color:var(--text-muted); font-weight:600;">TOP</span>
-        <input type="number" id="topNInput" class="input-box" value="15" min="1" max="50" style="max-width:120px;">
-        <span style="color:var(--text-muted); font-weight:600;">STOCKS</span>
-      </div>
-      <span class="hint">ซื้อหุ้น <strong>อันดับ Top N</strong> จากการจัดอันดับ · น้อยตัว (5-10) = เสี่ยงกระจุก แต่กำไรตัวเดียววิ่งจะหนัก · เยอะตัว (20-30) = กระจายความเสี่ยงแต่ผลตอบแทนเจือจาง</span>
-    </div>
-
-    <!-- 3. Start Year -->
-    <div class="control-group">
-      <label>START YEAR — ปีเริ่มแบ็คเทส</label>
-      <select id="startYearSelect" class="input-box">
-        <option value="2015">2015</option>
-      </select>
-      <span class="hint">เลือกปีเริ่มทดสอบย้อนหลัง · ยิ่งนาน = data มากขึ้น แต่ต้องเจอ bear market หลายครั้ง · สั้นก็เห็นผลเฉพาะ bull regime</span>
-    </div>
-
-  </div>
-  <div class="panel-footer">
-    <button class="btn-cancel" onclick="closeSettingsPanel()">ยกเลิก</button>
-    <button class="btn-run-backtest" onclick="runBacktest(); closeSettingsPanel();">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      RUN BACKTEST
-    </button>
-  </div>
-</aside>
-
-<!-- ABOUT MODAL -->
-<div id="aboutModal" class="about-modal" onclick="if(event.target===this)closeAboutModal()">
-  <div class="about-modal-content">
-    <button class="panel-close" onclick="closeAboutModal()" aria-label="ปิด">✕</button>
-    <h2>📈 Strategy Pro V22</h2>
-    <div class="about-sub">Long-term momentum backtesting — 6-month return ranking across the S&amp;P 500 universe</div>
-
-    <div class="about-philosophy">
-      <div class="philosophy-label">Trading Philosophy</div>
-      <div class="philosophy-text">
-        <strong>กลยุทธ์โมเมนตัม 6 เดือน</strong> มุ่งเน้นหุ้นที่แสดงแนวโน้มแข็งแกร่งในระยะยาว · แทนที่จะพยายามเดาจุดกลับตัว เราปล่อยให้ <strong>ผู้ชนะวิ่งต่อ</strong> และตัดขาดทุนเมื่อ trend หายไป
-      </div>
-      <div class="philosophy-signature">Rules Over Emotions · Data-Driven</div>
-    </div>
-
-    <div class="about-pillars">
-      <div class="about-pillar ret">
-        <div class="pillar-header">
-          <span class="pillar-icon">📊</span>
-          <span class="pillar-title">RETURN</span>
-        </div>
-        <div class="pillar-subtitle">ผลตอบแทน 6 เดือน</div>
-        <div class="pillar-desc">จัดอันดับหุ้นตามผลตอบแทนในช่วง 6 เดือนที่ผ่านมา · หุ้นที่ขึ้นแรงต่อเนื่องมักจะ<strong>วิ่งต่อในระยะใกล้</strong></div>
-      </div>
-      <div class="about-pillar vol">
-        <div class="pillar-header">
-          <span class="pillar-icon">💎</span>
-          <span class="pillar-title">VOLUME</span>
-        </div>
-        <div class="pillar-subtitle">สภาพคล่องตลาด</div>
-        <div class="pillar-desc">ตัวกรองสำคัญเพื่อหลีกเลี่ยงหุ้นที่ <strong>เทรดน้อย</strong> · สภาพคล่องสูง = จุดเข้าออกดี ไม่เจอ slippage</div>
-      </div>
-    </div>
-
-    <p>กลยุทธ์นี้ <strong>Re-balance ทุกไตรมาส</strong> (ม.ค. / เม.ย. / ก.ค. / ต.ค.) โดยใช้ราคาปิดของวันสุดท้ายในเดือนก่อนหน้าเป็นสัญญาณ · ทุกครั้งที่ re-balance จะ<strong>ขายของเก่าหมด</strong>แล้ว<strong>ซื้อ Top N ใหม่</strong>ตามอันดับปัจจุบัน</p>
-
-    <p>ปรับ <strong>Ranking Weight</strong> เพื่อสร้างกลยุทธ์ที่เข้ากับสไตล์คุณ · ปรับ <strong>Portfolio Size</strong> เพื่อสมดุลระหว่างความเสี่ยงกับ upside · ปรับ <strong>Start Year</strong> เพื่อดูผลในรอบเวลาต่าง ๆ</p>
-  </div>
-</div>
-
 </body>
 </html>
