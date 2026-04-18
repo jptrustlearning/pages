@@ -924,12 +924,12 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
         <div><div class="kpi-title">SKIPPED WEEKS</div><div class="kpi-value" style="color:var(--text-dark);" id="kpi-skipped">0</div></div>
         <div class="kpi-sub">Regime filter blocked</div>
       </div>
-      <!-- Market Analyzer -->
+      <!-- SPY Benchmark -->
       <div class="card kpi-card market-analyzer">
         <div class="ma-header">
           <div>
-            <div class="kpi-title" style="color:var(--accent);">MARKET BENCHMARK</div>
-            <div style="font-size:0.78rem;color:var(--text-muted);">S&P 500 (Market Proxy)</div>
+            <div class="kpi-title" style="color:var(--accent);">SPY BENCHMARK</div>
+            <div style="font-size:0.78rem;color:var(--text-muted);" id="ma-period">10Y Rolling · SPDR S&amp;P 500 ETF</div>
           </div>
           <div><div class="kpi-value" id="ma-return" style="font-size:1.3rem;">0.0%</div></div>
         </div>
@@ -937,10 +937,7 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
           <div class="ma-stat-item">VOL: <span id="ma-vol">0.0%</span></div>
           <div class="ma-stat-item">MAX DD: <span id="ma-dd" class="text-red">0.0%</span></div>
         </div>
-        <div class="slider-container">
-          <input type="range" id="timeSlider" min="1" max="5" step="1" value="3">
-          <div class="range-labels"><span>1Y</span><span id="slider-val-disp" style="color:var(--accent);font-weight:700;">3Y</span><span>5Y</span></div>
-        </div>
+        <div class="ma-note" id="ma-note" style="font-size:0.68rem;color:var(--text-muted);margin-top:10px;letter-spacing:0.02em;">—</div>
       </div>
     </div>
 
@@ -1408,7 +1405,7 @@ const el = {
 // ====== INIT ======
 document.addEventListener('DOMContentLoaded', () => { loadCloudData(); });
 el.input.addEventListener('change', handleUpload);
-document.getElementById('timeSlider').addEventListener('input', updateMarket);
+// timeSlider removed — benchmark is fixed at 10Y
 
 // ====== MANUAL RUN — mark settings dirty ======
 let settingsDirty = false;
@@ -2968,35 +2965,73 @@ function switchTab(evt, tabId) {
   evt.currentTarget.classList.add('active');
 }
 
-// ====== MARKET BENCHMARK ======
+// ====== SPY BENCHMARK (10Y FIXED) ======
 function updateMarket() {
   if(state.sortedDates.length===0) return;
-  const years = parseInt(document.getElementById('timeSlider').value);
-  document.getElementById('slider-val-disp').innerText = years+'Y';
-  const spyWk = weeklyCache['_MARKET_'];
-  if(!spyWk || spyWk.length<50) return;
+
+  // Prefer real SPY ticker data; fallback to equal-weighted market proxy
+  const spyWk = weeklyCache['SPY'] && weeklyCache['SPY'].length >= 50
+    ? weeklyCache['SPY']
+    : weeklyCache['_MARKET_'];
+  const usingRealSpy = weeklyCache['SPY'] && weeklyCache['SPY'].length >= 50;
+
+  if(!spyWk || spyWk.length < 50) {
+    document.getElementById('ma-return').innerText = '—';
+    document.getElementById('ma-vol').innerText = '—';
+    document.getElementById('ma-dd').innerText = '—';
+    document.getElementById('ma-note').innerText = 'ข้อมูลไม่พอ';
+    return;
+  }
+
+  // Fixed 10-year window — take last 10Y of data, fallback to all if shorter
+  const TARGET_YEARS = 10;
   const endDate = new Date(spyWk[spyWk.length-1].date);
   let startIdx = 0;
-  for(let i=spyWk.length-1;i>=0;i--) {
-    if((endDate-new Date(spyWk[i].date))/(365.25*86400000)>=years){startIdx=i;break;}
+  for(let i = spyWk.length - 1; i >= 0; i--) {
+    const yrsBack = (endDate - new Date(spyWk[i].date)) / (365.25 * 86400000);
+    if(yrsBack >= TARGET_YEARS) { startIdx = i; break; }
   }
   const period = spyWk.slice(startIdx);
-  const cagr = Math.pow(period[period.length-1].close/period[0].close, 1/years)-1;
-  document.getElementById('ma-return').innerText = (cagr>=0?'+':'')+(cagr*100).toFixed(1)+'%';
-  document.getElementById('ma-return').style.color = cagr>=0?'var(--accent)':'var(--red)';
-  let peak=-Infinity, maxDD=0;
-  const rets=[];
-  for(let i=1;i<period.length;i++){
-    rets.push((period[i].close-period[i-1].close)/period[i-1].close);
-    if(period[i].close>peak) peak=period[i].close;
-    const dd=(period[i].close-peak)/peak;
-    if(dd<maxDD) maxDD=dd;
+  const actualYears = (endDate - new Date(period[0].date)) / (365.25 * 86400000);
+
+  // CAGR
+  const cagr = Math.pow(period[period.length-1].close / period[0].close, 1 / actualYears) - 1;
+  document.getElementById('ma-return').innerText = (cagr >= 0 ? '+' : '') + (cagr * 100).toFixed(1) + '%';
+  document.getElementById('ma-return').style.color = cagr >= 0 ? 'var(--green)' : 'var(--red)';
+
+  // Vol + Max DD
+  let peak = -Infinity, maxDD = 0;
+  const rets = [];
+  for(let i = 1; i < period.length; i++) {
+    rets.push((period[i].close - period[i-1].close) / period[i-1].close);
+    if(period[i].close > peak) peak = period[i].close;
+    const dd = (period[i].close - peak) / peak;
+    if(dd < maxDD) maxDD = dd;
   }
-  const avg=rets.reduce((a,b)=>a+b,0)/rets.length;
-  const std=Math.sqrt(rets.reduce((a,b)=>a+Math.pow(b-avg,2),0)/rets.length);
-  const vol=std*Math.sqrt(52);
-  document.getElementById('ma-vol').innerText = (vol*100).toFixed(1)+'%';
-  document.getElementById('ma-dd').innerText = (maxDD*100).toFixed(1)+'%';
+  const avg = rets.reduce((a,b) => a+b, 0) / rets.length;
+  const std = Math.sqrt(rets.reduce((a,b) => a + Math.pow(b - avg, 2), 0) / rets.length);
+  const vol = std * Math.sqrt(52);
+
+  document.getElementById('ma-vol').innerText = (vol * 100).toFixed(1) + '%';
+  document.getElementById('ma-dd').innerText = (maxDD * 100).toFixed(1) + '%';
+
+  // Note: actual date range + source
+  const fmt = (d) => {
+    const dt = new Date(d);
+    const m = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    return m[dt.getMonth()] + ' ' + dt.getFullYear();
+  };
+  const src = usingRealSpy ? 'SPY ETF' : 'Equal-weighted avg';
+  const yrsLabel = actualYears >= 9.5 ? '10Y' : actualYears.toFixed(1) + 'Y';
+  document.getElementById('ma-note').innerText = fmt(period[0].date) + ' → ' + fmt(period[period.length-1].date) + ' · ' + yrsLabel + ' · ' + src;
+
+  // Update the subtitle label if we fell back to proxy
+  const periodLabel = document.getElementById('ma-period');
+  if(periodLabel) {
+    periodLabel.innerText = usingRealSpy
+      ? (yrsLabel + ' Rolling · SPDR S&P 500 ETF')
+      : (yrsLabel + ' Rolling · Market Proxy');
+  }
 }
 </script>
 </body>
