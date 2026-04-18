@@ -111,12 +111,12 @@ header > * { position:relative; z-index:2; }
 
 /* Row 2 — DM Serif Title */
 .header-title-wrap {
-  padding-left:14px;
+  padding-left:36px;  /* matches .status-box indent below */
   position:relative;
   margin-bottom:14px;
 }
 .header-title-wrap::before {
-  content:''; position:absolute; left:0; top:4px; bottom:4px;
+  content:''; position:absolute; left:22px; top:4px; bottom:4px;
   width:4px;
   background:linear-gradient(180deg, #D4AF37 0%, #8B2252 100%);
   border-radius:3px;
@@ -190,7 +190,8 @@ input[type="file"] { display:none; }
 @media (max-width:600px) {
   header { padding:18px 18px 16px; margin:-4px -2px 20px; border-radius:18px; }
   .subtitle-lab { font-size:0.62rem; letter-spacing:3px; margin-bottom:10px; }
-  .header-title-wrap { margin-bottom:12px; padding-left:12px; }
+  .header-title-wrap { margin-bottom:12px; padding-left:30px; }
+  .header-title-wrap::before { left:18px; }
   .status-box { padding-left:30px; }
   .status-indicator { font-size:0.52rem; padding:3px 9px; }
   h1 { font-size:1.25rem; }
