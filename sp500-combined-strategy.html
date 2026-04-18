@@ -2104,8 +2104,8 @@ function runCombinedBacktest() {
   CONFIG.dhTopN = parseInt(document.getElementById('dhTopN').value) || 10;
   CONFIG.dhHoldWeeks = parseInt(document.getElementById('dhHoldWeeks').value) || 4;
   CONFIG.startYear = parseInt(document.getElementById('startYearSelect').value) || 2015;
-  CONFIG.regimeEma = parseInt(document.getElementById('regimeSlider').value) || 0;
-  CONFIG.stoploss = parseInt(document.getElementById('stoplossSlider').value) || 0;
+  CONFIG.regimeEma = parseInt(document.getElementById('regimeSelect').value) || 0;
+  CONFIG.stoploss = parseInt(document.getElementById('stoplossSelect').value) || 0;
 
   state.allResults = [];
   state.cumulativePnl = [];
