@@ -748,9 +748,31 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height
 .about-modal #biasModalMetrics > div > div > div:last-child{color:#F4E4BA !important}
 .about-modal #biasModalStatus > div > div{background:rgba(244,228,186,0.05) !important}
 .about-modal .method-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:14px}
-.about-modal .method-card{background:rgba(244,228,186,0.05);border:1px solid rgba(212,175,55,0.2);border-radius:10px;padding:14px;color:#E8E4DC}
-.about-modal .method-card h4{color:#D4AF37;margin:0 0 8px;font-family:'Cinzel',serif;font-size:.78rem;letter-spacing:1.5px}
-.about-modal .method-card p{margin:0;font-size:.82rem;line-height:1.65;color:#C4C0B6}
+.about-modal .method-card{
+  background:linear-gradient(160deg, #FAF6ED 0%, #F5EDD8 55%, #EDE1C8 100%);
+  border:1px solid rgba(212,175,55,0.45);
+  border-radius:12px;
+  padding:16px 18px;
+  color:#3D3228;
+  box-shadow:0 4px 14px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.6);
+  position:relative;
+  overflow:hidden;
+}
+.about-modal .method-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,#D4AF37,#E8D48B,#D4AF37,transparent);
+  opacity:0.7;
+}
+.about-modal .method-card h4{
+  color:#8B6914;margin:0 0 8px;
+  font-family:'Cinzel',serif;font-size:.82rem;
+  letter-spacing:1.8px;font-weight:700;
+}
+.about-modal .method-card p{
+  margin:0;font-size:.85rem;line-height:1.7;
+  color:#5A3D20;font-family:'Sarabun','Anuphan',sans-serif;
+}
+.about-modal .method-card strong{color:#722F37;font-weight:700}
 
 @media (max-width:600px) {
   .fab-stack { bottom:16px; right:16px; gap:10px; }
