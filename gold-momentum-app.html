@@ -1565,17 +1565,15 @@ body{padding-bottom:80px !important}
 <div class="fab-stack">
   <button class="fab fab-secondary" onclick="openAboutModal()" aria-label="ปรัชญาและวิธีการคำนวณ">
     <svg width="30" height="30" viewBox="0 0 64 64" fill="none" stroke="#FFF5E1" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3))">
-      <!-- Bullseye target rings (3 concentric circles) -->
-      <circle cx="28" cy="34" r="20"/>
-      <circle cx="28" cy="34" r="13"/>
-      <circle cx="28" cy="34" r="6"/>
-      <!-- Center dot -->
-      <circle cx="28" cy="34" r="1.5" fill="#FFF5E1"/>
-      <!-- Arrow shaft (going through center, top-right to bottom-left) -->
-      <line x1="56" y1="6" x2="28" y2="34" stroke-width="3"/>
-      <!-- Arrow fletching (top-right end, V shape) -->
-      <path d="M56 6 L50 4 M56 6 L58 12" stroke-width="2.4"/>
-      <path d="M52 10 L58 12" stroke-width="2.4"/>
+      <!-- Bullseye target — 3 concentric rings (center slightly lower-left to leave room for arrow) -->
+      <circle cx="28" cy="36" r="20"/>
+      <circle cx="28" cy="36" r="13"/>
+      <circle cx="28" cy="36" r="6"/>
+      <!-- Arrow shaft (diagonal from upper-right to bullseye center) -->
+      <line x1="28" y1="36" x2="54" y2="10" stroke-width="3"/>
+      <!-- Fletching — twin feather flares at the nock end (upper-right) forming a V split -->
+      <path d="M54 10 L48 6 L52 12 Z" fill="#FFF5E1" stroke-width="1.5"/>
+      <path d="M54 10 L58 16 L52 12 Z" fill="#FFF5E1" stroke-width="1.5"/>
     </svg>
     <span class="fab-tooltip">ปรัชญา &amp; วิธีคำนวณ</span>
   </button>
