@@ -576,203 +576,188 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height
 /* Split meter removed — redundant with infinity */
 
 /* ══════════════════════════════════════════════════════════ */
-/* ★ FLOATING ACTION BUTTONS (FAB) + MODALS                  ★ */
+/* ★ FLOATING ACTION BUTTONS (FAB) — copied from sp500       ★ */
 /* ══════════════════════════════════════════════════════════ */
-.fab-stack{
-  position:fixed;
-  right:20px;
-  bottom:90px;
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-  z-index:9000;
+.fab-stack {
+  position:fixed; bottom:24px; right:24px; z-index:100;
+  display:flex; flex-direction:column; gap:14px; align-items:flex-end;
 }
-.fab-btn{
-  width:56px;height:56px;
-  border-radius:50%;
-  border:1.5px solid rgba(212,175,55,0.5);
-  background:linear-gradient(145deg,#3a1520 0%,#1a0a0e 100%);
-  color:#D4AF37;
-  cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 6px 22px rgba(0,0,0,0.35),0 0 24px rgba(212,175,55,0.18),inset 0 1px 0 rgba(255,255,255,0.08);
-  transition:all 0.3s cubic-bezier(.4,0,.2,1);
-  position:relative;
-  overflow:hidden;
+.fab {
+  width:58px; height:58px; border-radius:50%; border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.3rem; color:#FFF5E1; position:relative;
+  transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:0 8px 24px rgba(0,0,0,0.25), 0 0 0 0 rgba(212,175,55,0.4);
 }
-.fab-btn::before{
-  content:'';position:absolute;inset:0;border-radius:50%;
-  background:radial-gradient(circle at 30% 25%,rgba(212,175,55,0.25),transparent 60%);
-  opacity:0;transition:opacity 0.3s;
-  pointer-events:none;
+.fab:hover { transform:scale(1.08) translateY(-2px); }
+.fab:active { transform:scale(0.95); }
+.fab-primary {
+  background:linear-gradient(135deg, #722F37 0%, #8B2252 55%, #D4AF37 100%);
+  color:#FFF5E1;
+  box-shadow:0 8px 24px rgba(139,34,82,0.35), 0 0 0 0 rgba(212,175,55,0.4);
+  animation:fabPulse 2.8s infinite;
 }
-.fab-btn:hover{
-  transform:translateY(-3px) scale(1.06);
-  box-shadow:0 10px 30px rgba(0,0,0,0.45),0 0 36px rgba(212,175,55,0.35),inset 0 1px 0 rgba(255,255,255,0.12);
-  border-color:#D4AF37;
+@keyframes fabPulse {
+  0%, 100% { box-shadow:0 8px 24px rgba(139,34,82,0.35), 0 0 0 0 rgba(212,175,55,0.4); }
+  50% { box-shadow:0 8px 24px rgba(139,34,82,0.5), 0 0 0 12px rgba(212,175,55,0); }
 }
-.fab-btn:hover::before{opacity:1}
-.fab-btn:active{transform:translateY(-1px) scale(1.02)}
-.fab-btn svg{position:relative;z-index:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3))}
+.fab-secondary {
+  background:linear-gradient(135deg, #722F37 0%, #8B2252 55%, #D4AF37 100%);
+  color:#FFF5E1;
+  box-shadow:0 8px 24px rgba(139,34,82,0.35);
+}
+.fab svg { stroke:#FFF5E1 !important; color:#FFF5E1 !important; }
+.fab-primary svg, .fab-secondary svg { filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3)); }
+.fab-tooltip {
+  position:absolute; right:calc(100% + 14px); top:50%; transform:translateY(-50%);
+  background:rgba(26,10,14,0.95); color:#F4E4BA;
+  padding:8px 14px; border-radius:10px; font-size:0.78rem;
+  font-weight:600; white-space:nowrap; pointer-events:none;
+  opacity:0; transition:opacity 0.2s ease;
+  border:1px solid rgba(212,175,55,0.3); backdrop-filter:blur(8px);
+  letter-spacing:0.3px;
+}
+.fab-tooltip::after {
+  content:''; position:absolute; left:100%; top:50%; transform:translateY(-50%);
+  border:6px solid transparent; border-left-color:rgba(26,10,14,0.95);
+}
+.fab:hover .fab-tooltip { opacity:1; }
 
-/* Modal overlay */
-.fab-modal-overlay{
-  position:fixed;inset:0;
-  background:rgba(10,8,5,0.78);
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
-  z-index:10000;
-  display:none;
-  align-items:flex-start;justify-content:center;
-  padding:60px 16px 20px;
-  overflow-y:auto;
-  animation:fabFadeIn 0.25s ease;
+/* --- ABOUT MODAL (dark luxe — copied from sp500) --- */
+.about-modal {
+  position:fixed; inset:0; z-index:210; display:none;
+  align-items:center; justify-content:center; padding:20px;
+  background:rgba(10,5,8,0.78); backdrop-filter:blur(8px);
 }
-.fab-modal-overlay.active{display:flex}
-@keyframes fabFadeIn{from{opacity:0}to{opacity:1}}
-@keyframes fabSlideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-
-.fab-modal{
-  background:linear-gradient(180deg,#FFFEF8 0%,#FAF6ED 100%);
-  border:1.5px solid rgba(212,175,55,0.45);
-  border-radius:20px;
-  max-width:680px;width:100%;
-  box-shadow:0 20px 60px rgba(0,0,0,0.4),0 0 0 1px rgba(212,175,55,0.15);
-  animation:fabSlideUp 0.35s cubic-bezier(.2,.8,.2,1);
-  position:relative;
-  margin-bottom:60px;
+.about-modal.open { display:flex; }
+.about-modal-content {
+  background:linear-gradient(160deg, #1a0a0e 0%, #2d1018 50%, #3a1520 100%);
+  background-image:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(212,175,55,0.12), transparent 60%),
+    radial-gradient(ellipse 70% 55% at 80% 90%, rgba(139,34,82,0.25), transparent 60%),
+    linear-gradient(160deg, #1a0a0e 0%, #2d1018 50%, #3a1520 100%);
+  border:1px solid rgba(212,175,55,0.35); border-radius:16px;
+  max-width:680px; width:100%; max-height:85vh; overflow-y:auto;
+  padding:32px; position:relative;
+  box-shadow:0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(212,175,55,0.2);
 }
-.fab-modal-wide{max-width:920px}
-
-.fab-modal-close{
-  position:absolute;
-  top:14px;right:14px;
-  width:36px;height:36px;
-  border-radius:50%;
-  border:1px solid rgba(114,47,55,0.25);
-  background:rgba(255,255,255,0.85);
-  color:#722F37;
-  font-size:22px;font-weight:300;
-  cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  line-height:1;
-  transition:all 0.2s;
-  z-index:2;
+.about-modal-wide { max-width:920px; }
+.about-modal-content::-webkit-scrollbar { width:6px; }
+.about-modal-content::-webkit-scrollbar-track { background:rgba(0,0,0,0.2); border-radius:3px; }
+.about-modal-content::-webkit-scrollbar-thumb { background:rgba(212,175,55,0.35); border-radius:3px; }
+.about-modal h2 {
+  font-family:'Cinzel','Anuphan',serif; color:#F4E4BA;
+  font-size:1.35rem; margin-bottom:8px; letter-spacing:1.5px; font-weight:700;
+  display:flex; align-items:center; gap:12px;
 }
-.fab-modal-close:hover{
-  background:#722F37;color:#fff;
-  transform:rotate(90deg);
+.about-modal .about-sub {
+  color:#C4B88A; font-size:0.9rem; margin-bottom:22px;
+  padding-bottom:18px; border-bottom:1px solid rgba(212,175,55,0.2);
+  font-family:'Sarabun','Anuphan',sans-serif; line-height:1.55;
 }
-
-.fab-modal-header{
-  padding:32px 28px 20px;
-  border-bottom:1px solid rgba(212,175,55,0.25);
-  text-align:center;
-  background:linear-gradient(180deg,rgba(245,237,216,0.4) 0%,transparent 100%);
-  border-radius:20px 20px 0 0;
-}
-.fab-modal-eyebrow{
-  font-family:'Cinzel',serif;
-  font-size:.7rem;
-  letter-spacing:4px;
-  color:#8B6914;
-  font-weight:600;
-  margin-bottom:8px;
-}
-.fab-modal-header h2{
-  font-family:'DM Serif Display','Anuphan',serif;
-  font-size:1.6rem;
-  color:#5A3D20;
-  margin:0 0 6px;
-  font-weight:400;
-  line-height:1.25;
-}
-.fab-modal-sub{
+.about-modal p {
+  color:#E8E4DC; line-height:1.85; margin-bottom:14px; font-size:0.9rem;
   font-family:'Sarabun','Anuphan',sans-serif;
-  font-size:.85rem;
-  color:#7A6F62;
-  margin:0;
+}
+.about-modal strong { color:#F4E4BA; font-weight:700; }
+.about-philosophy {
+  background:linear-gradient(145deg, rgba(244,228,186,0.08), rgba(212,175,55,0.04));
+  border:1px solid rgba(212,175,55,0.25); border-radius:16px;
+  padding:22px 24px; margin-bottom:24px; position:relative;
+}
+.about-philosophy::before {
+  content:'"'; position:absolute; top:-10px; left:18px;
+  font-family:'DM Serif Display',serif; font-size:4rem; line-height:1;
+  color:rgba(212,175,55,0.4);
+}
+.philosophy-label {
+  font-family:'Cinzel','Anuphan',serif; font-size:0.68rem; font-weight:700;
+  color:#D4AF37; letter-spacing:3.5px; text-transform:uppercase;
+  margin-bottom:12px; padding-left:32px;
+}
+.philosophy-text {
+  font-family:'Sarabun','Anuphan',sans-serif; font-size:0.92rem;
+  color:#F4E4BA; line-height:1.9; font-weight:300;
+}
+.philosophy-text strong { color:#FFE9A3; font-weight:600; }
+.philosophy-signature {
+  margin-top:16px; padding-top:14px;
+  border-top:1px dashed rgba(212,175,55,0.25);
+  font-family:'Cinzel','Anuphan',serif; font-size:0.68rem;
+  color:#B8860B; letter-spacing:2.5px; text-transform:uppercase;
+  text-align:right;
+}
+.about-pillars {
+  display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0 22px;
+}
+.about-pillar {
+  background:linear-gradient(145deg, rgba(244,228,186,0.09), rgba(244,228,186,0.03));
+  border:1px solid rgba(212,175,55,0.3); border-radius:12px;
+  padding:18px 18px 16px; position:relative;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.about-pillar.ret { border-top:3px solid #2E9F5F; }
+.about-pillar.vol { border-top:3px solid #D4AF37; }
+.about-pillar.rsi { border-top:3px solid #60A5FA; }
+.about-pillar.ma  { border-top:3px solid #C084FC; }
+.about-pillar.macro { border-top:3px solid #F87171; }
+.pillar-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.pillar-icon { font-size:1.4rem; }
+.pillar-title {
+  font-family:'Cinzel','Anuphan',serif; font-size:0.95rem; font-weight:700;
+  letter-spacing:1.5px; color:#F4E4BA;
+}
+.about-pillar.ret .pillar-title { color:#9DE8B8; }
+.about-pillar.vol .pillar-title { color:#F4E4BA; }
+.about-pillar.rsi .pillar-title { color:#A8C8F0; }
+.about-pillar.ma  .pillar-title { color:#D8B5F8; }
+.about-pillar.macro .pillar-title { color:#F8B8B8; }
+.pillar-subtitle {
+  font-family:'Sarabun','Anuphan',sans-serif; font-size:0.75rem;
+  color:#C4B88A; margin-bottom:10px; font-style:italic;
+}
+.pillar-desc {
+  font-family:'Sarabun','Anuphan',sans-serif; font-size:0.83rem;
+  color:#E8E4DC; line-height:1.7;
+}
+@media (max-width:500px) { .about-pillars { grid-template-columns:1fr; } }
+.about-modal .panel-close {
+  position:absolute; top:18px; right:18px;
+  width:36px; height:36px; border-radius:50%;
+  background:rgba(244,228,186,0.1);
+  border:1px solid rgba(212,175,55,0.3);
+  color:#F4E4BA;
+  cursor:pointer; font-size:1.1rem;
+  display:flex; align-items:center; justify-content:center;
+  transition:all 0.2s ease;
+}
+.about-modal .panel-close:hover {
+  background:rgba(193,69,69,0.2);
+  border-color:#D95F5F;
+  color:#FFA8A8;
 }
 
-.fab-modal-body{
-  padding:24px 28px 32px;
-  font-family:'Sarabun','Anuphan',sans-serif;
-  color:#3D3228;
-  line-height:1.75;
-  font-size:.92rem;
-}
+/* Bias modal table styling override (white text on dark bg) */
+.about-modal .scenario-table-wrap{margin-top:18px}
+.about-modal .scenario-table{color:#E8E4DC;font-size:.78rem;border-color:rgba(212,175,55,0.2)}
+.about-modal .scenario-table th{color:#D4AF37;background:rgba(212,175,55,0.08);border-color:rgba(212,175,55,0.2)}
+.about-modal .scenario-table td{color:#E8E4DC;border-color:rgba(212,175,55,0.15)}
+.about-modal .scenario-table tr.current-scenario{background:rgba(212,175,55,0.12)}
+.about-modal #biasModalMetrics > div > div{background:rgba(244,228,186,0.05) !important;border-color:rgba(212,175,55,0.2) !important}
+.about-modal #biasModalMetrics > div > div > div:first-child{color:#C4B88A !important}
+.about-modal #biasModalMetrics > div > div > div:last-child{color:#F4E4BA !important}
+.about-modal #biasModalStatus > div > div{background:rgba(244,228,186,0.05) !important}
+.about-modal .method-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:14px}
+.about-modal .method-card{background:rgba(244,228,186,0.05);border:1px solid rgba(212,175,55,0.2);border-radius:10px;padding:14px;color:#E8E4DC}
+.about-modal .method-card h4{color:#D4AF37;margin:0 0 8px;font-family:'Cinzel',serif;font-size:.78rem;letter-spacing:1.5px}
+.about-modal .method-card p{margin:0;font-size:.82rem;line-height:1.65;color:#C4C0B6}
 
-/* Philosophy content styling */
-.philo-section{margin-bottom:26px}
-.philo-section:last-child{margin-bottom:0}
-.philo-section h3{
-  font-family:'Cinzel','Anuphan',serif;
-  font-size:.78rem;
-  letter-spacing:2.5px;
-  color:#8B6914;
-  font-weight:600;
-  text-transform:uppercase;
-  margin:0 0 10px;
-  display:flex;align-items:center;gap:10px;
-}
-.philo-section h3::before{
-  content:'';
-  width:24px;height:1.5px;
-  background:linear-gradient(90deg,#D4AF37,transparent);
-}
-.philo-section p{margin:0 0 10px;color:#3D3228}
-.philo-section p:last-child{margin-bottom:0}
-.philo-section strong{color:#722F37;font-weight:700}
-.philo-quote{
-  background:rgba(212,175,55,0.08);
-  border-left:3px solid #D4AF37;
-  padding:14px 18px;
-  margin:14px 0;
-  border-radius:0 10px 10px 0;
-  font-style:italic;
-  color:#5A3D20;
-}
-.philo-not-list{
-  background:rgba(193,69,69,0.05);
-  border:1px solid rgba(193,69,69,0.2);
-  border-radius:10px;
-  padding:14px 16px 14px 36px;
-  margin:12px 0;
-}
-.philo-not-list li{
-  margin-bottom:6px;
-  color:#7A1A1A;
-  font-size:.9rem;
-  position:relative;
-}
-.philo-not-list li::marker{color:#C14545}
-.philo-is-list{
-  background:rgba(46,159,95,0.05);
-  border:1px solid rgba(46,159,95,0.2);
-  border-radius:10px;
-  padding:14px 16px 14px 36px;
-  margin:12px 0;
-}
-.philo-is-list li{
-  margin-bottom:6px;
-  color:#1A4A2A;
-  font-size:.9rem;
-}
-.philo-is-list li::marker{color:#2E9F5F}
-.philo-divider{
-  height:1px;
-  background:linear-gradient(90deg,transparent,rgba(212,175,55,0.4),transparent);
-  margin:22px 0;
-}
-
-@media (max-width:600px){
-  .fab-stack{right:14px;bottom:80px;gap:12px}
-  .fab-btn{width:50px;height:50px}
-  .fab-btn svg{width:26px;height:26px}
-  .fab-modal-overlay{padding:30px 12px 20px}
-  .fab-modal-header{padding:26px 20px 16px}
-  .fab-modal-header h2{font-size:1.3rem}
-  .fab-modal-body{padding:20px 18px 26px;font-size:.88rem}
+@media (max-width:600px) {
+  .fab-stack { bottom:16px; right:16px; gap:10px; }
+  .fab { width:52px; height:52px; font-size:1.2rem; }
+  .fab-tooltip { display:none; }
+  .about-modal-content { padding:24px 18px; }
+  .about-modal h2 { font-size:1.15rem; }
 }
 
 /* ══════════════════════════════════════════════ */
@@ -1073,61 +1058,61 @@ body{padding-bottom:80px !important}
 </div>
 
 <!-- ══════════════════════════════════════════════════════════ -->
-<!-- ★ FLOATING ACTION BUTTONS (bottom right)                  ★ -->
+<!-- ★ FLOATING ACTION BUTTONS (sp500 design)                  ★ -->
 <!-- ══════════════════════════════════════════════════════════ -->
 <div class="fab-stack">
-  <button class="fab-btn fab-philosophy" onclick="openPhilosophyModal()" title="ปรัชญาเครื่องมือ">
-    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
-      <!-- Owl icon -->
-      <circle cx="32" cy="32" r="22" fill="none" stroke="currentColor" stroke-width="2.2"/>
-      <circle cx="24" cy="28" r="5" fill="none" stroke="currentColor" stroke-width="2"/>
-      <circle cx="40" cy="28" r="5" fill="none" stroke="currentColor" stroke-width="2"/>
-      <circle cx="24" cy="28" r="1.6" fill="currentColor"/>
-      <circle cx="40" cy="28" r="1.6" fill="currentColor"/>
-      <path d="M30 36 L32 40 L34 36" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M14 18 L20 24 M50 18 L44 24" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-    </svg>
+  <button class="fab fab-secondary" onclick="openAboutModal()" aria-label="ปรัชญาและวิธีการคำนวณ">
+    <img src="jpt-owl-line.png" alt="owl" style="width:30px;height:30px;object-fit:contain;filter:brightness(0) invert(1) drop-shadow(0 1px 2px rgba(0,0,0,0.3));" onerror="this.style.display='none';this.parentElement.innerHTML='<svg width=\'28\' height=\'28\' viewBox=\'0 0 64 64\' fill=\'none\' stroke=\'#FFF5E1\' stroke-width=\'2.4\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><circle cx=\'32\' cy=\'32\' r=\'22\'/><circle cx=\'24\' cy=\'28\' r=\'5\'/><circle cx=\'40\' cy=\'28\' r=\'5\'/><circle cx=\'24\' cy=\'28\' r=\'1.6\' fill=\'#FFF5E1\'/><circle cx=\'40\' cy=\'28\' r=\'1.6\' fill=\'#FFF5E1\'/><path d=\'M30 36 L32 40 L34 36\'/><path d=\'M14 18 L20 24 M50 18 L44 24\'/></svg>';">
+    <span class="fab-tooltip">ปรัชญา &amp; วิธีคำนวณ</span>
   </button>
-  <button class="fab-btn fab-bias" onclick="openBiasModal()" title="Bias Scenarios &amp; Exhaustion">
-    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" width="30" height="30">
-      <!-- Flask / lab icon -->
-      <path d="M22 8 L22 22 L12 48 Q12 56 20 56 L44 56 Q52 56 52 48 L42 22 L42 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/>
-      <line x1="20" y1="8" x2="44" y2="8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
-      <path d="M16 38 Q22 35 28 38 Q34 41 40 38 Q46 35 50 38" fill="none" stroke="currentColor" stroke-width="1.8" opacity="0.6"/>
-      <circle cx="26" cy="44" r="1.5" fill="currentColor" opacity="0.5"/>
-      <circle cx="36" cy="48" r="1.2" fill="currentColor" opacity="0.5"/>
-    </svg>
+  <button class="fab fab-primary" onclick="openBiasModal()" aria-label="Bias Scenarios และ Exhaustion Reference">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg>
+    <span class="fab-tooltip">Bias &amp; Exhaustion Reference</span>
   </button>
 </div>
 
-<!-- ★ PHILOSOPHY MODAL ★ -->
-<div class="fab-modal-overlay" id="philosophyModal" onclick="closePhilosophyModal(event)">
-  <div class="fab-modal" onclick="event.stopPropagation()">
-    <button class="fab-modal-close" onclick="closePhilosophyModal()">×</button>
-    <div class="fab-modal-header">
-      <div class="fab-modal-eyebrow">PHILOSOPHY</div>
-      <h2>ปรัชญาเครื่องมือ</h2>
-      <p class="fab-modal-sub">เครื่องมือนี้คืออะไร และไม่ใช่อะไร</p>
+<!-- ★ ABOUT MODAL: Philosophy + Methodology ★ -->
+<div id="aboutModal" class="about-modal" onclick="if(event.target===this)closeAboutModal()">
+  <div class="about-modal-content">
+    <button class="panel-close" onclick="closeAboutModal()" aria-label="ปิด">✕</button>
+    <h2>🦉 Gold Momentum Lab</h2>
+    <div class="about-sub">เครื่องมือสำรวจสภาพตลาดทอง — Multi-dimensional analysis of buy/sell pressure, regime, and exhaustion signals</div>
+
+    <div class="about-philosophy">
+      <div class="philosophy-label">Trading Philosophy</div>
+      <div class="philosophy-text">
+        เครื่องมือนี้ <strong>ไม่ใช่ระบบเทรดอัตโนมัติ และไม่ใช่ backtest</strong> แต่เป็น <strong>หน้าจอเครื่องบินของนักเทรด</strong> — กระดานสรุปสภาพตลาดทองแบบ real-time ที่ช่วยให้เข้าใจโครงสร้างของราคา แรงซื้อ-แรงขาย และจังหวะของตลาดก่อนตัดสินใจเข้าเทรดจริง · ปรัชญาคือ <strong>"ดูหลายมิติพร้อมกัน"</strong> เพราะตลาดทองซับซ้อน — ดอลลาร์ ดอกเบี้ย ภูมิรัฐศาสตร์ flow ธนาคารกลาง · เครื่องมือนี้รวม 5 มิติ buy + 5 มิติ sell ผ่าน rolling percentile 252 วัน เพื่อให้เห็น <strong>ความแข็งแรงของแต่ละด้านเป็นตัวเลข</strong> ไม่ใช่ความรู้สึก
+      </div>
+      <div class="philosophy-signature">Monitor Before You Trade · Data-Driven</div>
     </div>
-    <div class="fab-modal-body" id="philosophyContent"></div>
+
+    <p>หลักการทำงาน <strong>3 ชั้น</strong>: <strong>(1) Score</strong> — คำนวณคะแนน Buy/Sell จาก 5 มิติให้เป็น 0-100 · <strong>(2) Context</strong> — ใส่บริบทเพิ่ม เช่น Z-Score, Pivot, DXY/VIX · <strong>(3) Exhaustion Detection</strong> — ระบบเตือนล่วงหน้าเมื่อโมเมนตัมเริ่มหมด</p>
+
+    <p>ใช้แบบ <strong>Confluence</strong> — สัญญาณหลายอย่างชี้ทางเดียวกัน เช่น Buy แข็ง + Sell อ่อน + Z-Score Normal + ราคาเหนือ Pivot + ไม่มี exhaustion = สัญญาณขาขึ้นที่น่าเชื่อถือ · ในทางกลับกัน หากเครื่องมือบอกขัดแย้งกัน (Buy แข็งแต่มี Bull Exhaustion + Z-Score Extreme) = สัญญาณเตือนให้ระมัดระวัง</p>
+
+    <div style="margin-top:28px;padding-top:20px;border-top:1px solid rgba(212,175,55,0.25)">
+      <div style="font-family:'Cinzel',serif;font-size:.78rem;letter-spacing:3px;color:#D4AF37;font-weight:700;text-align:center;margin-bottom:6px">METHODOLOGY</div>
+      <h3 style="font-family:'DM Serif Display',serif;color:#F4E4BA;text-align:center;margin:0 0 18px;font-weight:400;font-size:1.3rem">วิธีการคำนวณคะแนน 5 มิติ</h3>
+      <div style="display:flex;gap:0;margin-bottom:16px">
+        <button id="modalMethBuyTab" onclick="switchModalMethTab('buy')" style="flex:1;padding:10px;background:rgba(52,211,153,0.15);color:#9DE8B8;border:1px solid rgba(52,211,153,.3);border-radius:8px 0 0 8px;font-weight:700;font-size:.78rem;cursor:pointer;letter-spacing:1px">BUY METHODOLOGY</button>
+        <button id="modalMethSellTab" onclick="switchModalMethTab('sell')" style="flex:1;padding:10px;background:rgba(244,228,186,0.05);color:#C4C0B6;border:1px solid rgba(212,175,55,0.2);border-radius:0 8px 8px 0;font-weight:700;font-size:.78rem;cursor:pointer;letter-spacing:1px">SELL METHODOLOGY</button>
+      </div>
+      <div id="modalMethBuyContent" class="method-grid"></div>
+      <div id="modalMethSellContent" class="method-grid" style="display:none"></div>
+    </div>
   </div>
 </div>
 
-<!-- ★ BIAS REFERENCE MODAL ★ -->
-<div class="fab-modal-overlay" id="biasModal" onclick="closeBiasModal(event)">
-  <div class="fab-modal fab-modal-wide" onclick="event.stopPropagation()">
-    <button class="fab-modal-close" onclick="closeBiasModal()">×</button>
-    <div class="fab-modal-header">
-      <div class="fab-modal-eyebrow">REFERENCE</div>
-      <h2>Bias Scenarios &amp; Exhaustion Detection</h2>
-      <p class="fab-modal-sub">ตารางอ้างอิงสัญญาณทั้งหมด + คำอธิบาย</p>
-    </div>
-    <div class="fab-modal-body">
-      <div id="biasModalStatus"></div>
-      <div id="biasModalMetrics"></div>
-      <div id="biasModalTable"></div>
-      <div id="biasModalMethodology" style="margin-top:32px"></div>
-    </div>
+<!-- ★ BIAS MODAL: Scenarios + Exhaustion Reference ★ -->
+<div id="biasModal" class="about-modal" onclick="if(event.target===this)closeBiasModal()">
+  <div class="about-modal-content about-modal-wide">
+    <button class="panel-close" onclick="closeBiasModal()" aria-label="ปิด">✕</button>
+    <h2>🧪 Bias Scenarios &amp; Exhaustion</h2>
+    <div class="about-sub">ตารางอ้างอิงสัญญาณ Bias Scenarios + ระบบตรวจจับ Exhaustion ทั้งหมดของเครื่องมือ</div>
+
+    <div id="biasModalStatus"></div>
+    <div id="biasModalMetrics"></div>
+    <div id="biasModalTable"></div>
   </div>
 </div>
 
@@ -3023,144 +3008,72 @@ const THEME_COLORS = {
 function tc(key){ return THEME_COLORS.light[key]; }
 
 // ══════════════════════════════════════════════════════════
-// ★ FAB MODALS — Philosophy + Bias Reference                ★
+// ★ FAB MODALS — sp500-style: About (Philosophy + Method) + Bias ★
 // ══════════════════════════════════════════════════════════
 
-// ── Philosophy content (Joon's tool: tracking + monitor + analyze) ──
-const PHILOSOPHY_HTML = `
-  <div class="philo-section">
-    <h3>เครื่องมือนี้คืออะไร</h3>
-    <p>JP Trust Gold Lab ไม่ใช่ระบบเทรดอัตโนมัติ และไม่ใช่ backtest ที่บอกว่าควรซื้อ-ขายเมื่อไหร่ แต่เป็น <strong>เครื่องมือสำรวจสภาพตลาด</strong> ที่ช่วยให้นักเทรดเข้าใจโครงสร้างของราคาทอง แรงซื้อ-ขาย และจังหวะของตลาด<strong>ก่อนจะตัดสินใจเข้าเทรดจริง</strong></p>
-    <div class="philo-quote">มองเครื่องมือนี้เป็น "หน้าจอเครื่องบิน" ของนักเทรด — ไม่ใช่ระบบขับอัตโนมัติ แต่เป็นแผงควบคุมที่บอกว่าตลาดอยู่ในสภาพไหน เพื่อให้คุณตัดสินใจอย่างมีข้อมูลครบถ้วน</div>
-  </div>
+function openAboutModal() {
+  // Pull existing methodology grids into the modal
+  const srcBuy = document.getElementById('methBuyGrid');
+  const srcSell = document.getElementById('methSellGrid');
+  const dstBuy = document.getElementById('modalMethBuyContent');
+  const dstSell = document.getElementById('modalMethSellContent');
 
-  <div class="philo-divider"></div>
+  if(dstBuy && srcBuy) dstBuy.innerHTML = srcBuy.innerHTML;
+  if(dstSell && srcSell) dstSell.innerHTML = srcSell.innerHTML;
 
-  <div class="philo-section">
-    <h3>ปรัชญาการสร้าง</h3>
-    <p>ตลาดทองมีตัวแปรที่ซับซ้อนมาก — ทั้งดอลลาร์ ดอกเบี้ย เงินเฟ้อ ภูมิรัฐศาสตร์ และ flow ของธนาคารกลางทั่วโลก การจะเข้าใจตลาดในแต่ละจังหวะ จำเป็นต้องดู <strong>หลายมิติพร้อมกัน</strong> ไม่ใช่แค่ราคาขึ้น-ลง</p>
-    <p>เครื่องมือนี้จึงรวม <strong>5 มิติของแรงซื้อ</strong> และ <strong>5 มิติของแรงขาย</strong> เข้าด้วยกัน คำนวณผ่าน rolling percentile กับข้อมูลย้อนหลัง 252 วันทำการ ให้คะแนน 0-100 เพื่อให้เห็น<strong>ความแข็งแรงของแต่ละด้าน</strong>เป็นตัวเลขที่เปรียบเทียบได้ ไม่ใช่ความรู้สึก</p>
-  </div>
-
-  <div class="philo-divider"></div>
-
-  <div class="philo-section">
-    <h3>หลักการทำงาน 3 ชั้น</h3>
-    <p><strong>ชั้นที่ 1 — Score</strong>: คำนวณคะแนน Buy + Sell แต่ละด้านจาก 5 มิติ (Return, Volume, RSI, MA Trend, Macro) เพื่อให้รู้ว่าตอนนี้แรงไหนเด่นกว่ากัน</p>
-    <p><strong>ชั้นที่ 2 — Context</strong>: ใส่บริบทเพิ่ม เช่น Z-Score (ราคาห่างจากค่าเฉลี่ยเท่าไหร่), Pivot Position (อยู่เหนือ-ใต้แนวสำคัญไหน), DXY/VIX (ภาพรวม macro)</p>
-    <p><strong>ชั้นที่ 3 — Exhaustion Detection</strong>: ระบบเตือนล่วงหน้าเมื่อแรงซื้อหรือขายเริ่มหมด (อิงจาก score history 5-10 วัน) เพื่อหลีกเลี่ยงการเข้าเทรดตอนรอบจบ</p>
-  </div>
-
-  <div class="philo-divider"></div>
-
-  <div class="philo-section">
-    <h3>เครื่องมือนี้ "ไม่ใช่"</h3>
-    <ul class="philo-not-list">
-      <li>ไม่ใช่ backtest หรือ trading system ที่ให้สัญญาณซื้อ-ขายอัตโนมัติ</li>
-      <li>ไม่ใช่ทำนายราคาทองว่าจะไปถึงเท่าไหร่</li>
-      <li>ไม่รับประกันผลกำไร และไม่ทดแทนการตัดสินใจของคุณ</li>
-      <li>ไม่ใช่เครื่องมือสำหรับมือใหม่ที่ต้องการ "บอกให้ซื้อ"</li>
-    </ul>
-  </div>
-
-  <div class="philo-section">
-    <h3>เครื่องมือนี้ "เป็น"</h3>
-    <ul class="philo-is-list">
-      <li>กระดานสรุปสภาพตลาดทองแบบ real-time จากข้อมูลหลายแหล่ง</li>
-      <li>เครื่องวัดแรงซื้อ-ขายที่ช่วยจับจังหวะตลาด</li>
-      <li>ระบบเตือนเมื่อโมเมนตัมเริ่มหมดแรง (exhaustion)</li>
-      <li>ตัวช่วยตัดสินใจสำหรับนักเทรดที่มีระบบของตัวเองอยู่แล้ว</li>
-      <li>เครื่องมือเรียนรู้ — ทำให้เห็นว่าตลาดมีหลายมิติที่ต้องพิจารณา</li>
-    </ul>
-  </div>
-
-  <div class="philo-divider"></div>
-
-  <div class="philo-section">
-    <h3>ข้อแนะนำการใช้งาน</h3>
-    <p>ใช้เครื่องมือนี้ <strong>ก่อนเปิดออเดอร์</strong> เพื่อตรวจสภาพตลาดในขณะนั้น ดูว่าแรงซื้อ-ขายเป็นยังไง มีสัญญาณ exhaustion หรือไม่ Z-Score อยู่ในเขตปกติหรือสุดขั้ว</p>
-    <p>หากต้องการให้สัญญาณชัดเจนที่สุด ควรดูแบบ <strong>confluence</strong> — สัญญาณหลายอย่างชี้ทางเดียวกัน เช่น Buy แข็ง + Sell อ่อน + Z-Score Normal + ราคาเหนือ Pivot + ไม่มี exhaustion = สัญญาณขาขึ้นที่น่าเชื่อถือ</p>
-    <p>ในทางกลับกัน หากเครื่องมือบอกขัดแย้งกัน (Buy แข็งแต่มี Bull Exhaustion + Z-Score Extreme) = สัญญาณเตือนให้ระมัดระวัง รอจังหวะใหม่</p>
-  </div>
-`;
-
-function openPhilosophyModal(){
-  const el = document.getElementById('philosophyContent');
-  if(el && !el.innerHTML.trim()) el.innerHTML = PHILOSOPHY_HTML;
-  document.getElementById('philosophyModal').classList.add('active');
+  document.getElementById('aboutModal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-function closePhilosophyModal(e){
-  if(e && e.target.id !== 'philosophyModal' && e.target.className !== 'fab-modal-close') return;
-  document.getElementById('philosophyModal').classList.remove('active');
+function closeAboutModal() {
+  document.getElementById('aboutModal').classList.remove('open');
   document.body.style.overflow = '';
 }
 
-function openBiasModal(){
-  // Move existing rendered content into modal (preserves all dynamic data)
-  const target = document.getElementById('biasModalStatus');
-  const targetMetrics = document.getElementById('biasModalMetrics');
-  const targetTable = document.getElementById('biasModalTable');
-  const targetMethod = document.getElementById('biasModalMethodology');
-
+function openBiasModal() {
   // Pull from hidden source containers (rendered by existing render functions)
   const srcStatus = document.getElementById('exhaustStatusBadge');
   const srcMetrics = document.getElementById('exhaustMetrics');
   const srcTable = document.getElementById('scenarioTable');
-  const srcMethBuy = document.getElementById('methBuyGrid');
-  const srcMethSell = document.getElementById('methSellGrid');
 
-  if(target && srcStatus) target.innerHTML = srcStatus.innerHTML;
-  if(targetMetrics && srcMetrics) targetMetrics.innerHTML = srcMetrics.innerHTML;
-  if(targetTable && srcTable) targetTable.innerHTML = srcTable.innerHTML;
+  const dstStatus = document.getElementById('biasModalStatus');
+  const dstMetrics = document.getElementById('biasModalMetrics');
+  const dstTable = document.getElementById('biasModalTable');
 
-  // Render methodology inside the bias modal too (Joon merged both refs into bias FAB)
-  if(targetMethod && srcMethBuy){
-    targetMethod.innerHTML = `
-      <div style="border-top:2px solid rgba(212,175,55,0.3);padding-top:24px">
-        <div style="font-family:'Cinzel',serif;font-size:.78rem;letter-spacing:3px;color:#8B6914;font-weight:600;text-align:center;margin-bottom:8px">METHODOLOGY</div>
-        <h3 style="font-family:'DM Serif Display',serif;color:#5A3D20;text-align:center;margin:0 0 18px;font-weight:400;font-size:1.3rem">วิธีการคำนวณคะแนน</h3>
-        <div style="display:flex;gap:0;margin-bottom:16px">
-          <button id="modalMethBuyTab" onclick="switchModalMethTab('buy')" style="flex:1;padding:10px;background:var(--emerald-dim);color:var(--emerald);border:1px solid rgba(52,211,153,.3);border-radius:8px 0 0 8px;font-weight:700;font-size:.78rem;cursor:pointer;letter-spacing:1px">BUY METHODOLOGY</button>
-          <button id="modalMethSellTab" onclick="switchModalMethTab('sell')" style="flex:1;padding:10px;background:var(--bg3);color:var(--text3);border:1px solid var(--border);border-radius:0 8px 8px 0;font-weight:700;font-size:.78rem;cursor:pointer;letter-spacing:1px">SELL METHODOLOGY</button>
-        </div>
-        <div id="modalMethBuyContent" class="method-grid">${srcMethBuy.innerHTML}</div>
-        <div id="modalMethSellContent" class="method-grid" style="display:none">${srcMethSell ? srcMethSell.innerHTML : ''}</div>
-      </div>`;
-  }
+  if(dstStatus && srcStatus) dstStatus.innerHTML = srcStatus.innerHTML;
+  if(dstMetrics && srcMetrics) dstMetrics.innerHTML = srcMetrics.innerHTML;
+  if(dstTable && srcTable) dstTable.innerHTML = srcTable.innerHTML;
 
-  document.getElementById('biasModal').classList.add('active');
+  document.getElementById('biasModal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-function closeBiasModal(e){
-  if(e && e.target.id !== 'biasModal' && e.target.className !== 'fab-modal-close') return;
-  document.getElementById('biasModal').classList.remove('active');
+function closeBiasModal() {
+  document.getElementById('biasModal').classList.remove('open');
   document.body.style.overflow = '';
 }
 
-// Methodology tab switcher inside modal
-function switchModalMethTab(tab){
+// Methodology tab switcher inside about modal (dark bg variant)
+function switchModalMethTab(tab) {
   const buyBtn = document.getElementById('modalMethBuyTab');
   const sellBtn = document.getElementById('modalMethSellTab');
   const buyC = document.getElementById('modalMethBuyContent');
   const sellC = document.getElementById('modalMethSellContent');
   if(!buyBtn || !sellBtn) return;
-  if(tab === 'buy'){
-    buyBtn.style.background = 'var(--emerald-dim)';
-    buyBtn.style.color = 'var(--emerald)';
+  if(tab === 'buy') {
+    buyBtn.style.background = 'rgba(52,211,153,0.15)';
+    buyBtn.style.color = '#9DE8B8';
     buyBtn.style.borderColor = 'rgba(52,211,153,.3)';
-    sellBtn.style.background = 'var(--bg3)';
-    sellBtn.style.color = 'var(--text3)';
-    sellBtn.style.borderColor = 'var(--border)';
+    sellBtn.style.background = 'rgba(244,228,186,0.05)';
+    sellBtn.style.color = '#C4C0B6';
+    sellBtn.style.borderColor = 'rgba(212,175,55,0.2)';
     buyC.style.display = 'grid';
     sellC.style.display = 'none';
   } else {
-    sellBtn.style.background = 'var(--red-dim)';
-    sellBtn.style.color = 'var(--red)';
+    sellBtn.style.background = 'rgba(248,113,113,0.15)';
+    sellBtn.style.color = '#F8B8B8';
     sellBtn.style.borderColor = 'rgba(248,113,113,.3)';
-    buyBtn.style.background = 'var(--bg3)';
-    buyBtn.style.color = 'var(--text3)';
-    buyBtn.style.borderColor = 'var(--border)';
+    buyBtn.style.background = 'rgba(244,228,186,0.05)';
+    buyBtn.style.color = '#C4C0B6';
+    buyBtn.style.borderColor = 'rgba(212,175,55,0.2)';
     sellC.style.display = 'grid';
     buyC.style.display = 'none';
   }
@@ -3168,9 +3081,9 @@ function switchModalMethTab(tab){
 
 // ESC key to close modals
 document.addEventListener('keydown', e => {
-  if(e.key === 'Escape'){
-    closePhilosophyModal({target:{id:'philosophyModal'}});
-    closeBiasModal({target:{id:'biasModal'}});
+  if(e.key === 'Escape') {
+    closeAboutModal();
+    closeBiasModal();
   }
 });
 </script>
