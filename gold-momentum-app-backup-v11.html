@@ -576,85 +576,6 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height
 /* Split meter removed — redundant with infinity */
 
 /* ══════════════════════════════════════════════════════════ */
-/* ★ ZONE TABS (4-in-1 — copied from sp500-strategy-pro)     ★ */
-/* ══════════════════════════════════════════════════════════ */
-.zone-tabs-container {
-  margin-bottom: 24px;
-  display: flex;
-  flex-direction: column;
-}
-.zone-tabs-header {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  background: #F5EDD8 !important;
-  padding: 4px !important;
-  gap: 3px !important;
-  border-radius: 12px 12px 0 0 !important;
-  border: 1px solid var(--border2) !important;
-  border-bottom: none !important;
-  margin-bottom: 0 !important;
-}
-.zone-tab-btn {
-  flex: 1 1 0 !important;
-  min-width: 0 !important;
-  padding: 12px 8px !important;
-  background: transparent !important;
-  border: none !important;
-  color: var(--text2) !important;
-  font-family: 'Cinzel','Anuphan',serif !important;
-  font-size: 0.7rem !important;
-  font-weight: 600 !important;
-  letter-spacing: 1.5px !important;
-  text-transform: uppercase !important;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  border-radius: 8px !important;
-  line-height: 1.3;
-  word-break: break-word;
-  white-space: normal !important;
-}
-.zone-tab-btn:hover:not(.active) {
-  color: #722F37 !important;
-  background: rgba(255,255,255,0.5) !important;
-}
-.zone-tab-btn.active {
-  background: #FFFEF8 !important;
-  color: #722F37 !important;
-  box-shadow: 0 2px 6px rgba(114,47,55,0.12) !important;
-}
-.zone-tab-content {
-  padding: 20px !important;
-  display: none;
-  animation: zoneTabSlide 0.35s ease;
-  border: 1px solid var(--border2);
-  border-top: none;
-  border-radius: 0 0 16px 16px;
-  background: #FFFEF8;
-}
-.zone-tab-content.active {
-  display: block !important;
-}
-@keyframes zoneTabSlide {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@media (max-width: 600px) {
-  .zone-tab-btn {
-    padding: 10px 4px !important;
-    font-size: 0.6rem !important;
-    letter-spacing: 1.1px !important;
-  }
-  .zone-tab-content { padding: 14px !important; }
-}
-@media (max-width: 380px) {
-  .zone-tab-btn {
-    padding: 8px 3px !important;
-    font-size: 0.55rem !important;
-    letter-spacing: 0.8px !important;
-  }
-}
-
-/* ══════════════════════════════════════════════════════════ */
 /* ★ FLOATING ACTION BUTTONS (FAB) — copied from sp500       ★ */
 /* ══════════════════════════════════════════════════════════ */
 .fab-stack {
@@ -1050,39 +971,32 @@ body{padding-bottom:80px !important}
       <div id="dimCompareGrid"></div>
     </div>
 
-    <!-- ★ ZONE ANALYSIS — TABBED (4-in-1: Chart + Price Zones + Pivot Levels + Confluence) ★ -->
+    <!-- ★ PIVOT ZONE (Tabbed Multi-TF) ★ -->
     <div class="section fade-up">
-      <div class="section-title"><span class="dot"></span>Zone Analysis — Multi-TF Pivot &amp; Confluence</div>
-      <div class="zone-tabs-container" id="zoneTabsContainer">
-        <div class="zone-tabs-header">
-          <button class="zone-tab-btn active" onclick="switchZoneTab(event,'zone-chart')">Chart</button>
-          <button class="zone-tab-btn" onclick="switchZoneTab(event,'zone-prices')">Price Zones</button>
-          <button class="zone-tab-btn" onclick="switchZoneTab(event,'zone-pivot')">Pivot Levels</button>
-          <button class="zone-tab-btn" onclick="switchZoneTab(event,'zone-confluence')">Confluence</button>
-        </div>
-
-        <div id="zone-chart" class="zone-tab-content active">
-          <div class="pivot-tabs" id="pivotTabs"></div>
-          <div class="pivot-chart-wrap">
-            <div style="height:420px;position:relative"><canvas id="pivotChart"></canvas></div>
-            <div class="bias-signal" id="biasSignal"></div>
-            <div id="pivotExhaust"></div>
-            <div class="pivot-score-link" id="pivotScoreLink"></div>
-          </div>
-        </div>
-
-        <div id="zone-prices" class="zone-tab-content">
-          <div id="upzSection"></div>
-        </div>
-
-        <div id="zone-pivot" class="zone-tab-content">
-          <div id="multiTFTable"></div>
-        </div>
-
-        <div id="zone-confluence" class="zone-tab-content">
-          <div id="confluenceSection"></div>
-        </div>
+      <div class="section-title"><span class="dot"></span>Unified Price Zones &times; Multi-TF Pivot &times; Momentum Bias</div>
+      <div class="pivot-tabs" id="pivotTabs"></div>
+      <div class="pivot-chart-wrap">
+        <div style="height:420px;position:relative"><canvas id="pivotChart"></canvas></div>
+        <div class="bias-signal" id="biasSignal"></div>
+        <div id="pivotExhaust"></div>
+        <div class="pivot-score-link" id="pivotScoreLink"></div>
       </div>
+    </div>
+
+    <!-- ★ MULTI-TF TABLE + CONFLUENCE ★ -->
+    <div class="section fade-up">
+      <div class="section-title"><span class="dot"></span>Unified Price Zones — ATR + Pivot + Mean Confluence</div>
+      <div id="upzSection" style="background:var(--card);border-radius:12px;padding:16px;border:1px solid var(--border2)"></div>
+    </div>
+
+    <div class="section fade-up">
+      <div class="section-title"><span class="dot"></span>Pivot Levels — D1 (Daily) / W1 (Weekly) / MN (Monthly)</div>
+      <div id="multiTFTable" style="background:var(--card);border-radius:12px;padding:16px;border:1px solid var(--border2)"></div>
+    </div>
+
+    <div class="section fade-up">
+      <div class="section-title"><span class="dot"></span>⚡ Confluence Zones — โซนที่ Pivot หลาย TF ซ้อนกัน (ภายใน 20 จุด)</div>
+      <div id="confluenceSection" style="background:var(--card);border-radius:12px;padding:16px;border:1px solid var(--border2)"></div>
     </div>
 
     <div class="section fade-up" style="display:none">
@@ -1810,8 +1724,6 @@ function drawPivotChart(tab){
       }
     }
   });
-  // Expose for zone tab switcher (resize on activation)
-  window.pivotChartInstance = pivotChartInstance;
 }
 
 function renderBiasAndInterpretation(){
@@ -3116,26 +3028,6 @@ const THEME_COLORS = {
 
 // Theme-aware color getter — locked to light theme (toggle removed)
 function tc(key){ return THEME_COLORS.light[key]; }
-
-// ── Zone Tab Switcher (4-in-1 section) ──
-function switchZoneTab(evt, tabId){
-  const container = document.getElementById('zoneTabsContainer');
-  if(!container) return;
-  const contents = container.querySelectorAll('.zone-tab-content');
-  const btns = container.querySelectorAll('.zone-tab-btn');
-  contents.forEach(c => c.classList.remove('active'));
-  btns.forEach(b => b.classList.remove('active'));
-  const target = document.getElementById(tabId);
-  if(target) target.classList.add('active');
-  if(evt && evt.currentTarget) evt.currentTarget.classList.add('active');
-
-  // Force chart resize when switching to chart tab (Chart.js needs visible parent for proper sizing)
-  if(tabId === 'zone-chart' && window.pivotChartInstance){
-    setTimeout(() => {
-      try { window.pivotChartInstance.resize(); } catch(e){}
-    }, 50);
-  }
-}
 
 // ══════════════════════════════════════════════════════════
 // ★ FAB MODALS — sp500-style: About (Philosophy + Method) + Bias ★
