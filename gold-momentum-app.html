@@ -3108,17 +3108,16 @@ function renderAIAnalysis(){
   if(exSell && exSell !== 'None' && exSell !== '') warnParts.push(`พบสัญญาณ${hlGold('การหมดแรงฝั่งขาย')} (${exSell})${exSellAct?' แนะนำให้ '+exSellAct:''}`);
   // DXY interpretation — use numeric value (matches Macro tab logic)
   const dxyPct = parseFloat(D.DXY_1M_Pct||0);
-  if(Math.abs(dxyPct) >= 0.5){
-    if(dxyPct >= 2) warnParts.push(`ดัชนีดอลลาร์สหรัฐ (DXY) ${hlNeg('แข็งค่าอย่างมีนัยสำคัญ +'+dxyPct.toFixed(2)+'% — กดดันราคาทอง')}`);
-    else if(dxyPct >= 0.5) warnParts.push(`ดัชนีดอลลาร์สหรัฐ (DXY) ${hlNeg('แข็งค่า +'+dxyPct.toFixed(2)+'% — กดดันราคาทอง')}`);
-    else if(dxyPct <= -2) warnParts.push(`ดัชนีดอลลาร์สหรัฐ (DXY) ${hlPos('อ่อนค่าอย่างมีนัยสำคัญ '+dxyPct.toFixed(2)+'% — สนับสนุนราคาทอง')}`);
-    else warnParts.push(`ดัชนีดอลลาร์สหรัฐ (DXY) ${hlPos('อ่อนค่า '+dxyPct.toFixed(2)+'% — สนับสนุนราคาทอง')}`);
-  }
+  if(dxyPct >= 2) warnParts.push(`ดัชนีดอลลาร์สหรัฐ (DXY) ${hlNeg('แข็งค่าอย่างมีนัยสำคัญ +'+dxyPct.toFixed(2)+'% — กดดันราคาทอง')}`);
+  else if(dxyPct >= 0.5) warnParts.push(`ดัชนีดอลลาร์สหรัฐ (DXY) ${hlNeg('แข็งค่า +'+dxyPct.toFixed(2)+'% — กดดันราคาทอง')}`);
+  else if(dxyPct <= -2) warnParts.push(`ดัชนีดอลลาร์สหรัฐ (DXY) ${hlPos('อ่อนค่าอย่างมีนัยสำคัญ '+dxyPct.toFixed(2)+'% — สนับสนุนราคาทอง')}`);
+  else if(dxyPct <= -0.5) warnParts.push(`ดัชนีดอลลาร์สหรัฐ (DXY) ${hlPos('อ่อนค่า '+dxyPct.toFixed(2)+'% — สนับสนุนราคาทอง')}`);
+  else warnParts.push(`ดัชนีดอลลาร์สหรัฐ (DXY ${dxyPct>=0?'+':''}${dxyPct.toFixed(2)}%) ${hlGold('ทรงตัวในกรอบจำกัด')}`);
   // VIX interpretation — use numeric level (matches Macro tab logic)
   const vixLvl = parseFloat(D.VIX_Level||0);
   if(vixLvl > 0){
     if(vixLvl < 15) warnParts.push(`ดัชนีความผันผวน (VIX) ${hlPos('ต่ำที่ '+vixLvl.toFixed(2)+' — ตลาดอยู่ในภาวะสงบ')}`);
-    else if(vixLvl < 20) {} // Normal range — don't add (avoid noise in analysis)
+    else if(vixLvl < 20) warnParts.push(`ดัชนีความผันผวน (VIX) ${hlGold('ที่ระดับ '+vixLvl.toFixed(2)+' — ความผันผวนอยู่ในระดับปกติ')}`);
     else if(vixLvl < 30) warnParts.push(`ดัชนีความผันผวน (VIX) ${hlGold('ยกระดับที่ '+vixLvl.toFixed(2)+' — ความกังวลในตลาดเริ่มเพิ่มขึ้น')}`);
     else warnParts.push(`ดัชนีความผันผวน (VIX) ${hlNeg('สูงที่ '+vixLvl.toFixed(2)+' — ตลาดอยู่ในภาวะตื่นตระหนก')}`);
   }
