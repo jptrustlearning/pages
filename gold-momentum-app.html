@@ -3009,33 +3009,39 @@ function renderDimCompare(){
   if(!DN||!DS){el.innerHTML='<div style="padding:20px;text-align:center;color:var(--text3)">Comparison data not available</div>';return;}
   const dims=['D1','D2','D3','D4','D5','D6'];
   const names=['Return Rank','Volume Rank','RSI','MA Trend','Dir. Volatility','Macro'];
-  const colors=dimColors;
-  // Charcoal-gold gradient backdrop (-margin to extend to tab edges) + white floating cards
-  let html=`<div style="background:linear-gradient(160deg,#2A2520 0%,#3A322B 50%,#2A2520 100%);border:1px solid rgba(212,175,55,0.3);border-radius:14px;padding:16px;margin:-4px;position:relative;overflow:hidden">
-    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(212,175,55,0.08) 0%,transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(212,175,55,0.06) 0%,transparent 60%);pointer-events:none"></div>
-    <div style="position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,1fr);gap:12px">`;
+  // Lighter dunes overlay (50% opacity vs summary card)
+  const dunesBg = `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 70' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'%3E%3Cpath d='M0,55 C20,50 40,40 70,35 C100,30 130,38 160,30 C180,25 195,32 200,28 L200,70 L0,70 Z' fill='rgba(218,195,148,0.22)'/%3E%3Cpath d='M0,60 C30,52 60,45 100,40 C140,35 170,42 200,36 L200,70 L0,70 Z' fill='rgba(232,220,192,0.4)'/%3E%3Cpath d='M0,45 C25,42 50,30 80,28 C110,26 140,35 170,22 C190,15 200,20 200,18 L200,70 L0,70 Z' fill='rgba(212,175,55,0.1)'/%3E%3Cpath d='M0,40 Q50,25 100,30 Q150,35 200,20' fill='none' stroke='rgba(184,134,11,0.18)' stroke-width='1.5'/%3E%3Cpath d='M0,50 Q60,38 120,42 Q180,46 200,35' fill='none' stroke='rgba(184,134,11,0.14)' stroke-width='1'/%3E%3C/svg%3E")`;
+  let html='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">';
   dims.forEach((d,i)=>{
     const bv=parseFloat(DN['Buy_'+d]||0),sv=parseFloat(DN['Sell_'+d]||0);
     const diff=bv-sv;
-    html+=`<div style="background:linear-gradient(160deg,#FFFEF8 0%,#FAF6ED 100%);border:1px solid rgba(212,175,55,0.25);border-radius:12px;padding:14px 12px;box-shadow:0 4px 14px rgba(0,0,0,0.25),0 1px 3px rgba(0,0,0,0.15),inset 0 1px 0 rgba(255,255,255,0.8)">
-      <div style="font-size:.82rem;color:${colors[i]};text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:8px">${names[i]}</div>
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
-        <span style="font-size:.78rem;color:#2E9F5F;font-weight:700">${bv.toFixed(0)}</span>
-        <span style="font-family:var(--font-h);font-size:.92rem;color:${diff>=0?'#2E9F5F':'#C14545'};font-weight:700"> ${diff>=0?'+':''}${diff.toFixed(0)}</span>
-        <span style="font-size:.78rem;color:#C14545;font-weight:700">${sv.toFixed(0)}</span>
-      </div>
-      <div style="display:flex;gap:2px;height:8px">
-        <div style="flex:1;background:rgba(46,159,95,.12);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end">
-          <div style="width:${Math.max(5,bv)}%;background:#2E9F5F;border-radius:3px;min-width:4px"></div>
+    html+=`<div style="
+      background:linear-gradient(180deg,#FFFFFF 0%,#FFFFFF 55%,#F5EDD8 100%);
+      border:1.5px solid rgba(212,175,55,0.45);
+      border-radius:12px;padding:14px 12px;
+      box-shadow:0 4px 14px rgba(114,47,55,0.08),0 1px 4px rgba(114,47,55,0.05),inset 0 0 0 1px rgba(255,255,255,0.6);
+      position:relative;overflow:hidden;min-height:118px;">
+      <div style="position:absolute;bottom:0;left:0;right:0;height:72px;background:${dunesBg};background-size:100% 100%;border-radius:0 0 12px 12px;pointer-events:none;z-index:0"></div>
+      <div style="position:relative;z-index:1">
+        <div style="font-family:'Cinzel','Anuphan',serif;font-size:.7rem;color:#8B6914;text-transform:uppercase;letter-spacing:2px;font-weight:700;margin-bottom:10px">${names[i]}</div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+          <span style="font-size:.82rem;color:#2E9F5F;font-weight:700">${bv.toFixed(0)}</span>
+          <span style="font-family:var(--font-h);font-size:.92rem;color:${diff>=0?'#2E9F5F':'#C14545'};font-weight:700"> ${diff>=0?'+':''}${diff.toFixed(0)}</span>
+          <span style="font-size:.82rem;color:#C14545;font-weight:700">${sv.toFixed(0)}</span>
         </div>
-        <div style="flex:1;background:rgba(193,69,69,.12);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end">
-          <div style="width:${Math.max(5,sv)}%;background:#C14545;border-radius:3px;min-width:4px"></div>
+        <div style="display:flex;gap:2px;height:8px">
+          <div style="flex:1;background:rgba(46,159,95,.12);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end">
+            <div style="width:${Math.max(5,bv)}%;background:#2E9F5F;border-radius:3px;min-width:4px"></div>
+          </div>
+          <div style="flex:1;background:rgba(193,69,69,.12);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end">
+            <div style="width:${Math.max(5,sv)}%;background:#C14545;border-radius:3px;min-width:4px"></div>
+          </div>
         </div>
+        <div style="display:flex;justify-content:space-between;font-size:.7rem;color:#7A6F62;margin-top:4px;font-weight:600"><span>Buy</span><span>Sell</span></div>
       </div>
-      <div style="display:flex;justify-content:space-between;font-size:.72rem;color:#7A6F62;margin-top:4px;font-weight:600"><span>Buy</span><span>Sell</span></div>
     </div>`;
   });
-  html+='</div></div>';
+  html+='</div>';
   el.innerHTML=html;
 }
 
