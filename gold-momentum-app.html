@@ -2079,13 +2079,20 @@ function drawPivotChart(tab){
           const text=lv.tf+' '+fp(lv.value)+' '+stars+' '+lv.sources;
           ctx.font='bold 10px Anuphan, sans-serif';
           const w=ctx.measureText(text).width+10;
-          ctx.fillStyle=lv.color+'18';ctx.beginPath();ctx.roundRect(x-w-2,y-8,w+4,16,4);ctx.fill();
+          // Drop shadow + solid cream background + gold border
+          ctx.shadowColor='rgba(114,47,55,0.18)';ctx.shadowBlur=4;ctx.shadowOffsetY=1;
+          ctx.fillStyle='#FFFEF8';ctx.beginPath();ctx.roundRect(x-w-2,y-8,w+4,16,4);ctx.fill();
+          ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetY=0;
+          ctx.strokeStyle=lv.color+'66';ctx.lineWidth=1;ctx.stroke();
           ctx.fillStyle=lv.color;ctx.fillText(text,x,y);
         }else{
           const text=lv.tf+' '+lv.label+' '+fp(lv.value);
           ctx.font='bold 11px Anuphan, sans-serif';
           const w=ctx.measureText(text).width+10;
-          ctx.fillStyle=lv.color+'18';ctx.beginPath();ctx.roundRect(x-w-2,y-8,w+4,16,4);ctx.fill();
+          ctx.shadowColor='rgba(114,47,55,0.18)';ctx.shadowBlur=4;ctx.shadowOffsetY=1;
+          ctx.fillStyle='#FFFEF8';ctx.beginPath();ctx.roundRect(x-w-2,y-8,w+4,16,4);ctx.fill();
+          ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetY=0;
+          ctx.strokeStyle=lv.color+'66';ctx.lineWidth=1;ctx.stroke();
           ctx.fillStyle=lv.color;ctx.fillText(text,x,y);
         }
       });
@@ -2215,9 +2222,15 @@ function drawPivotChart(tab){
           }
         },
         tooltip:{
-          backgroundColor:tc('tooltipBg'),borderColor:tc('tooltipBorder'),borderWidth:1,
-          titleColor:tc('tooltipTitle'),bodyColor:tc('tooltipBody'),padding:12,
-          titleFont:{family:'Anuphan',weight:'700'},bodyFont:{family:'Anuphan',size:11},
+          enabled:true,
+          backgroundColor:tc('tooltipBg'),
+          borderColor:tc('tooltipBorder'),borderWidth:1.5,
+          titleColor:tc('tooltipTitle'),bodyColor:tc('tooltipBody'),
+          padding:{top:10,right:14,bottom:10,left:14},
+          cornerRadius:8,
+          titleFont:{family:'Anuphan',weight:'700',size:12},
+          bodyFont:{family:'Anuphan',size:11,weight:'500'},
+          titleSpacing:4,bodySpacing:4,
           filter:function(item){return item.raw!==null;},
           callbacks:{
             title:function(items){return items[0]?items[0].label:'';},
