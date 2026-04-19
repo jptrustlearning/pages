@@ -934,7 +934,6 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height
 /* ★ SMART ANALYSIS BOX — JP Trust theme         */
 /* ══════════════════════════════════════════════ */
 .ai-analysis-card{
-  margin-top:24px;
   background:linear-gradient(180deg,#FFFEF8 0%,#FAF6ED 60%,#F5EDD8 100%);
   border:1.5px solid rgba(212,175,55,0.45);
   border-radius:18px;
@@ -2868,105 +2867,104 @@ function renderAIAnalysis(){
   const hlNeg = (t) => `<span class="ai-hl-neg">${t}</span>`;
   const hlGold = (t) => `<span class="ai-hl-gold">${t}</span>`;
 
-  // Momentum — ภาษาแบบบทวิเคราะห์ธนาคาร
+  // Momentum
   let momentumText = '';
   if(buyS >= 75 && sellS < 45){
-    momentumText = `แรงซื้อ${hlPos('แข็งแกร่ง')}ที่ระดับ ${buyS.toFixed(0)} คะแนน ในขณะที่แรงขาย${hlNeg('อ่อนตัว')}อยู่ที่ ${sellS.toFixed(0)} คะแนน สะท้อนให้เห็นว่าฝั่งผู้ซื้อยังคงควบคุมตลาดได้อย่างชัดเจน`;
+    momentumText = `แรงซื้อ${hlPos('แข็งมาก')} (${buyS.toFixed(0)}/100) ขณะที่แรงขาย${hlNeg('อ่อน')} (${sellS.toFixed(0)}/100) — แรงซื้อมีอำนาจเหนือตลาดเกือบทั้งหมด`;
   } else if(sellS >= 75 && buyS < 45){
-    momentumText = `แรงขาย${hlNeg('แข็งแกร่ง')}ที่ระดับ ${sellS.toFixed(0)} คะแนน ในขณะที่แรงซื้ออ่อนตัวอยู่ที่ ${buyS.toFixed(0)} คะแนน บ่งชี้ว่าฝั่งผู้ขายเป็นผู้กำหนดทิศทางตลาดในช่วงนี้`;
+    momentumText = `แรงขาย${hlNeg('แข็งมาก')} (${sellS.toFixed(0)}/100) ขณะที่แรงซื้อ${hlPos('อ่อน')} (${buyS.toFixed(0)}/100) — แรงขายครอบงำตลาด`;
   } else if(buyS >= 55 && sellS >= 55){
-    momentumText = `ทั้งแรงซื้อ (${buyS.toFixed(0)}) และแรงขาย (${sellS.toFixed(0)}) ${hlGold('ต่างมีน้ำหนักใกล้เคียงกัน')} สะท้อนภาวะที่ตลาดยังไม่มีฝ่ายใดได้เปรียบอย่างชัดเจน อาจต้องรอความชัดเจนของทิศทางก่อน`;
+    momentumText = `ทั้งแรงซื้อ (${buyS.toFixed(0)}) และแรงขาย (${sellS.toFixed(0)}) ${hlGold('มีแรงทั้งสองฝั่ง')} — ตลาดกำลังชักเย่อ รอฝั่งใดชนะก่อน`;
   } else if(buyS < 45 && sellS < 45){
-    momentumText = `แรงซื้อและแรงขาย${hlGold('อ่อนตัวพร้อมกัน')} (Buy ${buyS.toFixed(0)} / Sell ${sellS.toFixed(0)}) สะท้อนภาวะตลาด${hlGold('นิ่ง')} ปริมาณการเคลื่อนไหวจำกัด นักลงทุนยังรอจังหวะ`;
+    momentumText = `ทั้งแรงซื้อและแรงขาย${hlGold('อ่อนพร้อมกัน')} (Buy ${buyS.toFixed(0)} / Sell ${sellS.toFixed(0)}) — ตลาด${hlGold('ไม่มีทิศทางชัดเจน')} อยู่ใน Dead Zone`;
   } else if(buyS > sellS){
-    momentumText = `แรงซื้อที่ระดับ ${buyS.toFixed(0)} คะแนน ${hlPos('สูงกว่า')}แรงขายที่ ${sellS.toFixed(0)} คะแนน บ่งชี้ทิศทางตลาด${hlPos('เอียงไปทางขาขึ้น')} แต่ระดับความแข็งแกร่งยังไม่เพียงพอที่จะยืนยันแนวโน้มอย่างมั่นคง`;
+    momentumText = `แรงซื้อ (${buyS.toFixed(0)}) ${hlPos('สูงกว่า')}แรงขาย (${sellS.toFixed(0)}) — เอียงขาขึ้นแต่ยังไม่แข็งพอจะยืนยัน`;
   } else {
-    momentumText = `แรงขายที่ระดับ ${sellS.toFixed(0)} คะแนน ${hlNeg('สูงกว่า')}แรงซื้อที่ ${buyS.toFixed(0)} คะแนน ${hlNeg('เอียงไปทางขาลง')} ควรใช้ความระมัดระวังในการเข้าซื้อ`;
+    momentumText = `แรงขาย (${sellS.toFixed(0)}) ${hlNeg('สูงกว่า')}แรงซื้อ (${buyS.toFixed(0)}) — เอียงขาลง ควรระวัง`;
   }
   if(Math.abs(buyDelta) > 2 || Math.abs(sellDelta) > 2){
     const d = [];
-    if(buyDelta > 2) d.push(`แรงซื้อ${hlPos('เพิ่มขึ้น '+buyDelta.toFixed(1)+' คะแนน')}`);
-    else if(buyDelta < -2) d.push(`แรงซื้อ${hlNeg('ลดลง '+Math.abs(buyDelta).toFixed(1)+' คะแนน')}`);
-    if(sellDelta > 2) d.push(`แรงขาย${hlNeg('เพิ่มขึ้น '+sellDelta.toFixed(1)+' คะแนน')}`);
-    else if(sellDelta < -2) d.push(`แรงขาย${hlPos('ลดลง '+Math.abs(sellDelta).toFixed(1)+' คะแนน')}`);
-    if(d.length) momentumText += ` ทั้งนี้ในรอบ 5 วันที่ผ่านมา ${d.join(' และ ')}`;
+    if(buyDelta > 2) d.push(`Buy ${hlPos('กำลังเร่ง +'+buyDelta.toFixed(1))}`);
+    else if(buyDelta < -2) d.push(`Buy ${hlNeg('กำลังชะลอ '+buyDelta.toFixed(1))}`);
+    if(sellDelta > 2) d.push(`Sell ${hlNeg('กำลังเร่ง +'+sellDelta.toFixed(1))}`);
+    else if(sellDelta < -2) d.push(`Sell ${hlPos('กำลังชะลอ '+sellDelta.toFixed(1))}`);
+    if(d.length) momentumText += ` • โมเมนตัม 5 วันล่าสุด: ${d.join(', ')}`;
   }
 
-  // Context — ภาษาแบบนักวิเคราะห์
+  // Context — Z-Score zones match Methodology (asymmetric, calibrated for gold)
   const ctx = [];
-  // Z-Score
-  if(z50 >= 2.5) ctx.push(`ราคาทองคำ${hlNeg('ปรับตัวขึ้นเกินค่าเฉลี่ย')}อย่างมีนัยสำคัญ (Z-Score ${z50.toFixed(2)}σ — เขต Extreme Extended ซึ่งเกิดเพียง 6% ของเวลา) มีความเสี่ยงที่จะเห็นการพักฐาน`);
-  else if(z50 >= 2.0) ctx.push(`ราคาเข้าสู่${hlGold('โซน Extended')} (Z-Score ${z50.toFixed(2)}σ พบประมาณ 9% ของเวลา) ความเสี่ยงต่อการพักตัวเริ่มสูงขึ้น`);
-  else if(z50 <= -2.0) ctx.push(`ราคา${hlPos('ปรับตัวลงต่ำเกินค่าเฉลี่ย')}อย่างมาก (Z-Score ${z50.toFixed(2)}σ — เขต Extreme Depressed) มีโอกาสเห็นการดีดตัวกลับ`);
-  else if(z50 <= -1.5) ctx.push(`ราคาอยู่ใน${hlPos('โซน Depressed')} (Z-Score ${z50.toFixed(2)}σ) ระดับที่อาจเห็นการฟื้นตัวเชิงเทคนิค`);
-  else ctx.push(`ราคาอยู่ใน${hlGold('กรอบปกติ')} (Z-Score ${z50.toFixed(2)}σ) บ่งชี้ว่ายังไม่มีสัญญาณ overshoot ในทิศทางใด`);
+  if(z50 >= 2.5) ctx.push(`Z-Score ${hlGold(z50.toFixed(2)+'σ')} — ${hlNeg('Extreme Extended')} (~6% ของเวลา) ระวัง mean-reversion`);
+  else if(z50 >= 2.0) ctx.push(`Z-Score ${hlGold(z50.toFixed(2)+'σ')} — ${hlGold('Extended')} (~9% ของเวลา) pullback risk สูงขึ้น`);
+  else if(z50 <= -2.0) ctx.push(`Z-Score ${hlGold(z50.toFixed(2)+'σ')} — ${hlPos('Extreme Depressed')} (~4%) oversold สุดโต่ง bounce potential`);
+  else if(z50 <= -1.5) ctx.push(`Z-Score ${hlGold(z50.toFixed(2)+'σ')} — ${hlPos('Depressed')} (~3%) bounce potential`);
+  else if(Math.abs(z50) < 0.5) ctx.push(`Z-Score ${z50.toFixed(2)}σ — ราคา${hlGold('อยู่ในเขต Normal')} ยังไม่ extreme`);
+  else ctx.push(`Z-Score ${z50.toFixed(2)}σ — ${hlGold('Normal')} (-1.5 ถึง +2.0σ) momentum ใช้ได้ตามปกติ`);
 
-  // Pivot Position
   if(pivotPos){
     const pp = pivotPos.toLowerCase();
-    if(pp.includes('above r1') || pp.includes('r2') || pp.includes('r3')) ctx.push(`ราคาเคลื่อนไหวอยู่${hlPos('เหนือแนวต้านสำคัญ')} (${pivotPos}) สะท้อนการ breakout ที่ต้องการ volume confirm`);
-    else if(pp.includes('below s1') || pp.includes('s2') || pp.includes('s3')) ctx.push(`ราคาหลุด${hlNeg('แนวรับสำคัญ')} (${pivotPos}) เพิ่มความเสี่ยงต่อการปรับฐานต่อ`);
-    else if(pp.includes('pp')) ctx.push(`ราคาเคลื่อนไหวใกล้ Pivot Point (${pivotPos}) ซึ่งเป็นจุดตัดสินทิศทางระยะสั้น`);
+    if(pp.includes('above r1') || pp.includes('r2') || pp.includes('r3')) ctx.push(`ราคา ${price>0?'$'+price.toFixed(2):''} อยู่${hlPos('เหนือแนวต้าน')} (${pivotPos})`);
+    else if(pp.includes('below s1') || pp.includes('s2') || pp.includes('s3')) ctx.push(`ราคา ${price>0?'$'+price.toFixed(2):''} อยู่${hlNeg('ใต้แนวรับ')} (${pivotPos})`);
+    else if(pp.includes('pp')) ctx.push(`ราคาอยู่ใกล้ Pivot Point (${pivotPos})`);
   }
 
-  // Vol Ratio - ภาษาธรรมชาติ
-  if(voRatio <= 0.6) ctx.push(`ปริมาณการซื้อขายฝั่งขาขึ้น${hlPos('แข็งแกร่งกว่ามาก')} (Vol Ratio ${voRatio.toFixed(2)}x) เป็นสัญญาณการสะสมที่ชัดเจน`);
-  else if(voRatio <= 0.8) ctx.push(`ปริมาณการซื้อขายฝั่งขาขึ้น${hlPos('มีน้ำหนักมากกว่า')} (Vol Ratio ${voRatio.toFixed(2)}x) สนับสนุนทิศทางบวก`);
-  else if(voRatio <= 1.0) ctx.push(`ปริมาณการซื้อขายฝั่งขาขึ้น-ลง${hlGold('สมดุลใกล้เคียงกัน')} (Vol Ratio ${voRatio.toFixed(2)}x)`);
-  else if(voRatio <= 1.2) ctx.push(`ปริมาณการซื้อขายเริ่ม${hlGold('เอียงไปฝั่งขาลง')}เล็กน้อย (Vol Ratio ${voRatio.toFixed(2)}x)`);
-  else if(voRatio <= 1.5) ctx.push(`ปริมาณการซื้อขายฝั่งขาลง${hlNeg('มีน้ำหนักมากกว่า')} (Vol Ratio ${voRatio.toFixed(2)}x) อาจเป็นสัญญาณ distribution`);
-  else ctx.push(`ปริมาณการซื้อขายฝั่งขาลง${hlNeg('แข็งแกร่งอย่างชัดเจน')} (Vol Ratio ${voRatio.toFixed(2)}x) สะท้อนแรงขายที่หนาแน่น`);
+  // Vol Ratio buckets match Methodology D5 (downside_vol / upside_vol)
+  if(voRatio <= 0.6) ctx.push(`Vol Ratio ${hlGold(voRatio.toFixed(2)+'x')} — upside dominant ${hlPos('แรงสุด (D5=100)')}`);
+  else if(voRatio <= 0.8) ctx.push(`Vol Ratio ${hlGold(voRatio.toFixed(2)+'x')} — upside dominant ${hlPos('(D5=85)')}`);
+  else if(voRatio <= 1.0) ctx.push(`Vol Ratio ${voRatio.toFixed(2)}x — balanced ${hlGold('(D5=70)')}`);
+  else if(voRatio <= 1.2) ctx.push(`Vol Ratio ${voRatio.toFixed(2)}x — เริ่มเอียง downside (D5=55)`);
+  else if(voRatio <= 1.5) ctx.push(`Vol Ratio ${hlGold(voRatio.toFixed(2)+'x')} — downside dominant ${hlNeg('(D5=40)')}`);
+  else if(voRatio <= 2.0) ctx.push(`Vol Ratio ${hlGold(voRatio.toFixed(2)+'x')} — downside dominant ${hlNeg('(D5=20)')}`);
+  else ctx.push(`Vol Ratio ${hlGold(voRatio.toFixed(2)+'x')} — downside dominant ${hlNeg('แรงสุด (D5=10)')}`);
 
-  // MA alignment
   if(gc && gc !== 'None' && gc.toLowerCase() !== 'neutral'){
-    if(gc.toLowerCase().includes('golden') || gc.toLowerCase().includes('bullish')) ctx.push(`โครงสร้างเส้นค่าเฉลี่ยเป็น${hlPos('ลักษณะ Golden Cross')} ซึ่งเป็นสัญญาณบวกระยะกลาง`);
-    else if(gc.toLowerCase().includes('death') || gc.toLowerCase().includes('bearish')) ctx.push(`โครงสร้างเส้นค่าเฉลี่ยเป็น${hlNeg('ลักษณะ Death Cross')} ซึ่งเป็นสัญญาณลบระยะกลาง`);
+    if(gc.toLowerCase().includes('golden') || gc.toLowerCase().includes('bullish')) ctx.push(`${hlPos(gc)} MA alignment`);
+    else if(gc.toLowerCase().includes('death') || gc.toLowerCase().includes('bearish')) ctx.push(`${hlNeg(gc)} MA alignment`);
   }
-  const contextText = ctx.length ? ctx.join(' ') : 'บริบทตลาดโดยรวมยังไม่มีสัญญาณที่บ่งชี้การเปลี่ยนแปลงอย่างมีนัยสำคัญ';
+  const contextText = ctx.length ? ctx.join(' • ') : 'บริบทการตลาดยังอยู่ในเขตกลาง ไม่มีสัญญาณ extreme';
 
-  // Signals/Macro - ภาษาธรรมชาติ
+  // Signals/Macro
   const warnParts = [];
-  if(exBuy && exBuy !== 'None' && exBuy !== '') warnParts.push(`พบสัญญาณ${hlGold('การหมดแรงฝั่งซื้อ')} (${exBuy})${exBuyAct?' แนะนำให้ '+exBuyAct:''}`);
-  if(exSell && exSell !== 'None' && exSell !== '') warnParts.push(`พบสัญญาณ${hlGold('การหมดแรงฝั่งขาย')} (${exSell})${exSellAct?' แนะนำให้ '+exSellAct:''}`);
+  if(exBuy && exBuy !== 'None' && exBuy !== '') warnParts.push(`⚡ Buy-side: ${hlGold(exBuy)}${exBuyAct?' → '+exBuyAct:''}`);
+  if(exSell && exSell !== 'None' && exSell !== '') warnParts.push(`⚡ Sell-side: ${hlGold(exSell)}${exSellAct?' → '+exSellAct:''}`);
   if(dxy && dxy.toLowerCase() !== 'neutral' && dxy !== ''){
     const isNeg = dxy.toLowerCase().includes('strong') || dxy.toLowerCase().includes('up');
-    warnParts.push(`ดัชนีดอลลาร์สหรัฐ (DXY) ${isNeg?hlNeg('แข็งค่า — กดดันราคาทอง'):hlPos('อ่อนค่า — สนับสนุนราคาทอง')}`);
+    warnParts.push(`DXY: ${isNeg?hlNeg(dxy):hlPos(dxy)} (กระทบทอง)`);
   }
   if(vix && vix.toLowerCase() !== 'neutral' && vix !== ''){
     const isHigh = vix.toLowerCase().includes('high') || vix.toLowerCase().includes('spike');
-    warnParts.push(`ดัชนีความผันผวน (VIX) ${isHigh?hlGold('สูง — ความกังวลในตลาดเพิ่มขึ้น'):hlPos('ต่ำ — ตลาดอยู่ในภาวะสงบ')}`);
+    warnParts.push(`VIX: ${isHigh?hlGold(vix):hlPos(vix)}`);
   }
-  if(warnings && warnings !== 'None' && warnings !== '') warnParts.push(`มีสัญญาณเตือนเพิ่มเติม: ${hlNeg(warnings)}`);
+  if(warnings && warnings !== 'None' && warnings !== '') warnParts.push(`⚠️ ${hlNeg(warnings)}`);
 
-  // Verdict — สไตล์บทวิเคราะห์ธนาคาร
+  // Verdict
   let verdict = '';
   let verdictClass = 'verdict-hold';
   if(sigAction === 'BUY'){
     verdictClass = 'verdict-bull';
     if(buyS >= 75 && sellS < 45 && nb >= 20){
-      verdict = `<strong>มุมมองเชิงบวก — แนะนำพิจารณาเข้าซื้อ</strong> สัญญาณซื้อครบทุกเงื่อนไขในระดับ Full Bullish Confirmed โดยแรงซื้อแข็งแกร่งชัดเจนพร้อม Net Bias +${nb.toFixed(0)} คะแนน ยืนยันทิศทาง `;
-      if(z50 >= 2.0) verdict += `อย่างไรก็ตาม Z-Score อยู่ในระดับสูง ${hlGold('แนะนำให้ตั้ง Stop-Loss ที่แนวรับล่าสุด')}เพื่อบริหารความเสี่ยงจากการพักฐานที่อาจเกิดขึ้น`;
-      else verdict += `อัตราส่วนความเสี่ยงต่อผลตอบแทนเอื้อต่อฝั่งขาขึ้น สามารถถือสถานะต่อเนื่องจนกว่าจะปรากฏสัญญาณการหมดแรง`;
+      verdict = `<strong>เข้าได้</strong> — สัญญาณซื้อครบเงื่อนไข (Full Bullish Confirmed): แรงซื้อแข็งมาก + แรงขายอ่อน + Net Bias +${nb.toFixed(0)} ยืนยัน. `;
+      if(z50 >= 2.0) verdict += `${hlGold('ข้อควรระวัง:')} Z-Score สูง อาจพักตัวได้ ควรตั้ง stop-loss ที่${hlGold('แนวรับล่าสุด')}`;
+      else verdict += `ช่องเสี่ยง/รีเทิร์นเอื้อฝั่งขาขึ้น — ถือจนกว่าจะเห็นสัญญาณ exhaustion`;
     } else {
-      verdict = `<strong>มุมมองเชิงบวกอย่างระมัดระวัง</strong> สัญญาณ ${DN.Scenario_Signal||'Buy'} ยังให้น้ำหนักฝั่งซื้อ แต่ความห่างระหว่างแรงซื้อ (${buyS.toFixed(0)}) และแรงขาย (${sellS.toFixed(0)}) ${buyS-sellS<30?hlGold('ยังไม่กว้างพอ'):'อยู่ในระดับที่ยอมรับได้'} แนะนำให้เข้าซื้อในขนาด position ที่เหมาะสมกับความเสี่ยงที่รับได้`;
+      verdict = `<strong>เข้าได้แต่ระวัง</strong> — ${DN.Scenario_Signal||'สัญญาณซื้อ'}. แรงซื้อ (${buyS.toFixed(0)}) vs แรงขาย (${sellS.toFixed(0)}) ${buyS-sellS<30?hlGold('ยังใกล้เคียงกัน'):'ห่างพอ'} ควรขนาด position ให้พอดี`;
     }
   } else if(sigAction === 'SELL'){
     verdictClass = 'verdict-bear';
     if(sellS >= 75 && buyS < 45 && nb <= -20){
-      verdict = `<strong>มุมมองเชิงลบ — ควรหลีกเลี่ยงการเข้าซื้อ</strong> สัญญาณขายครบทุกเงื่อนไขในระดับ Full Bearish Confirmed โดยแรงขายแข็งแกร่งและ Net Bias ${nb.toFixed(0)} คะแนน ยืนยันทิศทาง `;
-      if(z50 <= -2.0) verdict += `${hlGold('ข้อควรระวัง:')} Z-Score อยู่ในระดับต่ำมาก อาจเห็นการดีดตัวเชิงเทคนิคได้ จึงไม่แนะนำให้ไล่ short ในจังหวะนี้`;
-      else verdict += `แนะนำให้ปิดสถานะซื้อเดิมหรือชะลอการเข้าใหม่ จนกว่าจะเห็นสัญญาณการหมดแรงของฝั่งขาย`;
+      verdict = `<strong>ขายหรือหลีกเลี่ยง</strong> — สัญญาณขายครบเงื่อนไข (Full Bearish Confirmed): แรงขายแข็งมาก + แรงซื้อหมด + Net Bias ${nb.toFixed(0)} ยืนยัน. `;
+      if(z50 <= -2.0) verdict += `${hlGold('ข้อควรระวัง:')} Z-Score ต่ำ อาจเห็น oversold bounce ไม่ควรไล่ short ช่วงนี้`;
+      else verdict += `ควรขายล็อตเดิมหรืออย่าเข้า long — รอฝั่งขายหมดแรงก่อน`;
     } else {
-      verdict = `<strong>มุมมองเชิงระมัดระวัง</strong> สัญญาณ ${DN.Scenario_Signal||'Sell'} เริ่มเห็นแรงขายเข้ามา (${sellS.toFixed(0)}) มากกว่าแรงซื้อ (${buyS.toFixed(0)}) ${sellS-buyS<30?hlGold('แต่ยังไม่ชัดเจนถึงระดับที่ต้องลงรุนแรง'):'อย่างมีนัยสำคัญ'} แนะนำชะลอการเปิดสถานะซื้อใหม่`;
+      verdict = `<strong>ระวังขาลง</strong> — ${DN.Scenario_Signal||'สัญญาณขาย'}. แรงขาย (${sellS.toFixed(0)}) vs แรงซื้อ (${buyS.toFixed(0)}) ${sellS-buyS<30?hlGold('ยังไม่ extreme'):'ชัด'} ยังไม่ควรเข้า long`;
     }
   } else {
     verdictClass = 'verdict-hold';
     if(buyS >= 55 && sellS >= 55){
-      verdict = `<strong>มุมมองเป็นกลาง — แนะนำถือสถานะ</strong> ตลาดอยู่ในภาวะ ${hlGold('Tug of War')} ทั้งฝั่งซื้อ (${buyS.toFixed(0)}) และฝั่งขาย (${sellS.toFixed(0)}) ต่างมีน้ำหนักใกล้เคียงกัน ยังไม่มีฝ่ายใดได้เปรียบ แนะนำให้รอความชัดเจนของทิศทางก่อนเปิด position ใหม่`;
+      verdict = `<strong>ถือมือไว้</strong> — ${hlGold('Tug of War')}: ทั้ง Buy (${buyS.toFixed(0)}) และ Sell (${sellS.toFixed(0)}) แข็งพร้อมกัน ยังไม่ชัดว่าใครชนะ. รอ Delta แยกทางกัน (ฝั่งนึงเร่ง ฝั่งนึงชะลอ) ก่อนเข้า position ใหม่`;
     } else if(buyS < 45 && sellS < 45){
-      verdict = `<strong>มุมมองรอจังหวะ</strong> ตลาดอยู่ใน ${hlGold('Dead Zone')} ทั้งสองฝั่งอ่อนแรงพร้อมกัน (Buy ${buyS.toFixed(0)} / Sell ${sellS.toFixed(0)}) ยังไม่มีทิศทางที่ชัดเจน แนะนำให้รอจังหวะ breakout ที่ยืนยันก่อนเปิด position ใหม่`;
+      verdict = `<strong>รออยู่ข้างสนาม</strong> — ${hlGold('Dead Zone')}: ทั้งสองฝั่งอ่อน (Buy ${buyS.toFixed(0)} / Sell ${sellS.toFixed(0)}). ตลาดไม่มีทิศทาง อย่าเข้า position ใหม่ รอ breakout ชัดๆ`;
     } else {
-      verdict = `<strong>มุมมองรอสัญญาณยืนยัน</strong> ${DN.Scenario_Signal||'Mixed Signal'} โดย Net Bias อยู่ที่ ${nb>=0?'+':''}${nb.toFixed(0)} คะแนน ${Math.abs(nb)<20?hlGold('ยังไม่ผ่านระดับยืนยันที่ ±20'):''} ${exBuy!=='None'||exSell!=='None'?'อีกทั้งยังพบสัญญาณการหมดแรงเตือนอยู่':'แนะนำให้ติดตามตัวเลขในอีก 1-2 วันข้างหน้า'}`;
+      verdict = `<strong>รอสัญญาณชัดเจน</strong> — ${DN.Scenario_Signal||'Mixed'}. Net Bias ${nb>=0?'+':''}${nb.toFixed(0)} ${Math.abs(nb)<20?hlGold('ยังไม่ extreme'):''}. ${exBuy!=='None'||exSell!=='None'?'มีสัญญาณ exhaustion เตือน':'ให้ตัวเลขพัฒนาอีก 1-2 วัน'}`;
     }
   }
 
@@ -2994,7 +2992,7 @@ function renderAIAnalysis(){
         ${warnParts.length ? `
         <div class="ai-section">
           <div class="ai-section-label">Signals &amp; Macro</div>
-          <div>${warnParts.join(' ')}</div>
+          <div>${warnParts.join(' • ')}</div>
         </div>` : ''}
         <div class="ai-verdict ${verdictClass}">
           <span class="ai-verdict-label">Verdict</span>${verdict}
