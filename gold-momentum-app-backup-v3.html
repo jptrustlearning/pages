@@ -56,7 +56,11 @@
 [data-theme="dark"] .action-badge.buy{color:#0B0E11}
 [data-theme="dark"] .action-badge.sell{color:#0B0E11}
 [data-theme="dark"] .action-badge.hold{color:#0B0E11}
-/* Theme toggle removed — light theme only */
+/* ── Theme Toggle ── */
+.theme-toggle{display:flex;align-items:center;gap:6px;cursor:pointer;padding:7px 16px;border-radius:50px;border:1px solid var(--border2);background:var(--bg2);font-size:.78rem;font-weight:600;color:var(--text2);transition:all .3s;user-select:none}
+.theme-toggle:hover{border-color:var(--gold);color:var(--text)}
+.theme-toggle .toggle-icon{font-size:1rem;transition:transform .3s}
+[data-theme="dark"] .theme-toggle .toggle-icon{transform:rotate(180deg)}
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;font-size:clamp(14px,1.6vw,18px)}
 body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;font-size:1rem;line-height:1.6;-webkit-font-smoothing:antialiased}
@@ -129,47 +133,6 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height
 .h1-amp{
   color:#D4AF37;font-style:italic;
   font-family:'DM Serif Display',serif;margin:0 0.08em;
-}
-/* Hero gold price (huge number above status) */
-.luxe-hero-price{
-  padding-left:36px;
-  margin:18px 0 14px;
-  display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
-}
-.luxe-hero-price .lhp-currency{
-  font-family:'Cinzel',serif;font-size:.7rem;font-weight:600;
-  letter-spacing:3px;color:#D4AF37;text-transform:uppercase;
-  align-self:center;
-}
-.luxe-hero-price .lhp-value{
-  font-family:'DM Serif Display',serif;
-  font-size:clamp(2.4rem,7vw,3.6rem);
-  line-height:1;font-weight:400;
-  color:#F4E4BA;
-  letter-spacing:-0.5px;
-  text-shadow:
-    0 0 30px rgba(212,175,55,0.45),
-    0 0 60px rgba(212,175,55,0.2),
-    0 2px 8px rgba(0,0,0,0.6);
-  animation:lhpGlow 4s ease-in-out infinite;
-}
-@keyframes lhpGlow{
-  0%,100%{text-shadow:0 0 30px rgba(212,175,55,0.45),0 0 60px rgba(212,175,55,0.2),0 2px 8px rgba(0,0,0,0.6)}
-  50%{text-shadow:0 0 40px rgba(212,175,55,0.7),0 0 90px rgba(212,175,55,0.35),0 2px 8px rgba(0,0,0,0.6)}
-}
-.luxe-hero-price .lhp-delta{
-  font-family:'Sarabun','Anuphan',sans-serif;
-  font-size:.78rem;font-weight:600;
-  padding:3px 10px;border-radius:6px;
-  letter-spacing:.3px;
-  align-self:center;
-}
-.luxe-hero-price .lhp-delta.up{color:#7FEBA8;background:rgba(46,159,95,0.15);border:1px solid rgba(127,235,168,0.3)}
-.luxe-hero-price .lhp-delta.down{color:#F87171;background:rgba(193,69,69,0.15);border:1px solid rgba(248,113,113,0.3)}
-.luxe-hero-price .lhp-unit{
-  font-family:'Cinzel',serif;font-size:.62rem;
-  letter-spacing:1.5px;color:rgba(244,228,186,0.5);
-  text-transform:uppercase;align-self:center;
 }
 .status-box{
   display:flex;align-items:center;gap:10px;flex-wrap:wrap;
@@ -654,15 +617,9 @@ body{padding-bottom:80px !important}
     <div class="header-title-wrap">
       <h1>Gold XAU/USD <span class="h1-amp">&amp;</span> Sentiment Lab</h1>
     </div>
-    <!-- Hero Gold Price (big number, fintech-app style) -->
-    <div class="luxe-hero-price" id="luxeHeroPrice">
-      <span class="lhp-currency">XAU/USD</span>
-      <span class="lhp-value" id="luxeHeroPriceVal">—</span>
-      <span class="lhp-unit">USD/oz</span>
-    </div>
     <div class="status-box">
       <div id="status" class="luxe-status loading"><span>●</span> Connecting</div>
-      <div id="luxeDateTag" class="luxe-status" style="display:none"></div>
+      <div class="theme-toggle" onclick="toggleTheme()" style="margin-left:auto"><span class="toggle-icon">☀️</span> <span id="themeLabel">Light</span></div>
     </div>
   </header>
 
@@ -1559,32 +1516,22 @@ function renderConfluenceZones(){
 // ── Hero ──
 function renderHero(){
   const p=fi('Price');
-  // Hero section is empty — data shown in luxe header (price + date) and infinity below
+  // Hero section is now empty — data shown via luxe header price pill + infinity below
   document.getElementById('heroSection').innerHTML='';
-
-  // 1. Big hero price in luxe header
-  const priceVal = document.getElementById('luxeHeroPriceVal');
-  if(priceVal && p > 0){
-    priceVal.textContent = '$' + p.toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:2});
-  }
-
-  // 2. Date tag next to "Connected" status (replaces previous price badge)
-  const dateTag = document.getElementById('luxeDateTag');
-  if(dateTag && D && D.As_Of_Running){
-    // Format: "As of 19 Apr 2026 · 02:01 UTC" → keep clean, derive from CSV date
-    let dateStr = D.As_Of_Running;
-    // Try to parse and format nicely
-    const dateMatch = dateStr.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4}).*?(\d{1,2}:\d{2})/);
-    if(dateMatch){
-      const [_, dd, mm, yyyy, time] = dateMatch;
-      const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      const monthIdx = parseInt(mm,10) - 1;
-      if(monthIdx >= 0 && monthIdx < 12){
-        dateStr = `${parseInt(dd,10)} ${monthNames[monthIdx]} ${yyyy} · ${time}`;
-      }
+  // Inject gold spot price as a small badge into luxe header status box
+  const statusBox = document.querySelector('.status-box');
+  if(statusBox && p > 0){
+    let priceBadge = document.getElementById('luxe-price-badge');
+    if(!priceBadge){
+      priceBadge = document.createElement('div');
+      priceBadge.id = 'luxe-price-badge';
+      priceBadge.style.cssText = 'display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:50px;background:rgba(212,175,55,0.12);color:#F5D76E;border:1px solid rgba(212,175,55,0.3);font-family:DM Serif Display,serif;font-size:0.78rem;letter-spacing:0.3px;backdrop-filter:blur(6px)';
+      // Insert before theme-toggle (so it sits between status pill and toggle)
+      const toggle = statusBox.querySelector('.theme-toggle');
+      if(toggle) statusBox.insertBefore(priceBadge, toggle);
+      else statusBox.appendChild(priceBadge);
     }
-    dateTag.innerHTML = `<span style="color:#D4AF37;font-family:Cinzel,serif;font-size:0.6rem;letter-spacing:1.5px;text-transform:uppercase">As of</span> ${dateStr}`;
-    dateTag.style.display = 'inline-flex';
+    priceBadge.innerHTML = `<span style="font-family:Cinzel,serif;font-size:0.6rem;letter-spacing:1.5px;color:#D4AF37;text-transform:uppercase">XAU</span> $${p.toLocaleString('en-US',{minimumFractionDigits:1})}`;
   }
 }
 
@@ -2572,7 +2519,40 @@ const THEME_COLORS = {
   }
 };
 
-// Theme toggle removed — light theme only.
+let currentTheme = 'light';
+
+function toggleTheme(){
+  currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', currentTheme === 'dark' ? 'dark' : '');
+  document.getElementById('themeLabel').textContent = currentTheme === 'light' ? 'Light' : 'Dark';
+  document.querySelector('.toggle-icon').textContent = currentTheme === 'light' ? '☀️' : '🌙';
+  try { localStorage.setItem('gm-theme', currentTheme); } catch(e){}
+  // Re-render charts with correct colors
+  if(D) {
+    // Destroy existing charts
+    Chart.helpers.each(Chart.instances, function(instance){ instance.destroy(); });
+    pivotChartInstance = null;
+    render();
+  }
+}
+
+// Apply saved theme on load
+(function(){
+  try {
+    const saved = localStorage.getItem('gm-theme');
+    if(saved === 'dark') {
+      currentTheme = 'dark';
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  } catch(e){}
+  // Update toggle UI
+  setTimeout(()=>{
+    const label = document.getElementById('themeLabel');
+    const icon = document.querySelector('.toggle-icon');
+    if(label) label.textContent = currentTheme === 'light' ? 'Light' : 'Dark';
+    if(icon) icon.textContent = currentTheme === 'light' ? '☀️' : '🌙';
+  }, 0);
+})();
 
 // Theme-aware color getter
 function tc(key){ return THEME_COLORS[currentTheme][key]; }
