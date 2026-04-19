@@ -66,167 +66,6 @@ html{scroll-behavior:smooth;font-size:clamp(14px,1.6vw,18px)}
 body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;font-size:1rem;line-height:1.6;-webkit-font-smoothing:antialiased}
 .container{max-width:1400px;width:95%;margin:0 auto;padding:2% 2.5%}
 
-/* ══════════════════════════════════════════════ */
-/* ★ LUXE HERO HEADER (matches sp500-strategy-pro) ★ */
-/* ══════════════════════════════════════════════ */
-.luxe-header{
-  position:relative;
-  margin:0 0 24px;
-  padding:20px 22px 18px;
-  border-radius:22px;
-  background:
-    radial-gradient(ellipse 80% 55% at 85% 20%, rgba(212,175,55,0.22), transparent 60%),
-    radial-gradient(ellipse 70% 60% at 15% 90%, rgba(139,34,82,0.35), transparent 65%),
-    linear-gradient(145deg, #0f0507 0%, #1a0a0e 25%, #2d1018 55%, #1a0a0e 85%, #0a0305 100%);
-  box-shadow:
-    0 10px 34px rgba(26,10,14,0.45),
-    0 0 0 1px rgba(212,175,55,0.18),
-    inset 0 1px 0 rgba(212,175,55,0.12);
-  overflow:hidden;
-}
-.luxe-header::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:1.5px;
-  background:linear-gradient(90deg, transparent, rgba(212,175,55,0.6), rgba(244,228,186,0.9), rgba(212,175,55,0.6), transparent);
-  z-index:3;
-}
-.luxe-header::after{
-  content:'';position:absolute;top:-50px;right:-50px;
-  width:200px;height:200px;border-radius:50%;
-  background:radial-gradient(circle, rgba(212,175,55,0.14), transparent 60%);
-  pointer-events:none;
-}
-.luxe-header > *{position:relative;z-index:2}
-.subtitle-lab{
-  font-family:'Cinzel','Anuphan',serif;
-  font-size:0.66rem;font-weight:600;color:#D4AF37;
-  letter-spacing:3.5px;text-transform:uppercase;
-  margin-bottom:12px;
-  text-shadow:0 1px 2px rgba(0,0,0,0.5);
-  display:flex;align-items:center;gap:10px;
-}
-.subtitle-lab::after{
-  content:'';flex:1;height:1px;max-width:60px;
-  background:linear-gradient(90deg, rgba(212,175,55,0.5), transparent);
-}
-.header-title-wrap{
-  padding-left:36px;
-  position:relative;
-  margin-bottom:14px;
-}
-.header-title-wrap::before{
-  content:'';position:absolute;left:22px;top:4px;bottom:4px;
-  width:4px;
-  background:linear-gradient(180deg, #D4AF37 0%, #8B2252 100%);
-  border-radius:3px;
-  box-shadow:0 0 12px rgba(212,175,55,0.4);
-}
-.luxe-header h1{
-  font-family:'DM Serif Display','Sarabun','Anuphan',serif;
-  font-weight:400;
-  font-size:1.5rem;line-height:1.25;
-  color:#F4E4BA;
-  margin:0;
-  letter-spacing:0.005em;
-  text-shadow:0 1px 3px rgba(0,0,0,0.55);
-  display:block;
-}
-.h1-amp{
-  color:#D4AF37;font-style:italic;
-  font-family:'DM Serif Display',serif;margin:0 0.08em;
-}
-.status-box{
-  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
-  padding-left:36px;
-}
-.luxe-status{
-  display:inline-flex;align-items:center;gap:5px;
-  font-family:'Anuphan','Sarabun',sans-serif;
-  font-size:0.62rem;font-weight:500;
-  padding:3px 10px;border-radius:50px;
-  background:rgba(255,255,255,0.06);color:#F4E4BA;
-  border:1px solid rgba(244,228,186,0.16);
-  transition:all 0.3s ease;
-  backdrop-filter:blur(6px);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);
-  letter-spacing:0.3px;
-  white-space:nowrap;
-  text-transform:none;
-}
-.luxe-status.loading{color:#F4E4BA;border-color:rgba(212,175,55,0.35);background:rgba(212,175,55,0.08)}
-.luxe-status.loading span:first-child{color:#D4AF37;animation:luxeStatusBlink 1.2s ease-in-out infinite}
-.luxe-status.success{color:#7FEBA8;border-color:rgba(127,235,168,0.35);background:rgba(46,159,95,0.1)}
-.luxe-status.success span:first-child{color:#7FEBA8}
-.luxe-status.error{color:rgba(244,228,186,0.6);border-color:rgba(122,111,98,0.3);background:rgba(0,0,0,0.2)}
-@keyframes luxeStatusBlink{0%,100%{opacity:1}50%{opacity:0.3}}
-
-@media (max-width:600px){
-  .luxe-header{padding:18px 18px 16px;border-radius:18px;margin-bottom:20px}
-  .subtitle-lab{font-size:0.62rem;letter-spacing:3px;margin-bottom:10px}
-  .header-title-wrap{margin-bottom:12px;padding-left:30px}
-  .header-title-wrap::before{left:18px}
-  .status-box{padding-left:30px}
-  .luxe-header h1{font-size:1.25rem}
-}
-
-/* ══════════════════════════════════════════════ */
-/* ★ OWL LOADER (matches sp500-strategy-pro)     ★ */
-/* ══════════════════════════════════════════════ */
-#owlLoadingScreen{
-  display:flex;align-items:center;justify-content:center;min-height:60vh;
-}
-.owl-loader-wrap{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:60px 20px;min-height:420px;gap:28px;
-}
-.owl-loader-stage{
-  position:relative;width:200px;height:200px;
-  display:flex;align-items:center;justify-content:center;
-}
-.owl-loader-ring{
-  position:absolute;inset:0;width:100%;height:100%;
-  transform:rotate(-90deg);
-  filter:drop-shadow(0 0 10px rgba(46,159,95,0.3)) drop-shadow(0 0 14px rgba(212,175,55,0.25));
-}
-.owl-loader-ring-bg{fill:none;stroke:rgba(139,105,20,0.25);stroke-width:8}
-.owl-loader-ring-fg{
-  fill:none;stroke:url(#owlRingGrad);stroke-width:8;stroke-linecap:round;
-  stroke-dasharray:565.48;stroke-dashoffset:565.48;
-  transition:stroke-dashoffset 0.35s cubic-bezier(0.4,0,0.2,1);
-}
-.owl-loader-img{
-  width:100px;height:100px;object-fit:contain;
-  animation:owlFloat 2.8s ease-in-out infinite;
-  filter:drop-shadow(0 4px 12px rgba(46,159,95,0.25)) drop-shadow(0 2px 8px rgba(212,175,55,0.3));
-  margin-top:-22px;
-}
-@keyframes owlFloat{
-  0%,100%{transform:translateY(0)}
-  50%{transform:translateY(-8px)}
-}
-.owl-loader-text{
-  font-family:'Sarabun','Anuphan',sans-serif;font-size:0.95rem;font-weight:700;
-  color:#8B6914;letter-spacing:3px;text-align:center;
-  text-transform:uppercase;
-}
-[data-theme="dark"] .owl-loader-text{color:var(--gold)}
-.loader-dots-left,.loader-dots-right{
-  display:inline-block;color:#2E9F5F;
-  animation:loaderDotsBlink 1.4s ease-in-out infinite;
-  letter-spacing:2px;font-weight:700;
-}
-.loader-dots-right{animation-delay:0.7s}
-@keyframes loaderDotsBlink{
-  0%,100%{opacity:0.25;transform:translateY(0)}
-  50%{opacity:1;transform:translateY(-2px)}
-}
-.owl-loader-pct{
-  font-family:'DM Serif Display',serif;font-size:1.75rem;font-weight:400;
-  color:#722F37;letter-spacing:0;
-  position:absolute;left:50%;top:62%;transform:translate(-50%,-50%);
-  text-shadow:0 1px 6px rgba(255,254,248,0.8);
-}
-[data-theme="dark"] .owl-loader-pct{color:var(--gold)}
-
 .header{text-align:center;padding:3% 0 2.5%;position:relative}
 .header::before{content:'';position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:70%;height:350px;background:radial-gradient(ellipse,rgba(26,115,232,.06) 0%,rgba(26,115,232,.02) 40%,transparent 70%);pointer-events:none}
 .header h1{font-family:var(--font-h);font-size:clamp(2.2rem,5vw,3.5rem);font-weight:800;background:linear-gradient(135deg,#1A73E8,#4285F4,#1A73E8,#1565C0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:1px;margin-bottom:6px}
@@ -611,42 +450,18 @@ body{padding-bottom:80px !important}
 </head>
 <body>
 <div class="container">
-  <!-- ★ LUXE HERO HEADER ★ -->
-  <header class="luxe-header">
-    <div class="subtitle-lab">LAB · GOLD MOMENTUM</div>
-    <div class="header-title-wrap">
-      <h1>Gold XAU/USD <span class="h1-amp">&amp;</span> Sentiment Lab</h1>
-    </div>
-    <div class="status-box">
-      <div id="status" class="luxe-status loading"><span>●</span> Connecting</div>
-      <div class="theme-toggle" onclick="toggleTheme()" style="margin-left:auto"><span class="toggle-icon">☀️</span> <span id="themeLabel">Light</span></div>
-    </div>
+  <header class="header">
+    <h1>Gold Momentum Score</h1>
+    <div class="sub">JP Trust Learning &bull; Rolling Percentile + Macro Factor Analysis v3.0 — All Dimensions /100</div>
+    <div class="period" id="periodLabel">Loading...</div>
   </header>
 
-  <!-- ★ OWL LOADER ★ -->
-  <div id="owlLoadingScreen">
-    <div class="owl-loader-wrap">
-      <div class="owl-loader-stage">
-        <svg class="owl-loader-ring" viewBox="0 0 200 200">
-          <defs>
-            <linearGradient id="owlRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#2E9F5F"/>
-              <stop offset="40%" stop-color="#5BC48E"/>
-              <stop offset="75%" stop-color="#D4AF37"/>
-              <stop offset="100%" stop-color="#8B6914"/>
-            </linearGradient>
-          </defs>
-          <circle class="owl-loader-ring-bg" cx="100" cy="100" r="90"/>
-          <circle id="owlLoaderRingFg" class="owl-loader-ring-fg" cx="100" cy="100" r="90"/>
-        </svg>
-        <img src="jpt-owl-logo.png" alt="JP Trust" class="owl-loader-img" onerror="this.style.display='none'">
-        <div id="owlLoaderPct" class="owl-loader-pct">0%</div>
-      </div>
-      <div class="owl-loader-text"><span class="loader-dots-left">...</span> Initializing <span class="loader-dots-right">...</span></div>
-    </div>
+  <div class="status-bar">
+    <div id="status" class="status-indicator loading"><span>●</span> CONNECTING TO GITHUB...</div>
+    <div class="theme-toggle" onclick="toggleTheme()"><span class="toggle-icon">☀️</span> <span id="themeLabel">Light</span></div>
   </div>
 
-  <div id="loadingMsg" class="loading-msg" style="display:none">/// LOADING DATA FROM GITHUB...</div>
+  <div id="loadingMsg" class="loading-msg">/// LOADING DATA FROM GITHUB...</div>
 
   <div id="dashboard" class="hidden">
     <div class="hero" id="heroSection"></div>
@@ -781,24 +596,8 @@ let D=null,DS=null,DN=null,PIVOT=null,PIVOT_ALL=null,CONFLUENCES=[],UPZ_ZONES=[]
 
 document.addEventListener('DOMContentLoaded',loadData);
 
-// Owl loader progress (2πr ≈ 565.48 with r=90)
-function updateOwlProgress(pct){
-  const ring=document.getElementById('owlLoaderRingFg');
-  const label=document.getElementById('owlLoaderPct');
-  if(!ring||!label)return;
-  const clamped=Math.max(0,Math.min(100,pct));
-  ring.style.strokeDashoffset=565.48*(1-clamped/100);
-  label.textContent=Math.round(clamped)+'%';
-}
-
 async function loadData(){
   const st=document.getElementById('status');
-  // Smooth owl progress simulation while fetching
-  let owlPct=0;
-  const owlTick=setInterval(()=>{
-    owlPct=Math.min(owlPct+Math.random()*8+2,90);
-    updateOwlProgress(owlPct);
-  },180);
   try{
     const [sRes,sellRes,netRes,pRes]=await Promise.all([fetch(CSV_URL),fetch(SELL_CSV_URL),fetch(NET_CSV_URL),fetch(PRICE_CSV_URL)]);
     if(!sRes.ok)throw new Error('Buy CSV: HTTP '+sRes.status);
@@ -819,24 +618,17 @@ async function loadData(){
     UPZ_ZONES=parseUPZ(D);
     PRICE_DATA=parsePriceCSV(pText);
     if(PIVOT) PIVOT.price=parseFloat(D.Price)||0;
-    st.className='luxe-status success';
-    st.innerHTML='<span>●</span> Connected';
-    // Finish owl progress + hide loader
-    clearInterval(owlTick);
-    updateOwlProgress(100);
-    setTimeout(()=>{
-      const owl=document.getElementById('owlLoadingScreen');
-      if(owl) owl.style.display='none';
-      document.getElementById('dashboard').classList.remove('hidden');
-      render();
-    },400);
+    st.className='status-indicator success';
+    st.innerHTML='<span>●</span> DATA LOADED — BUY + SELL + NET BIAS + PIVOT';
+    document.getElementById('periodLabel').textContent='As of: '+D.As_Of_Running+'  •  BD1: '+D.Base_Date_1+'  •  BD2: '+D.Base_Date_2;
+    document.getElementById('loadingMsg').classList.add('hidden');
+    document.getElementById('dashboard').classList.remove('hidden');
+    render();
   }catch(e){
-    clearInterval(owlTick);
     console.error(e);
-    st.className='luxe-status error';
-    st.innerHTML='<span>●</span> Failed — '+e.message;
-    const lm=document.getElementById('loadingMsg');
-    if(lm){lm.style.display='block';lm.textContent='Error loading data. Check console.';}
+    st.className='status-indicator error';
+    st.innerHTML='<span>●</span> FAILED — '+e.message;
+    document.getElementById('loadingMsg').textContent='Error loading data. Check console.';
   }
 }
 
@@ -1515,24 +1307,63 @@ function renderConfluenceZones(){
 
 // ── Hero ──
 function renderHero(){
-  const p=fi('Price');
-  // Hero section is now empty — data shown via luxe header price pill + infinity below
-  document.getElementById('heroSection').innerHTML='';
-  // Inject gold spot price as a small badge into luxe header status box
-  const statusBox = document.querySelector('.status-box');
-  if(statusBox && p > 0){
-    let priceBadge = document.getElementById('luxe-price-badge');
-    if(!priceBadge){
-      priceBadge = document.createElement('div');
-      priceBadge.id = 'luxe-price-badge';
-      priceBadge.style.cssText = 'display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:50px;background:rgba(212,175,55,0.12);color:#F5D76E;border:1px solid rgba(212,175,55,0.3);font-family:DM Serif Display,serif;font-size:0.78rem;letter-spacing:0.3px;backdrop-filter:blur(6px)';
-      // Insert before theme-toggle (so it sits between status pill and toggle)
-      const toggle = statusBox.querySelector('.theme-toggle');
-      if(toggle) statusBox.insertBefore(priceBadge, toggle);
-      else statusBox.appendChild(priceBadge);
-    }
-    priceBadge.innerHTML = `<span style="font-family:Cinzel,serif;font-size:0.6rem;letter-spacing:1.5px;color:#D4AF37;text-transform:uppercase">XAU</span> $${p.toLocaleString('en-US',{minimumFractionDigits:1})}`;
-  }
+  const n=fi('Net_Score_Avg'),t=D.Tier,p=fi('Price'),d=fi('Score_Delta'),b1=fi('Net_Score_BD1'),b2=fi('Net_Score_BD2');
+  const sellScore=DS?parseFloat(DS.Net_Score_Avg||0):0;
+  const sellBD1=DS?parseFloat(DS.Net_Score_BD1||0):0;
+  const buyBD1=fi('Net_Score_BD1');
+  const netBias=DN?parseFloat(DN.Net_Bias||0):n-sellScore;
+  const biasTier=DN?DN.Bias_Tier:'';
+  const scenAction=DN?DN.Scenario_Action:'';
+  const scenSignal=DN?DN.Scenario_Signal:'';
+  const scenIcon=DN?DN.Scenario_Icon:'';
+  const actionCls=scenAction==='BUY'?'buy':scenAction==='SELL'?'sell':'hold';
+  const buyDelta=DN?parseFloat(DN.Buy_Delta||0):(n-buyBD1);
+  const sellDelta=DN?parseFloat(DN.Sell_Delta||0):(sellScore-sellBD1);
+  const buyPrev=n-buyDelta;
+  const sellPrev=sellScore-sellDelta;
+  // Combined Signal — read directly from net CSV
+  const buyS=n,sellS=sellScore,nb=netBias;
+  const comboRaw=DN?DN.Combined_Signal:'';
+  let comboName='',comboColor2='';
+  if(comboRaw.includes('Full Bullish')){comboName='🟢 '+comboRaw;comboColor2='var(--emerald)';}
+  else if(comboRaw.includes('Bullish Dominant')){comboName='🟢 '+comboRaw;comboColor2='#8BD4B0';}
+  else if(comboRaw.includes('Full Bearish')){comboName='🔴 '+comboRaw;comboColor2='var(--red)';}
+  else if(comboRaw.includes('Bearish Dominant')){comboName='🔴 '+comboRaw;comboColor2='#F87171';}
+  else if(comboRaw.includes('Tug')){comboName='🟡 '+comboRaw;comboColor2='var(--gold)';}
+  else if(comboRaw.includes('Lean Bullish')){comboName='🟢 '+comboRaw;comboColor2='#8BD4B0';}
+  else if(comboRaw.includes('Lean Bearish')){comboName='🔴 '+comboRaw;comboColor2='#F87171';}
+  else if(comboRaw.includes('Dead')){comboName='⚪ '+comboRaw;comboColor2='var(--text3)';}
+  else{comboName='⚪ '+(comboRaw||'Mixed Signal');comboColor2='var(--text3)';}
+
+  document.getElementById('heroSection').innerHTML=`
+    <div class="hero-score"><div class="ring"><canvas id="ringCanvas" width="200" height="200"></canvas>
+      <div class="center"><div class="v" style="color:${scoreColor(n)}">${n.toFixed(1)}</div><div class="l">Buy Score</div></div></div>
+      <div style="margin-top:8px;font-size:.88rem;color:var(--text3);text-align:center">prev: <span style="color:${scoreColor(buyPrev)}">${buyPrev.toFixed(1)}</span> <span style="color:${buyDelta>=0?'var(--emerald)':'var(--red)'}">(${buyDelta>=0?'+':''}${buyDelta.toFixed(1)})</span></div>
+    </div>
+    <div class="hero-tier">
+      <div style="font-size:.85rem;color:${comboColor2};font-weight:700;margin-bottom:6px">${comboName}</div>
+      <div class="price hero-price-glow" style="font-size:2.8rem">$${p.toLocaleString('en-US',{minimumFractionDigits:1})}</div><div class="price-label">Gold Spot Price</div>
+      ${scenSignal?`<div style="margin-top:14px;padding:10px 20px;background:rgba(0,0,0,.03);border:1px solid var(--border2);border-radius:12px">
+        <div style="font-size:1rem;font-weight:700">${scenIcon} ${scenSignal}</div>
+        <span class="sc-action ${actionCls}" style="margin-top:4px;display:inline-block;padding:4px 14px;border-radius:6px;font-size:.85rem;font-weight:800;letter-spacing:1.5px">${scenAction}</span>
+      </div>`:''}
+    </div>
+    <div class="hero-score"><div class="ring"><canvas id="ringSellCanvas" width="200" height="200"></canvas>
+      <div class="center"><div class="v" style="color:${sellScore>=60?'var(--red)':sellScore>=45?'var(--orange)':'var(--text3)'}">${sellScore.toFixed(1)}</div><div class="l">Sell Score</div></div></div>
+      <div style="margin-top:8px;font-size:.88rem;color:var(--text3);text-align:center">prev: <span style="color:${sellPrev>=60?'var(--red)':sellPrev>=45?'var(--orange)':'var(--text3)'}">${sellPrev.toFixed(1)}</span> <span style="color:${sellDelta>=0?'var(--red)':'var(--emerald)'}">(${sellDelta>=0?'+':''}${sellDelta.toFixed(1)})</span></div>
+    </div>`;
+  setTimeout(()=>{
+    const c=document.getElementById('ringCanvas');if(c){const x=c.getContext('2d');
+    const cx=100,cy=100,r=85,lw=10,pct=Math.max(0,Math.min(n/100,1)),sA=-Math.PI/2,eA=sA+pct*2*Math.PI;
+    x.beginPath();x.arc(cx,cy,r,0,2*Math.PI);x.strokeStyle=tc('ringBg');x.lineWidth=lw;x.stroke();
+    const br=tc('buyRing');const gr=x.createLinearGradient(0,0,200,200);gr.addColorStop(0,br[0]);gr.addColorStop(.5,br[1]);gr.addColorStop(1,br[2]);
+    x.beginPath();x.arc(cx,cy,r,sA,eA);x.strokeStyle=gr;x.lineWidth=lw;x.lineCap='round';x.stroke();}
+    const c2=document.getElementById('ringSellCanvas');if(c2){const x2=c2.getContext('2d');
+    const cx=100,cy=100,r=85,lw=10,pct2=Math.max(0,Math.min(sellScore/100,1)),sA=-Math.PI/2,eA2=sA+pct2*2*Math.PI;
+    x2.beginPath();x2.arc(cx,cy,r,0,2*Math.PI);x2.strokeStyle=tc('ringBg');x2.lineWidth=lw;x2.stroke();
+    const sr=tc('sellRing');const gr2=x2.createLinearGradient(0,0,200,200);gr2.addColorStop(0,sr[0]);gr2.addColorStop(.5,sr[1]);gr2.addColorStop(1,sr[2]);
+    x2.beginPath();x2.arc(cx,cy,r,sA,eA2);x2.strokeStyle=gr2;x2.lineWidth=lw;x2.lineCap='round';x2.stroke();}
+  },100);
 }
 
 // ── Stats (moved to Technical Details) ──
