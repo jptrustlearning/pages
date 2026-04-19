@@ -1115,28 +1115,20 @@ body{padding-bottom:80px !important}
       <div class="dim-grid" id="dimGrid"></div>
     </div>
 
-    <!-- ★ CONTEXT — TABBED (3-in-1: Macro Signals + Returns + Z-Score Regime) ★ -->
     <div class="section fade-up">
-      <div class="section-title"><span class="dot"></span>Context — Macro / Returns / Regime</div>
-      <div class="zone-tabs-container" id="contextTabsContainer">
-        <div class="zone-tabs-header">
-          <button class="zone-tab-btn active" onclick="switchContextTab(event,'ctx-macro')">Macro</button>
-          <button class="zone-tab-btn" onclick="switchContextTab(event,'ctx-returns')">Returns</button>
-          <button class="zone-tab-btn" onclick="switchContextTab(event,'ctx-zscore')">Z-Score</button>
-        </div>
+      <div class="section-title"><span class="dot"></span>Macro Factor Signals — DXY &amp; VIX</div>
+      <div class="macro-grid" id="macroGrid"></div>
+    </div>
 
-        <div id="ctx-macro" class="zone-tab-content active">
-          <div class="macro-grid" id="macroGrid"></div>
-        </div>
+    <div class="section fade-up">
+      <div class="section-title"><span class="dot"></span>Return Performance &amp; Rolling Percentile</div>
+      <div class="ret-grid" id="retGrid"></div>
+    </div>
 
-        <div id="ctx-returns" class="zone-tab-content">
-          <div class="ret-grid" id="retGrid"></div>
-        </div>
-
-        <div id="ctx-zscore" class="zone-tab-content">
-          <div id="zscoreContent"></div>
-        </div>
-      </div>
+    <!-- ★ Z-SCORE REGIME FILTER ★ -->
+    <div class="section fade-up" id="zscoreSection">
+      <div class="section-title"><span class="dot"></span>Z-Score Regime Filter — ราคาปัจจุบันอยู่ตรงไหนของ Distribution</div>
+      <div id="zscoreContent"></div>
     </div>
 
     <div class="section fade-up" style="display:none">
@@ -3169,19 +3161,6 @@ function switchDimTab(evt, tabId){
       if(tabId === 'dim-sell-radar' && window.radarSellInstance) window.radarSellInstance.resize();
     } catch(e){}
   }, 50);
-}
-
-// ── Context Tab Switcher (3-in-1 section: Macro + Returns + Z-Score) ──
-function switchContextTab(evt, tabId){
-  const container = document.getElementById('contextTabsContainer');
-  if(!container) return;
-  const contents = container.querySelectorAll('.zone-tab-content');
-  const btns = container.querySelectorAll('.zone-tab-btn');
-  contents.forEach(c => c.classList.remove('active'));
-  btns.forEach(b => b.classList.remove('active'));
-  const target = document.getElementById(tabId);
-  if(target) target.classList.add('active');
-  if(evt && evt.currentTarget) evt.currentTarget.classList.add('active');
 }
 
 // ══════════════════════════════════════════════════════════
