@@ -2162,6 +2162,14 @@ function renderNetBias(){
         NET BIAS <span class="nb-val ${nbCls}">${nb>=0?'+':''}${nb.toFixed(0)}</span>
         <span class="nb-tier">${netTier}</span>
       </div>
+      <div class="sentiment-combo-bar">
+        <span class="combo-icon">${si||'📊'}</span>
+        <div style="flex:1;min-width:120px">
+          <div class="combo-label">${ss||comboLabel}</div>
+          <div class="combo-thai">${sth||''}</div>
+        </div>
+        <span class="combo-action ${actionCls}" style="background:${actionBg};color:#fff;box-shadow:0 0 16px ${actionShadow}">${sa}</span>
+      </div>
     </div>
     <div id="summaryCardsSection"></div>
     <div id="aiAnalysisSection"></div>`;
@@ -2315,7 +2323,7 @@ function renderSummaryCards(){
 
   const card1 = `
     <div class="summary-card" title="${ss}">
-      <div class="sc-label">SCENARIO</div>
+      <div class="sc-label"><span class="sc-icon">${si}</span> SCENARIO</div>
       <div class="sc-value ${actionCls}" style="font-size:1.15rem;line-height:1.2">${ss || 'Mixed Signal'}</div>
       <div class="sc-desc">${card1Desc}<br><strong>Buy ${buyS.toFixed(1)} · Sell ${sellS.toFixed(1)} · Net ${nb >= 0 ? '+' : ''}${nb.toFixed(1)}</strong>
         <span style="display:inline-block;margin-left:6px;padding:2px 8px;border-radius:4px;background:${actionBgInline};color:#fff;font-weight:800;font-size:.7rem;letter-spacing:1px">${sa}</span>
@@ -2336,12 +2344,12 @@ function renderSummaryCards(){
 
   const card2 = exBuyOn ? `
     <div class="summary-card">
-      <div class="sc-label">Buy Exhaustion</div>
+      <div class="sc-label"><span class="sc-icon">${exBuyIcon[exBuy]||'⚠️'}</span> Buy Exhaustion</div>
       <div class="sc-value signal-on" style="font-size:1.15rem;line-height:1.2">${exBuy}</div>
       <div class="sc-desc">${exBuyDesc[exBuy]||'สัญญาณเตือน'}${exBuyAct?` · <span class="sc-gold">→ ${exBuyAct}</span>`:''}</div>
     </div>` : `
     <div class="summary-card">
-      <div class="sc-label">Buy Exhaustion</div>
+      <div class="sc-label"><span class="sc-icon">✅</span> Buy Exhaustion</div>
       <div class="sc-value no-signal" style="font-size:1.35rem">No Signal</div>
       <div class="sc-desc">ไม่มีสัญญาณ exhaustion ฝั่ง Buy<br>โมเมนตัมขาซื้อ<span class="sc-pos">ยังปลอดภัย</span></div>
     </div>`;
@@ -2360,12 +2368,12 @@ function renderSummaryCards(){
 
   const card3 = exSellOn ? `
     <div class="summary-card">
-      <div class="sc-label">Sell Exhaustion</div>
+      <div class="sc-label"><span class="sc-icon">${exSellIcon[exSell]||'⚠️'}</span> Sell Exhaustion</div>
       <div class="sc-value signal-on" style="font-size:1.15rem;line-height:1.2">${exSell}</div>
       <div class="sc-desc">${exSellDesc[exSell]||'สัญญาณเตือน'}${exSellAct?` · <span class="sc-gold">→ ${exSellAct}</span>`:''}</div>
     </div>` : `
     <div class="summary-card">
-      <div class="sc-label">Sell Exhaustion</div>
+      <div class="sc-label"><span class="sc-icon">✅</span> Sell Exhaustion</div>
       <div class="sc-value no-signal" style="font-size:1.35rem">No Signal</div>
       <div class="sc-desc">ไม่มีสัญญาณ exhaustion ฝั่ง Sell<br>โมเมนตัมขาขาย<span class="sc-pos">ยังปลอดภัย</span></div>
     </div>`;
@@ -2403,7 +2411,7 @@ function renderSummaryCards(){
 
   const card4 = z50 !== null ? `
     <div class="summary-card">
-      <div class="sc-label">Z-Score 50d</div>
+      <div class="sc-label"><span class="sc-icon">${zoneIcon}</span> Z-Score 50d</div>
       <div class="sc-value ${zCls}">${z50 >= 0 ? '+' : ''}${z50.toFixed(3)}</div>
       <div class="sc-desc">
         <strong>${zZone.toUpperCase()} ZONE</strong> — ${zRegime || 'momentum score ใช้ได้ตามปกติ'}
@@ -2416,7 +2424,7 @@ function renderSummaryCards(){
       <div class="sc-desc">Z-Score data not available</div>
     </div>`;
 
-  el.innerHTML = `<div class="summary-cards-grid">${card2}${card3}${card1}${card4}</div>`;
+  el.innerHTML = `<div class="summary-cards-grid">${card1}${card2}${card3}${card4}</div>`;
 }
 
 // ══════════════════════════════════════════════════════════
