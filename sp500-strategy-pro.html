@@ -1881,7 +1881,18 @@
 <!-- FLOATING ACTION BUTTONS -->
 <div class="fab-stack">
   <button class="fab fab-secondary" onclick="openAboutModal()" aria-label="เกี่ยวกับกลยุทธ์">
-    <img src="jpt-owl-line.png" alt="owl" style="width:30px;height:30px;object-fit:contain;filter:brightness(0) invert(1) drop-shadow(0 1px 2px rgba(0,0,0,0.3));">
+    <svg width="32" height="32" viewBox="0 0 64 64" fill="none" stroke="#FFF5E1" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3))">
+      <!-- Bullseye target — 4 concentric rings, centered horizontally -->
+      <circle cx="32" cy="26" r="20"/>
+      <circle cx="32" cy="26" r="14"/>
+      <circle cx="32" cy="26" r="8"/>
+      <circle cx="32" cy="26" r="2.5" fill="#FFF5E1"/>
+      <!-- Tripod stand — two legs angled outward from below the target -->
+      <line x1="32" y1="46" x2="22" y2="60"/>
+      <line x1="32" y1="46" x2="42" y2="60"/>
+      <!-- Ground line connecting feet -->
+      <line x1="20" y1="60" x2="44" y2="60"/>
+    </svg>
     <span class="fab-tooltip">เกี่ยวกับกลยุทธ์</span>
   </button>
   <button class="fab fab-primary" onclick="openSettingsPanel()" aria-label="ตั้งค่าแบ็คเทส">
