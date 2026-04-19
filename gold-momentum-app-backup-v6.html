@@ -573,7 +573,18 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height
 .sentiment-combo-bar .combo-thai{font-size:.78rem;color:var(--text2);flex:1;min-width:120px}
 .sentiment-combo-bar .combo-action{margin-left:auto;padding:6px 18px;border-radius:8px;font-weight:800;font-size:.82rem;letter-spacing:2px}
 
-/* Split meter removed — redundant with infinity */
+/* Split meter */
+.sentiment-split{
+  display:flex;align-items:center;gap:10px;margin-top:10px;
+  font-size:.72rem;color:var(--text3);font-weight:600;
+  letter-spacing:1px;text-transform:uppercase;
+}
+.sentiment-split .split-track{
+  flex:1;height:6px;background:rgba(0,0,0,.04);border-radius:3px;
+  overflow:hidden;display:flex;border:1px solid var(--border);
+}
+.sentiment-split .split-buy{background:linear-gradient(90deg,var(--emerald),#5DD190);transition:width 1s cubic-bezier(.4,0,.2,1)}
+.sentiment-split .split-sell{background:linear-gradient(90deg,#F87171,var(--red));transition:width 1s cubic-bezier(.4,0,.2,1)}
 
 /* ══════════════════════════════════════════════ */
 /* ★ AI SMART ANALYSIS BOX                        */
@@ -2100,6 +2111,14 @@ function renderNetBias(){
           <div class="combo-thai">${sth||''}</div>
         </div>
         <span class="combo-action ${actionCls}" style="background:${actionBg};color:#fff;box-shadow:0 0 16px ${actionShadow}">${sa}</span>
+      </div>
+      <div class="sentiment-split">
+        <span style="color:var(--emerald)">${Math.round(buyPct)}%</span>
+        <div class="split-track">
+          <div class="split-buy" style="width:${buyPct}%"></div>
+          <div class="split-sell" style="width:${sellPct}%"></div>
+        </div>
+        <span style="color:var(--red)">${Math.round(sellPct)}%</span>
       </div>
     </div>
     <div id="aiAnalysisSection"></div>`;
