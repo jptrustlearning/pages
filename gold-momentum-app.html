@@ -2727,7 +2727,7 @@ function renderSummaryCards(){
 
   const actionCls = sa === 'BUY' ? 'positive' : sa === 'SELL' ? 'negative' : 'neutral';
   const actionBgInline = sa === 'BUY' ? '#2E9F5F' : sa === 'SELL' ? '#C14545' : '#8B6914';
-  const actionLabelTH = sa === 'BUY' ? 'ทยอยซื้อ' : sa === 'SELL' ? 'ทยอยขาย' : 'ถือสถานะ';
+  const actionLabelTH = sa === 'BUY' ? 'ทยอยซื้อ' : sa === 'SELL' ? 'ทยอยขาย' : 'ชะลอการลงทุน';
 
   let card1Desc = sd || sth || '';
   if(card1Desc.length > 90) card1Desc = card1Desc.substring(0, 87) + '...';
@@ -2751,7 +2751,7 @@ function renderSummaryCards(){
     'Topping': 'แรงซื้อปรับลงจากจุดสูงสุด — อาจถึงยอดในรอบนี้',
     'Vol Shift': 'โครงสร้างความผันผวนเปลี่ยนแปลงอย่างมีนัยสำคัญ',
   };
-  const actThaiBuy = {'BUY':'ทยอยซื้อ','HOLD':'ถือสถานะ','SELL':'ทยอยขาย'};
+  const actThaiBuy = {'BUY':'ทยอยซื้อ','HOLD':'ชะลอการลงทุน','SELL':'ทยอยขาย'};
 
   const card2 = exBuyOn ? `
     <div class="summary-card">
@@ -2962,7 +2962,7 @@ function renderAIAnalysis(){
   } else {
     verdictClass = 'verdict-hold';
     if(buyS >= 55 && sellS >= 55){
-      verdict = `<strong>มุมมองเป็นกลาง — แนะนำถือสถานะ</strong> ตลาดอยู่ในภาวะ ${hlGold('Tug of War')} ทั้งฝั่งซื้อ (${buyS.toFixed(0)}) และฝั่งขาย (${sellS.toFixed(0)}) ต่างมีน้ำหนักใกล้เคียงกัน ยังไม่มีฝ่ายใดได้เปรียบ แนะนำให้รอความชัดเจนของทิศทางก่อนเปิด position ใหม่`;
+      verdict = `<strong>มุมมองเป็นกลาง — แนะนำชะลอการลงทุน</strong> ตลาดอยู่ในภาวะ ${hlGold('Tug of War')} ทั้งฝั่งซื้อ (${buyS.toFixed(0)}) และฝั่งขาย (${sellS.toFixed(0)}) ต่างมีน้ำหนักใกล้เคียงกัน ยังไม่มีฝ่ายใดได้เปรียบ แนะนำให้รอความชัดเจนของทิศทางก่อนเปิด position ใหม่`;
     } else if(buyS < 45 && sellS < 45){
       verdict = `<strong>มุมมองรอจังหวะ</strong> ตลาดอยู่ใน ${hlGold('Dead Zone')} ทั้งสองฝั่งอ่อนแรงพร้อมกัน (Buy ${buyS.toFixed(0)} / Sell ${sellS.toFixed(0)}) ยังไม่มีทิศทางที่ชัดเจน แนะนำให้รอจังหวะ breakout ที่ยืนยันก่อนเปิด position ใหม่`;
     } else {
