@@ -931,119 +931,61 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height
 }
 
 /* ══════════════════════════════════════════════ */
-/* ★ SMART ANALYSIS BOX — JP Trust theme         */
+/* ★ AI SMART ANALYSIS BOX                        */
 /* ══════════════════════════════════════════════ */
 .ai-analysis-card{
-  background:linear-gradient(180deg,#FFFEF8 0%,#FAF6ED 60%,#F5EDD8 100%);
-  border:1.5px solid rgba(212,175,55,0.45);
-  border-radius:18px;
-  padding:22px 24px;
-  position:relative;
-  overflow:hidden;
-  box-shadow:0 6px 24px rgba(114,47,55,.08), inset 0 1px 0 rgba(255,255,255,0.6);
+  background:linear-gradient(160deg,#FFFEF8 0%,#F8F2E4 100%);
+  border:1px solid var(--border2);border-radius:16px;
+  padding:18px 20px;position:relative;overflow:hidden;
+  box-shadow:0 4px 20px rgba(114,47,55,.06);
 }
+[data-theme="dark"] .ai-analysis-card{background:var(--card);box-shadow:none}
 .ai-analysis-card::before{
   content:'';position:absolute;top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,transparent,#D4AF37,#E8D48B,#D4AF37,transparent);
-  opacity:.85;
+  background:linear-gradient(90deg,transparent,var(--gold),#E8D48B,var(--gold),transparent);
+  opacity:.8;
 }
-
-/* Header — single line, simpler */
-.ai-header{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:12px;margin-bottom:18px;padding-bottom:14px;
-  border-bottom:1px solid rgba(212,175,55,0.25);
+.ai-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px dashed var(--border2)}
+.ai-badge{
+  display:inline-flex;align-items:center;gap:6px;padding:4px 12px;
+  background:linear-gradient(135deg,var(--gold-dim),rgba(232,185,49,.15));
+  border:1px solid var(--border2);border-radius:50px;
+  font-family:'Cinzel',serif;font-size:.68rem;letter-spacing:2px;
+  color:var(--gold2);font-weight:700;text-transform:uppercase;
 }
-.ai-title-block{display:flex;flex-direction:column;gap:2px}
+.ai-badge .ai-pulse{
+  width:6px;height:6px;border-radius:50%;background:var(--gold);
+  box-shadow:0 0 6px var(--gold);
+  animation:aipulse 2s ease-in-out infinite;
+}
+@keyframes aipulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
 .ai-title{
-  font-family:'DM Serif Display','Anuphan',serif;
-  font-weight:400;font-size:1.25rem;color:#5A3D20;
-  letter-spacing:0.3px;line-height:1.2;
+  font-family:'Sarabun','Anuphan',sans-serif;font-weight:700;
+  font-size:.92rem;color:var(--text);flex:1;
 }
-.ai-eyebrow{
-  font-family:'Cinzel',serif;font-size:.62rem;
-  letter-spacing:3px;color:#8B6914;
-  font-weight:700;text-transform:uppercase;
-}
-.ai-timestamp{
-  font-size:.7rem;color:#7A6F62;font-weight:500;
-  font-family:'Sarabun','Anuphan',sans-serif;
-  white-space:nowrap;
-}
+.ai-timestamp{font-size:.72rem;color:var(--text3);font-weight:500}
 
-/* Body — sectioned with colored zones */
-.ai-body{font-size:.9rem;line-height:1.8;color:#3D3228;font-family:'Sarabun','Anuphan',sans-serif}
-
-.ai-section{
-  margin-bottom:14px;padding:14px 16px;
-  border-radius:12px;
-  background:rgba(255,255,255,0.55);
-  border:1px solid rgba(212,175,55,0.18);
-}
-.ai-section:last-of-type{margin-bottom:14px}
-
+.ai-body{font-size:.88rem;line-height:1.75;color:var(--text2)}
+.ai-section{margin-bottom:12px}
+.ai-section:last-child{margin-bottom:0}
 .ai-section-label{
-  display:flex;align-items:center;gap:8px;
-  font-family:'Cinzel','Anuphan',serif;font-size:.7rem;
-  letter-spacing:2px;color:#8B6914;font-weight:700;
-  text-transform:uppercase;margin-bottom:8px;
+  display:inline-block;font-family:'Cinzel',serif;font-size:.68rem;
+  letter-spacing:1.5px;color:var(--gold2);font-weight:700;
+  text-transform:uppercase;margin-bottom:4px;
 }
-.ai-section-label::before{
-  content:'';width:6px;height:6px;border-radius:50%;
-  background:#D4AF37;box-shadow:0 0 6px rgba(212,175,55,0.5);
-}
-
-.ai-body strong{color:#722F37;font-weight:700}
-.ai-body .ai-hl-pos{color:#2E9F5F;font-weight:700}
-.ai-body .ai-hl-neg{color:#C14545;font-weight:700}
-.ai-body .ai-hl-gold{color:#8B6914;font-weight:700}
-
-/* Verdict — pill banner like dashboard cards */
+.ai-body strong{color:var(--text);font-weight:700}
+.ai-body .ai-hl-pos{color:var(--emerald);font-weight:700}
+.ai-body .ai-hl-neg{color:var(--red);font-weight:700}
+.ai-body .ai-hl-gold{color:var(--gold2);font-weight:700}
+[data-theme="dark"] .ai-body .ai-hl-gold{color:var(--gold)}
 .ai-verdict{
-  margin-top:18px;padding:16px 20px;
-  background:linear-gradient(135deg,rgba(46,159,95,0.08) 0%,rgba(212,175,55,0.1) 100%);
-  border:1.5px solid rgba(46,159,95,0.3);
-  border-left:4px solid #2E9F5F;
-  border-radius:12px;
-  font-size:.95rem;color:#3D3228;line-height:1.7;
-  font-family:'Sarabun','Anuphan',sans-serif;
-  position:relative;
+  margin-top:14px;padding:12px 16px;
+  background:rgba(212,175,55,.08);border:1px solid var(--border2);
+  border-left:3px solid var(--gold);border-radius:8px;
+  font-size:.9rem;color:var(--text);line-height:1.7;
 }
-.ai-verdict.verdict-bull{
-  background:linear-gradient(135deg,rgba(46,159,95,0.1) 0%,rgba(46,159,95,0.04) 100%);
-  border-color:rgba(46,159,95,0.35);
-  border-left-color:#2E9F5F;
-}
-.ai-verdict.verdict-bear{
-  background:linear-gradient(135deg,rgba(193,69,69,0.1) 0%,rgba(193,69,69,0.04) 100%);
-  border-color:rgba(193,69,69,0.35);
-  border-left-color:#C14545;
-}
-.ai-verdict.verdict-hold{
-  background:linear-gradient(135deg,rgba(212,175,55,0.12) 0%,rgba(212,175,55,0.05) 100%);
-  border-color:rgba(212,175,55,0.4);
-  border-left-color:#D4AF37;
-}
-.ai-verdict-label{
-  display:inline-block;
-  font-family:'Cinzel',serif;font-size:.68rem;
-  letter-spacing:2.5px;font-weight:700;text-transform:uppercase;
-  margin-right:8px;
-}
-.ai-verdict.verdict-bull .ai-verdict-label{color:#2E9F5F}
-.ai-verdict.verdict-bear .ai-verdict-label{color:#C14545}
-.ai-verdict.verdict-hold .ai-verdict-label{color:#8B6914}
-
-/* Mobile tuning */
-@media (max-width:600px){
-  .ai-analysis-card{padding:18px 16px;border-radius:14px}
-  .ai-title{font-size:1.05rem}
-  .ai-section{padding:12px 14px}
-  .ai-body{font-size:.85rem;line-height:1.75}
-  .ai-verdict{padding:14px 16px;font-size:.88rem}
-  .ai-header{flex-wrap:wrap}
-  .ai-timestamp{font-size:.65rem}
-}
+.ai-verdict strong{color:var(--gold2)}
+[data-theme="dark"] .ai-verdict strong{color:var(--gold)}
 
 body{padding-bottom:80px !important}
 </style>
@@ -2928,33 +2870,30 @@ function renderAIAnalysis(){
 
   // Verdict
   let verdict = '';
-  let verdictClass = 'verdict-hold';
+  const icon = sigAction==='BUY'?'🟢':sigAction==='SELL'?'🔴':'🟡';
   if(sigAction === 'BUY'){
-    verdictClass = 'verdict-bull';
     if(buyS >= 75 && sellS < 45 && nb >= 20){
-      verdict = `<strong>เข้าได้</strong> — สัญญาณซื้อครบเงื่อนไข (Full Bullish Confirmed): แรงซื้อแข็งมาก + แรงขายอ่อน + Net Bias +${nb.toFixed(0)} ยืนยัน. `;
+      verdict = `${icon} <strong>เข้าได้</strong> — สัญญาณซื้อครบเงื่อนไข (Full Bullish Confirmed): แรงซื้อแข็งมาก + แรงขายอ่อน + Net Bias +${nb.toFixed(0)} ยืนยัน. `;
       if(z50 >= 2.0) verdict += `${hlGold('ข้อควรระวัง:')} Z-Score สูง อาจพักตัวได้ ควรตั้ง stop-loss ที่${hlGold('แนวรับล่าสุด')}`;
       else verdict += `ช่องเสี่ยง/รีเทิร์นเอื้อฝั่งขาขึ้น — ถือจนกว่าจะเห็นสัญญาณ exhaustion`;
     } else {
-      verdict = `<strong>เข้าได้แต่ระวัง</strong> — ${DN.Scenario_Signal||'สัญญาณซื้อ'}. แรงซื้อ (${buyS.toFixed(0)}) vs แรงขาย (${sellS.toFixed(0)}) ${buyS-sellS<30?hlGold('ยังใกล้เคียงกัน'):'ห่างพอ'} ควรขนาด position ให้พอดี`;
+      verdict = `${icon} <strong>เข้าได้แต่ระวัง</strong> — ${DN.Scenario_Signal||'สัญญาณซื้อ'}. แรงซื้อ (${buyS.toFixed(0)}) vs แรงขาย (${sellS.toFixed(0)}) ${buyS-sellS<30?hlGold('ยังใกล้เคียงกัน'):'ห่างพอ'} ควรขนาด position ให้พอดี`;
     }
   } else if(sigAction === 'SELL'){
-    verdictClass = 'verdict-bear';
     if(sellS >= 75 && buyS < 45 && nb <= -20){
-      verdict = `<strong>ขายหรือหลีกเลี่ยง</strong> — สัญญาณขายครบเงื่อนไข (Full Bearish Confirmed): แรงขายแข็งมาก + แรงซื้อหมด + Net Bias ${nb.toFixed(0)} ยืนยัน. `;
+      verdict = `${icon} <strong>ขายหรือหลีกเลี่ยง</strong> — สัญญาณขายครบเงื่อนไข (Full Bearish Confirmed): แรงขายแข็งมาก + แรงซื้อหมด + Net Bias ${nb.toFixed(0)} ยืนยัน. `;
       if(z50 <= -2.0) verdict += `${hlGold('ข้อควรระวัง:')} Z-Score ต่ำ อาจเห็น oversold bounce ไม่ควรไล่ short ช่วงนี้`;
       else verdict += `ควรขายล็อตเดิมหรืออย่าเข้า long — รอฝั่งขายหมดแรงก่อน`;
     } else {
-      verdict = `<strong>ระวังขาลง</strong> — ${DN.Scenario_Signal||'สัญญาณขาย'}. แรงขาย (${sellS.toFixed(0)}) vs แรงซื้อ (${buyS.toFixed(0)}) ${sellS-buyS<30?hlGold('ยังไม่ extreme'):'ชัด'} ยังไม่ควรเข้า long`;
+      verdict = `${icon} <strong>ระวังขาลง</strong> — ${DN.Scenario_Signal||'สัญญาณขาย'}. แรงขาย (${sellS.toFixed(0)}) vs แรงซื้อ (${buyS.toFixed(0)}) ${sellS-buyS<30?hlGold('ยังไม่ extreme'):'ชัด'} ยังไม่ควรเข้า long`;
     }
   } else {
-    verdictClass = 'verdict-hold';
     if(buyS >= 55 && sellS >= 55){
-      verdict = `<strong>ถือมือไว้</strong> — ${hlGold('Tug of War')}: ทั้ง Buy (${buyS.toFixed(0)}) และ Sell (${sellS.toFixed(0)}) แข็งพร้อมกัน ยังไม่ชัดว่าใครชนะ. รอ Delta แยกทางกัน (ฝั่งนึงเร่ง ฝั่งนึงชะลอ) ก่อนเข้า position ใหม่`;
+      verdict = `${icon} <strong>ถือมือไว้</strong> — ${hlGold('Tug of War')}: ทั้ง Buy (${buyS.toFixed(0)}) และ Sell (${sellS.toFixed(0)}) แข็งพร้อมกัน ยังไม่ชัดว่าใครชนะ. รอ Delta แยกทางกัน (ฝั่งนึงเร่ง ฝั่งนึงชะลอ) ก่อนเข้า position ใหม่`;
     } else if(buyS < 45 && sellS < 45){
-      verdict = `<strong>รออยู่ข้างสนาม</strong> — ${hlGold('Dead Zone')}: ทั้งสองฝั่งอ่อน (Buy ${buyS.toFixed(0)} / Sell ${sellS.toFixed(0)}). ตลาดไม่มีทิศทาง อย่าเข้า position ใหม่ รอ breakout ชัดๆ`;
+      verdict = `${icon} <strong>รออยู่ข้างสนาม</strong> — ${hlGold('Dead Zone')}: ทั้งสองฝั่งอ่อน (Buy ${buyS.toFixed(0)} / Sell ${sellS.toFixed(0)}). ตลาดไม่มีทิศทาง อย่าเข้า position ใหม่ รอ breakout ชัดๆ`;
     } else {
-      verdict = `<strong>รอสัญญาณชัดเจน</strong> — ${DN.Scenario_Signal||'Mixed'}. Net Bias ${nb>=0?'+':''}${nb.toFixed(0)} ${Math.abs(nb)<20?hlGold('ยังไม่ extreme'):''}. ${exBuy!=='None'||exSell!=='None'?'มีสัญญาณ exhaustion เตือน':'ให้ตัวเลขพัฒนาอีก 1-2 วัน'}`;
+      verdict = `${icon} <strong>รอสัญญาณชัดเจน</strong> — ${DN.Scenario_Signal||'Mixed'}. Net Bias ${nb>=0?'+':''}${nb.toFixed(0)} ${Math.abs(nb)<20?hlGold('ยังไม่ extreme'):''}. ${exBuy!=='None'||exSell!=='None'?'มีสัญญาณ exhaustion เตือน':'ให้ตัวเลขพัฒนาอีก 1-2 วัน'}`;
     }
   }
 
@@ -2964,28 +2903,26 @@ function renderAIAnalysis(){
   el.innerHTML = `
     <div class="ai-analysis-card">
       <div class="ai-header">
-        <div class="ai-title-block">
-          <div class="ai-eyebrow">Analysis</div>
-          <div class="ai-title">บทสรุปวิเคราะห์</div>
-        </div>
+        <div class="ai-badge"><span class="ai-pulse"></span>AI Analysis</div>
+        <div class="ai-title">สรุปวิเคราะห์อัจฉริยะ</div>
         <div class="ai-timestamp">${timeStr}</div>
       </div>
       <div class="ai-body">
         <div class="ai-section">
-          <div class="ai-section-label">Momentum</div>
+          <div class="ai-section-label">◆ Momentum</div>
           <div>${momentumText}</div>
         </div>
         <div class="ai-section">
-          <div class="ai-section-label">Market Context</div>
+          <div class="ai-section-label">◆ Market Context</div>
           <div>${contextText}</div>
         </div>
         ${warnParts.length ? `
         <div class="ai-section">
-          <div class="ai-section-label">Signals &amp; Macro</div>
+          <div class="ai-section-label">◆ Signals &amp; Macro</div>
           <div>${warnParts.join(' • ')}</div>
         </div>` : ''}
-        <div class="ai-verdict ${verdictClass}">
-          <span class="ai-verdict-label">Verdict</span>${verdict}
+        <div class="ai-verdict">
+          <strong>VERDICT:</strong> ${verdict}
         </div>
       </div>
     </div>`;
