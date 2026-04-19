@@ -1564,7 +1564,18 @@ body{padding-bottom:80px !important}
 <!-- ══════════════════════════════════════════════════════════ -->
 <div class="fab-stack">
   <button class="fab fab-secondary" onclick="openAboutModal()" aria-label="ปรัชญาและวิธีการคำนวณ">
-    <img src="jpt-owl-line.png" alt="owl" style="width:30px;height:30px;object-fit:contain;filter:brightness(0) invert(1) drop-shadow(0 1px 2px rgba(0,0,0,0.3));" onerror="this.style.display='none';this.parentElement.innerHTML='<svg width=\'28\' height=\'28\' viewBox=\'0 0 64 64\' fill=\'none\' stroke=\'#FFF5E1\' stroke-width=\'2.4\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><circle cx=\'32\' cy=\'32\' r=\'22\'/><circle cx=\'24\' cy=\'28\' r=\'5\'/><circle cx=\'40\' cy=\'28\' r=\'5\'/><circle cx=\'24\' cy=\'28\' r=\'1.6\' fill=\'#FFF5E1\'/><circle cx=\'40\' cy=\'28\' r=\'1.6\' fill=\'#FFF5E1\'/><path d=\'M30 36 L32 40 L34 36\'/><path d=\'M14 18 L20 24 M50 18 L44 24\'/></svg>';">
+    <svg width="28" height="28" viewBox="0 0 64 64" fill="none" stroke="#FFF5E1" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3))">
+      <!-- Bow (arc on left) -->
+      <path d="M14 10 Q4 32 14 54"/>
+      <!-- Bowstring -->
+      <path d="M14 10 L14 54" stroke-width="1.5"/>
+      <!-- Arrow shaft (string pull point to right) -->
+      <line x1="14" y1="32" x2="56" y2="32"/>
+      <!-- Arrow head (right tip) -->
+      <polyline points="48 24 56 32 48 40"/>
+      <!-- Arrow fletching (left feathers at nock) -->
+      <path d="M14 32 L20 28 M14 32 L20 36"/>
+    </svg>
     <span class="fab-tooltip">ปรัชญา &amp; วิธีคำนวณ</span>
   </button>
   <button class="fab fab-primary" onclick="openBiasModal()" aria-label="Bias Scenarios และ Exhaustion Reference">
