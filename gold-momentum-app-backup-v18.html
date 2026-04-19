@@ -1451,7 +1451,7 @@ function csvL(l){const r=[];let c='',q=false;for(let i=0;i<l.length;i++){const c
 const f=(k,d=1)=>parseFloat(D[k]||0).toFixed(d);
 const fi=k=>parseFloat(D[k]||0);
 const tierColor=t=>t.includes('Very Strong')?'var(--emerald)':t.includes('Strong')?'#34D399':t.includes('Moderate')?'var(--gold)':t.includes('Neutral')?'var(--text2)':'var(--red)';
-const scoreColor=v=>v>=75?'var(--emerald)':v>=60?'#34A853':v>=45?'var(--gold)':'var(--red)';
+const scoreColor=v=>v>=85?'var(--emerald)':v>=75?'#34A853':v>=60?'var(--gold)':v>=45?'var(--text2)':v>=30?'var(--text3)':'var(--red)';
 const retColor=v=>v>=0?'var(--emerald)':'var(--red)';
 const dimColors=['#4285F4','#9334E6','#34A853','#1A73E8','#E8710A','#0097A7'];
 const fp=v=>'$'+v.toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1});
@@ -2509,16 +2509,15 @@ function renderNetBias(){
   else if(buyS<55&&sellS<55)comboLabel='Dead Zone';
   else comboLabel='Mixed Signal';
 
-  // Tier matches Tier Reference (Buy: 4 levels at 75/60/45)
-  const tierStr=v=>v>=75?'VERY STRONG':v>=60?'STRONG':v>=45?'MODERATE':'WEAK';
-  // netTier matches Tier Reference (Bias: 5 levels at ±25/±10)
+  const tierStr=v=>v>=75?'VERY STRONG':v>=60?'STRONG':v>=45?'MODERATE':v>=30?'WEAK':'VERY WEAK';
   const absNet=Math.abs(nb);
   let netTier;
-  if(absNet>=25)netTier=nb>0?'— STRONG BULLISH':'— STRONG BEARISH';
-  else if(absNet>=10)netTier=nb>0?'— BULLISH':'— BEARISH';
+  if(absNet>=40)netTier=nb>0?'— STRONG BULLISH':'— STRONG BEARISH';
+  else if(absNet>=20)netTier=nb>0?'— LEAN BULLISH':'— LEAN BEARISH';
+  else if(absNet>=5)netTier=nb>0?'— TILT UP':'— TILT DOWN';
   else netTier='— NEUTRAL';
 
-  const nbCls=nb>=10?'positive':nb<=-10?'negative':'neutral';
+  const nbCls=nb>5?'positive':nb<-5?'negative':'neutral';
   const total=buyS+sellS;
   const buyPct=total>0?(buyS/total)*100:50;
   const sellPct=100-buyPct;
