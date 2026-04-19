@@ -1564,17 +1564,18 @@ body{padding-bottom:80px !important}
 <!-- ══════════════════════════════════════════════════════════ -->
 <div class="fab-stack">
   <button class="fab fab-secondary" onclick="openAboutModal()" aria-label="ปรัชญาและวิธีการคำนวณ">
-    <svg width="28" height="28" viewBox="0 0 64 64" fill="none" stroke="#FFF5E1" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3))">
-      <!-- Bow (arc on left) -->
-      <path d="M14 10 Q4 32 14 54"/>
-      <!-- Bowstring -->
-      <path d="M14 10 L14 54" stroke-width="1.5"/>
-      <!-- Arrow shaft (string pull point to right) -->
-      <line x1="14" y1="32" x2="56" y2="32"/>
-      <!-- Arrow head (right tip) -->
-      <polyline points="48 24 56 32 48 40"/>
-      <!-- Arrow fletching (left feathers at nock) -->
-      <path d="M14 32 L20 28 M14 32 L20 36"/>
+    <svg width="30" height="30" viewBox="0 0 64 64" fill="none" stroke="#FFF5E1" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3))">
+      <!-- Bullseye target rings (3 concentric circles) -->
+      <circle cx="28" cy="34" r="20"/>
+      <circle cx="28" cy="34" r="13"/>
+      <circle cx="28" cy="34" r="6"/>
+      <!-- Center dot -->
+      <circle cx="28" cy="34" r="1.5" fill="#FFF5E1"/>
+      <!-- Arrow shaft (going through center, top-right to bottom-left) -->
+      <line x1="56" y1="6" x2="28" y2="34" stroke-width="3"/>
+      <!-- Arrow fletching (top-right end, V shape) -->
+      <path d="M56 6 L50 4 M56 6 L58 12" stroke-width="2.4"/>
+      <path d="M52 10 L58 12" stroke-width="2.4"/>
     </svg>
     <span class="fab-tooltip">ปรัชญา &amp; วิธีคำนวณ</span>
   </button>
