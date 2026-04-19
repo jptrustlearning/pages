@@ -2063,7 +2063,7 @@ function drawPivotChart(tab){
   // Label plugin
   const pivotLabelPlugin={
     id:'pivotLabels',
-    afterDraw(chart){
+    afterDatasetsDraw(chart){
       const ctx=chart.ctx,yScale=chart.scales.y,area=chart.chartArea,x=area.right-8;
       ctx.save();ctx.textAlign='right';ctx.textBaseline='middle';
       const drawn=[];
@@ -2173,7 +2173,7 @@ function drawPivotChart(tab){
   // Current price marker plugin
   const priceMarkerPlugin={
     id:'priceMarker',
-    afterDraw(chart){
+    afterDatasetsDraw(chart){
       const ctx=chart.ctx,yScale=chart.scales.y,area=chart.chartArea;
       const y=yScale.getPixelForValue(price);
       if(y<area.top||y>area.bottom)return;
