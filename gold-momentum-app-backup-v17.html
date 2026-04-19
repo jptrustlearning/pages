@@ -2903,9 +2903,8 @@ function renderAIAnalysis(){
     else if(pp.includes('pp')) ctx.push(`ราคาอยู่ใกล้ Pivot Point (${pivotPos})`);
   }
 
-  if(voRatio < 0.7) ctx.push(`Vol Ratio ${hlGold(voRatio.toFixed(2)+'x')} (D/U) — up volume แข็งกว่า down ${hlPos('สนับสนุนขาขึ้น')}`);
-  else if(voRatio > 1.5) ctx.push(`Vol Ratio ${hlGold(voRatio.toFixed(2)+'x')} (D/U) — down volume แข็งกว่า up ${hlNeg('distribution')}`);
-  else if(voRatio >= 0.85 && voRatio <= 1.15) ctx.push(`Vol Ratio ${voRatio.toFixed(2)}x (D/U) — up/down ใกล้สมดุล`);
+  if(voRatio >= 1.5) ctx.push(`ปริมาณการซื้อขาย ${hlGold(voRatio.toFixed(2)+'x')} ค่าเฉลี่ย — ${hlPos('volume confirm')}`);
+  else if(voRatio < 0.7) ctx.push(`ปริมาณการซื้อขายต่ำ (${voRatio.toFixed(2)}x) — ${hlNeg('ขาดการยืนยัน')}`);
 
   if(gc && gc !== 'None' && gc.toLowerCase() !== 'neutral'){
     if(gc.toLowerCase().includes('golden') || gc.toLowerCase().includes('bullish')) ctx.push(`${hlPos(gc)} MA alignment`);
