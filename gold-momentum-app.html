@@ -2736,8 +2736,8 @@ function renderSummaryCards(){
     <div class="summary-card" title="${ss}">
       <div class="sc-label">SCENARIO</div>
       <div class="sc-value ${actionCls}" style="font-size:1.15rem;line-height:1.2">${ss || 'Mixed Signal'}</div>
-      <div class="sc-desc">${card1Desc}<br><strong>คะแนนซื้อ ${buyS.toFixed(1)} · คะแนนขาย ${sellS.toFixed(1)} · ส่วนต่าง ${nb >= 0 ? '+' : ''}${nb.toFixed(1)}</strong>
-        <span style="display:inline-block;margin-left:6px;padding:2px 8px;border-radius:4px;background:${actionBgInline};color:#fff;font-weight:800;font-size:.7rem;letter-spacing:1px">${actionLabelTH}</span>
+      <div class="sc-desc">${card1Desc}<br>คำแนะนำ: <strong>${actionLabelTH}</strong><br><strong>คะแนนซื้อ ${buyS.toFixed(1)} · คะแนนขาย ${sellS.toFixed(1)} · ส่วนต่าง ${nb >= 0 ? '+' : ''}${nb.toFixed(1)}</strong>
+        <span style="display:inline-block;margin-left:6px;padding:2px 8px;border-radius:4px;background:${actionBgInline};color:#fff;font-weight:800;font-size:.7rem;letter-spacing:1px">${sa}</span>
       </div>
     </div>`;
 
@@ -2824,7 +2824,7 @@ function renderSummaryCards(){
   const card4 = z50 !== null ? `
     <div class="summary-card">
       <div class="sc-label">Z-Score 50D</div>
-      <div class="sc-value ${zCls}" style="font-size:1.35rem;line-height:1.2">${zZone.toUpperCase()} ZONE</div>
+      <div class="sc-value ${zCls}" style="font-size:1.35rem;line-height:1.2">${zZone.toUpperCase()}</div>
       <div class="sc-desc">
         <strong>Z = ${z50 >= 0 ? '+' : ''}${z50.toFixed(3)}σ</strong> — ${zoneRegimeTH[zZone] || zRegime || 'ราคาเคลื่อนไหวในกรอบปกติ'}
         ${zDelta !== null ? `<br>Δ 5 วัน: ${zDelta >= 0 ? '+' : ''}${zDelta.toFixed(3)} · ${deltaText}` : ''}
