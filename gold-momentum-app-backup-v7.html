@@ -576,75 +576,6 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height
 /* Split meter removed — redundant with infinity */
 
 /* ══════════════════════════════════════════════ */
-/* ★ SUMMARY CARDS (4 cards under infinity)      */
-/* ★ Design copied from sp500-strategy-pro       */
-/* ══════════════════════════════════════════════ */
-.summary-cards-grid{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
-  margin-top:14px;position:relative;z-index:1;
-}
-.summary-card{
-  background:linear-gradient(180deg,#FFFFFF 0%,#FFFFFF 55%,#F5EDD8 100%);
-  border:1.5px solid rgba(212,175,55,0.45);
-  border-radius:12px;padding:14px 14px 18px;
-  transition:all 0.3s ease;
-  box-shadow:0 4px 14px rgba(114,47,55,0.08),0 1px 4px rgba(114,47,55,0.05),inset 0 0 0 1px rgba(255,255,255,0.6);
-  position:relative;overflow:hidden;min-height:118px;
-}
-.summary-card::before{
-  content:'';position:absolute;bottom:0;left:0;right:0;height:65%;
-  background:linear-gradient(180deg,transparent 0%,rgba(245,237,216,0.5) 100%);
-  pointer-events:none;border-radius:0 0 12px 12px;z-index:0;
-}
-.summary-card::after{
-  content:'';position:absolute;bottom:0;left:0;right:0;height:72px;
-  pointer-events:none;z-index:0;
-  background:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 70' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'%3E%3Cpath d='M0,55 C20,50 40,40 70,35 C100,30 130,38 160,30 C180,25 195,32 200,28 L200,70 L0,70 Z' fill='rgba(218,195,148,0.55)'/%3E%3Cpath d='M0,60 C30,52 60,45 100,40 C140,35 170,42 200,36 L200,70 L0,70 Z' fill='rgba(232,220,192,0.85)'/%3E%3Cpath d='M0,45 C25,42 50,30 80,28 C110,26 140,35 170,22 C190,15 200,20 200,18 L200,70 L0,70 Z' fill='rgba(212,175,55,0.22)'/%3E%3Cpath d='M0,40 Q50,25 100,30 Q150,35 200,20' fill='none' stroke='rgba(184,134,11,0.4)' stroke-width='1.5'/%3E%3Cpath d='M0,50 Q60,38 120,42 Q180,46 200,35' fill='none' stroke='rgba(184,134,11,0.3)' stroke-width='1'/%3E%3C/svg%3E");
-  background-size:100% 100%;
-  border-radius:0 0 12px 12px;
-}
-.summary-card > *{position:relative;z-index:1}
-.summary-card:hover{
-  border-color:rgba(212,175,55,0.7);
-  box-shadow:0 6px 20px rgba(114,47,55,0.12),0 2px 6px rgba(114,47,55,0.08),inset 0 0 0 1px rgba(255,255,255,0.7);
-  transform:translateY(-1px);
-}
-.sc-label{
-  font-family:'Cinzel','Anuphan',serif;font-size:.65rem;font-weight:600;
-  color:#8B6914;letter-spacing:2px;text-transform:uppercase;
-  margin-bottom:6px;
-  display:flex;align-items:center;gap:6px;
-}
-.sc-icon{font-size:.95rem;line-height:1}
-.sc-value{
-  font-family:'DM Serif Display','Sarabun',serif;font-size:1.45rem;font-weight:400;
-  color:#5A3D20;line-height:1.15;letter-spacing:-0.01em;
-  margin-bottom:6px;
-}
-.sc-value.positive{color:#2E9F5F}
-.sc-value.negative{color:#C14545}
-.sc-value.neutral{color:#8B6914}
-.sc-value.signal-on{color:#C14545}  /* warning highlight */
-.sc-value.no-signal{color:#2E9F5F}   /* clean state */
-.sc-value-mini{font-size:1rem;font-weight:700;color:#5A3D20;display:inline-flex;align-items:center;gap:6px}
-.sc-desc{
-  font-family:'Sarabun','Anuphan',sans-serif;font-size:.72rem;color:#7A6F62;
-  line-height:1.5;
-}
-.sc-desc strong{color:#5A3D20;font-weight:700}
-.sc-desc .sc-pos{color:#2E9F5F;font-weight:700}
-.sc-desc .sc-neg{color:#C14545;font-weight:700}
-.sc-desc .sc-gold{color:#8B6914;font-weight:700}
-
-@media (max-width:900px){
-  .summary-cards-grid{grid-template-columns:repeat(2,1fr)}
-}
-@media (max-width:480px){
-  .sc-value{font-size:1.25rem}
-  .sc-label{font-size:.6rem;letter-spacing:1.5px}
-}
-
-/* ══════════════════════════════════════════════ */
 /* ★ AI SMART ANALYSIS BOX                        */
 /* ══════════════════════════════════════════════ */
 .ai-analysis-card{
@@ -2171,11 +2102,9 @@ function renderNetBias(){
         <span class="combo-action ${actionCls}" style="background:${actionBg};color:#fff;box-shadow:0 0 16px ${actionShadow}">${sa}</span>
       </div>
     </div>
-    <div id="summaryCardsSection"></div>
     <div id="aiAnalysisSection"></div>`;
 
   initInfinityAnimation(buyS, sellS);
-  renderSummaryCards();
   renderAIAnalysis();
 }
 
@@ -2290,141 +2219,6 @@ function initInfinityAnimation(buyScore, sellScore){
     requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
-}
-
-// ══════════════════════════════════════════════════════════
-// ★ Summary Cards (4 cards under infinity)                 ★
-// ★ All values dynamically link to CSV parameters          ★
-// ══════════════════════════════════════════════════════════
-function renderSummaryCards(){
-  const el = document.getElementById('summaryCardsSection');
-  if(!el) return;
-  if(!D || !DN){
-    el.innerHTML = '';
-    return;
-  }
-
-  // ── CARD 1: Bullish Accumulation (Scenario from Net CSV) ──
-  const sa = DN.Scenario_Action || '';
-  const ss = DN.Scenario_Signal || '';
-  const sth = DN.Scenario_Thai || '';
-  const si = DN.Scenario_Icon || '📊';
-  const sd = DN.Scenario_Detail || '';
-  const buyS = parseFloat(DN.Buy_Score || 0);
-  const sellS = parseFloat(DN.Sell_Score || 0);
-  const nb = parseFloat(DN.Net_Bias || 0);
-
-  const actionCls = sa === 'BUY' ? 'positive' : sa === 'SELL' ? 'negative' : 'neutral';
-  const actionBgInline = sa === 'BUY' ? '#2E9F5F' : sa === 'SELL' ? '#C14545' : '#8B6914';
-
-  let card1Desc = sd || sth || '';
-  // Fallback truncate if too long
-  if(card1Desc.length > 90) card1Desc = card1Desc.substring(0, 87) + '...';
-
-  const card1 = `
-    <div class="summary-card" title="${ss}">
-      <div class="sc-label"><span class="sc-icon">${si}</span> SCENARIO</div>
-      <div class="sc-value ${actionCls}" style="font-size:1.15rem;line-height:1.2">${ss || 'Mixed Signal'}</div>
-      <div class="sc-desc">${card1Desc}<br><strong>Buy ${buyS.toFixed(1)} · Sell ${sellS.toFixed(1)} · Net ${nb >= 0 ? '+' : ''}${nb.toFixed(1)}</strong>
-        <span style="display:inline-block;margin-left:6px;padding:2px 8px;border-radius:4px;background:${actionBgInline};color:#fff;font-weight:800;font-size:.7rem;letter-spacing:1px">${sa}</span>
-      </div>
-    </div>`;
-
-  // ── CARD 2: Buy Exhaustion (from D CSV) ──
-  const exBuy = D.Exhaust_Scenario || 'None';
-  const exBuyAct = D.Exhaust_Action || '';
-  const exBuyOn = exBuy && exBuy !== 'None' && exBuy !== '';
-  const exBuyDesc = {
-    'Bull Exhaustion': 'Z extended + Buy score สูง + เริ่มลด → ขาขึ้นหมดแรง',
-    'Bear Exhaustion': 'Buy score เคยต่ำ + เริ่มฟื้น → ขาลงหมดแรง',
-    'Topping': 'Buy score หล่นจากพีค → อาจถึงยอด',
-    'Vol Shift': 'D5 เปลี่ยนแรง ≥50pts → โครงสร้างเปลี่ยน',
-  };
-  const exBuyIcon = {'Bull Exhaustion':'🔥','Bear Exhaustion':'🔋','Topping':'🏔️','Vol Shift':'⚡'};
-
-  const card2 = exBuyOn ? `
-    <div class="summary-card">
-      <div class="sc-label"><span class="sc-icon">${exBuyIcon[exBuy]||'⚠️'}</span> Buy Exhaustion</div>
-      <div class="sc-value signal-on" style="font-size:1.15rem;line-height:1.2">${exBuy}</div>
-      <div class="sc-desc">${exBuyDesc[exBuy]||'สัญญาณเตือน'}${exBuyAct?` · <span class="sc-gold">→ ${exBuyAct}</span>`:''}</div>
-    </div>` : `
-    <div class="summary-card">
-      <div class="sc-label"><span class="sc-icon">✅</span> Buy Exhaustion</div>
-      <div class="sc-value no-signal" style="font-size:1.35rem">No Signal</div>
-      <div class="sc-desc">ไม่มีสัญญาณ exhaustion ฝั่ง Buy<br>โมเมนตัมขาซื้อ<span class="sc-pos">ยังปลอดภัย</span></div>
-    </div>`;
-
-  // ── CARD 3: Sell Exhaustion (from DS CSV) ──
-  const exSell = DS ? (DS.Exhaust_Scenario || 'None') : 'None';
-  const exSellAct = DS ? (DS.Exhaust_Action || '') : '';
-  const exSellOn = exSell && exSell !== 'None' && exSell !== '';
-  const exSellDesc = {
-    'Sell Exhaustion': 'Sell score สูง + เริ่มลด → selling pressure หมดแรง',
-    'Sell Recovery': 'Sell score เคยต่ำ + เริ่มเพิ่ม → sell pressure กำลังมา',
-    'Sell Topping': 'Sell score หล่นจากพีค → panic selling อาจจบ',
-    'Vol Shift': 'D5s เปลี่ยนแรง ≥50pts → โครงสร้างเปลี่ยน',
-  };
-  const exSellIcon = {'Sell Exhaustion':'🔥','Sell Recovery':'🔋','Sell Topping':'🏔️','Vol Shift':'⚡'};
-
-  const card3 = exSellOn ? `
-    <div class="summary-card">
-      <div class="sc-label"><span class="sc-icon">${exSellIcon[exSell]||'⚠️'}</span> Sell Exhaustion</div>
-      <div class="sc-value signal-on" style="font-size:1.15rem;line-height:1.2">${exSell}</div>
-      <div class="sc-desc">${exSellDesc[exSell]||'สัญญาณเตือน'}${exSellAct?` · <span class="sc-gold">→ ${exSellAct}</span>`:''}</div>
-    </div>` : `
-    <div class="summary-card">
-      <div class="sc-label"><span class="sc-icon">✅</span> Sell Exhaustion</div>
-      <div class="sc-value no-signal" style="font-size:1.35rem">No Signal</div>
-      <div class="sc-desc">ไม่มีสัญญาณ exhaustion ฝั่ง Sell<br>โมเมนตัมขาขาย<span class="sc-pos">ยังปลอดภัย</span></div>
-    </div>`;
-
-  // ── CARD 4: Z-Score Regime (from D CSV) ──
-  const z50 = D.Z_Score_50d ? parseFloat(D.Z_Score_50d) : null;
-  const zZone = D.Z_Zone || 'N/A';
-  const zRegime = D.Z_Regime || '';
-  const zDelta = D.Z_Delta_5d ? parseFloat(D.Z_Delta_5d) : null;
-
-  // Z value color (asymmetric for gold)
-  let zCls = 'neutral';
-  if(z50 !== null){
-    if(z50 >= 2.5) zCls = 'negative';
-    else if(z50 >= 2.0) zCls = 'neutral';
-    else if(z50 <= -2.0) zCls = 'positive';
-    else if(z50 <= -1.5) zCls = 'neutral';
-    else zCls = 'positive';  // Normal zone — green like sp500 returns
-  }
-
-  // Z zone icon + zone interpretation
-  const zoneIcons = {
-    'Extreme Extended':'🔴','Extended':'🟡','Normal':'🟢',
-    'Depressed':'🔵','Extreme Depressed':'🟢',
-  };
-  const zoneIcon = zoneIcons[zZone] || '⚪';
-
-  // Delta interpretation
-  let deltaText = '';
-  if(zDelta !== null){
-    if(zDelta > 0.1) deltaText = `<span class="sc-neg">Z rising</span> — extending`;
-    else if(zDelta < -0.1) deltaText = `<span class="sc-pos">Z falling</span> — mean-reverting`;
-    else deltaText = '<span class="sc-gold">Z stable</span>';
-  }
-
-  const card4 = z50 !== null ? `
-    <div class="summary-card">
-      <div class="sc-label"><span class="sc-icon">${zoneIcon}</span> Z-Score 50d</div>
-      <div class="sc-value ${zCls}">${z50 >= 0 ? '+' : ''}${z50.toFixed(3)}</div>
-      <div class="sc-desc">
-        <strong>${zZone.toUpperCase()} ZONE</strong> — ${zRegime || 'momentum score ใช้ได้ตามปกติ'}
-        ${zDelta !== null ? `<br>Δ5d: ${zDelta >= 0 ? '+' : ''}${zDelta.toFixed(3)} ${deltaText}` : ''}
-      </div>
-    </div>` : `
-    <div class="summary-card">
-      <div class="sc-label">Z-Score 50d</div>
-      <div class="sc-value neutral">N/A</div>
-      <div class="sc-desc">Z-Score data not available</div>
-    </div>`;
-
-  el.innerHTML = `<div class="summary-cards-grid">${card1}${card2}${card3}${card4}</div>`;
 }
 
 // ══════════════════════════════════════════════════════════
