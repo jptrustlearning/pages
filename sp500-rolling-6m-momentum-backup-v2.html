@@ -1782,7 +1782,7 @@
           <table id="yearlyTable" class="simple-table">
             <thead><tr>
               <th style="text-align:left;">Year</th>
-              <th>Lots</th>
+              <th>Rounds</th>
               <th>Wins</th>
               <th>Losses</th>
               <th>Win Rate</th>
@@ -3020,47 +3020,43 @@ function renderDistChart() {
   });
 }
 
-// === PHASE 6: YEARLY SUMMARY TABLE — grouped by lot EXIT year ===
+// === PHASE 6: YEARLY SUMMARY TABLE ===
 function renderYearly() {
   const tbody = document.getElementById('yearlyBody');
   const tfoot = document.getElementById('yearlyFoot');
   if (!tbody || !tfoot) return;
   tbody.innerHTML = ''; tfoot.innerHTML = '';
 
-  // Use closedLots (realized 6-month lots) — consistent with Win Rate in "ความแม่น" tab
-  const closedLots = state.closedLots || [];
-  if (closedLots.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text-muted);">ยังไม่มีล็อตที่ครบอายุ 6 เดือน</td></tr>';
-    return;
-  }
+  const logs = state.tradeLog || [];
+  if (logs.length < 2) return;
 
-  // Group closed lots by YEAR of exitDate (ปีที่ขายล็อต)
+  // Group closed rounds by YEAR (year of entry)
   const yearMap = {};
-  closedLots.forEach(cl => {
-    const year = cl.exitDate.substring(0, 4);
-    const pnl = cl.pl || 0;
-    const pct = (cl.returnPct || 0) * 100;
+  for (let i = 0; i < logs.length - 1; i++) {
+    const year = logs[i].date.substring(0, 4);
+    const pnl = logs[i+1].equity - logs[i].equity;
+    const pct = logs[i].equity > 0 ? (pnl / logs[i].equity) * 100 : 0;
     if (!yearMap[year]) yearMap[year] = [];
     yearMap[year].push({ pnl, pct });
-  });
+  }
 
-  let gLots = 0, gWins = 0, gPnl = 0;
+  let gRounds = 0, gWins = 0, gPnl = 0;
   const years = Object.keys(yearMap).sort();
 
   years.forEach(y => {
-    const lots = yearMap[y];
-    const wins = lots.filter(r => r.pct > 0).length;
-    const losses = lots.length - wins;
-    const winRate = lots.length > 0 ? (wins / lots.length * 100) : 0;
-    const pnl = lots.reduce((s, r) => s + r.pnl, 0);
-    const best = Math.max(...lots.map(r => r.pct));
-    const worst = Math.min(...lots.map(r => r.pct));
-    gLots += lots.length; gWins += wins; gPnl += pnl;
+    const rounds = yearMap[y];
+    const wins = rounds.filter(r => r.pct > 0).length;
+    const losses = rounds.length - wins;
+    const winRate = rounds.length > 0 ? (wins / rounds.length * 100) : 0;
+    const pnl = rounds.reduce((s, r) => s + r.pnl, 0);
+    const best = Math.max(...rounds.map(r => r.pct));
+    const worst = Math.min(...rounds.map(r => r.pct));
+    gRounds += rounds.length; gWins += wins; gPnl += pnl;
 
     const pnlCls = pnl >= 0 ? 'text-green' : 'text-red';
     tbody.innerHTML += `<tr>
       <td style="text-align:left;color:var(--gold-deep);font-weight:700;">${y}</td>
-      <td>${lots.length}</td>
+      <td>${rounds.length}</td>
       <td class="text-green">${wins}</td>
       <td class="text-red">${losses}</td>
       <td>${winRate.toFixed(0)}%</td>
@@ -3070,13 +3066,13 @@ function renderYearly() {
     </tr>`;
   });
 
-  const gWinRate = gLots > 0 ? (gWins / gLots * 100) : 0;
+  const gWinRate = gRounds > 0 ? (gWins / gRounds * 100) : 0;
   const gPnlCls = gPnl >= 0 ? 'text-green' : 'text-red';
   tfoot.innerHTML = `<tr style="font-weight:700;background:rgba(212,175,55,0.08);">
     <td style="text-align:left;">TOTAL</td>
-    <td>${gLots}</td>
+    <td>${gRounds}</td>
     <td class="text-green">${gWins}</td>
-    <td class="text-red">${gLots - gWins}</td>
+    <td class="text-red">${gRounds - gWins}</td>
     <td>${gWinRate.toFixed(0)}%</td>
     <td class="${gPnlCls}"><strong>$${Math.round(gPnl).toLocaleString()}</strong></td>
     <td>—</td><td>—</td>
