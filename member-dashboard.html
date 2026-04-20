@@ -598,12 +598,40 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 var supabaseClient=(function(){
     try{return window.supabase.createClient('https://rcdukwwcbyryauhqlzmx.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZHVrd3djYnlyeWF1aHFsem14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MTY0MDAsImV4cCI6MjA4NTQ5MjQwMH0.rprPmudJYyb6dyhXb9Z9GrtQWEeIX99A2Wrj55PvS54')}catch(e){console.error('Supabase init failed');return null}
 })();
-let isLoggedIn=false;let userSettings={name:'Joon',email:'joon@example.com',language:'th',darkMode:false,notifications:{momentum:true,weekly:false,price:true},risk:'medium',capital:'100000',broker:''};
+let isLoggedIn=false;let userSettings={name:'',email:'',language:'th',darkMode:false,notifications:{momentum:true,weekly:false,price:true},risk:'medium',capital:'100000',broker:''};
 let savedPIN=null;let tempPIN='';
-try{const s=localStorage.getItem('jpt_user');if(s)userSettings=JSON.parse(s);savedPIN=localStorage.getItem('jpt_pin')}catch(e){}
+// One-time wipe of legacy localStorage settings (now stored per-user in Supabase user_settings table)
+try{localStorage.removeItem('jpt_user');savedPIN=localStorage.getItem('jpt_pin')}catch(e){}
 // Session flag: survives page reload (pull-to-refresh) but dies when tab/app closes
 try{if(sessionStorage.getItem('jpt_session_active')==='1')isLoggedIn=true}catch(e){}
-function saveSettings(){try{localStorage.setItem('jpt_user',JSON.stringify(userSettings))}catch(e){}applySettings()}
+function saveSettings(){saveSettingsToCloud();applySettings()}
+
+// ===== Supabase user_settings (per-user cloud sync) =====
+// Schema: public.user_settings (user_id uuid PK, data jsonb, updated_at timestamptz) + RLS auth.uid()=user_id
+async function loadSettingsFromCloud(){
+    if(!supabaseClient)return null;
+    try{
+        const{data:{user}}=await supabaseClient.auth.getUser();
+        if(!user)return null;
+        // Always sync email from auth (source of truth)
+        userSettings.email=user.email||userSettings.email;
+        const{data,error}=await supabaseClient.from('user_settings').select('data').eq('user_id',user.id).maybeSingle();
+        if(error){console.warn('[settings] load failed:',error.message);return null}
+        if(data&&data.data)Object.assign(userSettings,data.data,{email:user.email||userSettings.email});
+        return data?data.data:null;
+    }catch(e){console.warn('[settings] load error:',e);return null}
+}
+
+async function saveSettingsToCloud(){
+    if(!supabaseClient)return;
+    try{
+        const{data:{user}}=await supabaseClient.auth.getUser();
+        if(!user)return;
+        const payload={...userSettings};delete payload.email;  // email lives in auth.users, no need to mirror
+        const{error}=await supabaseClient.from('user_settings').upsert({user_id:user.id,data:payload,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+        if(error)console.warn('[settings] save failed:',error.message);
+    }catch(e){console.warn('[settings] save error:',e)}
+}
 // Manual refresh button — keeps session active, shows spin before reload
 function refreshApp(){
     try{sessionStorage.setItem('jpt_session_active','1')}catch(e){}
@@ -745,7 +773,7 @@ function backToEmail(){
     document.getElementById('stepEmail').classList.add('active');
     document.getElementById('loginEmail').focus();
 }
-function showApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('active');applySettings();renderTickerTape();loadSignalCards()}
+function showApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('active');applySettings();renderTickerTape();loadSignalCards();loadSettingsFromCloud().then(d=>{if(d)applySettings()})}
 
 // ===== SIGNAL CARDS (Gold + BTC) — fetch latest row of momentum CSVs =====
 function parseCSV(text){
