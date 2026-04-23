@@ -167,6 +167,91 @@ html, body {
 .continue-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(139,34,82,0.4); }
 .continue-btn svg { width: 18px; height: 18px; stroke-width: 2.5; }
 
+/* ===== PLANNING SECTION (top of roadmap) ===== */
+.planning-section {
+  padding: 26px 18px 10px;
+  background: var(--cream);
+}
+.planning-inner { max-width: 900px; margin: 0 auto; }
+.planning-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  font-weight: 600;
+  padding: 0 4px 10px 4px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(212,175,55,0.3);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.planning-label::before {
+  content: '◆';
+  color: var(--gold);
+  font-size: 9px;
+}
+.planning-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 640px) { .planning-grid { grid-template-columns: repeat(2, 1fr); } }
+.planning-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  background: linear-gradient(180deg, #FFFEF8 0%, #FAF6ED 70%, #F5EDD8 100%);
+  border: 1.5px solid var(--border-gold-strong);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 14px rgba(114,47,55,0.06), inset 0 1px 0 rgba(255,255,255,0.7);
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  font-family: inherit;
+  color: var(--text);
+}
+.planning-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(114,47,55,0.14), inset 0 1px 0 rgba(255,255,255,0.8);
+  border-color: var(--gold);
+}
+.planning-icon {
+  width: 48px; height: 48px;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #722F37, #8B2252, #D4AF37);
+  border-radius: 12px;
+  color: #FFF5E1;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(139,34,82,0.25);
+}
+.planning-icon svg { width: 26px; height: 26px; }
+.planning-meta { flex: 1; min-width: 0; }
+.planning-title {
+  font-family: 'Sarabun', 'Anuphan', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--maroon);
+  margin-bottom: 2px;
+  line-height: 1.3;
+}
+.planning-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+.planning-arrow {
+  width: 18px; height: 18px;
+  color: var(--gold-deep);
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+.planning-card:hover .planning-arrow { transform: translateX(4px); color: var(--maroon); }
+
 /* ===== CYCLES TABS ===== */
 .cycles-nav {
   background: var(--cream-card);
@@ -307,12 +392,12 @@ html, body {
 /* Day grid */
 .day-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+  gap: 10px;
 }
 .day-card {
-  min-height: 130px;
-  padding: 14px 14px 16px;
+  aspect-ratio: 1 / 1.1;
+  padding: 10px 10px 12px;
   border-radius: 12px;
   background: var(--cream-card);
   border: 1.5px solid var(--border-gold);
@@ -320,7 +405,7 @@ html, body {
   transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
   position: relative;
   overflow: hidden;
   box-shadow: 0 1px 4px rgba(114,47,55,0.04);
@@ -330,76 +415,72 @@ html, body {
   box-shadow: 0 6px 18px rgba(114,47,55,0.12);
   border-color: var(--gold);
 }
-.day-card .dc-top {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  justify-content: space-between;
-}
 .day-card .dc-num {
   font-family: 'DM Serif Display', serif;
-  font-size: 1.7rem;
+  font-size: 1.6rem;
   line-height: 1;
   color: var(--maroon);
 }
-.day-card .dc-phase-dot {
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
+.day-card .dc-phase-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  font-family: 'DM Serif Display', serif;
+  font-size: 0.95rem;
+  color: #FFF5E1;
+  align-self: flex-start;
 }
-.day-card[data-phase="J"] .dc-phase-dot { background: linear-gradient(135deg, #722F37, #9C2B2B); }
-.day-card[data-phase="P"] .dc-phase-dot { background: linear-gradient(135deg, #8B6914, #D4AF37); }
-.day-card[data-phase="T"] .dc-phase-dot { background: linear-gradient(135deg, #1F7D49, #2E9F5F); }
-.day-card .dc-title {
-  font-family: 'Sarabun', 'Anuphan', sans-serif;
-  font-size: 0.88rem;
-  line-height: 1.4;
-  color: var(--text);
-  margin-top: auto;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  font-weight: 500;
-  word-break: break-word;
+.day-card[data-phase="J"] .dc-phase-badge { background: linear-gradient(135deg, #722F37, #9C2B2B); }
+.day-card[data-phase="P"] .dc-phase-badge { background: linear-gradient(135deg, #8B6914, #D4AF37); }
+.day-card[data-phase="T"] .dc-phase-badge { background: linear-gradient(135deg, #1F7D49, #2E9F5F); }
+.day-card .dc-lock {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(122,111,98,0.35);
+  transition: color 0.2s ease;
+}
+.day-card:hover .dc-lock { color: var(--gold-deep); }
+.day-card .dc-lock svg { width: 18px; height: 18px; stroke-width: 1.8; }
+.day-card.locked {
+  /* Base state — keep subtle */
+}
+.day-card.unlocked {
+  /* future state when Joon unlocks content */
 }
 .day-card.done {
   background: linear-gradient(135deg, #FFFEF8 0%, #F5EDD8 100%);
   border-color: var(--gold);
 }
-.day-card.done::before {
-  content: '';
-  position: absolute;
-  top: 10px; right: 10px;
-  width: 20px; height: 20px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--emerald), var(--emerald-dk));
-  z-index: 1;
+.day-card.done .dc-lock {
+  display: none;
 }
 .day-card.done::after {
   content: '';
   position: absolute;
-  top: 14px; right: 14px;
-  width: 11px; height: 6.5px;
+  bottom: 10px; left: 50%;
+  transform: translateX(-50%);
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--emerald), var(--emerald-dk));
+}
+.day-card.done::before {
+  content: '';
+  position: absolute;
+  bottom: 16px; left: 50%;
+  transform: translate(-50%, 0) rotate(-45deg);
+  width: 10px; height: 6px;
   border-left: 2px solid #FFF5E1;
   border-bottom: 2px solid #FFF5E1;
-  transform: rotate(-45deg);
   z-index: 2;
-}
-.day-card.done .dc-phase-dot {
-  /* Hide dot when done — check badge replaces */
-  display: none;
 }
 .day-card.current {
   border-color: var(--maroon);
   border-width: 2px;
   box-shadow: 0 0 0 3px rgba(114,47,55,0.15), 0 4px 12px rgba(114,47,55,0.18);
-}
-.day-card.has-journal:not(.done) .dc-num::after {
-  content: '•';
-  color: var(--gold);
-  margin-left: 4px;
-  font-size: 0.7em;
 }
 
 /* ===== DAY DETAIL MODAL ===== */
@@ -778,28 +859,50 @@ html, body {
     <div class="hero-label">JP Trust Learning · JPT Framework</div>
     <h1 class="hero-title">Roadmap <span class="th">90 วัน</span><br><span class="th">สู่เทรดเดอร์มืออาชีพ</span></h1>
     <p class="hero-sub">Journal · Plan · Trade · ลูปต่อเนื่อง · จากมือใหม่สู่ระบบของตัวเอง</p>
+  </div>
+</div>
 
-    <div class="progress-card">
-      <div class="progress-head">
-        <div class="progress-current">
-          วันที่ <strong id="progDone">0</strong> / <strong id="progTotal">90</strong>
-          <span style="opacity:0.6; margin-left:8px;">· <span id="progCycle">Cycle 1 · Foundation</span></span>
+<!-- ===== PLANNING DASHBOARDS (top of roadmap) ===== -->
+<section class="planning-section">
+  <div class="planning-inner">
+    <div class="planning-label">Planning Toolkit</div>
+    <div class="planning-grid">
+      <button class="planning-card" onclick="openPlanningDashboard('finance')">
+        <div class="planning-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 7v10"/>
+            <path d="M15 9.5a2.5 2.5 0 0 0-2.5-2.5h-1a2 2 0 0 0 0 4h1a2.5 2.5 0 0 1 0 5h-1a2.5 2.5 0 0 1-2.5-2.5"/>
+          </svg>
         </div>
-        <div class="progress-pct" id="progPct">0%</div>
-      </div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progFill"></div>
-      </div>
-      <button class="continue-btn" id="continueBtn" onclick="continueBookmark()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="13 5 20 12 13 19"/>
-          <line x1="4" y1="12" x2="20" y2="12"/>
+        <div class="planning-meta">
+          <div class="planning-title">วางแผนการเงินส่วนบุคคล</div>
+          <div class="planning-desc">รายรับ · รายจ่าย · เงินสำรอง · เป้าหมายการเงิน</div>
+        </div>
+        <svg class="planning-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
         </svg>
-        <span id="continueLabel">เริ่มวันที่ 1</span>
+      </button>
+      <button class="planning-card" onclick="openPlanningDashboard('portfolio')">
+        <div class="planning-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3v18h18"/>
+            <rect x="7" y="12" width="3" height="6"/>
+            <rect x="12" y="8" width="3" height="10"/>
+            <rect x="17" y="5" width="3" height="13"/>
+          </svg>
+        </div>
+        <div class="planning-meta">
+          <div class="planning-title">วางแผนพอร์ตการลงทุน</div>
+          <div class="planning-desc">Asset allocation · risk budget · rebalancing plan</div>
+        </div>
+        <svg class="planning-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
       </button>
     </div>
   </div>
-</div>
+</section>
 
 <!-- ===== CYCLES NAV ===== -->
 <nav class="cycles-nav">
@@ -834,50 +937,6 @@ html, body {
 </main>
 
 <!-- ===== DAY DETAIL MODAL ===== -->
-<div class="day-modal" id="dayModal" onclick="if(event.target===this) closeDayModal()">
-  <div class="day-modal-inner" id="dayModalInner">
-    <button class="dm-close" onclick="closeDayModal()" aria-label="ปิด">✕</button>
-
-    <div class="day-modal-head">
-      <div class="dm-day-big" id="dmDay">1</div>
-      <div class="dm-head-meta">
-        <span class="dm-phase-tag" id="dmPhaseTag"></span>
-        <div class="dm-title" id="dmTitle"></div>
-      </div>
-    </div>
-
-    <div class="dm-desc" id="dmDesc"></div>
-
-    <div class="dm-check-wrap" id="dmCheck" onclick="toggleDmCheck()">
-      <div class="dm-check"></div>
-      <div class="dm-check-label">ทำเสร็จแล้ว</div>
-    </div>
-
-    <div>
-      <label class="dm-journal-label">Journal · สิ่งที่ได้เรียนรู้</label>
-      <textarea class="dm-journal" id="dmJournal" placeholder="จดบันทึกสั้นๆ หรือยาวๆ ตามต้องการ · สิ่งที่ได้เรียนรู้ · คำถามที่ยังค้างอยู่ · emotion ที่รู้สึก..."></textarea>
-      <div class="dm-journal-hint">Journal ของคุณจะถูกบันทึกเมื่อกด "บันทึก"</div>
-      <div class="dm-journal-ts" id="dmSavedAt"></div>
-    </div>
-
-    <div class="dm-footer">
-      <button class="dm-nav" id="dmPrev" onclick="navDay(-1)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="15 18 9 12 15 6"/>
-        </svg>
-        ก่อน
-      </button>
-      <button class="dm-save" onclick="saveDayModal()">💾 บันทึก</button>
-      <button class="dm-nav" id="dmNext" onclick="navDay(1)">
-        ถัดไป
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="9 6 15 12 9 18"/>
-        </svg>
-      </button>
-    </div>
-  </div>
-</div>
-
 <!-- ===== ABOUT MODAL ===== -->
 <div class="about-modal" id="aboutModal" onclick="if(event.target===this) closeAboutModal()">
   <div class="about-inner">
@@ -932,119 +991,12 @@ html, body {
 
 <script>
 // ========================================
-// TASK DATA — 90 Days JPT Roadmap
+// METADATA (phase labels + cycle metadata)
 // ========================================
-const TASKS = [
-  // ===== CYCLE 1: FOUNDATION (Day 1-30) =====
-  // J — Journal & Justify (Day 1-10)
-  {day:1,cycle:1,phase:'J',title:'ทำไมคุณถึงอยากเทรด?',desc:'เขียน 3 ประโยคเกี่ยวกับเป้าหมายการเทรดของคุณ · เงิน? อิสระ? ความท้าทาย? · Why ที่ชัดจะช่วยให้ผ่านช่วงยากๆ ไปได้'},
-  {day:2,cycle:1,phase:'J',title:'ประวัติการเงินของคุณ',desc:'บันทึกภาพรวมการเงินปัจจุบัน: รายได้ต่อเดือน · ค่าใช้จ่าย · หนี้สิน · เงินสำรอง · ความสบายใจกับความเสี่ยง — ก่อนจะเริ่มเทรด ต้องรู้จุดยืนของตัวเอง'},
-  {day:3,cycle:1,phase:'J',title:'ประสบการณ์เทรดเดิม',desc:'เคยเทรดอะไรไหม? กำไรขาดทุนประมาณเท่าไร? บทเรียนที่จำได้คืออะไร? · การมองย้อนกลับไปจะช่วยเห็นรูปแบบที่ซ้ำ'},
-  {day:4,cycle:1,phase:'J',title:'สไตล์ชีวิตและเวลา',desc:'เวลาที่ดูตลาดได้ต่อวัน: กี่นาที? · ใช้มือถือหรือคอม? · สมาธิดีช่วงไหน? · กำหนด "trading hours" ของตัวเองที่เหมาะกับชีวิตจริง'},
-  {day:5,cycle:1,phase:'J',title:'Goals แบบ SMART',desc:'เขียนเป้าหมาย 12 เดือน · Specific/Measurable/Achievable/Realistic/Time-bound · ตัวอย่าง: "ทำกำไร 12% ต่อปี โดยไม่ให้ DD เกิน 15%"'},
-  {day:6,cycle:1,phase:'J',title:'ความกลัว 3 อย่าง',desc:'เขียน 3 สิ่งที่กลัวที่สุดในการเทรด · FOMO? ขาดทุน? ตกรถ? ดูผิด? · การรู้ว่ากลัวอะไรคือก้าวแรกในการเอาชนะ'},
-  {day:7,cycle:1,phase:'J',title:'Risk tolerance ตัวจริง',desc:'ตอบตัวเองจริงใจ: ถ้าขาดทุน 10% ทีเดียวรู้สึกยังไง? 20%? 30%? · กำหนด "pain point" ที่ทนได้จริงไม่ใช่ที่อยากให้เป็น'},
-  {day:8,cycle:1,phase:'J',title:'แผนจัดสรรเงินทุน',desc:'ทุนที่พร้อมเสีย (ไม่ใช่ทุกบาท) · เงินสำรองอย่างน้อย 6 เดือนก่อน · trading capital ≤ 20% ของ liquid assets เป็น rule of thumb ปลอดภัย'},
-  {day:9,cycle:1,phase:'J',title:'ภาพ "เทรดเดอร์ที่ประสบความสำเร็จ"',desc:'บรรยาย: เขาใช้เวลายังไง? ตัดสินใจยังไง? reaction กับขาดทุนยังไง? · ใช้เป็น north star ของตัวเอง'},
-  {day:10,cycle:1,phase:'J',title:'Weekly check-in routine',desc:'กำหนดวันและเวลา review สัปดาห์ละ 1 ครั้ง (เช่น ทุกอาทิตย์ 20:00) · กันเวลาไว้ล่วงหน้า · routine = สิ่งที่ทำแม้ไม่อยากทำ'},
-  // P — Plan & Power (Day 11-20)
-  {day:11,cycle:1,phase:'P',title:'Candlestick OHLC พื้นฐาน',desc:'เรียน: Open/High/Low/Close · Green vs Red · Body vs Wick · ฝึกดูกราฟ 1 ชั่วโมง — พื้นฐานที่สุดของการอ่านตลาด'},
-  {day:12,cycle:1,phase:'P',title:'Trend vs Range',desc:'ตลาดมี 3 สภาพ: uptrend · downtrend · sideways · เรียนวิธีบอกจาก Higher Highs/Lower Lows — รู้สภาพก่อนเลือกกลยุทธ์'},
-  {day:13,cycle:1,phase:'P',title:'Support &amp; Resistance',desc:'พื้นฐานที่สุด · วาด S/R บนกราฟ SPY หรือ SET · เส้นไหนโดนทดสอบหลายครั้ง = แข็ง · ใช้เป็นเครื่องมือ entry/exit ได้'},
-  {day:14,cycle:1,phase:'P',title:'Moving Averages',desc:'ความหมายของ MA20 / MA50 / MA200 · ราคาอยู่เหนือ MA200 = long-term bullish · MA เป็น filter กันเทรดสวนเทรนด์'},
-  {day:15,cycle:1,phase:'P',title:'RSI เบื้องต้น',desc:'0-100 scale · Overbought >70 · Oversold <30 · ไม่ใช่ signal เดียว ต้องประกอบกับอื่นๆ — แรงขึ้นแรงลงวัดได้'},
-  {day:16,cycle:1,phase:'P',title:'Volume พื้นฐาน',desc:'Volume confirms price · volume เพิ่มขึ้นพร้อมราคาขึ้น = strong · ปริมาณน้อยตอนราคาขึ้น = weak · หุ้นสภาพคล่องต่ำมักหลอก'},
-  {day:17,cycle:1,phase:'P',title:'Risk per trade (1-2% rule)',desc:'ห้ามเสียเกิน 1-2% ของทุนต่อ 1 trade · คำนวณ position size จาก stop loss distance — กฎข้อนี้ช่วยให้รอดจาก draw down ระยะยาว'},
-  {day:18,cycle:1,phase:'P',title:'Stop Loss มีเสมอ',desc:'ทุก trade ต้องมี stop · Hard stop (เข้าในระบบ broker) · Mental stop = no stop (จะเลื่อนเมื่อถึงเวลา)'},
-  {day:19,cycle:1,phase:'P',title:'Risk/Reward ratio',desc:'Target R:R ≥ 2:1 · หมายถึง reward potential ≥ 2× risk · ถึงแม้ชนะ 50% ถ้า R:R = 2:1 ก็ยังกำไร'},
-  {day:20,cycle:1,phase:'P',title:'Trading Plan v1',desc:'เขียน rule ของตัวเอง: entry criteria · exit · position size · max positions · hours · ไม่เกิน 1 หน้า — เป็นเอกสารคู่ใจตลอด journey นี้'},
-  // T — Trade & Trust (Day 21-30)
-  {day:21,cycle:1,phase:'T',title:'เปิด Paper trading',desc:'เปิด demo account บน TradingView หรือ MT5 · ตั้งทุน paper ให้ match ทุนจริงที่วางแผน — paper trade ก่อนทุกครั้งที่เริ่มกลยุทธ์ใหม่'},
-  {day:22,cycle:1,phase:'T',title:'First paper trade',desc:'ใช้ Trading Plan v1 จาก Day 20 · จด entry/stop/target ก่อนเข้า · ห้ามเปลี่ยนระหว่างทาง · 1 trade เต็ม flow'},
-  {day:23,cycle:1,phase:'T',title:'Paper trade #2',desc:'ทำตาม rule เคร่งครัด · max 1 position/day — ฝึกให้ได้ก่อนจะเพิ่ม frequency'},
-  {day:24,cycle:1,phase:'T',title:'Paper trade #3',desc:'หลัง exit → journal ทันที: ทำไมเข้า · ทำไมออก · รู้สึกยังไง · ทำตาม plan ได้ 100% หรือเปล่า'},
-  {day:25,cycle:1,phase:'T',title:'Paper trade #4',desc:'ฝึก discipline · ถึงจะอยาก override plan ก็ห้าม · การยึด rule คือ edge ของมือสมัครเล่น'},
-  {day:26,cycle:1,phase:'T',title:'Review paper trades',desc:'R:R จริงเป็นเท่าไร? · Win rate? · pattern ผิดพลาดมีอะไร? · จุดแข็งของเราคืออะไร?'},
-  {day:27,cycle:1,phase:'T',title:'Refine plan v2',desc:'แก้ rule ตามสิ่งที่เจอใน paper trade · เปลี่ยนเล็กๆ ไม่ต้องรื้อใหม่ · update Trading Plan เป็น v1.1'},
-  {day:28,cycle:1,phase:'T',title:'Live micro-trade (optional)',desc:'ถ้าพร้อม: เทรดจริง 1 position ขนาดเล็กสุด (0.5% ของทุน) · ถ้ายังไม่พร้อมก็ paper ต่อได้ · ห้ามบังคับตัวเอง'},
-  {day:29,cycle:1,phase:'T',title:'Journal first live trade',desc:'เปรียบเทียบ paper vs live · emotions มีผลแค่ไหน? · ทำอะไรแตกต่างออกไป? — ความรู้สึกคนละเรื่องกันเลย'},
-  {day:30,cycle:1,phase:'T',title:'Cycle 1 review',desc:'สรุปสิ่งที่เรียนรู้ใน 30 วันแรก · พร้อมเข้า Cycle 2 หรือยัง? · ถ้ายังไม่พร้อม ทำ Cycle 1 ซ้ำได้ ไม่มีใครตรวจ'},
-
-  // ===== CYCLE 2: INTERMEDIATE (Day 31-60) =====
-  // J (Day 31-40)
-  {day:31,cycle:2,phase:'J',title:'รวบรวม 1-month history',desc:'ทุก trade ที่ทำใน Cycle 1 · รวมเป็น spreadsheet ชัดเจน · date, entry, exit, R:R, notes — ไม่มีข้อมูลก็วิเคราะห์ไม่ได้'},
-  {day:32,cycle:2,phase:'J',title:'Win rate analysis',desc:'นับ winners vs losers · อัตรากี่ %? · สูงเกิน 70% = อาจ sample เล็กไป · ต่ำเกิน 30% = มีปัญหา setup'},
-  {day:33,cycle:2,phase:'J',title:'Avg R:R analysis',desc:'R realized เฉลี่ยต่อ win · R realized เฉลี่ยต่อ loss · อัตราต้อง ≥ 1:1 ถึงจะทำกำไรได้ในระยะยาว'},
-  {day:34,cycle:2,phase:'J',title:'Expectancy calculation',desc:'E = (Win% × Avg Win) - (Loss% × Avg Loss) · ต้อง > 0 ถึงจะกำไรระยะยาว · ถ้าเป็นลบ = กลยุทธ์แพ้ตั้งแต่แรก'},
-  {day:35,cycle:2,phase:'J',title:'Pattern-find ใน winners',desc:'หา 3 trade ที่กำไรดีที่สุด · อะไรเหมือนกัน? · context? setup? emotion? · replicable เป็นกลยุทธ์ได้ไหม?'},
-  {day:36,cycle:2,phase:'J',title:'Pattern-find ใน losers',desc:'หา 3 trade ที่เจ็บที่สุด · ผิดเพราะอะไร? · impulse? รีบ? ไม่ follow plan? · หลีกเลี่ยงยังไงในอนาคต?'},
-  {day:37,cycle:2,phase:'J',title:'Emotional audit',desc:'trade ไหนตัดสินใจจาก fear / greed / FOMO? · คิดเป็นเปอร์เซ็นต์? · emotion-driven trades มักผลเสีย'},
-  {day:38,cycle:2,phase:'J',title:'Revenge trading check',desc:'ถ้าเสียแล้วรีบเทรดต่อทันที = danger · มี cooling-off rule หรือยัง? · "หลังเสียต้องพัก 24 ชม." เป็น rule ที่ปกป้องตัวเองได้'},
-  {day:39,cycle:2,phase:'J',title:'Trading Plan v2',desc:'ใช้ข้อมูลจริง 38 วัน · แก้ rule ที่ทำผลเสีย · อัพเกรด Trading Plan เป็น version 2 ที่ evidence-based'},
-  {day:40,cycle:2,phase:'J',title:'Commit to Plan v2',desc:'Print plan · เก็บไว้ใกล้คอมหรือโทรศัพท์ · ห้ามเทรดถ้าไม่ตรง plan — commitment คือตัวแยกมือสมัครเล่นออกจากมืออาชีพ'},
-  // P (Day 41-50)
-  {day:41,cycle:2,phase:'P',title:'Introduction to Momentum',desc:'Concept "winners keep winning" · ทำไม work? · behavioral finance + institutional rebalancing — หนึ่งในกลยุทธ์ที่ robust ที่สุดในประวัติศาสตร์'},
-  {day:42,cycle:2,phase:'P',title:'6-month momentum backtest',desc:'ใช้ sp500-strategy-pro (ในแอพของเรา) · ลอง backtest แบบต่างๆ · ดู CAGR vs buy-and-hold · หลักฐานเชิงตัวเลข'},
-  {day:43,cycle:2,phase:'P',title:'Read backtest results',desc:'Sharpe? Max DD? Win rate? · compare vs SPY benchmark · เข้าใจว่าเลขแต่ละตัวสื่ออะไร · number literacy ของเทรดเดอร์'},
-  {day:44,cycle:2,phase:'P',title:'Sector rotation theory',desc:'แต่ละ sector ทำงานต่างกันในแต่ละ economic regime · Tech-led bull vs Value-led bull · การกระจายที่ฉลาด'},
-  {day:45,cycle:2,phase:'P',title:'Sector rotation dashboard',desc:'ดู Top 3 sectors ตอนนี้ (จาก dashboard ในแอพ) · เทียบกับอดีต regime · รู้ว่าตลาดอยู่ช่วงไหน'},
-  {day:46,cycle:2,phase:'P',title:'Macro: Fed rates',desc:'rate ขึ้น = growth stocks ลบ · rate ลง = growth stocks บวก · เหตุผล: discount rate เปลี่ยน present value · macro เข้าใจได้ไม่ยาก'},
-  {day:47,cycle:2,phase:'P',title:'Macro: VIX',desc:'VIX สูง = fear · VIX ต่ำ = complacency · ใช้ประกอบ timing · VIX > 30 = เวลาซื้อคน contrarian'},
-  {day:48,cycle:2,phase:'P',title:'Macro: DXY (US dollar)',desc:'Dollar แข็ง = US exports เจ็บ · Gold ลง · macro chain พื้นฐาน — ต้องเข้าใจก่อนเทรด global assets'},
-  {day:49,cycle:2,phase:'P',title:'Correlation audit',desc:'stocks vs bonds vs gold vs crypto · ช่วงไหน move together vs diverge · การกระจายที่แท้จริงคืออะไร'},
-  {day:50,cycle:2,phase:'P',title:'Build strategic watchlist',desc:'10-20 tickers ที่สนใจ · จัดเป็น sectors · review weekly · watchlist = เวทีที่จำกัดให้ focus'},
-  // T (Day 51-60)
-  {day:51,cycle:2,phase:'T',title:'Strategy routine setup',desc:'เช้า 15 นาที: ดู overnight + plan วัน · เย็น 15 นาที: review + log · routine ทำทุกวันแม้ไม่มี trade'},
-  {day:52,cycle:2,phase:'T',title:'Trade ตามระบบ Momentum',desc:'ซื้อ Top N จาก sp500-strategy-pro · hold ตาม rebalance schedule · ห้าม override · trust the system'},
-  {day:53,cycle:2,phase:'T',title:'Logged trade #1',desc:'ห้าม override — ถ้าระบบบอกซื้อ = ซื้อ · ถ้าระบบบอกขาย = ขาย · นี่คือ discipline test แรก'},
-  {day:54,cycle:2,phase:'T',title:'Logged trade #2',desc:'สังเกตอารมณ์ตัวเอง · อยากแทรกกี่ครั้ง? จดไว้ทุกครั้ง · ความอยากแทรก = สัญญาณว่าคุณไม่ trust ระบบ'},
-  {day:55,cycle:2,phase:'T',title:'Logged trade #3',desc:'discipline check — ทำได้ตามระบบ 100% ไหม? ถ้าไม่ 100% สาเหตุคืออะไร?'},
-  {day:56,cycle:2,phase:'T',title:'Mid-cycle review',desc:'ทำตามระบบได้กี่ %? · อยากแทรกกี่ครั้ง? · ถ้า discipline > 90% → พร้อมเพิ่ม size · ถ้าน้อยกว่า → ยังไม่พร้อม'},
-  {day:57,cycle:2,phase:'T',title:'Size up 25%',desc:'ถ้า Cycle 2 ผ่าน discipline test → เพิ่ม position size 25% · ไม่เกินนี้เพราะ emotional impact ของ size ใหญ่ขึ้นต้องค่อยๆ เรียน'},
-  {day:58,cycle:2,phase:'T',title:'Diversification test',desc:'ถือ > 1 asset class พร้อมกัน (เช่น stock + gold) · DD combined เป็นยังไง? · correlation ช่วยลดความเสี่ยงจริงไหม?'},
-  {day:59,cycle:2,phase:'T',title:'Tax &amp; fees awareness',desc:'คำนวณ impact ของ fees + tax บน net return · sometimes 30% gross → 18% net · ต้องรู้ net เพื่อเข้าใจ real return'},
-  {day:60,cycle:2,phase:'T',title:'Cycle 2 review',desc:'Net performance? · Lessons learned ใน 30 วันที่สอง · พร้อมเข้า Advanced หรือไม่? · ถ้ายังไม่พร้อม ทำ Cycle 2 ซ้ำได้'},
-
-  // ===== CYCLE 3: ADVANCED (Day 61-90) =====
-  // J (Day 61-70)
-  {day:61,cycle:3,phase:'J',title:'Performance attribution',desc:'กำไร/ขาดทุนมาจากอะไร? · skill vs luck? · market beta (ตลาดพาไป) vs alpha (ทักษะตัวเอง)? · แยกให้ได้คือทักษะ'},
-  {day:62,cycle:3,phase:'J',title:'Behavioral audit advanced',desc:'เข้า trade early (ก่อน signal) หรือ late? · average winner hold time vs loser hold time? · "cut losers fast, let winners run" ทำได้จริงหรือไม่?'},
-  {day:63,cycle:3,phase:'J',title:'Strategy comparison',desc:'ถ้าไม่เทรดเลย (buy &amp; hold SPY) · better or worse? · ต้อง benchmark เสมอ · ถ้าแพ้ passive investing = กลยุทธ์ไม่มีประโยชน์'},
-  {day:64,cycle:3,phase:'J',title:'Correlation ของ positions',desc:'trades ที่ทำ correlated ไหม? · ถ้าทุก position อยู่ sector เดียวกันหมด = false diversification · ต้อง spread across'},
-  {day:65,cycle:3,phase:'J',title:'Time-of-day analysis',desc:'เทรดช่วงไหน profit เยอะ? · ช่วงไหนขาดทุน? · เทรดเฉพาะช่วง optimal — รู้ edge ของเวลา'},
-  {day:66,cycle:3,phase:'J',title:'Day-of-week pattern',desc:'จันทร์ vs ศุกร์ performance · ตลาดมี seasonal patterns: Turn-of-the-Month · End-of-Quarter · สังเกตของตัวเอง'},
-  {day:67,cycle:3,phase:'J',title:'Macro call review',desc:'Fed rate calls ของเราถูกกี่ %? · ใช้ macro ในการตัดสินใจยังไง? · honest feedback — บางทีเราไม่ได้ดีพอในการคาดการณ์ macro'},
-  {day:68,cycle:3,phase:'J',title:'"What if" scenarios',desc:'ถ้าตลาดลงอีก 20% → มี plan? · stress test portfolio · "hope" ไม่ใช่กลยุทธ์ · prepare ล่วงหน้า'},
-  {day:69,cycle:3,phase:'J',title:'Private philosophy',desc:'Trading = business · edge ของคุณคืออะไร? · sustainable ไหม? · ถ้าตลาดเปลี่ยนสภาพ edge หายไปหรือเปล่า?'},
-  {day:70,cycle:3,phase:'J',title:'Refine JPT for Cycle 4+',desc:'ทำอะไรเพิ่มใน Cycle 4? · skill ไหนเสริม? · มืออาชีพมาจาก deliberate practice ไม่ใช่แค่เวลา'},
-  // P (Day 71-80)
-  {day:71,cycle:3,phase:'P',title:'Portfolio construction',desc:'Core vs satellite · % allocation · rebalancing frequency · แต่ละ position มีที่ของมันในภาพรวม'},
-  {day:72,cycle:3,phase:'P',title:'Risk budgeting',desc:'แต่ละ position ≤ 5-10% ของ portfolio · max drawdown รวม cap ที่ 20% · ออกจากระบบถ้าเกิน'},
-  {day:73,cycle:3,phase:'P',title:'Multi-strategy approach',desc:'Momentum + Mean-reversion + Carry · ทำ 2 อย่างให้ดี > 5 อย่างกลางๆ · diversify strategies ไม่ใช่แค่ tickers'},
-  {day:74,cycle:3,phase:'P',title:'Hedging basics',desc:'ใช้ gold / bonds / VIX เป็น hedge · เมื่อไรและอย่างไร · hedging ลด return แต่ลด pain ตอนวิกฤต'},
-  {day:75,cycle:3,phase:'P',title:'Options intro (optional)',desc:'Call / Put พื้นฐาน · ใช้ protect existing position ไม่ใช่ speculation · options = insurance ไม่ใช่ lottery'},
-  {day:76,cycle:3,phase:'P',title:'Leverage — extreme caution',desc:'Leverage 2x = risk 2x · Drawdown compounds กับ leverage · เข้าใจ Kelly criterion · ความโลภ leverage ฆ่ามากกว่าช่วย'},
-  {day:77,cycle:3,phase:'P',title:'Compounding math',desc:'10% สม่ำเสมอ 20 ปี = 7x · 15% = 16x · 20% = 38x · วินัย > กำไรสูงระยะสั้น · คณิตศาสตร์ของความอดทน'},
-  {day:78,cycle:3,phase:'P',title:'Tax efficiency',desc:'Long-term vs short-term capital gains · tax-loss harvesting · tax = ต้นทุนที่มักถูกลืม'},
-  {day:79,cycle:3,phase:'P',title:'Advanced: JP Trust dashboards',desc:'ใช้ gold-momentum + sp500-strategy-pro + sector-rotation · signals ไหนประกอบกันได้? · confluence ของหลาย signal = คุณภาพสูง'},
-  {day:80,cycle:3,phase:'P',title:'Master plan v3',desc:'Trading plan version 3 · comprehensive · ready-to-scale · เอกสาร 3-5 หน้าที่ครอบคลุมทุก scenario'},
-  // T (Day 81-90)
-  {day:81,cycle:3,phase:'T',title:'Size up ด้วยวินัย',desc:'ถ้า Cycle 1+2 สำเร็จ → เพิ่มทุน 25-50% · ห้ามเพิ่มถ้ายัง inconsistent · size up = เพิ่ม responsibility'},
-  {day:82,cycle:3,phase:'T',title:'Multiple positions',desc:'Hold 3-5 positions พร้อมกัน · track separately · แต่ละตัวมี entry/stop/target ของตัวเอง'},
-  {day:83,cycle:3,phase:'T',title:'Execute #1',desc:'ปล่อยระบบทำงาน · intervene แค่เมื่อ plan บอก · trust the process'},
-  {day:84,cycle:3,phase:'T',title:'Execute #2',desc:'ดูอารมณ์ · journal ตัวเอง · ถ้า anxious = size ใหญ่เกิน · ถ้า bored = size เล็กเกิน'},
-  {day:85,cycle:3,phase:'T',title:'Execute #3',desc:'full trust ในระบบ · outcome จะดีหรือแย่ · ประเมินที่ process ไม่ใช่ result เดียว'},
-  {day:86,cycle:3,phase:'T',title:'Quarterly deep review',desc:'จำลอง institutional review · metrics ครบทุกด้าน · return, risk, attribution, lessons · 2-3 หน้าเอกสาร'},
-  {day:87,cycle:3,phase:'T',title:'Document your edge',desc:'เขียนให้อ่านได้ในอีก 6 เดือน: "ทำไมกลยุทธ์ฉัน work" · evidence-based ไม่ใช่ feeling · edge ที่จับต้องได้'},
-  {day:88,cycle:3,phase:'T',title:'Teach someone',desc:'อธิบายกลยุทธ์ให้เพื่อนสักคน · ถ้าอธิบายไม่ได้ = ไม่เข้าใจจริง · teaching = clarity test'},
-  {day:89,cycle:3,phase:'T',title:'Set Cycle 4 goals',desc:'ก้าวต่อไป · ทำซ้ำ J-P-T · เพิ่มอะไรจาก Cycle 3? · new skill · new asset class · new market?'},
-  {day:90,cycle:3,phase:'T',title:'Lifelong practice',desc:'Trading = skill ที่ต้องฝึกตลอดชีวิต · ฉลองความสำเร็จ 90 วัน · พัก 1 วัน · กลับมา Day 1 Cycle 4 ด้วยมุมมองใหม่'}
-];
-
 const PHASE_LABELS = {
-  J: {title:'Journal &amp; Justify', subtitle:'ทบทวน · ให้เหตุผล'},
-  P: {title:'Plan &amp; Power', subtitle:'วางแผน · ยกระดับความรู้'},
-  T: {title:'Trade &amp; Trust', subtitle:'ลงมือ · เข้าใจระบบตนเอง'}
+  J: {title:'Journal & Justify', subtitle:'ทบทวน · ให้เหตุผล'},
+  P: {title:'Plan & Power', subtitle:'วางแผน · ยกระดับความรู้'},
+  T: {title:'Trade & Trust', subtitle:'ลงมือ · เข้าใจระบบตนเอง'}
 };
 const CYCLE_META = {
   1: {label:'Cycle 1 · Foundation', title:'Foundation — พื้นฐาน', desc:'รู้จักตัวเอง · เรียนพื้นฐาน · ลงมือ paper trade'},
@@ -1078,57 +1030,53 @@ function jptToast(msg) {
 }
 
 // ========================================
+// PHASE ROTATION — J/P/T cycles daily
+// Day 1 = J, Day 2 = P, Day 3 = T, Day 4 = J, ...
+// ========================================
+function phaseForDay(day) {
+  return ['J', 'P', 'T'][(day - 1) % 3];
+}
+
+// ========================================
 // RENDER
 // ========================================
 function renderAllCycles() {
   for (let c = 1; c <= 3; c++) {
     const panel = document.getElementById('cyclePanel-' + c);
     const meta = CYCLE_META[c];
+    const startDay = (c - 1) * 30 + 1;
+    const endDay = c * 30;
+
     let html = `
       <div class="cycle-header">
         <div class="cycle-header-label">${meta.label}</div>
         <div class="cycle-header-title">${meta.title}</div>
         <div class="cycle-header-desc">${meta.desc}</div>
       </div>
+      <div class="day-grid">
     `;
-    // 3 phases per cycle
-    for (const phase of ['J', 'P', 'T']) {
-      const tasksInPhase = TASKS.filter(t => t.cycle === c && t.phase === phase);
-      if (!tasksInPhase.length) continue;
-      const firstDay = tasksInPhase[0].day;
-      const lastDay = tasksInPhase[tasksInPhase.length - 1].day;
-      const plabel = PHASE_LABELS[phase];
-      html += `
-        <section class="phase-section" data-phase="${phase}">
-          <div class="phase-header">
-            <div class="phase-letter">${phase}</div>
-            <div class="phase-title-group">
-              <div class="phase-title">${plabel.title}</div>
-              <div class="phase-subtitle">${plabel.subtitle}</div>
-            </div>
-            <div class="phase-range">Day ${firstDay}–${lastDay}</div>
-          </div>
-          <div class="day-grid">
-            ${tasksInPhase.map(t => renderDayCard(t)).join('')}
-          </div>
-        </section>
-      `;
+    for (let d = startDay; d <= endDay; d++) {
+      html += renderDayCard(d);
     }
+    html += '</div>';
     panel.innerHTML = html;
   }
 }
 
-function renderDayCard(t) {
-  const p = progress[t.day] || {};
+function renderDayCard(day) {
+  const phase = phaseForDay(day);
+  const p = progress[day] || {};
   const done = p.done ? 'done' : '';
-  const hasJournal = p.journal && p.journal.trim() ? 'has-journal' : '';
   return `
-    <div class="day-card ${done} ${hasJournal}" data-day="${t.day}" data-phase="${t.phase}" onclick="openDayModal(${t.day})">
-      <div class="dc-top">
-        <div class="dc-num">${t.day}</div>
-        <div class="dc-phase-dot"></div>
+    <div class="day-card locked ${done}" data-day="${day}" data-phase="${phase}" onclick="openDayModal(${day})">
+      <div class="dc-num">${day}</div>
+      <div class="dc-phase-badge">${phase}</div>
+      <div class="dc-lock">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="11" width="16" height="10" rx="2"/>
+          <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+        </svg>
       </div>
-      <div class="dc-title">${t.title}</div>
     </div>
   `;
 }
@@ -1195,86 +1143,21 @@ function switchCycle(n) {
 }
 
 // ========================================
-// DAY MODAL
+// DAY MODAL (currently locked — content coming later)
 // ========================================
 function openDayModal(day) {
-  const task = TASKS.find(t => t.day === day);
-  if (!task) return;
-  currentModalDay = day;
-
-  // Auto-switch to the cycle tab
-  if (!document.getElementById('cyclePanel-' + task.cycle).classList.contains('active')) {
-    switchCycle(task.cycle);
-  }
-
-  document.getElementById('dmDay').textContent = day;
-  const phaseTag = document.getElementById('dmPhaseTag');
-  phaseTag.className = 'dm-phase-tag phase-' + task.phase;
-  phaseTag.textContent = task.phase + ' · ' + PHASE_LABELS[task.phase].title.replace('&amp;', '&');
-  document.getElementById('dmTitle').innerHTML = task.title;
-  document.getElementById('dmDesc').innerHTML = task.desc;
-
-  const p = progress[day] || {};
-  document.getElementById('dmCheck').classList.toggle('checked', !!p.done);
-  document.getElementById('dmJournal').value = p.journal || '';
-
-  // Saved timestamp
-  const ts = document.getElementById('dmSavedAt');
-  if (p.at) {
-    const d = new Date(p.at);
-    ts.textContent = 'บันทึกล่าสุด · ' + d.toLocaleString('th-TH', { dateStyle:'medium', timeStyle:'short' });
-  } else {
-    ts.textContent = '';
-  }
-
-  // Nav buttons
-  document.getElementById('dmPrev').disabled = (day === 1);
-  document.getElementById('dmNext').disabled = (day === 90);
-
-  document.getElementById('dayModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  jptToast('🔒 Day ' + day + ' · เนื้อหากำลังพัฒนา เร็วๆ นี้');
 }
 
-function closeDayModal() {
-  document.getElementById('dayModal').classList.remove('open');
-  document.body.style.overflow = '';
-  currentModalDay = null;
-}
-
-function toggleDmCheck() {
-  const wrap = document.getElementById('dmCheck');
-  wrap.classList.toggle('checked');
-}
-
-function navDay(delta) {
-  if (!currentModalDay) return;
-  const next = currentModalDay + delta;
-  if (next < 1 || next > 90) return;
-  // Auto-save current before navigating? Optional — let user hit save themselves
-  openDayModal(next);
-}
-
-async function saveDayModal() {
-  if (!currentModalDay) return;
-  const day = currentModalDay;
-  const done = document.getElementById('dmCheck').classList.contains('checked');
-  const journal = document.getElementById('dmJournal').value;
-  const at = new Date().toISOString();
-
-  progress[day] = { done, journal, at };
-  refreshAllCards();
-  updateProgressUI();
-
-  // Update timestamp in modal
-  const ts = document.getElementById('dmSavedAt');
-  ts.textContent = 'บันทึกล่าสุด · ' + new Date(at).toLocaleString('th-TH', { dateStyle:'medium', timeStyle:'short' });
-
-  // Save to cloud
-  if (!window.JPSettings) { jptToast('ระบบยังไม่พร้อม'); return; }
-  const user = await window.JPSettings.getUser();
-  if (!user) { jptToast('กรุณา login ก่อนบันทึก'); return; }
-  const ok = await window.JPSettings.patch({ roadmap: progress });
-  jptToast(ok ? 'บันทึก Day ' + day + ' เรียบร้อย' : 'บันทึกไม่สำเร็จ — กรุณาลองใหม่');
+// ========================================
+// PLANNING DASHBOARDS (placeholder for future)
+// ========================================
+function openPlanningDashboard(type) {
+  const names = {
+    finance: 'วางแผนการเงินส่วนบุคคล',
+    portfolio: 'วางแผนพอร์ตการลงทุน'
+  };
+  jptToast('🚧 ' + names[type] + ' · เร็วๆ นี้');
 }
 
 // ========================================
@@ -1315,15 +1198,19 @@ async function loadProgress() {
 document.addEventListener('DOMContentLoaded', async () => {
   renderAllCycles();
   await loadProgress();
-  refreshAllCards();
-  updateProgressUI();
+  // Re-render cards to reflect any loaded done state
+  document.querySelectorAll('.day-card').forEach(card => {
+    const day = parseInt(card.dataset.day, 10);
+    const p = progress[day] || {};
+    card.classList.toggle('done', !!p.done);
+  });
 });
 
-// Close modal with Escape
+// Close modals with Escape
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
-    if (document.getElementById('dayModal').classList.contains('open')) closeDayModal();
-    else if (document.getElementById('aboutModal').classList.contains('open')) closeAboutModal();
+    const about = document.getElementById('aboutModal');
+    if (about && about.classList.contains('open')) closeAboutModal();
   }
 });
 </script>
