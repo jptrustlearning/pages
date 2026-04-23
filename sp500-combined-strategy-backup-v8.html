@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Combined Strategy — Momentum + Dark Horse Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./jp-settings.js?v=1761234567"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@200;300;400;500;600;700&family=Cinzel:wght@400;500;600;700&family=DM+Serif+Display&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -1083,53 +1081,6 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
 }
 .btn-cancel:hover { background:rgba(193,69,69,0.06); border-color:var(--red); color:var(--red); }
 
-/* Save + Reset settings (secondary footer row) */
-.panel-footer { flex-direction:column; gap:10px; align-items:stretch; }
-.footer-row { display:flex; gap:12px; }
-.btn-save-settings, .btn-reset-settings {
-  flex:1; padding:11px 16px; border-radius:10px;
-  font-family:'Cinzel','Anuphan',serif; font-size:0.78rem; font-weight:600;
-  letter-spacing:1.4px; text-transform:uppercase; cursor:pointer;
-  transition:all 0.2s ease; display:flex; align-items:center; justify-content:center; gap:8px;
-}
-.btn-save-settings {
-  background:linear-gradient(135deg, #FFFEF8 0%, #F5EDD8 100%);
-  border:1.5px solid rgba(212,175,55,0.55);
-  color:#8B6914;
-  box-shadow:0 2px 8px rgba(212,175,55,0.12), inset 0 1px 0 rgba(255,255,255,0.7);
-}
-.btn-save-settings:hover {
-  background:linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
-  color:#FFF5E1; border-color:#B8860B;
-  transform:translateY(-1px); box-shadow:0 6px 16px rgba(212,175,55,0.35);
-}
-.btn-reset-settings {
-  background:transparent;
-  border:1.5px solid rgba(122,111,98,0.3);
-  color:#7A6F62;
-}
-.btn-reset-settings:hover {
-  background:rgba(122,111,98,0.06); border-color:#7A6F62;
-}
-.btn-save-settings svg, .btn-reset-settings svg {
-  width:16px; height:16px; stroke-width:2;
-}
-
-/* Toast notification */
-#jpt-toast {
-  position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(20px);
-  background:linear-gradient(135deg, #722F37 0%, #8B2252 55%, #D4AF37 100%);
-  color:#FFF5E1; padding:13px 26px; border-radius:10px;
-  font-family:'Anuphan','Sarabun',sans-serif; font-size:0.92rem; font-weight:500;
-  letter-spacing:0.3px; z-index:10000;
-  box-shadow:0 8px 32px rgba(114,47,55,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
-  opacity:0; pointer-events:none;
-  transition:opacity 0.3s ease, transform 0.3s ease;
-}
-#jpt-toast.show {
-  opacity:1; transform:translateX(-50%) translateY(0);
-}
-
 /* ===== ABOUT MODAL ===== */
 .about-modal {
   position:fixed; inset:0; z-index:210; display:none;
@@ -2047,29 +1998,10 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
 
   </div>
   <div class="panel-footer">
-    <div class="footer-row">
-      <button class="btn-save-settings" onclick="saveSp500CombinedSettings()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-          <polyline points="17 21 17 13 7 13 7 21"/>
-          <polyline points="7 3 7 8 15 8"/>
-        </svg>
-        บันทึกการตั้งค่า
-      </button>
-      <button class="btn-reset-settings" onclick="resetSp500CombinedSettings()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="1 4 1 10 7 10"/>
-          <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
-        </svg>
-        คืนค่าเริ่มต้น
-      </button>
-    </div>
-    <div class="footer-row">
-      <button class="btn-cancel" onclick="closeSettingsPanel()">ยกเลิก</button>
-      <button id="runBacktestBtn" class="btn-run-backtest" onclick="runBacktestFromPanel()">
-        <span style="font-size:1.1rem;">▶</span> รันแบ็คเทส
-      </button>
-    </div>
+    <button class="btn-cancel" onclick="closeSettingsPanel()">ยกเลิก</button>
+    <button id="runBacktestBtn" class="btn-run-backtest" onclick="runBacktestFromPanel()">
+      <span style="font-size:1.1rem;">▶</span> รันแบ็คเทส
+    </button>
   </div>
 </aside>
 
@@ -2209,95 +2141,6 @@ let CONFIG = {
   bullMomPct: 10, sideMomPct: 30,
 };
 
-// ====== PER-USER SETTINGS (cloud-synced via Supabase) ======
-const SP500_COMBINED_FIELDS = [
-  'capitalInput', 'bullMomSelect', 'sideMomSelect',
-  'momTopN', 'momHoldWeeks', 'momRocLookback', 'momRsiCeiling',
-  'dhTopN', 'dhHoldWeeks',
-  'minRetSelect', 'volSurgeSelect', 'obscuritySelect',
-  'rankOutSelect', 'rankInSelect',
-  'startYearSelect', 'stoplossSelect', 'regimeSelect'
-];
-
-// Default values captured from DOM on first render (before any saved settings applied)
-let _sp500CombinedDefaults = null;
-// Cache for saved settings (used by dynamic year-dropdown populate logic)
-let _savedSp500CombinedCache = null;
-
-// Init JPSettings helper
-if (window.JPSettings && window.supabase) {
-  window.JPSettings.init({
-    url: 'https://rcdukwwcbyryauhqlzmx.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZHVrd3djYnlyeWF1aHFsem14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MTY0MDAsImV4cCI6MjA4NTQ5MjQwMH0.rprPmudJYyb6dyhXb9Z9GrtQWEeIX99A2Wrj55PvS54'
-  });
-}
-
-function jptToast(msg) {
-  let t = document.getElementById('jpt-toast');
-  if (!t) { t = document.createElement('div'); t.id = 'jpt-toast'; document.body.appendChild(t); }
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(t._hideTimer);
-  t._hideTimer = setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-function captureSp500CombinedDefaults() {
-  if (_sp500CombinedDefaults) return;
-  _sp500CombinedDefaults = {};
-  SP500_COMBINED_FIELDS.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) _sp500CombinedDefaults[id] = el.value;
-  });
-}
-
-function getSp500CombinedSettings() {
-  const result = {};
-  SP500_COMBINED_FIELDS.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) result[id] = el.value;
-  });
-  return result;
-}
-
-function applySp500CombinedSettings(s) {
-  if (!s) return;
-  SP500_COMBINED_FIELDS.forEach(id => {
-    if (s[id] != null) {
-      const el = document.getElementById(id);
-      if (el) el.value = s[id];
-    }
-  });
-}
-
-async function loadSp500CombinedSettings() {
-  if (!window.JPSettings) return;
-  try {
-    const data = await window.JPSettings.load();
-    if (data && data.sp500_combined) {
-      _savedSp500CombinedCache = data.sp500_combined;
-      applySp500CombinedSettings(data.sp500_combined);
-      console.log('[sp500-combined] loaded saved settings from cloud');
-    }
-  } catch (e) {
-    console.warn('[sp500-combined] load settings error:', e);
-  }
-}
-
-async function saveSp500CombinedSettings() {
-  if (!window.JPSettings) { jptToast('ระบบยังไม่พร้อม — กรุณาลองใหม่'); return; }
-  const user = await window.JPSettings.getUser();
-  if (!user) { jptToast('กรุณา login ก่อนบันทึกการตั้งค่า'); return; }
-  const ok = await window.JPSettings.patch({ sp500_combined: getSp500CombinedSettings() });
-  jptToast(ok ? 'บันทึกการตั้งค่าเรียบร้อย' : 'บันทึกไม่สำเร็จ — กรุณาลองใหม่');
-}
-
-function resetSp500CombinedSettings() {
-  if (!confirm('คืนค่าเริ่มต้นทั้งหมด? (ค่าที่เคยบันทึกจะถูกทับ เมื่อกดบันทึกครั้งถัดไป)')) return;
-  if (!_sp500CombinedDefaults) { jptToast('ยังจับค่า default ไม่ได้'); return; }
-  applySp500CombinedSettings(_sp500CombinedDefaults);
-  jptToast('รีเซ็ตเป็นค่าเริ่มต้นแล้ว — อย่าลืมกดบันทึก');
-}
-
 let state = {
   dailyData: {}, sortedDates: [], dateIndex: {},
   weeklyDates: [], fridayDates: [], entryDates: [],
@@ -2321,13 +2164,7 @@ const el = {
 };
 
 // ====== INIT ======
-document.addEventListener('DOMContentLoaded', async () => {
-  // Capture DOM defaults BEFORE anything loads saved settings
-  captureSp500CombinedDefaults();
-  // Load saved settings from cloud (if user logged in) — so backtest uses their prefs
-  await loadSp500CombinedSettings();
-  loadCloudData();
-});
+document.addEventListener('DOMContentLoaded', () => { loadCloudData(); });
 el.input.addEventListener('change', handleUpload);
 // timeSlider removed — benchmark is fixed at 10Y
 
@@ -2812,14 +2649,9 @@ function processCSV(csv) {
   const years = [...new Set(state.sortedDates.map(d=>d.substring(0,4)))].sort();
   const sel = document.getElementById('startYearSelect'); sel.innerHTML='';
   years.forEach(y => { const opt=document.createElement('option'); opt.value=y; opt.innerText=y; sel.appendChild(opt); });
-  // Respect saved setting first, else default to 2021, else earliest year
-  const preferredYear = (_savedSp500CombinedCache && _savedSp500CombinedCache.startYearSelect) || '2021';
-  const matchYear = years.find(y => y === String(preferredYear))
-                 || years.find(y => y === '2021')
-                 || years[0];
-  if(matchYear) sel.value = matchYear;
-  // Also update cached default so Reset works properly (captured before populate ran)
-  if (_sp500CombinedDefaults) _sp500CombinedDefaults.startYearSelect = years.includes('2021') ? '2021' : (years[0] || '2021');
+  // Default to 2021 if available, else earliest year
+  if(years.includes('2021')) { sel.value = '2021'; }
+  else if(years.length) { sel.value = years[0]; }
   console.timeEnd('processCSV');
 }
 
