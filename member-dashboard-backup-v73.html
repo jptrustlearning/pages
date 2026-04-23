@@ -675,7 +675,7 @@ function checkPIN(){
     if(pin===savedPIN){
         isLoggedIn=true;
         try{localStorage.setItem('jpt_logged_in','true');sessionStorage.setItem('jpt_session_active','1')}catch(e){}
-        showApp();
+        saveSettings();showApp();
     } else {
         document.getElementById('pinError').style.display='block';
         document.getElementById('pinInput').value='';
@@ -760,7 +760,7 @@ function confirmPIN(){
         savedPIN=pin;
         try{localStorage.setItem('jpt_pin',pin);localStorage.setItem('jpt_logged_in','true');sessionStorage.setItem('jpt_session_active','1')}catch(e){}
         isLoggedIn=true;
-        showApp();
+        saveSettings();showApp();
     } else {
         document.getElementById('pinMismatch').style.display='block';
         document.getElementById('confirmPinInput').value='';

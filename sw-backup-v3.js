@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jptrust-member-v4';  // bumped 2026-04-23 — fix POST caching crash
+const CACHE_NAME = 'jptrust-member-v3';  // bumped 2026-04-18 to force-refresh after sp500-strategy-pro luxe overhaul
 const ASSETS = [
   './',
   './member-dashboard.html',
@@ -27,12 +27,8 @@ self.addEventListener('activate', event => {
 });
 
 // Fetch — network first, fallback to cache
-// Skip non-GET requests (Cache API only supports GET — POST/PUT/DELETE would throw)
 // EXCEPT: news files are always fetched fresh (never cached), so new batches show immediately
 self.addEventListener('fetch', event => {
-  // Skip caching for non-GET (POST to Supabase, etc.)
-  if (event.request.method !== 'GET') return;
-
   const url = event.request.url;
   const isNews = url.includes('/news/') || url.includes('news-index.json');
   if (isNews) {
