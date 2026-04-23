@@ -392,90 +392,98 @@ html, body {
 /* Day grid */
 .day-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
 }
 .day-card {
-  aspect-ratio: 1 / 1.1;
-  padding: 10px 10px 12px;
-  border-radius: 12px;
+  min-height: 78px;
+  padding: 9px 11px;
+  border-radius: 10px;
   background: var(--cream-card);
   border: 1.5px solid var(--border-gold);
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  justify-content: space-between;
   position: relative;
   overflow: hidden;
   box-shadow: 0 1px 4px rgba(114,47,55,0.04);
 }
 .day-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(114,47,55,0.12);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(114,47,55,0.1);
   border-color: var(--gold);
+}
+.day-card .dc-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 .day-card .dc-num {
   font-family: 'DM Serif Display', serif;
-  font-size: 1.6rem;
+  font-size: 1.25rem;
   line-height: 1;
   color: var(--maroon);
 }
-.day-card .dc-phase-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px; height: 22px;
-  border-radius: 6px;
-  font-family: 'DM Serif Display', serif;
-  font-size: 0.95rem;
-  color: #FFF5E1;
-  align-self: flex-start;
-}
-.day-card[data-phase="J"] .dc-phase-badge { background: linear-gradient(135deg, #722F37, #9C2B2B); }
-.day-card[data-phase="P"] .dc-phase-badge { background: linear-gradient(135deg, #8B6914, #D4AF37); }
-.day-card[data-phase="T"] .dc-phase-badge { background: linear-gradient(135deg, #1F7D49, #2E9F5F); }
 .day-card .dc-lock {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: rgba(122,111,98,0.35);
+  color: rgba(122,111,98,0.4);
   transition: color 0.2s ease;
 }
 .day-card:hover .dc-lock { color: var(--gold-deep); }
-.day-card .dc-lock svg { width: 18px; height: 18px; stroke-width: 1.8; }
-.day-card.locked {
-  /* Base state — keep subtle */
+.day-card .dc-lock svg { width: 13px; height: 13px; stroke-width: 1.9; display: block; }
+
+/* Phase mini-badges row — J P T shown on every card, primary highlighted */
+.day-card .dc-phases {
+  display: flex;
+  gap: 4px;
+  align-items: center;
 }
-.day-card.unlocked {
-  /* future state when Joon unlocks content */
+.day-card .dc-mini {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  font-family: 'DM Serif Display', serif;
+  font-size: 0.75rem;
+  line-height: 1;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1.2px solid rgba(122,111,98,0.3);
+  transition: all 0.2s ease;
 }
+/* Primary phase — highlighted with brand color */
+.day-card[data-phase="J"] .dc-mini.is-primary {
+  background: linear-gradient(135deg, #722F37, #9C2B2B);
+  border-color: transparent; color: #FFF5E1;
+  box-shadow: 0 2px 6px rgba(114,47,55,0.28);
+}
+.day-card[data-phase="P"] .dc-mini.is-primary {
+  background: linear-gradient(135deg, #8B6914, #D4AF37);
+  border-color: transparent; color: #FFF5E1;
+  box-shadow: 0 2px 6px rgba(139,105,20,0.28);
+}
+.day-card[data-phase="T"] .dc-mini.is-primary {
+  background: linear-gradient(135deg, #1F7D49, #2E9F5F);
+  border-color: transparent; color: #FFF5E1;
+  box-shadow: 0 2px 6px rgba(31,125,73,0.28);
+}
+
 .day-card.done {
   background: linear-gradient(135deg, #FFFEF8 0%, #F5EDD8 100%);
   border-color: var(--gold);
 }
-.day-card.done .dc-lock {
-  display: none;
-}
+.day-card.done .dc-lock { display: none; }
 .day-card.done::after {
-  content: '';
+  content: '✓';
   position: absolute;
-  bottom: 10px; left: 50%;
-  transform: translateX(-50%);
-  width: 22px; height: 22px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--emerald), var(--emerald-dk));
-}
-.day-card.done::before {
-  content: '';
-  position: absolute;
-  bottom: 16px; left: 50%;
-  transform: translate(-50%, 0) rotate(-45deg);
-  width: 10px; height: 6px;
-  border-left: 2px solid #FFF5E1;
-  border-bottom: 2px solid #FFF5E1;
-  z-index: 2;
+  top: 8px; right: 10px;
+  color: var(--emerald-dk);
+  font-size: 1rem;
+  font-weight: 900;
 }
 .day-card.current {
   border-color: var(--maroon);
@@ -834,17 +842,17 @@ html, body {
 @media (max-width: 500px) {
   .hero { padding: 32px 18px 26px; }
   .hero-title { font-size: 2rem; }
-  .day-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
-  .day-card { min-height: 120px; padding: 12px; }
-  .day-card .dc-num { font-size: 1.5rem; }
-  .day-card .dc-title { font-size: 0.85rem; -webkit-line-clamp: 3; }
+  .day-grid { gap: 7px; }
+  .day-card { padding: 8px 9px; min-height: 70px; }
+  .day-card .dc-num { font-size: 1.1rem; }
+  .day-card .dc-mini { width: 16px; height: 16px; font-size: 0.65rem; }
   .cycle-tab { font-size: 0.66rem; padding: 8px 10px; min-width: 100px; }
   .cycle-tab .ct-num { font-size: 0.9rem; }
   .container { padding: 20px 14px 120px; }
-  .dm-day-big { font-size: 2.6rem; }
-  .dm-footer { flex-wrap: wrap; }
-  .dm-nav { flex: 1; justify-content: center; }
-  .dm-save { flex: 1 0 100%; order: -1; }
+  .planning-section { padding: 20px 14px 4px; }
+  .planning-card { padding: 14px; gap: 12px; }
+  .planning-icon { width: 42px; height: 42px; }
+  .planning-icon svg { width: 22px; height: 22px; }
 }
 @media (min-width: 501px) {
   .container { padding: 26px 18px 120px; }
@@ -1064,18 +1072,24 @@ function renderAllCycles() {
 }
 
 function renderDayCard(day) {
-  const phase = phaseForDay(day);
+  const primary = phaseForDay(day);
   const p = progress[day] || {};
   const done = p.done ? 'done' : '';
   return `
-    <div class="day-card locked ${done}" data-day="${day}" data-phase="${phase}" onclick="openDayModal(${day})">
-      <div class="dc-num">${day}</div>
-      <div class="dc-phase-badge">${phase}</div>
-      <div class="dc-lock">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="4" y="11" width="16" height="10" rx="2"/>
-          <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
-        </svg>
+    <div class="day-card locked ${done}" data-day="${day}" data-phase="${primary}" onclick="openDayModal(${day})">
+      <div class="dc-top">
+        <div class="dc-num">${day}</div>
+        <div class="dc-lock">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="11" width="16" height="10" rx="2"/>
+            <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+          </svg>
+        </div>
+      </div>
+      <div class="dc-phases">
+        <span class="dc-mini ${primary === 'J' ? 'is-primary' : ''}">J</span>
+        <span class="dc-mini ${primary === 'P' ? 'is-primary' : ''}">P</span>
+        <span class="dc-mini ${primary === 'T' ? 'is-primary' : ''}">T</span>
       </div>
     </div>
   `;
