@@ -68,10 +68,16 @@ html, body {
 .hero-title {
   font-family: 'DM Serif Display', serif;
   font-size: clamp(2.2rem, 6vw, 3.2rem);
-  line-height: 1.05;
+  line-height: 1.15;
   color: var(--maroon);
   margin-bottom: 8px;
   letter-spacing: -0.5px;
+}
+.hero-title .th {
+  font-family: 'Anuphan', 'Sarabun', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0;
+  font-size: 0.88em;
 }
 .hero-sub {
   font-size: 1rem;
@@ -183,8 +189,8 @@ html, body {
 .cycles-tabs::-webkit-scrollbar { display: none; }
 .cycle-tab {
   flex: 1;
-  min-width: 120px;
-  padding: 10px 16px;
+  min-width: 130px;
+  padding: 10px 14px;
   border-radius: 10px;
   border: 1px solid var(--border-gold);
   background: var(--cream);
@@ -197,10 +203,10 @@ html, body {
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
-  white-space: nowrap;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
+  line-height: 1.2;
 }
 .cycle-tab:hover { background: var(--cream-deep); color: var(--gold-deep); }
 .cycle-tab.active {
@@ -215,7 +221,18 @@ html, body {
   letter-spacing: 0;
   text-transform: none;
 }
-.cycle-tab .ct-label { font-size: 0.7rem; opacity: 0.9; }
+.cycle-tab .ct-label {
+  font-size: 0.68rem;
+  letter-spacing: 1.2px;
+  opacity: 0.9;
+}
+.cycle-tab .ct-range {
+  font-family: 'DM Serif Display', serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.5px;
+  text-transform: none;
+  opacity: 0.8;
+}
 
 /* ===== MAIN CONTENT ===== */
 .container {
@@ -759,7 +776,7 @@ html, body {
 <div class="hero">
   <div class="hero-inner">
     <div class="hero-label">JP Trust Learning · JPT Framework</div>
-    <h1 class="hero-title">Roadmap 90 วัน<br>สู่เทรดเดอร์มืออาชีพ</h1>
+    <h1 class="hero-title">Roadmap <span class="th">90 วัน</span><br><span class="th">สู่เทรดเดอร์มืออาชีพ</span></h1>
     <p class="hero-sub">Journal · Plan · Trade · ลูปต่อเนื่อง · จากมือใหม่สู่ระบบของตัวเอง</p>
 
     <div class="progress-card">
@@ -789,15 +806,18 @@ html, body {
   <div class="cycles-tabs">
     <button class="cycle-tab active" data-cycle="1" onclick="switchCycle(1)">
       <span class="ct-num">Cycle 1</span>
-      <span class="ct-label">Foundation · Day 1-30</span>
+      <span class="ct-label">Foundation</span>
+      <span class="ct-range">Day 1–30</span>
     </button>
     <button class="cycle-tab" data-cycle="2" onclick="switchCycle(2)">
       <span class="ct-num">Cycle 2</span>
-      <span class="ct-label">Intermediate · Day 31-60</span>
+      <span class="ct-label">Intermediate</span>
+      <span class="ct-range">Day 31–60</span>
     </button>
     <button class="cycle-tab" data-cycle="3" onclick="switchCycle(3)">
       <span class="ct-num">Cycle 3</span>
-      <span class="ct-label">Advanced · Day 61-90</span>
+      <span class="ct-label">Advanced</span>
+      <span class="ct-range">Day 61–90</span>
     </button>
   </div>
 </nav>
