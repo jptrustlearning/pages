@@ -2098,10 +2098,6 @@ const DEFAULT_SP500_PRO = {
   startYear: 2015
 };
 
-// Cache for saved settings — used by populate logic (year dropdown only
-// exists AFTER data loads, so we need to remember the saved year for then)
-let _savedSp500ProCache = null;
-
 // --- Initialize JPSettings (cloud-synced per-user settings) ---
 if (window.JPSettings && window.supabase) {
   window.JPSettings.init({
@@ -2157,7 +2153,6 @@ async function loadSp500ProSettings() {
   try {
     const data = await window.JPSettings.load();
     if (data && data.sp500_pro) {
-      _savedSp500ProCache = data.sp500_pro;  // cache for populate-dropdown logic
       applySp500ProSettings(data.sp500_pro);
       console.log('[sp500-pro] loaded saved settings from cloud');
     }
@@ -2383,15 +2378,9 @@ function processData(csv) {
     const opt = document.createElement('option');
     opt.value = y;
     opt.innerText = y;
+    if (parseInt(y) === 2015) opt.selected = true; // Default to 2015 if available
     el.inputStartYear.appendChild(opt);
   });
-
-  // Respect saved setting if available, else default to 2015, else first year
-  const preferredYear = (_savedSp500ProCache && _savedSp500ProCache.startYear) || 2015;
-  const matchYear = displayYears.find(y => parseInt(y) === preferredYear)
-                 || displayYears.find(y => parseInt(y) === 2015)
-                 || displayYears[0];
-  if (matchYear) el.inputStartYear.value = matchYear;
 }
 
 function simulateStrategy(wRet, nStocks) {
