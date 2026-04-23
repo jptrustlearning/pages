@@ -2248,8 +2248,6 @@ function captureSp500CombinedDefaults() {
     const el = document.getElementById(id);
     if (el) _sp500CombinedDefaults[id] = el.value;
   });
-  // Also capture allocMode (toggle button, not an input)
-  _sp500CombinedDefaults.allocMode = CONFIG.allocMode || 'dynamic';
 }
 
 function getSp500CombinedSettings() {
@@ -2258,8 +2256,6 @@ function getSp500CombinedSettings() {
     const el = document.getElementById(id);
     if (el) result[id] = el.value;
   });
-  // Include allocMode (toggle button state, stored in CONFIG)
-  result.allocMode = CONFIG.allocMode || 'dynamic';
   return result;
 }
 
@@ -2271,10 +2267,6 @@ function applySp500CombinedSettings(s) {
       if (el) el.value = s[id];
     }
   });
-  // Restore allocMode via setAllocMode (handles CONFIG + UI .active class + panel visibility)
-  if (s.allocMode && typeof setAllocMode === 'function') {
-    setAllocMode(s.allocMode);
-  }
 }
 
 async function loadSp500CombinedSettings() {
