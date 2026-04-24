@@ -310,16 +310,6 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 .fade-up{animation:fadeUp .5s ease forwards}.fade-up-1{animation-delay:.05s;opacity:0}.fade-up-2{animation-delay:.1s;opacity:0}.fade-up-3{animation-delay:.15s;opacity:0}.fade-up-4{animation-delay:.2s;opacity:0}.fade-up-5{animation-delay:.25s;opacity:0}
 ::-webkit-scrollbar{width:0}
-/* Planning Toolkit shortcut card (home screen) */
-.planning-shortcut{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;padding:16px 18px;background:linear-gradient(135deg,#FFFEF8 0%,#F8F2E4 55%,#F5EDD8 100%);border:1.5px solid rgba(212,175,55,0.5);border-radius:14px;margin-bottom:24px;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(114,47,55,0.08),inset 0 1px 0 rgba(255,255,255,0.7);position:relative;overflow:hidden}
-.planning-shortcut:active{transform:scale(.98);box-shadow:0 6px 18px rgba(212,175,55,0.2)}
-.planning-shortcut::after{content:'';position:absolute;bottom:0;left:0;right:0;height:55px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 60' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'%3E%3Cpath d='M0,50 C30,42 70,32 120,35 C160,38 180,30 200,32 L200,60 L0,60 Z' fill='rgba(237,228,208,0.35)'/%3E%3Cpath d='M0,40 Q60,28 120,32 Q170,36 200,24' fill='none' stroke='rgba(212,175,55,0.18)' stroke-width='1'/%3E%3C/svg%3E");background-size:100% 100%;z-index:0;border-radius:0 0 14px 14px}
-.planning-shortcut>*{position:relative;z-index:1}
-.planning-shortcut-icon{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 10px rgba(114,47,55,0.25)}
-.planning-shortcut-icon svg{width:22px;height:22px;color:#FFF0D4;stroke:#FFF0D4}
-.planning-shortcut-title{font-size:15px;font-weight:700;color:var(--maroon);margin-bottom:3px}
-.planning-shortcut-desc{font-size:12px;color:var(--text-dark-muted);line-height:1.45}
-.planning-shortcut-arrow{color:var(--gold-deep);font-size:20px;font-weight:600;flex-shrink:0;font-family:'DM Serif Display',serif}
 /* Toast notification */
 #jpt-toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%) translateY(20px);background:linear-gradient(135deg,#722F37 0%,#8B2252 55%,#D4AF37 100%);color:#FFF5E1;padding:13px 26px;border-radius:10px;font-family:'Anuphan','Sarabun',sans-serif;font-size:14px;font-weight:500;z-index:10000;box-shadow:0 8px 32px rgba(114,47,55,0.35),inset 0 1px 0 rgba(255,255,255,0.15);opacity:0;pointer-events:none;transition:opacity .3s ease,transform .3s ease;max-width:calc(100% - 40px)}
 #jpt-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -433,15 +423,6 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                 <div class="dash-card" onclick="openIframe('Newstum — News + Momentum','https://jptrustlearning.github.io/pages/sp500-newstum.html')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="M2 15h6"/><path d="M5 12v6"/><polyline points="10 18 12 16 14 18 16 14"/></svg></span></div><div class="dash-card-title">Newstum</div><div class="dash-card-desc">News + Momentum Score</div></div>
                 <div class="dash-card" onclick="navigateTo('portfolio')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg></span></div><div class="dash-card-title">Portfolio</div><div class="dash-card-desc">จัดการพอร์ตการลงทุน</div></div>
             </div>
-            <div class="section-header fade-up fade-up-3"><div class="section-title">Planning Toolkit</div></div>
-            <div class="planning-shortcut fade-up fade-up-3" onclick="openIframe('วางแผนการเงินส่วนบุคคล','https://jptrustlearning.github.io/pages/finance-planner.html?v=1777015500')">
-                <div class="planning-shortcut-icon"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/><path d="M8 17l2-2 2 1 4-4"/></svg></span></div>
-                <div>
-                    <div class="planning-shortcut-title">วางแผนการเงินส่วนบุคคล</div>
-                    <div class="planning-shortcut-desc">สำรวจกระแสเงินสด · ประเมินเงินสำรองฉุกเฉิน · รู้ระดับความเสี่ยงทางการเงิน</div>
-                </div>
-                <div class="planning-shortcut-arrow">›</div>
-            </div>
             <div class="section-header fade-up fade-up-4"><div class="section-title">สิทธิพิเศษสำหรับคุณ</div></div>
             <div class="fade-up fade-up-4" style="margin-bottom:24px;border-radius:16px;overflow:hidden;"><img src="promo-lotus.jpg" alt="Lotus's Promotion" style="width:100%;display:block;border-radius:16px;"></div>
             <div class="section-header fade-up fade-up-4"><div class="section-title">กิจกรรมล่าสุด</div><div class="section-link">ดูทั้งหมด ›</div></div>
@@ -513,7 +494,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
         <div class="section-header"><div class="section-title">Tools</div></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;">
             <div class="dash-card" onclick="navigateTo('lab')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="7 14 10 10 13 13 17 9"/></svg></span></div><div class="dash-card-title">Backtest Lab</div><div class="dash-card-desc">ทดสอบกลยุทธ์</div></div>
-            <div class="dash-card" onclick="openIframe('วางแผนการเงินส่วนบุคคล','https://jptrustlearning.github.io/pages/finance-planner.html?v=1777015500')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span></div><div class="dash-card-title">Financial Plan</div><div class="dash-card-desc">วางแผนการเงิน</div></div>
+            <div class="dash-card"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span></div><div class="dash-card-title">Financial Plan</div><div class="dash-card-desc">วางแผนการเงิน</div></div>
         </div>
 
         <!-- Settings section moved to dedicated screen-settings (gear icon top-right) -->
