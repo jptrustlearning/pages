@@ -494,14 +494,18 @@ body {
   box-shadow: 0 1px 3px rgba(20,90,52,0.4);
 }
 
-/* Rest day (every 7th day) — rose-gold tint background, only J + P badges */
+/* Rest day (every 7th day) — deeper rose-gold tint background, only J + P badges */
 .day-card.rest-day {
-  background: linear-gradient(135deg, #FFF5F0 0%, #FDF6E6 45%, #F8E6D8 100%);
-  border-color: rgba(218,165,140,0.45);
+  background: linear-gradient(135deg, #F9D9C8 0%, #F4D4A8 50%, #EFC08A 100%);
+  border-color: rgba(201,140,100,0.6);
+  box-shadow: 0 2px 8px rgba(201,140,100,0.15), inset 0 1px 0 rgba(255,255,255,0.4);
 }
-.day-card.rest-day:hover { border-color: #D4A574; }
-.day-card.rest-day .dc-num { color: #8B3A2A; }
-.day-card.rest-day .dc-lock { color: rgba(139,58,42,0.3); }
+.day-card.rest-day:hover {
+  border-color: #B87850;
+  box-shadow: 0 4px 14px rgba(201,140,100,0.25), inset 0 1px 0 rgba(255,255,255,0.5);
+}
+.day-card.rest-day .dc-num { color: #7A2A1E; }
+.day-card.rest-day .dc-lock { color: rgba(122,42,30,0.35); }
 
 .day-card.done {
   background: linear-gradient(135deg, #FFFEF8 0%, #F5EDD8 100%);
