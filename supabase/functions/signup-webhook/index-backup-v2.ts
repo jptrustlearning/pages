@@ -216,38 +216,6 @@ function escapeHtml(s: string): string {
     .replace(/'/g, "&#39;");
 }
 
-// RFC 2047 subject encoder — splits non-ASCII subjects into base64 chunks
-// Each chunk kept under 75 chars total (delimiters included). denomailer 1.6.0's
-// auto Q-encoding overflows the limit for long Thai subjects → mail clients
-// (Gmail) fail to decode and display the raw bytes.
-function encodeSubjectRfc2047(s: string): string {
-  if (/^[\x00-\x7F]*$/.test(s)) return s; // pure ASCII — no encoding needed
-  const bytes = new TextEncoder().encode(s);
-  let binary = "";
-  bytes.forEach((b) => (binary += String.fromCharCode(b)));
-  // Token "=?UTF-8?B?<base64>?=" wrapper = 10 chars. Limit 75 → base64 max 65 chars → raw max 48 bytes.
-  // Use 45 bytes per chunk for safety (yields 60 b64 chars, 70 total). Don't split multi-byte char sequences.
-  const MAX_RAW = 45;
-  const tokens: string[] = [];
-  for (let i = 0; i < binary.length;) {
-    let take = Math.min(MAX_RAW, binary.length - i);
-    // Back off so we don't split inside a UTF-8 multi-byte sequence (continuation bytes 0x80-0xBF)
-    if (i + take < binary.length) {
-      while (take > 0) {
-        const nextByte = binary.charCodeAt(i + take);
-        if (nextByte < 0x80 || nextByte >= 0xC0) break; // start of new char (ASCII or leading byte)
-        take--;
-      }
-      if (take === 0) take = Math.min(MAX_RAW, binary.length - i); // safety fallback
-    }
-    const chunk = binary.slice(i, i + take);
-    tokens.push(`=?UTF-8?B?${btoa(chunk)}?=`);
-    i += take;
-  }
-  // RFC 2047 continuation: CRLF + single space folds tokens into one logical line
-  return tokens.join("\r\n ");
-}
-
 function buildWelcomeEmailHtml(username: string): string {
   const who = escapeHtml((username || "สมาชิก").trim());
   return `<!DOCTYPE html>
@@ -342,17 +310,11 @@ async function sendWelcomeEmail(email: string, username: string): Promise<EmailR
   });
 
   try {
-    // Pass html only + content:"auto" so denomailer generates a simple
-    // multipart/alternative with matching boundaries (more robust than
-    // providing both content + html strings, which triggered encoding
-    // weirdness for Thai in 1.6.0).
-    // Subject is pre-encoded in RFC 2047 base64 chunks to avoid the
-    // library's built-in Q-encoding overflow with long Thai subjects.
     await client.send({
       from: `${EMAIL_FROM_NAME} <${user}>`,
       to: email,
-      subject: encodeSubjectRfc2047(EMAIL_SUBJECT),
-      content: "auto",
+      subject: EMAIL_SUBJECT,
+      content: buildWelcomeEmailText(username),
       html: buildWelcomeEmailHtml(username),
     });
     await client.close();
