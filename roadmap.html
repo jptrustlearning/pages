@@ -347,7 +347,12 @@ body {
 .container {
   max-width: 720px;
   margin: 0 auto;
-  padding: 16px 28px 80px;
+  padding: 16px 18px 80px;
+}
+/* Day grid sits inset from the container edges — creates clear 'subset' visual
+   on mobile where cycle tabs extend to page edges */
+.day-grid-wrap {
+  padding: 0 20px;
 }
 .cycle-panel { display: none; }
 .cycle-panel.active { display: block; }
@@ -1061,11 +1066,11 @@ function renderAllCycles() {
     const startDay = (c - 1) * 30 + 1;
     const endDay = c * 30;
 
-    let html = '<div class="day-grid">';
+    let html = '<div class="day-grid-wrap"><div class="day-grid">';
     for (let d = startDay; d <= endDay; d++) {
       html += renderDayCard(d);
     }
-    html += '</div>';
+    html += '</div></div>';
     panel.innerHTML = html;
   }
 }
