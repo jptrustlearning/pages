@@ -159,69 +159,91 @@ input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 input[type="number"] { -moz-appearance: textfield; }
 
-/* 2-col form grid */
-.form-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-@media (max-width: 520px) { .form-2col { grid-template-columns: 1fr; } }
+/* Stacked 2-col grid (for pool & goal card) */
+.form-stack { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 520px) { .form-stack { grid-template-columns: 1fr; } }
 
-/* ===== ASSET ALLOCATION TABLE ===== */
-.asset-table {
+/* Side-by-side form row: label (with hint) on left, input on right */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(212,175,55,0.25);
+}
+.form-row:last-child { border-bottom: none; padding-bottom: 0; }
+.form-row:first-child { padding-top: 0; }
+.form-row .fr-labels {
+  display: flex; flex-direction: column; gap: 2px; min-width: 0;
+}
+.form-row .fr-labels label {
+  font-size: 0.92rem; font-weight: 600; color: var(--text-dark); line-height: 1.3;
+}
+.form-row .fr-labels .hint {
+  font-size: 0.76rem; color: var(--text-muted); line-height: 1.4;
+}
+.form-row input[type="number"] {
+  width: 180px; max-width: 100%;
+  text-align: right;
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.1rem;
+  color: var(--maroon);
+}
+@media (max-width: 520px) {
+  .form-row { grid-template-columns: 1fr; gap: 6px; padding: 10px 0; }
+  .form-row input[type="number"] { width: 100%; }
+}
+
+/* ===== ASSET ALLOCATION CARDS ===== */
+.asset-list {
+  display: flex; flex-direction: column; gap: 10px;
+}
+.asset-card {
   display: grid;
   grid-template-columns: auto 1fr auto auto;
-  gap: 0;
-  border: 1px solid var(--border-gold);
-  border-radius: 10px;
-  overflow: hidden;
-  background: var(--cream-card);
-}
-.asset-table-head {
-  display: contents;
-}
-.asset-table-head > div {
-  background: rgba(114,47,55,0.08);
-  font-family: 'Cinzel', serif;
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: var(--maroon);
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
-  padding: 10px 12px;
-  border-bottom: 1.5px solid var(--border-gold);
-}
-.asset-row {
-  display: contents;
-}
-.asset-row > div {
-  padding: 12px;
-  border-bottom: 1px solid rgba(212,175,55,0.2);
-  display: flex;
   align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--cream-card);
+  border: 1.5px solid var(--border-gold);
+  border-radius: 12px;
+  transition: all 0.2s ease;
 }
-.asset-row:last-child > div { border-bottom: none; }
-.asset-row .ar-icon {
-  padding: 12px 8px 12px 14px;
+.asset-card:hover {
+  border-color: var(--gold);
+  box-shadow: 0 4px 14px rgba(114,47,55,0.06);
 }
-.asset-row .ar-icon .dot {
-  width: 14px; height: 14px; border-radius: 50%;
-  flex-shrink: 0;
+.asset-card .ac-dot {
+  width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
 }
-.asset-row .ar-name {
-  flex-direction: column; align-items: flex-start; gap: 2px;
-  padding-right: 10px;
+.asset-card .ac-name {
+  min-width: 0;
 }
-.asset-row .ar-name .name-main {
-  font-weight: 600; color: var(--text-dark); font-size: 0.95rem;
+.asset-card .ac-name .name-main {
+  font-weight: 700; color: var(--maroon); font-size: 1.05rem;
+  margin-bottom: 2px;
 }
-.asset-row .ar-name .name-sub {
-  font-size: 0.75rem; color: var(--text-muted);
+.asset-card .ac-name .name-sub {
+  font-size: 0.78rem; color: var(--text-muted); line-height: 1.35;
 }
-.asset-row .ar-pct, .asset-row .ar-roi {
-  justify-content: flex-end;
-  padding: 8px 12px;
+.asset-card .ac-field {
+  display: flex; flex-direction: column; gap: 4px;
+  align-items: flex-end;
+}
+.asset-card .ac-field-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem; font-weight: 600;
+  color: var(--gold-deep);
+  letter-spacing: 1.4px; text-transform: uppercase;
+}
+.asset-card .ac-field-input {
+  display: flex; align-items: center; gap: 3px;
 }
 .inline-input {
-  width: 72px;
+  width: 68px;
   font-family: 'DM Serif Display', serif;
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   padding: 6px 8px;
   border: 1.5px solid var(--border-gold);
   border-radius: 8px;
@@ -229,35 +251,50 @@ input[type="number"] { -moz-appearance: textfield; }
   text-align: right;
   color: var(--maroon);
 }
-.inline-input:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 0 3px rgba(212,175,55,0.15); }
+.inline-input:focus {
+  border-color: var(--gold); outline: none;
+  box-shadow: 0 0 0 3px rgba(212,175,55,0.15);
+}
 .inline-input + .unit {
-  font-size: 0.82rem; color: var(--text-muted); margin-left: 4px;
+  font-size: 0.82rem; color: var(--text-muted);
+}
+
+@media (max-width: 560px) {
+  .asset-card {
+    grid-template-columns: auto 1fr;
+    gap: 10px 12px;
+  }
+  .asset-card .ac-field {
+    grid-column: 2 / 3;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .asset-card .ac-field:nth-of-type(1) { grid-row: 2; }
+  .asset-card .ac-field:nth-of-type(2) { grid-row: 3; }
+  .asset-card .ac-field-label {
+    font-size: 0.68rem;
+  }
 }
 
 .total-row {
-  display: grid;
-  grid-template-columns: auto 1fr auto auto;
-  padding: 14px;
-  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  margin-top: 12px;
   background: linear-gradient(135deg, rgba(114,47,55,0.05), rgba(212,175,55,0.08));
   border: 1.5px solid var(--border-gold-strong);
   border-radius: 10px;
-  align-items: center;
-  gap: 0;
   font-family: 'Cinzel', serif;
   font-size: 0.8rem;
   letter-spacing: 1.6px;
   color: var(--maroon);
   text-transform: uppercase;
 }
-.total-row .tr-label {
-  grid-column: 1 / 3;
-  padding: 0 8px 0 14px;
-  font-weight: 700;
-}
+.total-row .tr-label { font-weight: 700; }
 .total-row .tr-pct {
-  grid-column: 3 / 5;
-  justify-self: end;
   font-family: 'DM Serif Display', serif;
   font-size: 1.4rem;
   letter-spacing: 0;
@@ -551,27 +588,37 @@ input[type="number"] { -moz-appearance: textfield; }
   <div class="card">
     <div class="card-title">เงินเริ่มต้น + เงินลงทุนต่อเดือน</div>
     <div class="card-desc">กรอกทั้ง 2 ช่อง — ระบบจะคำนวณ mix ของ lump sum + DCA ให้อัตโนมัติ</div>
-    <div class="form-2col">
-      <div class="form-group">
-        <label>ทุนเริ่มต้น (Lump Sum) — บาท</label>
-        <input type="number" id="principal" value="100000" min="0" step="10000">
-        <span class="hint">เงินก้อนที่มีอยู่แล้ววันนี้ · หากยังไม่มีใส่ 0</span>
+
+    <div class="form-row">
+      <div class="fr-labels">
+        <label>ทุนเริ่มต้น (Lump Sum)</label>
+        <div class="hint">เงินก้อนที่มีอยู่แล้ววันนี้ · หากยังไม่มีใส่ 0 · หน่วยบาท</div>
       </div>
-      <div class="form-group">
-        <label>เงินลงทุนต่อเดือน (DCA) — บาท</label>
-        <input type="number" id="monthly" value="10000" min="0" step="500">
-        <span class="hint">จำนวนที่ทยอยใส่ทุกเดือน · 0 = ลงครั้งเดียวเท่านั้น</span>
+      <input type="number" id="principal" value="100000" min="0" step="10000">
+    </div>
+
+    <div class="form-row">
+      <div class="fr-labels">
+        <label>เงินลงทุนต่อเดือน (DCA)</label>
+        <div class="hint">จำนวนที่ทยอยใส่ทุกเดือน · 0 = ลงครั้งเดียวเท่านั้น · หน่วยบาท</div>
       </div>
-      <div class="form-group">
-        <label>เป้าหมายที่ต้องการ (บาท)</label>
-        <input type="number" id="goal" value="5000000" min="0" step="100000">
-        <span class="hint">เช่น เงินเกษียณ · ดาวน์บ้าน · ทุนธุรกิจ</span>
+      <input type="number" id="monthly" value="10000" min="0" step="500">
+    </div>
+
+    <div class="form-row">
+      <div class="fr-labels">
+        <label>เป้าหมายที่ต้องการ</label>
+        <div class="hint">เช่น เงินเกษียณ · ดาวน์บ้าน · ทุนธุรกิจ · หน่วยบาท</div>
       </div>
-      <div class="form-group">
-        <label>ระยะเวลาวางแผน (ปี)</label>
-        <input type="number" id="years" value="20" min="1" max="50" step="1">
-        <span class="hint">ดู projection ไปข้างหน้ากี่ปี</span>
+      <input type="number" id="goal" value="5000000" min="0" step="100000">
+    </div>
+
+    <div class="form-row">
+      <div class="fr-labels">
+        <label>ระยะเวลาวางแผน</label>
+        <div class="hint">ดู projection ไปข้างหน้ากี่ปี</div>
       </div>
+      <input type="number" id="years" value="20" min="1" max="50" step="1">
     </div>
   </div>
 
@@ -588,63 +635,88 @@ input[type="number"] { -moz-appearance: textfield; }
       <button class="preset-btn" onclick="applyPreset('aggressive')">เน้นเติบโต</button>
     </div>
 
-    <div class="asset-table">
-      <div class="asset-table-head">
-        <div></div>
-        <div>สินทรัพย์</div>
-        <div>% ของ Pool</div>
-        <div>Expected Return (%/ปี)</div>
-      </div>
+    <div class="asset-list">
 
-      <div class="asset-row" data-asset="cash">
-        <div class="ar-icon"><span class="dot" style="background:var(--asset-cash)"></span></div>
-        <div class="ar-name">
+      <div class="asset-card" data-asset="cash">
+        <span class="ac-dot" style="background:var(--asset-cash)"></span>
+        <div class="ac-name">
           <div class="name-main">เงินออม</div>
           <div class="name-sub">บัญชีออมทรัพย์ดอกเบี้ยสูง · กองทุนตลาดเงิน</div>
         </div>
-        <div class="ar-pct"><input type="number" class="inline-input pct-input" id="pct-cash" value="15" min="0" max="100" step="1"><span class="unit">%</span></div>
-        <div class="ar-roi"><input type="number" class="inline-input roi-input" id="roi-cash" value="2.5" min="0" max="30" step="0.1"><span class="unit">%</span></div>
+        <div class="ac-field">
+          <div class="ac-field-label">% ของ Pool</div>
+          <div class="ac-field-input"><input type="number" class="inline-input pct-input" id="pct-cash" value="15" min="0" max="100" step="1"><span class="unit">%</span></div>
+        </div>
+        <div class="ac-field">
+          <div class="ac-field-label">Return (%/ปี)</div>
+          <div class="ac-field-input"><input type="number" class="inline-input roi-input" id="roi-cash" value="2.5" min="0" max="30" step="0.1"><span class="unit">%</span></div>
+        </div>
       </div>
 
-      <div class="asset-row" data-asset="bond">
-        <div class="ar-icon"><span class="dot" style="background:var(--asset-bond)"></span></div>
-        <div class="ar-name">
+      <div class="asset-card" data-asset="bond">
+        <span class="ac-dot" style="background:var(--asset-bond)"></span>
+        <div class="ac-name">
           <div class="name-main">พันธบัตร</div>
           <div class="name-sub">พันธบัตรรัฐบาล · หุ้นกู้ investment-grade</div>
         </div>
-        <div class="ar-pct"><input type="number" class="inline-input pct-input" id="pct-bond" value="15" min="0" max="100" step="1"><span class="unit">%</span></div>
-        <div class="ar-roi"><input type="number" class="inline-input roi-input" id="roi-bond" value="3.5" min="0" max="30" step="0.1"><span class="unit">%</span></div>
+        <div class="ac-field">
+          <div class="ac-field-label">% ของ Pool</div>
+          <div class="ac-field-input"><input type="number" class="inline-input pct-input" id="pct-bond" value="15" min="0" max="100" step="1"><span class="unit">%</span></div>
+        </div>
+        <div class="ac-field">
+          <div class="ac-field-label">Return (%/ปี)</div>
+          <div class="ac-field-input"><input type="number" class="inline-input roi-input" id="roi-bond" value="3.5" min="0" max="30" step="0.1"><span class="unit">%</span></div>
+        </div>
       </div>
 
-      <div class="asset-row" data-asset="thai">
-        <div class="ar-icon"><span class="dot" style="background:var(--asset-thai)"></span></div>
-        <div class="ar-name">
+      <div class="asset-card" data-asset="thai">
+        <span class="ac-dot" style="background:var(--asset-thai)"></span>
+        <div class="ac-name">
           <div class="name-main">หุ้นไทย</div>
           <div class="name-sub">SET Index · กองทุน passive SET50/100</div>
         </div>
-        <div class="ar-pct"><input type="number" class="inline-input pct-input" id="pct-thai" value="20" min="0" max="100" step="1"><span class="unit">%</span></div>
-        <div class="ar-roi"><input type="number" class="inline-input roi-input" id="roi-thai" value="7" min="0" max="30" step="0.1"><span class="unit">%</span></div>
+        <div class="ac-field">
+          <div class="ac-field-label">% ของ Pool</div>
+          <div class="ac-field-input"><input type="number" class="inline-input pct-input" id="pct-thai" value="20" min="0" max="100" step="1"><span class="unit">%</span></div>
+        </div>
+        <div class="ac-field">
+          <div class="ac-field-label">Return (%/ปี)</div>
+          <div class="ac-field-input"><input type="number" class="inline-input roi-input" id="roi-thai" value="7" min="0" max="30" step="0.1"><span class="unit">%</span></div>
+        </div>
       </div>
 
-      <div class="asset-row" data-asset="us">
-        <div class="ar-icon"><span class="dot" style="background:var(--asset-us)"></span></div>
-        <div class="ar-name">
+      <div class="asset-card" data-asset="us">
+        <span class="ac-dot" style="background:var(--asset-us)"></span>
+        <div class="ac-name">
           <div class="name-main">ดัชนีหุ้น US</div>
           <div class="name-sub">S&amp;P 500 · NASDAQ · ETF ต่างประเทศ</div>
         </div>
-        <div class="ar-pct"><input type="number" class="inline-input pct-input" id="pct-us" value="35" min="0" max="100" step="1"><span class="unit">%</span></div>
-        <div class="ar-roi"><input type="number" class="inline-input roi-input" id="roi-us" value="10" min="0" max="30" step="0.1"><span class="unit">%</span></div>
+        <div class="ac-field">
+          <div class="ac-field-label">% ของ Pool</div>
+          <div class="ac-field-input"><input type="number" class="inline-input pct-input" id="pct-us" value="35" min="0" max="100" step="1"><span class="unit">%</span></div>
+        </div>
+        <div class="ac-field">
+          <div class="ac-field-label">Return (%/ปี)</div>
+          <div class="ac-field-input"><input type="number" class="inline-input roi-input" id="roi-us" value="10" min="0" max="30" step="0.1"><span class="unit">%</span></div>
+        </div>
       </div>
 
-      <div class="asset-row" data-asset="gold">
-        <div class="ar-icon"><span class="dot" style="background:var(--asset-gold)"></span></div>
-        <div class="ar-name">
-          <div class="name-main">ทองคำ / กลยุทธ์</div>
+      <div class="asset-card" data-asset="gold">
+        <span class="ac-dot" style="background:var(--asset-gold)"></span>
+        <div class="ac-name">
+          <div class="name-main">ทอง / กลยุทธ์</div>
           <div class="name-sub">ทองคำแท่ง · ETF ทอง · strategy momentum</div>
         </div>
-        <div class="ar-pct"><input type="number" class="inline-input pct-input" id="pct-gold" value="15" min="0" max="100" step="1"><span class="unit">%</span></div>
-        <div class="ar-roi"><input type="number" class="inline-input roi-input" id="roi-gold" value="6" min="0" max="30" step="0.1"><span class="unit">%</span></div>
+        <div class="ac-field">
+          <div class="ac-field-label">% ของ Pool</div>
+          <div class="ac-field-input"><input type="number" class="inline-input pct-input" id="pct-gold" value="15" min="0" max="100" step="1"><span class="unit">%</span></div>
+        </div>
+        <div class="ac-field">
+          <div class="ac-field-label">Return (%/ปี)</div>
+          <div class="ac-field-input"><input type="number" class="inline-input roi-input" id="roi-gold" value="6" min="0" max="30" step="0.1"><span class="unit">%</span></div>
+        </div>
       </div>
+
     </div>
 
     <div class="total-row" id="totalRow">
@@ -655,7 +727,7 @@ input[type="number"] { -moz-appearance: textfield; }
 
   <!-- ═══ SECTION 3: WEIGHTED RETURN + DONUT ═══ -->
   <div class="section-label">3 · Weighted Return &amp; สัดส่วน</div>
-  <div class="form-2col">
+  <div class="form-stack">
     <div class="card">
       <div class="card-title">Weighted Return (ถ่วงน้ำหนัก)</div>
       <div class="donut-wrap">
