@@ -252,72 +252,91 @@ html, body {
 }
 .planning-card:hover .planning-arrow { transform: translateX(4px); color: var(--maroon); }
 
-/* ===== CYCLES TABS ===== */
+/* ===== CYCLES TABS — sticky filter ===== */
 .cycles-nav {
-  background: var(--cream-card);
+  background: rgba(250, 246, 237, 0.94);
   border-bottom: 1.5px solid var(--border-gold);
-  padding: 14px 22px;
+  padding: 10px 18px;
   position: sticky;
   top: 0;
   z-index: 100;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 .cycles-tabs {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   max-width: 900px;
   margin: 0 auto;
-  overflow-x: auto;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
 }
-.cycles-tabs::-webkit-scrollbar { display: none; }
 .cycle-tab {
-  flex: 1;
-  min-width: 130px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: 1px solid var(--border-gold);
-  background: var(--cream);
-  font-family: 'Cinzel', serif;
+  padding: 12px 10px 14px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(212,175,55,0.45);
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 55%, #F5EDD8 100%);
+  font-family: 'Cinzel', 'Anuphan', serif;
   font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
   color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
   text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
   line-height: 1.2;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(114,47,55,0.06), inset 0 0 0 1px rgba(255,255,255,0.55);
 }
-.cycle-tab:hover { background: var(--cream-deep); color: var(--gold-deep); }
+/* Mountain art layer (non-active) */
+.cycle-tab::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 44px;
+  pointer-events: none;
+  z-index: 0;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 70' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'%3E%3Cpath d='M0,55 C20,50 40,40 70,35 C100,30 130,38 160,30 C180,25 195,32 200,28 L200,70 L0,70 Z' fill='rgba(218,195,148,0.18)'/%3E%3Cpath d='M0,60 C30,52 60,45 100,40 C140,35 170,42 200,36 L200,70 L0,70 Z' fill='rgba(232,220,192,0.28)'/%3E%3Cpath d='M0,45 C25,42 50,30 80,28 C110,26 140,35 170,22 C190,15 200,20 200,18 L200,70 L0,70 Z' fill='rgba(212,175,55,0.08)'/%3E%3Cpath d='M0,40 Q50,25 100,30 Q150,35 200,20' fill='none' stroke='rgba(184,134,11,0.14)' stroke-width='1'/%3E%3Cpath d='M0,50 Q60,38 120,42 Q180,46 200,35' fill='none' stroke='rgba(184,134,11,0.1)' stroke-width='0.7'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
+  border-radius: 0 0 12px 12px;
+}
+.cycle-tab > * { position: relative; z-index: 1; }
+.cycle-tab:hover {
+  border-color: var(--gold);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(114,47,55,0.1), inset 0 0 0 1px rgba(255,255,255,0.7);
+}
 .cycle-tab.active {
   background: linear-gradient(135deg, #722F37 0%, #8B2252 55%, #D4AF37 100%);
   color: #FFF5E1;
   border-color: transparent;
-  box-shadow: 0 4px 12px rgba(139,34,82,0.25);
+  box-shadow: 0 6px 18px rgba(139,34,82,0.32), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+/* Mountain art on active — tinted lighter over gradient */
+.cycle-tab.active::after {
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 70' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'%3E%3Cpath d='M0,55 C20,50 40,40 70,35 C100,30 130,38 160,30 C180,25 195,32 200,28 L200,70 L0,70 Z' fill='rgba(255,245,225,0.12)'/%3E%3Cpath d='M0,60 C30,52 60,45 100,40 C140,35 170,42 200,36 L200,70 L0,70 Z' fill='rgba(255,245,225,0.15)'/%3E%3Cpath d='M0,45 C25,42 50,30 80,28 C110,26 140,35 170,22 C190,15 200,20 200,18 L200,70 L0,70 Z' fill='rgba(255,215,100,0.1)'/%3E%3Cpath d='M0,40 Q50,25 100,30 Q150,35 200,20' fill='none' stroke='rgba(255,245,225,0.22)' stroke-width='1'/%3E%3Cpath d='M0,50 Q60,38 120,42 Q180,46 200,35' fill='none' stroke='rgba(255,245,225,0.15)' stroke-width='0.7'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
 }
 .cycle-tab .ct-num {
   font-family: 'DM Serif Display', serif;
-  font-size: 1rem;
+  font-size: 1.15rem;
   letter-spacing: 0;
   text-transform: none;
+  line-height: 1;
+  color: var(--maroon);
 }
-.cycle-tab .ct-label {
-  font-size: 0.68rem;
-  letter-spacing: 1.2px;
-  opacity: 0.9;
-}
+.cycle-tab.active .ct-num { color: #FFF5E1; }
 .cycle-tab .ct-range {
   font-family: 'DM Serif Display', serif;
-  font-size: 0.78rem;
-  letter-spacing: 0.5px;
+  font-size: 0.82rem;
+  letter-spacing: 0.3px;
   text-transform: none;
   opacity: 0.8;
+  color: var(--text-muted);
 }
+.cycle-tab.active .ct-range { color: #FFF5E1; opacity: 0.9; }
 
 /* ===== MAIN CONTENT ===== */
 .container {
@@ -327,28 +346,6 @@ html, body {
 }
 .cycle-panel { display: none; }
 .cycle-panel.active { display: block; }
-.cycle-header {
-  display: flex; flex-direction: column; gap: 6px;
-  margin-bottom: 22px;
-  padding: 18px 20px;
-  background: linear-gradient(180deg, #FFFEF8 0%, #FAF6ED 100%);
-  border: 1.5px solid var(--border-gold);
-  border-radius: 12px;
-}
-.cycle-header-label {
-  font-family: 'Cinzel', serif;
-  font-size: 0.7rem;
-  letter-spacing: 2px;
-  color: var(--gold-deep);
-  font-weight: 600;
-}
-.cycle-header-title {
-  font-family: 'DM Serif Display', serif;
-  font-size: 1.5rem;
-  color: var(--maroon);
-  line-height: 1.2;
-}
-.cycle-header-desc { font-size: 0.9rem; color: var(--text-muted); }
 
 /* Phase sections */
 .phase-section { margin-bottom: 32px; }
@@ -917,17 +914,14 @@ html, body {
   <div class="cycles-tabs">
     <button class="cycle-tab active" data-cycle="1" onclick="switchCycle(1)">
       <span class="ct-num">Cycle 1</span>
-      <span class="ct-label">Foundation</span>
       <span class="ct-range">Day 1–30</span>
     </button>
     <button class="cycle-tab" data-cycle="2" onclick="switchCycle(2)">
       <span class="ct-num">Cycle 2</span>
-      <span class="ct-label">Intermediate</span>
       <span class="ct-range">Day 31–60</span>
     </button>
     <button class="cycle-tab" data-cycle="3" onclick="switchCycle(3)">
       <span class="ct-num">Cycle 3</span>
-      <span class="ct-label">Advanced</span>
       <span class="ct-range">Day 61–90</span>
     </button>
   </div>
@@ -1051,18 +1045,10 @@ function phaseForDay(day) {
 function renderAllCycles() {
   for (let c = 1; c <= 3; c++) {
     const panel = document.getElementById('cyclePanel-' + c);
-    const meta = CYCLE_META[c];
     const startDay = (c - 1) * 30 + 1;
     const endDay = c * 30;
 
-    let html = `
-      <div class="cycle-header">
-        <div class="cycle-header-label">${meta.label}</div>
-        <div class="cycle-header-title">${meta.title}</div>
-        <div class="cycle-header-desc">${meta.desc}</div>
-      </div>
-      <div class="day-grid">
-    `;
+    let html = '<div class="day-grid">';
     for (let d = startDay; d <= endDay; d++) {
       html += renderDayCard(d);
     }
@@ -1153,7 +1139,14 @@ function switchCycle(n) {
   document.querySelectorAll('.cycle-tab').forEach(t => t.classList.toggle('active', parseInt(t.dataset.cycle) === n));
   document.querySelectorAll('.cycle-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('cyclePanel-' + n).classList.add('active');
-  window.scrollTo({ top: document.querySelector('.cycles-nav').offsetTop - 10, behavior: 'smooth' });
+  // Only scroll up if we're below the nav bar — otherwise let user stay where they are
+  const nav = document.querySelector('.cycles-nav');
+  const navTop = nav.getBoundingClientRect().top;
+  if (navTop < -20) {
+    // User has scrolled past the nav — scroll back so cards start right below sticky bar
+    const absTop = window.pageYOffset + navTop;
+    window.scrollTo({ top: absTop, behavior: 'smooth' });
+  }
 }
 
 // ========================================
