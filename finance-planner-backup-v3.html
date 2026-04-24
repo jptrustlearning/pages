@@ -451,41 +451,6 @@ input[type="number"] { -moz-appearance: textfield; }
   margin-top: 2px;
 }
 
-/* Tier badge + note (shown under progress bar in each risk bar) */
-.risk-bar .rb-tier-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 10px;
-  flex-wrap: wrap;
-}
-.risk-bar .rb-tier {
-  font-family: 'Cinzel', 'Anuphan', sans-serif;
-  font-size: 0.64rem;
-  font-weight: 700;
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
-  padding: 4px 12px;
-  border-radius: 20px;
-  white-space: nowrap;
-}
-.risk-bar .rb-tier.good { background: rgba(46,159,95,0.18);  color: var(--emerald-dk); }
-.risk-bar .rb-tier.ok   { background: rgba(212,175,55,0.22); color: var(--gold-deep); }
-.risk-bar .rb-tier.warn { background: rgba(214,139,44,0.2);  color: var(--amber); }
-.risk-bar .rb-tier.bad  { background: rgba(193,69,69,0.18);  color: var(--burgundy-dk); }
-.risk-bar .rb-tier-range {
-  font-family: 'DM Serif Display', serif;
-  font-size: 0.82rem;
-  color: var(--text-muted);
-}
-.risk-bar .rb-note {
-  margin-top: 8px;
-  font-size: 0.82rem;
-  color: var(--text);
-  line-height: 1.65;
-}
-.risk-bar .rb-note strong { color: var(--maroon); }
-
 /* ===== INSIGHTS ===== */
 .insights-list {
   display: flex; flex-direction: column; gap: 12px;
@@ -1699,103 +1664,6 @@ function severityFromScore(s) {
   return 'bad';
 }
 
-// Per-metric tier label + range + actionable 1-line note based on current value
-function getMetricAdvice(id, inp) {
-  if (id === 'saveRate') {
-    if (!inp.totalIncome) return { tierLabel: '—', tierRange: '', note: 'กรอกรายรับเพื่อประเมิน' };
-    const sr = inp.saveRate;
-    if (sr >= 20) return {
-      tierLabel: 'ดีเยี่ยม', tierRange: '≥ 20%',
-      note: 'อยู่ในเกณฑ์แข็งแกร่ง — สะสมสินทรัพย์ได้เร็ว สามารถจัดสรรเงินเหลือไปลงทุนระยะยาวได้อย่างมั่นใจ'
-    };
-    if (sr >= 15) return {
-      tierLabel: 'ดี', tierRange: '15 – 19%',
-      note: `ใกล้เกณฑ์ดีเยี่ยมแล้ว — เพิ่มอัตราการออมอีก <strong>${(20 - sr).toFixed(1)}%</strong> จะถึงเป้ามาตรฐาน 20%`
-    };
-    if (sr >= 10) return {
-      tierLabel: 'เฝ้าระวัง', tierRange: '10 – 14%',
-      note: 'ต่ำกว่าเกณฑ์มาตรฐาน 20% — พิจารณาลดรายจ่ายผันแปรหรือหารายได้เสริม เพื่อดันอัตราการออมขึ้น'
-    };
-    if (sr > 0) return {
-      tierLabel: 'ควรปรับปรุง', tierRange: '< 10%',
-      note: 'อัตราการออมต่ำมาก สะสมสินทรัพย์ได้ช้า — ควรทบทวนรายจ่ายทุกหมวดเป็นลำดับแรก'
-    };
-    return {
-      tierLabel: 'ติดลบ', tierRange: 'รายจ่ายเกินรายรับ',
-      note: 'สถานะติดลบ — ต้องจัดการรายจ่ายเร่งด่วน ก่อนจะสะสมหนี้เพิ่มเติม'
-    };
-  }
-
-  if (id === 'debt') {
-    if (!inp.totalIncome) return { tierLabel: '—', tierRange: '', note: 'กรอกรายรับเพื่อประเมิน' };
-    const d = inp.debtRatio;
-    if (d === 0) return {
-      tierLabel: 'ไม่มีหนี้', tierRange: '0%',
-      note: 'ไม่มีภาระหนี้ — เยี่ยมมาก สามารถเน้นสะสมสินทรัพย์ลงทุนได้เต็มที่'
-    };
-    if (d <= 25) return {
-      tierLabel: 'ดีเยี่ยม', tierRange: '≤ 25%',
-      note: 'ภาระหนี้อยู่ในเกณฑ์ต่ำ — จัดการได้สบาย เน้นสะสมสินทรัพย์ลงทุนควบคู่ไปได้'
-    };
-    if (d <= 35) return {
-      tierLabel: 'ปลอดภัย', tierRange: '25 – 35%',
-      note: 'อยู่ในเกณฑ์ปลอดภัย — ควรชะลอการก่อหนี้ใหม่ และทยอยลดหนี้ดอกเบี้ยสูง (บัตร/สินเชื่อ) ก่อน'
-    };
-    if (d <= 45) return {
-      tierLabel: 'เฝ้าระวัง', tierRange: '35 – 45%',
-      note: 'เกินเกณฑ์แนะนำ 35% — ควรลดการก่อหนี้ใหม่และวางแผนทยอยชำระ ก่อนขยายการลงทุน'
-    };
-    return {
-      tierLabel: 'เสี่ยงสูง', tierRange: '> 45%',
-      note: 'ภาระหนี้สูงอย่างมีนัยสำคัญ — เร่งชำระหนี้ดอกเบี้ยสูงก่อน และหยุดการก่อหนี้ใหม่ทุกประเภท'
-    };
-  }
-
-  if (id === 'emergency') {
-    if (inp.totalExpense <= 0) return { tierLabel: '—', tierRange: '', note: 'กรอกรายจ่ายเพื่อประเมิน' };
-    const c = inp.emergencyCoverage;
-    if (c >= 6) return {
-      tierLabel: 'ดีเยี่ยม', tierRange: '≥ 6 เดือน',
-      note: 'ครอบคลุมความเสี่ยงฉุกเฉินได้ดี — เป็นรากฐานที่แข็งแรงสำหรับการลงทุนระยะยาว'
-    };
-    if (c >= 3) return {
-      tierLabel: 'ปลอดภัย', tierRange: '3 – 5.9 เดือน',
-      note: `อยู่ในเกณฑ์พื้นฐาน — ควรเก็บเพิ่มอีก <strong>${fmtFull(inp.emergencyGoal - inp.emergencyFund)}</strong> ให้ถึงเป้า 6 เดือน`
-    };
-    if (c >= 1.5) return {
-      tierLabel: 'เฝ้าระวัง', tierRange: '1.5 – 2.9 เดือน',
-      note: 'ต่ำกว่าเกณฑ์ขั้นต่ำ 3 เดือน — ให้ความสำคัญกับการเก็บสำรองก่อนลงทุน ลดความเสี่ยงหากเกิดเหตุฉุกเฉิน'
-    };
-    return {
-      tierLabel: 'เสี่ยงสูง', tierRange: '< 1.5 เดือน',
-      note: 'เงินสำรองไม่เพียงพอ — หากเกิดเหตุฉุกเฉินอาจต้องขายสินทรัพย์ลงทุนในจังหวะที่ไม่เหมาะสม หรือก่อหนี้ใหม่'
-    };
-  }
-
-  if (id === 'fixed') {
-    if (!inp.totalIncome) return { tierLabel: '—', tierRange: '', note: 'กรอกรายรับเพื่อประเมิน' };
-    const f = inp.fixedExpenseRatio;
-    if (f <= 45) return {
-      tierLabel: 'ดีเยี่ยม', tierRange: '≤ 45%',
-      note: 'ความยืดหยุ่นทางการเงินสูง — ปรับตัวได้ดีเมื่อรายรับผันผวน มีกันชนกระแสเงินสดเพียงพอ'
-    };
-    if (f <= 55) return {
-      tierLabel: 'ปลอดภัย', tierRange: '45 – 55%',
-      note: 'อยู่ในเกณฑ์ปลอดภัย — ความยืดหยุ่นพอใช้ สามารถรับมือกับการเปลี่ยนแปลงรายรับระดับกลางได้'
-    };
-    if (f <= 70) return {
-      tierLabel: 'เฝ้าระวัง', tierRange: '55 – 70%',
-      note: 'ความยืดหยุ่นเริ่มต่ำ — หากรายรับลดจะปรับตัวยาก พิจารณาลดรายจ่ายจำเป็นหรือเพิ่มรายรับหลัก'
-    };
-    return {
-      tierLabel: 'ควรปรับปรุง', tierRange: '> 70%',
-      note: 'รายจ่ายคงที่สูงเกินไป — การเงินเปราะบางอย่างมีนัยสำคัญ ควรทบทวนที่อยู่อาศัย/ค่าประกัน/ค่าเดินทาง'
-    };
-  }
-
-  return { tierLabel: '—', tierRange: '', note: '' };
-}
-
 function computeRiskScore(inp) {
   // 1. Saving Rate (higher = better)
   const saveRateScore = scoreBandDesc(inp.saveRate, [
@@ -1847,72 +1715,57 @@ function computeRiskScore(inp) {
   // Overall level
   let level, levelCls, headline;
   if (!inp.totalIncome) {
-    level = '—'; levelCls = '';
-    headline = 'กรอกรายรับและรายจ่ายเพื่อเริ่มประเมินสถานะการเงินของคุณ';
+    level = '—'; levelCls = ''; headline = 'กรอกรายรับเพื่อเริ่มประเมิน';
   } else if (total >= 80) {
     level = 'ดีเยี่ยม'; levelCls = 'good';
-    headline = 'สถานะการเงินของคุณอยู่ในระดับแข็งแกร่งทุกมิติ พื้นฐานมั่นคงพอที่จะขยายการลงทุนระยะยาวได้อย่างมั่นใจ ' +
-               'แนะนำใช้เครื่องมือ "วางแผนพอร์ตการลงทุน" เพื่อกระจายเงินไปยังสินทรัพย์หลากหลาย ต่อยอดความมั่งคั่งในอนาคต';
+    headline = 'สถานะการเงินอยู่ในระดับแข็งแกร่ง — พร้อมขยายการลงทุนได้อย่างมั่นใจ';
   } else if (total >= 65) {
     level = 'ปลอดภัย'; levelCls = 'ok';
-    headline = 'สถานะการเงินของคุณอยู่ในเกณฑ์ดี มีพื้นฐานแข็งแรงพอสำหรับการลงทุนระยะยาว ' +
-               'สามารถเริ่มวางแผนพอร์ตการลงทุนได้ในสัดส่วนที่เหมาะสมกับความเสี่ยงที่ยอมรับได้ ขณะเดียวกันยังพัฒนาตัวชี้วัดที่คะแนนต่ำสุดให้ดีขึ้น';
+    headline = 'สถานะการเงินอยู่ในเกณฑ์ดี — มีพื้นฐานแข็งแรงพอสำหรับการลงทุนระยะยาว';
   } else if (total >= 50) {
     level = 'เฝ้าระวัง'; levelCls = 'warn';
-    headline = 'สถานะการเงินของคุณอยู่ในเกณฑ์กลาง มีบางจุดที่ควรปรับปรุงก่อนขยายการลงทุนระยะยาว ' +
-               'ดูตัวชี้วัดแต่ละตัวด้านล่างเพื่อระบุจุดที่ต้องให้ความสำคัญเป็นลำดับแรก และอ่านคำแนะนำในส่วนท้ายเพื่อวางแผนขั้นถัดไป';
+    headline = 'สถานะการเงินอยู่ในเกณฑ์กลาง — ควรปรับปรุงบางจุดก่อนขยายการลงทุน';
   } else {
     level = 'ควรปรับปรุง'; levelCls = 'bad';
-    headline = 'สถานะการเงินของคุณอยู่ในเกณฑ์เสี่ยง มีความเปราะบางต่อเหตุฉุกเฉินหรือการเปลี่ยนแปลงรายรับ ' +
-               'แนะนำให้ความสำคัญกับการจัดการกระแสเงินสดและลดภาระหนี้เป็นลำดับแรก ยังไม่ควรขยายการลงทุนในช่วงนี้ จนกว่าพื้นฐานจะแข็งแรงขึ้น';
+    headline = 'สถานะการเงินอยู่ในเกณฑ์เสี่ยง — แนะนำจัดการเงินสดและหนี้สินเป็นลำดับแรก';
   }
-
-  // Merge tier/note advice into each breakdown entry
-  const metrics = [
-    {
-      id: 'saveRate',
-      label: 'อัตราการออม',
-      desc: 'เงินเหลือสุทธิต่อรายรับ · หลักการทั่วไปแนะนำ ≥20%',
-      value: inp.totalIncome > 0 ? pct(inp.saveRate, 1) : '—',
-      score: saveRateScore,
-      severity: severityFromScore(saveRateScore)
-    },
-    {
-      id: 'debt',
-      label: 'ภาระหนี้ต่อรายรับ',
-      desc: 'ยอดผ่อนหนี้รวมต่อรายรับ · เกณฑ์ปลอดภัยไม่เกิน 35%',
-      value: inp.totalIncome > 0 ? pct(inp.debtRatio, 1) : '—',
-      score: debtScore,
-      severity: severityFromScore(debtScore)
-    },
-    {
-      id: 'emergency',
-      label: 'เงินสำรองฉุกเฉิน',
-      desc: 'จำนวนเดือนของค่าใช้จ่ายที่ครอบคลุม · เป้าหมายมาตรฐาน 6 เดือน',
-      value: inp.totalExpense > 0 ? inp.emergencyCoverage.toFixed(1) + ' เดือน' : '—',
-      score: emergencyScore,
-      severity: severityFromScore(emergencyScore)
-    },
-    {
-      id: 'fixed',
-      label: 'รายจ่ายคงที่ต่อรายรับ',
-      desc: 'ค่าใช้จ่ายจำเป็น + ค่าประกัน ต่อรายรับ · เกณฑ์ปลอดภัยไม่เกิน 50%',
-      value: inp.totalIncome > 0 ? pct(inp.fixedExpenseRatio, 1) : '—',
-      score: fixedScore,
-      severity: severityFromScore(fixedScore)
-    }
-  ];
-
-  metrics.forEach(m => {
-    const adv = getMetricAdvice(m.id, inp);
-    m.tierLabel = adv.tierLabel;
-    m.tierRange = adv.tierRange;
-    m.note = adv.note;
-  });
 
   return {
     total, level, levelCls, headline,
-    breakdown: metrics
+    breakdown: [
+      {
+        id: 'saveRate',
+        label: 'อัตราการออม',
+        desc: 'เงินเหลือสุทธิต่อรายรับ · หลักการทั่วไปแนะนำ ≥20%',
+        value: inp.totalIncome > 0 ? pct(inp.saveRate, 1) : '—',
+        score: saveRateScore,
+        severity: severityFromScore(saveRateScore)
+      },
+      {
+        id: 'debt',
+        label: 'ภาระหนี้ต่อรายรับ',
+        desc: 'ยอดผ่อนหนี้รวมต่อรายรับ · เกณฑ์ปลอดภัยไม่เกิน 35%',
+        value: inp.totalIncome > 0 ? pct(inp.debtRatio, 1) : '—',
+        score: debtScore,
+        severity: severityFromScore(debtScore)
+      },
+      {
+        id: 'emergency',
+        label: 'เงินสำรองฉุกเฉิน',
+        desc: 'จำนวนเดือนของค่าใช้จ่ายที่ครอบคลุม · เป้าหมายมาตรฐาน 6 เดือน',
+        value: inp.totalExpense > 0 ? inp.emergencyCoverage.toFixed(1) + ' เดือน' : '—',
+        score: emergencyScore,
+        severity: severityFromScore(emergencyScore)
+      },
+      {
+        id: 'fixed',
+        label: 'รายจ่ายคงที่ต่อรายรับ',
+        desc: 'ค่าใช้จ่ายจำเป็น + ค่าประกัน ต่อรายรับ · เกณฑ์ปลอดภัยไม่เกิน 50%',
+        value: inp.totalIncome > 0 ? pct(inp.fixedExpenseRatio, 1) : '—',
+        score: fixedScore,
+        severity: severityFromScore(fixedScore)
+      }
+    ]
   };
 }
 
@@ -1940,13 +1793,6 @@ function renderRisk(inp, risk) {
         <div class="rb-track">
           <div class="rb-fill ${b.severity}" style="width: ${b.score}%;"></div>
         </div>
-        ${b.tierLabel && b.tierLabel !== '—' ? `
-          <div class="rb-tier-row">
-            <span class="rb-tier ${b.severity}">${b.tierLabel}</span>
-            ${b.tierRange ? `<span class="rb-tier-range">${b.tierRange}</span>` : ''}
-          </div>
-          ${b.note ? `<div class="rb-note">${b.note}</div>` : ''}
-        ` : ''}
       </div>
       <div class="rb-value ${b.severity}">
         ${b.value}
