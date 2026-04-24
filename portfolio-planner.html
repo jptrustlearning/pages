@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Portfolio Planner — JPTrust Learning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600;700&family=DM+Serif+Display&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./jp-settings.js?v=1777008471"></script>
+<style>
+:root {
+  --gold: #D4AF37;
+  --gold-dark: #B8860B;
+  --gold-deep: #8B6914;
+  --gold-light: #F4E4BA;
+  --gold-sheen: #E8D48B;
+  --maroon: #722F37;
+  --maroon-dk: #5A1F26;
+  --burgundy: #C14545;
+  --burgundy-dk: #9C2B2B;
+  --emerald: #2E9F5F;
+  --emerald-dk: #1F7D49;
+  --red: #C14545;
+  --cream: #FAF6ED;
+  --cream-card: #FFFEF8;
+  --cream-deep: #F5EDD8;
+  --text: #3D3228;
+  --text-dark: #5A3D20;
+  --text-muted: #7A6F62;
+  --border-gold: rgba(212,175,55,0.4);
+  --border-gold-strong: rgba(212,175,55,0.55);
+  --asset-cash:    #A8935F;
+  --asset-bond:    #6B4A82;
+  --asset-thai:    #C14545;
+  --asset-us:      #1F6FB8;
+  --asset-gold:    #D4AF37;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-padding-top: 0; }
+body {
+  font-family: 'Sarabun', 'Anuphan', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: clip;
+}
+
+/* ===== HERO ===== */
+.hero {
+  padding: 36px 22px 28px;
+  background: linear-gradient(180deg, #FFFEF8 0%, #FAF6ED 70%, #F5EDD8 100%);
+  border-bottom: 1.5px solid var(--border-gold);
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold-sheen), var(--gold), var(--gold-sheen), transparent);
+}
+.hero-inner { position: relative; z-index: 2; max-width: 1000px; margin: 0 auto; }
+.hero-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  margin-bottom: 10px;
+}
+.hero-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2rem, 5.5vw, 2.8rem);
+  line-height: 1.15;
+  color: var(--maroon);
+  margin-bottom: 6px;
+}
+.hero-title .th {
+  font-family: 'Anuphan', 'Sarabun', sans-serif;
+  font-weight: 700;
+  font-size: 0.88em;
+}
+.hero-sub { font-size: 0.95rem; color: var(--text-muted); max-width: 650px; }
+
+/* ===== CONTAINER ===== */
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px 18px 100px;
+}
+.section-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gold-deep);
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 4px 10px 4px;
+  margin: 30px 0 14px;
+  border-bottom: 1.5px solid rgba(212,175,55,0.3);
+}
+.section-label::before {
+  content: '◆';
+  color: var(--gold);
+  font-size: 0.7em;
+}
+
+/* ===== CARD ===== */
+.card {
+  background: linear-gradient(180deg, #FFFEF8 0%, #FAF6ED 70%, #F5EDD8 100%);
+  border: 1.5px solid var(--border-gold-strong);
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: 0 4px 14px rgba(114,47,55,0.06), inset 0 1px 0 rgba(255,255,255,0.7);
+}
+.card-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gold-deep);
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.card-desc {
+  font-size: 0.82rem; color: var(--text-muted); margin-top: -8px; margin-bottom: 14px;
+}
+
+/* ===== FORM ELEMENTS ===== */
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label {
+  font-size: 0.82rem; font-weight: 600; color: var(--text-dark);
+}
+.form-group .hint { font-size: 0.74rem; color: var(--text-muted); font-weight: 400; }
+input[type="number"], select {
+  font-family: 'Sarabun', 'Anuphan', sans-serif;
+  font-size: 0.98rem;
+  padding: 9px 12px;
+  border: 1.5px solid var(--border-gold);
+  border-radius: 10px;
+  background: var(--cream-card);
+  color: var(--text-dark);
+  outline: none;
+  transition: all 0.2s ease;
+}
+input[type="number"]:focus, select:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212,175,55,0.15);
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* 2-col form grid */
+.form-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 520px) { .form-2col { grid-template-columns: 1fr; } }
+
+/* ===== ASSET ALLOCATION TABLE ===== */
+.asset-table {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 0;
+  border: 1px solid var(--border-gold);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--cream-card);
+}
+.asset-table-head {
+  display: contents;
+}
+.asset-table-head > div {
+  background: rgba(114,47,55,0.08);
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--maroon);
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  padding: 10px 12px;
+  border-bottom: 1.5px solid var(--border-gold);
+}
+.asset-row {
+  display: contents;
+}
+.asset-row > div {
+  padding: 12px;
+  border-bottom: 1px solid rgba(212,175,55,0.2);
+  display: flex;
+  align-items: center;
+}
+.asset-row:last-child > div { border-bottom: none; }
+.asset-row .ar-icon {
+  padding: 12px 8px 12px 14px;
+}
+.asset-row .ar-icon .dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  flex-shrink: 0;
+}
+.asset-row .ar-name {
+  flex-direction: column; align-items: flex-start; gap: 2px;
+  padding-right: 10px;
+}
+.asset-row .ar-name .name-main {
+  font-weight: 600; color: var(--text-dark); font-size: 0.95rem;
+}
+.asset-row .ar-name .name-sub {
+  font-size: 0.75rem; color: var(--text-muted);
+}
+.asset-row .ar-pct, .asset-row .ar-roi {
+  justify-content: flex-end;
+  padding: 8px 12px;
+}
+.inline-input {
+  width: 72px;
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.05rem;
+  padding: 6px 8px;
+  border: 1.5px solid var(--border-gold);
+  border-radius: 8px;
+  background: var(--cream-card);
+  text-align: right;
+  color: var(--maroon);
+}
+.inline-input:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 0 3px rgba(212,175,55,0.15); }
+.inline-input + .unit {
+  font-size: 0.82rem; color: var(--text-muted); margin-left: 4px;
+}
+
+.total-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  padding: 14px;
+  margin-top: 8px;
+  background: linear-gradient(135deg, rgba(114,47,55,0.05), rgba(212,175,55,0.08));
+  border: 1.5px solid var(--border-gold-strong);
+  border-radius: 10px;
+  align-items: center;
+  gap: 0;
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  letter-spacing: 1.6px;
+  color: var(--maroon);
+  text-transform: uppercase;
+}
+.total-row .tr-label {
+  grid-column: 1 / 3;
+  padding: 0 8px 0 14px;
+  font-weight: 700;
+}
+.total-row .tr-pct {
+  grid-column: 3 / 5;
+  justify-self: end;
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.4rem;
+  letter-spacing: 0;
+}
+.total-row.error .tr-pct { color: var(--red); }
+.total-row.ok .tr-pct { color: var(--emerald-dk); }
+
+/* ===== KPI PILLARS ===== */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+@media (max-width: 640px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+.kpi {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 55%, #F5EDD8 100%);
+  border: 1.5px solid rgba(212,175,55,0.45);
+  border-radius: 12px;
+  padding: 14px 14px 18px;
+  box-shadow: 0 4px 14px rgba(114,47,55,0.08), 0 1px 4px rgba(114,47,55,0.05), inset 0 0 0 1px rgba(255,255,255,0.6);
+  position: relative;
+  overflow: hidden;
+  min-height: 110px;
+}
+.kpi::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
+  pointer-events: none; z-index: 0;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 70' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'%3E%3Cpath d='M0,55 C20,50 40,40 70,35 C100,30 130,38 160,30 C180,25 195,32 200,28 L200,70 L0,70 Z' fill='rgba(218,195,148,0.18)'/%3E%3Cpath d='M0,60 C30,52 60,45 100,40 C140,35 170,42 200,36 L200,70 L0,70 Z' fill='rgba(232,220,192,0.28)'/%3E%3Cpath d='M0,45 C25,42 50,30 80,28 C110,26 140,35 170,22 C190,15 200,20 200,18 L200,70 L0,70 Z' fill='rgba(212,175,55,0.08)'/%3E%3Cpath d='M0,40 Q50,25 100,30 Q150,35 200,20' fill='none' stroke='rgba(184,134,11,0.14)' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
+  border-radius: 0 0 12px 12px;
+}
+.kpi > * { position: relative; z-index: 1; }
+.kpi-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--gold-deep);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.kpi-value {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.5rem;
+  color: var(--text-dark);
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+.kpi-value.positive { color: var(--emerald-dk); }
+.kpi-value.negative { color: var(--red); }
+.kpi-value.maroon { color: var(--maroon); }
+.kpi-desc {
+  font-size: 0.72rem; color: var(--text-muted); line-height: 1.5;
+}
+
+/* ===== GOAL SUMMARY BANNER ===== */
+.goal-banner {
+  background: linear-gradient(135deg, #722F37 0%, #8B2252 55%, #D4AF37 100%);
+  border-radius: 16px;
+  padding: 22px 24px;
+  margin-bottom: 22px;
+  color: #FFF5E1;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 28px rgba(114,47,55,0.25);
+}
+.goal-banner::before {
+  content: ''; position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 160' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'%3E%3Cpath d='M0,120 C60,100 120,80 200,80 C280,80 340,100 400,85 L400,160 L0,160 Z' fill='rgba(255,245,225,0.05)'/%3E%3Cpath d='M0,130 C80,110 160,130 240,115 C320,100 380,125 400,115 L400,160 L0,160 Z' fill='rgba(255,245,225,0.08)'/%3E%3C/svg%3E");
+  background-size: cover;
+  opacity: 0.7;
+  pointer-events: none;
+}
+.goal-banner > * { position: relative; z-index: 1; }
+.goal-banner-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  opacity: 0.85;
+  margin-bottom: 6px;
+}
+.goal-banner-verdict {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.6rem;
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+.goal-banner-verdict .th {
+  font-family: 'Anuphan', sans-serif; font-weight: 700;
+}
+.goal-banner-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding-top: 14px;
+  border-top: 1.5px solid rgba(255,245,225,0.2);
+}
+@media (max-width: 520px) { .goal-banner-stats { grid-template-columns: 1fr 1fr; gap: 12px; } }
+.gb-stat-label {
+  font-size: 0.72rem; opacity: 0.8; margin-bottom: 3px;
+}
+.gb-stat-value {
+  font-family: 'DM Serif Display', serif; font-size: 1.35rem; line-height: 1.1;
+}
+
+/* ===== CHART WRAPS ===== */
+.chart-wrap { position: relative; height: 280px; }
+.chart-wrap-wide { position: relative; height: 340px; }
+
+/* Donut legend */
+.donut-wrap { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+.donut-canvas { width: 150px; height: 150px; flex-shrink: 0; position: relative; }
+.donut-legend { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 8px; }
+.legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; }
+.legend-item .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.legend-item .leg-name { flex: 1; color: var(--text-dark); }
+.legend-item .leg-val { color: var(--text-muted); font-family: 'DM Serif Display', serif; font-size: 1rem; }
+
+/* ===== TABLE ===== */
+.proj-table {
+  width: 100%; border-collapse: collapse; font-size: 0.85rem;
+}
+.proj-table thead th {
+  background: rgba(114,47,55,0.08);
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--maroon);
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  padding: 10px 8px;
+  text-align: right;
+  border-bottom: 1.5px solid var(--border-gold);
+}
+.proj-table thead th:first-child { text-align: left; }
+.proj-table tbody td {
+  padding: 10px 8px;
+  border-bottom: 1px solid rgba(212,175,55,0.2);
+  text-align: right;
+  font-family: 'DM Serif Display', serif;
+  color: var(--text-dark);
+}
+.proj-table tbody td:first-child {
+  text-align: left; font-weight: 600; color: var(--gold-deep);
+  font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 1px;
+}
+.proj-table tbody tr:hover td { background: rgba(212,175,55,0.06); }
+.proj-table .reached-row td { background: rgba(46,159,95,0.08); font-weight: 700; }
+.proj-table .reached-row td:first-child { color: var(--emerald-dk); }
+
+/* ===== TABS ===== */
+.tab-bar {
+  display: flex; gap: 8px; margin-bottom: 18px;
+  padding: 4px; background: var(--cream-deep);
+  border: 1.5px solid var(--border-gold);
+  border-radius: 12px;
+  width: fit-content;
+}
+.tab-btn {
+  padding: 9px 18px;
+  border: none; background: transparent;
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  color: var(--text-muted);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.tab-btn:hover { color: var(--maroon); }
+.tab-btn.active {
+  background: linear-gradient(135deg, #5A1F26, #722F37);
+  color: #FFF5E1;
+  box-shadow: 0 2px 8px rgba(90,31,38,0.3);
+}
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ===== Save button (sticky action) ===== */
+.actions-bar {
+  display: flex; gap: 12px;
+  margin-top: 24px;
+}
+.btn-save, .btn-reset {
+  padding: 11px 20px; border-radius: 10px;
+  font-family: 'Cinzel', 'Anuphan', serif;
+  font-size: 0.78rem; font-weight: 600;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.2s ease;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: 1.5px solid;
+}
+.btn-save {
+  background: linear-gradient(135deg, #FFFEF8 0%, #F5EDD8 100%);
+  border-color: rgba(212,175,55,0.55);
+  color: var(--gold-deep);
+  box-shadow: 0 2px 8px rgba(212,175,55,0.12), inset 0 1px 0 rgba(255,255,255,0.7);
+  flex: 1;
+}
+.btn-save:hover {
+  background: linear-gradient(135deg, #D4AF37, #B8860B);
+  color: #FFF5E1; border-color: #B8860B;
+  transform: translateY(-1px); box-shadow: 0 6px 16px rgba(212,175,55,0.35);
+}
+.btn-reset {
+  background: transparent;
+  border-color: rgba(122,111,98,0.3);
+  color: var(--text-muted);
+}
+.btn-reset:hover { background: rgba(122,111,98,0.06); border-color: var(--text-muted); }
+
+/* ===== TOAST ===== */
+#jpt-toast {
+  position: fixed; bottom: 30px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: linear-gradient(135deg, #722F37 0%, #8B2252 55%, #D4AF37 100%);
+  color: #FFF5E1;
+  padding: 13px 26px;
+  border-radius: 10px;
+  font-family: 'Anuphan','Sarabun',sans-serif;
+  font-size: 0.92rem; font-weight: 500;
+  z-index: 10000;
+  box-shadow: 0 8px 32px rgba(114,47,55,0.35);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+#jpt-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.login-banner {
+  max-width: 900px; margin: 20px auto;
+  padding: 12px 20px;
+  background: linear-gradient(180deg, rgba(193,69,69,0.08), rgba(193,69,69,0.03));
+  border: 1.5px solid rgba(193,69,69,0.3);
+  border-radius: 10px;
+  color: var(--burgundy-dk);
+  font-size: 0.88rem; text-align: center;
+}
+
+.quick-presets {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;
+}
+.preset-btn {
+  padding: 6px 12px;
+  border: 1.5px solid var(--border-gold);
+  background: var(--cream-card);
+  border-radius: 20px;
+  font-family: 'Sarabun', 'Anuphan', sans-serif;
+  font-size: 0.78rem; font-weight: 600;
+  color: var(--gold-deep);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.preset-btn:hover {
+  background: var(--gold);
+  color: #FFF5E1;
+  border-color: var(--gold-dark);
+}
+
+@media (max-width: 520px) {
+  .hero-title { font-size: 1.75rem; }
+  .goal-banner-verdict { font-size: 1.3rem; }
+  .gb-stat-value { font-size: 1.15rem; }
+  .kpi-value { font-size: 1.3rem; }
+  .asset-table { grid-template-columns: auto 1fr auto auto; }
+  .asset-row .ar-name .name-sub { font-size: 0.7rem; }
+  .inline-input { width: 60px; font-size: 0.95rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">JP Trust Learning · Planning Toolkit</div>
+    <h1 class="hero-title"><span class="th">วางแผนพอร์ตการลงทุน</span></h1>
+    <p class="hero-sub">สร้าง Investable Pool ของคุณ · กระจายเงินลงทุน · ดูว่าจะถึงเป้าหมายในกี่ปี</p>
+  </div>
+</div>
+
+<div id="loginBanner" class="login-banner" style="display:none;">
+  คุณยังไม่ได้ login — ใช้เครื่องคำนวณได้ แต่การตั้งค่าจะไม่ถูกบันทึก
+</div>
+
+<div class="container">
+
+  <!-- ═══ SECTION 1: INVESTABLE POOL ═══ -->
+  <div class="section-label">1 · Investable Pool &amp; เป้าหมาย</div>
+
+  <div class="card">
+    <div class="card-title">เงินเริ่มต้น + เงินลงทุนต่อเดือน</div>
+    <div class="card-desc">กรอกทั้ง 2 ช่อง — ระบบจะคำนวณ mix ของ lump sum + DCA ให้อัตโนมัติ</div>
+    <div class="form-2col">
+      <div class="form-group">
+        <label>ทุนเริ่มต้น (Lump Sum) — บาท</label>
+        <input type="number" id="principal" value="100000" min="0" step="10000">
+        <span class="hint">เงินก้อนที่มีอยู่แล้ววันนี้ · หากยังไม่มีใส่ 0</span>
+      </div>
+      <div class="form-group">
+        <label>เงินลงทุนต่อเดือน (DCA) — บาท</label>
+        <input type="number" id="monthly" value="10000" min="0" step="500">
+        <span class="hint">จำนวนที่ทยอยใส่ทุกเดือน · 0 = ลงครั้งเดียวเท่านั้น</span>
+      </div>
+      <div class="form-group">
+        <label>เป้าหมายที่ต้องการ (บาท)</label>
+        <input type="number" id="goal" value="5000000" min="0" step="100000">
+        <span class="hint">เช่น เงินเกษียณ · ดาวน์บ้าน · ทุนธุรกิจ</span>
+      </div>
+      <div class="form-group">
+        <label>ระยะเวลาวางแผน (ปี)</label>
+        <input type="number" id="years" value="20" min="1" max="50" step="1">
+        <span class="hint">ดู projection ไปข้างหน้ากี่ปี</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SECTION 2: ASSET ALLOCATION ═══ -->
+  <div class="section-label">2 · การกระจายการลงทุน</div>
+
+  <div class="card">
+    <div class="card-title">แบ่ง Pool เป็น 5 หมวด</div>
+    <div class="card-desc">กรอก % ให้รวมเป็น 100 · expected return ปรับได้จากตัวอย่างอิงตลาดจริง</div>
+
+    <div class="quick-presets">
+      <button class="preset-btn" onclick="applyPreset('conservative')">อนุรักษ์นิยม</button>
+      <button class="preset-btn" onclick="applyPreset('balanced')">สมดุล</button>
+      <button class="preset-btn" onclick="applyPreset('aggressive')">เน้นเติบโต</button>
+    </div>
+
+    <div class="asset-table">
+      <div class="asset-table-head">
+        <div></div>
+        <div>สินทรัพย์</div>
+        <div>% ของ Pool</div>
+        <div>Expected Return (%/ปี)</div>
+      </div>
+
+      <div class="asset-row" data-asset="cash">
+        <div class="ar-icon"><span class="dot" style="background:var(--asset-cash)"></span></div>
+        <div class="ar-name">
+          <div class="name-main">เงินออม</div>
+          <div class="name-sub">บัญชีออมทรัพย์ดอกเบี้ยสูง · กองทุนตลาดเงิน</div>
+        </div>
+        <div class="ar-pct"><input type="number" class="inline-input pct-input" id="pct-cash" value="15" min="0" max="100" step="1"><span class="unit">%</span></div>
+        <div class="ar-roi"><input type="number" class="inline-input roi-input" id="roi-cash" value="2.5" min="0" max="30" step="0.1"><span class="unit">%</span></div>
+      </div>
+
+      <div class="asset-row" data-asset="bond">
+        <div class="ar-icon"><span class="dot" style="background:var(--asset-bond)"></span></div>
+        <div class="ar-name">
+          <div class="name-main">พันธบัตร</div>
+          <div class="name-sub">พันธบัตรรัฐบาล · หุ้นกู้ investment-grade</div>
+        </div>
+        <div class="ar-pct"><input type="number" class="inline-input pct-input" id="pct-bond" value="15" min="0" max="100" step="1"><span class="unit">%</span></div>
+        <div class="ar-roi"><input type="number" class="inline-input roi-input" id="roi-bond" value="3.5" min="0" max="30" step="0.1"><span class="unit">%</span></div>
+      </div>
+
+      <div class="asset-row" data-asset="thai">
+        <div class="ar-icon"><span class="dot" style="background:var(--asset-thai)"></span></div>
+        <div class="ar-name">
+          <div class="name-main">หุ้นไทย</div>
+          <div class="name-sub">SET Index · กองทุน passive SET50/100</div>
+        </div>
+        <div class="ar-pct"><input type="number" class="inline-input pct-input" id="pct-thai" value="20" min="0" max="100" step="1"><span class="unit">%</span></div>
+        <div class="ar-roi"><input type="number" class="inline-input roi-input" id="roi-thai" value="7" min="0" max="30" step="0.1"><span class="unit">%</span></div>
+      </div>
+
+      <div class="asset-row" data-asset="us">
+        <div class="ar-icon"><span class="dot" style="background:var(--asset-us)"></span></div>
+        <div class="ar-name">
+          <div class="name-main">ดัชนีหุ้น US</div>
+          <div class="name-sub">S&amp;P 500 · NASDAQ · ETF ต่างประเทศ</div>
+        </div>
+        <div class="ar-pct"><input type="number" class="inline-input pct-input" id="pct-us" value="35" min="0" max="100" step="1"><span class="unit">%</span></div>
+        <div class="ar-roi"><input type="number" class="inline-input roi-input" id="roi-us" value="10" min="0" max="30" step="0.1"><span class="unit">%</span></div>
+      </div>
+
+      <div class="asset-row" data-asset="gold">
+        <div class="ar-icon"><span class="dot" style="background:var(--asset-gold)"></span></div>
+        <div class="ar-name">
+          <div class="name-main">ทองคำ / กลยุทธ์</div>
+          <div class="name-sub">ทองคำแท่ง · ETF ทอง · strategy momentum</div>
+        </div>
+        <div class="ar-pct"><input type="number" class="inline-input pct-input" id="pct-gold" value="15" min="0" max="100" step="1"><span class="unit">%</span></div>
+        <div class="ar-roi"><input type="number" class="inline-input roi-input" id="roi-gold" value="6" min="0" max="30" step="0.1"><span class="unit">%</span></div>
+      </div>
+    </div>
+
+    <div class="total-row" id="totalRow">
+      <div class="tr-label">รวม %</div>
+      <div class="tr-pct" id="totalPct">100%</div>
+    </div>
+  </div>
+
+  <!-- ═══ SECTION 3: WEIGHTED RETURN + DONUT ═══ -->
+  <div class="section-label">3 · Weighted Return &amp; สัดส่วน</div>
+  <div class="form-2col">
+    <div class="card">
+      <div class="card-title">Weighted Return (ถ่วงน้ำหนัก)</div>
+      <div class="donut-wrap">
+        <div class="donut-canvas"><canvas id="allocChart"></canvas></div>
+        <div class="donut-legend" id="allocLegend"></div>
+      </div>
+    </div>
+    <div class="kpi-grid" style="grid-template-columns:1fr;gap:10px;align-content:start;">
+      <div class="kpi">
+        <div class="kpi-label">Blended Return</div>
+        <div class="kpi-value maroon" id="blendedRoi">—</div>
+        <div class="kpi-desc">ผลตอบแทนเฉลี่ยถ่วงน้ำหนักตาม allocation</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Monthly DCA</div>
+        <div class="kpi-value" id="monthlyCap">—</div>
+        <div class="kpi-desc">เงินลงทุนรายเดือนปัจจุบัน</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SECTION 4: GOAL VERDICT ═══ -->
+  <div class="section-label">4 · ผลลัพธ์ &amp; การถึงเป้าหมาย</div>
+
+  <div class="goal-banner">
+    <div class="goal-banner-label">Goal Verdict</div>
+    <div class="goal-banner-verdict" id="goalVerdict">—</div>
+    <div class="goal-banner-stats">
+      <div>
+        <div class="gb-stat-label">มูลค่าพอร์ต ณ ปลายแผน</div>
+        <div class="gb-stat-value" id="statEnd">—</div>
+      </div>
+      <div>
+        <div class="gb-stat-label">เงินลงทุนทั้งหมด</div>
+        <div class="gb-stat-value" id="statContrib">—</div>
+      </div>
+      <div>
+        <div class="gb-stat-label">กำไรสะสม</div>
+        <div class="gb-stat-value" id="statGain">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SECTION 5: PROJECTION CHART / TABLE ═══ -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('chart')">กราฟ</button>
+    <button class="tab-btn" onclick="switchTab('table')">ตารางรายปี</button>
+  </div>
+
+  <div id="tab-chart" class="tab-panel active">
+    <div class="card">
+      <div class="card-title">พอร์ตสะสม vs เป้าหมาย</div>
+      <div class="chart-wrap-wide"><canvas id="projChart"></canvas></div>
+    </div>
+  </div>
+
+  <div id="tab-table" class="tab-panel">
+    <div class="card">
+      <div class="card-title">Projection รายปี</div>
+      <div style="overflow-x:auto">
+        <table class="proj-table" id="projTable"></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SAVE ACTIONS ═══ -->
+  <div class="actions-bar">
+    <button class="btn-reset" onclick="resetAllSettings()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+      คืนค่าเริ่มต้น
+    </button>
+    <button class="btn-save" onclick="savePortfolioSettings()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      บันทึกการตั้งค่า
+    </button>
+  </div>
+
+</div>
+
+<script>
+// ==========================================================
+// PORTFOLIO PLANNER — JPTrust Learning
+// ==========================================================
+
+const ASSETS = [
+  { id: 'cash', name: 'เงินออม',       color: '#A8935F' },
+  { id: 'bond', name: 'พันธบัตร',     color: '#6B4A82' },
+  { id: 'thai', name: 'หุ้นไทย',      color: '#C14545' },
+  { id: 'us',   name: 'ดัชนีหุ้น US', color: '#1F6FB8' },
+  { id: 'gold', name: 'ทอง / กลยุทธ์', color: '#D4AF37' }
+];
+
+const DEFAULTS = {
+  principal: 100000, monthly: 10000, goal: 5000000, years: 20,
+  cash: { pct: 15, roi: 2.5 },
+  bond: { pct: 15, roi: 3.5 },
+  thai: { pct: 20, roi: 7 },
+  us:   { pct: 35, roi: 10 },
+  gold: { pct: 15, roi: 6 }
+};
+
+const PRESETS = {
+  conservative: { cash: 30, bond: 30, thai: 15, us: 15, gold: 10 },
+  balanced:     { cash: 15, bond: 15, thai: 20, us: 35, gold: 15 },
+  aggressive:   { cash: 5,  bond: 5,  thai: 25, us: 55, gold: 10 }
+};
+
+// ==========================================================
+// JPSettings init
+// ==========================================================
+if (window.JPSettings && window.supabase) {
+  window.JPSettings.init({
+    url: 'https://rcdukwwcbyryauhqlzmx.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZHVrd3djYnlyeWF1aHFsem14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MTY0MDAsImV4cCI6MjA4NTQ5MjQwMH0.rprPmudJYyb6dyhXb9Z9GrtQWEeIX99A2Wrj55PvS54'
+  });
+}
+
+function jptToast(msg) {
+  let t = document.getElementById('jpt-toast');
+  if (!t) { t = document.createElement('div'); t.id = 'jpt-toast'; document.body.appendChild(t); }
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ==========================================================
+// FORMATTERS
+// ==========================================================
+function fmt(n) {
+  if (!isFinite(n)) return '—';
+  if (Math.abs(n) >= 1e9) return '฿' + (n/1e9).toFixed(2) + 'B';
+  if (Math.abs(n) >= 1e6) return '฿' + (n/1e6).toFixed(2) + 'M';
+  if (Math.abs(n) >= 1e3) return '฿' + (n/1e3).toFixed(0) + 'K';
+  return '฿' + Math.round(n).toLocaleString();
+}
+function fmtFull(n) { return '฿' + Math.round(n).toLocaleString('en-US'); }
+function pct(n) { return n.toFixed(2) + '%'; }
+
+// ==========================================================
+// DATA GATHERING
+// ==========================================================
+function getInputs() {
+  const principal = +document.getElementById('principal').value || 0;
+  const monthly = +document.getElementById('monthly').value || 0;
+  const goal = +document.getElementById('goal').value || 0;
+  const years = Math.max(1, Math.min(50, +document.getElementById('years').value || 20));
+  const allocs = {};
+  ASSETS.forEach(a => {
+    allocs[a.id] = {
+      pct: +document.getElementById('pct-' + a.id).value || 0,
+      roi: +document.getElementById('roi-' + a.id).value || 0
+    };
+  });
+  return { principal, monthly, goal, years, allocs };
+}
+
+function computeTotalPct(allocs) {
+  return ASSETS.reduce((s, a) => s + (allocs[a.id].pct || 0), 0);
+}
+
+function computeBlendedRoi(allocs) {
+  const total = computeTotalPct(allocs) || 1;
+  return ASSETS.reduce((s, a) => s + (allocs[a.id].pct / total) * (allocs[a.id].roi / 100), 0);
+}
+
+// ==========================================================
+// PROJECTION
+// Monthly compounding with annual weighted ROI
+// ==========================================================
+function buildProjection(inp) {
+  const { principal, monthly, years, allocs } = inp;
+  const annualRoi = computeBlendedRoi(allocs);  // decimal
+  const monthlyRoi = Math.pow(1 + annualRoi, 1/12) - 1;
+
+  const data = []; // {year, portfolio, contributed, gain}
+  let portfolio = principal;
+  let contributed = principal;
+
+  // Year 0 (baseline)
+  data.push({ year: 0, portfolio: principal, contributed: principal, gain: 0 });
+
+  for (let y = 1; y <= years; y++) {
+    for (let m = 0; m < 12; m++) {
+      portfolio = portfolio * (1 + monthlyRoi) + monthly;
+      contributed += monthly;
+    }
+    data.push({
+      year: y,
+      portfolio,
+      contributed,
+      gain: portfolio - contributed
+    });
+  }
+  return { data, annualRoi, monthlyRoi };
+}
+
+function findGoalReached(data, goal) {
+  // Return { reached: bool, year: number|null, portfolioAtEnd }
+  if (goal <= 0) return { reached: true, year: 0, portfolioAtEnd: data[data.length - 1].portfolio };
+  for (const d of data) {
+    if (d.portfolio >= goal) return { reached: true, year: d.year, portfolioAtEnd: data[data.length - 1].portfolio };
+  }
+  return { reached: false, year: null, portfolioAtEnd: data[data.length - 1].portfolio };
+}
+
+// ==========================================================
+// RENDERERS
+// ==========================================================
+let allocC = null;
+let projC = null;
+
+function renderTotals(inp) {
+  const total = computeTotalPct(inp.allocs);
+  const row = document.getElementById('totalRow');
+  const pctEl = document.getElementById('totalPct');
+  pctEl.textContent = total + '%';
+  row.classList.remove('ok', 'error');
+  if (total === 100) row.classList.add('ok');
+  else row.classList.add('error');
+}
+
+function renderAllocDonut(inp) {
+  const canvas = document.getElementById('allocChart');
+  const legendEl = document.getElementById('allocLegend');
+  const total = computeTotalPct(inp.allocs);
+
+  const labels = ASSETS.map(a => a.name);
+  const values = ASSETS.map(a => inp.allocs[a.id].pct);
+  const colors = ASSETS.map(a => a.color);
+
+  // Destroy previous
+  if (allocC) { try { allocC.destroy(); } catch(e){} }
+  allocC = new Chart(canvas, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data: values, backgroundColor: colors, borderColor: '#FAF6ED', borderWidth: 2 }] },
+    options: {
+      responsive: true, maintainAspectRatio: true, cutout: '64%',
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ctx.label + ': ' + ctx.parsed + '%' } } }
+    }
+  });
+
+  // Legend
+  legendEl.innerHTML = ASSETS.map(a => `
+    <div class="legend-item">
+      <span class="dot" style="background:${a.color}"></span>
+      <span class="leg-name">${a.name}</span>
+      <span class="leg-val">${inp.allocs[a.id].pct}% · ${inp.allocs[a.id].roi}%/ปี</span>
+    </div>
+  `).join('');
+}
+
+function renderKpis(inp, proj) {
+  document.getElementById('blendedRoi').textContent = pct(proj.annualRoi * 100) + '/ปี';
+  document.getElementById('monthlyCap').textContent = fmt(inp.monthly);
+}
+
+function renderGoalBanner(inp, proj, reached) {
+  const verdictEl = document.getElementById('goalVerdict');
+  const goalFmt = fmt(inp.goal);
+  const endValue = proj.data[proj.data.length - 1].portfolio;
+  const contribAtEnd = proj.data[proj.data.length - 1].contributed;
+  const gainAtEnd = endValue - contribAtEnd;
+
+  if (reached.reached && reached.year !== null && reached.year > 0) {
+    verdictEl.innerHTML = `<span class="th">ถึงเป้า</span> ${goalFmt} <span class="th">ได้ใน</span> ${reached.year} <span class="th">ปี</span> ✓`;
+  } else if (reached.reached && reached.year === 0) {
+    verdictEl.innerHTML = `<span class="th">ทุนเริ่มต้นถึงเป้าแล้ว</span> — ลงทุนต่อเพื่อเติบโต`;
+  } else {
+    const shortfall = inp.goal - endValue;
+    verdictEl.innerHTML = `<span class="th">ยังไม่ถึงเป้า</span> ${goalFmt} <span class="th">ใน</span> ${inp.years} <span class="th">ปี · ขาดอีก</span> ${fmt(shortfall)}`;
+  }
+
+  document.getElementById('statEnd').textContent = fmt(endValue);
+  document.getElementById('statContrib').textContent = fmt(contribAtEnd);
+  document.getElementById('statGain').textContent = fmt(gainAtEnd);
+}
+
+function renderProjChart(inp, proj, reached) {
+  const canvas = document.getElementById('projChart');
+  const years = proj.data.map(d => d.year);
+
+  if (projC) { try { projC.destroy(); } catch(e){} }
+  projC = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: years,
+      datasets: [
+        {
+          label: 'พอร์ตสะสม',
+          data: proj.data.map(d => d.portfolio),
+          borderColor: '#722F37',
+          backgroundColor: 'rgba(114,47,55,0.12)',
+          fill: true, tension: 0.3, pointRadius: 0, pointHoverRadius: 5, borderWidth: 2.5
+        },
+        {
+          label: 'เงินลงทุนสะสม',
+          data: proj.data.map(d => d.contributed),
+          borderColor: '#B8860B',
+          backgroundColor: 'transparent',
+          borderDash: [6, 4], tension: 0.3, pointRadius: 0, pointHoverRadius: 5, borderWidth: 2
+        },
+        {
+          label: 'เป้าหมาย',
+          data: years.map(() => inp.goal),
+          borderColor: '#1F7D49',
+          backgroundColor: 'transparent',
+          borderDash: [3, 3], tension: 0, pointRadius: 0, borderWidth: 1.8
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: {
+        x: { title: { display: true, text: 'ปีที่', color: '#7A6F62', font:{family:'Cinzel'} } },
+        y: { ticks: { callback: v => fmt(v), color: '#7A6F62' }, grid: { color: 'rgba(212,175,55,0.1)' } }
+      },
+      plugins: {
+        legend: { position: 'top', labels: { color: '#3D3228', font:{family:'Sarabun', size:12} } },
+        tooltip: { callbacks: { label: (ctx) => ctx.dataset.label + ': ' + fmtFull(ctx.parsed.y) } }
+      }
+    }
+  });
+}
+
+function renderProjTable(inp, proj, reached) {
+  const table = document.getElementById('projTable');
+  let html = `
+    <thead>
+      <tr>
+        <th>ปีที่</th>
+        <th>เงินลงทุนสะสม</th>
+        <th>พอร์ต</th>
+        <th>กำไร</th>
+        <th>% ถึงเป้า</th>
+      </tr>
+    </thead>
+    <tbody>
+  `;
+  let reachedFlagged = false;
+  proj.data.forEach(d => {
+    const pctGoal = inp.goal > 0 ? Math.min(100, (d.portfolio / inp.goal) * 100) : 0;
+    const isReachedRow = !reachedFlagged && d.portfolio >= inp.goal && inp.goal > 0;
+    if (isReachedRow) reachedFlagged = true;
+    html += `
+      <tr${isReachedRow ? ' class="reached-row"' : ''}>
+        <td>ปี ${d.year}</td>
+        <td>${fmt(d.contributed)}</td>
+        <td>${fmt(d.portfolio)}</td>
+        <td style="color:${d.gain >= 0 ? 'var(--emerald-dk)' : 'var(--red)'}">${fmt(d.gain)}</td>
+        <td>${pctGoal.toFixed(1)}%</td>
+      </tr>
+    `;
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+}
+
+// ==========================================================
+// MAIN RECALC
+// ==========================================================
+function recalc() {
+  const inp = getInputs();
+  renderTotals(inp);
+
+  const proj = buildProjection(inp);
+  const reached = findGoalReached(proj.data, inp.goal);
+
+  renderAllocDonut(inp);
+  renderKpis(inp, proj);
+  renderGoalBanner(inp, proj, reached);
+  renderProjChart(inp, proj, reached);
+  renderProjTable(inp, proj, reached);
+}
+
+// ==========================================================
+// PRESETS
+// ==========================================================
+function applyPreset(name) {
+  const p = PRESETS[name];
+  if (!p) return;
+  Object.keys(p).forEach(k => {
+    const el = document.getElementById('pct-' + k);
+    if (el) el.value = p[k];
+  });
+  recalc();
+  jptToast('ใช้ allocation แบบ ' + (name === 'conservative' ? 'อนุรักษ์นิยม' : name === 'balanced' ? 'สมดุล' : 'เน้นเติบโต'));
+}
+
+// ==========================================================
+// TABS
+// ==========================================================
+function switchTab(which) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-' + which).classList.add('active');
+}
+
+// ==========================================================
+// SAVE / LOAD / RESET
+// ==========================================================
+function getPortfolioSettings() {
+  const inp = getInputs();
+  return {
+    principal: inp.principal, monthly: inp.monthly, goal: inp.goal, years: inp.years,
+    cash: { pct: inp.allocs.cash.pct, roi: inp.allocs.cash.roi },
+    bond: { pct: inp.allocs.bond.pct, roi: inp.allocs.bond.roi },
+    thai: { pct: inp.allocs.thai.pct, roi: inp.allocs.thai.roi },
+    us:   { pct: inp.allocs.us.pct,   roi: inp.allocs.us.roi },
+    gold: { pct: inp.allocs.gold.pct, roi: inp.allocs.gold.roi }
+  };
+}
+
+function applyPortfolioSettings(s) {
+  if (!s) return;
+  if (s.principal != null) document.getElementById('principal').value = s.principal;
+  if (s.monthly != null) document.getElementById('monthly').value = s.monthly;
+  if (s.goal != null) document.getElementById('goal').value = s.goal;
+  if (s.years != null) document.getElementById('years').value = s.years;
+  ASSETS.forEach(a => {
+    if (s[a.id]) {
+      if (s[a.id].pct != null) document.getElementById('pct-' + a.id).value = s[a.id].pct;
+      if (s[a.id].roi != null) document.getElementById('roi-' + a.id).value = s[a.id].roi;
+    }
+  });
+}
+
+async function loadPortfolioSettings() {
+  if (!window.JPSettings) return;
+  try {
+    const data = await window.JPSettings.load();
+    if (data && data.portfolio_planner) {
+      applyPortfolioSettings(data.portfolio_planner);
+      console.log('[portfolio-planner] loaded settings from cloud');
+    }
+    const user = await window.JPSettings.getUser();
+    if (!user) {
+      document.getElementById('loginBanner').style.display = 'block';
+    }
+  } catch (e) {
+    console.warn('[portfolio-planner] load error:', e);
+  }
+}
+
+async function savePortfolioSettings() {
+  if (!window.JPSettings) { jptToast('ระบบยังไม่พร้อม — กรุณาลองใหม่'); return; }
+  const user = await window.JPSettings.getUser();
+  if (!user) { jptToast('กรุณา login ก่อนบันทึกการตั้งค่า'); return; }
+  const ok = await window.JPSettings.patch({ portfolio_planner: getPortfolioSettings() });
+  jptToast(ok ? 'บันทึกการตั้งค่าเรียบร้อย' : 'บันทึกไม่สำเร็จ — กรุณาลองใหม่');
+}
+
+function resetAllSettings() {
+  if (!confirm('คืนค่าเริ่มต้นทั้งหมด? (ค่าที่เคยบันทึกจะถูกทับเมื่อกดบันทึกครั้งถัดไป)')) return;
+  document.getElementById('principal').value = DEFAULTS.principal;
+  document.getElementById('monthly').value = DEFAULTS.monthly;
+  document.getElementById('goal').value = DEFAULTS.goal;
+  document.getElementById('years').value = DEFAULTS.years;
+  ASSETS.forEach(a => {
+    document.getElementById('pct-' + a.id).value = DEFAULTS[a.id].pct;
+    document.getElementById('roi-' + a.id).value = DEFAULTS[a.id].roi;
+  });
+  recalc();
+  jptToast('รีเซ็ตเป็นค่าเริ่มต้นแล้ว — อย่าลืมกดบันทึก');
+}
+
+// ==========================================================
+// INIT
+// ==========================================================
+document.addEventListener('DOMContentLoaded', async () => {
+  // Load saved settings first
+  await loadPortfolioSettings();
+  // Initial calc
+  recalc();
+  // Live recalc on any input change (debounced)
+  let recalcTimer = null;
+  document.querySelectorAll('input[type="number"]').forEach(input => {
+    input.addEventListener('input', () => {
+      clearTimeout(recalcTimer);
+      recalcTimer = setTimeout(recalc, 200);
+    });
+  });
+});
+</script>
+
+</body>
+</html>

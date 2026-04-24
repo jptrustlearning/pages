@@ -1454,6 +1454,16 @@ function openPlanningDashboard(type) {
     finance: 'วางแผนการเงินส่วนบุคคล',
     portfolio: 'วางแผนพอร์ตการลงทุน'
   };
+  if (type === 'portfolio') {
+    // Navigate parent window to portfolio-planner via iframe wrapper
+    if (window.parent && window.parent !== window) {
+      // Inside an iframe — ask parent to open
+      window.parent.postMessage({ type: 'openIframe', title: 'วางแผนพอร์ตการลงทุน', url: 'https://jptrustlearning.github.io/pages/portfolio-planner.html?v=' + Date.now() }, '*');
+    } else {
+      window.location.href = 'portfolio-planner.html';
+    }
+    return;
+  }
   jptToast('🚧 ' + names[type] + ' · เร็วๆ นี้');
 }
 
