@@ -203,7 +203,7 @@ function buildWelcomeEmailText(username: string): string {
 
 ด้วยความเคารพ
 ทีมงาน JP Trust Learning
-jptrustlearning.github.io
+www.jptrustlearning.com
 `;
 }
 
@@ -279,7 +279,7 @@ function buildWelcomeEmailHtml(username: string): string {
         <!-- Footer -->
         <tr><td style="padding:20px 24px 28px;background:#FFFEF8;border-top:1px solid rgba(212,175,55,0.25);text-align:center;">
           <div style="font-size:13px;color:#5A3D20;font-weight:600;">ด้วยความเคารพ<br>ทีมงาน JP Trust Learning</div>
-          <div style="font-size:11px;color:#8B6914;margin-top:8px;letter-spacing:1.5px;font-family:'Times New Roman',serif;">jptrustlearning.github.io</div>
+          <div style="font-size:11px;color:#8B6914;margin-top:8px;letter-spacing:1.5px;font-family:'Times New Roman',serif;">www.jptrustlearning.com</div>
         </td></tr>
 
       </table>
