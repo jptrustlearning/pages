@@ -347,7 +347,7 @@ body {
 .container {
   max-width: 900px;
   margin: 0 auto;
-  padding: 26px 18px 80px;
+  padding: 16px 18px 80px;
 }
 .cycle-panel { display: none; }
 .cycle-panel.active { display: block; }
@@ -398,8 +398,8 @@ body {
   gap: 8px;
 }
 .day-card {
-  min-height: 78px;
-  padding: 9px 11px;
+  min-height: 88px;
+  padding: 9px 11px 9px;
   border-radius: 10px;
   background: var(--cream-card);
   border: 1.5px solid var(--border-gold);
@@ -421,6 +421,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
+  z-index: 2;
 }
 .day-card .dc-num {
   font-family: 'DM Serif Display', serif;
@@ -428,18 +430,27 @@ body {
   line-height: 1;
   color: var(--maroon);
 }
+/* Big centered lock icon */
 .day-card .dc-lock {
-  color: rgba(122,111,98,0.4);
-  transition: color 0.2s ease;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(184,134,11,0.28);
+  transition: color 0.2s ease, opacity 0.2s ease;
+  z-index: 1;
+  pointer-events: none;
 }
-.day-card:hover .dc-lock { color: var(--gold-deep); }
-.day-card .dc-lock svg { width: 13px; height: 13px; stroke-width: 1.9; display: block; }
+.day-card:hover .dc-lock { color: rgba(184,134,11,0.5); }
+.day-card .dc-lock svg { width: 26px; height: 26px; stroke-width: 1.7; display: block; }
 
-/* Phase mini-badges row — J P T shown on every card, primary highlighted */
+/* Phase mini-badges row — all 3 highlighted (each day = full JPT mini-cycle) */
 .day-card .dc-phases {
   display: flex;
   gap: 4px;
   align-items: center;
+  position: relative;
+  z-index: 2;
 }
 .day-card .dc-mini {
   display: inline-flex;
@@ -452,27 +463,23 @@ body {
   font-size: 0.75rem;
   line-height: 1;
   font-weight: 600;
-  color: var(--text-muted);
-  background: transparent;
-  border: 1.2px solid rgba(122,111,98,0.3);
+  color: #FFF5E1;
+  border: none;
   transition: all 0.2s ease;
+  flex-shrink: 0;
 }
-/* Primary phase — highlighted with brand color */
-.day-card[data-phase="J"] .dc-mini.is-primary {
-  background: linear-gradient(135deg, #722F37, #9C2B2B);
-  border-color: transparent; color: #FFF5E1;
-  box-shadow: 0 2px 6px rgba(114,47,55,0.28);
+.day-card .dc-mini.jpt-J { background: linear-gradient(135deg, #722F37, #9C2B2B); box-shadow: 0 1px 3px rgba(114,47,55,0.25); }
+.day-card .dc-mini.jpt-P { background: linear-gradient(135deg, #8B6914, #D4AF37); box-shadow: 0 1px 3px rgba(139,105,20,0.25); }
+.day-card .dc-mini.jpt-T { background: linear-gradient(135deg, #1F7D49, #2E9F5F); box-shadow: 0 1px 3px rgba(31,125,73,0.25); }
+
+/* Rest day (every 7th day) — rose-gold tint background, only J + P badges */
+.day-card.rest-day {
+  background: linear-gradient(135deg, #FFF5F0 0%, #FDF6E6 45%, #F8E6D8 100%);
+  border-color: rgba(218,165,140,0.45);
 }
-.day-card[data-phase="P"] .dc-mini.is-primary {
-  background: linear-gradient(135deg, #8B6914, #D4AF37);
-  border-color: transparent; color: #FFF5E1;
-  box-shadow: 0 2px 6px rgba(139,105,20,0.28);
-}
-.day-card[data-phase="T"] .dc-mini.is-primary {
-  background: linear-gradient(135deg, #1F7D49, #2E9F5F);
-  border-color: transparent; color: #FFF5E1;
-  box-shadow: 0 2px 6px rgba(31,125,73,0.28);
-}
+.day-card.rest-day:hover { border-color: #D4A574; }
+.day-card.rest-day .dc-num { color: #8B3A2A; }
+.day-card.rest-day .dc-lock { color: rgba(139,58,42,0.3); }
 
 .day-card.done {
   background: linear-gradient(135deg, #FFFEF8 0%, #F5EDD8 100%);
@@ -486,6 +493,7 @@ body {
   color: var(--emerald-dk);
   font-size: 1rem;
   font-weight: 900;
+  z-index: 3;
 }
 .day-card.current {
   border-color: var(--maroon);
@@ -1063,25 +1071,25 @@ function renderAllCycles() {
 }
 
 function renderDayCard(day) {
-  const primary = phaseForDay(day);
   const p = progress[day] || {};
   const done = p.done ? 'done' : '';
+  const isRest = day % 7 === 0;
+  const restClass = isRest ? 'rest-day' : '';
+  const badges = isRest
+    ? '<span class="dc-mini jpt-J">J</span><span class="dc-mini jpt-P">P</span>'
+    : '<span class="dc-mini jpt-J">J</span><span class="dc-mini jpt-P">P</span><span class="dc-mini jpt-T">T</span>';
   return `
-    <div class="day-card locked ${done}" data-day="${day}" data-phase="${primary}" onclick="openDayModal(${day})">
+    <div class="day-card locked ${done} ${restClass}" data-day="${day}" onclick="openDayModal(${day})">
       <div class="dc-top">
         <div class="dc-num">${day}</div>
-        <div class="dc-lock">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="4" y="11" width="16" height="10" rx="2"/>
-            <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
-          </svg>
-        </div>
       </div>
-      <div class="dc-phases">
-        <span class="dc-mini ${primary === 'J' ? 'is-primary' : ''}">J</span>
-        <span class="dc-mini ${primary === 'P' ? 'is-primary' : ''}">P</span>
-        <span class="dc-mini ${primary === 'T' ? 'is-primary' : ''}">T</span>
+      <div class="dc-lock">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="11" width="16" height="10" rx="2"/>
+          <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+        </svg>
       </div>
+      <div class="dc-phases">${badges}</div>
     </div>
   `;
 }
