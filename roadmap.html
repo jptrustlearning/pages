@@ -34,13 +34,18 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body {
+html {
+  /* Keep html free of overflow rules — sticky needs the root scroll container clean */
+  scroll-padding-top: 0;
+}
+body {
   font-family: 'Sarabun', 'Anuphan', sans-serif;
   background: var(--cream);
   color: var(--text);
   line-height: 1.6;
   min-height: 100vh;
-  overflow-x: hidden;
+  /* overflow-x hidden on body only (not html) to prevent sticky breakage */
+  overflow-x: clip;
 }
 
 /* ===== HERO ===== */
