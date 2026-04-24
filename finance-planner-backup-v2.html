@@ -1375,16 +1375,6 @@ const EXPENSE_IDS  = ['expenseFixed', 'expenseVariable', 'expenseDebt', 'expense
 const ALL_MONEY_IDS = INCOME_IDS.concat(EXPENSE_IDS).concat(['emergencyFund']);
 
 // ==========================================================
-// JPSettings init (must run before any load/save)
-// ==========================================================
-if (window.JPSettings && window.supabase) {
-  window.JPSettings.init({
-    url: 'https://rcdukwwcbyryauhqlzmx.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZHVrd3djYnlyeWF1aHFsem14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MTY0MDAsImV4cCI6MjA4NTQ5MjQwMH0.rprPmudJYyb6dyhXb9Z9GrtQWEeIX99A2Wrj55PvS54'
-  });
-}
-
-// ==========================================================
 // NUMBER FORMATTING
 // ==========================================================
 function parseNum(str) {
