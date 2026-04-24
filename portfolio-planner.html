@@ -184,16 +184,26 @@ input[type="number"] { -moz-appearance: textfield; }
 .form-row .fr-labels .hint {
   font-size: 0.76rem; color: var(--text-muted); line-height: 1.4;
 }
-.form-row input[type="number"] {
+.form-row input[type="number"], .form-row input[type="text"].num-with-commas {
   width: 180px; max-width: 100%;
   text-align: right;
   font-family: 'DM Serif Display', serif;
   font-size: 1.1rem;
   color: var(--maroon);
+  padding: 9px 12px;
+  border: 1.5px solid var(--border-gold);
+  border-radius: 10px;
+  background: var(--cream-card);
+  outline: none;
+  transition: all 0.2s ease;
+}
+.form-row input[type="number"]:focus, .form-row input.num-with-commas:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212,175,55,0.15);
 }
 @media (max-width: 520px) {
   .form-row { grid-template-columns: 1fr; gap: 6px; padding: 10px 0; }
-  .form-row input[type="number"] { width: 100%; }
+  .form-row input[type="number"], .form-row input.num-with-commas { width: 100%; }
 }
 
 /* ===== ASSET ALLOCATION CARDS ===== */
@@ -313,28 +323,59 @@ input[type="number"] { -moz-appearance: textfield; }
 }
 
 .total-row {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
   align-items: center;
-  padding: 14px 18px;
+  gap: 14px;
+  padding: 14px 16px;
   margin-top: 12px;
   background: linear-gradient(135deg, rgba(114,47,55,0.05), rgba(212,175,55,0.08));
   border: 1.5px solid var(--border-gold-strong);
-  border-radius: 10px;
+  border-radius: 12px;
   font-family: 'Cinzel', serif;
   font-size: 0.8rem;
   letter-spacing: 1.6px;
   color: var(--maroon);
   text-transform: uppercase;
 }
-.total-row .tr-label { font-weight: 700; }
+.total-row .tr-spacer {
+  /* Empty spacer to align with .ac-dot column (14px dot + no gap) */
+  width: 14px;
+}
+.total-row .tr-label {
+  font-weight: 700;
+}
 .total-row .tr-pct {
   font-family: 'DM Serif Display', serif;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   letter-spacing: 0;
+  text-align: right;
+  /* Match asset-card .inline-input width (68px) + padding for visual alignment */
+  min-width: 80px;
+}
+.total-row .tr-pct-end {
+  /* Placeholder to match the Return column on asset-card */
+  width: 80px;
 }
 .total-row.error .tr-pct { color: var(--red); }
 .total-row.ok .tr-pct { color: var(--emerald-dk); }
+
+@media (max-width: 560px) {
+  .total-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .total-row .tr-spacer,
+  .total-row .tr-pct-end { display: none; }
+  .total-row .tr-label {
+    grid-column: 1; text-align: left;
+  }
+  .total-row .tr-pct {
+    grid-column: 2;
+    text-align: right;
+    min-width: 0;
+  }
+}
 
 /* ===== KPI PILLARS ===== */
 .kpi-grid {
@@ -628,7 +669,7 @@ input[type="number"] { -moz-appearance: textfield; }
         <label>ทุนเริ่มต้น (Lump Sum)</label>
         <div class="hint">เงินก้อนที่มีอยู่แล้ววันนี้ · หากยังไม่มีใส่ 0 · หน่วยบาท</div>
       </div>
-      <input type="number" id="principal" value="100000" min="0" step="10000">
+      <input type="text" inputmode="numeric" class="num-with-commas" id="principal" value="100,000">
     </div>
 
     <div class="form-row">
@@ -636,7 +677,7 @@ input[type="number"] { -moz-appearance: textfield; }
         <label>เงินลงทุนต่อเดือน (DCA)</label>
         <div class="hint">จำนวนที่ทยอยใส่ทุกเดือน · 0 = ลงครั้งเดียวเท่านั้น · หน่วยบาท</div>
       </div>
-      <input type="number" id="monthly" value="10000" min="0" step="500">
+      <input type="text" inputmode="numeric" class="num-with-commas" id="monthly" value="10,000">
     </div>
 
     <div class="form-row">
@@ -644,7 +685,7 @@ input[type="number"] { -moz-appearance: textfield; }
         <label>เป้าหมายที่ต้องการ</label>
         <div class="hint">เช่น เงินเกษียณ · ดาวน์บ้าน · ทุนธุรกิจ · หน่วยบาท</div>
       </div>
-      <input type="number" id="goal" value="5000000" min="0" step="100000">
+      <input type="text" inputmode="numeric" class="num-with-commas" id="goal" value="5,000,000">
     </div>
 
     <div class="form-row">
@@ -770,8 +811,10 @@ input[type="number"] { -moz-appearance: textfield; }
     </div>
 
     <div class="total-row" id="totalRow">
+      <div class="tr-spacer"></div>
       <div class="tr-label">รวม %</div>
       <div class="tr-pct" id="totalPct">100%</div>
+      <div class="tr-pct-end"></div>
     </div>
   </div>
 
@@ -888,6 +931,40 @@ const PRESETS = {
 };
 
 // ==========================================================
+// NUMBER FORMATTING (comma input handling)
+// ==========================================================
+function parseNum(str) {
+  if (str == null) return 0;
+  const n = +String(str).replace(/,/g, '');
+  return isFinite(n) ? n : 0;
+}
+function formatNum(n) {
+  if (!isFinite(n)) return '0';
+  return Math.round(n).toLocaleString('en-US');
+}
+// Get numeric value from any input (handles text-with-commas and plain number)
+function numVal(el) {
+  if (!el) return 0;
+  return parseNum(el.value);
+}
+// Format .num-with-commas inputs on blur + restrict typing to digits
+function attachCommaFormatting() {
+  document.querySelectorAll('input.num-with-commas').forEach(input => {
+    input.addEventListener('input', () => {
+      const raw = input.value.replace(/[^0-9]/g, '');
+      if (raw === '') { /* allow empty */ return; }
+      const n = parseInt(raw, 10);
+      // Preserve cursor at end (simplest approach for number inputs)
+      input.value = formatNum(n);
+    });
+    input.addEventListener('blur', () => {
+      if (input.value === '') input.value = '0';
+      else input.value = formatNum(parseNum(input.value));
+    });
+  });
+}
+
+// ==========================================================
 // JPSettings init
 // ==========================================================
 if (window.JPSettings && window.supabase) {
@@ -923,9 +1000,9 @@ function pct(n) { return n.toFixed(2) + '%'; }
 // DATA GATHERING
 // ==========================================================
 function getInputs() {
-  const principal = +document.getElementById('principal').value || 0;
-  const monthly = +document.getElementById('monthly').value || 0;
-  const goal = +document.getElementById('goal').value || 0;
+  const principal = numVal(document.getElementById('principal'));
+  const monthly = numVal(document.getElementById('monthly'));
+  const goal = numVal(document.getElementById('goal'));
   const years = Math.max(1, Math.min(50, +document.getElementById('years').value || 20));
   const allocs = {};
   ASSETS.forEach(a => {
@@ -1195,9 +1272,9 @@ function getPortfolioSettings() {
 
 function applyPortfolioSettings(s) {
   if (!s) return;
-  if (s.principal != null) document.getElementById('principal').value = s.principal;
-  if (s.monthly != null) document.getElementById('monthly').value = s.monthly;
-  if (s.goal != null) document.getElementById('goal').value = s.goal;
+  if (s.principal != null) document.getElementById('principal').value = formatNum(s.principal);
+  if (s.monthly != null) document.getElementById('monthly').value = formatNum(s.monthly);
+  if (s.goal != null) document.getElementById('goal').value = formatNum(s.goal);
   if (s.years != null) document.getElementById('years').value = s.years;
   ASSETS.forEach(a => {
     if (s[a.id]) {
@@ -1234,9 +1311,9 @@ async function savePortfolioSettings() {
 
 function resetAllSettings() {
   if (!confirm('คืนค่าเริ่มต้นทั้งหมด? (ค่าที่เคยบันทึกจะถูกทับเมื่อกดบันทึกครั้งถัดไป)')) return;
-  document.getElementById('principal').value = DEFAULTS.principal;
-  document.getElementById('monthly').value = DEFAULTS.monthly;
-  document.getElementById('goal').value = DEFAULTS.goal;
+  document.getElementById('principal').value = formatNum(DEFAULTS.principal);
+  document.getElementById('monthly').value = formatNum(DEFAULTS.monthly);
+  document.getElementById('goal').value = formatNum(DEFAULTS.goal);
   document.getElementById('years').value = DEFAULTS.years;
   ASSETS.forEach(a => {
     document.getElementById('pct-' + a.id).value = DEFAULTS[a.id].pct;
@@ -1250,13 +1327,15 @@ function resetAllSettings() {
 // INIT
 // ==========================================================
 document.addEventListener('DOMContentLoaded', async () => {
-  // Load saved settings first
+  // Attach comma formatting to money inputs first
+  attachCommaFormatting();
+  // Load saved settings (applies with formatted values)
   await loadPortfolioSettings();
   // Initial calc
   recalc();
   // Live recalc on any input change (debounced)
   let recalcTimer = null;
-  document.querySelectorAll('input[type="number"]').forEach(input => {
+  document.querySelectorAll('input[type="number"], input.num-with-commas').forEach(input => {
     input.addEventListener('input', () => {
       clearTimeout(recalcTimer);
       recalcTimer = setTimeout(recalc, 200);
