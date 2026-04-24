@@ -37,6 +37,7 @@
   --asset-thai:    #C14545;
   --asset-us:      #1F6FB8;
   --asset-gold:    #D4AF37;
+  --asset-strategy: #722F37;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -259,22 +260,55 @@ input[type="number"] { -moz-appearance: textfield; }
   font-size: 0.82rem; color: var(--text-muted);
 }
 
+/* Tint return field background subtle green for emphasis */
+.asset-card .ac-field.is-return .ac-field-input {
+  background: rgba(46,159,95,0.08);
+  border-radius: 8px;
+  padding: 2px 4px;
+}
+.asset-card .ac-field.is-return .inline-input {
+  background: rgba(255,255,255,0.6);
+  border-color: rgba(46,159,95,0.35);
+  color: var(--emerald-dk);
+}
+.asset-card .ac-field.is-return .inline-input:focus {
+  border-color: var(--emerald);
+  box-shadow: 0 0 0 3px rgba(46,159,95,0.18);
+}
+.asset-card .ac-field.is-return .ac-field-label {
+  color: var(--emerald-dk);
+}
+
 @media (max-width: 560px) {
   .asset-card {
-    grid-template-columns: auto 1fr;
-    gap: 10px 12px;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .asset-card .ac-dot {
+    grid-column: 1 / 3;
+    grid-row: 1;
+    justify-self: start;
+  }
+  .asset-card .ac-name {
+    grid-column: 1 / 3;
+    grid-row: 2;
   }
   .asset-card .ac-field {
-    grid-column: 2 / 3;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
+    grid-row: 3;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
   }
-  .asset-card .ac-field:nth-of-type(1) { grid-row: 2; }
-  .asset-card .ac-field:nth-of-type(2) { grid-row: 3; }
+  .asset-card .ac-field:nth-of-type(1) { grid-column: 1; }
+  .asset-card .ac-field:nth-of-type(2) { grid-column: 2; }
   .asset-card .ac-field-label {
-    font-size: 0.68rem;
+    font-size: 0.62rem;
+  }
+  .asset-card .ac-field-input {
+    width: 100%;
+  }
+  .inline-input {
+    width: 100%;
   }
 }
 
@@ -647,7 +681,7 @@ input[type="number"] { -moz-appearance: textfield; }
           <div class="ac-field-label">% ของ Pool</div>
           <div class="ac-field-input"><input type="number" class="inline-input pct-input" id="pct-cash" value="15" min="0" max="100" step="1"><span class="unit">%</span></div>
         </div>
-        <div class="ac-field">
+        <div class="ac-field is-return">
           <div class="ac-field-label">Return (%/ปี)</div>
           <div class="ac-field-input"><input type="number" class="inline-input roi-input" id="roi-cash" value="2.5" min="0" max="30" step="0.1"><span class="unit">%</span></div>
         </div>
@@ -663,7 +697,7 @@ input[type="number"] { -moz-appearance: textfield; }
           <div class="ac-field-label">% ของ Pool</div>
           <div class="ac-field-input"><input type="number" class="inline-input pct-input" id="pct-bond" value="15" min="0" max="100" step="1"><span class="unit">%</span></div>
         </div>
-        <div class="ac-field">
+        <div class="ac-field is-return">
           <div class="ac-field-label">Return (%/ปี)</div>
           <div class="ac-field-input"><input type="number" class="inline-input roi-input" id="roi-bond" value="3.5" min="0" max="30" step="0.1"><span class="unit">%</span></div>
         </div>
@@ -679,7 +713,7 @@ input[type="number"] { -moz-appearance: textfield; }
           <div class="ac-field-label">% ของ Pool</div>
           <div class="ac-field-input"><input type="number" class="inline-input pct-input" id="pct-thai" value="20" min="0" max="100" step="1"><span class="unit">%</span></div>
         </div>
-        <div class="ac-field">
+        <div class="ac-field is-return">
           <div class="ac-field-label">Return (%/ปี)</div>
           <div class="ac-field-input"><input type="number" class="inline-input roi-input" id="roi-thai" value="7" min="0" max="30" step="0.1"><span class="unit">%</span></div>
         </div>
@@ -693,9 +727,9 @@ input[type="number"] { -moz-appearance: textfield; }
         </div>
         <div class="ac-field">
           <div class="ac-field-label">% ของ Pool</div>
-          <div class="ac-field-input"><input type="number" class="inline-input pct-input" id="pct-us" value="35" min="0" max="100" step="1"><span class="unit">%</span></div>
+          <div class="ac-field-input"><input type="number" class="inline-input pct-input" id="pct-us" value="30" min="0" max="100" step="1"><span class="unit">%</span></div>
         </div>
-        <div class="ac-field">
+        <div class="ac-field is-return">
           <div class="ac-field-label">Return (%/ปี)</div>
           <div class="ac-field-input"><input type="number" class="inline-input roi-input" id="roi-us" value="10" min="0" max="30" step="0.1"><span class="unit">%</span></div>
         </div>
@@ -704,16 +738,32 @@ input[type="number"] { -moz-appearance: textfield; }
       <div class="asset-card" data-asset="gold">
         <span class="ac-dot" style="background:var(--asset-gold)"></span>
         <div class="ac-name">
-          <div class="name-main">ทอง / กลยุทธ์</div>
-          <div class="name-sub">ทองคำแท่ง · ETF ทอง · strategy momentum</div>
+          <div class="name-main">ทองคำ</div>
+          <div class="name-sub">ทองคำแท่ง · ETF ทอง · safe-haven hedge</div>
         </div>
         <div class="ac-field">
           <div class="ac-field-label">% ของ Pool</div>
-          <div class="ac-field-input"><input type="number" class="inline-input pct-input" id="pct-gold" value="15" min="0" max="100" step="1"><span class="unit">%</span></div>
+          <div class="ac-field-input"><input type="number" class="inline-input pct-input" id="pct-gold" value="10" min="0" max="100" step="1"><span class="unit">%</span></div>
         </div>
-        <div class="ac-field">
+        <div class="ac-field is-return">
           <div class="ac-field-label">Return (%/ปี)</div>
           <div class="ac-field-input"><input type="number" class="inline-input roi-input" id="roi-gold" value="6" min="0" max="30" step="0.1"><span class="unit">%</span></div>
+        </div>
+      </div>
+
+      <div class="asset-card" data-asset="strategy">
+        <span class="ac-dot" style="background:var(--asset-strategy)"></span>
+        <div class="ac-name">
+          <div class="name-main">กลยุทธ์ JPTrust</div>
+          <div class="name-sub">Momentum · Rotation · Active managed portfolio</div>
+        </div>
+        <div class="ac-field">
+          <div class="ac-field-label">% ของ Pool</div>
+          <div class="ac-field-input"><input type="number" class="inline-input pct-input" id="pct-strategy" value="10" min="0" max="100" step="1"><span class="unit">%</span></div>
+        </div>
+        <div class="ac-field is-return">
+          <div class="ac-field-label">Return (%/ปี)</div>
+          <div class="ac-field-input"><input type="number" class="inline-input roi-input" id="roi-strategy" value="20" min="0" max="50" step="0.1"><span class="unit">%</span></div>
         </div>
       </div>
 
@@ -813,26 +863,28 @@ input[type="number"] { -moz-appearance: textfield; }
 // ==========================================================
 
 const ASSETS = [
-  { id: 'cash', name: 'เงินออม',       color: '#A8935F' },
-  { id: 'bond', name: 'พันธบัตร',     color: '#6B4A82' },
-  { id: 'thai', name: 'หุ้นไทย',      color: '#C14545' },
-  { id: 'us',   name: 'ดัชนีหุ้น US', color: '#1F6FB8' },
-  { id: 'gold', name: 'ทอง / กลยุทธ์', color: '#D4AF37' }
+  { id: 'cash',     name: 'เงินออม',         color: '#A8935F' },
+  { id: 'bond',     name: 'พันธบัตร',        color: '#6B4A82' },
+  { id: 'thai',     name: 'หุ้นไทย',         color: '#C14545' },
+  { id: 'us',       name: 'ดัชนีหุ้น US',    color: '#1F6FB8' },
+  { id: 'gold',     name: 'ทองคำ',            color: '#D4AF37' },
+  { id: 'strategy', name: 'กลยุทธ์ JPTrust',  color: '#722F37' }
 ];
 
 const DEFAULTS = {
   principal: 100000, monthly: 10000, goal: 5000000, years: 20,
-  cash: { pct: 15, roi: 2.5 },
-  bond: { pct: 15, roi: 3.5 },
-  thai: { pct: 20, roi: 7 },
-  us:   { pct: 35, roi: 10 },
-  gold: { pct: 15, roi: 6 }
+  cash:     { pct: 15, roi: 2.5 },
+  bond:     { pct: 15, roi: 3.5 },
+  thai:     { pct: 20, roi: 7 },
+  us:       { pct: 30, roi: 10 },
+  gold:     { pct: 10, roi: 6 },
+  strategy: { pct: 10, roi: 20 }
 };
 
 const PRESETS = {
-  conservative: { cash: 30, bond: 30, thai: 15, us: 15, gold: 10 },
-  balanced:     { cash: 15, bond: 15, thai: 20, us: 35, gold: 15 },
-  aggressive:   { cash: 5,  bond: 5,  thai: 25, us: 55, gold: 10 }
+  conservative: { cash: 30, bond: 30, thai: 15, us: 15, gold: 7,  strategy: 3 },
+  balanced:     { cash: 15, bond: 15, thai: 20, us: 30, gold: 10, strategy: 10 },
+  aggressive:   { cash: 5,  bond: 5,  thai: 20, us: 45, gold: 10, strategy: 15 }
 };
 
 // ==========================================================
@@ -1132,14 +1184,13 @@ function switchTab(which) {
 // ==========================================================
 function getPortfolioSettings() {
   const inp = getInputs();
-  return {
-    principal: inp.principal, monthly: inp.monthly, goal: inp.goal, years: inp.years,
-    cash: { pct: inp.allocs.cash.pct, roi: inp.allocs.cash.roi },
-    bond: { pct: inp.allocs.bond.pct, roi: inp.allocs.bond.roi },
-    thai: { pct: inp.allocs.thai.pct, roi: inp.allocs.thai.roi },
-    us:   { pct: inp.allocs.us.pct,   roi: inp.allocs.us.roi },
-    gold: { pct: inp.allocs.gold.pct, roi: inp.allocs.gold.roi }
+  const result = {
+    principal: inp.principal, monthly: inp.monthly, goal: inp.goal, years: inp.years
   };
+  ASSETS.forEach(a => {
+    result[a.id] = { pct: inp.allocs[a.id].pct, roi: inp.allocs[a.id].roi };
+  });
+  return result;
 }
 
 function applyPortfolioSettings(s) {
