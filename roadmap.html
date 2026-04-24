@@ -257,6 +257,14 @@ body {
 }
 .planning-card:hover .planning-arrow { transform: translateX(4px); color: var(--maroon); }
 
+/* ===== JPTRUST LEARNING SECTION HEADER (before cycles) ===== */
+.jpt-learning-header {
+  padding: 28px 18px 10px;
+  background: var(--cream);
+  margin-top: 12px;
+}
+.jpt-learning-inner { max-width: 900px; margin: 0 auto; }
+
 /* ===== CYCLES TABS — sticky filter ===== */
 .cycles-nav {
   background: rgba(250, 246, 237, 0.94);
@@ -314,14 +322,14 @@ body {
   box-shadow: 0 6px 18px rgba(114,47,55,0.1), inset 0 0 0 1px rgba(255,255,255,0.7);
 }
 .cycle-tab.active {
-  background: linear-gradient(135deg, #722F37 0%, #8B2252 55%, #D4AF37 100%);
+  background: linear-gradient(135deg, #5A1F26 0%, #722F37 50%, #4A2318 100%);
   color: #FFF5E1;
   border-color: transparent;
-  box-shadow: 0 6px 18px rgba(139,34,82,0.32), inset 0 1px 0 rgba(255,255,255,0.15);
+  box-shadow: 0 8px 22px rgba(90,31,38,0.45), inset 0 1px 0 rgba(255,255,255,0.1);
 }
-/* Mountain art on active — tinted lighter over gradient */
+/* Mountain art on active — darker maroon undertone */
 .cycle-tab.active::after {
-  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 70' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'%3E%3Cpath d='M0,55 C20,50 40,40 70,35 C100,30 130,38 160,30 C180,25 195,32 200,28 L200,70 L0,70 Z' fill='rgba(255,245,225,0.12)'/%3E%3Cpath d='M0,60 C30,52 60,45 100,40 C140,35 170,42 200,36 L200,70 L0,70 Z' fill='rgba(255,245,225,0.15)'/%3E%3Cpath d='M0,45 C25,42 50,30 80,28 C110,26 140,35 170,22 C190,15 200,20 200,18 L200,70 L0,70 Z' fill='rgba(255,215,100,0.1)'/%3E%3Cpath d='M0,40 Q50,25 100,30 Q150,35 200,20' fill='none' stroke='rgba(255,245,225,0.22)' stroke-width='1'/%3E%3Cpath d='M0,50 Q60,38 120,42 Q180,46 200,35' fill='none' stroke='rgba(255,245,225,0.15)' stroke-width='0.7'/%3E%3C/svg%3E");
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 70' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'%3E%3Cpath d='M0,55 C20,50 40,40 70,35 C100,30 130,38 160,30 C180,25 195,32 200,28 L200,70 L0,70 Z' fill='rgba(0,0,0,0.12)'/%3E%3Cpath d='M0,60 C30,52 60,45 100,40 C140,35 170,42 200,36 L200,70 L0,70 Z' fill='rgba(0,0,0,0.18)'/%3E%3Cpath d='M0,45 C25,42 50,30 80,28 C110,26 140,35 170,22 C190,15 200,20 200,18 L200,70 L0,70 Z' fill='rgba(212,175,55,0.1)'/%3E%3Cpath d='M0,40 Q50,25 100,30 Q150,35 200,20' fill='none' stroke='rgba(255,245,225,0.3)' stroke-width='1'/%3E%3Cpath d='M0,50 Q60,38 120,42 Q180,46 200,35' fill='none' stroke='rgba(255,245,225,0.2)' stroke-width='0.7'/%3E%3C/svg%3E");
   background-size: 100% 100%;
 }
 .cycle-tab .ct-num {
@@ -924,6 +932,13 @@ body {
         </svg>
       </button>
     </div>
+  </div>
+</section>
+
+<!-- ===== SECTION BREAK + HEADER before cycles ===== -->
+<section class="jpt-learning-header">
+  <div class="jpt-learning-inner">
+    <div class="planning-label">JPTrust Learning</div>
   </div>
 </section>
 
