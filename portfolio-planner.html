@@ -369,15 +369,19 @@ input[type="number"] { -moz-appearance: textfield; }
   }
   .total-row .tr-spacer,
   .total-row .tr-pct-end { display: none; }
+  /* Both label & 100% share col 1 (under the Pool column above),
+     but sit at opposite ends via justify-self */
   .total-row .tr-label {
-    grid-column: 2;
-    text-align: right;
-    justify-self: end;
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+    align-self: center;
   }
   .total-row .tr-pct {
     grid-column: 1;
-    text-align: left;
-    justify-self: start;
+    grid-row: 1;
+    justify-self: end;
+    align-self: center;
     min-width: 0;
   }
 }
