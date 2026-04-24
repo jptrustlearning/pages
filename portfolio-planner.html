@@ -204,10 +204,10 @@ input[type="number"] { -moz-appearance: textfield; }
 @media (max-width: 520px) {
   .form-row { grid-template-columns: 1fr; gap: 6px; padding: 10px 0; }
   .form-row input[type="number"], .form-row input.num-with-commas { width: 100%; }
-  /* Years input is special — only 2-3 digits, so keep it narrow and right-aligned */
+  /* Years input is special — only 2-3 digits, so keep it narrow
+     but still anchored to the LEFT like the money inputs above */
   .form-row input[type="number"]#years {
     width: 120px;
-    margin-left: auto;
   }
 }
 
