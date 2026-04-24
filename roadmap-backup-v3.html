@@ -1450,19 +1450,21 @@ function openDayModal(day) {
 // PLANNING DASHBOARDS (placeholder for future)
 // ========================================
 function openPlanningDashboard(type) {
-  const TARGETS = {
-    finance:   { title: 'วางแผนการเงินส่วนบุคคล', file: 'finance-planner.html' },
-    portfolio: { title: 'วางแผนพอร์ตการลงทุน',    file: 'portfolio-planner.html' }
+  const names = {
+    finance: 'วางแผนการเงินส่วนบุคคล',
+    portfolio: 'วางแผนพอร์ตการลงทุน'
   };
-  const t = TARGETS[type];
-  if (!t) return;
-  const url = 'https://jptrustlearning.github.io/pages/' + t.file + '?v=' + Date.now();
-  if (window.parent && window.parent !== window) {
-    // Inside an iframe — ask parent to open
-    window.parent.postMessage({ type: 'openIframe', title: t.title, url: url }, '*');
-  } else {
-    window.location.href = t.file;
+  if (type === 'portfolio') {
+    // Navigate parent window to portfolio-planner via iframe wrapper
+    if (window.parent && window.parent !== window) {
+      // Inside an iframe — ask parent to open
+      window.parent.postMessage({ type: 'openIframe', title: 'วางแผนพอร์ตการลงทุน', url: 'https://jptrustlearning.github.io/pages/portfolio-planner.html?v=' + Date.now() }, '*');
+    } else {
+      window.location.href = 'portfolio-planner.html';
+    }
+    return;
   }
+  jptToast('🚧 ' + names[type] + ' · เร็วๆ นี้');
 }
 
 // ========================================
