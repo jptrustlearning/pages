@@ -366,22 +366,16 @@ input[type="number"] { -moz-appearance: textfield; }
   .total-row {
     grid-template-columns: 1fr 1fr;
     gap: 12px;
+    padding: 14px 16px;
   }
   .total-row .tr-spacer,
+  .total-row .tr-label,
   .total-row .tr-pct-end { display: none; }
-  /* Both label & 100% share col 1 (under the Pool column above),
-     but sit at opposite ends via justify-self */
-  .total-row .tr-label {
-    grid-column: 1;
-    grid-row: 1;
-    justify-self: start;
-    align-self: center;
-  }
+  /* 100% sits in col 1 (same visual column as % of Pool above) */
   .total-row .tr-pct {
     grid-column: 1;
-    grid-row: 1;
-    justify-self: end;
-    align-self: center;
+    justify-self: start;
+    text-align: left;
     min-width: 0;
   }
 }
