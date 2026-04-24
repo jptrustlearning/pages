@@ -1164,39 +1164,8 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPro
 setTimeout(()=>{if(!deferredPrompt&&!isStandalone()&&/iPhone|iPad|iPod|Android/i.test(navigator.userAgent))showIB()},2000);
 // Cleanup any legacy dismiss flag from previous versions — banner now driven purely by standalone detection
 try{localStorage.removeItem('jpt_install_dismissed')}catch(e){}
-function handleInstallClick(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(r=>{if(r.outcome==='accepted'){hideIB();showInstallSuccessModal()}deferredPrompt=null})}else{const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent);const m=document.getElementById('editModal'),t=document.getElementById('modalTitle'),c=document.getElementById('modalContent');t.textContent='ติดตั้งแอป JP Trust';const steps=isIOS?[['1','กดปุ่ม <strong style="color:var(--gold-dark)">Share</strong> ↑ ด้านล่างของ Safari'],['2','เลื่อนลงแล้วกด <strong style="color:var(--gold-dark)">"Add to Home Screen"</strong>'],['3','กด <strong style="color:var(--gold-dark)">"Add"</strong> — เสร็จ!']]:[['1','กดเมนู <strong style="color:var(--gold-dark)">⋮</strong> มุมขวาบนของ Chrome'],['2','กด <strong style="color:var(--gold-dark)">"เพิ่มลงในหน้าจอหลัก"</strong>'],['3','กด <strong style="color:var(--gold-dark)">"เพิ่ม"</strong> — เสร็จ!']];c.innerHTML='<div class="ios-guide"><div style="font-size:40px;margin-bottom:12px"><span class="jpt-icon" style="width:40px;height:40px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="8" x2="12" y2="14"/><polyline points="9 12 12 15 15 12"/><line x1="9" y1="18" x2="15" y2="18"/></svg></span></div><div style="font-size:14px;color:var(--text-dark-muted);margin-bottom:20px">ทำตาม 3 ขั้นตอนนี้เพื่อเพิ่มแอปลงหน้าจอ</div>'+steps.map(s=>'<div class="ios-guide-step"><div class="ios-guide-num">'+s[0]+'</div><div class="ios-guide-text">'+s[1]+'</div></div>').join('')+'<button class="modal-btn" style="margin-top:16px" onclick="closeModal()">เข้าใจแล้ว</button></div>';m.classList.add('show')}}
-
-// Success modal after install completes (Chrome/Edge beforeinstallprompt flow)
-function showInstallSuccessModal(){
-    const m=document.getElementById('editModal'),t=document.getElementById('modalTitle'),c=document.getElementById('modalContent');
-    t.textContent='ติดตั้งสำเร็จ';
-    c.innerHTML=`<div style="text-align:center;padding:8px 4px 4px">
-        <div style="width:88px;height:88px;margin:0 auto 16px;background:linear-gradient(135deg,var(--maroon-dark,#1a0a0e),var(--burgundy,#722F37));border-radius:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(212,175,55,0.35),0 0 0 1.5px rgba(212,175,55,0.4)">
-            <img src="jpt-owl-logo.png" alt="JP Trust" style="width:60px;height:60px;object-fit:contain" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex'">
-            <span class="jpt-icon" style="display:none;width:46px;height:46px;color:var(--gold,#D4AF37);align-items:center;justify-content:center">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="8" x2="12" y2="14"/><polyline points="9 12 12 15 15 12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
-            </span>
-        </div>
-        <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;color:var(--gold-deep,#8B6914);text-transform:uppercase;margin-bottom:6px;font-weight:600">JP TRUST LEARNING</div>
-        <div style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--maroon,#722F37);margin-bottom:10px">พร้อมใช้งานแล้ว</div>
-        <div style="font-size:14px;color:var(--text-dark-muted);line-height:1.65;margin-bottom:22px;padding:0 6px">
-            แอป <strong style="color:var(--gold-dark)">JP Trust</strong> ถูกเพิ่มลงหน้าจอของคุณเรียบร้อย<br>
-            เปิดใช้งานได้แบบเต็มจอ ไม่มีแถบ URL รบกวน
-        </div>
-        <button onclick="openInstalledApp()" style="width:100%;padding:15px;background:linear-gradient(135deg,var(--gold,#D4AF37),var(--gold-dark,#B8860B));color:#1a0a0e;font-family:'Sarabun','Anuphan',sans-serif;font-size:15px;font-weight:700;border:none;border-radius:12px;cursor:pointer;box-shadow:0 6px 20px rgba(212,175,55,0.35);margin-bottom:10px;letter-spacing:0.3px">เปิดแอป JP Trust</button>
-        <button onclick="closeModal()" style="width:100%;padding:12px;background:transparent;color:var(--text-muted,#7A6F62);font-family:'Sarabun','Anuphan',sans-serif;font-size:13.5px;font-weight:500;border:1px solid rgba(212,175,55,0.3);border-radius:12px;cursor:pointer">ปิด</button>
-    </div>`;
-    m.classList.add('show');
-}
-
-// Attempt to open the installed PWA. Browsers can't reliably launch PWA from JS,
-// but window.open on Chrome may open in standalone; otherwise the user sees a fresh tab
-// and can close current + tap icon on home screen.
-function openInstalledApp(){
-    try{window.open(window.location.origin+window.location.pathname,'_blank')}catch(e){}
-    closeModal();
-}
-window.addEventListener('appinstalled',()=>{hideIB();showInstallSuccessModal()});
+function handleInstallClick(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(r=>{if(r.outcome==='accepted')hideIB();deferredPrompt=null})}else{const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent);const m=document.getElementById('editModal'),t=document.getElementById('modalTitle'),c=document.getElementById('modalContent');t.textContent='ติดตั้งแอป JP Trust';const steps=isIOS?[['1','กดปุ่ม <strong style="color:var(--gold-dark)">Share</strong> ↑ ด้านล่างของ Safari'],['2','เลื่อนลงแล้วกด <strong style="color:var(--gold-dark)">"Add to Home Screen"</strong>'],['3','กด <strong style="color:var(--gold-dark)">"Add"</strong> — เสร็จ!']]:[['1','กดเมนู <strong style="color:var(--gold-dark)">⋮</strong> มุมขวาบนของ Chrome'],['2','กด <strong style="color:var(--gold-dark)">"เพิ่มลงในหน้าจอหลัก"</strong>'],['3','กด <strong style="color:var(--gold-dark)">"เพิ่ม"</strong> — เสร็จ!']];c.innerHTML='<div class="ios-guide"><div style="font-size:40px;margin-bottom:12px"><span class="jpt-icon" style="width:40px;height:40px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="8" x2="12" y2="14"/><polyline points="9 12 12 15 15 12"/><line x1="9" y1="18" x2="15" y2="18"/></svg></span></div><div style="font-size:14px;color:var(--text-dark-muted);margin-bottom:20px">ทำตาม 3 ขั้นตอนนี้เพื่อเพิ่มแอปลงหน้าจอ</div>'+steps.map(s=>'<div class="ios-guide-step"><div class="ios-guide-num">'+s[0]+'</div><div class="ios-guide-text">'+s[1]+'</div></div>').join('')+'<button class="modal-btn" style="margin-top:16px" onclick="closeModal()">เข้าใจแล้ว</button></div>';m.classList.add('show')}}
+window.addEventListener('appinstalled',()=>{hideIB()});
 // ===== HERO CHART LINES =====
 (function(){
     const canvas=document.getElementById('heroCanvas');
