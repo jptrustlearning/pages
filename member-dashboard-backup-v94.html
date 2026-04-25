@@ -931,18 +931,15 @@ function loadSignalCards(){
 }
 function applySettings(){const n=userSettings.name||'Member';var el;el=document.getElementById('displayName');if(el)el.textContent=n;el=document.getElementById('settingsName');if(el)el.textContent=n;el=document.getElementById('settingsEmail');if(el)el.textContent=userSettings.email;el=document.getElementById('settingNameVal');if(el)el.textContent=n;const r={low:'ต่ำ (Low)',medium:'ปานกลาง (Medium)',high:'สูง (High)'};el=document.getElementById('settingRisk');if(el)el.textContent=r[userSettings.risk]||'ปานกลาง';el=document.getElementById('settingCapital');if(el)el.textContent='฿'+Number(userSettings.capital||0).toLocaleString();el=document.getElementById('settingBroker');if(el)el.textContent=userSettings.broker||'ยังไม่ระบุ';const i=n.slice(0,2).toUpperCase();document.querySelectorAll('.avatar,.profile-avatar').forEach(el=>el.textContent=i);el=document.getElementById('cardName');if(el)el.textContent=n}
 function doLogout(){isLoggedIn=false;try{localStorage.removeItem('jpt_logged_in');sessionStorage.removeItem('jpt_session_active')}catch(e){}location.reload()}
-function navigateTo(screen){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const t=document.getElementById('screen-'+screen);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const b=document.querySelector('.nav-item[data-screen="'+screen+'"]');if(b)b.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});t?.querySelectorAll('.fade-up').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''});if(screen==='news'){loadNewsFeed()}if(screen==='home'){refreshTickerTape()}}
+function navigateTo(screen){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const t=document.getElementById('screen-'+screen);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const b=document.querySelector('.nav-item[data-screen="'+screen+'"]');if(b)b.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});t?.querySelectorAll('.fade-up').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''});if(screen==='news'){loadNewsFeed()}}
 // ===== TRADINGVIEW TICKER TAPE =====
 // Free embed widget — real-time prices, no API key, auto-updating
-let _tickerLastLoad = 0;
-
 function renderTickerTape(){
   const wrapper=document.querySelector('.ticker-tape-wrapper .tradingview-widget-container__widget');
   if(!wrapper)return;
   // Only inject once
   if(wrapper.dataset.tvLoaded==='1')return;
   wrapper.dataset.tvLoaded='1';
-  _tickerLastLoad = Date.now();
 
   const config={
     "symbols":[
@@ -971,29 +968,6 @@ function renderTickerTape(){
   script.innerHTML=JSON.stringify(config);
   wrapper.parentElement.appendChild(script);
 }
-
-// Re-inject the TradingView widget — fixes stale ticker after navigating
-// away and back. Throttled to once per 30s to avoid spam reloads.
-function refreshTickerTape(){
-  if(Date.now() - _tickerLastLoad < 30000) return;
-  const wrapper=document.querySelector('.ticker-tape-wrapper .tradingview-widget-container__widget');
-  if(!wrapper) return;
-  // Clear current widget DOM + the orphaned script-tag from prior load
-  wrapper.innerHTML='';
-  delete wrapper.dataset.tvLoaded;
-  const parent=wrapper.parentElement;
-  if(parent){
-    parent.querySelectorAll('script[src*="embed-widget-ticker-tape"]').forEach(s=>s.remove());
-  }
-  renderTickerTape();
-}
-
-// When user returns to the tab/app from background, refresh ticker if home is active
-document.addEventListener('visibilitychange', ()=>{
-  if(document.hidden) return;
-  const home=document.getElementById('screen-home');
-  if(home && home.classList.contains('active')) refreshTickerTape();
-});
 
 const NEWS_INDEX_URL='https://raw.githubusercontent.com/jptrustlearning/pages/main/news/news-index.json';
 let newsFeedCache=null;
