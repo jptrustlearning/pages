@@ -930,34 +930,7 @@ function loadSignalCards(){
   */
 }
 function applySettings(){const n=userSettings.name||'Member';var el;el=document.getElementById('displayName');if(el)el.textContent=n;el=document.getElementById('settingsName');if(el)el.textContent=n;el=document.getElementById('settingsEmail');if(el)el.textContent=userSettings.email;el=document.getElementById('settingNameVal');if(el)el.textContent=n;const r={low:'ต่ำ (Low)',medium:'ปานกลาง (Medium)',high:'สูง (High)'};el=document.getElementById('settingRisk');if(el)el.textContent=r[userSettings.risk]||'ปานกลาง';el=document.getElementById('settingCapital');if(el)el.textContent='฿'+Number(userSettings.capital||0).toLocaleString();el=document.getElementById('settingBroker');if(el)el.textContent=userSettings.broker||'ยังไม่ระบุ';const i=n.slice(0,2).toUpperCase();document.querySelectorAll('.avatar,.profile-avatar').forEach(el=>el.textContent=i);el=document.getElementById('cardName');if(el)el.textContent=n}
-// LOCK ONLY — does NOT sign out from Supabase.
-// PIN stays in localStorage; Supabase session token stays in localStorage;
-// user_id remains identifiable on next entry → analytics continuity preserved.
-// Effect: hides app, shows PIN screen. User unlocks with PIN to come back.
-function doLogout(){
-  isLoggedIn=false;
-  try{localStorage.removeItem('jpt_logged_in');sessionStorage.removeItem('jpt_session_active')}catch(e){}
-  // Close any open iframe sub-page so it doesn't keep running in background
-  const ifr=document.getElementById('iframeContent');
-  if(ifr)ifr.src='about:blank';
-  // Reset to home screen so next unlock lands clean
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  const home=document.getElementById('screen-home');
-  if(home)home.classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.querySelector('.nav-item[data-screen="home"]')?.classList.add('active');
-  // Reset PIN input UI
-  const pinInput=document.getElementById('pinInput');
-  if(pinInput)pinInput.value='';
-  document.querySelectorAll('#pinDots .pin-dot').forEach(d=>d.classList.remove('filled'));
-  // Show login screen with PIN step active (savedPIN already in localStorage)
-  document.getElementById('mainApp').classList.remove('active');
-  document.getElementById('loginScreen').classList.remove('hidden');
-  document.querySelectorAll('.login-step').forEach(s=>s.classList.remove('active'));
-  document.getElementById('stepPin').classList.add('active');
-  window.scrollTo({top:0});
-  setTimeout(()=>pinInput?.focus(),100);
-}
+function doLogout(){isLoggedIn=false;try{localStorage.removeItem('jpt_logged_in');sessionStorage.removeItem('jpt_session_active')}catch(e){}location.reload()}
 function navigateTo(screen){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const t=document.getElementById('screen-'+screen);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const b=document.querySelector('.nav-item[data-screen="'+screen+'"]');if(b)b.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});t?.querySelectorAll('.fade-up').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''});if(screen==='news'){loadNewsFeed()}if(screen==='home'){refreshTickerTape()}}
 // ===== TRADINGVIEW TICKER TAPE =====
 // Free embed widget — real-time prices, no API key, auto-updating
