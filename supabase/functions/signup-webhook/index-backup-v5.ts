@@ -313,15 +313,6 @@ async function sendWelcomeEmail(email: string, username: string): Promise<EmailR
         subject: EMAIL_SUBJECT,
         text: buildWelcomeEmailText(username),
         html: buildWelcomeEmailHtml(username),
-        // RFC 2369 / 8058 — signals to Gmail/Outlook this is a managed
-        // sender that respects user opt-out. Lowers spam-filter risk
-        // even for transactional welcome mail. mailto: form (no
-        // List-Unsubscribe-Post) because we don't have a one-click
-        // HTTP endpoint yet — admin processes opt-outs manually.
-        headers: {
-          "List-Unsubscribe": "<mailto:jptrustlearning@gmail.com?subject=Unsubscribe%20JP%20Trust%20Learning>",
-          "List-ID": "JP Trust Learning Membership <members.jptrustlearning.com>",
-        },
       }),
     });
 
