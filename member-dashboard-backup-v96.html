@@ -706,22 +706,6 @@ function refreshApp(){
     setTimeout(function(){location.reload()},400);
 }
 
-// ===== EVENT TRACKING (Supabase user_events) =====
-// Async fire-and-forget — never blocks UI. Skips silently if no Supabase
-// session (RLS requires auth.uid() = user_id).
-async function logEvent(eventType, extra){
-    if(!supabaseClient) return;
-    try{
-        const{data:{user}}=await supabaseClient.auth.getUser();
-        if(!user)return;
-        const row={user_id:user.id, event_type:eventType};
-        if(extra&&extra.screen)row.screen=extra.screen;
-        if(extra&&extra.url)row.url=extra.url;
-        const{error}=await supabaseClient.from('user_events').insert(row);
-        if(error)console.warn('[event]',eventType,'failed:',error.message);
-    }catch(e){console.warn('[event]',eventType,'error:',e)}
-}
-
 // Show correct login step on load
 function initLoginScreen(){
     document.querySelectorAll('.login-step').forEach(s=>s.classList.remove('active'));
@@ -855,7 +839,7 @@ function backToEmail(){
     document.getElementById('stepEmail').classList.add('active');
     document.getElementById('loginEmail').focus();
 }
-function showApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('active');applySettings();renderTickerTape();loadSignalCards();loadSettingsFromCloud().then(d=>{if(d)applySettings()});logEvent('app_open',{screen:'home'})}
+function showApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('active');applySettings();renderTickerTape();loadSignalCards();loadSettingsFromCloud().then(d=>{if(d)applySettings()})}
 
 // ===== SIGNAL CARDS (Gold + BTC) — fetch latest row of momentum CSVs =====
 function parseCSV(text){
@@ -952,7 +936,6 @@ function applySettings(){const n=userSettings.name||'Member';var el;el=document.
 // Effect: hides app, shows PIN screen. User unlocks with PIN to come back.
 function doLogout(){
   isLoggedIn=false;
-  logEvent('app_lock');
   try{localStorage.removeItem('jpt_logged_in');sessionStorage.removeItem('jpt_session_active')}catch(e){}
   // Close any open iframe sub-page so it doesn't keep running in background
   const ifr=document.getElementById('iframeContent');
@@ -975,7 +958,7 @@ function doLogout(){
   window.scrollTo({top:0});
   setTimeout(()=>pinInput?.focus(),100);
 }
-function navigateTo(screen){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const t=document.getElementById('screen-'+screen);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const b=document.querySelector('.nav-item[data-screen="'+screen+'"]');if(b)b.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});t?.querySelectorAll('.fade-up').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''});if(screen==='news'){loadNewsFeed()}if(screen==='home'){refreshTickerTape()}logEvent('screen_view',{screen:screen})}
+function navigateTo(screen){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const t=document.getElementById('screen-'+screen);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const b=document.querySelector('.nav-item[data-screen="'+screen+'"]');if(b)b.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});t?.querySelectorAll('.fade-up').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''});if(screen==='news'){loadNewsFeed()}if(screen==='home'){refreshTickerTape()}}
 // ===== TRADINGVIEW TICKER TAPE =====
 // Free embed widget — real-time prices, no API key, auto-updating
 let _tickerLastLoad = 0;
@@ -1228,7 +1211,7 @@ function openComingSoon(name){alert('กลยุทธ์ "'+name+'" กำล�
 function jptToast(msg){let t=document.getElementById('jpt-toast');if(!t){t=document.createElement('div');t.id='jpt-toast';document.body.appendChild(t)}t.textContent=msg;t.classList.add('show');clearTimeout(t._hideTimer);t._hideTimer=setTimeout(()=>t.classList.remove('show'),2800)}
 function btcComingSoon(e){if(e){e.stopPropagation();e.preventDefault()}jptToast('🚧 Bitcoin · กำลังพัฒนา · เร็วๆ นี้')}
 let lastScreen='home';
-function openIframe(title,url,navScreen){const tEl=document.getElementById('iframeTitle'),tb=document.getElementById('iframeTopbar'),ld=document.getElementById('iframeLoading'),ct=document.getElementById('iframeContainer'),ifr=document.getElementById('iframeContent');const cur=document.querySelector('.screen.active');if(cur)lastScreen=cur.id.replace('screen-','');if(tEl)tEl.textContent=title;/* Hide topbar only for pages that already own their header (sp500-combined-strategy); show for everything else including news-detail */if(tb){const hideTopbar=/sp500-combined-strategy|sp500-strategy-pro|sp500-rolling-6m-momentum|gold-momentum-app|roadmap\.html|portfolio-planner|finance-planner/.test(url);tb.style.display=hideTopbar?'none':'flex'}ld.style.display='flex';ct.style.display='none';ifr.src='about:blank';document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-iframe').classList.add('active');/* Sync bottom nav highlight — for iframes that represent a top-level nav tab (e.g. Roadmap) */document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));if(navScreen){const b=document.querySelector('.nav-item[data-screen="'+navScreen+'"]');if(b)b.classList.add('active')}setTimeout(()=>{ifr.src=url;ifr.onload=function(){ld.style.display='none';ct.style.display='block'}},100);window.scrollTo({top:0});/* Strip cache-bust ?v= for cleaner analytics URLs */const cleanUrl=url.replace(/\?v=\d+/,'');logEvent('page_view',{screen:'iframe',url:cleanUrl})}
+function openIframe(title,url,navScreen){const tEl=document.getElementById('iframeTitle'),tb=document.getElementById('iframeTopbar'),ld=document.getElementById('iframeLoading'),ct=document.getElementById('iframeContainer'),ifr=document.getElementById('iframeContent');const cur=document.querySelector('.screen.active');if(cur)lastScreen=cur.id.replace('screen-','');if(tEl)tEl.textContent=title;/* Hide topbar only for pages that already own their header (sp500-combined-strategy); show for everything else including news-detail */if(tb){const hideTopbar=/sp500-combined-strategy|sp500-strategy-pro|sp500-rolling-6m-momentum|gold-momentum-app|roadmap\.html|portfolio-planner|finance-planner/.test(url);tb.style.display=hideTopbar?'none':'flex'}ld.style.display='flex';ct.style.display='none';ifr.src='about:blank';document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-iframe').classList.add('active');/* Sync bottom nav highlight — for iframes that represent a top-level nav tab (e.g. Roadmap) */document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));if(navScreen){const b=document.querySelector('.nav-item[data-screen="'+navScreen+'"]');if(b)b.classList.add('active')}setTimeout(()=>{ifr.src=url;ifr.onload=function(){ld.style.display='none';ct.style.display='block'}},100);window.scrollTo({top:0})}
 function closeIframe(){document.getElementById('iframeContent').src='about:blank';navigateTo(lastScreen)}
 /* Listen for openIframe requests from within child iframes (e.g. roadmap → portfolio planner) */
 window.addEventListener('message', function(ev) {
