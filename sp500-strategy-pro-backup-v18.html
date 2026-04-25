@@ -876,73 +876,6 @@
 
 
   /* ============================================================
-     BACKTEST HEADLINE (frameless — owl + left-aligned pull-quote)
-  ============================================================ */
-  .backtest-headline {
-    margin: 4px 0 22px;
-    padding: 6px 4px 12px;
-    display: flex;
-    align-items: center;
-    gap: 18px;
-  }
-  .backtest-headline-icon {
-    width: 110px;
-    height: 110px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .backtest-headline-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-  }
-  .headline-text {
-    flex: 1;
-    min-width: 0;
-    text-align: left;
-  }
-  .headline-line-1 {
-    font-family: 'Anuphan', 'Sarabun', sans-serif;
-    font-size: 1rem;
-    font-weight: 400;
-    color: var(--text-muted);
-    margin-bottom: 6px;
-    letter-spacing: 0.2px;
-    line-height: 1.5;
-  }
-  .headline-line-1 strong {
-    color: var(--text-dark);
-    font-weight: 700;
-  }
-  .headline-line-2 {
-    font-family: 'Anuphan', 'Sarabun', sans-serif;
-    font-size: 1.18rem;
-    font-weight: 500;
-    color: var(--text-dark);
-    line-height: 1.5;
-  }
-  .headline-cagr {
-    font-family: 'DM Serif Display', serif;
-    font-size: 2rem;
-    font-weight: 400;
-    color: var(--green);
-    margin: 0 4px;
-    vertical-align: -3px;
-    line-height: 1;
-  }
-  .headline-cagr.negative { color: var(--red); }
-  @media (max-width: 600px) {
-    .backtest-headline { gap: 12px; margin-bottom: 18px; }
-    .backtest-headline-icon { width: 88px; height: 88px; }
-    .headline-line-1 { font-size: 0.92rem; margin-bottom: 4px; line-height: 1.45; }
-    .headline-line-2 { font-size: 1.02rem; line-height: 1.45; }
-    .headline-cagr { font-size: 1.55rem; vertical-align: -2px; margin: 0 2px; }
-  }
-
-  /* ============================================================
      PHASE 4 v2: 4-TAB SUMMARY CARD (exact port from weekly momentum)
   ============================================================ */
 
@@ -1604,24 +1537,6 @@
   </div>
 
   <div id="dashboard" class="hidden">
-
-    <!-- ═══════════════════════════════════════════════════════════
-         BACKTEST HEADLINE (frameless — owl + left-aligned)
-    ═══════════════════════════════════════════════════════════ -->
-    <div class="backtest-headline" id="backtestHeadline">
-      <div class="backtest-headline-icon">
-        <img src="jpt-owl-cropped.png" alt="JP Trust">
-      </div>
-      <div class="headline-text">
-        <div class="headline-line-1">
-          ผลการทดสอบ หากลงทุนด้วยกลยุทธ์นี้<br>
-          ตั้งแต่ <strong id="headlineYears">—</strong> ปีที่แล้ว ผลตอบแทนเฉลี่ย
-        </div>
-        <div class="headline-line-2">
-          ปีละ <span class="headline-cagr" id="headlineCagr">—</span> แบบทบต้น
-        </div>
-      </div>
-    </div>
 
     <!-- ═══════════════════════════════════════════════════════════
          RESULTS SUMMARY CARD (Weekly-style 4-metric + 4-tab)
@@ -2951,16 +2866,6 @@ function calculateStats() {
     const totalRebalCount = state.tradeLog ? state.tradeLog.length : 0;
 
     document.getElementById('rscPeriod').innerText = `${startDateTh} → ${endDateTh} · ${totalRebalCount} รอบ · ${yearsStr} ปี`;
-
-    // === Backtest headline (pull-quote above summary card) ===
-    const headlineYearsNum = Math.max(1, Math.round(years));
-    const headlineYearsEl = document.getElementById('headlineYears');
-    if (headlineYearsEl) headlineYearsEl.innerText = headlineYearsNum;
-    const headlineCagrEl = document.getElementById('headlineCagr');
-    if (headlineCagrEl) {
-      headlineCagrEl.innerText = (cagr >= 0 ? '+' : '') + fmt(cagr);
-      headlineCagrEl.classList.toggle('negative', cagr < 0);
-    }
 
     const heroPnl = document.getElementById('rscTotalPnl');
     heroPnl.innerText = pnlSign + '$' + Math.abs(Math.round(absPnl)).toLocaleString();

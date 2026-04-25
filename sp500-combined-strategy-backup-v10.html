@@ -648,71 +648,6 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
   .strategy-diagram { padding:22px 16px; }
 }
 
-/* ===== BACKTEST HEADLINE (frameless — owl + left-aligned pull-quote) ===== */
-.backtest-headline {
-  margin: 4px 0 22px;
-  padding: 6px 4px 12px;
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-.backtest-headline-icon {
-  width: 110px;
-  height: 110px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.backtest-headline-icon img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-}
-.headline-text {
-  flex: 1;
-  min-width: 0;
-  text-align: left;
-}
-.headline-line-1 {
-  font-family: 'Anuphan', 'Sarabun', sans-serif;
-  font-size: 1rem;
-  font-weight: 400;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-  letter-spacing: 0.2px;
-  line-height: 1.5;
-}
-.headline-line-1 strong {
-  color: var(--text-dark);
-  font-weight: 700;
-}
-.headline-line-2 {
-  font-family: 'Anuphan', 'Sarabun', sans-serif;
-  font-size: 1.18rem;
-  font-weight: 500;
-  color: var(--text-dark);
-  line-height: 1.5;
-}
-.headline-cagr {
-  font-family: 'DM Serif Display', serif;
-  font-size: 2rem;
-  font-weight: 400;
-  color: var(--green);
-  margin: 0 4px;
-  vertical-align: -3px;
-  line-height: 1;
-}
-.headline-cagr.negative { color: var(--red); }
-@media (max-width: 600px) {
-  .backtest-headline { gap: 12px; margin-bottom: 18px; }
-  .backtest-headline-icon { width: 88px; height: 88px; }
-  .headline-line-1 { font-size: 0.92rem; margin-bottom: 4px; line-height: 1.45; }
-  .headline-line-2 { font-size: 1.02rem; line-height: 1.45; }
-  .headline-cagr { font-size: 1.55rem; vertical-align: -2px; margin: 0 2px; }
-}
-
 /* ===== RESULTS SUMMARY CARD ===== */
 .results-summary-card {
   background:linear-gradient(145deg, #FFFEF8 0%, #F5EFE0 100%);
@@ -1489,24 +1424,6 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
   </div>
 
   <div id="dashboard" class="hidden">
-    <!-- ═══════════════════════════════════════════════════════════
-         BACKTEST HEADLINE (frameless — owl + left-aligned)
-    ═══════════════════════════════════════════════════════════ -->
-    <div class="backtest-headline" id="backtestHeadline">
-      <div class="backtest-headline-icon">
-        <img src="jpt-owl-cropped.png" alt="JP Trust">
-      </div>
-      <div class="headline-text">
-        <div class="headline-line-1">
-          ผลการทดสอบ หากลงทุนด้วยกลยุทธ์นี้<br>
-          ตั้งแต่ <strong id="headlineYears">—</strong> ปีที่แล้ว ผลตอบแทนเฉลี่ย
-        </div>
-        <div class="headline-line-2">
-          ปีละ <span class="headline-cagr" id="headlineCagr">—</span> แบบทบต้น
-        </div>
-      </div>
-    </div>
-
     <!-- RESULTS NARRATIVE SUMMARY CARD -->
     <div class="results-summary-card">
       <div class="rsc-header">
@@ -3541,10 +3458,6 @@ function updateResultsSummary() {
     rsAlpha.innerText = '—';
     rsDD.innerText = '—';
     rsNarr.innerText = 'ปรับพารามิเตอร์แล้วกด ▶ รันแบ็คเทส เพื่อดูผลลัพธ์';
-    const hY = document.getElementById('headlineYears');
-    const hC = document.getElementById('headlineCagr');
-    if (hY) hY.innerText = '—';
-    if (hC) { hC.innerText = '—'; hC.classList.remove('negative'); }
     return;
   }
 
@@ -3591,16 +3504,6 @@ function updateResultsSummary() {
   // Annualized
   rsAnn.innerText = (annualizedRoi>=0?'+':'') + annualizedRoi.toFixed(1) + '%';
   rsAnn.style.color = annualizedRoi >= 0 ? 'var(--green)' : 'var(--red)';
-
-  // === Backtest headline (pull-quote above summary card) ===
-  const headlineYearsNum = Math.max(1, Math.round(yearsSpan));
-  const hYearsEl = document.getElementById('headlineYears');
-  if (hYearsEl) hYearsEl.innerText = headlineYearsNum;
-  const hCagrEl = document.getElementById('headlineCagr');
-  if (hCagrEl) {
-    hCagrEl.innerText = (annualizedRoi >= 0 ? '+' : '') + annualizedRoi.toFixed(1) + '%';
-    hCagrEl.classList.toggle('negative', annualizedRoi < 0);
-  }
 
   // Sharpe
   if(sharpe !== null) {
