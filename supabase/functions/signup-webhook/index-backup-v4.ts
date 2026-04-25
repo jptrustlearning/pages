@@ -1,26 +1,25 @@
-// Supabase Edge Function: signup-webhook  (v3 — Resend)
+// Supabase Edge Function: signup-webhook  (v2)
 // Receives member signup data → (1) writes to jptrustlearning/payment GitHub repo,
 // (2) auto-creates Supabase auth user (email_confirm=true), (3) sends welcome email
-// via Resend HTTP API.
+// via Gmail SMTP.
 //
 // Deploy:      supabase functions deploy signup-webhook
 // Invoke:      POST https://<project>.supabase.co/functions/v1/signup-webhook
 //
 // Required secrets (set via `supabase secrets set KEY=VALUE`):
-//   • GITHUB_PAT       GitHub fine-grained PAT with Contents R/W on jptrustlearning/payment
-//   • RESEND_API_KEY   Resend API key (re_xxxxx) — must be from a verified domain account
-//   • RESEND_FROM      Sender, e.g. "JP Trust Learning <noreply@jptrustlearning.com>"
+//   • GITHUB_PAT            GitHub fine-grained PAT with Contents R/W on jptrustlearning/payment
+//   • SMTP_HOST             e.g. smtp.gmail.com
+//   • SMTP_PORT             e.g. 465   (465 = implicit TLS, 587 = STARTTLS)
+//   • SMTP_USER             e.g. jptrustlearning@gmail.com
+//   • SMTP_PASS             Gmail App Password (16 chars, no spaces)
 //
 // Auto-provided by Supabase runtime (no need to set):
 //   • SUPABASE_URL
 //   • SUPABASE_SERVICE_ROLE_KEY
-//
-// Migration notes (v2 → v3):
-//   The legacy SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASS secrets are no longer used
-//   here. They can stay set or be removed; this function ignores them.
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import nodemailer from "npm:nodemailer@6.9.16";
 
 // ============ Config ============
 const GITHUB_REPO = "jptrustlearning/payment";
@@ -291,41 +290,34 @@ function buildWelcomeEmailHtml(username: string): string {
 }
 
 async function sendWelcomeEmail(email: string, username: string): Promise<EmailResult> {
-  const apiKey = Deno.env.get("RESEND_API_KEY");
-  const from = Deno.env.get("RESEND_FROM") || `${EMAIL_FROM_NAME} <onboarding@resend.dev>`;
-  if (!apiKey) {
-    return { sent: false, error: "missing RESEND_API_KEY secret" };
+  const host = Deno.env.get("SMTP_HOST");
+  const portStr = Deno.env.get("SMTP_PORT");
+  const user = Deno.env.get("SMTP_USER");
+  const pass = Deno.env.get("SMTP_PASS");
+  if (!host || !portStr || !user || !pass) {
+    return { sent: false, error: "missing SMTP_HOST/PORT/USER/PASS secret(s)" };
   }
+  const port = parseInt(portStr, 10);
+  if (isNaN(port)) return { sent: false, error: "SMTP_PORT is not a number" };
 
   try {
-    // Resend HTTP API — modern transactional email service. Handles UTF-8 (Thai)
-    // natively, no RFC 2047 encoding tricks needed. Returns { id } on success,
-    // structured error JSON on failure.
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        from,
-        to: [email],
-        subject: EMAIL_SUBJECT,
-        text: buildWelcomeEmailText(username),
-        html: buildWelcomeEmailHtml(username),
-      }),
+    // nodemailer — the production-grade SMTP client used by millions of Node apps.
+    // Handles RFC 2047 subject encoding + MIME body encoding for Unicode (including Thai)
+    // correctly out of the box. Works in Supabase Edge Functions via npm: specifier.
+    const transporter = nodemailer.createTransport({
+      host,
+      port,
+      secure: port === 465, // implicit TLS on 465, STARTTLS on 587
+      auth: { user, pass },
     });
 
-    if (!res.ok) {
-      let detail = "";
-      try {
-        const j = await res.json();
-        detail = j.message || j.error || JSON.stringify(j);
-      } catch (_) {
-        detail = await res.text();
-      }
-      return { sent: false, error: `Resend ${res.status}: ${detail}` };
-    }
+    await transporter.sendMail({
+      from: `"${EMAIL_FROM_NAME}" <${user}>`,
+      to: email,
+      subject: EMAIL_SUBJECT,
+      text: buildWelcomeEmailText(username),
+      html: buildWelcomeEmailHtml(username),
+    });
 
     return { sent: true };
   } catch (err) {
