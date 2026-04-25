@@ -886,8 +886,8 @@
     gap: 18px;
   }
   .backtest-headline-icon {
-    width: 110px;
-    height: 110px;
+    width: 78px;
+    height: 78px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -897,24 +897,34 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    display: block;
   }
   .headline-text {
     flex: 1;
     min-width: 0;
     text-align: left;
   }
-  .headline-line {
+  .headline-line-1 {
+    font-family: 'Anuphan', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    letter-spacing: 0.2px;
+  }
+  .headline-line-1 strong {
+    color: var(--text-dark);
+    font-weight: 700;
+  }
+  .headline-line-2 {
     font-family: 'Anuphan', sans-serif;
     font-size: 1.18rem;
-    font-weight: 700;
+    font-weight: 500;
     color: var(--text-dark);
     line-height: 1.5;
   }
   .headline-cagr {
     font-family: 'DM Serif Display', serif;
     font-size: 2rem;
-    font-weight: 400;
     color: var(--green);
     margin: 0 4px;
     vertical-align: -3px;
@@ -923,9 +933,10 @@
   .headline-cagr.negative { color: var(--red); }
   @media (max-width: 600px) {
     .backtest-headline { gap: 12px; margin-bottom: 18px; }
-    .backtest-headline-icon { width: 88px; height: 88px; }
-    .headline-line { font-size: 1.02rem; line-height: 1.45; }
-    .headline-cagr { font-size: 1.55rem; vertical-align: -2px; margin: 0 2px; }
+    .backtest-headline-icon { width: 62px; height: 62px; }
+    .headline-line-1   { font-size: 0.92rem; margin-bottom: 4px; }
+    .headline-line-2   { font-size: 1.02rem; line-height: 1.45; }
+    .headline-cagr     { font-size: 1.55rem; vertical-align: -2px; margin: 0 2px; }
   }
 
   /* ============================================================
@@ -1596,12 +1607,15 @@
     ═══════════════════════════════════════════════════════════ -->
     <div class="backtest-headline" id="backtestHeadline">
       <div class="backtest-headline-icon">
-        <img src="jpt-owl-cropped.png" alt="JP Trust">
+        <img src="jpt-owl-logo.png" alt="JP Trust">
       </div>
       <div class="headline-text">
-        <div class="headline-line">ผลการทดสอบ หากลงทุนด้วยกลยุทธ์นี้</div>
-        <div class="headline-line">ตั้งแต่ <span id="headlineYears">—</span> ปีที่แล้ว เราจะได้ผลตอบแทนเฉลี่ย</div>
-        <div class="headline-line">ปีละ <span class="headline-cagr" id="headlineCagr">—</span> แบบทบต้น</div>
+        <div class="headline-line-1">
+          ผลการทดสอบ หากลงทุนด้วยกลยุทธ์นี้ ตั้งแต่ <strong id="headlineYears">—</strong> ปีที่แล้ว
+        </div>
+        <div class="headline-line-2">
+          เราจะได้ผลตอบแทนเฉลี่ยปีละ <span class="headline-cagr" id="headlineCagr">—</span> แบบทบต้น
+        </div>
       </div>
     </div>
 
