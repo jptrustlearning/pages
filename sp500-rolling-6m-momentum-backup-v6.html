@@ -904,23 +904,10 @@
     min-width: 0;
     text-align: left;
   }
-  .headline-line-1 {
-    font-family: 'Anuphan', sans-serif;
-    font-size: 1rem;
-    font-weight: 400;
-    color: var(--text-muted);
-    margin-bottom: 6px;
-    letter-spacing: 0.2px;
-    line-height: 1.5;
-  }
-  .headline-line-1 strong {
-    color: var(--text-dark);
-    font-weight: 700;
-  }
-  .headline-line-2 {
+  .headline-line {
     font-family: 'Anuphan', sans-serif;
     font-size: 1.18rem;
-    font-weight: 500;
+    font-weight: 700;
     color: var(--text-dark);
     line-height: 1.5;
   }
@@ -937,8 +924,7 @@
   @media (max-width: 600px) {
     .backtest-headline { gap: 12px; margin-bottom: 18px; }
     .backtest-headline-icon { width: 88px; height: 88px; }
-    .headline-line-1 { font-size: 0.92rem; margin-bottom: 4px; line-height: 1.45; }
-    .headline-line-2 { font-size: 1.02rem; line-height: 1.45; }
+    .headline-line { font-size: 1.02rem; line-height: 1.45; }
     .headline-cagr { font-size: 1.55rem; vertical-align: -2px; margin: 0 2px; }
   }
 
@@ -1613,13 +1599,9 @@
         <img src="jpt-owl-cropped.png" alt="JP Trust">
       </div>
       <div class="headline-text">
-        <div class="headline-line-1">
-          ผลการทดสอบ หากลงทุนด้วยกลยุทธ์นี้<br>
-          ตั้งแต่ <strong id="headlineYears">—</strong> ปีที่แล้ว เราจะได้ผลตอบแทนเฉลี่ย
-        </div>
-        <div class="headline-line-2">
-          ปีละ <span class="headline-cagr" id="headlineCagr">—</span> แบบทบต้น
-        </div>
+        <div class="headline-line">ผลการทดสอบ หากลงทุนด้วยกลยุทธ์นี้</div>
+        <div class="headline-line">ตั้งแต่ <span id="headlineYears">—</span> ปีที่แล้ว เราจะได้ผลตอบแทนเฉลี่ย</div>
+        <div class="headline-line">ปีละ <span class="headline-cagr" id="headlineCagr">—</span> แบบทบต้น</div>
       </div>
     </div>
 
