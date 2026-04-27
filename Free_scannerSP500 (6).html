@@ -76,6 +76,17 @@ thead th.sorted-asc::after{content:' ▲';font-size:0.55rem}thead th.sorted-desc
 tbody tr{transition:background 0.2s}tbody tr:hover{background:rgba(212,175,55,0.05)}
 tbody td{padding:10px 12px;border-bottom:1px solid rgba(212,175,55,0.06);font-size:0.76rem;white-space:nowrap;color:var(--text-dark)}
 tbody td.ticker{font-weight:700;color:var(--maroon)}
+.scanner-pagination{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px;padding:10px 12px;background:linear-gradient(180deg,rgba(255,254,248,0.98),rgba(255,254,248,0.95));border:1px solid var(--border-gold);border-radius:12px;margin-top:14px;box-shadow:0 3px 12px rgba(114,47,55,0.08)}
+.scnr-info{font-family:var(--font-thai);font-size:0.72rem;color:var(--text-muted);margin-right:auto;padding-left:6px;letter-spacing:0.02em}
+.scnr-info strong{color:var(--maroon);font-weight:700}
+.scnr-btn{min-width:32px;height:32px;padding:0 8px;background:var(--cream-card);border:1px solid var(--border-gold);border-radius:7px;font-family:var(--font-number),'Sarabun',serif;font-size:0.88rem;font-weight:400;color:var(--text-dark);cursor:pointer;transition:all 0.15s ease;display:inline-flex;align-items:center;justify-content:center}
+.scnr-btn:hover:not(:disabled):not(.active){background:rgba(212,175,55,0.12);color:var(--maroon)}
+.scnr-btn:active:not(:disabled){transform:scale(0.93)}
+.scnr-btn.active{background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF5E1;border-color:transparent;box-shadow:0 2px 8px rgba(139,34,82,0.3);font-weight:500}
+.scnr-btn.nav{font-family:var(--font-thai);font-weight:700;color:var(--gold-dark)}
+.scnr-btn:disabled{opacity:0.35;cursor:not-allowed}
+.scnr-dots{color:var(--text-muted);padding:0 4px;font-size:0.9rem;display:inline-flex;align-items:flex-end}
+@media (max-width:500px){.scanner-pagination{padding:8px;gap:3px}.scnr-info{display:none}.scnr-btn{min-width:28px;height:28px;font-size:0.8rem;padding:0 5px}}
 .positive-cell{color:var(--green-dark)}.negative-cell{color:var(--red)}.neutral-cell{color:var(--text-muted)}
 .sector-cell{font-size:0.66rem;color:var(--text-muted);max-width:130px;overflow:hidden;text-overflow:ellipsis}
 .momentum-bar{display:inline-block;height:5px;border-radius:3px;min-width:4px;max-width:80px;vertical-align:middle;margin-left:6px}
@@ -530,6 +541,7 @@ function renderDashboard(metrics, latestDate) {
           <tbody id="tableBody"></tbody>
         </table>
       </div>
+      <div id="paginationBar" class="scanner-pagination" style="display:none"></div>
       <div class="tooltip-note">แสดง Momentum Score = 15%×1M + 25%×3M + 35%×6M + 25%×1Y</div>
     </div>
   `;
@@ -699,9 +711,12 @@ function renderCharts(metrics, retBuckets, top5, bottom5) {
 let currentMetrics = [];
 let sortCol = 'momScore';
 let sortDir = 'desc';
+const SCANNER_PAGE_SIZE = 15;
+let _scannerPage = 1;
 
 function populateTable(metrics) {
   currentMetrics = [...metrics];
+  _scannerPage = 1;
   renderTable();
 }
 
@@ -733,7 +748,15 @@ function renderTable() {
     return va < vb ? 1 : va > vb ? -1 : 0;
   });
 
-  tbody.innerHTML = filtered.map((m, i) => {
+  // Pagination — slice to current page
+  const totalPages = Math.max(1, Math.ceil(filtered.length / SCANNER_PAGE_SIZE));
+  if (_scannerPage > totalPages) _scannerPage = totalPages;
+  if (_scannerPage < 1) _scannerPage = 1;
+  const page = _scannerPage;
+  const startIdx = (page - 1) * SCANNER_PAGE_SIZE;
+  const pageRecords = filtered.slice(startIdx, startIdx + SCANNER_PAGE_SIZE);
+
+  tbody.innerHTML = pageRecords.map((m, i) => {
     const fmtPct = (v) => {
       const cls = v >= 0 ? 'positive-cell' : 'negative-cell';
       return `<td class="${cls}">${v >= 0 ? '+' : ''}${v.toFixed(2)}%</td>`;
@@ -741,7 +764,7 @@ function renderTable() {
     const momW = Math.min(Math.abs(m.momScore) * 1.2, 80);
     const momCls = m.momScore >= 0 ? 'pos' : 'neg';
     return `<tr>
-      <td>${i + 1}</td>
+      <td>${startIdx + i + 1}</td>
       <td class="ticker">${m.ticker}</td>
       <td class="sector-cell">${m.sector}</td>
       <td>$${m.latest.toFixed(2)}</td>
@@ -761,9 +784,38 @@ function renderTable() {
       </td>
     </tr>`;
   }).join('');
+
+  // Render pagination bar
+  const pagBar = document.getElementById('paginationBar');
+  if (!pagBar) return;
+  if (totalPages <= 1) { pagBar.style.display = 'none'; pagBar.innerHTML = ''; return; }
+  pagBar.style.display = '';
+  let html = `<div class="scnr-info"><strong>${filtered.length}</strong> หุ้น · หน้า <strong>${page}</strong>/${totalPages}</div>`;
+  html += `<button class="scnr-btn nav" onclick="gotoScannerPage(1)" ${page===1?'disabled':''}>«</button>`;
+  html += `<button class="scnr-btn nav" onclick="gotoScannerPage(${page-1})" ${page===1?'disabled':''}>‹</button>`;
+  const pages = [];
+  pages.push(1);
+  if (page > 3) pages.push('...');
+  for (let p = Math.max(2, page-1); p <= Math.min(totalPages-1, page+1); p++) pages.push(p);
+  if (page < totalPages - 2) pages.push('...');
+  if (totalPages > 1) pages.push(totalPages);
+  pages.forEach(p => {
+    if (p === '...') html += `<span class="scnr-dots">…</span>`;
+    else html += `<button class="scnr-btn ${p===page?'active':''}" onclick="gotoScannerPage(${p})">${p}</button>`;
+  });
+  html += `<button class="scnr-btn nav" onclick="gotoScannerPage(${page+1})" ${page===totalPages?'disabled':''}>›</button>`;
+  html += `<button class="scnr-btn nav" onclick="gotoScannerPage(${totalPages})" ${page===totalPages?'disabled':''}>»</button>`;
+  pagBar.innerHTML = html;
 }
 
-function filterTable() { renderTable(); }
+window.gotoScannerPage = function(p) {
+  _scannerPage = p;
+  renderTable();
+  const tbl = document.getElementById('stockTable');
+  if (tbl) tbl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+
+function filterTable() { _scannerPage = 1; renderTable(); }
 
 function setupTableSort(metrics) {
   document.querySelectorAll('#stockTable thead th').forEach(th => {
@@ -774,6 +826,7 @@ function setupTableSort(metrics) {
       else { sortCol = col; sortDir = 'desc'; }
       document.querySelectorAll('#stockTable thead th').forEach(t => t.classList.remove('sorted-asc', 'sorted-desc'));
       th.classList.add(sortDir === 'asc' ? 'sorted-asc' : 'sorted-desc');
+      _scannerPage = 1;
       renderTable();
     });
   });
