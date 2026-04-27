@@ -35,17 +35,16 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .main-inner{max-width:1400px;margin:0 auto}
 .loading-overlay{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;gap:20px}
 .owl-loader-stage{position:relative;width:200px;height:200px;display:flex;align-items:center;justify-content:center}
-.owl-loader-ring{position:absolute;inset:0;width:100%;height:100%;filter:drop-shadow(0 0 10px rgba(46,159,95,0.3)) drop-shadow(0 0 14px rgba(212,175,55,0.25));animation:owlRingSpin 2.4s linear infinite;transform-origin:center}
+.owl-loader-ring{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);filter:drop-shadow(0 0 10px rgba(46,159,95,0.3)) drop-shadow(0 0 14px rgba(212,175,55,0.25))}
 .owl-loader-ring-bg{fill:none;stroke:rgba(139,105,20,0.25);stroke-width:8}
-.owl-loader-ring-fg{fill:none;stroke:url(#owlRingGrad);stroke-width:8;stroke-linecap:round;stroke-dasharray:380 565.48}
-@keyframes owlRingSpin{from{transform:rotate(-90deg)}to{transform:rotate(270deg)}}
+.owl-loader-ring-fg{fill:none;stroke:url(#owlRingGrad);stroke-width:8;stroke-linecap:round;stroke-dasharray:565.48;stroke-dashoffset:565.48;transition:stroke-dashoffset 0.35s cubic-bezier(0.4,0,0.2,1)}
 .owl-loader-img{width:100px;height:100px;object-fit:contain;animation:owlFloat 2.8s ease-in-out infinite;filter:drop-shadow(0 4px 12px rgba(46,159,95,0.25)) drop-shadow(0 2px 8px rgba(212,175,55,0.3));margin-top:-22px}
 @keyframes owlFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 .owl-loader-text{font-family:var(--font-label);font-size:0.95rem;font-weight:700;color:var(--gold-dark);letter-spacing:3px;text-align:center;text-transform:uppercase}
+.owl-loader-pct{font-family:var(--font-number);font-size:1.75rem;font-weight:400;color:var(--maroon);letter-spacing:0;position:absolute;left:50%;top:62%;transform:translate(-50%,-50%);text-shadow:0 1px 6px rgba(255,254,248,0.8)}
 .loader-dots-left,.loader-dots-right{display:inline-block;color:var(--green);animation:loaderDotsBlink 1.4s ease-in-out infinite;letter-spacing:2px;font-weight:700}
 .loader-dots-right{animation-delay:0.7s}
 @keyframes loaderDotsBlink{0%,100%{opacity:0.25;transform:translateY(0)}50%{opacity:1;transform:translateY(-2px)}}
-.loader-sub{font-size:0.73rem;color:var(--text-muted);text-align:center}
 .metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px}
 .metric-card{background:linear-gradient(160deg,var(--cream-card),#F8F2E4);border:1px solid rgba(212,175,55,0.18);border-radius:14px;padding:18px;position:relative;overflow:hidden;transition:all 0.3s;box-shadow:0 2px 12px rgba(114,47,55,0.04)}
 .metric-card:hover{border-color:rgba(212,175,55,0.35);transform:translateY(-3px);box-shadow:0 8px 28px rgba(114,47,55,0.08)}
@@ -130,12 +129,12 @@ tbody td.ticker{font-weight:700;color:var(--maroon)}
             </linearGradient>
           </defs>
           <circle class="owl-loader-ring-bg" cx="100" cy="100" r="90"/>
-          <circle class="owl-loader-ring-fg" cx="100" cy="100" r="90"/>
+          <circle id="owlLoaderRingFg" class="owl-loader-ring-fg" cx="100" cy="100" r="90"/>
         </svg>
         <img src="jpt-owl-logo.png" alt="JP Trust" class="owl-loader-img">
+        <div id="owlLoaderPct" class="owl-loader-pct">0%</div>
       </div>
-      <div class="owl-loader-text"><span class="loader-dots-left">...</span> <span class="loading-text">FETCHING S&amp;P 500 DATA</span> <span class="loader-dots-right">...</span></div>
-      <div class="loader-sub">กำลังดึงข้อมูลจาก GitHub Repository</div>
+      <div class="owl-loader-text"><span class="loader-dots-left">...</span> Initializing <span class="loader-dots-right">...</span></div>
     </div>
   </div>
 </div>
@@ -169,24 +168,43 @@ function destroyChart(id) {
   if (chartInstances[id]) { chartInstances[id].destroy(); delete chartInstances[id]; }
 }
 
-function updateLoadingStatus(msg) {
-  const el = document.querySelector('.loading-text');
-  if (el) el.textContent = msg;
+// Owl loader progress ring (2πr ≈ 565.48 with r=90) — same shape as backtest pages
+function updateOwlProgress(pct) {
+  const ring = document.getElementById('owlLoaderRingFg');
+  const label = document.getElementById('owlLoaderPct');
+  if (!ring || !label) return;
+  const clamped = Math.max(0, Math.min(100, pct));
+  ring.style.strokeDashoffset = 565.48 * (1 - clamped / 100);
+  label.textContent = Math.round(clamped) + '%';
+}
+
+// Smooth ramp toward a target percent (eases as it approaches the cap)
+let _owlRampTimer = null;
+function rampOwlTo(target, capOverride) {
+  if (_owlRampTimer) clearInterval(_owlRampTimer);
+  let cur = parseFloat(document.getElementById('owlLoaderPct')?.textContent) || 0;
+  const cap = capOverride != null ? capOverride : target;
+  _owlRampTimer = setInterval(() => {
+    const gap = cap - cur;
+    if (gap <= 0.5) { updateOwlProgress(cap); clearInterval(_owlRampTimer); _owlRampTimer = null; return; }
+    cur += Math.max(0.4, gap * 0.08);
+    updateOwlProgress(cur);
+  }, 90);
 }
 
 async function init() {
   try {
-    updateLoadingStatus('FETCHING S&P 500 DATA');
+    rampOwlTo(35);  // start ramp during initial fetch
     const [res, sectorRes] = await Promise.all([
       fetch(CLOUD_URL),
       fetch(SECTOR_URL).catch(() => null)
     ]);
     if (!res.ok) throw new Error('fetch fail: ' + res.status);
     const csv = await res.text();
+    rampOwlTo(65);
 
     // Parse sector mapping
     if (sectorRes && sectorRes.ok) {
-      updateLoadingStatus('LOADING SECTOR DATA');
       const sectorCsv = await sectorRes.text();
       const sectorParsed = Papa.parse(sectorCsv.trim(), { header: true, skipEmptyLines: true });
       sectorParsed.data.forEach(row => {
@@ -200,9 +218,12 @@ async function init() {
       });
     }
 
-    updateLoadingStatus('PROCESSING DATA');
+    rampOwlTo(90);
     processCSV(csv);
+    if (_owlRampTimer) { clearInterval(_owlRampTimer); _owlRampTimer = null; }
+    updateOwlProgress(100);
   } catch(e) {
+    if (_owlRampTimer) { clearInterval(_owlRampTimer); _owlRampTimer = null; }
     console.error(e);
     document.getElementById('mainContent').innerHTML = `
       <div class="loading-overlay">
