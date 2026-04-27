@@ -109,10 +109,8 @@ tbody td.ticker{font-weight:700;color:var(--maroon)}
 </section>
 <div class="gold-line"></div>
 
-<div class="status-wrap">
-  <div class="status-inner" id="statusBar">
-    <div class="status-chip"><span class="dot"></span> กำลังโหลดข้อมูล...</div>
-  </div>
+<div class="status-wrap" id="statusWrap" style="display:none">
+  <div class="status-inner" id="statusBar"></div>
 </div>
 
 <div class="main-wrap">
@@ -296,6 +294,7 @@ function processCSV(text) {
     <div class="status-chip">📋 ${rows.length.toLocaleString()} แถวข้อมูล</div>
     <div class="status-chip">🏭 ${Object.keys(sectorMap).length > 0 ? new Set(Object.values(sectorMap)).size + ' Sectors' : 'No Sector Data'}</div>
   `;
+  document.getElementById('statusWrap').style.display = '';
 
   // Compute metrics for each ticker
   const metrics = computeAllMetrics(validTickers);
