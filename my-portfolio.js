@@ -877,25 +877,63 @@ async function submitSell(){
 window.submitSell = submitSell;
 
 /* ============================================================
+   CONFIRM DIALOG (replaces native confirm)
+============================================================ */
+function showConfirm(opts){
+  // opts: { title, text, okLabel, onOk }
+  const m = document.getElementById('confirmModal');
+  document.getElementById('confirmTitle').textContent = opts.title || 'ยืนยัน';
+  document.getElementById('confirmText').innerHTML = opts.text || '';
+  const ok = document.getElementById('confirmOkBtn');
+  ok.textContent = opts.okLabel || 'ลบ';
+  // Replace handler (clone to wipe old listeners)
+  const fresh = ok.cloneNode(true);
+  ok.parentNode.replaceChild(fresh, ok);
+  fresh.addEventListener('click', async () => {
+    fresh.disabled = true;
+    fresh.textContent = 'กำลังลบ...';
+    try { await opts.onOk(); }
+    finally { closeConfirmModal(); }
+  });
+  m.classList.add('active');
+}
+function closeConfirmModal(){
+  document.getElementById('confirmModal').classList.remove('active');
+}
+window.closeConfirmModal = closeConfirmModal;
+
+/* ============================================================
    DELETE
 ============================================================ */
 async function deleteSell(sellId){
-  if (!confirm('ลบรายการขายนี้?')) return;
-  const { error } = await sb.from('portfolio_sells').delete().eq('id', sellId);
-  if (error){ toast('ลบล้มเหลว: '+error.message, 'err'); return; }
-  toast('ลบแล้ว');
-  await fetchLots();
-  renderAll();
+  showConfirm({
+    title: 'ลบรายการขายนี้?',
+    text: 'รายการขายจะถูกลบและคำนวณ P&amp;L ใหม่ทันที',
+    okLabel: 'ลบรายการขาย',
+    onOk: async () => {
+      const { error } = await sb.from('portfolio_sells').delete().eq('id', sellId);
+      if (error){ toast('ลบล้มเหลว: '+error.message, 'err'); return; }
+      toast('ลบแล้ว');
+      await fetchLots();
+      renderAll();
+    }
+  });
 }
 window.deleteSell = deleteSell;
 
 async function confirmDeleteLot(lotId, ticker){
-  if (!confirm(`ลบไม้ ${ticker} นี้? · การขายทั้งหมดของไม้นี้จะถูกลบด้วย`)) return;
-  const { error } = await sb.from('portfolio_lots').delete().eq('id', lotId);
-  if (error){ toast('ลบล้มเหลว: '+error.message, 'err'); return; }
-  toast('ลบแล้ว');
-  await fetchLots();
-  renderAll();
+  showConfirm({
+    title: `ลบไม้ ${ticker} นี้?`,
+    text: 'การขายทั้งหมดของไม้นี้จะถูกลบด้วย — <strong>การกระทำนี้ย้อนกลับไม่ได้</strong>',
+    okLabel: 'ลบไม้นี้',
+    onOk: async () => {
+      const { error } = await sb.from('portfolio_lots').delete().eq('id', lotId);
+      if (error){ toast('ลบล้มเหลว: '+error.message, 'err'); return; }
+      toast('ลบแล้ว');
+      await fetchLots();
+      renderAll();
+    }
+  });
 }
 window.confirmDeleteLot = confirmDeleteLot;
 
