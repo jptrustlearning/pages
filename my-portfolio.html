@@ -73,9 +73,15 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .eq-leg-dot{width:10px;height:2px;border-radius:1px}
 
 /* === TABS === */
-.tabs{display:flex;gap:6px;margin-bottom:14px;background:var(--cream-deep);padding:4px;border-radius:11px}
-.tab-btn{flex:1;background:none;border:none;font-family:var(--font-thai);font-size:.82rem;font-weight:600;padding:9px 12px;border-radius:8px;color:var(--text-muted);cursor:pointer;transition:all .15s}
+.tabs{display:flex;gap:4px;margin-bottom:14px;background:var(--cream-deep);padding:4px;border-radius:11px}
+.tab-btn{flex:1;background:none;border:none;font-family:var(--font-thai);font-size:.78rem;font-weight:600;padding:9px 6px;border-radius:8px;color:var(--text-muted);cursor:pointer;transition:all .15s;white-space:nowrap}
 .tab-btn.active{background:var(--cream-card);color:var(--maroon);box-shadow:0 1px 3px rgba(114,47,55,0.08)}
+
+/* === SELLS STATS HEADER === */
+.sells-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;background:linear-gradient(160deg,var(--cream-card),#F8F2E4);border:1px solid var(--border-gold);border-radius:12px;padding:13px 12px;box-shadow:0 1px 6px rgba(114,47,55,0.04)}
+.ss-cell{text-align:center}
+.ss-label{font-family:var(--font-label);font-size:.55rem;letter-spacing:1.6px;color:var(--gold-dark);margin-bottom:4px;text-transform:uppercase}
+.ss-value{font-family:var(--font-number);font-size:1.05rem;color:var(--text-heading);line-height:1.1}
 
 /* === LOT CARDS === */
 .lots-list{display:flex;flex-direction:column;gap:11px}
@@ -292,11 +298,13 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
     <div class="tabs">
       <button class="tab-btn active" data-tab="lots" onclick="switchTab('lots')">ดูเป็นไม้</button>
       <button class="tab-btn" data-tab="ticker" onclick="switchTab('ticker')">ดูรวมต่อหุ้น</button>
+      <button class="tab-btn" data-tab="sells" onclick="switchTab('sells')">รายการขายแล้ว</button>
     </div>
 
     <!-- TAB CONTENT -->
     <div id="tabLots" class="tab-content"></div>
     <div id="tabTicker" class="tab-content" style="display:none"></div>
+    <div id="tabSells" class="tab-content" style="display:none"></div>
 
   </div>
 </div>
@@ -401,7 +409,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 ============================================================ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-<script src="my-portfolio.js?v=1777340102"></script>
+<script src="my-portfolio.js?v=1777340575"></script>
 
 </body>
 </html>

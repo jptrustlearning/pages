@@ -661,6 +661,7 @@ function switchTab(tab){
   });
   document.getElementById('tabLots').style.display   = tab === 'lots' ? 'block' : 'none';
   document.getElementById('tabTicker').style.display = tab === 'ticker' ? 'block' : 'none';
+  document.getElementById('tabSells').style.display  = tab === 'sells' ? 'block' : 'none';
 }
 window.switchTab = switchTab;
 
@@ -1078,12 +1079,119 @@ async function confirmDeleteLot(lotId, ticker){
 window.confirmDeleteLot = confirmDeleteLot;
 
 /* ============================================================
+   RENDER: SOLD ITEMS
+============================================================ */
+function renderSells(){
+  const wrap = document.getElementById('tabSells');
+  // Flatten all sells across all lots, attach lot info
+  const allSells = [];
+  S.lots.forEach(lot => {
+    lot.sells.forEach(s => {
+      allSells.push({
+        ...s,
+        ticker: lot.ticker,
+        entry_date: lot.entry_date,
+        entry_price: lot.entry_price,
+      });
+    });
+  });
+
+  if (!allSells.length){
+    wrap.innerHTML = `<div class="empty">
+      <div class="empty-icon">💵</div>
+      <div class="empty-text">ยังไม่มีการขาย</div>
+      <div class="empty-sub">รายการขายของคุณจะแสดงที่นี่</div>
+    </div>`;
+    return;
+  }
+
+  // Sort newest first
+  allSells.sort((a, b) => a.exit_date < b.exit_date ? 1 : (a.exit_date > b.exit_date ? -1 : (a.created_at < b.created_at ? 1 : -1)));
+
+  // Stats
+  const totalRealized = allSells.reduce((a, s) => a + (s.exit_price - s.entry_price) * s.shares_sold, 0);
+  const totalProceeds = allSells.reduce((a, s) => a + s.exit_price * s.shares_sold, 0);
+  const wins = allSells.filter(s => (s.exit_price - s.entry_price) * s.shares_sold > 0).length;
+  const winRate = (wins / allSells.length) * 100;
+
+  const statsHtml = `<div class="sells-stats">
+    <div class="ss-cell">
+      <div class="ss-label">Total Realized</div>
+      <div class="ss-value ${pnlText(totalRealized)}">${fmtUSDsigned(totalRealized)}</div>
+    </div>
+    <div class="ss-cell">
+      <div class="ss-label">จำนวนการขาย</div>
+      <div class="ss-value">${allSells.length}</div>
+    </div>
+    <div class="ss-cell">
+      <div class="ss-label">Win Rate</div>
+      <div class="ss-value">${winRate.toFixed(0)}%</div>
+    </div>
+  </div>`;
+
+  const cardsHtml = allSells.map(s => {
+    const pnl = (s.exit_price - s.entry_price) * s.shares_sold;
+    const proceeds = s.exit_price * s.shares_sold;
+    const cost = s.entry_price * s.shares_sold;
+    const pnlPct = cost > 0 ? (pnl / cost) * 100 : 0;
+    const cls = pnlText(pnl);
+    // Hold period in days
+    const d1 = new Date(s.entry_date + 'T00:00:00');
+    const d2 = new Date(s.exit_date + 'T00:00:00');
+    const days = Math.round((d2 - d1) / 86400000);
+    const sector = S.sectors[s.ticker] || '';
+
+    return `<div class="lot-card">
+      <div class="lot-head">
+        <div class="lot-head-left">
+          <div class="lot-ticker-row">
+            <span class="lot-ticker">${s.ticker}</span>
+            <span class="lot-badge closed">SOLD</span>
+          </div>
+          <div class="lot-meta">
+            ${sector ? sector + ' · ' : ''}ขาย ${s.exit_date} · ถือ ${days} วัน
+          </div>
+        </div>
+        <div class="lot-pnl">
+          <div class="lot-pnl-val ${cls}">${fmtUSDsigned(pnl)}</div>
+          <div class="lot-pnl-pct ${cls}">${fmtPct(pnlPct)}</div>
+        </div>
+      </div>
+      <div class="lot-detail-row">
+        <div>
+          <div class="lot-detail-label">จำนวนที่ขาย</div>
+          <div class="lot-detail-val">${fmtShares(s.shares_sold)} Shares</div>
+        </div>
+        <div>
+          <div class="lot-detail-label">ราคาขาย</div>
+          <div class="lot-detail-val">$${s.exit_price.toFixed(2)}</div>
+        </div>
+        <div>
+          <div class="lot-detail-label">ราคาซื้อ</div>
+          <div class="lot-detail-val">$${s.entry_price.toFixed(2)}</div>
+        </div>
+        <div>
+          <div class="lot-detail-label">เงินที่ได้รับ</div>
+          <div class="lot-detail-val">${fmtUSD(proceeds)}</div>
+        </div>
+      </div>
+      <div class="lot-actions">
+        <button class="lot-btn delete" style="flex:1" onclick="deleteSell('${s.id}')">ลบรายการขายนี้</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  wrap.innerHTML = statsHtml + `<div class="lots-list">${cardsHtml}</div>`;
+}
+
+/* ============================================================
    RENDER ALL + TF BAR
 ============================================================ */
 function renderAll(){
   renderHero();
   renderLots();
   renderByTicker();
+  renderSells();
   drawEquityChart();
 }
 
