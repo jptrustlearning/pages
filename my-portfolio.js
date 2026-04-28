@@ -248,6 +248,11 @@ async function fetchLots(){
 /* ============================================================
    PER-LOT METRICS
 ============================================================ */
+/* Dust threshold: half of fmtShares display precision (4 decimals).
+   Anything below this rounds to "0.0000" in the UI and is treated as fully closed
+   to avoid stuck PARTIAL lots that show 0 shares but block re-selling. */
+const DUST_SHARES = 5e-5;
+
 function lotMetrics(lot){
   const sold = lot.sells.reduce((a,s) => a + s.shares_sold, 0);
   const remaining = lot.shares - sold;
@@ -255,15 +260,17 @@ function lotMetrics(lot){
   const proceeds    = lot.sells.reduce((a,s) => a + s.exit_price * s.shares_sold, 0);
   const lp = latestPrice(lot.ticker);
   const latest = lp ? lp.close : null;
-  const unrealizedPnl = (latest !== null && remaining > 0) ? (latest - lot.entry_price) * remaining : 0;
-  const marketValue   = (latest !== null && remaining > 0) ? latest * remaining : 0;
-  const costRemaining = remaining * lot.entry_price;
-  const status = remaining < 1e-8 ? 'closed' : (sold > 1e-8 ? 'partial' : 'open');
+  // Dust cleanup: a lot with sub-display-precision remaining is effectively closed
+  const isClosed = remaining < DUST_SHARES;
+  const effRemaining = isClosed ? 0 : remaining;
+  const unrealizedPnl = (latest !== null && effRemaining > 0) ? (latest - lot.entry_price) * effRemaining : 0;
+  const marketValue   = (latest !== null && effRemaining > 0) ? latest * effRemaining : 0;
+  const costRemaining = effRemaining * lot.entry_price;
+  const status = isClosed ? 'closed' : (sold > 1e-8 ? 'partial' : 'open');
   const totalPnl = realizedPnl + unrealizedPnl;
-  // pct vs original cost
   const pctOriginal = lot.amount_usd > 0 ? (totalPnl / lot.amount_usd) * 100 : 0;
   const unrealizedPct = costRemaining > 0 ? (unrealizedPnl / costRemaining) * 100 : 0;
-  return { sold, remaining, realizedPnl, proceeds, latest, unrealizedPnl, marketValue, costRemaining, status, totalPnl, pctOriginal, unrealizedPct };
+  return { sold, remaining, effRemaining, realizedPnl, proceeds, latest, unrealizedPnl, marketValue, costRemaining, status, totalPnl, pctOriginal, unrealizedPct };
 }
 
 /* ============================================================
@@ -375,10 +382,11 @@ function renderLots(){
           <div class="lot-pnl-pct ${pnlCls}">${fmtPct(m.pctOriginal)}</div>
         </div>
       </div>
+      ${m.status === 'closed' ? '' : `
       <div class="lot-detail-row">
         <div>
           <div class="lot-detail-label">ถืออยู่</div>
-          <div class="lot-detail-val">${fmtShares(m.remaining)} Shares</div>
+          <div class="lot-detail-val">${fmtShares(m.effRemaining)} Shares</div>
         </div>
         <div>
           <div class="lot-detail-label">ราคาตอนนี้</div>
@@ -392,7 +400,7 @@ function renderLots(){
           <div class="lot-detail-label">Unrealized</div>
           <div class="lot-detail-val ${pnlText(m.unrealizedPnl)}">${fmtUSDsigned(m.unrealizedPnl)}</div>
         </div>
-      </div>
+      </div>`}
       ${sellsHtml}
       ${actions}
     </div>`;
@@ -425,7 +433,7 @@ function renderByTicker(){
     a.lotsCount += 1;
     a.totalShares += lot.shares;
     a.totalCost += lot.amount_usd;
-    a.remainingShares += m.remaining;
+    a.remainingShares += m.effRemaining;
     a.costRemaining += m.costRemaining;
     a.realized += m.realizedPnl;
     a.unrealized += m.unrealizedPnl;
@@ -871,7 +879,7 @@ function openSellModal(lotId){
   document.getElementById('sellLotInfo').innerHTML = `
     <div style="font-family:var(--font-number);font-size:1.1rem;color:var(--maroon)">${lot.ticker}</div>
     <div style="font-size:.78rem;color:var(--text-muted);margin-top:3px">
-      ซื้อ ${lot.entry_date} @ $${lot.entry_price.toFixed(2)} · ถืออยู่ <strong style="color:var(--text-heading)">${fmtShares(m.remaining)}</strong> Shares
+      ซื้อ ${lot.entry_date} @ $${lot.entry_price.toFixed(2)} · ถืออยู่ <strong style="color:var(--text-heading)">${fmtShares(m.effRemaining)}</strong> Shares
     </div>`;
   // Reset mode + amount
   _sellMode = 'shares';
@@ -1054,6 +1062,9 @@ function recalcSellProceedsFromPrice(){
   }
   // If user clicked "ขายทั้งหมด" — snap to exact remaining (avoids floating-point drift)
   if (_sellAllFlag) shares = m.remaining;
+  // Dust snap: if user typed a value within display precision of remaining,
+  // they meant to sell all. Snap to exact remaining so no dust is left behind.
+  else if (shares > m.remaining - DUST_SHARES) shares = m.remaining;
 
   // Validate shares ≤ remaining
   if (shares > m.remaining + 1e-8){
@@ -1106,6 +1117,8 @@ async function submitSell(){
     shares = amt / price;
   }
   if (_sellAllFlag) shares = m.remaining;
+  // Dust snap (same as preview) — keeps DB write consistent with what user saw
+  else if (shares > m.remaining - DUST_SHARES) shares = m.remaining;
   if (shares > m.remaining + 1e-8){
     toast(`จำนวนเกินที่ถืออยู่ (สูงสุด ${fmtShares(m.remaining)} Shares)`, 'err');
     return;
