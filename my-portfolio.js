@@ -873,17 +873,22 @@ function openSellModal(lotId){
     <div style="font-size:.78rem;color:var(--text-muted);margin-top:3px">
       ซื้อ ${lot.entry_date} @ $${lot.entry_price.toFixed(2)} · ถืออยู่ <strong style="color:var(--text-heading)">${fmtShares(m.remaining)}</strong> Shares
     </div>`;
-  document.getElementById('sellMaxShares').textContent = fmtShares(m.remaining);
+  // Reset mode + amount
+  _sellMode = 'shares';
+  _sellAllFlag = false;
+  document.querySelectorAll('#sellModal .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === 'shares'));
+  const amtInp = document.getElementById('sellAmount');
+  amtInp.value = '';
+  amtInp.step = '0.0001'; amtInp.min = '0.0001'; amtInp.placeholder = '';
   document.getElementById('sellDate').value = todayISO();
-  document.getElementById('sellShares').value = '';
-  document.getElementById('sellShares').max = m.remaining;
   document.getElementById('sellPreview').style.display = 'none';
   document.getElementById('sellPreviewWarn').style.display = 'none';
   document.getElementById('sellConfirmBtn').disabled = true;
   _sellPriceDate = null;
   _sellRange = null;
+  updateSellMaxHint();
   document.getElementById('sellModal').classList.add('active');
-  setTimeout(()=> document.getElementById('sellShares').focus(), 100);
+  setTimeout(()=> amtInp.focus(), 100);
 }
 function closeSellModal(){ document.getElementById('sellModal').classList.remove('active'); _sellLot = null; }
 window.openSellModal = openSellModal;
@@ -892,6 +897,70 @@ window.closeSellModal = closeSellModal;
 /* Track effective trading day used for current sell price input + valid range */
 let _sellPriceDate = null;
 let _sellRange = null;
+let _sellMode = 'shares';     // 'shares' or 'usd'
+let _sellAllFlag = false;     // true after user clicks "ขายทั้งหมด" until they edit amount
+
+function setSellMode(mode){
+  if (mode !== 'shares' && mode !== 'usd') return;
+  _sellMode = mode;
+  _sellAllFlag = false;
+  document.querySelectorAll('#sellModal .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  const amtInp = document.getElementById('sellAmount');
+  amtInp.value = '';
+  if (mode === 'shares'){
+    amtInp.step = '0.0001'; amtInp.min = '0.0001'; amtInp.placeholder = '';
+  } else {
+    amtInp.step = '0.01';   amtInp.min = '0.01';   amtInp.placeholder = '500.00';
+  }
+  updateSellMaxHint();
+  recalcSellProceedsFromPrice();
+}
+window.setSellMode = setSellMode;
+
+function sellAll(){
+  if (!_sellLot) return;
+  const m = lotMetrics(_sellLot);
+  const price = parseFloat(document.getElementById('sellPrevPrice').value);
+  const amtInp = document.getElementById('sellAmount');
+  if (_sellMode === 'shares'){
+    amtInp.value = fmtShares(m.remaining).replace(/,/g,'');
+  } else {
+    if (!isFinite(price) || price <= 0){
+      toast('เลือกวันที่ขายก่อน เพื่อให้รู้ราคา', 'err');
+      return;
+    }
+    amtInp.value = (m.remaining * price).toFixed(2);
+  }
+  _sellAllFlag = true;
+  recalcSellProceedsFromPrice();
+}
+window.sellAll = sellAll;
+
+function onSellAmountInput(){
+  _sellAllFlag = false;  // user is now manually editing
+  recalcSellProceedsFromPrice();
+}
+window.onSellAmountInput = onSellAmountInput;
+
+function updateSellMaxHint(){
+  if (!_sellLot) return;
+  const m = lotMetrics(_sellLot);
+  const span = document.getElementById('sellMaxLabel');
+  const price = parseFloat(document.getElementById('sellPrevPrice').value);
+  if (_sellMode === 'shares'){
+    if (isFinite(price) && price > 0){
+      span.textContent = `${fmtShares(m.remaining)} Shares (≈ ${fmtUSD(m.remaining * price)})`;
+    } else {
+      span.textContent = `${fmtShares(m.remaining)} Shares`;
+    }
+  } else {
+    if (isFinite(price) && price > 0){
+      span.textContent = `${fmtUSD(m.remaining * price)} (= ${fmtShares(m.remaining)} Shares)`;
+    } else {
+      span.textContent = `(เลือกวันที่ขายก่อน)`;
+    }
+  }
+}
 
 function recalcSellPreview(){
   if (!_sellLot) return;
@@ -902,21 +971,21 @@ function recalcSellPreview(){
   warn.style.display = 'none'; warn.textContent='';
   btn.disabled = true;
   const m = lotMetrics(_sellLot);
-  if (!date) { prev.style.display='none'; _sellPriceDate=null; return; }
+  if (!date) { prev.style.display='none'; _sellPriceDate=null; updateSellMaxHint(); return; }
   if (date < _sellLot.entry_date){
     prev.style.display='none';
     warn.style.display='block';
     warn.textContent = `วันที่ขายต้องไม่ก่อนวันที่ซื้อ (${_sellLot.entry_date})`;
-    _sellPriceDate=null; return;
+    _sellPriceDate=null; updateSellMaxHint(); return;
   }
   if (date > S.latestDate){
     prev.style.display='none';
     warn.style.display='block';
     warn.textContent = `วันที่ต้องไม่หลังจากวันที่ข้อมูลล่าสุด (${S.latestDate})`;
-    _sellPriceDate=null; return;
+    _sellPriceDate=null; updateSellMaxHint(); return;
   }
   const p = priceOnOrBefore(_sellLot.ticker, date);
-  if (!p){ prev.style.display='none'; warn.style.display='block'; warn.textContent='ไม่พบราคา'; _sellPriceDate=null; return; }
+  if (!p){ prev.style.display='none'; warn.style.display='block'; warn.textContent='ไม่พบราคา'; _sellPriceDate=null; updateSellMaxHint(); return; }
 
   prev.style.display = 'block';
   document.getElementById('sellPrevDate').textContent = p.date + (p.date !== date ? '  (วันก่อนหน้า)' : '');
@@ -933,11 +1002,18 @@ function recalcSellPreview(){
     _sellPriceDate = p.date;
   }
 
+  // If user hit "ขายทั้งหมด" while in USD mode without a price, the input is empty.
+  // Now that price is available, refill it.
+  if (_sellAllFlag && _sellMode === 'usd' && !document.getElementById('sellAmount').value){
+    document.getElementById('sellAmount').value = (m.remaining * p.close).toFixed(2);
+  }
+
+  updateSellMaxHint();
   recalcSellProceedsFromPrice();
 }
 window.recalcSellPreview = recalcSellPreview;
 
-/* Re-validate price + recompute proceeds + P&L */
+/* Re-validate price + amount, derive shares per mode, recompute proceeds + P&L */
 function recalcSellProceedsFromPrice(){
   if (!_sellLot) return;
   const priceInp = document.getElementById('sellPrevPrice');
@@ -946,22 +1022,9 @@ function recalcSellProceedsFromPrice(){
   const btn = document.getElementById('sellConfirmBtn');
   const hint = document.getElementById('sellPriceRangeHint');
   const warn = document.getElementById('sellPreviewWarn');
-  const sh = parseFloat(document.getElementById('sellShares').value);
+  const amt = parseFloat(document.getElementById('sellAmount').value);
   const price = parseFloat(priceInp.value);
   const m = lotMetrics(_sellLot);
-
-  // Validate shares
-  if (!isFinite(sh) || sh <= 0){
-    proceedsEl.textContent = '—'; pnlEl.textContent = '—';
-    btn.disabled = true; return;
-  }
-  if (sh > m.remaining + 1e-8){
-    proceedsEl.textContent = '—'; pnlEl.textContent = '—';
-    warn.style.display = 'block';
-    warn.textContent = `จำนวนเกินที่ถืออยู่ (สูงสุด ${fmtShares(m.remaining)})`;
-    btn.disabled = true; return;
-  }
-  warn.style.display = 'none';
 
   // Validate price
   let priceOk = isFinite(price) && price > 0;
@@ -970,13 +1033,48 @@ function recalcSellProceedsFromPrice(){
   }
   priceInp.classList.toggle('invalid', !priceOk);
   hint.classList.toggle('err', !priceOk);
+
+  // Bail if amount empty/invalid
+  if (!isFinite(amt) || amt <= 0){
+    proceedsEl.textContent = '—'; pnlEl.textContent = '—';
+    btn.disabled = true; warn.style.display='none'; return;
+  }
+
+  // Derive shares from mode
+  let shares;
+  if (_sellMode === 'shares'){
+    shares = amt;
+  } else {
+    // USD mode requires valid price to convert
+    if (!priceOk){
+      proceedsEl.textContent = '—'; pnlEl.textContent = '—';
+      btn.disabled = true; warn.style.display='none'; return;
+    }
+    shares = amt / price;
+  }
+  // If user clicked "ขายทั้งหมด" — snap to exact remaining (avoids floating-point drift)
+  if (_sellAllFlag) shares = m.remaining;
+
+  // Validate shares ≤ remaining
+  if (shares > m.remaining + 1e-8){
+    proceedsEl.textContent = '—'; pnlEl.textContent = '—';
+    warn.style.display = 'block';
+    if (_sellMode === 'shares'){
+      warn.textContent = `จำนวนหุ้นเกินที่ถืออยู่ (สูงสุด ${fmtShares(m.remaining)})`;
+    } else {
+      warn.textContent = `จำนวนเงินเกินมูลค่าที่ถืออยู่ (สูงสุด ${fmtUSD(m.remaining * price)})`;
+    }
+    btn.disabled = true; return;
+  }
+  warn.style.display = 'none';
+
   if (!priceOk){
     proceedsEl.textContent = '—'; pnlEl.textContent = '—';
     btn.disabled = true; return;
   }
 
-  const proceeds = price * sh;
-  const pnl = (price - _sellLot.entry_price) * sh;
+  const proceeds = price * shares;
+  const pnl = (price - _sellLot.entry_price) * shares;
   proceedsEl.textContent = fmtUSD(proceeds);
   pnlEl.textContent = fmtUSDsigned(pnl);
   pnlEl.style.color = pnl >= 0 ? '#226F44' : '#922B21';
@@ -989,7 +1087,7 @@ window.onSellPriceEdit = onSellPriceEdit;
 async function submitSell(){
   if (!_sellLot || !sb || !S.user) return;
   const date = document.getElementById('sellDate').value;
-  const sh = parseFloat(document.getElementById('sellShares').value);
+  const amt = parseFloat(document.getElementById('sellAmount').value);
   const price = parseFloat(document.getElementById('sellPrevPrice').value);
   const p = priceOnOrBefore(_sellLot.ticker, date);
   if (!p){ toast('ไม่พบราคา', 'err'); return; }
@@ -998,6 +1096,21 @@ async function submitSell(){
     toast(`ราคาเกินช่วงที่อนุญาต ($${_sellRange.min.toFixed(2)} — $${_sellRange.max.toFixed(2)})`, 'err');
     return;
   }
+  if (!isFinite(amt) || amt <= 0){ toast('จำนวนไม่ถูกต้อง', 'err'); return; }
+
+  const m = lotMetrics(_sellLot);
+  let shares;
+  if (_sellMode === 'shares'){
+    shares = amt;
+  } else {
+    shares = amt / price;
+  }
+  if (_sellAllFlag) shares = m.remaining;
+  if (shares > m.remaining + 1e-8){
+    toast(`จำนวนเกินที่ถืออยู่ (สูงสุด ${fmtShares(m.remaining)} Shares)`, 'err');
+    return;
+  }
+
   const btn = document.getElementById('sellConfirmBtn');
   btn.disabled = true; btn.textContent = 'กำลังบันทึก...';
   const { error } = await sb.from('portfolio_sells').insert({
@@ -1005,11 +1118,11 @@ async function submitSell(){
     lot_id: _sellLot.id,
     exit_date: p.date,
     exit_price: price,
-    shares_sold: sh,
+    shares_sold: shares,
   });
   btn.textContent = 'บันทึก'; btn.disabled = false;
   if (error){ toast('บันทึกล้มเหลว: '+error.message, 'err'); return; }
-  const realized = (price - _sellLot.entry_price) * sh;
+  const realized = (price - _sellLot.entry_price) * shares;
   toast(`ขายแล้ว · Realized ${fmtUSDsigned(realized)}`, realized >= 0 ? 'ok' : 'err');
   closeSellModal();
   await fetchLots();

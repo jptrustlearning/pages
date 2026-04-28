@@ -83,6 +83,17 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .ss-label{font-family:var(--font-label);font-size:.55rem;letter-spacing:1.6px;color:var(--gold-dark);margin-bottom:4px;text-transform:uppercase}
 .ss-value{font-family:var(--font-number);font-size:1.05rem;color:var(--text-heading);line-height:1.1}
 
+/* === SEGMENTED CONTROL (sell mode toggle) === */
+.seg-control{display:flex;background:var(--cream-deep);border-radius:9px;padding:3px;gap:2px}
+.seg-btn{flex:1;background:none;border:none;font-family:var(--font-thai);font-size:.74rem;font-weight:600;padding:8px 10px;border-radius:7px;color:var(--text-muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.seg-btn.active{background:var(--cream-card);color:var(--maroon);box-shadow:0 1px 3px rgba(114,47,55,0.08)}
+
+/* === SELL ALL BUTTON === */
+.sell-all-btn{background:linear-gradient(135deg,rgba(46,159,95,0.12),rgba(212,175,55,0.12));border:1px solid rgba(46,159,95,0.3);color:var(--green-dark);font-family:var(--font-thai);font-size:.7rem;font-weight:700;padding:5px 12px;border-radius:7px;cursor:pointer;letter-spacing:.4px;transition:all .15s}
+.sell-all-btn:hover{background:linear-gradient(135deg,rgba(46,159,95,0.2),rgba(212,175,55,0.2));border-color:rgba(46,159,95,0.5)}
+.sell-all-btn:active{transform:scale(.96)}
+.sell-all-btn:disabled{opacity:.4;cursor:not-allowed;background:var(--cream-deep);border-color:var(--border-gold);color:var(--text-muted)}
+
 /* === LOT CARDS === */
 .lots-list{display:flex;flex-direction:column;gap:11px}
 .lot-card{background:var(--cream-card);border:1px solid var(--border-gold);border-radius:12px;padding:14px;box-shadow:0 1px 6px rgba(114,47,55,0.04);transition:all .15s}
@@ -363,9 +374,16 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
       <div class="field-hint">วันที่ตลาดเปิด — ถ้าไม่ใช่วันทำการจะใช้ราคาปิดของวันก่อนหน้า</div>
     </div>
     <div class="field">
-      <label class="field-label">จำนวนหุ้นที่ขาย</label>
-      <input id="sellShares" class="field-input num" type="number" step="0.0001" min="0.0001" oninput="recalcSellPreview()">
-      <div id="sellSharesHint" class="field-hint">ขายได้สูงสุด <span id="sellMaxShares">0</span> หุ้น</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px">
+        <label class="field-label">จำนวนที่ขาย</label>
+        <button type="button" class="sell-all-btn" onclick="sellAll()">ขายทั้งหมด</button>
+      </div>
+      <div class="seg-control" style="margin-bottom:8px">
+        <button type="button" class="seg-btn active" data-mode="shares" onclick="setSellMode('shares')">จำนวนหุ้น</button>
+        <button type="button" class="seg-btn" data-mode="usd" onclick="setSellMode('usd')">จำนวนเงิน (USD)</button>
+      </div>
+      <input id="sellAmount" class="field-input num" type="number" step="0.0001" min="0.0001" oninput="onSellAmountInput()">
+      <div class="field-hint">ขายได้สูงสุด <span id="sellMaxLabel">—</span></div>
     </div>
     <div id="sellPreview" class="preview-box" style="display:none">
       <div class="preview-row"><span class="preview-label">วันที่ใช้คำนวณ</span><span id="sellPrevDate" class="preview-value">—</span></div>
@@ -409,7 +427,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 ============================================================ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-<script src="my-portfolio.js?v=1777340575"></script>
+<script src="my-portfolio.js?v=1777343107"></script>
 
 </body>
 </html>
