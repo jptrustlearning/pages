@@ -1543,7 +1543,7 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
         <div class="rsc-metric">
           <div class="rsc-metric-label">Max Drawdown</div>
           <div class="rsc-metric-value" id="rscMaxDD" style="color:var(--red);">0.0%</div>
-          <div class="rsc-metric-desc">พอร์ตเคยลดจากจุดสูงสุดมากที่สุด — เอาไว้วัดความอดทนที่ต้องมี</div>
+          <div class="rsc-metric-desc">ขาดทุนรอบที่หนักที่สุด — เอาไว้วัดความอดทนที่ต้องมี</div>
         </div>
       </div>
 
@@ -3638,16 +3638,8 @@ function updateResultsSummary() {
     rsAlphaDesc.innerText = 'ต้องมีอย่างน้อย 10 รอบถึงจะวัดได้';
   }
 
-  // Max DD — equity-curve drawdown (peak-to-trough), matches 6M / Rolling 6M
-  let ddPeak = -Infinity, equityDD = 0;
-  if(state.equityCurve && state.equityCurve.length > 0) {
-    state.equityCurve.forEach(e => {
-      if(e.equity > ddPeak) ddPeak = e.equity;
-      const dd = (e.equity - ddPeak) / ddPeak;
-      if(dd < equityDD) equityDD = dd;
-    });
-  }
-  rsDD.innerText = (equityDD * 100).toFixed(1) + '%';
+  // Max DD
+  rsDD.innerText = maxLoss.toFixed(1) + '%';
 
   // Narrative — Thai prose summarizing parameters + outcome
   const modeText = CONFIG.allocMode === 'split' ? 'แยกงบ' : 'งบเดียวปรับสัดส่วน';

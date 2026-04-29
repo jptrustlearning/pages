@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>S&P 500 · Rolling 6M Momentum · JP Trust Learning</title>
+<title>S&P 500 · 6-Month Momentum · JP Trust Learning</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./jp-settings.js?v=1761234567"></script>
 <!-- Modern Fonts: Outfit (Headings) + Inter (Body/Numbers) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@200;300;400;500;600;700&family=Cinzel:wght@400;500;600;700&family=DM+Serif+Display&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Cinzel:wght@500;600;700&family=DM+Serif+Display&family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
   :root {
@@ -1567,9 +1567,9 @@
 <div class="container">
   <!-- Luxe Hero Header -->
   <header>
-    <div class="subtitle-lab">LAB · Rolling 6M Momentum</div>
+    <div class="subtitle-lab">LAB · 6-Month Momentum</div>
     <div class="header-title-wrap">
-      <h1>S&amp;P 500 Rolling <span class="h1-amp">&amp;</span> 6M</h1>
+      <h1>S&amp;P 500 Strategy <span class="h1-amp">&amp;</span> Pro V22</h1>
     </div>
     <div class="status-box">
       <div id="data-status" class="status-indicator loading"><span>●</span> Connecting</div>
@@ -1662,7 +1662,7 @@
         <div class="rsc-metric">
           <div class="rsc-metric-label">Max Drawdown</div>
           <div class="rsc-metric-value" id="rscMaxDD" style="color:var(--red);">0.0%</div>
-          <div class="rsc-metric-desc">พอร์ตเคยลดจากจุดสูงสุดมากที่สุด — เอาไว้วัดความอดทนที่ต้องมี</div>
+          <div class="rsc-metric-desc">ขาดทุนรอบที่หนักที่สุด — เอาไว้วัดความอดทนที่ต้องมี</div>
         </div>
       </div>
 
@@ -1756,14 +1756,14 @@
               <div class="rss-stat-sub">ผลตอบแทนเฉลี่ย / เดือน</div>
             </div>
             <div class="rss-stat">
-              <div class="rss-stat-label">Best Lot</div>
+              <div class="rss-stat-label">Best Round</div>
               <div class="rss-stat-val text-green" id="stat-best">0.0%</div>
-              <div class="rss-stat-sub">ล็อตที่กำไรสูงสุด (6 เดือน)</div>
+              <div class="rss-stat-sub">รอบที่กำไรสูงสุด</div>
             </div>
             <div class="rss-stat">
-              <div class="rss-stat-label">Worst Lot</div>
+              <div class="rss-stat-label">Worst Round</div>
               <div class="rss-stat-val text-red" id="stat-worst">0.0%</div>
-              <div class="rss-stat-sub">ล็อตที่ขาดทุนสูงสุด (6 เดือน)</div>
+              <div class="rss-stat-sub">รอบที่ขาดทุนสูงสุด</div>
             </div>
           </div>
           <div class="rss-tab-narrative" id="rssProfit">กำลังคำนวณ...</div>
@@ -1775,7 +1775,7 @@
             <div class="rss-stat">
               <div class="rss-stat-label">Win Rate</div>
               <div class="rss-stat-val text-green" id="stat-win">0%</div>
-              <div class="rss-stat-sub">สัดส่วนล็อตที่กำไร</div>
+              <div class="rss-stat-sub">สัดส่วนรอบที่กำไร</div>
             </div>
             <div class="rss-stat">
               <div class="rss-stat-label">Profit Factor</div>
@@ -1788,9 +1788,9 @@
               <div class="rss-stat-sub">จำนวนเดือนทั้งหมด</div>
             </div>
             <div class="rss-stat">
-              <div class="rss-stat-label">Lots Entered</div>
+              <div class="rss-stat-label">Rebalances</div>
               <div class="rss-stat-val" id="stat-rebal">0</div>
-              <div class="rss-stat-sub">ล็อตที่เข้าซื้อ</div>
+              <div class="rss-stat-sub">รอบการปรับพอร์ต</div>
             </div>
           </div>
           <div class="rss-tab-narrative" id="rssAccuracy">กำลังคำนวณ...</div>
@@ -1919,7 +1919,7 @@
           <table id="yearlyTable" class="simple-table">
             <thead><tr>
               <th style="text-align:left;">Year</th>
-              <th>Lots</th>
+              <th>Rounds</th>
               <th>Wins</th>
               <th>Losses</th>
               <th>Win Rate</th>
@@ -2067,24 +2067,24 @@
 
     <div class="section-label"><span>📦 พอร์ตการลงทุน</span><div class="line"></div></div>
 
-    <!-- 0. Per-Lot Capital (replaces Initial Capital) -->
+    <!-- 0. Initial Capital (moved from hero card) -->
     <div class="control-group">
-      <label>PER-LOT CAPITAL — เงินลงทุนต่อรอบ</label>
+      <label>INITIAL CAPITAL — ทุนเริ่มต้น</label>
       <div class="top-n-wrapper" style="display:flex; align-items:center; gap:10px;">
         <span style="color:var(--gold-deep); font-weight:700; font-family:'DM Serif Display',serif; font-size:1.1rem;">$</span>
-        <input type="number" id="perLotCapitalInput" class="input-box" value="600" step="100" min="50">
+        <input type="number" id="initialCapitalInput" class="input-box" value="15000" step="1000" min="100">
       </div>
-      <span class="hint">เงินที่ใส่ <strong>ต่อรอบ</strong> (ต่อเดือน) · default $600 · รวมสูงสุดช่วง ramp-up = เงินต่อรอบ × 6 = <span id="totalDeployedHint" style="color:var(--gold-deep);font-weight:700">$3,600</span> (แสดงเป็นยอดรวมที่ต้องเตรียม)</span>
+      <span class="hint">ทุนเริ่มต้นที่ใช้ทดสอบกลยุทธ์ · ค่า default $15,000 · สามารถเปลี่ยนเพื่อดูผลกำไรสเกลตามที่วางแผนจริง</span>
     </div>
 
     <div class="control-group">
       <label>PORTFOLIO SIZE — จำนวนหุ้นต่อรอบ</label>
       <div class="top-n-wrapper" style="display:flex; align-items:center; gap:10px;">
         <span style="color:var(--text-muted); font-weight:600;">TOP</span>
-        <input type="number" id="topNInput" class="input-box" value="10" min="1" max="50" style="max-width:120px;">
+        <input type="number" id="topNInput" class="input-box" value="15" min="1" max="50" style="max-width:120px;">
         <span style="color:var(--text-muted); font-weight:600;">STOCKS</span>
       </div>
-      <span class="hint">ซื้อหุ้น <strong>อันดับ Top N</strong> จากการจัดอันดับในแต่ละล็อต · default = 10 · <strong>ล็อตต่างรอบถือซ้ำกันได้</strong></span>
+      <span class="hint">ซื้อหุ้น <strong>อันดับ Top N</strong> จากการจัดอันดับ · น้อยตัว (5-10) = เสี่ยงกระจุก แต่กำไรตัวเดียววิ่งจะหนัก · เยอะตัว (20-30) = กระจายความเสี่ยงแต่ผลตอบแทนเจือจาง</span>
     </div>
 
     <!-- 3. Start Year -->
@@ -2099,7 +2099,7 @@
   </div>
   <div class="panel-footer">
     <div class="footer-row">
-      <button class="btn-save-settings" onclick="saveRolling6mSettings()">
+      <button class="btn-save-settings" onclick="saveSp500ProSettings()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
           <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
           <polyline points="17 21 17 13 7 13 7 21"/>
@@ -2107,7 +2107,7 @@
         </svg>
         บันทึกการตั้งค่า
       </button>
-      <button class="btn-reset-settings" onclick="resetRolling6mSettings()">
+      <button class="btn-reset-settings" onclick="resetSp500ProSettings()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="1 4 1 10 7 10"/>
           <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
@@ -2129,15 +2129,15 @@
 <div id="aboutModal" class="about-modal" onclick="if(event.target===this)closeAboutModal()">
   <div class="about-modal-content">
     <button class="panel-close" onclick="closeAboutModal()" aria-label="ปิด">✕</button>
-    <h2>🔄 Rolling 6M Momentum</h2>
-    <div class="about-sub">กลยุทธ์ทบต้นแบบหมุนเวียน — ซื้อทุกเดือน ถือ 6 เดือน ขายแล้วนำเงินไปซื้อรอบใหม่</div>
+    <h2>📈 Strategy Pro V22</h2>
+    <div class="about-sub">Long-term momentum backtesting — 6-month return ranking across the S&amp;P 500 universe</div>
 
     <div class="about-philosophy">
       <div class="philosophy-label">Trading Philosophy</div>
       <div class="philosophy-text">
-        <strong>กระจายเวลาเข้าซื้อ · เก็บกำไรแบบทบต้น</strong> · เราใช้ <strong>การจัดอันดับ 6 เดือน</strong>เหมือน 6M Momentum ทุกประการ · แต่แทนที่จะ rebalance ทั้งพอร์ตทุก 6 เดือน · เราจะ<strong>เข้าซื้อทุกเดือน</strong>และ<strong>ถือแต่ละล็อต 6 เดือน</strong>เต็ม เมื่อครบกำหนดจึงขายและนำเงินไปซื้อรอบใหม่ทันที
+        <strong>กลยุทธ์โมเมนตัม 6 เดือน</strong> มุ่งเน้นหุ้นที่แสดงแนวโน้มแข็งแกร่งในระยะยาว · แทนที่จะพยายามเดาจุดกลับตัว เราปล่อยให้ <strong>ผู้ชนะวิ่งต่อ</strong> และตัดขาดทุนเมื่อ trend หายไป
       </div>
-      <div class="philosophy-signature">Time Diversification · Auto-Compounding</div>
+      <div class="philosophy-signature">Rules Over Emotions · Data-Driven</div>
     </div>
 
     <div class="about-pillars">
@@ -2159,20 +2159,19 @@
       </div>
     </div>
 
-    <p>กลยุทธ์นี้ <strong>เข้าซื้อทุกวันทำการแรกของเดือน</strong> · แต่ละรอบซื้อ Top N ของหุ้นตามอันดับ 6 เดือน · <strong>ถือแต่ละล็อต 6 เดือนเต็ม</strong>จึงขาย · ช่วง 6 เดือนแรกเป็น <strong>ramp-up</strong> (ใส่เงินใหม่ทุกเดือน) · เดือนที่ 7 เป็นต้นไปเข้าสู่ <strong>steady state</strong> (มี 6 ล็อตทำงานพร้อมกัน · ล็อตที่ครบอายุขายเงินกลับมาซื้อล็อตใหม่)</p>
+    <p>กลยุทธ์นี้ <strong>Re-balance ทุก 6 เดือน</strong> (ก.พ. และ ส.ค.) โดยใช้ข้อมูลย้อนหลัง 26 สัปดาห์ในการจัดอันดับหุ้น · ทุกครั้งที่ re-balance จะ<strong>ขายของเก่าหมด</strong>แล้ว<strong>ซื้อ Top N ใหม่</strong>ตามอันดับปัจจุบัน · ระหว่างรอบถือครองหุ้นเดิมโดยไม่มีการซื้อขาย</p>
 
-    <p>ข้อดีของ Rolling: <strong>กระจายจุดเข้าซื้อ</strong>ลดความเสี่ยง timing · <strong>เงินหมุนเวียนอัตโนมัติ</strong>ไม่ต้องรอครบ 6 เดือนเต็ม · ปรับ <strong>เงินต่อรอบ</strong>และ <strong>Top N</strong> ตามเงินทุนและความกระจายที่ต้องการ</p>
+    <p>ปรับ <strong>Ranking Weight</strong> เพื่อสร้างกลยุทธ์ที่เข้ากับสไตล์คุณ · ปรับ <strong>Portfolio Size</strong> เพื่อสมดุลระหว่างความเสี่ยงกับ upside · ปรับ <strong>Start Year</strong> เพื่อดูผลในรอบเวลาต่าง ๆ</p>
   </div>
 </div>
 
 <script>
 // --- CONFIGURATION ---
 let CONFIG = {
-  perLotCapital: 600,          // default per-lot USD (user editable)
-  topN: 10,                    // default top 10 stocks per lot
-  lookbackWeeks: 26,           // 6 months (~130 trading days) — same as 6M Momentum
-  holdMonths: 6,               // hold each lot for 6 months
-  rebalanceMonths: [0,1,2,3,4,5,6,7,8,9,10,11], // every month (first biz day)
+  initialCapital: 15000,
+  topN: 15,
+  lookbackWeeks: 26,
+  rebalanceMonths: [1, 7], // Feb(1), Aug(7)
   weightRet: 0.5,
   weightVol: 0.5,
   startYear: 2015,
@@ -2180,17 +2179,18 @@ let CONFIG = {
 };
 
 // --- Default backtest settings (for Reset button) ---
-const DEFAULT_ROLLING_6M = {
-  weight: 50,
-  perLotCapital: 600,
-  topN: 10,
+const DEFAULT_SP500_PRO = {
+  weight: 50,          // Return % (Volume = 100 - weight)
+  initialCapital: 15000,
+  topN: 15,
   startYear: 2015
 };
 
-// Cache for saved settings (needed for dynamic year-dropdown populate)
-let _savedRolling6mCache = null;
+// Cache for saved settings — used by populate logic (year dropdown only
+// exists AFTER data loads, so we need to remember the saved year for then)
+let _savedSp500ProCache = null;
 
-// --- Initialize JPSettings ---
+// --- Initialize JPSettings (cloud-synced per-user settings) ---
 if (window.JPSettings && window.supabase) {
   window.JPSettings.init({
     url: 'https://rcdukwwcbyryauhqlzmx.supabase.co',
@@ -2198,65 +2198,82 @@ if (window.JPSettings && window.supabase) {
   });
 }
 
+// --- Toast notification helper ---
 function jptToast(msg) {
   let t = document.getElementById('jpt-toast');
-  if (!t) { t = document.createElement('div'); t.id = 'jpt-toast'; document.body.appendChild(t); }
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'jpt-toast';
+    document.body.appendChild(t);
+  }
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(t._hideTimer);
   t._hideTimer = setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-function getRolling6mSettings() {
+// --- Collect current UI values into a settings object ---
+function getSp500ProSettings() {
   const w = document.getElementById('weightSlider');
-  const c = document.getElementById('perLotCapitalInput');
+  const c = document.getElementById('initialCapitalInput');
   const n = document.getElementById('topNInput');
   const y = document.getElementById('startYearSelect');
   return {
-    weight: w ? parseInt(w.value, 10) : DEFAULT_ROLLING_6M.weight,
-    perLotCapital: c ? parseFloat(c.value) || DEFAULT_ROLLING_6M.perLotCapital : DEFAULT_ROLLING_6M.perLotCapital,
-    topN: n ? parseInt(n.value, 10) || DEFAULT_ROLLING_6M.topN : DEFAULT_ROLLING_6M.topN,
-    startYear: y ? parseInt(y.value, 10) || DEFAULT_ROLLING_6M.startYear : DEFAULT_ROLLING_6M.startYear
+    weight: w ? parseInt(w.value, 10) : DEFAULT_SP500_PRO.weight,
+    initialCapital: c ? parseFloat(c.value) || DEFAULT_SP500_PRO.initialCapital : DEFAULT_SP500_PRO.initialCapital,
+    topN: n ? parseInt(n.value, 10) || DEFAULT_SP500_PRO.topN : DEFAULT_SP500_PRO.topN,
+    startYear: y ? parseInt(y.value, 10) || DEFAULT_SP500_PRO.startYear : DEFAULT_SP500_PRO.startYear
   };
 }
 
-function applyRolling6mSettings(s) {
+// --- Apply a settings object back to the UI ---
+function applySp500ProSettings(s) {
   if (!s) return;
   const w = document.getElementById('weightSlider');
-  const c = document.getElementById('perLotCapitalInput');
+  const c = document.getElementById('initialCapitalInput');
   const n = document.getElementById('topNInput');
   const y = document.getElementById('startYearSelect');
   if (w && s.weight != null) { w.value = s.weight; if (typeof updateWeightsUI === 'function') updateWeightsUI(); }
-  if (c && s.perLotCapital != null) c.value = s.perLotCapital;
+  if (c && s.initialCapital != null) c.value = s.initialCapital;
   if (n && s.topN != null) n.value = s.topN;
   if (y && s.startYear != null) y.value = s.startYear;
 }
 
-async function loadRolling6mSettings() {
+// --- Load user's saved settings from cloud (called on page load) ---
+async function loadSp500ProSettings() {
   if (!window.JPSettings) return;
   try {
     const data = await window.JPSettings.load();
-    if (data && data.rolling_6m) {
-      _savedRolling6mCache = data.rolling_6m;
-      applyRolling6mSettings(data.rolling_6m);
-      console.log('[rolling-6m] loaded saved settings from cloud');
+    if (data && data.sp500_pro) {
+      _savedSp500ProCache = data.sp500_pro;  // cache for populate-dropdown logic
+      applySp500ProSettings(data.sp500_pro);
+      console.log('[sp500-pro] loaded saved settings from cloud');
     }
   } catch (e) {
-    console.warn('[rolling-6m] load settings error:', e);
+    console.warn('[sp500-pro] load settings error:', e);
   }
 }
 
-async function saveRolling6mSettings() {
-  if (!window.JPSettings) { jptToast('ระบบยังไม่พร้อม — กรุณาลองใหม่'); return; }
+// --- Save current settings to cloud (Save button handler) ---
+async function saveSp500ProSettings() {
+  if (!window.JPSettings) {
+    jptToast('ระบบยังไม่พร้อม — กรุณาลองใหม่');
+    return;
+  }
   const user = await window.JPSettings.getUser();
-  if (!user) { jptToast('กรุณา login ก่อนบันทึกการตั้งค่า'); return; }
-  const ok = await window.JPSettings.patch({ rolling_6m: getRolling6mSettings() });
+  if (!user) {
+    jptToast('กรุณา login ก่อนบันทึกการตั้งค่า');
+    return;
+  }
+  const settings = getSp500ProSettings();
+  const ok = await window.JPSettings.patch({ sp500_pro: settings });
   jptToast(ok ? 'บันทึกการตั้งค่าเรียบร้อย' : 'บันทึกไม่สำเร็จ — กรุณาลองใหม่');
 }
 
-function resetRolling6mSettings() {
+// --- Reset settings to defaults (Reset button handler) ---
+function resetSp500ProSettings() {
   if (!confirm('คืนค่าเริ่มต้นทั้งหมด? (ค่าที่เคยบันทึกจะถูกทับ เมื่อกดบันทึกครั้งถัดไป)')) return;
-  applyRolling6mSettings(DEFAULT_ROLLING_6M);
+  applySp500ProSettings(DEFAULT_SP500_PRO);
   jptToast('รีเซ็ตเป็นค่าเริ่มต้นแล้ว — อย่าลืมกดบันทึก');
 }
 
@@ -2265,15 +2282,10 @@ let state = {
   marketData: {},
   sortedDates: [],
   universeDaily: [],
-  equityCurve: [],              // portfolio equity = sum(all lots) + cash (always ~0)
+  equityCurve: [],
   monthlyReturns: [],
-  tradeLog: [],                 // kept for optimization grid compatibility
-  optResults: [],
-  // --- Rolling-specific ---
-  lots: [],                     // active lots (6 max at steady state). Each: {chainId, entryDate, entryIdx, initialCapital, isReinvest, stocks:{ticker:shares}, entryMonthKey}
-  closedLots: [],               // matured lots with realized P&L
-  externalCapitalTimeline: [],  // [{date, cumulativeDeployed}] — tracks total external $ deployed over time (caps at perLotCapital*6)
-  pendingSignal: null
+  tradeLog: [],
+  optResults: []
 };
 
 // --- DOM ELEMENTS ---
@@ -2292,8 +2304,7 @@ const el = {
   valRet: document.getElementById('val-ret'),
   valVol: document.getElementById('val-vol'),
   inputTopN: document.getElementById('topNInput'),
-  inputPerLotCap: document.getElementById('perLotCapitalInput'),
-  totalDeployedHint: document.getElementById('totalDeployedHint'),
+  inputInitCap: document.getElementById('initialCapitalInput'),
   inputStartYear: document.getElementById('startYearSelect'),
 
   // Opt
@@ -2309,8 +2320,9 @@ const el = {
 
 // --- AUTO LOAD DATA ---
 document.addEventListener('DOMContentLoaded', async () => {
-  // Load user's saved settings from cloud first (if logged in)
-  await loadRolling6mSettings();
+  // Load user's saved settings from cloud first (if logged in) — so the
+  // backtest below runs with the saved preferences, not the defaults.
+  await loadSp500ProSettings();
 
   if (CONFIG.cloudCsvUrl && CONFIG.cloudCsvUrl !== 'REPLACE_WITH_YOUR_RAW_CSV_URL') {
       loadDataFromCloud();
@@ -2372,13 +2384,7 @@ el.sliderMarket.addEventListener('input', updateMarketAnalyzer);
 el.sliderWeight.addEventListener('input', updateWeightsUI);
 el.sliderWeight.addEventListener('change', runBacktest);
 el.inputTopN.addEventListener('change', runBacktest);
-el.inputPerLotCap.addEventListener('change', runBacktest);
-el.inputPerLotCap.addEventListener('input', () => {
-  if (el.totalDeployedHint) {
-    const perLot = parseFloat(el.inputPerLotCap.value) || 0;
-    el.totalDeployedHint.textContent = '$' + (perLot * CONFIG.holdMonths).toLocaleString();
-  }
-});
+el.inputInitCap.addEventListener('change', runBacktest);
 el.inputStartYear.addEventListener('change', runBacktest);
 
 // --- TAB LOGIC ---
@@ -2468,8 +2474,8 @@ function processData(csv) {
     el.inputStartYear.appendChild(opt);
   });
 
-  // Respect saved setting first, else default 2015, else first year
-  const preferredYear = (_savedRolling6mCache && _savedRolling6mCache.startYear) || 2015;
+  // Respect saved setting if available, else default to 2015, else first year
+  const preferredYear = (_savedSp500ProCache && _savedSp500ProCache.startYear) || 2015;
   const matchYear = displayYears.find(y => parseInt(y) === preferredYear)
                  || displayYears.find(y => parseInt(y) === 2015)
                  || displayYears[0];
@@ -2477,16 +2483,17 @@ function processData(csv) {
 }
 
 function simulateStrategy(wRet, nStocks) {
-  // SENSITIVITY SIMULATOR — mirrors runRollingBacktest but with override weight + topN.
-  // Must produce identical CAGR/DD/Sharpe as main run when wRet=CONFIG.weightRet, nStocks=CONFIG.topN.
+  // SENSITIVITY SIMULATOR — MUST use identical logic as runBacktest so grid cell with
+  // (wRet=CONFIG.weightRet, nStocks=CONFIG.topN) returns same CAGR/DD/Sharpe as main run.
+  //
+  // Calls the SAME rankStocks() as runBacktest, just with overridden weight + topN.
 
   const startYear = parseInt(el.inputStartYear.value);
-  const perLot = parseFloat(el.inputPerLotCap.value) || CONFIG.perLotCapital;
   let startIndex = state.sortedDates.findIndex(d => d.startsWith(startYear.toString()));
   if (startIndex === -1) startIndex = 0;
 
-  let cash = perLot * CONFIG.holdMonths;
-  let lots = [];   // {entryMonthKey, stocks:{t:shares}}
+  let cash = CONFIG.initialCapital;
+  let holdings = {};
   let curve = [];
 
   let lastRebalancedMonth = -1;
@@ -2496,57 +2503,36 @@ function simulateStrategy(wRet, nStocks) {
     const dateObj = new Date(dateStr);
     const dayData = state.marketData[dateStr];
 
-    // Mark-to-market
-    let lotsVal = 0;
-    for (const lot of lots) {
-      for (const [t, shares] of Object.entries(lot.stocks)) {
-        const p = dayData[t] ? dayData[t].c : (i>0 ? state.marketData[state.sortedDates[i-1]][t]?.c : 0);
-        lotsVal += shares * (p || 0);
-      }
+    // Mark-to-market equity
+    let val = cash;
+    for (const [t, shares] of Object.entries(holdings)) {
+      const p = dayData[t] ? dayData[t].c : (i>0 ? state.marketData[state.sortedDates[i-1]][t]?.c : 0);
+      val += shares * (p || 0);
     }
-    curve.push(cash + lotsVal);
+    curve.push(val);
 
     const currentMonthKey = dateObj.getFullYear() * 12 + dateObj.getMonth();
+    const isRebalance = CONFIG.rebalanceMonths.includes(dateObj.getMonth());
     const isFirstWeek = dateObj.getDate() <= 7;
     const notAlreadyRebalanced = currentMonthKey !== lastRebalancedMonth;
 
-    if (isFirstWeek && notAlreadyRebalanced && i > CONFIG.lookbackWeeks) {
+    if (isRebalance && isFirstWeek && notAlreadyRebalanced && i > CONFIG.lookbackWeeks) {
       const signalIdx = i - 1;
       const startIdx = signalIdx - CONFIG.lookbackWeeks;
       if (startIdx >= 0) {
-        // Sell matured lots
-        let saleProceeds = 0;
-        const maturing = lots.filter(lot => (currentMonthKey - lot.entryMonthKey) >= CONFIG.holdMonths);
-        for (const mLot of maturing) {
-          for (const [t, shares] of Object.entries(mLot.stocks)) {
-            const p = dayData[t] ? dayData[t].c : (i>0 ? state.marketData[state.sortedDates[i-1]][t]?.c : 0);
-            saleProceeds += shares * (p || 0);
-          }
-        }
-        cash += saleProceeds;
-        lots = lots.filter(lot => (currentMonthKey - lot.entryMonthKey) < CONFIG.holdMonths);
-
-        // Determine new lot capital
-        let newCap;
-        if (saleProceeds > 0) newCap = saleProceeds;
-        else if (cash >= perLot) newCap = perLot;
-        else newCap = cash;
-        cash -= newCap;
-
-        // Rank (shared function, override weight)
+        // USE SHARED rankStocks (with override weight) — identical to runBacktest
         const candidates = rankStocks(signalIdx, startIdx, wRet);
         const selected = candidates.slice(0, nStocks);
-        const newLot = { entryMonthKey: currentMonthKey, stocks: {} };
-        const alloc = newCap / nStocks;
-        let deployed = 0;
-        for (const st of selected) {
-          if (dayData[st.ticker] && dayData[st.ticker].c > 0) {
-            newLot.stocks[st.ticker] = alloc / dayData[st.ticker].c;
-            deployed += alloc;
+
+        cash = val;
+        holdings = {};
+        const alloc = cash / nStocks;
+        selected.forEach(st => {
+          if (dayData[st.ticker]) {
+            holdings[st.ticker] = alloc / dayData[st.ticker].c;
+            cash -= alloc;
           }
-        }
-        cash += (newCap - deployed);
-        lots.push(newLot);
+        });
         lastRebalancedMonth = currentMonthKey;
       }
     }
@@ -2554,14 +2540,17 @@ function simulateStrategy(wRet, nStocks) {
 
   if (curve.length === 0) return { cagr: 0, dd: 0, sharpe: 0, win: 0 };
 
+  // === Metrics (calculated identically to runBacktest's calculateStats) ===
   const start = curve[0];
   const end = curve[curve.length - 1];
 
+  // CAGR: use actual calendar days between first/last dates (not curve.length * 7)
   const firstDate = new Date(state.sortedDates[startIndex]);
   const lastDate = new Date(state.sortedDates[state.sortedDates.length - 1]);
   const days = (lastDate - firstDate) / 86400000;
   const cagr = days > 0 ? Math.pow(end / start, 1 / (days / 365.25)) - 1 : 0;
 
+  // Max drawdown
   let peak = -Infinity;
   let maxDD = 0;
   curve.forEach(v => {
@@ -2570,6 +2559,8 @@ function simulateStrategy(wRet, nStocks) {
     if (d < maxDD) maxDD = d;
   });
 
+  // Sharpe: use MONTHLY returns (same as calculateStats / main dashboard)
+  // Aggregate curve into monthly end-of-month equity
   const monthlyByKey = {};
   curve.forEach((v, idx) => {
     const d = state.sortedDates[startIndex + idx];
@@ -2585,7 +2576,7 @@ function simulateStrategy(wRet, nStocks) {
   const avgM = monthlyRets.length > 0 ? monthlyRets.reduce((a,b) => a+b, 0) / monthlyRets.length : 0;
   const varM = monthlyRets.length > 0 ? monthlyRets.reduce((a,b) => a + Math.pow(b-avgM, 2), 0) / monthlyRets.length : 0;
   const stdM = Math.sqrt(varM);
-  const volAnn = stdM * Math.sqrt(12);
+  const volAnn = stdM * Math.sqrt(12);  // annualized vol
   const sharpe = volAnn === 0 ? 0 : (avgM * 12) / volAnn;
 
   const wins = monthlyRets.filter(r => r > 0).length;
@@ -2662,40 +2653,14 @@ function renderOptimizationTable() {
   });
 }
 
-function runBacktest() { return runRollingBacktest(); }  // alias so existing callers work
-
-function runRollingBacktest() {
-  // =============================================================
-  // ROLLING 6M MOMENTUM — LOGIC
-  //
-  // Entry: first business day of every month
-  // Ranking: identical to 6M Momentum (rankStocks with signalIdx = i-1, startIdx = i-1-lookbackWeeks)
-  // Hold: exactly `holdMonths` months per lot (no early exit)
-  // Ramp-up (months 1-6): draw `perLotCapital` from parked cash reserve → open new lot
-  // Steady-state (month 7+): matured lot sells → proceeds become next new lot's capital (compounding chain)
-  //
-  // Model: we "park" `perLotCapital × holdMonths` cash at t=0 (= $3,600 default).
-  // Equity curve = parked cash + live lot values + cash-from-sales (between sell and next buy).
-  // This gives a clean equity curve starting at $3,600 that all existing stats/render functions can consume.
-  // =============================================================
-
-  CONFIG.topN = parseInt(el.inputTopN.value) || 10;
-  CONFIG.perLotCapital = parseFloat(el.inputPerLotCap.value) || 600;
+function runBacktest() {
+  CONFIG.topN = parseInt(el.inputTopN.value) || 15;
+  CONFIG.initialCapital = parseFloat(el.inputInitCap.value) || 15000;
   CONFIG.startYear = parseInt(el.inputStartYear.value) || 2015;
 
-  // Derived: total external capital needed (backwards-compat for legacy chart/bar functions)
-  CONFIG.initialCapital = CONFIG.perLotCapital * CONFIG.holdMonths;
-
-  // Update hint (total deployed = perLot × holdMonths)
-  if (el.totalDeployedHint) {
-    el.totalDeployedHint.textContent = '$' + (CONFIG.perLotCapital * CONFIG.holdMonths).toLocaleString();
-  }
-
-  const totalReserve = CONFIG.perLotCapital * CONFIG.holdMonths;  // total external capital needed
-  let cash = totalReserve;  // parked cash reserve at t=0
-  state.lots = [];
-  state.closedLots = [];
-  state.externalCapitalTimeline = [];
+  let cash = CONFIG.initialCapital;
+  let holdings = {}; 
+  let currentEquity = CONFIG.initialCapital;
   state.equityCurve = [];
   state.tradeLog = [];
 
@@ -2714,130 +2679,49 @@ function runRollingBacktest() {
      }
   }
 
-  let lastRebalancedMonth = -1;
-  let monthsElapsedAtEntry = 0;  // counts first-business-days that have triggered an entry
+  let lastRebalancedMonth = -1;  // track to prevent duplicate rebalances in same month
 
   for (let i = startIndex; i < state.sortedDates.length; i++) {
     const dateStr = state.sortedDates[i];
     const dateObj = new Date(dateStr);
     const dayData = state.marketData[dateStr];
-
-    // === 1. Mark-to-market: sum all active lots + cash ===
-    let lotsVal = 0;
-    for (const lot of state.lots) {
-      for (const [t, shares] of Object.entries(lot.stocks)) {
-        const price = dayData[t] ? dayData[t].c : (i>0 ? state.marketData[state.sortedDates[i-1]][t]?.c : 0);
-        lotsVal += shares * (price || 0);
-      }
+    let holdingsVal = 0;
+    for (const [t, shares] of Object.entries(holdings)) {
+      const price = dayData[t] ? dayData[t].c : (i>0 ? state.marketData[state.sortedDates[i-1]][t]?.c : 0);
+      holdingsVal += shares * (price || 0);
     }
-    const currentEquity = cash + lotsVal;
+    currentEquity = cash + holdingsVal;
     state.equityCurve.push({ date: dateStr, equity: currentEquity });
 
-    // === 2. Check if first business day of month ===
     const currentMonthKey = dateObj.getFullYear() * 12 + dateObj.getMonth();
+    const isRebalanceMonth = CONFIG.rebalanceMonths.includes(dateObj.getMonth());
     const isFirstWeek = dateObj.getDate() <= 7;
     const notAlreadyRebalanced = currentMonthKey !== lastRebalancedMonth;
 
-    if (isFirstWeek && notAlreadyRebalanced && i > CONFIG.lookbackWeeks) {
+    // Ensure lookback works even if i is near start of filtered period 
+    // (i is index in FULL sortedDates, so lookback logic works fine)
+    if (isRebalanceMonth && isFirstWeek && notAlreadyRebalanced && i > CONFIG.lookbackWeeks) {
       const signalIdx = i - 1;
       const startIdx = signalIdx - CONFIG.lookbackWeeks;
       if (startIdx >= 0) {
-
-        // === 3. Sell any lot that has matured (age ≥ holdMonths) ===
-        let saleProceeds = 0;
-        const maturingLots = state.lots.filter(lot => (currentMonthKey - lot.entryMonthKey) >= CONFIG.holdMonths);
-        for (const mLot of maturingLots) {
-          let proceeds = 0;
-          for (const [t, shares] of Object.entries(mLot.stocks)) {
-            const price = dayData[t] ? dayData[t].c : (i>0 ? state.marketData[state.sortedDates[i-1]][t]?.c : 0);
-            proceeds += shares * (price || 0);
-          }
-          saleProceeds += proceeds;
-          state.closedLots.push({
-            chainId: mLot.chainId,
-            entryDate: mLot.entryDate,
-            exitDate: dateStr,
-            initialCapital: mLot.initialCapital,
-            exitValue: proceeds,
-            pl: proceeds - mLot.initialCapital,
-            returnPct: mLot.initialCapital > 0 ? (proceeds - mLot.initialCapital) / mLot.initialCapital : 0,
-            picks: mLot.picks || Object.keys(mLot.stocks),
-            ageMonths: currentMonthKey - mLot.entryMonthKey
-          });
-        }
-        cash += saleProceeds;
-        state.lots = state.lots.filter(lot => (currentMonthKey - lot.entryMonthKey) < CONFIG.holdMonths);
-
-        // === 4. Determine new lot capital ===
-        // Priority: use sale proceeds first (compounding). If no sale, draw fresh perLotCapital from cash reserve.
-        let newLotCapital;
-        let isReinvest = false;
-        if (saleProceeds > 0) {
-          // Compounding from matured lot(s)
-          newLotCapital = saleProceeds;
-          isReinvest = true;
-        } else if (cash >= CONFIG.perLotCapital) {
-          // Ramp-up: draw from parked cash reserve
-          newLotCapital = CONFIG.perLotCapital;
-          isReinvest = false;
-        } else {
-          // Fallback: use whatever cash is available (should rarely happen)
-          newLotCapital = cash;
-          isReinvest = false;
-        }
-        cash -= newLotCapital;  // decrement before allocating to lot
-
-        // === 5. Rank stocks (IDENTICAL to 6M Momentum — Rule 5 invariants preserved) ===
         const candidates = rankStocks(signalIdx, startIdx);
         const selected = candidates.slice(0, CONFIG.topN);
-
-        // === 6. Create new lot ===
-        const newLot = {
-          chainId: monthsElapsedAtEntry % CONFIG.holdMonths,  // 0..5
-          entryDate: dateStr,
-          entryIdx: i,
-          entryMonthKey: currentMonthKey,
-          initialCapital: newLotCapital,
-          isReinvest: isReinvest,
-          stocks: {},
-          picks: selected.map(s => s.ticker)
-        };
-        const alloc = newLotCapital / CONFIG.topN;
-        let deployed = 0;
-        for (const st of selected) {
-          if (dayData[st.ticker] && dayData[st.ticker].c > 0) {
-            newLot.stocks[st.ticker] = alloc / dayData[st.ticker].c;
-            deployed += alloc;
+        state.tradeLog.push({ date: dateStr, equity: currentEquity, stocks: selected.map(s => s.ticker) });
+        cash = currentEquity; holdings = {};
+        const alloc = cash / CONFIG.topN;
+        selected.forEach(st => {
+          if (dayData[st.ticker]) {
+            holdings[st.ticker] = alloc / dayData[st.ticker].c;
+            cash -= alloc;
           }
-        }
-        // Any leftover (tickers with no price) stays in cash
-        cash += (newLotCapital - deployed);
-
-        state.lots.push(newLot);
-
-        // === 7. Populate tradeLog for existing render/stats compatibility ===
-        state.tradeLog.push({
-          date: dateStr,
-          equity: currentEquity,
-          stocks: selected.map(s => s.ticker),
-          lotCapital: newLotCapital,
-          isReinvest: isReinvest,
-          chainId: newLot.chainId
         });
-
-        // === 8. Track external capital timeline ===
-        const externalDeployed = Math.min((monthsElapsedAtEntry + 1), CONFIG.holdMonths) * CONFIG.perLotCapital;
-        state.externalCapitalTimeline.push({ date: dateStr, cumulativeDeployed: externalDeployed });
-
-        lastRebalancedMonth = currentMonthKey;
-        monthsElapsedAtEntry++;
+        lastRebalancedMonth = currentMonthKey;  // prevent duplicate rebalance this month
       }
     }
   }
 
   // =========================================================
-  // PENDING SIGNAL — next first-business-day entry preview
-  // (Rolling enters every month, so "next rebalance" is always next month)
+  // PHASE 7 v2: PENDING SIGNAL — wrapped in try-catch to never break render
   // =========================================================
   state.pendingSignal = null;
   try {
@@ -2848,16 +2732,19 @@ function runRollingBacktest() {
       const lastMonth = lastDateObj.getMonth();
       const lastYear  = lastDateObj.getFullYear();
 
-      // Next rebalance = next month's first business day (rolling is monthly, so always next month)
-      let nextRebalMonth, nextRebalYear;
-      if (lastDateObj.getDate() <= 7 && currentMonthKeyOfLast(lastDateObj) !== lastRebalancedMonth) {
-        // Still in first week of this month and not yet rebalanced — next entry is THIS month
-        nextRebalMonth = lastMonth;
-        nextRebalYear = lastYear;
-      } else {
-        // First week passed or already rebalanced this month — next entry is NEXT month
-        nextRebalMonth = (lastMonth + 1) % 12;
-        nextRebalYear = lastMonth === 11 ? lastYear + 1 : lastYear;
+      const sortedRebalMonths = [...CONFIG.rebalanceMonths].sort((a,b) => a-b);
+      let nextRebalMonth = -1;
+      let nextRebalYear = lastYear;
+
+      for (const m of sortedRebalMonths) {
+        if (m > lastMonth || (m === lastMonth && lastDateObj.getDate() > 7)) {
+          nextRebalMonth = m;
+          break;
+        }
+      }
+      if (nextRebalMonth === -1) {
+        nextRebalMonth = sortedRebalMonths[0];
+        nextRebalYear = lastYear + 1;
       }
 
       const monthsThNames = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
@@ -2871,27 +2758,15 @@ function runRollingBacktest() {
         const candidates = rankStocks(signalIdx, startIdx);
         if (candidates && candidates.length > 0) {
           const picks = candidates.slice(0, CONFIG.topN);
-          // Next lot capital: if a lot will mature next month, use its projected value; else perLotCapital (ramp-up)
-          const nextMonthKey = nextRebalYear * 12 + nextRebalMonth;
-          const willMature = state.lots.find(lot => (nextMonthKey - lot.entryMonthKey) >= CONFIG.holdMonths);
-          let projectedCap = CONFIG.perLotCapital;
-          if (willMature) {
-            // Estimate: current lot value (MtM)
-            let mtm = 0;
-            const lastDayData = state.marketData[lastDate];
-            for (const [t, shares] of Object.entries(willMature.stocks)) {
-              const p = lastDayData[t] ? lastDayData[t].c : 0;
-              mtm += shares * p;
-            }
-            projectedCap = mtm;
-          }
+          const lastEquity = state.equityCurve.length > 0
+            ? state.equityCurve[state.equityCurve.length - 1].equity
+            : CONFIG.initialCapital;
 
           state.pendingSignal = {
             signalDate: lastDate,
             nextRebalLabel: nextRebalLabel,
             daysUntil: daysUntil,
-            capital: projectedCap,
-            isReinvest: !!willMature,
+            capital: lastEquity,
             picks: picks.map(p => ({
               ticker: p.ticker || '?',
               ret: typeof p.ret === 'number' ? p.ret : 0,
@@ -2909,12 +2784,6 @@ function runRollingBacktest() {
   calculateStats();
   renderAll();
 }
-
-// Helper used by pending signal logic
-function currentMonthKeyOfLast(dateObj) {
-  return dateObj.getFullYear() * 12 + dateObj.getMonth();
-}
-
 
 function rankStocks(endIdx, startIdx, weightRetOverride) {
   // SHARED ranking function — used by both runBacktest (main) AND simulateStrategy (sensitivity grid).
@@ -2994,25 +2863,22 @@ function calculateStats() {
     const vol = stdM * Math.sqrt(12);
     const sharpe = (avgM * 12) / vol;
 
-    // === ROLLING LOT RETURNS — Win rate + best/worst measured PER 6-MONTH LOT ===
-    // Each lot holds 6 months → its return = (exitValue - initialCapital) / initialCapital.
-    // This matches what the user cares about: "in each of my 6-month investments, did I profit?"
-    // Unrealized lots (still active) count using mark-to-market vs their initialCapital.
+    // === ROUND-BASED win rate + best/worst (Joon request) ===
+    // 6M strategy holds for 6 months per round — it makes sense to measure success
+    // per rebalance ROUND (was it profitable?), not per calendar month.
     const roundReturns = [];
-    const closed = state.closedLots || [];
-    closed.forEach(cl => {
-      if (cl.initialCapital > 0) roundReturns.push(cl.returnPct);
-    });
-    // Add unrealized open lots (mark-to-market)
-    const lastDayData = state.equityCurve.length > 0 ? state.marketData[state.equityCurve[state.equityCurve.length - 1].date] : {};
-    (state.lots || []).forEach(lot => {
-      let mtm = 0;
-      for (const [t, shares] of Object.entries(lot.stocks)) {
-        const p = lastDayData[t] ? lastDayData[t].c : 0;
-        mtm += shares * (p || 0);
-      }
-      if (lot.initialCapital > 0) roundReturns.push((mtm - lot.initialCapital) / lot.initialCapital);
-    });
+    const logs = state.tradeLog || [];
+    for (let k = 0; k < logs.length - 1; k++) {
+      const prev = logs[k].equity;
+      const curr = logs[k+1].equity;
+      if (prev > 0) roundReturns.push((curr - prev) / prev);
+    }
+    // If there's an open final round, compare to latest equity (unrealized)
+    if (logs.length > 0 && state.equityCurve.length > 0) {
+      const openEntry = logs[logs.length - 1].equity;
+      const latestEq = state.equityCurve[state.equityCurve.length - 1].equity;
+      if (openEntry > 0) roundReturns.push((latestEq - openEntry) / openEntry);
+    }
 
     const roundWins = roundReturns.filter(r => r > 0).length;
     const winRate = roundReturns.length > 0 ? roundWins / roundReturns.length : 0;
@@ -3087,7 +2953,7 @@ function calculateStats() {
     const endDateTh = formatDateThai(curve[curve.length-1].date);
     const totalRebalCount = state.tradeLog ? state.tradeLog.length : 0;
 
-    document.getElementById('rscPeriod').innerText = `${startDateTh} → ${endDateTh} · ${totalRebalCount} ล็อต · ${yearsStr} ปี`;
+    document.getElementById('rscPeriod').innerText = `${startDateTh} → ${endDateTh} · ${totalRebalCount} รอบ · ${yearsStr} ปี`;
 
     // === Backtest headline (pull-quote above summary card) ===
     const headlineYearsNum = Math.max(1, Math.round(years));
@@ -3105,7 +2971,7 @@ function calculateStats() {
 
     const avgMonthSign = monthlyAvgUsd >= 0 ? '+' : '-';
     document.getElementById('rscMonthlyAvg').innerHTML = 
-      `ตกเฉลี่ย <strong>${avgMonthSign}$${Math.abs(Math.round(monthlyAvgUsd)).toLocaleString()}</strong> / เดือน &middot; จากงบรวม <strong>$${Math.round(start).toLocaleString()}</strong> (ใส่เดือนละ $${Math.round(CONFIG.perLotCapital).toLocaleString()} × 6)`;
+      `ตกเฉลี่ย <strong>${avgMonthSign}$${Math.abs(Math.round(monthlyAvgUsd)).toLocaleString()}</strong> / เดือน &middot; จากงบตั้งต้น <strong>$${Math.round(start).toLocaleString()}</strong>`;
 
     // === 4 top metrics ===
     const annRoi = document.getElementById('rscAnnRoi');
@@ -3149,13 +3015,13 @@ function calculateStats() {
     const profitNarr = document.getElementById('rssProfit');
     if (profitNarr) {
       profitNarr.innerHTML = `<strong>กลยุทธ์ทำกำไรรวม ${(totalRet*100).toFixed(1)}%</strong> ในช่วง ${yearsStr} ปี ` +
-        `(เฉลี่ย ${fmt(cagr)}/ปี) &middot; ล็อตที่กำไรดีที่สุด <strong>${fmt(best)}</strong> &middot; ล็อตที่ขาดทุนมากที่สุด <strong>${fmt(worst)}</strong>`;
+        `(เฉลี่ย ${fmt(cagr)}/ปี) &middot; รอบที่ดีที่สุดกำไร <strong>${fmt(best)}</strong> &middot; รอบที่แย่ที่สุดขาดทุน <strong>${fmt(worst)}</strong>`;
     }
     const accNarr = document.getElementById('rssAccuracy');
     if (accNarr) {
-      accNarr.innerHTML = `Win Rate <strong>${fmt(winRate)}</strong> (${roundWins}/${roundReturns.length} ล็อตกำไร) &middot; ` +
+      accNarr.innerHTML = `Win Rate <strong>${fmt(winRate)}</strong> (${roundWins}/${roundReturns.length} รอบกำไร) &middot; ` +
         `Profit Factor <strong>${pf.toFixed(2)}</strong> — ทุก \$1 ที่ขาดทุน กลยุทธ์ทำเงินกลับมา \$${pf.toFixed(2)} &middot; ` +
-        `เข้าซื้อทั้งหมด <strong>${totalRebalCount}</strong> ล็อต (ถือล็อตละ 6 เดือน)`;
+        `ปรับพอร์ต <strong>${totalRebalCount}</strong> รอบตลอดการทดสอบ`;
     }
     const riskNarr = document.getElementById('rssRisk');
     if (riskNarr) {
@@ -3276,47 +3142,43 @@ function renderDistChart() {
   });
 }
 
-// === PHASE 6: YEARLY SUMMARY TABLE — grouped by lot EXIT year ===
+// === PHASE 6: YEARLY SUMMARY TABLE ===
 function renderYearly() {
   const tbody = document.getElementById('yearlyBody');
   const tfoot = document.getElementById('yearlyFoot');
   if (!tbody || !tfoot) return;
   tbody.innerHTML = ''; tfoot.innerHTML = '';
 
-  // Use closedLots (realized 6-month lots) — consistent with Win Rate in "ความแม่น" tab
-  const closedLots = state.closedLots || [];
-  if (closedLots.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text-muted);">ยังไม่มีล็อตที่ครบอายุ 6 เดือน</td></tr>';
-    return;
-  }
+  const logs = state.tradeLog || [];
+  if (logs.length < 2) return;
 
-  // Group closed lots by YEAR of exitDate (ปีที่ขายล็อต)
+  // Group closed rounds by YEAR (year of entry)
   const yearMap = {};
-  closedLots.forEach(cl => {
-    const year = cl.exitDate.substring(0, 4);
-    const pnl = cl.pl || 0;
-    const pct = (cl.returnPct || 0) * 100;
+  for (let i = 0; i < logs.length - 1; i++) {
+    const year = logs[i].date.substring(0, 4);
+    const pnl = logs[i+1].equity - logs[i].equity;
+    const pct = logs[i].equity > 0 ? (pnl / logs[i].equity) * 100 : 0;
     if (!yearMap[year]) yearMap[year] = [];
     yearMap[year].push({ pnl, pct });
-  });
+  }
 
-  let gLots = 0, gWins = 0, gPnl = 0;
+  let gRounds = 0, gWins = 0, gPnl = 0;
   const years = Object.keys(yearMap).sort();
 
   years.forEach(y => {
-    const lots = yearMap[y];
-    const wins = lots.filter(r => r.pct > 0).length;
-    const losses = lots.length - wins;
-    const winRate = lots.length > 0 ? (wins / lots.length * 100) : 0;
-    const pnl = lots.reduce((s, r) => s + r.pnl, 0);
-    const best = Math.max(...lots.map(r => r.pct));
-    const worst = Math.min(...lots.map(r => r.pct));
-    gLots += lots.length; gWins += wins; gPnl += pnl;
+    const rounds = yearMap[y];
+    const wins = rounds.filter(r => r.pct > 0).length;
+    const losses = rounds.length - wins;
+    const winRate = rounds.length > 0 ? (wins / rounds.length * 100) : 0;
+    const pnl = rounds.reduce((s, r) => s + r.pnl, 0);
+    const best = Math.max(...rounds.map(r => r.pct));
+    const worst = Math.min(...rounds.map(r => r.pct));
+    gRounds += rounds.length; gWins += wins; gPnl += pnl;
 
     const pnlCls = pnl >= 0 ? 'text-green' : 'text-red';
     tbody.innerHTML += `<tr>
       <td style="text-align:left;color:var(--gold-deep);font-weight:700;">${y}</td>
-      <td>${lots.length}</td>
+      <td>${rounds.length}</td>
       <td class="text-green">${wins}</td>
       <td class="text-red">${losses}</td>
       <td>${winRate.toFixed(0)}%</td>
@@ -3326,13 +3188,13 @@ function renderYearly() {
     </tr>`;
   });
 
-  const gWinRate = gLots > 0 ? (gWins / gLots * 100) : 0;
+  const gWinRate = gRounds > 0 ? (gWins / gRounds * 100) : 0;
   const gPnlCls = gPnl >= 0 ? 'text-green' : 'text-red';
   tfoot.innerHTML = `<tr style="font-weight:700;background:rgba(212,175,55,0.08);">
     <td style="text-align:left;">TOTAL</td>
-    <td>${gLots}</td>
+    <td>${gRounds}</td>
     <td class="text-green">${gWins}</td>
-    <td class="text-red">${gLots - gWins}</td>
+    <td class="text-red">${gRounds - gWins}</td>
     <td>${gWinRate.toFixed(0)}%</td>
     <td class="${gPnlCls}"><strong>$${Math.round(gPnl).toLocaleString()}</strong></td>
     <td>—</td><td>—</td>
@@ -3377,13 +3239,16 @@ function renderTradeLog() {
     }
     return false;
   };
-  // Planned exit for an open lot: first business day of (entryMonth + holdMonths)
-  const plannedExitForOpenLot = (entryDateStr) => {
+  // Planned exit for an open round: first trading day of the next rebalance month after entry
+  const plannedExitForOpenRound = (entryDateStr) => {
     const e = new Date(entryDateStr + 'T00:00:00Z');
     const eM = e.getUTCMonth(), eY = e.getUTCFullYear();
-    const exitMonthRaw = eM + CONFIG.holdMonths;
-    const xY = eY + Math.floor(exitMonthRaw / 12);
-    const xM = exitMonthRaw % 12;
+    const sortedRebal = [...CONFIG.rebalanceMonths].sort((a,b) => a-b);
+    let xM, xY;
+    for(const m of sortedRebal) {
+      if(m > eM) { xM = m; xY = eY; break; }
+    }
+    if(xM === undefined) { xM = sortedRebal[0]; xY = eY + 1; }
     const d = new Date(Date.UTC(xY, xM, 1));
     while(isUSMarketClosed(d)) d.setUTCDate(d.getUTCDate() + 1);
     return d.toISOString().substring(0, 10);
@@ -3435,56 +3300,44 @@ function renderTradeLog() {
     console.warn('Pending card render failed:', err);
   }
   const records = logs.map((log, i) => {
-    // === ROLLING: match this entry to closedLot (realized) or active lot (unrealized) ===
-    const closed = (state.closedLots || []).find(cl => cl.entryDate === log.date);
-    const active = (state.lots || []).find(lt => lt.entryDate === log.date);
-
-    let pnl = 0, pnlPct = 0, exitDate = null, stockRets = [], isOpen = false;
-    const lotCap = log.lotCapital || log.equity || 0;
-
-    if (closed) {
-      // REALIZED — 6 month hold completed
-      exitDate = closed.exitDate;
-      pnl = closed.pl;
-      pnlPct = (closed.returnPct || 0) * 100;
+    const isOpen = (i === logs.length - 1);  // last one = currently held
+    let pnl = 0, pnlPct = 0, exitDate = null, stockRets = [];
+    if (!isOpen) {
+      const nextLog = logs[i+1];
+      exitDate = nextLog.date;
+      // Per-stock returns from entry to exit using marketData
       stockRets = log.stocks.map(t => {
         const entryPrice = state.marketData[log.date]?.[t]?.c;
-        const exitPrice  = state.marketData[closed.exitDate]?.[t]?.c;
-        if (entryPrice && exitPrice) return { ticker: t, ret: (exitPrice - entryPrice) / entryPrice, entryPrice, latestPrice: exitPrice };
-        return { ticker: t, ret: 0 };
+        const exitPrice  = state.marketData[nextLog.date]?.[t]?.c;
+        if (entryPrice && exitPrice) {
+          const ret = (exitPrice - entryPrice) / entryPrice;
+          return { ticker: t, ret, entryPrice, latestPrice: exitPrice };
+        }
+        return { ticker: t, ret: 0, entryPrice: null, latestPrice: null };
       });
-    } else if (active) {
-      // UNREALIZED — still in 6-month holding window
-      isOpen = true;
+      // Equity-weighted P&L from equity delta (most accurate)
+      pnl = nextLog.equity - log.equity;
+      pnlPct = log.equity > 0 ? (pnl / log.equity) * 100 : 0;
+    } else {
+      // === OPEN POSITION: compute UNREALIZED P&L using latest close price ===
       const latestDate = state.sortedDates[state.sortedDates.length - 1];
-      exitDate = plannedExitForOpenLot(log.date);  // planned exit (first biz day of entryMonth + holdMonths, holiday-rolled)
+      exitDate = plannedExitForOpenRound(log.date);  // planned exit (next rebalance month, first trading day)
       stockRets = log.stocks.map(t => {
         const entryPrice = state.marketData[log.date]?.[t]?.c;
         const latestPrice = state.marketData[latestDate]?.[t]?.c;
-        if (entryPrice && latestPrice) return { ticker: t, ret: (latestPrice - entryPrice) / entryPrice, entryPrice, latestPrice };
+        if (entryPrice && latestPrice) {
+          const ret = (latestPrice - entryPrice) / entryPrice;
+          return { ticker: t, ret };
+        }
         return { ticker: t, ret: 0 };
       });
-      // Mark-to-market value of active lot
-      let mtm = 0;
-      const ldd = state.marketData[latestDate] || {};
-      for (const [t, shares] of Object.entries(active.stocks)) {
-        mtm += shares * ((ldd[t] && ldd[t].c) || 0);
-      }
-      pnl = mtm - active.initialCapital;
-      pnlPct = active.initialCapital > 0 ? (pnl / active.initialCapital) * 100 : 0;
-    } else {
-      // Rare: log entry without matching lot (shouldn't happen but safe fallback)
-      exitDate = log.date;
+      // Unrealized P&L: weighted by equal alloc (same as position entry)
+      const allocPerStock = log.stocks.length > 0 ? log.equity / log.stocks.length : 0;
+      pnl = stockRets.reduce((sum, s) => sum + (allocPerStock * s.ret), 0);
+      pnlPct = log.equity > 0 ? (pnl / log.equity) * 100 : 0;
     }
-
-    return {
-      date: log.date,
-      stocks: log.stocks,
-      equity: lotCap,                  // use lot capital, not full portfolio
-      isOpen, exitDate, pnl, pnlPct, stockRets,
-      isReinvest: log.isReinvest || false
-    };
-  }).reverse();  // newest first
+    return { ...log, isOpen, exitDate, pnl, pnlPct, stockRets };
+  }).reverse();  // display newest first
 
   if (records.length === 0) {
     container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">No trades yet — run a backtest first</div>';
@@ -3503,8 +3356,8 @@ function renderTradeLog() {
   if (totalPages > 1) {
     const pagBar = document.createElement('div');
     pagBar.className = 'trade-log-pagination';
-    const pendingMsg = state.pendingSignal ? ' · <span style="color:#2E9F5F;">+1 ล็อตรอ</span>' : '';
-    let pagHtml = '<div class="tlp-info"><strong>' + records.length + '</strong> ล็อต' + pendingMsg + ' · หน้า <strong>' + page + '</strong>/' + totalPages + '</div>';
+    const pendingMsg = state.pendingSignal ? ' · <span style="color:#2E9F5F;">+1 รอบรอ</span>' : '';
+    let pagHtml = '<div class="tlp-info"><strong>' + records.length + '</strong> รอบ' + pendingMsg + ' · หน้า <strong>' + page + '</strong>/' + totalPages + '</div>';
     pagHtml += `<button class="tlp-btn nav" onclick="gotoTradeLogPage(1)" ${page===1?'disabled':''}>«</button>`;
     pagHtml += `<button class="tlp-btn nav" onclick="gotoTradeLogPage(${page-1})" ${page===1?'disabled':''}>‹</button>`;
     const pages = [];
@@ -3530,17 +3383,15 @@ function renderTradeLog() {
     card.className = 'trade-card' + (isLatest && r.isOpen ? ' latest-signal' : '');
     const retCls = r.pnl >= 0 ? 'text-green' : 'text-red';
     const allocPerStock = r.stocks.length > 0 ? r.equity / r.stocks.length : 0;
-    const reinvestBadge = r.isReinvest
-      ? '<span style="display:inline-block;background:rgba(212,175,55,0.18);color:var(--gold-deep);border:1px solid rgba(212,175,55,0.4);padding:1px 7px;border-radius:4px;font-family:\'Cinzel\',\'Anuphan\',serif;font-size:0.58rem;font-weight:700;letter-spacing:1.2px;margin-left:6px;">REINVEST</span>'
-      : '<span style="display:inline-block;background:rgba(114,47,55,0.12);color:#722F37;border:1px solid rgba(114,47,55,0.35);padding:1px 7px;border-radius:4px;font-family:\'Cinzel\',\'Anuphan\',serif;font-size:0.58rem;font-weight:700;letter-spacing:1.2px;margin-left:6px;">FRESH</span>';
 
     let header = `<div class="trade-header"><div>
-      <div class="trade-date"><span class="trade-date-tag">Entry</span>${r.date}${r.exitDate ? '<span class="trade-date-arrow">→</span><span class="trade-date-tag">Exit</span><span class="exit-date">' + r.exitDate + '</span>' : ''}${r.isOpen ? ' <span class="open-badge">OPEN</span>' : ''}${reinvestBadge}</div>
-      <div class="trade-summary">ล็อตนี้ <strong>${r.stocks.length} ตัว</strong> · ทุน <strong>$${Math.round(r.equity).toLocaleString()}</strong>`;
+      <div class="trade-date"><span class="trade-date-tag">Entry</span>${r.date}${r.exitDate ? '<span class="trade-date-arrow">→</span><span class="trade-date-tag">Exit</span><span class="exit-date">' + r.exitDate + '</span>' : ''}${r.isOpen ? ' <span class="open-badge">OPEN</span>' : ''}</div>
+      <div class="trade-summary">ซื้อรวม <strong>${r.stocks.length} ตัว</strong> · ใช้เงิน <strong>$${Math.round(r.equity).toLocaleString()}</strong>`;
     if (!r.isOpen) {
       header += ` · P&L: <span class="${retCls}"><strong>$${Math.round(r.pnl).toLocaleString()}</strong> (${r.pnlPct>=0?'+':''}${r.pnlPct.toFixed(2)}%)</span>`;
     } else {
-      header += ` · <span style="color:var(--gold-deep);font-weight:600;">ยังถืออยู่:</span> <span class="${retCls}"><strong>$${Math.round(r.pnl).toLocaleString()}</strong> (${r.pnlPct>=0?'+':''}${r.pnlPct.toFixed(2)}%)</span>`;
+      // OPEN position: show unrealized P&L with "ล่าสุด" label
+      header += ` · <span style="color:var(--gold-deep);font-weight:600;">ล่าสุด:</span> <span class="${retCls}"><strong>$${Math.round(r.pnl).toLocaleString()}</strong> (${r.pnlPct>=0?'+':''}${r.pnlPct.toFixed(2)}%)</span>`;
     }
     header += `</div></div></div>`;
 
