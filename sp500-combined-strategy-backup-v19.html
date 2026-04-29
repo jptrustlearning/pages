@@ -1706,7 +1706,7 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
     <!-- Chart Tabs -->
     <div class="card tabs-container">
       <div class="tabs-header">
-        <button class="tab-btn active" onclick="switchTab(event,'tab-equity')">EQUITY CURVE</button>
+        <button class="tab-btn active" onclick="switchTab(event,'tab-equity')">CUMULATIVE P&L</button>
         <button class="tab-btn" onclick="switchTab(event,'tab-rounds')">ROUND RETURNS</button>
         <button class="tab-btn" onclick="switchTab(event,'tab-dist')">DISTRIBUTION</button>
         <button class="tab-btn" onclick="switchTab(event,'tab-dd')">DRAWDOWN</button>
@@ -3864,12 +3864,19 @@ function renderEquityChart() {
   Chart.defaults.font.family = 'Sarabun, Anuphan, sans-serif';
   Chart.defaults.color = '#7A6F62';
 
-  if(!state.equityCurve || state.equityCurve.length === 0) return;
-
-  const labels = state.equityCurve.map(e => e.date);
-  const combinedData = state.equityCurve.map(e => e.equity);
-  const momData = state.equityCurve.map(e => e.momEquity);
-  const dhData = state.equityCurve.map(e => e.dhEquity);
+  // Separate Mom and DH cumulative
+  let momCumul = 0, dhCumul = 0;
+  const momData = [], dhData = [], combinedData = [];
+  const labels = [];
+  const closed = state.allResults.filter(r => !r.isOpen).sort((a,b) => (a.exitDate||'').localeCompare(b.exitDate||''));
+  closed.forEach(r => {
+    if(r.type === 'mom') momCumul += r.pnl;
+    else dhCumul += r.pnl;
+    labels.push(r.exitDate);
+    momData.push(momCumul);
+    dhData.push(dhCumul);
+    combinedData.push(momCumul + dhCumul);
+  });
 
   const grad = ctx.createLinearGradient(0,0,0,400);
   grad.addColorStop(0,'rgba(91,196,142,0.3)');
@@ -3880,28 +3887,15 @@ function renderEquityChart() {
     data:{
       labels,
       datasets:[
-        { label:'Combined', data:combinedData, borderColor:'#5BC48E', backgroundColor:grad, borderWidth:2.5, pointRadius:0, fill:true, tension:0.2 },
-        { label:'Momentum', data:momData, borderColor:'#D4AF37', borderWidth:1.5, pointRadius:0, fill:false, tension:0.2, borderDash:[5,3] },
-        { label:'Dark Horse', data:dhData, borderColor:'#C85A4A', borderWidth:1.5, pointRadius:0, fill:false, tension:0.2, borderDash:[3,3] }
+        { label:'Combined', data:combinedData, borderColor:'#5BC48E', backgroundColor:grad, borderWidth:2.5, pointRadius:0, fill:true, tension:0.3 },
+        { label:'Momentum', data:momData, borderColor:'#D4AF37', borderWidth:1.5, pointRadius:0, fill:false, tension:0.3, borderDash:[5,3] },
+        { label:'Dark Horse', data:dhData, borderColor:'#C85A4A', borderWidth:1.5, pointRadius:0, fill:false, tension:0.3, borderDash:[3,3] }
       ]
     },
     options:{
       responsive:true, maintainAspectRatio:false,
-      interaction:{ mode:'index', intersect:false },
-      plugins:{
-        legend:{ display:true, labels:{ usePointStyle:true, pointStyle:'line', padding:20 } },
-        tooltip:{
-          mode:'index',
-          intersect:false,
-          callbacks:{
-            label:c => c.dataset.label + ': $' + (Math.abs(c.parsed.y) >= 1000 ? (c.parsed.y/1000).toFixed(2) + 'k' : c.parsed.y.toFixed(2))
-          }
-        }
-      },
-      scales:{
-        x:{ grid:{ display:false }, ticks:{ maxTicksLimit:8, maxRotation:0, autoSkip:true } },
-        y:{ grid:{ color:'rgba(212,175,55,0.08)' }, ticks:{ callback:v => '$' + (Math.abs(v) >= 1000 ? (v/1000).toFixed(1) + 'k' : v) } }
-      }
+      plugins:{ legend:{display:true,labels:{usePointStyle:true,pointStyle:'line',padding:20}}, tooltip:{mode:'index',intersect:false,callbacks:{label:c=>c.dataset.label+': $'+Math.round(c.parsed.y).toLocaleString()}} },
+      scales:{ x:{grid:{display:false},ticks:{maxTicksLimit:8,maxRotation:0}}, y:{grid:{color:'rgba(212,175,55,0.08)'},ticks:{callback:v=>'$'+(Math.abs(v)>=1000?(v/1000).toFixed(1)+'k':v)}} }
     }
   });
 }
@@ -3959,19 +3953,11 @@ function renderDistChart() {
 // (mirrors Rolling 6M's equityCurve mechanic but with NO COMPOUNDING — each new lot draws fixed
 // CONFIG.capital from cash; proceeds accumulate as realized P&L in the cash balance).
 //
-// Each point produces 3 values:
-//   equity     = capitalDeployed + Σ all positions' contributions (Mom + DH combined)
-//   momEquity  = capitalDeployed + Σ Mom positions' contributions only
-//   dhEquity   = capitalDeployed + Σ DH positions' contributions only
-//
-// Mom/DH lines share the same baseline as Combined; their delta-from-baseline shows each
-// strategy's standalone P&L contribution (Mom + DH lines were previously rendered as cumulative
-// P&L starting at 0; now lifted up to start at $capitalDeployed for the EQUITY CURVE chart).
-//
-// Position contribution at day d:
-//   d < r.entryDate                   → 0  (not yet started)
-//   d ≥ effExitDate (SL or lot exit)  → realized = shares × (exitPrice − entryPrice)
-//   entry ≤ d < effExitDate (or open) → unrealized = shares × (close[d] − entryPrice)
+// Equity[d] = capitalDeployed + Σ position contributions
+//   position contribution at d:
+//     d < r.entryDate                   → 0  (not yet started)
+//     d ≥ effExitDate (SL or lot exit)  → realized = shares × (exitPrice − entryPrice)
+//     entry ≤ d < effExitDate (or open) → unrealized = shares × (close[d] − entryPrice)
 function buildDailyEquityCurve() {
   state.equityCurve = [];
   if(state.allResults.length === 0) return;
@@ -3987,12 +3973,9 @@ function buildDailyEquityCurve() {
   for(let i = startIndex; i < state.sortedDates.length; i++) {
     const d = state.sortedDates[i];
     let totalContribution = 0;
-    let momContribution = 0;
-    let dhContribution = 0;
 
     for(const r of state.allResults) {
       if(r.entryDate > d) continue;
-      let rContrib = 0;
       for(const s of r.stocks) {
         if(s.shares === undefined || s.shares <= 0) continue;
         // Determine effective exit date for this position
@@ -4003,25 +3986,17 @@ function buildDailyEquityCurve() {
 
         if(effExitDate && d >= effExitDate) {
           // Realized
-          rContrib += s.shares * (s.exitPrice - s.entryPrice);
+          totalContribution += s.shares * (s.exitPrice - s.entryPrice);
         } else {
           // Unrealized — mark-to-market
           const px = state.dailyData[d]?.[s.ticker]?.c;
           if(px === undefined) continue;  // ticker not in universe today; contribution stays 0
-          rContrib += s.shares * (px - s.entryPrice);
+          totalContribution += s.shares * (px - s.entryPrice);
         }
       }
-      totalContribution += rContrib;
-      if(r.type === 'mom') momContribution += rContrib;
-      else if(r.type === 'dh') dhContribution += rContrib;
     }
 
-    state.equityCurve.push({
-      date: d,
-      equity: capitalDeployed + totalContribution,
-      momEquity: capitalDeployed + momContribution,
-      dhEquity: capitalDeployed + dhContribution
-    });
+    state.equityCurve.push({ date: d, equity: capitalDeployed + totalContribution });
   }
 }
 
