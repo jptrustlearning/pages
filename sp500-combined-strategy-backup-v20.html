@@ -3959,27 +3959,16 @@ function renderDistChart() {
 // (mirrors Rolling 6M's equityCurve mechanic but with NO COMPOUNDING — each new lot draws fixed
 // CONFIG.capital from cash; proceeds accumulate as realized P&L in the cash balance).
 //
-// Each point produces 3 values that visually sum (Mom + DH = Combined):
+// Each point produces 3 values:
+//   equity     = capitalDeployed + Σ all positions' contributions (Mom + DH combined)
+//   momEquity  = capitalDeployed + Σ Mom positions' contributions only
+//   dhEquity   = capitalDeployed + Σ DH positions' contributions only
 //
-//   SPLIT mode (each strategy has its own pool):
-//     combinedBaseline = (momHoldWeeks + dhHoldWeeks) × CONFIG.capital   e.g. $800 = 4w + 4w × $100
-//     momBaseline      = momHoldWeeks × CONFIG.capital                   e.g. $400
-//     dhBaseline       = dhHoldWeeks  × CONFIG.capital                   e.g. $400
+// Mom/DH lines share the same baseline as Combined; their delta-from-baseline shows each
+// strategy's standalone P&L contribution (Mom + DH lines were previously rendered as cumulative
+// P&L starting at 0; now lifted up to start at $capitalDeployed for the EQUITY CURVE chart).
 //
-//   DYNAMIC mode (Mom & DH share one pool, regime-weighted split per signal week):
-//     combinedBaseline = max(momHoldWeeks, dhHoldWeeks) × CONFIG.capital e.g. $400
-//     momBaseline      = combinedBaseline × actual Mom proportion        e.g. $40 if bull-regime-heavy
-//     dhBaseline       = combinedBaseline × actual DH proportion         e.g. $360
-//   (proportions derived empirically from r.capital sums — reflects regime mix in simulation,
-//    not just the bull/sideways setting in isolation. Mom+DH proportions = 100% by construction.)
-//
-// Per-day formulas:
-//   equity[d]    = combinedBaseline + Σ (Mom + DH) contributions at d
-//   momEquity[d] = momBaseline      + Σ Mom-only contributions at d
-//   dhEquity[d]  = dhBaseline       + Σ DH-only contributions at d
-//   → momEquity + dhEquity = equity  (visually sums) ✓
-//
-// Position contribution at day d (same for all 3 series):
+// Position contribution at day d:
 //   d < r.entryDate                   → 0  (not yet started)
 //   d ≥ effExitDate (SL or lot exit)  → realized = shares × (exitPrice − entryPrice)
 //   entry ≤ d < effExitDate (or open) → unrealized = shares × (close[d] − entryPrice)
@@ -3987,22 +3976,9 @@ function buildDailyEquityCurve() {
   state.equityCurve = [];
   if(state.allResults.length === 0) return;
 
-  // Compute baselines (3 numbers — apply per-mode logic)
-  let combinedBaseline, momBaseline, dhBaseline;
-  if(CONFIG.allocMode === 'split') {
-    combinedBaseline = (CONFIG.momHoldWeeks + CONFIG.dhHoldWeeks) * CONFIG.capital;
-    momBaseline = CONFIG.momHoldWeeks * CONFIG.capital;
-    dhBaseline = CONFIG.dhHoldWeeks  * CONFIG.capital;
-  } else {
-    combinedBaseline = Math.max(CONFIG.momHoldWeeks, CONFIG.dhHoldWeeks) * CONFIG.capital;
-    // Empirical proportion from actual capital deployment in the simulation
-    const totalMomCap = state.allResults.filter(r => r.type === 'mom').reduce((s,r) => s + r.capital, 0);
-    const totalDhCap  = state.allResults.filter(r => r.type === 'dh' ).reduce((s,r) => s + r.capital, 0);
-    const totalCap = totalMomCap + totalDhCap;
-    const momProp = totalCap > 0 ? totalMomCap / totalCap : 0.5;
-    momBaseline = combinedBaseline * momProp;
-    dhBaseline  = combinedBaseline * (1 - momProp);
-  }
+  const capitalDeployed = CONFIG.allocMode === 'split'
+    ? (CONFIG.momHoldWeeks + CONFIG.dhHoldWeeks) * CONFIG.capital
+    : Math.max(CONFIG.momHoldWeeks, CONFIG.dhHoldWeeks) * CONFIG.capital;
 
   // Match 6M / Rolling 6M: start curve at first trading day of CONFIG.startYear
   let startIndex = state.sortedDates.findIndex(d => parseInt(d.substring(0,4)) >= CONFIG.startYear);
@@ -4042,9 +4018,9 @@ function buildDailyEquityCurve() {
 
     state.equityCurve.push({
       date: d,
-      equity:    combinedBaseline + totalContribution,
-      momEquity: momBaseline + momContribution,
-      dhEquity:  dhBaseline + dhContribution
+      equity: capitalDeployed + totalContribution,
+      momEquity: capitalDeployed + momContribution,
+      dhEquity: capitalDeployed + dhContribution
     });
   }
 }
