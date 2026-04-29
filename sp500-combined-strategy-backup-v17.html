@@ -1709,14 +1709,10 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
         <button class="tab-btn active" onclick="switchTab(event,'tab-equity')">CUMULATIVE P&L</button>
         <button class="tab-btn" onclick="switchTab(event,'tab-rounds')">ROUND RETURNS</button>
         <button class="tab-btn" onclick="switchTab(event,'tab-dist')">DISTRIBUTION</button>
-        <button class="tab-btn" onclick="switchTab(event,'tab-dd')">DRAWDOWN</button>
-        <button class="tab-btn" onclick="switchTab(event,'tab-vs')">VS S&P500</button>
       </div>
       <div id="tab-equity" class="tab-content active" style="height:400px;"><canvas id="equityChart"></canvas></div>
       <div id="tab-rounds" class="tab-content" style="height:400px;"><canvas id="roundsChart"></canvas></div>
       <div id="tab-dist" class="tab-content" style="height:400px;"><canvas id="distChart"></canvas></div>
-      <div id="tab-dd" class="tab-content" style="height:400px;"><canvas id="ddChart"></canvas></div>
-      <div id="tab-vs" class="tab-content" style="height:400px;"><canvas id="vsChart"></canvas></div>
     </div>
 
     <!-- Bottom Tabs -->
@@ -3847,8 +3843,6 @@ function renderAll() {
   renderEquityChart();
   renderRoundsChart();
   renderDistChart();
-  renderDDChart();
-  renderVsChart();
   renderHeatmap();
   renderTradeLog();
   renderYearly();
@@ -3941,151 +3935,6 @@ function renderDistChart() {
       responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false}},
       scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(212,175,55,0.08)'}}}
-    }
-  });
-}
-
-function renderDDChart() {
-  const ctx = document.getElementById('ddChart').getContext('2d');
-  if(charts.dd) charts.dd.destroy();
-
-  // Build sorted equity curve from closed rounds (mirrors renderEquityChart sort)
-  const closed = state.allResults
-    .filter(r => !r.isOpen)
-    .sort((a,b) => (a.exitDate||'').localeCompare(b.exitDate||''));
-  if(closed.length === 0) return;
-
-  // Capital deployed at any time (max simultaneous capital) — used as equity baseline
-  const capitalDeployed = CONFIG.allocMode === 'split'
-    ? (CONFIG.momHoldWeeks + CONFIG.dhHoldWeeks) * CONFIG.capital
-    : Math.max(CONFIG.momHoldWeeks, CONFIG.dhHoldWeeks) * CONFIG.capital;
-
-  let cumulPnl = 0;
-  let peak = capitalDeployed;
-  const labels = [], dds = [];
-  closed.forEach(r => {
-    cumulPnl += r.pnl;
-    const equity = capitalDeployed + cumulPnl;
-    if(equity > peak) peak = equity;
-    const dd = ((equity - peak) / peak) * 100;
-    labels.push(r.exitDate);
-    dds.push(dd);
-  });
-
-  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-  gradient.addColorStop(0, 'rgba(212,175,55, 0.1)');
-  gradient.addColorStop(0.5, 'rgba(251, 146, 60, 0.6)');
-  gradient.addColorStop(1, 'rgba(185, 28, 28, 0.9)');
-
-  charts.dd = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [{
-        label: 'Drawdown',
-        data: dds,
-        borderColor: '#D95F5F',
-        backgroundColor: gradient,
-        borderWidth: 2,
-        pointRadius: 0,
-        pointHoverRadius: 6,
-        pointBackgroundColor: '#D95F5F',
-        pointBorderColor: '#fff',
-        fill: true,
-        tension: 0.2
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          enabled: true,
-          backgroundColor: 'rgba(30, 41, 59, 0.9)',
-          titleColor: '#fff',
-          bodyColor: '#D95F5F',
-          borderColor: 'rgba(217,95,95, 0.3)',
-          borderWidth: 1,
-          displayColors: false,
-          callbacks: { label: c => 'Drawdown: ' + c.parsed.y.toFixed(2) + '%' }
-        }
-      },
-      scales: {
-        x: { grid: { display: false }, ticks: { maxTicksLimit: 8, maxRotation: 0, autoSkip: true } },
-        y: { grid: { color: 'rgba(212,175,55,0.2)' }, ticks: { callback: v => v + '%' } }
-      }
-    }
-  });
-}
-
-function renderVsChart() {
-  const ctx = document.getElementById('vsChart').getContext('2d');
-  if(charts.vs) charts.vs.destroy();
-
-  const closed = state.allResults
-    .filter(r => !r.isOpen)
-    .sort((a,b) => (a.exitDate||'').localeCompare(b.exitDate||''));
-  if(closed.length === 0) return;
-
-  // Capital deployed = baseline for strategy yearly return %
-  const capitalDeployed = CONFIG.allocMode === 'split'
-    ? (CONFIG.momHoldWeeks + CONFIG.dhHoldWeeks) * CONFIG.capital
-    : Math.max(CONFIG.momHoldWeeks, CONFIG.dhHoldWeeks) * CONFIG.capital;
-
-  // Group P&L by year (year-isolated, not compounded — Weekly reuses same capital each round)
-  const yearPnl = {};
-  closed.forEach(r => {
-    const yr = (r.exitDate || r.entryDate || '').substring(0,4);
-    if(!yr) return;
-    yearPnl[yr] = (yearPnl[yr] || 0) + r.pnl;
-  });
-  const years = Object.keys(yearPnl).sort();
-  const strategyRets = years.map(y => (yearPnl[y] / capitalDeployed) * 100);
-
-  // S&P 500 yearly returns from SPY (or market proxy fallback)
-  const spyWk = (weeklyCache['SPY'] && weeklyCache['SPY'].length >= 50)
-    ? weeklyCache['SPY']
-    : weeklyCache['_MARKET_'];
-  const marketRets = years.map(y => {
-    if(!spyWk || spyWk.length === 0) return 0;
-    const inYr = spyWk.filter(p => p.date.startsWith(y));
-    if(inYr.length < 2) return 0;
-    const startMkt = inYr[0].close;
-    const endMkt = inYr[inYr.length - 1].close;
-    return ((endMkt - startMkt) / startMkt) * 100;
-  });
-
-  charts.vs = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: years,
-      datasets: [
-        { label: 'Strategy', data: strategyRets, backgroundColor: strategyRets.map(v => v >= 0 ? '#5BC48E' : '#D95F5F'), borderRadius: 3 },
-        { label: 'S&P 500', data: marketRets, backgroundColor: '#722F37', borderRadius: 3 }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'top', labels: { color: '#7A6F62', font: { family: 'Anuphan, Inter, sans-serif' } } },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              let label = context.dataset.label || '';
-              if(label) label += ': ';
-              if(context.parsed.y !== null) label += context.parsed.y.toFixed(1) + '%';
-              return label;
-            }
-          }
-        }
-      },
-      scales: {
-        x: { grid: { display: false } },
-        y: { grid: { color: 'rgba(212,175,55,0.2)' }, ticks: { callback: v => v + '%' } }
-      }
     }
   });
 }
