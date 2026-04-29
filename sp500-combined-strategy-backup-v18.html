@@ -2402,7 +2402,6 @@ let state = {
   fridayForEntry: {}, entryToDateIdx: {},
   weeklyROCRanks: {},
   allResults: [], cumulativePnl: [], skippedDates: [],
-  equityCurve: [],
 };
 let weeklyCache = {};
 let dateToWeekKey = {};
@@ -3257,7 +3256,7 @@ function runCombinedBacktest() {
             const pnl = shares * (exitPrice - ep);
             const ret = (exitPrice - ep) / ep;
             roundPnl += pnl;
-            stockReturns.push({ ticker:stock.ticker, ret, pnl, entryPrice:ep, exitPrice, hitSL, shares, slExitDate: hitSL ? slResult.exitDate : null });
+            stockReturns.push({ ticker:stock.ticker, ret, pnl, entryPrice:ep, exitPrice, hitSL });
           }
         }
 
@@ -3307,7 +3306,7 @@ function runCombinedBacktest() {
             const pnl = shares * (exitPrice - ep);
             const ret = (exitPrice - ep) / ep;
             roundPnl += pnl;
-            stockReturns.push({ ticker:dh.ticker, ret, pnl, entryPrice:ep, exitPrice, hitSL, isConfirmed, volRatio:dh.volRatio, shares, slExitDate: hitSL ? slResult.exitDate : null });
+            stockReturns.push({ ticker:dh.ticker, ret, pnl, entryPrice:ep, exitPrice, hitSL, isConfirmed, volRatio:dh.volRatio });
           }
         }
 
@@ -3383,9 +3382,6 @@ function runCombinedBacktest() {
 
   // Sort cumulative PnL by date
   state.cumulativePnl.sort((a,b) => a.date.localeCompare(b.date));
-
-  // Build daily equity curve (post-hoc) — used by DRAWDOWN tab + future analytics
-  buildDailyEquityCurve();
 
   console.timeEnd('combined-backtest');
   updateKPIs();
@@ -3949,68 +3945,31 @@ function renderDistChart() {
   });
 }
 
-// Build daily equity curve from state.allResults — single-portfolio model with overlapping lots
-// (mirrors Rolling 6M's equityCurve mechanic but with NO COMPOUNDING — each new lot draws fixed
-// CONFIG.capital from cash; proceeds accumulate as realized P&L in the cash balance).
-//
-// Equity[d] = capitalDeployed + Σ position contributions
-//   position contribution at d:
-//     d < r.entryDate                   → 0  (not yet started)
-//     d ≥ effExitDate (SL or lot exit)  → realized = shares × (exitPrice − entryPrice)
-//     entry ≤ d < effExitDate (or open) → unrealized = shares × (close[d] − entryPrice)
-function buildDailyEquityCurve() {
-  state.equityCurve = [];
-  if(state.allResults.length === 0) return;
-
-  const capitalDeployed = CONFIG.allocMode === 'split'
-    ? (CONFIG.momHoldWeeks + CONFIG.dhHoldWeeks) * CONFIG.capital
-    : Math.max(CONFIG.momHoldWeeks, CONFIG.dhHoldWeeks) * CONFIG.capital;
-
-  // Match 6M / Rolling 6M: start curve at first trading day of CONFIG.startYear
-  let startIndex = state.sortedDates.findIndex(d => parseInt(d.substring(0,4)) >= CONFIG.startYear);
-  if(startIndex < 0) startIndex = 0;
-
-  for(let i = startIndex; i < state.sortedDates.length; i++) {
-    const d = state.sortedDates[i];
-    let totalContribution = 0;
-
-    for(const r of state.allResults) {
-      if(r.entryDate > d) continue;
-      for(const s of r.stocks) {
-        if(s.shares === undefined || s.shares <= 0) continue;
-        // Determine effective exit date for this position
-        let effExitDate;
-        if(s.hitSL && s.slExitDate) effExitDate = s.slExitDate;
-        else if(!r.isOpen) effExitDate = r.exitDate;
-        else effExitDate = null;  // open round, never realized until end of data
-
-        if(effExitDate && d >= effExitDate) {
-          // Realized
-          totalContribution += s.shares * (s.exitPrice - s.entryPrice);
-        } else {
-          // Unrealized — mark-to-market
-          const px = state.dailyData[d]?.[s.ticker]?.c;
-          if(px === undefined) continue;  // ticker not in universe today; contribution stays 0
-          totalContribution += s.shares * (px - s.entryPrice);
-        }
-      }
-    }
-
-    state.equityCurve.push({ date: d, equity: capitalDeployed + totalContribution });
-  }
-}
-
 function renderDDChart() {
   const ctx = document.getElementById('ddChart').getContext('2d');
   if(charts.dd) charts.dd.destroy();
 
-  if(!state.equityCurve || state.equityCurve.length === 0) return;
+  // Build sorted equity curve from closed rounds (mirrors renderEquityChart sort)
+  const closed = state.allResults
+    .filter(r => !r.isOpen)
+    .sort((a,b) => (a.exitDate||'').localeCompare(b.exitDate||''));
+  if(closed.length === 0) return;
 
-  // Drawdown from running peak — same formula as 6M / Rolling 6M
-  let peak = -Infinity;
-  const dds = state.equityCurve.map(e => {
-    if(e.equity > peak) peak = e.equity;
-    return ((e.equity - peak) / peak) * 100;
+  // Capital deployed at any time (max simultaneous capital) — used as equity baseline
+  const capitalDeployed = CONFIG.allocMode === 'split'
+    ? (CONFIG.momHoldWeeks + CONFIG.dhHoldWeeks) * CONFIG.capital
+    : Math.max(CONFIG.momHoldWeeks, CONFIG.dhHoldWeeks) * CONFIG.capital;
+
+  let cumulPnl = 0;
+  let peak = capitalDeployed;
+  const labels = [], dds = [];
+  closed.forEach(r => {
+    cumulPnl += r.pnl;
+    const equity = capitalDeployed + cumulPnl;
+    if(equity > peak) peak = equity;
+    const dd = ((equity - peak) / peak) * 100;
+    labels.push(r.exitDate);
+    dds.push(dd);
   });
 
   const gradient = ctx.createLinearGradient(0, 0, 0, 400);
@@ -4021,7 +3980,7 @@ function renderDDChart() {
   charts.dd = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: state.equityCurve.map(e => e.date),
+      labels,
       datasets: [{
         label: 'Drawdown',
         data: dds,
