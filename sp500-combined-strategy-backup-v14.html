@@ -4122,35 +4122,10 @@ function renderTradeLog() {
     const retCls = totalPnl >= 0 ? 'text-green' : 'text-red';
     const retPct = totalCapital > 0 ? (totalPnl / totalCapital) * 100 : 0;
 
-    // Compute display exit date — actual for closed, planned (holiday-aware Monday) for open
-    const isUSMarketClosed = (d) => {
-      const y=d.getUTCFullYear(), m=d.getUTCMonth(), dd=d.getUTCDate(), wd=d.getUTCDay();
-      if(wd === 0 || wd === 6) return true; // weekend
-      // Floating Mondays
-      if(wd === 1) {
-        if(m === 0 && dd >= 15 && dd <= 21) return true; // MLK Day (3rd Mon Jan)
-        if(m === 1 && dd >= 15 && dd <= 21) return true; // Presidents Day (3rd Mon Feb)
-        if(m === 4 && dd >= 25 && dd <= 31) return true; // Memorial Day (last Mon May)
-        if(m === 8 && dd >= 1 && dd <= 7)   return true; // Labor Day (1st Mon Sep)
-      }
-      // Thanksgiving = 4th Thu Nov
-      if(wd === 4 && m === 10 && dd >= 22 && dd <= 28) return true;
-      // Fixed dates with Sat→Fri / Sun→Mon observance
-      const fixed = [[0,1],[5,19],[6,4],[11,25]]; // NewYear, Juneteenth, Independence, Christmas
-      for(const [fm, fd] of fixed) {
-        const real = new Date(Date.UTC(y, fm, fd));
-        let obsM = fm, obsD = fd;
-        if(real.getUTCDay() === 6) { obsD = fd - 1; }      // Sat → Fri
-        else if(real.getUTCDay() === 0) { obsD = fd + 1; } // Sun → Mon
-        if(m === obsM && dd === obsD) return true;
-      }
-      return false;
-    };
+    // Compute display exit date — actual for closed, planned (entryDate + holdWeeks × 7d) for open
     const plannedExit = (entryStr, holdWeeks) => {
       const d = new Date(entryStr + 'T00:00:00Z');
       d.setUTCDate(d.getUTCDate() + holdWeeks * 7);
-      // Roll forward to first business day of that week if Monday is a market holiday
-      while(isUSMarketClosed(d)) d.setUTCDate(d.getUTCDate() + 1);
       return d.toISOString().substring(0, 10);
     };
     const exitDates = [];
