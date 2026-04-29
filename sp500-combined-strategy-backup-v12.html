@@ -512,8 +512,6 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
 .strategy-tag.dh { background:rgba(200,90,74,0.08); color:var(--orange); border:1px solid rgba(200,90,74,0.2); }
 .confirmed-tag { display:inline-block; background:rgba(91,196,142,0.08); color:var(--green); border:1px solid rgba(91,196,142,0.2); padding:2px 7px; border-radius:var(--radius-xs); font-size:0.62rem; font-weight:700; margin-left:4px; }
 .open-badge { display:inline-block; background:rgba(212,175,55,0.1); color:var(--yellow); border:1px solid rgba(212,175,55,0.25); padding:2px 7px; border-radius:var(--radius-xs); font-size:0.62rem; font-weight:700; margin-left:4px; }
-.trade-date-arrow { color:var(--accent); font-weight:500; opacity:0.65; margin:0 5px; font-size:0.85em; }
-.trade-date .exit-date { color:var(--text-dark); font-weight:700; }
 
 .hidden { display:none!important; }
 
@@ -4122,22 +4120,13 @@ function renderTradeLog() {
     const retCls = totalPnl >= 0 ? 'text-green' : 'text-red';
     const retPct = totalCapital > 0 ? (totalPnl / totalCapital) * 100 : 0;
 
-    // Compute display exit date — latest among mom/dh exits, only if fully closed
-    let exitDateDisplay = '';
-    if(!anyOpen) {
-      const dates = [];
-      if(momR && momR.exitDate) dates.push(momR.exitDate);
-      if(dhR && dhR.exitDate) dates.push(dhR.exitDate);
-      if(dates.length > 0) exitDateDisplay = dates.sort().reverse()[0];
-    }
-
     const card = document.createElement('div');
     card.className = 'trade-card' + (isLatest ? ' latest-signal' : '');
 
     // Header
     let headerHtml = `<div class="trade-header">
       <div>
-        <div class="trade-date">${weekDate}${anyOpen ? ' <span class="open-badge">OPEN</span>' : (exitDateDisplay ? '<span class="trade-date-arrow">→</span><span class="exit-date">' + exitDateDisplay + '</span>' : '')}</div>
+        <div class="trade-date">${weekDate}${anyOpen ? ' <span class="open-badge">OPEN</span>' : ''}</div>
         <div class="trade-summary">ซื้อรวม <strong>${totalStocks} ตัว</strong> · ใช้เงิน <strong>$${Math.round(totalCapital).toLocaleString()}</strong> · P&L: <span class="${retCls}"><strong>$${Math.round(totalPnl).toLocaleString()}</strong> (${retPct>=0?'+':''}${retPct.toFixed(2)}%)</span></div>
       </div>
     </div>`;
