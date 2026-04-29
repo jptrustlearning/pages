@@ -4122,16 +4122,14 @@ function renderTradeLog() {
     const retCls = totalPnl >= 0 ? 'text-green' : 'text-red';
     const retPct = totalCapital > 0 ? (totalPnl / totalCapital) * 100 : 0;
 
-    // Compute display exit date — actual for closed, planned (entryDate + holdWeeks × 7d) for open
-    const plannedExit = (entryStr, holdWeeks) => {
-      const d = new Date(entryStr + 'T00:00:00Z');
-      d.setUTCDate(d.getUTCDate() + holdWeeks * 7);
-      return d.toISOString().substring(0, 10);
-    };
-    const exitDates = [];
-    if(momR) exitDates.push(momR.isOpen ? plannedExit(weekDate, CONFIG.momHoldWeeks) : momR.exitDate);
-    if(dhR)  exitDates.push(dhR.isOpen  ? plannedExit(weekDate, CONFIG.dhHoldWeeks)  : dhR.exitDate);
-    const exitDateDisplay = exitDates.filter(Boolean).sort().reverse()[0] || '';
+    // Compute display exit date — latest among mom/dh exits, only if fully closed
+    let exitDateDisplay = '';
+    if(!anyOpen) {
+      const dates = [];
+      if(momR && momR.exitDate) dates.push(momR.exitDate);
+      if(dhR && dhR.exitDate) dates.push(dhR.exitDate);
+      if(dates.length > 0) exitDateDisplay = dates.sort().reverse()[0];
+    }
 
     const card = document.createElement('div');
     card.className = 'trade-card' + (isLatest ? ' latest-signal' : '');
@@ -4139,7 +4137,7 @@ function renderTradeLog() {
     // Header
     let headerHtml = `<div class="trade-header">
       <div>
-        <div class="trade-date">${weekDate}${exitDateDisplay ? '<span class="trade-date-arrow">→</span><span class="exit-date">' + exitDateDisplay + '</span>' : ''}${anyOpen ? ' <span class="open-badge">OPEN</span>' : ''}</div>
+        <div class="trade-date">${weekDate}${anyOpen ? ' <span class="open-badge">OPEN</span>' : (exitDateDisplay ? '<span class="trade-date-arrow">→</span><span class="exit-date">' + exitDateDisplay + '</span>' : '')}</div>
         <div class="trade-summary">ซื้อรวม <strong>${totalStocks} ตัว</strong> · ใช้เงิน <strong>$${Math.round(totalCapital).toLocaleString()}</strong> · P&L: <span class="${retCls}"><strong>$${Math.round(totalPnl).toLocaleString()}</strong> (${retPct>=0?'+':''}${retPct.toFixed(2)}%)</span></div>
       </div>
     </div>`;
