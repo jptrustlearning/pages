@@ -1635,9 +1635,9 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
         <div id="rss-tab-risk" class="rss-tab-pane">
           <div class="rss-stat-grid">
             <div class="rss-stat">
-              <div class="rss-stat-label">Max Drawdown</div>
+              <div class="rss-stat-label">Max Drawdown (Round)</div>
               <div class="rss-stat-val text-red" id="kpi-maxdd">0.0%</div>
-              <div class="rss-stat-sub" id="kpi-maxdd-sub">พอร์ตเคยลดจากจุดสูงสุดมากที่สุด</div>
+              <div class="rss-stat-sub" id="kpi-maxdd-sub">ขาดทุนรอบหนักที่สุด</div>
             </div>
             <div class="rss-stat">
               <div class="rss-stat-label">Market Max DD (SPY)</div>
@@ -2519,11 +2519,10 @@ function updateStatsTabNarratives() {
   // ========== TAB 3: RISK ==========
   const riskNarr = document.getElementById('rssRisk');
   if(riskNarr) {
-    const equityDD = computeEquityDDPct();  // negative %; use absolute for thresholds
-    const ddCls = Math.abs(equityDD) >= 30 ? 'neg' : Math.abs(equityDD) >= 20 ? 'neg' : '';
-    const ddLevel = Math.abs(equityDD) >= 30 ? 'หนักมาก — ต้องใจแข็งพอรับได้'
-                  : Math.abs(equityDD) >= 20 ? 'พอสมควร — เตรียมใจได้'
-                  : Math.abs(equityDD) >= 10 ? 'ระดับปกติของตลาดหุ้น'
+    const ddCls = Math.abs(maxLoss) >= 30 ? 'neg' : Math.abs(maxLoss) >= 20 ? 'neg' : '';
+    const ddLevel = Math.abs(maxLoss) >= 30 ? 'หนักมาก — ต้องใจแข็งพอรับได้'
+                  : Math.abs(maxLoss) >= 20 ? 'พอสมควร — เตรียมใจได้'
+                  : Math.abs(maxLoss) >= 10 ? 'ระดับปกติของตลาดหุ้น'
                   : 'ต่ำ — ระบบควบคุมความเสี่ยงได้ดี';
     const consecNote = maxConsec >= 10 ? ' · เคยแพ้ติดกัน <strong>' + maxConsec + ' รอบ</strong> ซึ่งถือว่ายาว ต้องใจเย็นเวลาเจอ'
                      : maxConsec >= 5 ? ' · สตรีกแพ้ยาวสุด <strong>' + maxConsec + ' รอบ</strong> ถือว่าปกติ'
@@ -2531,7 +2530,7 @@ function updateStatsTabNarratives() {
     const skippedNote = state.skippedDates.length > 0
       ? ' · Regime Filter ข้าม <strong>' + state.skippedDates.length + ' สัปดาห์</strong> (ตลาดต่ำกว่า EMA ' + CONFIG.regimeEma + 'W)'
       : (CONFIG.regimeEma > 0 ? ' · Regime Filter เปิดอยู่แต่ไม่ได้ข้ามรอบไหนเลย (ตลาดสูงกว่า EMA ตลอด)' : ' · ไม่เปิด Regime Filter — เทรดทุกสัปดาห์');
-    riskNarr.innerHTML = 'ดรอว์ดาวน์ของพอร์ตหนักสุด <span class="rss-num ' + ddCls + '">' + equityDD.toFixed(1) + '%</span> — ' + ddLevel + consecNote + skippedNote;
+    riskNarr.innerHTML = 'ดรอว์ดาวน์หนักสุดในรอบเดียว <span class="rss-num ' + ddCls + '">' + maxLoss.toFixed(1) + '%</span> — ' + ddLevel + consecNote + skippedNote;
   }
 
   // ========== TAB 4: MARKET COMPARISON ==========
@@ -3495,7 +3494,7 @@ function updateKPIs() {
   document.getElementById('kpi-avg').innerText = (avg>=0?'+':'') + avg.toFixed(2) + '%';
   document.getElementById('kpi-avg').className = 'kpi-value ' + (avg>=0?'text-green':'text-red');
   document.getElementById('kpi-win').innerText = winRate.toFixed(0) + '%';
-  document.getElementById('kpi-maxdd').innerText = computeEquityDDPct().toFixed(2) + '%';
+  document.getElementById('kpi-maxdd').innerText = maxLoss.toFixed(2) + '%';
   document.getElementById('kpi-pf').innerText = pf.toFixed(2);
   document.getElementById('kpi-consec').innerText = maxConsec;
   document.getElementById('kpi-rounds').innerText = closed.length;
@@ -3641,8 +3640,16 @@ function updateResultsSummary() {
     rsAlphaDesc.innerText = 'ต้องมีอย่างน้อย 10 รอบถึงจะวัดได้';
   }
 
-  // Max DD — equity-curve drawdown (peak-to-trough)
-  rsDD.innerText = computeEquityDDPct().toFixed(1) + '%';
+  // Max DD — equity-curve drawdown (peak-to-trough), matches 6M / Rolling 6M
+  let ddPeak = -Infinity, equityDD = 0;
+  if(state.equityCurve && state.equityCurve.length > 0) {
+    state.equityCurve.forEach(e => {
+      if(e.equity > ddPeak) ddPeak = e.equity;
+      const dd = (e.equity - ddPeak) / ddPeak;
+      if(dd < equityDD) equityDD = dd;
+    });
+  }
+  rsDD.innerText = (equityDD * 100).toFixed(1) + '%';
 
   // Narrative — Thai prose summarizing parameters + outcome
   const modeText = CONFIG.allocMode === 'split' ? 'แยกงบ' : 'งบเดียวปรับสัดส่วน';
@@ -4050,18 +4057,6 @@ function buildDailyEquityCurve() {
       dhEquity:  dhBaseline + dhContribution
     });
   }
-}
-
-// Helper: peak-to-trough drawdown % from state.equityCurve (returns negative number)
-function computeEquityDDPct() {
-  if(!state.equityCurve || state.equityCurve.length === 0) return 0;
-  let peak = -Infinity, dd = 0;
-  state.equityCurve.forEach(e => {
-    if(e.equity > peak) peak = e.equity;
-    const cur = (e.equity - peak) / peak;
-    if(cur < dd) dd = cur;
-  });
-  return dd * 100;
 }
 
 function renderDDChart() {
