@@ -4175,7 +4175,7 @@ function renderTradeLog() {
     if(momR && momR.stocks.length > 0) {
       const momAllocPerStock = momR.capital / momR.stocks.length;
       momHtml = `<div class="trade-section">
-        <div class="trade-section-label mom">MOMENTUM — ${momR.stocks.length} ตัว <span class="alloc-info">· $${Math.round(momR.capital)} รวม · $${momAllocPerStock.toFixed(0)}/ตัว · hold ${CONFIG.momHoldWeeks}W${momR.slHits > 0 ? ' · <span class="text-red">' + momR.slHits + ' SL</span>' : ''}</span></div>
+        <div class="trade-section-label mom">MOMENTUM — ${momR.stocks.length} ตัว <span class="alloc-info">· $${Math.round(momR.capital)} รวม · $${momAllocPerStock.toFixed(0)}/ตัว · hold ${CONFIG.momHoldWeeks}W → ${momR.isOpen ? 'open' : momR.exitDate}${momR.slHits > 0 ? ' · <span class="text-red">' + momR.slHits + ' SL</span>' : ''}</span></div>
         <div>${momR.stocks.map(s => {
           let cls = s.ret >= 0 ? '' : ' loss';
           let extra = s.hitSL ? ' ⛔' : '';
@@ -4189,7 +4189,7 @@ function renderTradeLog() {
     if(dhR && dhR.stocks.length > 0) {
       const dhAllocPerStock = dhR.capital / dhR.stocks.length;
       dhHtml = `<div class="trade-section">
-        <div class="trade-section-label dh">DARK HORSE — ${dhR.stocks.length} ตัว <span class="alloc-info">· $${Math.round(dhR.capital)} รวม · $${dhAllocPerStock.toFixed(0)}/ตัว · hold ${CONFIG.dhHoldWeeks}W${dhR.slHits > 0 ? ' · <span class="text-red">' + dhR.slHits + ' SL</span>' : ''}${dhR.confirmedCount > 0 ? ' · <span class="text-green">★ ' + dhR.confirmedCount + ' confirmed</span>' : ''}</span></div>
+        <div class="trade-section-label dh">DARK HORSE — ${dhR.stocks.length} ตัว <span class="alloc-info">· $${Math.round(dhR.capital)} รวม · $${dhAllocPerStock.toFixed(0)}/ตัว · hold ${CONFIG.dhHoldWeeks}W → ${dhR.isOpen ? 'open' : dhR.exitDate}${dhR.slHits > 0 ? ' · <span class="text-red">' + dhR.slHits + ' SL</span>' : ''}${dhR.confirmedCount > 0 ? ' · <span class="text-green">★ ' + dhR.confirmedCount + ' confirmed</span>' : ''}</span></div>
         <div>${dhR.stocks.map(s => {
           let cls = s.ret >= 0 ? '' : ' loss';
           let extra = '';
