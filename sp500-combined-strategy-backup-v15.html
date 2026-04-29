@@ -514,7 +514,6 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
 .open-badge { display:inline-block; background:rgba(212,175,55,0.1); color:var(--yellow); border:1px solid rgba(212,175,55,0.25); padding:2px 7px; border-radius:var(--radius-xs); font-size:0.62rem; font-weight:700; margin-left:4px; }
 .trade-date-arrow { color:var(--accent); font-weight:500; opacity:0.65; margin:0 5px; font-size:0.85em; }
 .trade-date .exit-date { color:var(--text-dark); font-weight:700; }
-.trade-date-tag { font-family:var(--font-heading); font-size:0.58rem; font-weight:700; color:var(--gold-deep); letter-spacing:0.1em; text-transform:uppercase; margin-right:5px; opacity:0.85; }
 
 .hidden { display:none!important; }
 
@@ -4165,7 +4164,7 @@ function renderTradeLog() {
     // Header
     let headerHtml = `<div class="trade-header">
       <div>
-        <div class="trade-date"><span class="trade-date-tag">Entry</span>${weekDate}${exitDateDisplay ? '<span class="trade-date-arrow">→</span><span class="trade-date-tag">Exit</span><span class="exit-date">' + exitDateDisplay + '</span>' : ''}${anyOpen ? ' <span class="open-badge">OPEN</span>' : ''}</div>
+        <div class="trade-date">${weekDate}${exitDateDisplay ? '<span class="trade-date-arrow">→</span><span class="exit-date">' + exitDateDisplay + '</span>' : ''}${anyOpen ? ' <span class="open-badge">OPEN</span>' : ''}</div>
         <div class="trade-summary">ซื้อรวม <strong>${totalStocks} ตัว</strong> · ใช้เงิน <strong>$${Math.round(totalCapital).toLocaleString()}</strong> · P&L: <span class="${retCls}"><strong>$${Math.round(totalPnl).toLocaleString()}</strong> (${retPct>=0?'+':''}${retPct.toFixed(2)}%)</span></div>
       </div>
     </div>`;
