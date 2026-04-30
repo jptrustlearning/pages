@@ -87,11 +87,6 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 
 /* Screens */
 .screen{display:none;flex:1;overflow-y:auto}.screen.active{display:block}
-
-/* Home screen ambient gold BG — soft blur layer behind card + objects, fades out before ticker tape */
-#screen-home{position:relative}
-#screen-home::before{content:'';position:absolute;top:0;left:0;right:0;height:480px;background:url('home-bg-gold.png?v=1777565685') center top/cover no-repeat;pointer-events:none;z-index:0;opacity:0.6;-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,1) 0%,rgba(0,0,0,1) 60%,rgba(0,0,0,0) 100%);mask-image:linear-gradient(to bottom,rgba(0,0,0,1) 0%,rgba(0,0,0,1) 60%,rgba(0,0,0,0) 100%)}
-@media(min-width:600px){#screen-home::before{height:540px}}
 .screen-content{padding:0 20px 24px}
 
 /* Home Hero */
@@ -109,7 +104,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .member-badge .jpt-icon svg{width:14px;height:14px;color:var(--gold)}
 
 /* Reward Card */
-.reward-card{width:auto;overflow:hidden;position:relative;border-radius:16px;container-type:inline-size;z-index:1}
+.reward-card{width:auto;overflow:hidden;position:relative;border-radius:16px;container-type:inline-size}
 .reward-card img{width:100%;display:block}
 /* Member name overlay: hidden — new card has owl/brand on right, no name slot */
 .rc-member-name{display:none}
