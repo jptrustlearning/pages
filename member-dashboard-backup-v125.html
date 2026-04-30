@@ -154,15 +154,10 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .section-title{font-size:16px;font-weight:600;color:var(--text-dark)}.section-link{font-size:13px;color:var(--gold-dark);cursor:pointer;font-weight:500}
 
 /* About Us section (replaces former Dashboard grid on home) */
-.about-section{position:relative;margin:4px 4px 24px;padding:18px 18px 16px;background:linear-gradient(135deg,var(--cream-card) 0%,var(--cream) 100%);border:1px solid rgba(212,175,55,0.32);border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(114,47,55,0.05),0 1px 3px rgba(114,47,55,0.04),inset 0 1px 0 rgba(255,255,255,0.65);text-align:left}
-.about-chart-deco{position:absolute;right:-6px;top:0;bottom:0;width:55%;height:100%;pointer-events:none;z-index:0;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 32%,#000 100%);mask-image:linear-gradient(to right,transparent 0%,#000 32%,#000 100%)}
-.about-content{position:relative;z-index:1;max-width:66%}
-.about-eyebrow{font-family:'Cinzel',serif;font-size:10.5px;color:var(--gold-deep);letter-spacing:0.32em;text-transform:uppercase;margin-bottom:6px;font-weight:600}
-.about-title{font-family:'DM Serif Display','Anuphan',serif;font-size:22px;color:var(--burgundy);line-height:1.18;letter-spacing:0.3px;margin:0 0 10px;font-weight:400}
-.about-intro{font-family:'Anuphan','Sarabun',sans-serif;font-size:13px;color:var(--text-dark);line-height:1.6;margin:0 0 8px;font-weight:500}
-.about-disclaimer{font-family:'Anuphan','Sarabun',sans-serif;font-size:10px;color:var(--text-dark-muted);line-height:1.5;margin:0;font-style:italic;letter-spacing:0.2px;padding-top:8px;border-top:1px dashed rgba(212,175,55,0.2)}
-@media(max-width:380px){.about-content{max-width:62%}.about-title{font-size:20px}.about-chart-deco{width:50%}}
-/* Legacy about-* rules below — dormant but kept in case design reverts */
+.about-section{margin:4px 4px 28px;text-align:center}
+.about-eyebrow{font-family:'Cinzel',serif;font-size:11px;color:var(--gold-deep);letter-spacing:0.3em;text-transform:uppercase;margin-bottom:8px;font-weight:600}
+.about-title{font-family:'DM Serif Display','Anuphan',serif;font-size:26px;color:var(--burgundy);line-height:1.2;letter-spacing:0.4px;margin:0 0 14px;font-weight:400}
+.about-intro{font-family:'Anuphan','Sarabun',sans-serif;font-size:15px;color:var(--text-dark);line-height:1.65;margin:0 0 14px;font-weight:500;padding:0 4px}
 .about-body{font-family:'Anuphan','Sarabun',sans-serif;font-size:13.5px;color:var(--text-dark-muted);line-height:1.75;margin:0 0 6px;padding:0 4px}
 .about-divider{display:flex;align-items:center;justify-content:center;gap:10px;margin:22px auto 18px;max-width:200px}
 .about-divider::before,.about-divider::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dark) 50%,transparent)}
@@ -512,47 +507,11 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
               <div class="ticker-owl-badge" onclick="event.stopPropagation();return false"><span class="ticker-live-dot"></span><span class="ticker-live-text">LIVE</span></div>
             </div>
             <div class="about-section fade-up fade-up-3">
-                <svg class="about-chart-deco" viewBox="0 0 200 100" preserveAspectRatio="xMaxYMid slice" aria-hidden="true">
-                    <defs>
-                        <linearGradient id="aboutBgGrad" x1="0" y1="0" x2="1" y2="0">
-                            <stop offset="0%" stop-color="#FAF6ED" stop-opacity="0"/>
-                            <stop offset="50%" stop-color="#F4E4BA" stop-opacity="0.5"/>
-                            <stop offset="100%" stop-color="#D4AF37" stop-opacity="0.4"/>
-                        </linearGradient>
-                        <linearGradient id="aboutBarGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stop-color="#D4AF37" stop-opacity="0.95"/>
-                            <stop offset="100%" stop-color="#B8860B" stop-opacity="0.65"/>
-                        </linearGradient>
-                    </defs>
-                    <rect width="200" height="100" fill="url(#aboutBgGrad)"/>
-                    <g>
-                        <rect x="76" y="74" width="13" height="26" rx="1.5" fill="url(#aboutBarGrad)" opacity="0.5"/>
-                        <rect x="94" y="62" width="13" height="38" rx="1.5" fill="url(#aboutBarGrad)" opacity="0.55"/>
-                        <rect x="112" y="50" width="13" height="50" rx="1.5" fill="url(#aboutBarGrad)" opacity="0.62"/>
-                        <rect x="130" y="38" width="13" height="62" rx="1.5" fill="url(#aboutBarGrad)" opacity="0.68"/>
-                        <rect x="148" y="26" width="13" height="74" rx="1.5" fill="url(#aboutBarGrad)" opacity="0.74"/>
-                        <rect x="166" y="14" width="13" height="86" rx="1.5" fill="url(#aboutBarGrad)" opacity="0.8"/>
-                    </g>
-                    <polyline points="83,68 100,56 118,44 137,32 155,20 173,8" fill="none" stroke="#D4AF37" stroke-width="1.5" opacity="0.85" stroke-linecap="round" stroke-linejoin="round"/>
-                    <g>
-                        <circle cx="83" cy="68" r="2.2" fill="#FFFEF8" stroke="#D4AF37" stroke-width="0.9"/>
-                        <circle cx="100" cy="56" r="2.2" fill="#FFFEF8" stroke="#D4AF37" stroke-width="0.9"/>
-                        <circle cx="118" cy="44" r="2.2" fill="#FFFEF8" stroke="#D4AF37" stroke-width="0.9"/>
-                        <circle cx="137" cy="32" r="2.2" fill="#FFFEF8" stroke="#D4AF37" stroke-width="0.9"/>
-                        <circle cx="155" cy="20" r="2.2" fill="#FFFEF8" stroke="#D4AF37" stroke-width="0.9"/>
-                        <circle cx="173" cy="8" r="3" fill="#FFFEF8" stroke="#D4AF37" stroke-width="1.3"/>
-                        <circle cx="173" cy="8" r="3" fill="none" stroke="#D4AF37" stroke-width="0.8" opacity="0.6">
-                            <animate attributeName="r" values="3;7;3" dur="2.4s" repeatCount="indefinite"/>
-                            <animate attributeName="opacity" values="0.6;0;0.6" dur="2.4s" repeatCount="indefinite"/>
-                        </circle>
-                    </g>
-                </svg>
-                <div class="about-content">
-                    <div class="about-eyebrow">เกี่ยวกับเรา</div>
-                    <h2 class="about-title">JP Trust Learning</h2>
-                    <p class="about-intro">แพลตฟอร์มศึกษาด้านการลงทุน ที่นำกลยุทธ์จากงานวิจัยสาธารณะมาทดสอบและประยุกต์ใช้กับข้อมูลจริงย้อนหลังกว่า 15 ปี ครอบคลุมตลาดหุ้นสหรัฐฯ ทองคำ และ Bitcoin</p>
-                    <p class="about-disclaimer">ไม่ใช่คำแนะนำในการลงทุน · ผลในอดีตไม่ใช่การการันตีผลในอนาคต</p>
-                </div>
+                <div class="about-eyebrow">เกี่ยวกับเรา</div>
+                <h2 class="about-title">JP Trust Learning</h2>
+                <p class="about-intro">แพลตฟอร์มการศึกษาและเครื่องมือวิเคราะห์การลงทุน สำหรับนักลงทุนรายย่อยในไทย ที่ต้องการตัดสินใจด้วยข้อมูลจริง</p>
+                <p class="about-body">เราเชื่อว่านักลงทุนทุกคนควรเข้าถึงเครื่องมือคุณภาพระดับสถาบันการเงินได้ — ไม่ว่าจะเป็นนักลงทุนมือใหม่หรือมีประสบการณ์ เพราะการตัดสินใจที่ดีเริ่มต้นจากข้อมูลที่ถูกต้อง วินัยที่ชัดเจน และความเข้าใจในตลาดที่ลึกพอ</p>
+                <div class="about-divider"><span class="about-diamond"></span></div>
             </div>
             <div class="section-header fade-up fade-up-3"><div class="section-title">Planning Toolkit</div></div>
             <div class="planning-stack fade-up fade-up-3">
