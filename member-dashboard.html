@@ -93,6 +93,10 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 #screen-home{position:relative}
 #screen-home::before{content:'';position:absolute;top:0;left:0;right:0;height:480px;background:url('home-bg-gold.png?v=1777565685') center top/cover no-repeat;pointer-events:none;z-index:0;opacity:0.6;-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,1) 0%,rgba(0,0,0,1) 60%,rgba(0,0,0,0) 100%);mask-image:linear-gradient(to bottom,rgba(0,0,0,1) 0%,rgba(0,0,0,1) 60%,rgba(0,0,0,0) 100%)}
 @media(min-width:600px){#screen-home::before{height:540px}}
+#screen-news{position:relative}
+#screen-news::before{content:'';position:absolute;top:0;left:0;right:0;height:480px;background:url('home-bg-gold.png?v=1777565685') center top/cover no-repeat;pointer-events:none;z-index:0;opacity:0.55;-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,1) 0%,rgba(0,0,0,1) 60%,rgba(0,0,0,0) 100%);mask-image:linear-gradient(to bottom,rgba(0,0,0,1) 0%,rgba(0,0,0,1) 60%,rgba(0,0,0,0) 100%)}
+@media(min-width:600px){#screen-news::before{height:540px}}
+#screen-news>*{position:relative;z-index:1}
 .screen-content{padding:0 20px 24px}
 
 /* Home Hero */
@@ -215,20 +219,24 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .signal-card .signal-action.hold{background:rgba(212,175,55,0.14);border-color:rgba(212,175,55,0.35);color:#8B6914}
 
 /* ===== NEWS FEED CARDS ===== */
-/* Search header - replaces the balance-card hero */
-.news-search-header{padding:20px 20px 16px 20px;background:linear-gradient(180deg,#FFFEFB 0%,#FAF6ED 100%);border-bottom:1px solid rgba(212,175,55,0.2)}
-.news-search-title{font-family:'Cinzel',serif;font-size:13px;letter-spacing:3px;color:#722F37;text-transform:uppercase;font-weight:600;margin-bottom:12px;text-align:center}
-.news-search-box{position:relative;display:flex;align-items:center;background:#FFFEF8;border:1px solid rgba(212,175,55,0.35);border-radius:24px;padding:10px 14px;box-shadow:0 2px 8px rgba(114,47,55,0.06);transition:all .2s}
-.news-search-box:focus-within{border-color:#D4AF37;box-shadow:0 2px 14px rgba(212,175,55,0.25)}
-.news-search-icon{width:18px;height:18px;color:#8B6914;flex-shrink:0;margin-right:10px}
+/* Search header — transparent so #screen-news::before bg gold image shows through */
+.news-search-header{padding:20px 20px 16px 20px;background:transparent;border-bottom:none}
+.news-eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.news-eyebrow .spark-icon{width:18px;height:18px;color:var(--gold-dark);flex-shrink:0}
+.news-search-title{font-family:'Cinzel',serif;font-size:1.3rem;letter-spacing:0.18em;color:var(--burgundy);text-transform:uppercase;font-weight:700;margin:0}
+.news-sub{font-family:'Anuphan',sans-serif;font-size:0.82rem;color:var(--text-dark-muted);letter-spacing:0.2px;margin:0 0 12px 28px}
+.news-search-box{position:relative;display:flex;align-items:center;background:var(--cream-card,#FFFEF8);border:1px solid rgba(212,175,55,0.35);border-radius:14px;padding:10px 14px;box-shadow:0 1px 4px rgba(114,47,55,0.06);transition:all .2s}
+.news-search-box:focus-within{border-color:#D4AF37;box-shadow:0 2px 14px rgba(212,175,55,0.18)}
+.news-search-icon{width:17px;height:17px;color:#8B6914;flex-shrink:0;margin-right:10px}
 .news-search-input{flex:1;border:none;outline:none;background:transparent;font-family:'Anuphan',sans-serif;font-size:14px;color:#3D3228;padding:2px 0}
 .news-search-input::placeholder{color:#A09585}
-.news-search-clear{background:rgba(114,47,55,0.08);border:none;width:22px;height:22px;border-radius:50%;color:#722F37;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.news-search-clear{background:rgba(114,47,55,0.08);border:none;width:22px;height:22px;border-radius:50%;color:#722F37;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
 .news-search-clear:hover{background:rgba(114,47,55,0.15)}
+.news-search-clear svg{width:11px;height:11px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round}
 .news-time-filter{display:flex;gap:6px;margin-top:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:2px 0}
 .news-time-filter::-webkit-scrollbar{display:none}
-.time-chip{flex-shrink:0;padding:7px 14px;border-radius:18px;border:1px solid rgba(212,175,55,0.3);background:rgba(255,254,248,0.6);color:#7A6F62;font-family:'Anuphan',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap}
-.time-chip:hover{background:rgba(212,175,55,0.1);color:#5A3D20}
+.time-chip{flex-shrink:0;padding:7px 14px;border-radius:18px;border:1px solid rgba(212,175,55,0.32);background:rgba(255,254,248,0.7);color:#5A3D20;font-family:'Anuphan',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap}
+.time-chip:hover{background:rgba(212,175,55,0.1)}
 .time-chip.active{background:linear-gradient(135deg,#D4AF37,#B8860B);color:#fff;border-color:#B8860B;font-weight:600;box-shadow:0 2px 8px rgba(212,175,55,0.35)}
 .time-chip-custom{border-style:dashed;border-color:rgba(212,175,55,0.5);background:rgba(255,254,248,0.4)}
 .time-chip-custom.active{border-style:solid}
@@ -249,36 +257,54 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 /* Extra safety: disable all pointer events on TV widget iframe (only owl overlay catches clicks) */
 .ticker-tape-wrapper iframe{pointer-events:none !important}
 
-/* News feed cards - dashboard card style (cream + wave), 2 per row */
-.news-batch-group{margin-bottom:28px}
-.news-batch-date{font-family:'Cinzel',serif;font-size:10.5px;letter-spacing:2.5px;color:var(--gold-deep,#8B6914);text-transform:uppercase;font-weight:600;padding:0 4px 10px 4px;margin-bottom:10px;border-bottom:1px solid rgba(212,175,55,0.3);display:flex;align-items:center;gap:10px}
+/* News feed cards - DARK STORY DESIGN (burgundy → black gradient + gold sheen) */
+.news-batch-group{margin-bottom:18px}
+.news-batch-date{font-family:'Cinzel',serif;font-size:10.5px;letter-spacing:2.5px;color:var(--gold-deep,#8B6914);text-transform:uppercase;font-weight:600;padding:0 4px 8px 4px;margin:0 0 10px 0;border-bottom:1px solid rgba(212,175,55,0.3);display:flex;align-items:center;gap:10px}
 .news-batch-date::before{content:'◆';color:var(--gold,#D4AF37);font-size:9px}
-.news-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.news-grid{display:flex;flex-direction:column;gap:0}
 
-.news-dash-card{background:#FFFFFF;border:1px solid rgba(212,175,55,0.15);border-radius:var(--radius,16px);padding:14px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 4px 16px rgba(114,47,55,0.1),0 1px 4px rgba(0,0,0,0.06);position:relative;overflow:hidden;min-height:170px}
-.news-dash-card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:60%;background:linear-gradient(180deg,transparent 0%,rgba(237,225,200,0.3) 100%);pointer-events:none;border-radius:0 0 var(--radius,16px) var(--radius,16px);z-index:0}
-.news-dash-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:60px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 70' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'%3E%3Cpath d='M0,55 C20,50 40,40 70,35 C100,30 130,38 160,30 C180,25 195,32 200,28 L200,70 L0,70 Z' fill='rgba(237,228,208,0.35)'/%3E%3Cpath d='M0,60 C30,52 60,45 100,40 C140,35 170,42 200,36 L200,70 L0,70 Z' fill='rgba(237,228,208,0.25)'/%3E%3Cpath d='M0,45 C25,42 50,30 80,28 C110,26 140,35 170,22 C190,15 200,20 200,18 L200,70 L0,70 Z' fill='rgba(212,175,55,0.08)'/%3E%3Cpath d='M0,40 Q50,25 100,30 Q150,35 200,20' fill='none' stroke='rgba(212,175,55,0.15)' stroke-width='1.5'/%3E%3Cpath d='M0,50 Q60,38 120,42 Q180,46 200,35' fill='none' stroke='rgba(212,175,55,0.1)' stroke-width='1'/%3E%3C/svg%3E");background-size:100% 100%;border-radius:0 0 var(--radius,16px) var(--radius,16px);z-index:0}
+.news-dash-card{position:relative;display:flex;gap:12px;background:linear-gradient(135deg,#3a141d 0%,#4a1923 28%,#2a0e15 60%,#160709 100%);border:1px solid rgba(212,175,55,0.22);border-radius:14px;padding:14px 14px 14px 18px;margin-bottom:10px;overflow:hidden;box-shadow:0 4px 14px rgba(26,10,14,0.28),inset 0 1px 0 rgba(244,228,186,0.05);transition:all .25s;cursor:pointer;min-height:0}
+.news-dash-card::after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 100% 0%,rgba(212,175,55,0.13) 0%,transparent 38%),linear-gradient(135deg,transparent 0%,transparent 65%,rgba(244,228,186,0.04) 100%)}
+.news-dash-card:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(26,10,14,0.4),inset 0 1px 0 rgba(244,228,186,0.08);border-color:rgba(212,175,55,0.4)}
+.news-dash-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#F4E4BA 0%,#D4AF37 50%,#8B6914 100%);z-index:2}
 .news-dash-card>*{position:relative;z-index:1}
 .news-dash-card:active{transform:scale(.97)}
 
-.news-dash-title{font-size:13px;font-weight:600;color:var(--text-dark,#3D3228);line-height:1.45;margin-bottom:10px}
-.news-src-inline{display:inline;font-size:10.5px;font-weight:400;color:var(--text-dark-muted,#7A6F62);font-style:italic;letter-spacing:0.2px;line-height:1.4}
+.story-bm{position:absolute;top:12px;right:12px;width:14px;height:16px;color:#D4AF37;opacity:0.55;cursor:pointer;transition:opacity .2s;z-index:2}
+.story-bm:hover{opacity:0.95}
+.story-bm svg{width:14px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
 
-.news-item-tickers{display:flex;flex-wrap:wrap;gap:4px;margin-top:auto}
-.news-ticker-sm{display:inline-flex;align-items:center;gap:3px;font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:0.5px;padding:2.5px 7px;border-radius:9px;background:rgba(212,175,55,0.18);border:1px solid rgba(212,175,55,0.38);color:#8B6914;font-weight:600}
-.news-ticker-sm.positive{background:rgba(46,125,50,0.13);border-color:rgba(46,125,50,0.42);color:#1B5E20}
-.news-ticker-sm.negative{background:rgba(195,58,78,0.13);border-color:rgba(195,58,78,0.42);color:#8B1F2F}
-.tk-star{font-size:10px;line-height:1}
-.tk-star.positive{color:#2E7D32}
-.tk-star.negative{color:#C33A4E}
-.tk-star.neutral{color:#D4AF37}
+.story-body{flex:1;min-width:0}
+.news-dash-title{font-family:'Sarabun','Anuphan',sans-serif;font-size:13.5px;font-weight:400;color:#F4E4BA;line-height:1.5;margin-bottom:9px;padding-right:22px;letter-spacing:0.1px}
+.story-tags{display:flex;flex-wrap:wrap;gap:4px}
+.story-tag{padding:2px 8px;border-radius:6px;font-family:'Sarabun','Anuphan',sans-serif;font-size:10px;font-weight:500;letter-spacing:0.4px;border:1px solid;display:inline-block}
+.story-tag.positive{color:#6FD774;background:rgba(46,125,50,0.20);border-color:rgba(111,215,116,0.42)}
+.story-tag.negative{color:#FF8484;background:rgba(198,40,40,0.22);border-color:rgba(255,132,132,0.42)}
+.story-tag.neutral{color:#F4E4BA;background:rgba(212,175,55,0.12);border-color:rgba(212,175,55,0.32)}
+
+.story-meta{flex-shrink:0;width:84px;display:flex;flex-direction:column;justify-content:center;gap:6px;padding-left:11px;border-left:1px dashed rgba(212,175,55,0.28);font-family:'Sarabun','Anuphan',sans-serif}
+.story-meta-time{font-size:10.5px;color:rgba(244,228,186,0.62);line-height:1.45;font-weight:400;text-align:center}
+.impact-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;padding-top:7px;border-top:1px dashed rgba(212,175,55,0.18)}
+.impact-icon{width:34px;height:34px;display:block}
+.impact-wrap.bullish{color:#6FD774}
+.impact-wrap.bearish{color:#FF8484}
+.impact-wrap.neutral{color:#F4E4BA}
+.impact-label{font-family:'Sarabun','Anuphan',sans-serif;font-size:10px;font-weight:500;letter-spacing:0.4px;color:inherit;text-transform:uppercase}
+
+/* Latest Dispatches sect-hd + refresh button */
+.news-sect-hd{display:flex;justify-content:space-between;align-items:center;margin:4px 4px 14px 4px}
+.news-sect-label{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2.5px;color:var(--gold-deep);text-transform:uppercase;font-weight:600}
+.news-refresh-btn{background:rgba(212,175,55,0.13);border:1px solid rgba(212,175,55,0.25);color:#722F37;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.news-refresh-btn:hover{background:rgba(212,175,55,0.22)}
+.news-refresh-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
 /* Empty/no-results states */
-.news-empty{text-align:center;padding:40px 20px;color:var(--text-dark-muted,#7A6F62);font-size:13px;grid-column:1/-1}
+.news-empty{text-align:center;padding:40px 20px;color:var(--text-dark-muted,#7A6F62);font-size:13px;font-family:'Anuphan',sans-serif}
 
-/* On very narrow screens, fall back to 1 column */
-@media (max-width:360px){
-  .news-grid{grid-template-columns:1fr}
+@media (max-width:380px){
+  .story-meta{width:74px;padding-left:9px}
+  .news-dash-title{font-size:13px}
+  .story-meta-time{font-size:10px}
 }
 
 .activity-list{display:flex;flex-direction:column;gap:2px;margin-bottom:24px}
@@ -662,27 +688,35 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 
     <div class="screen" id="screen-news">
       <div class="news-search-header">
-        <div class="news-search-title">📰 Market News</div>
+        <div class="news-eyebrow">
+          <svg class="spark-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.7 5.3L19 9l-5.3 1.7L12 16l-1.7-5.3L5 9l5.3-1.7L12 2zm6 12l.8 2.5L21 17l-2.2.5L18 20l-.8-2.5L15 17l2.2-.5L18 14zM6 14l.6 1.9L8.5 16.5l-1.9.6L6 19l-.6-1.9L3.5 16.5l1.9-.6L6 14z"/></svg>
+          <div class="news-search-title">News Intelligence</div>
+        </div>
+        <div class="news-sub">ข่าวสารที่ขับเคลื่อนตลาด</div>
         <div class="news-search-box">
           <svg class="news-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
           <input type="text" class="news-search-input" id="newsSearchInput" placeholder="ค้นหาข่าว / ticker เช่น NVDA" oninput="filterNewsFeed()">
-          <button class="news-search-clear" id="newsSearchClear" onclick="clearNewsSearch()" style="display:none">✕</button>
+          <button class="news-search-clear" id="newsSearchClear" onclick="clearNewsSearch()" style="display:none">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
         </div>
         <div class="news-time-filter">
-          <button class="time-chip active" data-range="3day" onclick="setNewsTimeRange('3day')">3 วันล่าสุด</button>
+          <button class="time-chip active" data-range="latest" onclick="setNewsTimeRange('latest')">ล่าสุด</button>
           <button class="time-chip" data-range="today" onclick="setNewsTimeRange('today')">วันนี้</button>
+          <button class="time-chip" data-range="3day" onclick="setNewsTimeRange('3day')">3 วัน</button>
           <button class="time-chip" data-range="week" onclick="setNewsTimeRange('week')">7 วัน</button>
-          <button class="time-chip" data-range="month" onclick="setNewsTimeRange('month')">30 วัน</button>
-          <button class="time-chip time-chip-custom" data-range="custom" onclick="openCustomDateModal()" id="customDateChip">📅 ช่วงเวลาเอง</button>
+          <button class="time-chip time-chip-custom" data-range="custom" onclick="openCustomDateModal()" id="customDateChip">ช่วงเวลาเอง</button>
         </div>
       </div>
       <div class="screen-content">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin:4px 4px 14px 4px">
-          <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:2.5px;color:var(--gold-deep);text-transform:uppercase;font-weight:600">Latest Dispatches</div>
-          <button onclick="loadNewsFeed()" style="background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.25);color:#722F37;padding:6px 14px;border-radius:14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Anuphan',sans-serif">🔄 รีเฟรช</button>
+        <div class="news-sect-hd">
+          <div class="news-sect-label">Latest Dispatches</div>
+          <button class="news-refresh-btn" onclick="loadNewsFeed()" title="รีเฟรช">
+            <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          </button>
         </div>
         <div id="newsFeedList">
-          <div style="text-align:center;padding:40px 20px;color:var(--text-dark-muted);font-size:13px">กำลังโหลดข่าว...</div>
+          <div class="news-empty">กำลังโหลดข่าว...</div>
         </div>
       </div>
     </div>
@@ -743,7 +777,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 
 <div class="modal-overlay" id="editModal" onclick="closeModal(event)"><div class="modal-sheet" onclick="event.stopPropagation()"><div class="modal-handle"></div><div class="modal-title" id="modalTitle">แก้ไข</div><div id="modalContent"></div></div></div>
 
-<div class="modal-overlay" id="dateRangeModal" onclick="closeDateModal(event)"><div class="modal-sheet" onclick="event.stopPropagation()"><div class="modal-handle"></div><div class="modal-title">📅 เลือกช่วงเวลา</div>
+<div class="modal-overlay" id="dateRangeModal" onclick="closeDateModal(event)"><div class="modal-sheet" onclick="event.stopPropagation()"><div class="modal-handle"></div><div class="modal-title">เลือกช่วงเวลา</div>
   <div style="padding:8px 4px 4px 4px">
     <div style="margin-bottom:18px">
       <label style="display:block;font-size:12px;font-weight:600;color:var(--text-dark-sub,#5A3D20);margin-bottom:6px;letter-spacing:0.5px">วันที่เริ่มต้น</label>
@@ -1142,54 +1176,121 @@ document.addEventListener('visibilitychange', ()=>{
   if(home && home.classList.contains('active')) refreshTickerTape();
 });
 
+// Convention: batch dates use 'Z' suffix but the time written is Thai
+// local (UTC+7), not actual UTC. Convert Z to +07:00 so the Date object
+// lands at the real moment of publication.
+function parseBatchDate(iso){
+  if(!iso||typeof iso!=='string')return null;
+  let s=iso;
+  if(s.endsWith('Z'))s=s.slice(0,-1)+'+07:00';
+  const d=new Date(s);
+  return isNaN(d.getTime())?null:d;
+}
+const _MONTHS_TH=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function shortDate(d){return d.getDate()+' '+_MONTHS_TH[d.getMonth()]}
+function timeAgo(iso){
+  const d=parseBatchDate(iso);
+  if(!d)return '';
+  const diffMs=Date.now()-d.getTime();
+  if(diffMs<0)return shortDate(d);
+  const diffM=diffMs/60000;
+  if(diffM<1)return 'just now';
+  if(diffM<60)return Math.floor(diffM)+'m ago';
+  const diffH=diffMs/3600000;
+  if(diffH<24)return Math.floor(diffH)+'h ago';
+  const diffD=diffH/24;
+  if(diffD<7)return Math.floor(diffD)+'d ago';
+  return shortDate(d);
+}
+function deriveTone(tickers){
+  if(!tickers||!tickers.length)return{impactClass:'neutral',impactText:'Neutral'};
+  const c={positive:0,negative:0,neutral:0};
+  for(const t of tickers)c[t.sentiment||'neutral']=(c[t.sentiment||'neutral']||0)+1;
+  const sentTotal=c.positive+c.negative;
+  if(c.positive>c.negative&&c.positive>=sentTotal*0.7)return{impactClass:'bullish',impactText:'Bullish'};
+  if(c.negative>c.positive&&c.negative>=sentTotal*0.7)return{impactClass:'bearish',impactText:'Bearish'};
+  return{impactClass:'neutral',impactText:'Mixed'};
+}
+function impactIcon(impactClass){
+  if(impactClass==='bullish'){
+    return '<svg class="impact-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'
+      +'<path d="M10 13 Q 5 10, 1 4 Q 3 7, 9.5 11.5 Z" fill="currentColor" fill-opacity="0.42"/>'
+      +'<path d="M22 13 Q 27 10, 31 4 Q 29 7, 22.5 11.5 Z" fill="currentColor" fill-opacity="0.42"/>'
+      +'<ellipse cx="16" cy="20" rx="7.5" ry="7.8"/>'
+      +'<ellipse cx="16" cy="23.5" rx="3.6" ry="2.3" fill="currentColor" fill-opacity="0.22"/>'
+      +'<circle cx="14.6" cy="23" r="0.55" fill="currentColor"/>'
+      +'<circle cx="17.4" cy="23" r="0.55" fill="currentColor"/>'
+      +'<circle cx="13" cy="19" r="0.9" fill="currentColor"/>'
+      +'<circle cx="19" cy="19" r="0.9" fill="currentColor"/>'
+      +'</svg>';
+  }
+  if(impactClass==='bearish'){
+    return '<svg class="impact-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">'
+      +'<circle cx="9" cy="10" r="3.8" fill="currentColor" fill-opacity="0.18"/>'
+      +'<circle cx="23" cy="10" r="3.8" fill="currentColor" fill-opacity="0.18"/>'
+      +'<circle cx="16" cy="19" r="9"/>'
+      +'<ellipse cx="16" cy="22.5" rx="3.2" ry="2.2" fill="currentColor" fill-opacity="0.22"/>'
+      +'<circle cx="16" cy="20.5" r="0.7" fill="currentColor"/>'
+      +'<circle cx="13" cy="18" r="0.9" fill="currentColor"/>'
+      +'<circle cx="19" cy="18" r="0.9" fill="currentColor"/>'
+      +'</svg>';
+  }
+  return '<svg class="impact-icon" viewBox="0 0 32 32">'
+    +'<circle cx="16" cy="16" r="11" fill="currentColor" fill-opacity="0.7" stroke="currentColor" stroke-width="1.2"/>'
+    +'<circle cx="11" cy="13" r="1.6" fill="#3a141d" fill-opacity="0.28"/>'
+    +'<circle cx="20" cy="19" r="1.1" fill="#3a141d" fill-opacity="0.28"/>'
+    +'<circle cx="14" cy="20.5" r="0.9" fill="#3a141d" fill-opacity="0.28"/>'
+    +'</svg>';
+}
+
 const NEWS_INDEX_URL='https://raw.githubusercontent.com/jptrustlearning/pages/main/news/news-index.json';
 let newsFeedCache=null;
 let newsSearchQuery='';
-let newsTimeRange='3day';
+let newsTimeRange='latest';
 let newsCustomStart=null;
 let newsCustomEnd=null;
 async function loadNewsFeed(force){
   const listEl=document.getElementById('newsFeedList');
   if(!listEl)return;
-  listEl.innerHTML='<div class="news-empty">🔄 กำลังโหลดข่าว...</div>';
+  listEl.innerHTML='<div class="news-empty">กำลังโหลดข่าว...</div>';
   try{
-    const res=await fetch('https://raw.githubusercontent.com/jptrustlearning/pages/main/news/news-index.json?t='+Date.now(),{cache:'no-store'});
+    const res=await fetch(NEWS_INDEX_URL+'?t='+Date.now(),{cache:'no-store'});
     if(!res.ok)throw new Error('Index fetch failed');
     const data=await res.json();
     newsFeedCache=data;
     renderNewsFeed();
   }catch(err){
-    listEl.innerHTML='<div class="dash-card" style="padding:20px;text-align:center;color:#C33A4E;font-size:13px">ไม่สามารถโหลดข่าวได้<br><span style="font-size:11px;color:var(--text-dark-muted);margin-top:6px;display:block">'+(err.message||'Unknown error')+'</span></div>';
+    listEl.innerHTML='<div class="news-empty" style="color:#C33A4E">ไม่สามารถโหลดข่าวได้ — '+(err.message||'Unknown error')+'</div>';
   }
 }
 function renderNewsFeed(){
   const listEl=document.getElementById('newsFeedList');
   if(!listEl||!newsFeedCache)return;
   const allBatches=(newsFeedCache.batches||[]);
-  // Flatten every headline across all batches, enrich with {file, _origIndex, _pubDate}
   let allHeadlines=[];
   allBatches.forEach(b=>{
     (b.headlines||[]).forEach((h,i)=>{
       allHeadlines.push(Object.assign({},h,{
         _file:b.file,
         _origIndex:i,
-        _pubDate:parsePublishedDate(h.published)||new Date(b.date).getTime()
+        _batchDate:b.date,
+        _pubDate:parsePublishedDate(h.published)||(parseBatchDate(b.date)||new Date(b.date)).getTime()
       }));
     });
   });
-  // Time range filter based on _pubDate
-  // NOTE: when user has an active search query, we ignore time filter (show all matches)
-  if(!newsSearchQuery && newsTimeRange!=='all'){
-    if(newsTimeRange==='custom' && newsCustomStart && newsCustomEnd){
-      allHeadlines=allHeadlines.filter(h=>h._pubDate>=newsCustomStart && h._pubDate<=newsCustomEnd);
+  if(!newsSearchQuery&&newsTimeRange!=='all'){
+    if(newsTimeRange==='latest'){
+      allHeadlines.sort((a,b)=>b._pubDate-a._pubDate);
+      allHeadlines=allHeadlines.slice(0,4);
+    }else if(newsTimeRange==='custom'&&newsCustomStart&&newsCustomEnd){
+      allHeadlines=allHeadlines.filter(h=>h._pubDate>=newsCustomStart&&h._pubDate<=newsCustomEnd);
     }else{
       const now=Date.now();
-      const windows={today:24*3600*1000,'3day':3*24*3600*1000,week:7*24*3600*1000,month:30*24*3600*1000};
+      const windows={today:24*3600*1000,'3day':3*24*3600*1000,week:7*24*3600*1000};
       const cutoff=now-(windows[newsTimeRange]||0);
       allHeadlines=allHeadlines.filter(h=>h._pubDate>=cutoff);
     }
   }
-  // Search filter
   if(newsSearchQuery){
     const q=newsSearchQuery.toLowerCase().trim();
     allHeadlines=allHeadlines.filter(h=>{
@@ -1205,7 +1306,6 @@ function renderNewsFeed(){
     listEl.innerHTML='<div class="news-empty">'+msg+'</div>';
     return;
   }
-  // Group by published date label (falls back to published string itself)
   const groups={};
   const groupOrder=[];
   allHeadlines.forEach(h=>{
@@ -1213,11 +1313,9 @@ function renderNewsFeed(){
     if(!(key in groups)){groups[key]=[];groupOrder.push({key,sortKey:h._pubDate});}
     groups[key].push(h);
   });
-  // Sort groups newest-first
   groupOrder.sort((a,b)=>b.sortKey-a.sortKey);
   listEl.innerHTML=groupOrder.map(g=>renderDateGroup(g.key,groups[g.key])).join('');
 }
-// Parse Thai-style published date like "16 เม.ย. 2026" into timestamp
 function parsePublishedDate(s){
   if(!s)return 0;
   const thaiMonths={'ม.ค.':0,'ก.พ.':1,'มี.ค.':2,'เม.ย.':3,'พ.ค.':4,'มิ.ย.':5,'ก.ค.':6,'ส.ค.':7,'ก.ย.':8,'ต.ค.':9,'พ.ย.':10,'ธ.ค.':11};
@@ -1225,7 +1323,8 @@ function parsePublishedDate(s){
   if(m){
     const day=parseInt(m[1],10);
     const mon=thaiMonths[m[2]];
-    const year=parseInt(m[3],10);
+    let year=parseInt(m[3],10);
+    if(year>2400)year-=543;
     if(mon!==undefined)return new Date(year,mon,day).getTime();
   }
   const t=Date.parse(s);
@@ -1239,18 +1338,24 @@ function renderDateGroup(dateLabel,headlines){
 function renderHeadlineCard(h){
   const safeFile=encodeURIComponent(h._file||'');
   const tickers=normalizeTickers(h.tickers);
-  const tickerPills=tickers.map(t=>{
-    const s=t.sentiment||'neutral';
-    const star=s==='positive'?'<span class="tk-star positive">★</span>':s==='negative'?'<span class="tk-star negative">★</span>':'<span class="tk-star neutral">★</span>';
-    return '<span class="news-ticker-sm '+s+'">'+star+escapeText(t.symbol)+'</span>';
-  }).join('');
-  const metaLine=h.source?' <span class="news-src-inline">— '+escapeText(h.source)+'</span>':'';
-  return '<div class="news-dash-card" onclick="openNewsDetail(\''+safeFile+'\','+(h._origIndex||0)+')">'
-    +'<div class="news-dash-title">'+escapeText(h.title)+metaLine+'</div>'
-    +'<div class="news-item-tickers">'+tickerPills+'</div>'
-  +'</div>';
+  const tone=deriveTone(tickers);
+  const tagsHtml=tickers.slice(0,5).map(t=>'<span class="story-tag '+(t.sentiment||'neutral')+'">'+escapeText(t.symbol)+'</span>').join('');
+  const time=timeAgo(h._batchDate);
+  return '<article class="news-dash-card" onclick="openNewsDetail(\''+safeFile+'\','+(h._origIndex||0)+')">'
+    +'<svg class="story-bm" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>'
+    +'<div class="story-body">'
+      +'<div class="news-dash-title">'+escapeText(h.title)+'</div>'
+      +'<div class="story-tags">'+tagsHtml+'</div>'
+    +'</div>'
+    +'<div class="story-meta">'
+      +'<div class="story-meta-time">'+time+'</div>'
+      +'<div class="impact-wrap '+tone.impactClass+'">'
+        +impactIcon(tone.impactClass)
+        +'<div class="impact-label">'+tone.impactText+'</div>'
+      +'</div>'
+    +'</div>'
+  +'</article>';
 }
-// Support both old (string) and new (object with sentiment) ticker formats
 function normalizeTickers(tickers){
   if(!tickers)return[];
   return tickers.map(t=>typeof t==='string'?{symbol:t,sentiment:'neutral'}:{symbol:t.symbol||'',sentiment:t.sentiment||'neutral'});
@@ -1259,7 +1364,7 @@ function escapeText(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'
 function openNewsDetail(file,idx){
   let url='news-detail.html?file='+file;
   if(typeof idx==='number'&&idx>=0)url+='&idx='+idx;
-  openIframe('📰 News Detail',url);
+  openIframe('News Detail',url);
 }
 function filterNewsFeed(){
   const inp=document.getElementById('newsSearchInput');
@@ -1279,9 +1384,8 @@ function setNewsTimeRange(range){
   newsTimeRange=range;
   if(range!=='custom'){newsCustomStart=null;newsCustomEnd=null}
   document.querySelectorAll('.time-chip').forEach(c=>c.classList.toggle('active',c.dataset.range===range));
-  // Reset custom chip label when switching away
   const chip=document.getElementById('customDateChip');
-  if(chip && range!=='custom')chip.textContent='📅 ช่วงเวลาเอง';
+  if(chip&&range!=='custom')chip.textContent='ช่วงเวลาเอง';
   if(newsFeedCache)renderNewsFeed();
 }
 function openCustomDateModal(){
@@ -1290,7 +1394,6 @@ function openCustomDateModal(){
   const startEl=document.getElementById('dateRangeStart');
   const endEl=document.getElementById('dateRangeEnd');
   if(err)err.textContent='';
-  // Pre-fill with last-used or sensible defaults (last 7 days)
   const fmt=d=>d.toISOString().slice(0,10);
   const today=new Date();
   const weekAgo=new Date(today.getTime()-7*24*3600*1000);
@@ -1316,10 +1419,9 @@ function applyDateRange(){
   newsCustomStart=start;
   newsCustomEnd=end;
   newsTimeRange='custom';
-  // Update chip label to show selected range
   const thaiMonthsShort=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
   const fmt=ts=>{const d=new Date(ts);return d.getDate()+' '+thaiMonthsShort[d.getMonth()]};
-  if(chip)chip.textContent='📅 '+fmt(start)+' – '+fmt(end);
+  if(chip)chip.textContent=fmt(start)+' – '+fmt(end);
   document.querySelectorAll('.time-chip').forEach(c=>c.classList.toggle('active',c.dataset.range==='custom'));
   closeDateModal();
   if(newsFeedCache)renderNewsFeed();
