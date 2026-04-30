@@ -172,6 +172,15 @@ body{padding:0 0 100px;max-width:480px;margin:0 auto;position:relative}
     <div class="news-sub">ข่าวสารที่ขับเคลื่อนตลาด · คัดกรองโดย AI</div>
   </header>
 
+  <div class="sect-hd">
+    <div class="sect-label">Market Movers · จากข่าว</div>
+    <a class="sect-link">ดูทั้งหมด ›</a>
+  </div>
+
+  <div class="movers" id="movers">
+    <div class="loading" style="margin:0 auto"><div class="loading-row"><div class="spinner"></div><span>กำลังโหลดราคา...</span></div></div>
+  </div>
+
   <div class="search">
     <svg class="search-i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     <input placeholder="ค้นหาข่าว / ticker / theme เช่น NVDA, AI, Oil"/>
@@ -193,15 +202,6 @@ body{padding:0 0 100px;max-width:480px;margin:0 auto;position:relative}
 
   <div id="topStories">
     <div class="loading"><div class="loading-row"><div class="spinner"></div><span>กำลังโหลดข่าวล่าสุด...</span></div></div>
-  </div>
-
-  <div class="sect-hd">
-    <div class="sect-label">Market Movers · จากข่าว</div>
-    <a class="sect-link">ดูทั้งหมด ›</a>
-  </div>
-
-  <div class="movers" id="movers">
-    <div class="loading" style="margin:0 auto"><div class="loading-row"><div class="spinner"></div><span>กำลังโหลดราคา...</span></div></div>
   </div>
 
   <div id="aiInsight"></div>
@@ -230,14 +230,37 @@ const NEWS_BASE      = 'https://raw.githubusercontent.com/jptrustlearning/pages/
 const SP500_CSV_URL  = 'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_sp500_daily.csv';
 
 // ==== Helpers ====
+
+// Convention from NEWS-UPDATE-INSTRUCTION.md: batch dates use 'Z' suffix
+// but the time written is Thai local (UTC+7), not actual UTC. Convert Z
+// to +07:00 so the Date object lands at the real moment of publication.
+function parseBatchDate(iso) {
+  if (!iso || typeof iso !== 'string') return null;
+  let s = iso;
+  if (s.endsWith('Z')) s = s.slice(0, -1) + '+07:00';
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+const _MONTHS_TH = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function shortDate(d) {
+  return d.getDate() + ' ' + _MONTHS_TH[d.getMonth()];
+}
+
 function timeAgo(iso) {
-  if (!iso) return '';
-  const d = new Date(iso);
-  const now = new Date();
-  const diffH = (now - d) / 3600000;
-  if (diffH < 1) return Math.max(1, Math.floor(diffH * 60)) + 'm ago';
+  const d = parseBatchDate(iso);
+  if (!d) return '';
+  const diffMs = Date.now() - d.getTime();
+  // Future date or sub-minute (treat as fresh) — show date instead of bogus "1m ago"
+  if (diffMs < 0) return shortDate(d);
+  const diffM = diffMs / 60000;
+  if (diffM < 1) return 'just now';
+  if (diffM < 60) return Math.floor(diffM) + 'm ago';
+  const diffH = diffMs / 3600000;
   if (diffH < 24) return Math.floor(diffH) + 'h ago';
-  return Math.floor(diffH / 24) + 'd ago';
+  const diffD = diffH / 24;
+  if (diffD < 7) return Math.floor(diffD) + 'd ago';
+  return shortDate(d);
 }
 
 function shortSource(s) {
