@@ -109,7 +109,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 /* Member name overlay: hidden — new card has owl/brand on right, no name slot */
 .rc-member-name{display:none}
 /* Points overlay: dynamic number rendered in upper-left maroon space, with static "POINTS" word in image acting as label below */
-.rc-points{position:absolute;left:8%;top:22%;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;width:18%;aspect-ratio:1;pointer-events:none}
+.rc-points{position:absolute;left:6%;top:12%;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;width:22%;aspect-ratio:1;pointer-events:none}
 .rc-points-ring{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;border:1.5px solid transparent;border-top-color:rgba(212,175,55,0.7);border-right-color:rgba(244,228,186,0.3);animation:pointsSpin 3s linear infinite;filter:drop-shadow(0 0 4px rgba(212,175,55,0.4))}
 .rc-points-ring2{position:absolute;inset:7%;border-radius:50%;border:1px solid transparent;border-bottom-color:rgba(244,228,186,0.5);border-left-color:rgba(212,175,55,0.2);animation:pointsSpin 5s linear infinite reverse;filter:drop-shadow(0 0 3px rgba(212,175,55,0.3))}
 .rc-points-glow{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,0.18) 0%,rgba(212,175,55,0.06) 50%,transparent 72%);animation:pointsPulse 2.5s ease-in-out infinite}
@@ -118,15 +118,6 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .rc-points-label{display:none}
 @keyframes pointsSpin{to{transform:rotate(360deg)}}
 @keyframes pointsPulse{0%,100%{opacity:0.6;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
-
-/* User Guide link on home card (lower-right gold area) */
-.rc-guide-link{position:absolute;left:65%;top:56%;display:flex;flex-direction:column;align-items:center;gap:0.6cqw;cursor:pointer;z-index:5;width:14%;-webkit-tap-highlight-color:transparent;transition:transform 0.25s ease}
-.rc-guide-link:active{transform:scale(0.94)}
-.rc-guide-icon{width:100%;height:auto;aspect-ratio:1;display:block;filter:drop-shadow(0 3px 6px rgba(184,134,11,0.35))}
-.rc-guide-icon .rc-guide-page{transform-origin:32px 22px;transform-box:fill-box;animation:pageFlip 2.6s ease-in-out infinite}
-@keyframes pageFlip{0%,100%{transform:rotate(0) translateY(0)}30%{transform:rotate(-7deg) translateY(-0.5px)}55%{transform:rotate(2deg)}80%{transform:rotate(-3deg)}}
-.rc-guide-label{font-family:'Cinzel','Anuphan',serif;font-size:max(10px,2cqw);color:#8B6914;letter-spacing:0.04em;text-align:center;text-shadow:0 1px 2px rgba(255,254,248,0.6);font-weight:600;line-height:1.2;white-space:nowrap}
-@media(max-width:380px){.rc-guide-label{font-size:9px;letter-spacing:0.02em}}
 
 @media(max-width:360px){.rc-member-name{font-size:13px}}
 
@@ -435,26 +426,6 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             <canvas id="heroCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;"></canvas>
             <div class="rc-member-name" id="cardName">Joonstinn</div>
             <div class="rc-points"><div class="rc-points-glow"></div><div class="rc-points-ring"></div><div class="rc-points-ring2"></div><div class="rc-points-num" id="cardPoints">100</div><div class="rc-points-label">Points</div></div>
-            <div class="rc-guide-link" onclick="openIframe('คู่มือการใช้งาน','https://jptrustlearning.github.io/pages/user-guide.html?v=1777561550')" role="button" tabindex="0" aria-label="คู่มือการใช้งาน">
-                <svg class="rc-guide-icon" viewBox="0 0 64 64" fill="none" stroke="#B8860B" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <ellipse cx="32" cy="54.5" rx="22" ry="1.6" fill="#8B6914" opacity="0.18" stroke="none"/>
-                    <path d="M 8 16 L 32 22 L 32 50 L 8 46 Z" fill="#FFFEF8" stroke="#B8860B" stroke-width="1.8"/>
-                    <path d="M 56 16 L 32 22 L 32 50 L 56 46 Z" fill="#FFFEF8" stroke="#B8860B" stroke-width="1.8"/>
-                    <g stroke="#D4AF37" stroke-width="0.95" opacity="0.55">
-                        <line x1="13" y1="28" x2="28" y2="30"/>
-                        <line x1="13" y1="33" x2="28" y2="35"/>
-                        <line x1="13" y1="38" x2="28" y2="40"/>
-                    </g>
-                    <g stroke="#D4AF37" stroke-width="0.95" opacity="0.55">
-                        <line x1="36" y1="30" x2="51" y2="28"/>
-                        <line x1="36" y1="35" x2="51" y2="33"/>
-                        <line x1="36" y1="40" x2="51" y2="38"/>
-                    </g>
-                    <line x1="32" y1="22" x2="32" y2="50" stroke="#8B6914" stroke-width="1.3" opacity="0.55"/>
-                    <path class="rc-guide-page" d="M 32 22 Q 39 13 48 16 L 49 18 Q 41 17 32 22 Z" fill="#FAF6ED" stroke="#B8860B" stroke-width="1.5"/>
-                </svg>
-                <div class="rc-guide-label">คู่มือการใช้งาน</div>
-            </div>
         </div>
         <div class="home-content">
             <div class="install-banner-home" id="installBanner" onclick="handleInstallClick()">
@@ -1261,7 +1232,7 @@ function openComingSoon(name){alert('กลยุทธ์ "'+name+'" กำล�
 function jptToast(msg){let t=document.getElementById('jpt-toast');if(!t){t=document.createElement('div');t.id='jpt-toast';document.body.appendChild(t)}t.textContent=msg;t.classList.add('show');clearTimeout(t._hideTimer);t._hideTimer=setTimeout(()=>t.classList.remove('show'),2800)}
 function btcComingSoon(e){if(e){e.stopPropagation();e.preventDefault()}jptToast('🚧 Bitcoin · กำลังพัฒนา · เร็วๆ นี้')}
 let lastScreen='home';
-function openIframe(title,url,navScreen){const tEl=document.getElementById('iframeTitle'),tb=document.getElementById('iframeTopbar'),ld=document.getElementById('iframeLoading'),ct=document.getElementById('iframeContainer'),ifr=document.getElementById('iframeContent');const cur=document.querySelector('.screen.active');if(cur)lastScreen=cur.id.replace('screen-','');if(tEl)tEl.textContent=title;/* Hide topbar only for pages that already own their header (sp500-combined-strategy); show for everything else including news-detail */if(tb){const hideTopbar=/sp500-combined-strategy|sp500-strategy-pro|sp500-rolling-6m-momentum|gold-momentum-app|roadmap\.html|portfolio-planner|finance-planner|my-portfolio|user-guide/.test(url);tb.style.display=hideTopbar?'none':'flex'}ld.style.display='flex';ct.style.display='none';ifr.src='about:blank';document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-iframe').classList.add('active');/* Sync bottom nav highlight — auto-detect tab from URL when navScreen not explicitly passed */if(!navScreen){if(/sp500-(strategy-pro|combined-strategy|rolling-6m-momentum)|smc-patient-hunter|gold-swing-h1-sensitivity/.test(url))navScreen='lab';else if(/gold-momentum-app|Free_scannerSP500|my-portfolio|user-guide/.test(url))navScreen='more';else if(/portfolio-planner|finance-planner/.test(url))navScreen='roadmap';else if(/news-detail/.test(url))navScreen='news'}document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));if(navScreen){const b=document.querySelector('.nav-item[data-screen="'+navScreen+'"]');if(b)b.classList.add('active')}setTimeout(()=>{ifr.src=url;ifr.onload=function(){ld.style.display='none';ct.style.display='block'}},100);window.scrollTo({top:0});/* Strip cache-bust ?v= for cleaner analytics URLs */const cleanUrl=url.replace(/\?v=\d+/,'');logEvent('page_view',{screen:'iframe',url:cleanUrl})}
+function openIframe(title,url,navScreen){const tEl=document.getElementById('iframeTitle'),tb=document.getElementById('iframeTopbar'),ld=document.getElementById('iframeLoading'),ct=document.getElementById('iframeContainer'),ifr=document.getElementById('iframeContent');const cur=document.querySelector('.screen.active');if(cur)lastScreen=cur.id.replace('screen-','');if(tEl)tEl.textContent=title;/* Hide topbar only for pages that already own their header (sp500-combined-strategy); show for everything else including news-detail */if(tb){const hideTopbar=/sp500-combined-strategy|sp500-strategy-pro|sp500-rolling-6m-momentum|gold-momentum-app|roadmap\.html|portfolio-planner|finance-planner|my-portfolio/.test(url);tb.style.display=hideTopbar?'none':'flex'}ld.style.display='flex';ct.style.display='none';ifr.src='about:blank';document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-iframe').classList.add('active');/* Sync bottom nav highlight — auto-detect tab from URL when navScreen not explicitly passed */if(!navScreen){if(/sp500-(strategy-pro|combined-strategy|rolling-6m-momentum)|smc-patient-hunter|gold-swing-h1-sensitivity/.test(url))navScreen='lab';else if(/gold-momentum-app|Free_scannerSP500|my-portfolio/.test(url))navScreen='more';else if(/portfolio-planner|finance-planner/.test(url))navScreen='roadmap';else if(/news-detail/.test(url))navScreen='news'}document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));if(navScreen){const b=document.querySelector('.nav-item[data-screen="'+navScreen+'"]');if(b)b.classList.add('active')}setTimeout(()=>{ifr.src=url;ifr.onload=function(){ld.style.display='none';ct.style.display='block'}},100);window.scrollTo({top:0});/* Strip cache-bust ?v= for cleaner analytics URLs */const cleanUrl=url.replace(/\?v=\d+/,'');logEvent('page_view',{screen:'iframe',url:cleanUrl})}
 function closeIframe(){document.getElementById('iframeContent').src='about:blank';navigateTo(lastScreen)}
 /* Listen for openIframe requests from within child iframes (e.g. roadmap → portfolio planner) */
 window.addEventListener('message', function(ev) {
