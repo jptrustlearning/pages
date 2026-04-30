@@ -106,15 +106,14 @@ body::before{content:'';position:absolute;top:0;left:0;right:0;height:480px;back
 .story-tag.positive{color:#6FD774;background:rgba(46,125,50,0.20);border-color:rgba(111,215,116,0.42)}
 .story-tag.negative{color:#FF8484;background:rgba(198,40,40,0.22);border-color:rgba(255,132,132,0.42)}
 .story-tag.neutral{color:#F4E4BA;background:rgba(212,175,55,0.12);border-color:rgba(212,175,55,0.32)}
-.story-meta{flex-shrink:0;width:84px;display:flex;flex-direction:column;justify-content:center;gap:7px;padding-left:11px;border-left:1px dashed rgba(212,175,55,0.28);font-family:'Sarabun','Anuphan',sans-serif;position:relative;z-index:1}
-.story-meta-time{font-size:10.5px;color:rgba(244,228,186,0.62);line-height:1.45;font-weight:400}
-.story-meta-time .src{display:block;color:rgba(212,175,55,0.78);font-weight:400;margin-top:2px;font-size:10px}
-.story-meta-impact{display:flex;flex-direction:column;gap:2px;padding-top:5px;border-top:1px dashed rgba(212,175,55,0.18)}
-.story-meta-impact-label{font-family:'Cinzel',serif;font-size:8px;font-weight:500;color:rgba(244,228,186,0.5);letter-spacing:1.2px;text-transform:uppercase}
-.story-meta-impact-value{font-family:'Sarabun','Anuphan',sans-serif;font-size:11.5px;font-weight:500;letter-spacing:0.3px}
-.story-meta-impact-value.bullish{color:#6FD774}
-.story-meta-impact-value.bearish{color:#FF8484}
-.story-meta-impact-value.neutral{color:#F4E4BA}
+.story-meta{flex-shrink:0;width:84px;display:flex;flex-direction:column;justify-content:center;gap:6px;padding-left:11px;border-left:1px dashed rgba(212,175,55,0.28);font-family:'Sarabun','Anuphan',sans-serif;position:relative;z-index:1}
+.story-meta-time{font-size:10.5px;color:rgba(244,228,186,0.62);line-height:1.45;font-weight:400;text-align:center}
+.impact-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;padding-top:7px;border-top:1px dashed rgba(212,175,55,0.18)}
+.impact-icon{width:34px;height:34px;display:block}
+.impact-wrap.bullish{color:#6FD774}
+.impact-wrap.bearish{color:#FF8484}
+.impact-wrap.neutral{color:#F4E4BA}
+.impact-label{font-family:'Sarabun','Anuphan',sans-serif;font-size:10px;font-weight:500;letter-spacing:0.4px;color:inherit;text-transform:uppercase}
 .story-bm{position:absolute;top:12px;right:12px;width:14px;height:16px;color:#D4AF37;opacity:0.55;cursor:pointer;transition:opacity .2s;z-index:2}
 .story-bm:hover{opacity:0.95}
 .story-bm svg{width:14px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
@@ -218,10 +217,9 @@ body::before{content:'';position:absolute;top:0;left:0;right:0;height:480px;back
   </div>
 
   <div class="time-filter">
-    <button class="time-chip active" data-range="3day" onclick="setNewsTimeRange('3day')">3 วันล่าสุด</button>
-    <button class="time-chip" data-range="today" onclick="setNewsTimeRange('today')">วันนี้</button>
+    <button class="time-chip active" data-range="latest" onclick="setNewsTimeRange('latest')">ล่าสุด</button>
+    <button class="time-chip" data-range="3day" onclick="setNewsTimeRange('3day')">3 วัน</button>
     <button class="time-chip" data-range="week" onclick="setNewsTimeRange('week')">7 วัน</button>
-    <button class="time-chip" data-range="month" onclick="setNewsTimeRange('month')">30 วัน</button>
     <button class="time-chip time-chip-custom" data-range="custom" onclick="openCustomDateModal()" id="customDateChip">ช่วงเวลาเอง</button>
   </div>
 
@@ -366,13 +364,46 @@ function openDetail(file, origIdx) {
   window.location.href = url;
 }
 
+// SVG icons for impact (bull / bear / moon)
+function impactIcon(impactClass) {
+  if (impactClass === 'bullish') {
+    // Green bull — horns + face
+    return '<svg class="impact-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'
+      + '<path d="M8 13 Q 4 7, 6 3 Q 10 5, 10 11"/>'
+      + '<path d="M24 13 Q 28 7, 26 3 Q 22 5, 22 11"/>'
+      + '<ellipse cx="16" cy="20" rx="8" ry="8.5"/>'
+      + '<ellipse cx="16" cy="23.5" rx="3.6" ry="2.2" fill="currentColor" fill-opacity="0.22"/>'
+      + '<circle cx="13" cy="19" r="0.9" fill="currentColor"/>'
+      + '<circle cx="19" cy="19" r="0.9" fill="currentColor"/>'
+      + '</svg>';
+  }
+  if (impactClass === 'bearish') {
+    // Red bear — round ears + face
+    return '<svg class="impact-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">'
+      + '<circle cx="9" cy="10" r="3.8" fill="currentColor" fill-opacity="0.18"/>'
+      + '<circle cx="23" cy="10" r="3.8" fill="currentColor" fill-opacity="0.18"/>'
+      + '<circle cx="16" cy="19" r="9"/>'
+      + '<ellipse cx="16" cy="22.5" rx="3.2" ry="2.2" fill="currentColor" fill-opacity="0.22"/>'
+      + '<circle cx="16" cy="20.5" r="0.7" fill="currentColor"/>'
+      + '<circle cx="13" cy="18" r="0.9" fill="currentColor"/>'
+      + '<circle cx="19" cy="18" r="0.9" fill="currentColor"/>'
+      + '</svg>';
+  }
+  // Mixed → gold full moon with subtle craters
+  return '<svg class="impact-icon" viewBox="0 0 32 32">'
+    + '<circle cx="16" cy="16" r="11" fill="currentColor" fill-opacity="0.7" stroke="currentColor" stroke-width="1.2"/>'
+    + '<circle cx="11" cy="13" r="1.6" fill="#3a141d" fill-opacity="0.28"/>'
+    + '<circle cx="20" cy="19" r="1.1" fill="#3a141d" fill-opacity="0.28"/>'
+    + '<circle cx="14" cy="20.5" r="0.9" fill="#3a141d" fill-opacity="0.28"/>'
+    + '</svg>';
+}
+
 // ==== Render: News Feed (production-style: time-range filter + group by date) ====
 function renderNewsCard(h) {
   const tone = deriveTone(h.tickers);
   const tagsHtml = (h.tickers || []).slice(0, 5).map(t =>
     `<span class="story-tag ${t.sentiment || 'neutral'}">${escapeHtml(t.symbol)}</span>`
   ).join('');
-  const sourceShort = shortSource(h.source);
   const time = timeAgo(h._batchDate);
   const card = document.createElement('article');
   card.className = 'story';
@@ -384,10 +415,10 @@ function renderNewsCard(h) {
       <div class="story-tags">${tagsHtml}</div>
     </div>
     <div class="story-meta">
-      <div class="story-meta-time">${time}<span class="src">${escapeHtml(sourceShort)}</span></div>
-      <div class="story-meta-impact">
-        <span class="story-meta-impact-label">Impact</span>
-        <span class="story-meta-impact-value ${tone.impactClass}">${tone.impactText}</span>
+      <div class="story-meta-time">${time}</div>
+      <div class="impact-wrap ${tone.impactClass}">
+        ${impactIcon(tone.impactClass)}
+        <div class="impact-label">${tone.impactText}</div>
       </div>
     </div>`;
   return card;
@@ -414,11 +445,15 @@ function renderNewsFeed() {
 
   // Time-range filter (skip when search is active — show all matches)
   if (!newsSearchQuery && newsTimeRange !== 'all') {
-    if (newsTimeRange === 'custom' && newsCustomStart && newsCustomEnd) {
+    if (newsTimeRange === 'latest') {
+      // Sort newest first, take top 4
+      all.sort((a, b) => b._pubDate - a._pubDate);
+      all = all.slice(0, 4);
+    } else if (newsTimeRange === 'custom' && newsCustomStart && newsCustomEnd) {
       all = all.filter(h => h._pubDate >= newsCustomStart && h._pubDate <= newsCustomEnd);
     } else {
       const now = Date.now();
-      const windows = { today: 24*3600*1000, '3day': 3*24*3600*1000, week: 7*24*3600*1000, month: 30*24*3600*1000 };
+      const windows = { '3day': 3*24*3600*1000, week: 7*24*3600*1000 };
       const cutoff = now - (windows[newsTimeRange] || 0);
       all = all.filter(h => h._pubDate >= cutoff);
     }
@@ -609,7 +644,7 @@ function renderInsight(latestBatch) {
 // ==== State ====
 let newsFeedCache = null;
 let newsSearchQuery = '';
-let newsTimeRange = '3day';
+let newsTimeRange = 'latest';
 let newsCustomStart = null;
 let newsCustomEnd = null;
 
