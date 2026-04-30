@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JP Trust Learning — Member Dashboard</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a0a0e">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="JP Trust">
+    <link rel="apple-touch-icon" href="pwa-icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="pwa-icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="384x384" href="pwa-icons/icon-384x384.png">
+    <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@200;300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+    --cream:#FAF6ED;--cream-warm:#F5EFE0;--cream-deep:#EDE4D0;--cream-card:#FFFEF8;
+    --burgundy:#722F37;--burgundy-dark:#1a0a0e;--burgundy-mid:#2d1018;--burgundy-light:#3a1520;
+    --gold:#D4AF37;--gold-dark:#B8860B;--gold-deep:#8B6914;--gold-light:#F4E4BA;
+    --gold-glow:rgba(212,175,55,0.15);--gold-border:rgba(212,175,55,0.2);
+    --text-dark:#3D3228;--text-dark-sub:#5A3D20;--text-dark-muted:#7A6F62;
+    --text-light:#E8E4DC;--text-light-sub:#F4E4BA;--text-light-muted:#A09B92;
+    --green:#2E7D32;--green-light:#4CAF50;--red:#C62828;
+    --radius:16px;--radius-sm:12px;--radius-xs:8px;
+    --safe-bottom:env(safe-area-inset-bottom,0px)
+}
+html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);color:var(--text-dark);overflow-x:hidden;min-height:100vh;min-height:100dvh}
+
+/* JPT Icon system */
+.jpt-icon{display:inline-flex;align-items:center;justify-content:center}
+.jpt-icon svg{width:100%;height:100%}
+
+/* Splash Screen */
+.splash-screen{position:fixed;inset:0;background:linear-gradient(160deg,var(--burgundy-dark),var(--burgundy-mid) 40%,var(--burgundy-light) 60%,var(--burgundy-mid) 80%,var(--burgundy-dark));z-index:50000;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s ease,transform .6s ease}
+.splash-screen.hidden{opacity:0;transform:scale(1.1);pointer-events:none}
+.splash-screen::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(212,175,55,0.08),transparent 60%);pointer-events:none}
+.splash-logo{width:140px;height:140px;animation:spinIn 1.5s cubic-bezier(.22,1,.36,1) forwards;position:relative;z-index:1}
+.splash-logo img{width:100%;height:100%;object-fit:contain}
+@keyframes spinIn{0%{opacity:0;transform:rotate(0deg) scale(0.5)}40%{opacity:1;transform:rotate(200deg) scale(1.05)}70%{transform:rotate(340deg) scale(0.98)}100%{opacity:1;transform:rotate(360deg) scale(1)}}
+.splash-text{font-family:'Cinzel',serif;font-size:14px;letter-spacing:5px;color:var(--gold);text-transform:uppercase;margin-top:20px;opacity:0;animation:fadeInText .8s ease .8s forwards;position:relative;z-index:1}
+@keyframes fadeInText{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* Login */
+.login-screen{position:fixed;inset:0;background:linear-gradient(160deg,var(--burgundy-dark),var(--burgundy-mid) 40%,var(--burgundy-light) 60%,var(--burgundy-mid) 80%,var(--burgundy-dark));z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;transition:opacity .5s,transform .5s}
+.login-screen.hidden{opacity:0;transform:scale(1.05);pointer-events:none}
+.login-screen::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 30%,rgba(114,47,55,0.25),transparent 50%),radial-gradient(ellipse at 70% 60%,rgba(90,30,40,0.2),transparent 50%);pointer-events:none}
+.login-logo{width:80px;height:80px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:20px;font-weight:700;color:#fff;letter-spacing:2px;box-shadow:0 0 40px var(--gold-glow),0 0 80px rgba(212,175,55,0.08);margin-bottom:28px;position:relative;z-index:1}
+.login-title{font-family:'Cinzel',serif;font-size:14px;letter-spacing:5px;color:var(--gold);text-transform:uppercase;margin-bottom:8px;position:relative;z-index:1}
+.login-subtitle{color:var(--text-light-muted);font-size:14px;margin-bottom:24px;position:relative;z-index:1}
+.login-form{width:100%;max-width:380px;display:flex;flex-direction:column;gap:14px;position:relative;z-index:1}
+.login-input{width:100%;padding:16px 20px;background:rgba(26,10,14,0.6);border:1.5px solid var(--gold-border);border-radius:var(--radius-sm);color:var(--gold-light);font-family:'Sarabun','Anuphan',sans-serif;font-size:16px;outline:none;transition:border-color .3s;backdrop-filter:blur(4px)}
+.login-input::placeholder{color:var(--text-light-muted)}.login-input:focus{border-color:var(--gold)}
+.login-otp-input{text-align:center;font-size:28px;letter-spacing:10px;font-weight:600;font-family:'DM Serif Display',serif}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--gold-border);background:transparent;transition:background .2s}
+.pin-dot.filled{background:var(--gold);border-color:var(--gold)}
+.login-btn{padding:16px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border:none;border-radius:var(--radius-sm);color:#1a0a0e;font-family:'Sarabun','Anuphan',sans-serif;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 4px 20px rgba(212,175,55,0.3);transition:transform .2s}.login-btn:active{transform:scale(.97)}
+.login-link{color:var(--text-light-muted);font-size:13px;text-align:center;margin-top:8px;cursor:pointer}.login-link span{color:var(--gold)}
+.login-step{display:none}.login-step.active{display:flex;flex-direction:column;gap:14px}
+.otp-sent-msg{background:rgba(76,175,80,0.15);color:var(--green-light);padding:12px 16px;border-radius:var(--radius-xs);font-size:13px;text-align:center}
+.install-banner{display:none;align-items:center;gap:12px;padding:14px 16px;margin-bottom:20px;max-width:380px;width:100%;background:rgba(212,175,55,0.08);border:1px solid var(--gold-border);border-radius:var(--radius);cursor:pointer;transition:all .2s;position:relative;z-index:1}
+.install-banner:active{transform:scale(.98)}.install-banner.show{display:flex}
+.install-banner-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#FFF5E1}
+.install-banner-icon .jpt-icon svg{width:22px;height:22px}
+.install-banner-text{flex:1}.install-banner-title{font-size:14px;font-weight:600;color:var(--gold-light)}.install-banner-desc{font-size:12px;color:var(--text-light-muted);margin-top:2px}
+.install-banner-btn{padding:8px 16px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border:none;border-radius:20px;color:#1a0a0e;font-family:'Sarabun','Anuphan',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0}
+
+/* App Shell */
+.app{display:none;flex-direction:column;min-height:100vh;min-height:100dvh;padding-bottom:calc(90px + var(--safe-bottom))}.app.active{display:flex}
+
+/* Top Bar */
+.topbar{background:transparent;padding:14px 20px 10px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.avatar{width:42px;height:42px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:#fff;box-shadow:0 3px 10px rgba(212,175,55,0.3)}
+.greeting{font-size:12px;color:var(--text-light-muted)}.user-name{font-size:16px;font-weight:700;background:linear-gradient(135deg,#8B2A35 0%,#C4526A 35%,#D4AF37 65%,#F4E4BA 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-shadow:0 1px 2px rgba(0,0,0,0.15);letter-spacing:0.3px}
+.refresh-btn{width:22px;height:22px;border:none;background:transparent;padding:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--gold);opacity:0.75;transition:opacity .2s,transform .3s;border-radius:50%}
+.refresh-btn:hover,.refresh-btn:active{opacity:1}
+.refresh-btn svg{width:14px;height:14px}
+.refresh-btn.spinning svg{animation:refreshSpin 0.8s cubic-bezier(.4,.2,.2,1)}
+@keyframes refreshSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.topbar-right{display:flex;gap:8px}
+.icon-btn{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(212,175,55,0.2);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s;position:relative}
+.icon-btn:active{background:rgba(255,255,255,0.15)}.icon-btn svg{width:20px;height:20px;color:var(--text-light-muted)}
+.notif-dot{position:absolute;top:8px;right:8px;width:8px;height:8px;background:var(--gold);border-radius:50%;border:2px solid var(--burgundy-dark)}
+
+/* Screens */
+.screen{display:none;flex:1;overflow-y:auto}.screen.active{display:block}
+.screen-content{padding:0 20px 24px}
+
+/* Home Hero */
+.home-hero{background:linear-gradient(160deg,var(--burgundy-dark),var(--burgundy-mid) 40%,var(--burgundy-light) 60%,var(--burgundy-mid));padding:16px;border-radius:28px;margin:12px 16px 0;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(26,10,14,0.4),0 0 0 1px rgba(212,175,55,0.08)}
+.home-hero::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 70% 30%,rgba(212,175,55,0.06),transparent 60%);border-radius:28px;pointer-events:none;z-index:0}
+.hero-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;border-radius:28px}
+.balance-card{position:relative;z-index:1}
+.balance-label{font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:8px}
+.balance-row{display:flex;align-items:baseline;gap:8px;margin-bottom:4px}
+.balance-amount{font-family:'DM Serif Display',serif;font-size:38px;color:var(--text-light);line-height:1}
+.balance-currency{font-size:14px;color:var(--text-light-muted);font-weight:500}
+.balance-change{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:500;padding:4px 10px;border-radius:20px;margin-top:4px}
+.balance-change.up{color:var(--green-light);background:rgba(76,175,80,0.15)}
+.member-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(212,175,55,0.1);border:1px solid var(--gold-border);border-radius:20px;font-size:12px;color:var(--gold-light);margin-top:14px}
+.member-badge .jpt-icon svg{width:14px;height:14px;color:var(--gold)}
+
+/* Reward Card */
+.reward-card{width:auto;overflow:hidden;position:relative;border-radius:16px;container-type:inline-size}
+.reward-card img{width:100%;display:block}
+.rc-member-name{position:absolute;left:5%;bottom:38%;font-family:'Anuphan',sans-serif;font-size:4.5cqw;font-weight:500;color:var(--text-light);letter-spacing:1px;text-shadow:0 1px 4px rgba(0,0,0,0.4)}
+.rc-points{position:absolute;right:22%;top:6%;transform:translateX(50%);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;width:22%;aspect-ratio:1}
+.rc-points-ring{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;border:1.5px solid transparent;border-top-color:rgba(212,175,55,0.7);border-right-color:rgba(244,228,186,0.3);animation:pointsSpin 3s linear infinite;filter:drop-shadow(0 0 4px rgba(212,175,55,0.4))}
+.rc-points-ring2{position:absolute;inset:7%;border-radius:50%;border:1px solid transparent;border-bottom-color:rgba(244,228,186,0.5);border-left-color:rgba(212,175,55,0.2);animation:pointsSpin 5s linear infinite reverse;filter:drop-shadow(0 0 3px rgba(212,175,55,0.3))}
+.rc-points-glow{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,0.12) 0%,rgba(212,175,55,0.04) 50%,transparent 70%);animation:pointsPulse 2.5s ease-in-out infinite}
+.rc-points-num{font-family:'DM Serif Display',serif;font-size:8cqw;color:var(--gold-light);line-height:1;position:relative;z-index:1;text-shadow:0 0 13px rgba(212,175,55,0.55)}
+.rc-points-label{font-family:'Cinzel',serif;font-size:2.2cqw;color:var(--gold);letter-spacing:0.25em;text-transform:uppercase;margin-top:1%;position:relative;z-index:1;opacity:0.85}
+@keyframes pointsSpin{to{transform:rotate(360deg)}}
+@keyframes pointsPulse{0%,100%{opacity:0.6;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
+
+@media(max-width:360px){.rc-member-name{font-size:13px}}
+
+/* Cream Content */
+.home-content{padding:16px 20px 24px;position:relative;z-index:2}
+.quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+.quick-action{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 8px;background:var(--cream-card);border:1px solid rgba(212,175,55,0.15);border-radius:var(--radius);cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(114,47,55,0.04)}
+.quick-action:active{transform:scale(.95);box-shadow:0 4px 16px rgba(114,47,55,0.08)}
+.qa-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(139,34,82,0.2)}
+.qa-icon .jpt-icon svg{width:22px;height:22px;color:#FFF0D4;stroke:#FFF0D4}
+.qa-icon.bg-gold{background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF5E1}.qa-icon.bg-blue{background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF5E1}.qa-icon.bg-green{background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF5E1}.qa-icon.bg-burgundy{background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF5E1}
+.qa-label{font-size:11px;font-weight:500;color:var(--text-dark-muted);text-align:center;line-height:1.3}
+
+.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.section-title{font-size:16px;font-weight:600;color:var(--text-dark)}.section-link{font-size:13px;color:var(--gold-dark);cursor:pointer;font-weight:500}
+.dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+.dash-card{background:var(--cream-card);border:1.5px solid rgba(212,175,55,0.45);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all .2s;display:block;box-shadow:0 6px 20px rgba(114,47,55,0.15),0 2px 6px rgba(114,47,55,0.08),inset 0 0 0 1px rgba(255,255,255,0.5);position:relative;overflow:hidden}
+.dash-card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:60%;background:linear-gradient(180deg,transparent 0%,rgba(237,225,200,0.3) 100%);pointer-events:none;border-radius:0 0 var(--radius) var(--radius);z-index:0}
+.dash-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:70px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 70' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'%3E%3Cpath d='M0,55 C20,50 40,40 70,35 C100,30 130,38 160,30 C180,25 195,32 200,28 L200,70 L0,70 Z' fill='rgba(237,228,208,0.35)'/%3E%3Cpath d='M0,60 C30,52 60,45 100,40 C140,35 170,42 200,36 L200,70 L0,70 Z' fill='rgba(237,228,208,0.25)'/%3E%3Cpath d='M0,45 C25,42 50,30 80,28 C110,26 140,35 170,22 C190,15 200,20 200,18 L200,70 L0,70 Z' fill='rgba(212,175,55,0.08)'/%3E%3Cpath d='M0,40 Q50,25 100,30 Q150,35 200,20' fill='none' stroke='rgba(212,175,55,0.15)' stroke-width='1.5'/%3E%3Cpath d='M0,50 Q60,38 120,42 Q180,46 200,35' fill='none' stroke='rgba(212,175,55,0.1)' stroke-width='1'/%3E%3C/svg%3E");background-size:100% 100%;border-radius:0 0 var(--radius) var(--radius);z-index:0}
+.dash-card>*{position:relative;z-index:1}
+.dash-card:active{transform:scale(.97)}
+.dash-card-icon{margin-bottom:10px;color:#fff;width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);display:flex;align-items:center;justify-content:center}.dash-card-icon .jpt-icon svg{width:22px;height:22px;color:#FFF0D4;stroke:#FFF0D4}
+.dash-card-title{font-size:13px;font-weight:600;color:var(--text-dark-sub);margin-bottom:4px}.dash-card-desc{font-size:11px;color:var(--text-dark-muted);line-height:1.4}
+.dash-card-value{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text-dark);margin-top:8px}
+.dash-card-change{font-size:12px;font-weight:500;margin-top:2px}.dash-card-change.up{color:var(--green)}
+/* ===== COMING SOON variant — placeholder card with corner badge ===== */
+.dash-card.coming-soon{opacity:.85}
+.dash-card.coming-soon .dash-card-icon{background:linear-gradient(135deg,#8B6914,#B8860B,#D4AF37);opacity:.78}
+.dash-card.coming-soon::before{background:linear-gradient(180deg,transparent 0%,rgba(237,225,200,0.45) 100%)}
+.dash-card .soon-badge{position:absolute;top:10px;right:10px;z-index:2;padding:3px 9px;border-radius:10px;font-family:'Cinzel',serif;font-size:9px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:#FFFEF8;background:linear-gradient(135deg,#B8860B 0%,#D4AF37 100%);border:1px solid rgba(255,255,255,0.35);box-shadow:0 2px 6px rgba(184,134,11,0.35);white-space:nowrap}
+
+/* ===== SIGNAL CARD (Gold / BTC — replaces price with Buy/Sell score + bias) ===== */
+.signal-card .signal-scores{display:flex;gap:10px;margin-top:10px;margin-bottom:8px}
+.signal-card .signal-score{flex:1;display:flex;flex-direction:column;gap:1px;padding:7px 8px;border-radius:10px;text-align:center}
+.signal-card .signal-score.buy{background:rgba(46,125,50,0.13);border:1px solid rgba(46,125,50,0.3)}
+.signal-card .signal-score.sell{background:rgba(195,58,78,0.13);border:1px solid rgba(195,58,78,0.3)}
+.signal-card .ss-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;font-weight:700;opacity:.7}
+.signal-card .signal-score.buy .ss-label{color:#1B5E20}
+.signal-card .signal-score.sell .ss-label{color:#8B1F2F}
+.signal-card .ss-val{font-family:'DM Serif Display',serif;font-size:21px;font-weight:400;line-height:1.1;color:var(--text-dark,#3D3228);margin-top:1px}
+.signal-card .ss-delta{font-size:10px;font-weight:600;margin-top:1px;min-height:13px}
+.signal-card .ss-delta.up{color:#1B5E20}
+.signal-card .ss-delta.down{color:#8B1F2F}
+.signal-card .ss-delta.flat{color:var(--text-dark-muted,#7A6F62)}
+.signal-card .signal-bias{font-size:11px;font-weight:600;color:var(--text-dark-sub,#5A3D20);line-height:1.35;padding:6px 8px;border-radius:8px;background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.22);text-align:center;min-height:30px;display:flex;align-items:center;justify-content:center}
+.signal-card .signal-bias.bullish{background:rgba(46,125,50,0.1);border-color:rgba(46,125,50,0.28);color:#1B5E20}
+.signal-card .signal-bias.bearish{background:rgba(195,58,78,0.1);border-color:rgba(195,58,78,0.3);color:#8B1F2F}
+.signal-card .signal-bias.tug{background:rgba(212,175,55,0.13);border-color:rgba(212,175,55,0.32);color:#8B6914}
+.signal-card .signal-action{font-family:'Cinzel',serif;font-size:10.5px;font-weight:700;letter-spacing:1.5px;text-align:center;padding:6px 8px;border-radius:8px;margin-top:6px;min-height:28px;display:flex;align-items:center;justify-content:center;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);color:#8B6914}
+.signal-card .signal-action.buy{background:linear-gradient(135deg,rgba(46,125,50,0.18),rgba(46,125,50,0.08));border-color:rgba(46,125,50,0.4);color:#1B5E20}
+.signal-card .signal-action.sell{background:linear-gradient(135deg,rgba(195,58,78,0.18),rgba(195,58,78,0.08));border-color:rgba(195,58,78,0.42);color:#8B1F2F}
+.signal-card .signal-action.hold{background:rgba(212,175,55,0.14);border-color:rgba(212,175,55,0.35);color:#8B6914}
+
+/* ===== NEWS FEED CARDS ===== */
+/* Search header - replaces the balance-card hero */
+.news-search-header{padding:20px 20px 16px 20px;background:linear-gradient(180deg,#FFFEFB 0%,#FAF6ED 100%);border-bottom:1px solid rgba(212,175,55,0.2)}
+.news-search-title{font-family:'Cinzel',serif;font-size:13px;letter-spacing:3px;color:#722F37;text-transform:uppercase;font-weight:600;margin-bottom:12px;text-align:center}
+.news-search-box{position:relative;display:flex;align-items:center;background:#FFFEF8;border:1px solid rgba(212,175,55,0.35);border-radius:24px;padding:10px 14px;box-shadow:0 2px 8px rgba(114,47,55,0.06);transition:all .2s}
+.news-search-box:focus-within{border-color:#D4AF37;box-shadow:0 2px 14px rgba(212,175,55,0.25)}
+.news-search-icon{width:18px;height:18px;color:#8B6914;flex-shrink:0;margin-right:10px}
+.news-search-input{flex:1;border:none;outline:none;background:transparent;font-family:'Anuphan',sans-serif;font-size:14px;color:#3D3228;padding:2px 0}
+.news-search-input::placeholder{color:#A09585}
+.news-search-clear{background:rgba(114,47,55,0.08);border:none;width:22px;height:22px;border-radius:50%;color:#722F37;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.news-search-clear:hover{background:rgba(114,47,55,0.15)}
+.news-time-filter{display:flex;gap:6px;margin-top:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:2px 0}
+.news-time-filter::-webkit-scrollbar{display:none}
+.time-chip{flex-shrink:0;padding:7px 14px;border-radius:18px;border:1px solid rgba(212,175,55,0.3);background:rgba(255,254,248,0.6);color:#7A6F62;font-family:'Anuphan',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap}
+.time-chip:hover{background:rgba(212,175,55,0.1);color:#5A3D20}
+.time-chip.active{background:linear-gradient(135deg,#D4AF37,#B8860B);color:#fff;border-color:#B8860B;font-weight:600;box-shadow:0 2px 8px rgba(212,175,55,0.35)}
+.time-chip-custom{border-style:dashed;border-color:rgba(212,175,55,0.5);background:rgba(255,254,248,0.4)}
+.time-chip-custom.active{border-style:solid}
+
+/* ===== TRADINGVIEW TICKER TAPE ===== */
+.ticker-tape-wrapper{background:#0a0e17;border:1px solid rgba(212,175,55,0.35);border-radius:14px;margin:4px 0 18px 0;overflow:hidden;box-shadow:0 4px 18px rgba(114,47,55,0.18);position:relative}
+.ticker-tape-wrapper .tradingview-widget-container{width:100%}
+/* Hide TradingView copyright link (keep minimal branding compliance via tiny footer style) */
+.ticker-tape-wrapper .tradingview-widget-copyright{display:none}
+/* JP Trust owl badge overlay — covers TV logo at right edge, blocks click to tradingview.com */
+.ticker-owl-badge{position:absolute;top:0;right:0;bottom:0;width:52px;display:flex;align-items:center;justify-content:center;background:linear-gradient(270deg,#0a0e17 35%,rgba(10,14,23,0.85) 85%,transparent 100%);z-index:5;pointer-events:auto;cursor:default;gap:6px}
+.ticker-live-text{font-family:'Cinzel',serif;font-size:12px;font-weight:700;letter-spacing:2px;color:#FFFFFF;writing-mode:vertical-rl;transform:rotate(180deg);text-shadow:0 0 4px rgba(255,255,255,0.3)}
+.ticker-live-dot{width:8px;height:8px;border-radius:50%;background:#00E676;box-shadow:0 0 8px #00E676,0 0 12px rgba(0,230,118,0.6);animation:ticker-live-blink 1.2s ease-in-out infinite}
+@keyframes ticker-live-blink{
+  0%,100%{background:#00E676;box-shadow:0 0 8px #00E676,0 0 12px rgba(0,230,118,0.6);opacity:1}
+  50%{background:#1B5E20;box-shadow:0 0 4px rgba(27,94,32,0.5);opacity:0.5}
+}
+/* Extra safety: disable all pointer events on TV widget iframe (only owl overlay catches clicks) */
+.ticker-tape-wrapper iframe{pointer-events:none !important}
+
+/* News feed cards - dashboard card style (cream + wave), 2 per row */
+.news-batch-group{margin-bottom:28px}
+.news-batch-date{font-family:'Cinzel',serif;font-size:10.5px;letter-spacing:2.5px;color:var(--gold-deep,#8B6914);text-transform:uppercase;font-weight:600;padding:0 4px 10px 4px;margin-bottom:10px;border-bottom:1px solid rgba(212,175,55,0.3);display:flex;align-items:center;gap:10px}
+.news-batch-date::before{content:'◆';color:var(--gold,#D4AF37);font-size:9px}
+.news-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+.news-dash-card{background:#FFFFFF;border:1px solid rgba(212,175,55,0.15);border-radius:var(--radius,16px);padding:14px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 4px 16px rgba(114,47,55,0.1),0 1px 4px rgba(0,0,0,0.06);position:relative;overflow:hidden;min-height:170px}
+.news-dash-card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:60%;background:linear-gradient(180deg,transparent 0%,rgba(237,225,200,0.3) 100%);pointer-events:none;border-radius:0 0 var(--radius,16px) var(--radius,16px);z-index:0}
+.news-dash-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:60px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 70' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'%3E%3Cpath d='M0,55 C20,50 40,40 70,35 C100,30 130,38 160,30 C180,25 195,32 200,28 L200,70 L0,70 Z' fill='rgba(237,228,208,0.35)'/%3E%3Cpath d='M0,60 C30,52 60,45 100,40 C140,35 170,42 200,36 L200,70 L0,70 Z' fill='rgba(237,228,208,0.25)'/%3E%3Cpath d='M0,45 C25,42 50,30 80,28 C110,26 140,35 170,22 C190,15 200,20 200,18 L200,70 L0,70 Z' fill='rgba(212,175,55,0.08)'/%3E%3Cpath d='M0,40 Q50,25 100,30 Q150,35 200,20' fill='none' stroke='rgba(212,175,55,0.15)' stroke-width='1.5'/%3E%3Cpath d='M0,50 Q60,38 120,42 Q180,46 200,35' fill='none' stroke='rgba(212,175,55,0.1)' stroke-width='1'/%3E%3C/svg%3E");background-size:100% 100%;border-radius:0 0 var(--radius,16px) var(--radius,16px);z-index:0}
+.news-dash-card>*{position:relative;z-index:1}
+.news-dash-card:active{transform:scale(.97)}
+
+.news-dash-title{font-size:13px;font-weight:600;color:var(--text-dark,#3D3228);line-height:1.45;margin-bottom:10px}
+.news-src-inline{display:inline;font-size:10.5px;font-weight:400;color:var(--text-dark-muted,#7A6F62);font-style:italic;letter-spacing:0.2px;line-height:1.4}
+
+.news-item-tickers{display:flex;flex-wrap:wrap;gap:4px;margin-top:auto}
+.news-ticker-sm{display:inline-flex;align-items:center;gap:3px;font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:0.5px;padding:2.5px 7px;border-radius:9px;background:rgba(212,175,55,0.18);border:1px solid rgba(212,175,55,0.38);color:#8B6914;font-weight:600}
+.news-ticker-sm.positive{background:rgba(46,125,50,0.13);border-color:rgba(46,125,50,0.42);color:#1B5E20}
+.news-ticker-sm.negative{background:rgba(195,58,78,0.13);border-color:rgba(195,58,78,0.42);color:#8B1F2F}
+.tk-star{font-size:10px;line-height:1}
+.tk-star.positive{color:#2E7D32}
+.tk-star.negative{color:#C33A4E}
+.tk-star.neutral{color:#D4AF37}
+
+/* Empty/no-results states */
+.news-empty{text-align:center;padding:40px 20px;color:var(--text-dark-muted,#7A6F62);font-size:13px;grid-column:1/-1}
+
+/* On very narrow screens, fall back to 1 column */
+@media (max-width:360px){
+  .news-grid{grid-template-columns:1fr}
+}
+
+.activity-list{display:flex;flex-direction:column;gap:2px;margin-bottom:24px}
+.activity-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--cream-card);border-radius:var(--radius-sm);cursor:pointer;border:1px solid rgba(212,175,55,0.08)}
+.activity-item:active{background:var(--cream-warm)}
+.activity-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.activity-icon .jpt-icon svg{width:20px;height:20px;color:#FFF0D4;stroke:#FFF0D4}
+.activity-info{flex:1}.activity-name{font-size:14px;font-weight:500;color:var(--text-dark)}.activity-time{font-size:12px;color:var(--text-dark-muted)}
+.activity-value{text-align:right}.activity-score{font-family:'DM Serif Display',serif;font-size:16px}.activity-score.up{color:var(--green)}.activity-score.down{color:var(--red)}.activity-score.neutral{color:var(--text-dark-muted)}.activity-status{font-size:11px;color:var(--text-dark-muted)}
+
+/* Event Card — Workshop / past events */
+.event-card{position:relative;margin-bottom:24px;padding:24px 22px 20px;border-radius:20px;background:linear-gradient(145deg,#2A1418 0%,#4A1F26 45%,#722F37 100%);border:1px solid rgba(212,175,55,0.28);box-shadow:0 10px 28px rgba(42,20,24,0.22),inset 0 1px 0 rgba(212,175,55,0.12);overflow:hidden;color:#F4E4BA}
+.event-card::before{content:"";position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,0.18) 0%,transparent 70%);pointer-events:none}
+.event-card-badge{display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border-radius:999px;background:linear-gradient(135deg,rgba(212,175,55,0.22),rgba(212,175,55,0.08));border:1px solid rgba(212,175,55,0.4);font-family:'Cinzel',serif;font-size:11px;font-weight:600;letter-spacing:1.6px;color:#F4E4BA;margin-bottom:14px}
+.event-card-dot{width:6px;height:6px;border-radius:50%;background:#D4AF37;box-shadow:0 0 8px rgba(212,175,55,0.8)}
+.event-card-title{font-family:'DM Serif Display','Anuphan',serif;font-size:24px;line-height:1.35;color:#FFF5DC;margin-bottom:16px;letter-spacing:.2px}
+.event-card-accent{color:#E8C968;background:linear-gradient(90deg,#F4D470 0%,#D4AF37 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.event-card-meta{display:flex;flex-direction:column;gap:10px;padding:14px 16px;margin-bottom:14px;background:rgba(0,0,0,0.22);border:1px solid rgba(212,175,55,0.18);border-radius:14px}
+.event-card-meta-row{display:flex;align-items:center;gap:10px;font-family:'Anuphan',sans-serif;font-size:14px;color:#E6D5A8}
+.event-card-meta-row svg{width:18px;height:18px;flex-shrink:0;color:#D4AF37;stroke:#D4AF37}
+.event-card-meta-accent{color:#F4D470;font-weight:500}
+.event-card-desc{font-family:'Anuphan',sans-serif;font-size:13px;line-height:1.7;color:#C9B992;margin-bottom:14px}
+.event-card-footer{padding-top:12px;border-top:1px dashed rgba(212,175,55,0.22)}
+.event-card-status{display:inline-flex;align-items:center;gap:6px;font-family:'Anuphan',sans-serif;font-size:11.5px;color:#A89770;letter-spacing:.3px}
+.event-card-status::before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:#8B6914}
+
+/* Install Banner Home */
+.install-banner-home{display:none;align-items:center;gap:12px;padding:14px 16px;margin-bottom:16px;background:var(--cream-card);border:1px solid var(--gold-border);border-radius:var(--radius);cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(114,47,55,0.04)}
+.install-banner-home:active{transform:scale(.98)}.install-banner-home.show{display:flex}
+@media (display-mode:standalone){.settings-item-install{display:none!important}.install-banner,.install-banner-home{display:none!important}}
+.install-banner-home .install-banner-icon{background:linear-gradient(135deg,var(--burgundy),var(--burgundy-dark));color:var(--gold)}
+
+/* Portfolio */
+.portfolio-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+.port-stat{background:var(--cream-card);border:1px solid rgba(212,175,55,0.15);border-radius:var(--radius);padding:16px;text-align:center}
+.port-stat-label{font-size:11px;color:var(--text-dark-muted);margin-bottom:6px;font-weight:500}.port-stat-value{font-family:'DM Serif Display',serif;font-size:24px;color:var(--text-dark)}.port-stat-value.green{color:var(--green)}
+.port-item{display:flex;align-items:center;gap:12px;padding:16px;background:var(--cream-card);border:1px solid rgba(212,175,55,0.15);border-radius:var(--radius);margin-bottom:10px}
+.port-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.port-icon .jpt-icon svg{width:22px;height:22px;color:#FFF0D4;stroke:#FFF0D4}
+.port-info{flex:1}.port-name{font-size:14px;font-weight:600;color:var(--text-dark-sub)}.port-detail{font-size:12px;color:var(--text-dark-muted)}
+.port-values{text-align:right}.port-amount{font-family:'DM Serif Display',serif;font-size:16px;color:var(--text-dark)}.port-pnl{font-size:12px;font-weight:500}.port-pnl.up{color:var(--green)}
+
+/* Settings */
+.profile-header{display:flex;flex-direction:column;align-items:center;padding:24px 20px 28px;background:linear-gradient(160deg,var(--burgundy-dark),var(--burgundy-mid));border-radius:28px;margin:0 -4px 20px;box-shadow:0 8px 32px rgba(26,10,14,0.4),0 0 0 1px rgba(212,175,55,0.08)}
+.profile-avatar{width:72px;height:72px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:24px;font-weight:700;color:#fff;margin-bottom:14px;box-shadow:0 0 30px var(--gold-glow)}
+.profile-name{font-size:18px;font-weight:600;color:var(--text-light);margin-bottom:4px}.profile-email{font-size:13px;color:var(--text-light-muted);margin-bottom:10px}
+.profile-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;background:rgba(212,175,55,0.1);border:1px solid var(--gold-border);border-radius:20px;font-size:12px;color:var(--gold-light)}
+.profile-badge .jpt-icon svg{width:14px;height:14px;color:var(--gold)}
+.settings-group{margin-bottom:24px}.settings-group-title{font-size:12px;font-weight:600;color:var(--text-dark-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;padding-left:4px}
+.settings-list{background:var(--cream-card);border:1px solid rgba(212,175,55,0.12);border-radius:var(--radius);overflow:hidden;box-shadow:0 2px 8px rgba(114,47,55,0.04)}
+.settings-item{display:flex;align-items:center;gap:14px;padding:16px;border-bottom:1px solid rgba(212,175,55,0.08);cursor:pointer;transition:background .2s}
+.settings-item:last-child{border-bottom:none}.settings-item:active{background:var(--cream-warm)}
+.settings-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.settings-icon .jpt-icon svg{width:18px;height:18px;color:#FFF0D4;stroke:#FFF0D4}
+.settings-info{flex:1}.settings-label{font-size:14px;font-weight:500;color:var(--text-dark)}.settings-desc{font-size:12px;color:var(--text-dark-muted)}
+.settings-arrow{color:var(--text-dark-muted);font-size:18px}
+.toggle{width:48px;height:28px;background:var(--cream-deep);border-radius:14px;position:relative;cursor:pointer;transition:background .3s;flex-shrink:0;border:1px solid rgba(212,175,55,0.15)}.toggle.on{background:var(--gold)}.toggle::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;background:white;border-radius:50%;transition:transform .3s;box-shadow:0 1px 3px rgba(0,0,0,0.15)}.toggle.on::after{transform:translateX(20px)}
+.logout-btn{width:100%;padding:16px;background:transparent;border:1.5px solid rgba(198,40,40,0.3);border-radius:var(--radius-sm);color:var(--red);font-family:'Sarabun','Anuphan',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:background .2s;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px}.logout-btn:active{background:rgba(198,40,40,0.08)}
+.logout-btn .jpt-icon svg{width:18px;height:18px}
+
+/* Iframe */
+.iframe-screen{display:none;flex-direction:column;position:fixed;top:70px;left:0;right:0;bottom:calc(90px + var(--safe-bottom));background:var(--cream);z-index:500}.iframe-screen.active{display:flex}
+.iframe-topbar{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--cream-card);border-bottom:1px solid rgba(212,175,55,0.15);flex-shrink:0}
+.iframe-back{width:36px;height:36px;border-radius:50%;background:var(--cream-warm);border:1px solid rgba(212,175,55,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--text-dark-muted);font-size:18px}.iframe-back:active{background:var(--cream-deep)}
+.iframe-title{flex:1;font-size:15px;font-weight:600;color:var(--text-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iframe-loading{display:flex;align-items:center;justify-content:center;flex:1;color:var(--text-dark-muted);font-size:14px;gap:10px}
+.iframe-loading .spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--gold-border);border-radius:50%;border-top-color:var(--gold);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.iframe-container{flex:1;overflow:hidden}.iframe-container iframe{width:100%;height:100%;border:none}
+
+/* Bottom Nav */
+.bottom-nav{position:fixed;bottom:calc(12px + var(--safe-bottom));left:16px;right:16px;background:linear-gradient(135deg,var(--burgundy-dark),var(--burgundy-mid));border:1px solid rgba(212,175,55,0.15);border-radius:28px;display:flex;justify-content:space-around;padding:10px 8px;z-index:1000;box-shadow:0 8px 32px rgba(26,10,14,0.4),0 0 0 1px rgba(212,175,55,0.08)}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 12px;cursor:pointer;position:relative;border:none;background:none}
+.nav-item svg{width:22px;height:22px;color:var(--text-light-muted);transition:color .2s}
+.nav-label{font-size:10px;font-weight:500;color:var(--text-light-muted);font-family:'Sarabun','Anuphan',sans-serif}
+.nav-item.active svg{color:var(--gold)}.nav-item.active .nav-label{color:var(--gold)}
+.nav-item.active::before{content:'';position:absolute;top:-2px;left:50%;transform:translateX(-50%);width:24px;height:3px;background:var(--gold);border-radius:3px}
+/* Center Home button — owl icon in bar */
+.nav-home{position:relative}
+.nav-owl-img{width:38px;height:38px;object-fit:contain;opacity:0.6;transition:opacity .2s}
+.nav-home.active .nav-owl-img{opacity:1}
+.page-header{padding:8px 20px 16px}.page-title{font-size:22px;font-weight:700;color:var(--text-dark)}.page-subtitle{font-size:13px;color:var(--text-dark-muted);margin-top:2px}
+.placeholder-hero{background:linear-gradient(160deg,var(--burgundy-dark),var(--burgundy-mid));padding:20px;border-radius:28px;margin:0 16px 16px;box-shadow:0 8px 32px rgba(26,10,14,0.4),0 0 0 1px rgba(212,175,55,0.08)}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);z-index:20000;display:none;align-items:flex-end;justify-content:center}.modal-overlay.show{display:flex}
+.modal-sheet{background:var(--cream-card);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:20px 20px calc(20px + var(--safe-bottom));animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:40px;height:4px;background:var(--cream-deep);border-radius:2px;margin:0 auto 20px}.modal-title{font-size:18px;font-weight:600;margin-bottom:16px;text-align:center;color:var(--text-dark)}
+.modal-input{width:100%;padding:14px 16px;background:var(--cream);border:1.5px solid rgba(212,175,55,0.2);border-radius:var(--radius-xs);color:var(--text-dark);font-family:'Sarabun','Anuphan',sans-serif;font-size:15px;outline:none;margin-bottom:12px}.modal-input:focus{border-color:var(--gold)}
+.modal-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border:none;border-radius:var(--radius-xs);color:#1a0a0e;font-family:'Sarabun','Anuphan',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px}
+.ios-guide{padding:20px;text-align:center}.ios-guide-step{display:flex;align-items:center;gap:12px;padding:12px 0;text-align:left;border-bottom:1px solid rgba(212,175,55,0.1)}.ios-guide-step:last-child{border-bottom:none}
+.ios-guide-num{width:28px;height:28px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#1a0a0e;flex-shrink:0}.ios-guide-text{font-size:14px;color:var(--text-dark-muted)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .5s ease forwards}.fade-up-1{animation-delay:.05s;opacity:0}.fade-up-2{animation-delay:.1s;opacity:0}.fade-up-3{animation-delay:.15s;opacity:0}.fade-up-4{animation-delay:.2s;opacity:0}.fade-up-5{animation-delay:.25s;opacity:0}
+::-webkit-scrollbar{width:0}
+/* Planning Toolkit shortcut card (home screen) */
+.planning-stack{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.planning-shortcut{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;padding:16px 18px;background:linear-gradient(135deg,#FFFEF8 0%,#F8F2E4 55%,#F5EDD8 100%);border:1.5px solid rgba(212,175,55,0.5);border-radius:14px;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(114,47,55,0.08),inset 0 1px 0 rgba(255,255,255,0.7);position:relative;overflow:hidden}
+.planning-shortcut:active{transform:scale(.98);box-shadow:0 6px 18px rgba(212,175,55,0.2)}
+.planning-shortcut::after{content:'';position:absolute;bottom:0;left:0;right:0;height:55px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 60' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'%3E%3Cpath d='M0,50 C30,42 70,32 120,35 C160,38 180,30 200,32 L200,60 L0,60 Z' fill='rgba(237,228,208,0.35)'/%3E%3Cpath d='M0,40 Q60,28 120,32 Q170,36 200,24' fill='none' stroke='rgba(212,175,55,0.18)' stroke-width='1'/%3E%3C/svg%3E");background-size:100% 100%;z-index:0;border-radius:0 0 14px 14px}
+.planning-shortcut>*{position:relative;z-index:1}
+.planning-shortcut-icon{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 10px rgba(114,47,55,0.25)}
+.planning-shortcut-icon svg{width:22px;height:22px;color:#FFF0D4;stroke:#FFF0D4}
+.planning-shortcut-title{font-size:15px;font-weight:700;color:var(--maroon);margin-bottom:3px}
+.planning-shortcut-desc{font-size:12px;color:var(--text-dark-muted);line-height:1.45}
+.planning-shortcut-arrow{color:var(--gold-deep);font-size:20px;font-weight:600;flex-shrink:0;font-family:'DM Serif Display',serif}
+/* Toast notification */
+#jpt-toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%) translateY(20px);background:linear-gradient(135deg,#722F37 0%,#8B2252 55%,#D4AF37 100%);color:#FFF5E1;padding:13px 26px;border-radius:10px;font-family:'Anuphan','Sarabun',sans-serif;font-size:14px;font-weight:500;z-index:10000;box-shadow:0 8px 32px rgba(114,47,55,0.35),inset 0 1px 0 rgba(255,255,255,0.15);opacity:0;pointer-events:none;transition:opacity .3s ease,transform .3s ease;max-width:calc(100% - 40px)}
+#jpt-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* Coming-soon dim for unavailable cards */
+.dash-card.coming-soon{opacity:.78}
+.dash-card.coming-soon:hover{transform:none}
+.signal-bias.coming-soon-status{background:rgba(212,175,55,0.12);color:var(--gold-deep)!important;padding:6px 12px;border-radius:20px;font-family:'Cinzel','Anuphan',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.2px;text-align:center;display:inline-block;margin:4px auto}
+.signal-action.coming-soon-sub{color:var(--text-dark-muted)!important;font-size:11px;text-align:center}
+</style>
+</head>
+<body>
+<!-- Splash Screen -->
+<div class="splash-screen" id="splashScreen">
+    <div class="splash-logo"><img src="jpt-owl-logo.png" alt="JP Trust"></div>
+    <div class="splash-text">JP Trust Learning</div>
+</div>
+
+<div class="login-screen" id="loginScreen">
+    <div class="login-logo" style="font-size:18px;letter-spacing:2px">JPT</div>
+    <div class="login-title" id="loginTitle">Member Access</div>
+    <div class="login-subtitle" id="loginSubtitle">กรุณาใส่ PIN 6 หลัก</div>
+    <div class="install-banner" id="installBannerLogin" onclick="handleInstallClick()">
+        <div class="install-banner-icon"><span class="jpt-icon" style="width:22px;height:22px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="8" x2="12" y2="14"/><polyline points="9 12 12 15 15 12"/><line x1="9" y1="18" x2="15" y2="18"/></svg></span></div>
+        <div class="install-banner-text"><div class="install-banner-title">ติดตั้งแอป JP Trust</div><div class="install-banner-desc">เพิ่มไอคอนลงหน้าจอมือถือ</div></div>
+        <button class="install-banner-btn">ติดตั้ง</button>
+    </div>
+    <div class="login-form">
+        <!-- Step: PIN Entry (มี PIN แล้ว) -->
+        <div class="login-step" id="stepPin">
+            <div style="display:flex;justify-content:center;gap:8px;margin-bottom:20px;" id="pinDots">
+                <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+                <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+            </div>
+            <input type="password" class="login-input login-otp-input" id="pinInput" placeholder="------" maxlength="6" inputmode="numeric" autocomplete="off">
+            <button class="login-btn" onclick="checkPIN()">เข้าสู่ระบบ</button>
+            <div class="login-link" id="pinError" style="color:#EA4335;display:none;">PIN ไม่ถูกต้อง</div>
+            <div class="login-link" onclick="showForgotPIN()">ลืม PIN? <span>ยืนยันด้วย OTP</span></div>
+            <div class="login-link" onclick="location.href='signup.html?v=1777021838'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
+        </div>
+
+        <!-- Step 1: Email for OTP (ครั้งแรก / ลืม PIN) -->
+        <div class="login-step" id="stepEmail">
+            <input type="email" class="login-input" id="loginEmail" placeholder="กรอกอีเมลสมาชิก" autocomplete="email">
+            <button class="login-btn" onclick="sendOTP()">ส่งรหัสยืนยัน</button>
+            <div class="login-link" onclick="location.href='signup.html?v=1777021838'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
+        </div>
+
+        <!-- Step 2: OTP Verify -->
+        <div class="login-step" id="stepOTP">
+            <div class="otp-sent-msg" id="otpMsg">ส่งรหัสไปยัง <span id="otpEmail"></span> แล้ว</div>
+            <input type="text" class="login-input login-otp-input" id="loginOTP" placeholder="000000" maxlength="6" inputmode="numeric">
+            <button class="login-btn" onclick="verifyOTP()">ยืนยันรหัส</button>
+            <div class="login-link" onclick="backToEmail()">← เปลี่ยนอีเมล</div>
+        </div>
+
+        <!-- Step 3: Set New PIN -->
+        <div class="login-step" id="stepSetPin">
+            <input type="password" class="login-input login-otp-input" id="newPinInput" placeholder="------" maxlength="6" inputmode="numeric" autocomplete="off">
+            <button class="login-btn" onclick="setNewPIN()">ตั้ง PIN</button>
+        </div>
+
+        <!-- Step 4: Confirm PIN -->
+        <div class="login-step" id="stepConfirmPin">
+            <input type="password" class="login-input login-otp-input" id="confirmPinInput" placeholder="------" maxlength="6" inputmode="numeric" autocomplete="off">
+            <button class="login-btn" onclick="confirmPIN()">ยืนยัน PIN</button>
+            <div class="login-link" id="pinMismatch" style="color:#EA4335;display:none;">PIN ไม่ตรงกัน กรุณาลองใหม่</div>
+        </div>
+    </div>
+</div>
+
+<div class="app" id="mainApp">
+    <div class="topbar">
+        <div class="topbar-left"><div class="avatar">JP</div><div><div class="greeting">สวัสดี, ยินดีต้อนรับ</div><div style="display:flex;align-items:center;gap:8px"><div class="user-name" id="displayName">Joon</div><button class="refresh-btn" id="refreshBtn" onclick="refreshApp()" aria-label="Refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button></div></div></div>
+        <div class="topbar-right">
+            <div class="icon-btn" onclick="openNotifications()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="notif-dot"></div></div>
+            <div class="icon-btn" onclick="navigateTo('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.38.18.82.28 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+        </div>
+    </div>
+
+    <div class="screen active" id="screen-home">
+        <div class="reward-card fade-up fade-up-1" style="margin:0 16px;overflow:hidden;border-radius:16px;">
+            <img src="member-card-gold.png" alt="Gold Member Card" style="width:100%;display:block;">
+            <canvas id="heroCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;"></canvas>
+            <div class="rc-member-name" id="cardName">Joonstinn</div>
+            <div class="rc-points"><div class="rc-points-glow"></div><div class="rc-points-ring"></div><div class="rc-points-ring2"></div><div class="rc-points-num" id="cardPoints">100</div><div class="rc-points-label">Points</div></div>
+        </div>
+        <div class="home-content">
+            <div class="install-banner-home" id="installBanner" onclick="handleInstallClick()">
+                <div class="install-banner-icon"><span class="jpt-icon" style="width:22px;height:22px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="8" x2="12" y2="14"/><polyline points="9 12 12 15 15 12"/><line x1="9" y1="18" x2="15" y2="18"/></svg></span></div>
+                <div class="install-banner-text"><div class="install-banner-title" style="color:var(--text-dark-sub)">ติดตั้งแอป JP Trust</div><div class="install-banner-desc" style="color:var(--text-dark-muted)">เพิ่มไอคอนลงหน้าจอมือถือ</div></div>
+                <button class="install-banner-btn">ติดตั้ง</button>
+            </div>
+            <div class="quick-actions fade-up fade-up-2">
+                <div class="quick-action" onclick="openIframe('วางแผนพอร์ตการลงทุน','https://jptrustlearning.github.io/pages/portfolio-planner.html?v=1777100506')"><div class="qa-icon bg-burgundy"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3 v9 l9 0"/></svg></span></div><div class="qa-label">Portfolio<br>Planner</div></div>
+                <div class="quick-action" onclick="openIframe('SP500 Weekly Momentum','https://jptrustlearning.github.io/pages/sp500-combined-strategy.html?v=1777491632')"><div class="qa-icon bg-gold"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span></div><div class="qa-label">Weekly<br>Momentum</div></div>
+                <div class="quick-action" onclick="openIframe('SP500 Strategy Pro — 6M Momentum','https://jptrustlearning.github.io/pages/sp500-strategy-pro.html?v=1777490355')"><div class="qa-icon bg-blue"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg></span></div><div class="qa-label">6M<br>Momentum</div></div>
+                <div class="quick-action" onclick="openIframe('Gold Momentum Dashboard','https://jptrustlearning.github.io/pages/gold-momentum-app.html?v=1777514526')"><div class="qa-icon bg-gold"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span></div><div class="qa-label">Gold<br>Dashboard</div></div>
+            </div>
+            <!-- TradingView Ticker Tape Widget -->
+            <div class="ticker-tape-wrapper fade-up fade-up-2">
+              <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+              </div>
+              <div class="ticker-owl-badge" onclick="event.stopPropagation();return false"><span class="ticker-live-dot"></span><span class="ticker-live-text">LIVE</span></div>
+            </div>
+            <div class="section-header fade-up fade-up-3"><div class="section-title">แดชบอร์ด</div><div class="section-link">ดูทั้งหมด ›</div></div>
+            <div class="dashboard-grid fade-up fade-up-3">
+                <div class="dash-card signal-card" id="signalCardGold" onclick="openIframe('Gold Momentum Dashboard','https://jptrustlearning.github.io/pages/gold-momentum-app.html?v=1777514526')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span></div><div class="dash-card-title">Gold XAU/USD</div><div class="signal-scores"><div class="signal-score buy"><div class="ss-label">BUY SCORE</div><div class="ss-val" id="goldBuyScore">—</div><div class="ss-delta" id="goldBuyDelta">—</div></div><div class="signal-score sell"><div class="ss-label">SELL SCORE</div><div class="ss-val" id="goldSellScore">—</div><div class="ss-delta" id="goldSellDelta">—</div></div></div><div class="signal-bias" id="goldBias">— Loading —</div><div class="signal-action" id="goldAction">—</div></div>
+                <div class="dash-card signal-card coming-soon" id="signalCardBTC" onclick="btcComingSoon(event)"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 8h5a3 3 0 0 1 0 6H9V8z"/><path d="M9 14h5.5a3 3 0 0 1 0 6H9v-6z"/><line x1="11" y1="5" x2="11" y2="8"/><line x1="13" y1="5" x2="13" y2="8"/><line x1="11" y1="20" x2="11" y2="23"/><line x1="13" y1="20" x2="13" y2="23"/><line x1="7" y1="8" x2="9" y2="8"/><line x1="7" y1="14" x2="9" y2="14"/><line x1="7" y1="20" x2="9" y2="20"/></svg></span></div><div class="dash-card-title">Bitcoin BTC</div><div class="signal-scores"><div class="signal-score buy"><div class="ss-label">BUY SCORE</div><div class="ss-val" id="btcBuyScore">—</div><div class="ss-delta" id="btcBuyDelta">—</div></div><div class="signal-score sell"><div class="ss-label">SELL SCORE</div><div class="ss-val" id="btcSellScore">—</div><div class="ss-delta" id="btcSellDelta">—</div></div></div><div class="signal-bias coming-soon-status" id="btcBias">🚧 กำลังพัฒนา</div><div class="signal-action coming-soon-sub" id="btcAction">เร็วๆ นี้</div></div>
+                <div class="dash-card" onclick="navigateTo('lab')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="7 14 10 10 13 13 17 9"/><line x1="17" y1="9" x2="17" y2="13"/><line x1="13" y1="9" x2="17" y2="9"/></svg></span></div><div class="dash-card-title">Backtest Lab</div><div class="dash-card-desc">ทดสอบกลยุทธ์การเทรด</div></div>
+                <div class="dash-card" onclick="openIframe('S&P 500 Daily Scanner','https://jptrustlearning.github.io/pages/Free_scannerSP500%20(6).html?v=1777309146')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16" y1="16" x2="21" y2="21"/><line x1="8" y1="11" x2="14" y2="11"/><line x1="11" y1="8" x2="11" y2="14"/></svg></span></div><div class="dash-card-title">SP500 Scanner</div><div class="dash-card-desc">สแกนหุ้น S&P 500</div></div>
+                <div class="dash-card coming-soon" onclick="event.stopPropagation();jptToast('🚧 Newstum · กำลังพัฒนา · เร็วๆ นี้')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="M2 15h6"/><path d="M5 12v6"/><polyline points="10 18 12 16 14 18 16 14"/></svg></span></div><div class="dash-card-title">Newstum</div><div class="dash-card-desc">News + Momentum Score</div></div>
+            </div>
+            <div class="section-header fade-up fade-up-3"><div class="section-title">Planning Toolkit</div></div>
+            <div class="planning-stack fade-up fade-up-3">
+                <div class="planning-shortcut" onclick="openIframe('วางแผนการเงินส่วนบุคคล','https://jptrustlearning.github.io/pages/finance-planner.html?v=1777017700')">
+                    <div class="planning-shortcut-icon"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/><path d="M8 17l2-2 2 1 4-4"/></svg></span></div>
+                    <div>
+                        <div class="planning-shortcut-title">วางแผนการเงินส่วนบุคคล</div>
+                        <div class="planning-shortcut-desc">สำรวจกระแสเงินสด · ประเมินเงินสำรองฉุกเฉิน · รู้ระดับความเสี่ยงทางการเงิน</div>
+                    </div>
+                    <div class="planning-shortcut-arrow">›</div>
+                </div>
+                <div class="planning-shortcut" onclick="openIframe('วางแผนพอร์ตการลงทุน','https://jptrustlearning.github.io/pages/portfolio-planner.html?v=1777100506')">
+                    <div class="planning-shortcut-icon"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3 v9 l9 0"/></svg></span></div>
+                    <div>
+                        <div class="planning-shortcut-title">วางแผนพอร์ตการลงทุน</div>
+                        <div class="planning-shortcut-desc">สร้าง Investable Pool · กระจาย 6 หมวดสินทรัพย์ · ดูเส้นทางถึงเป้าหมาย</div>
+                    </div>
+                    <div class="planning-shortcut-arrow">›</div>
+                </div>
+            </div>
+            <div class="section-header fade-up fade-up-4"><div class="section-title">สิทธิพิเศษสำหรับคุณ</div></div>
+            <div class="fade-up fade-up-4" style="margin-bottom:24px;border-radius:16px;overflow:hidden;"><img src="promo-lotus.jpg" alt="Lotus's Promotion" style="width:100%;display:block;border-radius:16px;"></div>
+            <div class="section-header fade-up fade-up-4"><div class="section-title">กิจกรรมล่าสุด</div></div>
+            <div class="event-card fade-up fade-up-5">
+                <div class="event-card-badge"><span class="event-card-dot"></span>WORKSHOP 2026</div>
+                <div class="event-card-title">สมัคร <span class="event-card-accent">AI Dashboard</span><br>สำหรับนักลงทุน</div>
+                <div class="event-card-meta">
+                    <div class="event-card-meta-row">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg>
+                        <span class="event-card-meta-accent">วันอาทิตย์ที่ 22 มีนาคม 2026</span>
+                    </div>
+                    <div class="event-card-meta-row">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 22s-7-7.5-7-13a7 7 0 0 1 14 0c0 5.5-7 13-7 13z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                        <span>Circle Cafe @ BTS วงเวียนใหญ่</span>
+                    </div>
+                </div>
+                <div class="event-card-desc">เรียนรู้การสร้าง Dashboard อัจฉริยะด้วย AI<br>วิเคราะห์ตลาดแบบมืออาชีพ พร้อมลงมือทำจริง</div>
+                <div class="event-card-footer"><span class="event-card-status">ผ่านไปแล้ว · ขอบคุณสมาชิกทุกท่าน</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="screen" id="screen-portfolio"><div class="page-header"><div class="page-title">Portfolio</div><div class="page-subtitle">จัดการพอร์ตการลงทุนของคุณ</div></div>
+        <div class="screen-content">
+            <div class="portfolio-summary fade-up fade-up-1"><div class="port-stat"><div class="port-stat-label">มูลค่ารวม</div><div class="port-stat-value">฿285K</div></div><div class="port-stat"><div class="port-stat-label">กำไร/ขาดทุน</div><div class="port-stat-value green">+12.4%</div></div></div>
+            <div class="section-header"><div class="section-title">สินทรัพย์</div></div>
+            <div class="port-item fade-up fade-up-2"><div class="port-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon" style="width:22px;height:22px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span></div><div class="port-info"><div class="port-name">Gold XAU/USD</div><div class="port-detail">0.5 lots · Avg: 2,410</div></div><div class="port-values"><div class="port-amount">฿125,000</div><div class="port-pnl up">+3.1% ▲</div></div></div>
+            <div class="port-item fade-up fade-up-3"><div class="port-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon" style="width:22px;height:22px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 8h5a3 3 0 0 1 0 6H9V8z"/><path d="M9 14h5.5a3 3 0 0 1 0 6H9v-6z"/><line x1="11" y1="5" x2="11" y2="8"/><line x1="13" y1="5" x2="13" y2="8"/><line x1="11" y1="20" x2="11" y2="23"/><line x1="13" y1="20" x2="13" y2="23"/><line x1="7" y1="8" x2="9" y2="8"/><line x1="7" y1="14" x2="9" y2="14"/><line x1="7" y1="20" x2="9" y2="20"/></svg></span></div><div class="port-info"><div class="port-name">Bitcoin BTC</div><div class="port-detail">0.02 BTC · Avg: 95,200</div></div><div class="port-values"><div class="port-amount">฿72,000</div><div class="port-pnl up">+12.6% ▲</div></div></div>
+            <div class="port-item fade-up fade-up-4"><div class="port-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon" style="width:22px;height:22px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg></span></div><div class="port-info"><div class="port-name">S&P 500 ETF</div><div class="port-detail">10 units · Avg: 5,820</div></div><div class="port-values"><div class="port-amount">฿88,000</div><div class="port-pnl up">+5.8% ▲</div></div></div>
+        </div>
+    </div>
+
+    <div class="screen" id="screen-more"><div class="screen-content" style="padding-top:16px;">
+        <!-- Popular Section -->
+        <div class="section-header"><div class="section-title">Popular</div></div>
+        <div style="background:var(--cream-card);border:1px solid rgba(212,175,55,0.15);border-radius:20px;padding:20px;margin-bottom:24px;box-shadow:0 2px 8px rgba(114,47,55,0.04);position:relative;overflow:hidden;">
+            <div style="position:absolute;bottom:0;left:0;right:0;height:60px;overflow:hidden;opacity:0.15;">
+                <svg viewBox="0 0 400 60" preserveAspectRatio="none" style="width:100%;height:100%;"><path d="M0,40 C50,35 100,20 150,25 C200,30 250,15 300,20 C350,25 400,18 400,22 L400,60 L0,60 Z" fill="#D4AF37"/></svg>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1;">
+                <div style="text-align:center;flex:1;"><div style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--text-dark);">Gold</div><div style="font-size:11px;color:var(--text-dark-muted);">XAU/USD</div></div>
+                <div style="width:1px;height:30px;background:rgba(212,175,55,0.2);"></div>
+                <div style="text-align:center;flex:1;"><div style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--text-dark);">S&P500</div><div style="font-size:11px;color:var(--text-dark-muted);">Scanner</div></div>
+                <div style="width:1px;height:30px;background:rgba(212,175,55,0.2);"></div>
+                <div style="text-align:center;flex:1;"><div style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--text-dark);">BTC</div><div style="font-size:11px;color:var(--text-dark-muted);">Bitcoin</div></div>
+            </div>
+        </div>
+
+        <!-- Categories Grid -->
+        <div class="section-header"><div class="section-title">Categories</div></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px;">
+            <div class="quick-action" onclick="openIframe('Gold Momentum Dashboard','https://jptrustlearning.github.io/pages/gold-momentum-app.html?v=1777514526')"><div class="qa-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span></div><div class="qa-label">Gold</div></div>
+            <div class="quick-action" onclick="openIframe('SP500 Weekly Momentum','https://jptrustlearning.github.io/pages/sp500-combined-strategy.html?v=1777491632')"><div class="qa-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span></div><div class="qa-label">Momentum</div></div>
+            <div class="quick-action coming-soon-item" onclick="btcComingSoon(event)"><div class="qa-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M9 8h4a3 3 0 0 1 0 4H9V8z M9 12h4.5a3 3 0 0 1 0 4H9v-4z"/></svg></span></div><div class="qa-label">Bitcoin</div></div>
+            <div class="quick-action" onclick="openIframe('S&P 500 Scanner','https://jptrustlearning.github.io/pages/Free_scannerSP500%20(6).html?v=1777309146')"><div class="qa-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><line x1="16" y1="16" x2="21" y2="21"/></svg></span></div><div class="qa-label">Scanner</div></div>
+        </div>
+
+        <!-- Courses Section -->
+        <div class="section-header"><div class="section-title">Courses</div><div class="section-link">ดูทั้งหมด ›</div></div>
+        <div style="display:flex;gap:12px;overflow-x:auto;padding-bottom:16px;margin-bottom:24px;scrollbar-width:none;-webkit-overflow-scrolling:touch;">
+            <div style="min-width:120px;text-align:center;flex-shrink:0;">
+                <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-dark));margin:0 auto 8px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(212,175,55,0.25);"><span style="color:#fff;font-family:'Cinzel',serif;font-size:11px;font-weight:600;">BASIC</span></div>
+                <div style="font-size:12px;font-weight:500;color:var(--text-dark);">เริ่มต้น</div>
+                <div style="font-size:11px;color:var(--text-dark-muted);">ฟรี</div>
+            </div>
+            <div style="min-width:120px;text-align:center;flex-shrink:0;">
+                <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--burgundy),var(--burgundy-dark));margin:0 auto 8px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(114,47,55,0.25);"><span style="color:var(--gold-light);font-family:'Cinzel',serif;font-size:11px;font-weight:600;">PRO</span></div>
+                <div style="font-size:12px;font-weight:500;color:var(--text-dark);">Pro Course</div>
+                <div style="font-size:11px;color:var(--text-dark-muted);">Premium</div>
+            </div>
+            <div style="min-width:120px;text-align:center;flex-shrink:0;">
+                <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#3D3228,#1a0a0e);margin:0 auto 8px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.2);"><span style="color:var(--gold);font-family:'Cinzel',serif;font-size:10px;font-weight:600;">ELITE</span></div>
+                <div style="font-size:12px;font-weight:500;color:var(--text-dark);">Elite Course</div>
+                <div style="font-size:11px;color:var(--text-dark-muted);">VIP</div>
+            </div>
+        </div>
+
+        <!-- Tools Section -->
+        <div class="section-header"><div class="section-title">Tools</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;">
+            <div class="dash-card" onclick="navigateTo('lab')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="7 14 10 10 13 13 17 9"/></svg></span></div><div class="dash-card-title">Backtest Lab</div><div class="dash-card-desc">ทดสอบกลยุทธ์</div></div>
+            <div class="dash-card" onclick="openIframe('My Portfolio','https://jptrustlearning.github.io/pages/my-portfolio.html?v=1777335686')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2Z"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><path d="M2 13h20"/></svg></span></div><div class="dash-card-title">My Portfolio</div><div class="dash-card-desc">บันทึกพอร์ต SP500</div></div>
+            <div class="dash-card" onclick="openIframe('วางแผนการเงินส่วนบุคคล','https://jptrustlearning.github.io/pages/finance-planner.html?v=1777015500')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span></div><div class="dash-card-title">Financial Plan</div><div class="dash-card-desc">วางแผนการเงิน</div></div>
+        </div>
+
+        <!-- Settings section moved to dedicated screen-settings (gear icon top-right) -->
+    </div></div>
+
+    <div class="screen" id="screen-news">
+      <div class="news-search-header">
+        <div class="news-search-title">📰 Market News</div>
+        <div class="news-search-box">
+          <svg class="news-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" class="news-search-input" id="newsSearchInput" placeholder="ค้นหาข่าว / ticker เช่น NVDA" oninput="filterNewsFeed()">
+          <button class="news-search-clear" id="newsSearchClear" onclick="clearNewsSearch()" style="display:none">✕</button>
+        </div>
+        <div class="news-time-filter">
+          <button class="time-chip active" data-range="3day" onclick="setNewsTimeRange('3day')">3 วันล่าสุด</button>
+          <button class="time-chip" data-range="today" onclick="setNewsTimeRange('today')">วันนี้</button>
+          <button class="time-chip" data-range="week" onclick="setNewsTimeRange('week')">7 วัน</button>
+          <button class="time-chip" data-range="month" onclick="setNewsTimeRange('month')">30 วัน</button>
+          <button class="time-chip time-chip-custom" data-range="custom" onclick="openCustomDateModal()" id="customDateChip">📅 ช่วงเวลาเอง</button>
+        </div>
+      </div>
+      <div class="screen-content">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin:4px 4px 14px 4px">
+          <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:2.5px;color:var(--gold-deep);text-transform:uppercase;font-weight:600">Latest Dispatches</div>
+          <button onclick="loadNewsFeed()" style="background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.25);color:#722F37;padding:6px 14px;border-radius:14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Anuphan',sans-serif">🔄 รีเฟรช</button>
+        </div>
+        <div id="newsFeedList">
+          <div style="text-align:center;padding:40px 20px;color:var(--text-dark-muted);font-size:13px">กำลังโหลดข่าว...</div>
+        </div>
+      </div>
+    </div>
+    <div class="screen" id="screen-sixmonth"><div class="placeholder-hero"><div class="balance-card"><div class="balance-label">6-Month Trend</div><div class="balance-row"><div class="balance-amount">72.1</div><div class="balance-currency">/ 100</div></div><div class="balance-change up">▲ Moderate Bullish</div></div></div></div>
+    <div class="screen" id="screen-gold"><div class="placeholder-hero"><div class="balance-card"><div class="balance-label">Gold Price</div><div class="balance-row"><div class="balance-amount">2,485</div><div class="balance-currency">USD</div></div><div class="balance-change up">▲ +1.2%</div></div></div></div>
+    <div class="screen" id="screen-bitcoin"><div class="placeholder-hero"><div class="balance-card"><div class="balance-label">Bitcoin Price</div><div class="balance-row"><div class="balance-amount">107,250</div><div class="balance-currency">USD</div></div><div class="balance-change up">▲ +2.8%</div></div></div></div>
+    <div class="screen" id="screen-lab">
+        <div class="placeholder-hero"><div class="balance-card"><div class="balance-label">Lab</div><div class="balance-row"><div class="balance-amount">5</div><div class="balance-currency">กลยุทธ์</div></div><div class="balance-change up">Momentum + Gold Studies</div></div></div>
+        <div class="screen-content">
+            <div class="section-header fade-up fade-up-1"><div class="section-title">Momentum Strategies</div></div>
+            <div class="dashboard-grid fade-up fade-up-2">
+                <div class="dash-card" onclick="openIframe('SP500 Weekly Momentum','https://jptrustlearning.github.io/pages/sp500-combined-strategy.html?v=1777491632')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span></div><div class="dash-card-title">Weekly Momentum</div><div class="dash-card-desc">Combined Strategy (Momentum + Dark Horse)</div></div>
+                <div class="dash-card" onclick="openIframe('SP500 Strategy Pro — 6M Momentum','https://jptrustlearning.github.io/pages/sp500-strategy-pro.html?v=1777490355')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg></span></div><div class="dash-card-title">6M Momentum</div><div class="dash-card-desc">Strategy Pro V22 Backtest</div></div>
+                <div class="dash-card" onclick="openIframe('SP500 Rolling 6M Momentum','https://jptrustlearning.github.io/pages/sp500-rolling-6m-momentum.html?v=1777490355')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-15-6.7L3 8"/><polyline points="3 3 3 8 8 8"/><path d="M3 12a9 9 0 0 0 15 6.7L21 16"/><polyline points="21 21 21 16 16 16"/></svg></span></div><div class="dash-card-title">Rolling 6M Momentum</div><div class="dash-card-desc">Top Ranks Momentum ใหม่ทุกเดือน · ถือล็อตละ 6 เดือน</div></div>
+            </div>
+            <div class="section-header fade-up fade-up-3"><div class="section-title">Gold Strategies</div></div>
+            <div class="dashboard-grid fade-up fade-up-3">
+                <div class="dash-card" onclick="openIframe('SMC Patient Hunter — Gold Strategy','https://jptrustlearning.github.io/pages/smc-patient-hunter-report.html')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/><path d="M8 16l2-2 2 2 3-3"/></svg></span></div><div class="dash-card-title">SMC Patient Hunter</div><div class="dash-card-desc">Gold H1 Strategy Report</div></div>
+                <div class="dash-card" onclick="openIframe('Gold H1 Swing — Sensitivity Analysis','https://jptrustlearning.github.io/pages/gold-swing-h1-sensitivity.html')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-6 4 4 5-7"/><circle cx="10" cy="8" r="1.5" fill="currentColor" stroke="none"/><circle cx="14" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg></span></div><div class="dash-card-title">Gold H1 Swing</div><div class="dash-card-desc">Sensitivity Analysis (N × TP)</div></div>
+            </div>
+            <div class="section-header fade-up fade-up-4"><div class="section-title">Latest Backtest</div></div>
+            <div class="activity-list fade-up fade-up-4" style="margin-bottom:24px">
+                <div class="activity-item" onclick="openIframe('SP500 Rolling 6M Momentum','https://jptrustlearning.github.io/pages/sp500-rolling-6m-momentum.html?v=1777490355')"><div class="activity-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-15-6.7L3 8"/><polyline points="3 3 3 8 8 8"/><path d="M3 12a9 9 0 0 0 15 6.7L21 16"/><polyline points="21 21 21 16 16 16"/></svg></span></div><div class="activity-info"><div class="activity-name">Rolling 6M Momentum</div><div class="activity-time">อัปเดตล่าสุด 11 เม.ย. 2026</div></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dedicated Settings screen (gear icon top-right) — Profile + App Settings only -->
+    <div class="screen" id="screen-settings"><div class="screen-content" style="padding-top:16px;">
+        <div class="section-header"><div class="section-title">โปรไฟล์</div></div>
+        <div class="settings-list" style="margin-bottom:24px;">
+            <div class="settings-item" onclick="openEditModal('name')"><div class="settings-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span></div><div class="settings-info"><div class="settings-label">ชื่อผู้ใช้</div><div class="settings-desc" id="settingNameVal">Joon</div></div><div class="settings-arrow">›</div></div>
+            <div class="settings-item"><div class="settings-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M2 20h20"/><path d="M4 17l2-12 4 5 2-6 2 6 4-5 2 12H4z"/></svg></span></div><div class="settings-info"><div class="settings-label">แผนสมาชิก</div><div class="settings-desc">Gold — Beta</div></div><div class="settings-arrow">›</div></div>
+        </div>
+
+        <div class="section-header"><div class="section-title">ตั้งค่าแอป</div></div>
+        <div class="settings-list" style="margin-bottom:24px;">
+            <div class="settings-item"><div class="settings-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span></div><div class="settings-info"><div class="settings-label">การแจ้งเตือน</div><div class="settings-desc">Momentum, Price Alerts</div></div><div class="settings-arrow">›</div></div>
+            <div class="settings-item" onclick="openEditModal('risk')"><div class="settings-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span></div><div class="settings-info"><div class="settings-label">ระดับความเสี่ยง</div><div class="settings-desc" id="settingRisk">ปานกลาง (Medium)</div></div><div class="settings-arrow">›</div></div>
+            <div class="settings-item"><div class="settings-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span></div><div class="settings-info"><div class="settings-label">ภาษา</div><div class="settings-desc">ไทย</div></div><div class="settings-arrow">›</div></div>
+            <div class="settings-item settings-item-install" onclick="handleInstallClick()"><div class="settings-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="8" x2="12" y2="14"/><polyline points="9 12 12 15 15 12"/><line x1="9" y1="18" x2="15" y2="18"/></svg></span></div><div class="settings-info"><div class="settings-label">ติดตั้งแอป JP Trust</div><div class="settings-desc">เพิ่มไอคอนลงหน้าจอมือถือ</div></div><div class="settings-arrow">›</div></div>
+            <div class="settings-item"><div class="settings-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span></div><div class="settings-info"><div class="settings-label">เวอร์ชันแอป</div><div class="settings-desc">v1.0.0</div></div><div class="settings-arrow">›</div></div>
+        </div>
+
+        <button class="logout-btn" onclick="doLogout()"><span class="jpt-icon" style="width:18px;height:18px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span> ออกจากระบบ</button>
+    </div></div>
+
+    <div class="screen iframe-screen" id="screen-iframe"><div class="iframe-topbar" id="iframeTopbar"><div class="iframe-back" onclick="closeIframe()">←</div><div class="iframe-title" id="iframeTitle">Loading...</div></div><div class="iframe-loading" id="iframeLoading"><div class="spinner"></div><span>กำลังโหลด...</span></div><div class="iframe-container" id="iframeContainer" style="display:none"><iframe id="iframeContent" src="about:blank" allow="fullscreen"></iframe></div></div>
+
+    <nav class="bottom-nav">
+        <button class="nav-item" data-screen="roadmap" onclick="openIframe('JPT Roadmap — 90 วัน', 'https://jptrustlearning.github.io/pages/roadmap.html?v=1777028891', 'roadmap')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/></svg><span class="nav-label">Roadmap</span></button>
+        <button class="nav-item" data-screen="news" onclick="navigateTo('news')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14H10"/><path d="M15 18H10"/><path d="M18 10H10"/></svg><span class="nav-label">News</span></button>
+        <button class="nav-item nav-home active" data-screen="home" onclick="navigateTo('home')"><img class="nav-owl-img" src="jpt-owl-line.png" alt="Home"></button>
+        <button class="nav-item" data-screen="lab" onclick="navigateTo('lab')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="7 14 10 10 13 13 17 9"/><circle cx="17" cy="9" r="1.5" fill="currentColor" opacity="0.6"/></svg><span class="nav-label">Lab</span></button>
+        <button class="nav-item" data-screen="more" onclick="navigateTo('more')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="5" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.5" fill="currentColor" stroke="none"/></svg><span class="nav-label">More</span></button>
+    </nav>
+</div>
+
+<div class="modal-overlay" id="editModal" onclick="closeModal(event)"><div class="modal-sheet" onclick="event.stopPropagation()"><div class="modal-handle"></div><div class="modal-title" id="modalTitle">แก้ไข</div><div id="modalContent"></div></div></div>
+
+<div class="modal-overlay" id="dateRangeModal" onclick="closeDateModal(event)"><div class="modal-sheet" onclick="event.stopPropagation()"><div class="modal-handle"></div><div class="modal-title">📅 เลือกช่วงเวลา</div>
+  <div style="padding:8px 4px 4px 4px">
+    <div style="margin-bottom:18px">
+      <label style="display:block;font-size:12px;font-weight:600;color:var(--text-dark-sub,#5A3D20);margin-bottom:6px;letter-spacing:0.5px">วันที่เริ่มต้น</label>
+      <input type="date" id="dateRangeStart" style="width:100%;padding:12px 14px;border:1.5px solid rgba(212,175,55,0.4);border-radius:12px;font-family:'Anuphan',sans-serif;font-size:15px;background:var(--cream-card,#FFFEF8);color:var(--text-dark,#3D3228);outline:none;box-sizing:border-box">
+    </div>
+    <div style="margin-bottom:22px">
+      <label style="display:block;font-size:12px;font-weight:600;color:var(--text-dark-sub,#5A3D20);margin-bottom:6px;letter-spacing:0.5px">วันที่สิ้นสุด</label>
+      <input type="date" id="dateRangeEnd" style="width:100%;padding:12px 14px;border:1.5px solid rgba(212,175,55,0.4);border-radius:12px;font-family:'Anuphan',sans-serif;font-size:15px;background:var(--cream-card,#FFFEF8);color:var(--text-dark,#3D3228);outline:none;box-sizing:border-box">
+    </div>
+    <div id="dateRangeError" style="color:#C33A4E;font-size:12px;margin-bottom:12px;min-height:16px;text-align:center"></div>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeDateModal()" style="flex:1;padding:13px;border:1.5px solid rgba(114,47,55,0.3);border-radius:12px;background:transparent;color:#722F37;font-family:'Anuphan',sans-serif;font-size:14px;font-weight:600;cursor:pointer">ยกเลิก</button>
+      <button onclick="applyDateRange()" style="flex:1.3;padding:13px;border:none;border-radius:12px;background:linear-gradient(135deg,#D4AF37 0%,#B8860B 100%);color:#fff;font-family:'Anuphan',sans-serif;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 3px 10px rgba(212,175,55,0.35)">ใช้ช่วงเวลานี้</button>
+    </div>
+  </div>
+</div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// Supabase client init
+var supabaseClient=(function(){
+    try{return window.supabase.createClient('https://rcdukwwcbyryauhqlzmx.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZHVrd3djYnlyeWF1aHFsem14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MTY0MDAsImV4cCI6MjA4NTQ5MjQwMH0.rprPmudJYyb6dyhXb9Z9GrtQWEeIX99A2Wrj55PvS54')}catch(e){console.error('Supabase init failed');return null}
+})();
+let isLoggedIn=false;let userSettings={name:'',email:'',language:'th',darkMode:false,notifications:{momentum:true,weekly:false,price:true},risk:'medium',capital:'100000',broker:''};
+let savedPIN=null;let tempPIN='';
+// One-time wipe of legacy localStorage settings (now stored per-user in Supabase user_settings table)
+try{localStorage.removeItem('jpt_user');savedPIN=localStorage.getItem('jpt_pin')}catch(e){}
+// Session flag: survives page reload (pull-to-refresh) but dies when tab/app closes
+try{if(sessionStorage.getItem('jpt_session_active')==='1')isLoggedIn=true}catch(e){}
+function saveSettings(){saveSettingsToCloud();applySettings()}
+
+// ===== Supabase user_settings (per-user cloud sync) =====
+// Schema: public.user_settings (user_id uuid PK, data jsonb, updated_at timestamptz) + RLS auth.uid()=user_id
+async function loadSettingsFromCloud(){
+    if(!supabaseClient)return null;
+    try{
+        const{data:{user}}=await supabaseClient.auth.getUser();
+        if(!user)return null;
+        // Always sync email from auth (source of truth)
+        userSettings.email=user.email||userSettings.email;
+        const{data,error}=await supabaseClient.from('user_settings').select('data').eq('user_id',user.id).maybeSingle();
+        if(error){console.warn('[settings] load failed:',error.message);return null}
+        if(data&&data.data)Object.assign(userSettings,data.data,{email:user.email||userSettings.email});
+        return data?data.data:null;
+    }catch(e){console.warn('[settings] load error:',e);return null}
+}
+
+async function saveSettingsToCloud(){
+    if(!supabaseClient)return;
+    try{
+        const{data:{user}}=await supabaseClient.auth.getUser();
+        if(!user)return;
+        const payload={...userSettings};delete payload.email;  // email lives in auth.users, no need to mirror
+        const{error}=await supabaseClient.from('user_settings').upsert({user_id:user.id,data:payload,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+        if(error)console.warn('[settings] save failed:',error.message);
+    }catch(e){console.warn('[settings] save error:',e)}
+}
+// Manual refresh button — keeps session active, shows spin before reload
+function refreshApp(){
+    try{sessionStorage.setItem('jpt_session_active','1')}catch(e){}
+    var btn=document.getElementById('refreshBtn');
+    if(btn)btn.classList.add('spinning');
+    setTimeout(function(){location.reload()},400);
+}
+
+// ===== EVENT TRACKING (Supabase user_events) =====
+// Async fire-and-forget — never blocks UI. Skips silently if no Supabase
+// session (RLS requires auth.uid() = user_id).
+async function logEvent(eventType, extra){
+    if(!supabaseClient) return;
+    try{
+        const{data:{user}}=await supabaseClient.auth.getUser();
+        if(!user)return;
+        const row={user_id:user.id, event_type:eventType};
+        if(extra&&extra.screen)row.screen=extra.screen;
+        if(extra&&extra.url)row.url=extra.url;
+        const{error}=await supabaseClient.from('user_events').insert(row);
+        if(error)console.warn('[event]',eventType,'failed:',error.message);
+    }catch(e){console.warn('[event]',eventType,'error:',e)}
+}
+
+// Show correct login step on load
+function initLoginScreen(){
+    document.querySelectorAll('.login-step').forEach(s=>s.classList.remove('active'));
+    if(savedPIN){
+        // Has PIN — show PIN entry
+        document.getElementById('stepPin').classList.add('active');
+        document.getElementById('loginTitle').textContent='ยินดีต้อนรับกลับ';
+        document.getElementById('loginSubtitle').textContent='กรุณาใส่ PIN 6 หลัก';
+        setTimeout(()=>{document.getElementById('pinInput').focus()},300);
+    } else {
+        // No PIN — show email OTP first
+        document.getElementById('stepEmail').classList.add('active');
+        document.getElementById('loginTitle').textContent='Member Access';
+        document.getElementById('loginSubtitle').textContent='เข้าสู่ระบบด้วยอีเมลสมาชิก';
+    }
+}
+
+// PIN dots animation
+function updatePinDots(inputId,dotsId){
+    var input=document.getElementById(inputId);
+    if(!input)return;
+    input.addEventListener('input',function(){
+        this.value=this.value.replace(/[^0-9]/g,'').slice(0,6);
+        var dots=document.querySelectorAll('#'+dotsId+' .pin-dot');
+        dots.forEach(function(d,i){d.classList.toggle('filled',i<input.value.length)});
+    });
+}
+
+// Check PIN
+function checkPIN(){
+    var pin=document.getElementById('pinInput').value.trim();
+    if(pin.length<6)return;
+    if(pin===savedPIN){
+        isLoggedIn=true;
+        try{localStorage.setItem('jpt_logged_in','true');sessionStorage.setItem('jpt_session_active','1')}catch(e){}
+        showApp();
+    } else {
+        document.getElementById('pinError').style.display='block';
+        document.getElementById('pinInput').value='';
+        document.querySelectorAll('#pinDots .pin-dot').forEach(function(d){d.classList.remove('filled')});
+        setTimeout(function(){document.getElementById('pinError').style.display='none'},2000);
+    }
+}
+
+// Forgot PIN — go to OTP flow
+function showForgotPIN(){
+    document.querySelectorAll('.login-step').forEach(s=>s.classList.remove('active'));
+    document.getElementById('stepEmail').classList.add('active');
+    document.getElementById('loginTitle').textContent='ตั้ง PIN ใหม่';
+    document.getElementById('loginSubtitle').textContent='ยืนยันตัวตนด้วยอีเมล';
+}
+
+// Send OTP via Supabase
+async function sendOTP(){
+    var e=document.getElementById('loginEmail').value.trim();
+    if(!e)return;
+    var btn=document.querySelector('#stepEmail .login-btn');
+    if(btn){btn.disabled=true;btn.textContent='กำลังส่ง...';}
+    try{
+        var res=await supabaseClient.auth.signInWithOtp({email:e,options:{shouldCreateUser:false}});
+        if(res.error){
+            var msg='เกิดข้อผิดพลาด กรุณาลองใหม่';
+            if(res.error.message.includes('not allowed')||res.error.message.includes('Signups not allowed')||res.error.message.includes('User not found'))msg='อีเมลนี้ไม่ได้รับอนุญาต กรุณาติดต่อผู้ดูแลระบบ';
+            alert(msg);
+            if(btn){btn.disabled=false;btn.textContent='ส่งรหัสยืนยัน';}
+            return;
+        }
+    }catch(err){alert('เกิดข้อผิดพลาด กรุณาลองใหม่');if(btn){btn.disabled=false;btn.textContent='ส่งรหัสยืนยัน';}return;}
+    if(btn){btn.disabled=false;btn.textContent='ส่งรหัสยืนยัน';}
+    userSettings.email=e;
+    document.getElementById('otpEmail').textContent=e;
+    document.querySelectorAll('.login-step').forEach(s=>s.classList.remove('active'));
+    document.getElementById('stepOTP').classList.add('active');
+    document.getElementById('loginSubtitle').textContent='กรุณาใส่รหัส OTP 6 หลัก';
+    document.getElementById('loginOTP').focus();
+}
+
+// Verify OTP via Supabase → go to set PIN
+async function verifyOTP(){
+    var o=document.getElementById('loginOTP').value.trim();
+    if(o.length<6)return;
+    var btn=document.querySelector('#stepOTP .login-btn');
+    if(btn){btn.disabled=true;btn.textContent='กำลังยืนยัน...';}
+    try{
+        var res=await supabaseClient.auth.verifyOtp({email:userSettings.email,token:o,type:'email'});
+        if(res.error){
+            alert('รหัสไม่ถูกต้องหรือหมดอายุ กรุณาลองใหม่');
+            if(btn){btn.disabled=false;btn.textContent='ยืนยันรหัส';}
+            document.getElementById('loginOTP').value='';
+            return;
+        }
+    }catch(err){alert('เกิดข้อผิดพลาด กรุณาลองใหม่');if(btn){btn.disabled=false;btn.textContent='ยืนยันรหัส';}return;}
+    if(btn){btn.disabled=false;btn.textContent='ยืนยันรหัส';}
+    // OTP accepted — now set PIN
+    document.querySelectorAll('.login-step').forEach(s=>s.classList.remove('active'));
+    document.getElementById('stepSetPin').classList.add('active');
+    document.getElementById('loginTitle').textContent='ตั้ง PIN';
+    document.getElementById('loginSubtitle').textContent='สร้าง PIN 6 หลักสำหรับเข้าแอป';
+    document.getElementById('newPinInput').focus();
+}
+
+// Set new PIN
+function setNewPIN(){
+    var pin=document.getElementById('newPinInput').value.trim();
+    if(pin.length<6)return;
+    tempPIN=pin;
+    document.querySelectorAll('.login-step').forEach(s=>s.classList.remove('active'));
+    document.getElementById('stepConfirmPin').classList.add('active');
+    document.getElementById('loginSubtitle').textContent='ยืนยัน PIN อีกครั้ง';
+    document.getElementById('confirmPinInput').focus();
+}
+
+// Confirm PIN
+function confirmPIN(){
+    var pin=document.getElementById('confirmPinInput').value.trim();
+    if(pin.length<6)return;
+    if(pin===tempPIN){
+        savedPIN=pin;
+        try{localStorage.setItem('jpt_pin',pin);localStorage.setItem('jpt_logged_in','true');sessionStorage.setItem('jpt_session_active','1')}catch(e){}
+        isLoggedIn=true;
+        showApp();
+    } else {
+        document.getElementById('pinMismatch').style.display='block';
+        document.getElementById('confirmPinInput').value='';
+        setTimeout(function(){document.getElementById('pinMismatch').style.display='none'},2000);
+    }
+}
+
+function backToEmail(){
+    document.querySelectorAll('.login-step').forEach(s=>s.classList.remove('active'));
+    document.getElementById('stepEmail').classList.add('active');
+    document.getElementById('loginEmail').focus();
+}
+function showApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('active');applySettings();renderTickerTape();loadSignalCards();loadSettingsFromCloud().then(d=>{if(d)applySettings()});logEvent('app_open',{screen:'home'})}
+
+// ===== SIGNAL CARDS (Gold + BTC) — fetch latest row of momentum CSVs =====
+function parseCSV(text){
+  const lines=text.trim().split(/\r?\n/);
+  if(lines.length<2)return[];
+  const headers=lines[0].split(',').map(h=>h.trim());
+  return lines.slice(1).map(line=>{
+    const cols=line.split(',');
+    const row={};
+    headers.forEach((h,i)=>{row[h]=(cols[i]||'').trim()});
+    return row;
+  });
+}
+async function fetchCSV(url){
+  try{
+    const r=await fetch(url+'?t='+Date.now(),{cache:'no-store'});
+    if(!r.ok)return null;
+    const text=await r.text();
+    return parseCSV(text);
+  }catch(e){return null}
+}
+function lastRow(rows){return rows&&rows.length?rows[rows.length-1]:null}
+
+function biasLabel(combinedSignal){
+  // Combined_Signal values: Full Bullish, Bullish Dominant, Tug, Bearish Dominant, Full Bearish
+  if(!combinedSignal)return{text:'—',cls:''};
+  const s=combinedSignal.toLowerCase();
+  if(s.includes('full bullish'))return{text:'🟢 '+combinedSignal,cls:'bullish'};
+  if(s.includes('bullish'))return{text:'🟢 '+combinedSignal,cls:'bullish'};
+  if(s.includes('full bearish'))return{text:'🔴 '+combinedSignal,cls:'bearish'};
+  if(s.includes('bearish'))return{text:'🔴 '+combinedSignal,cls:'bearish'};
+  if(s.includes('tug'))return{text:'🟡 '+combinedSignal,cls:'tug'};
+  return{text:combinedSignal,cls:''};
+}
+function fmtDelta(val){
+  if(val===null||val===undefined||isNaN(val))return{text:'—',cls:'flat'};
+  const n=parseFloat(val);
+  if(Math.abs(n)<0.05)return{text:'±0.0',cls:'flat'};
+  const s=n>0?'▲ +':'▼ −';
+  return{text:s+Math.abs(n).toFixed(1),cls:n>0?'up':'down'};
+}
+async function loadSignalCard(prefix,buyUrl,sellUrl,netUrl){
+  const [buyRows,sellRows,netRows]=await Promise.all([fetchCSV(buyUrl),fetchCSV(sellUrl),fetchCSV(netUrl)]);
+  const buy=lastRow(buyRows),sell=lastRow(sellRows),net=lastRow(netRows);
+  const buyScore=buy?parseFloat(buy.Net_Score_Avg||0):null;
+  const sellScore=sell?parseFloat(sell.Net_Score_Avg||0):null;
+  const buyBD1=buy?parseFloat(buy.Net_Score_BD1||0):null;
+  const sellBD1=sell?parseFloat(sell.Net_Score_BD1||0):null;
+  const buyDelta=net&&net.Buy_Delta?parseFloat(net.Buy_Delta):(buyScore!==null&&buyBD1!==null?buyScore-buyBD1:null);
+  const sellDelta=net&&net.Sell_Delta?parseFloat(net.Sell_Delta):(sellScore!==null&&sellBD1!==null?sellScore-sellBD1:null);
+  const combined=net?net.Combined_Signal:'';
+  const scenSignal=net?net.Scenario_Signal:'';
+  const scenAction=net?(net.Scenario_Action||'').toUpperCase():'';
+  const scenIcon=net?net.Scenario_Icon:'';
+
+  const setText=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
+  const setDelta=(id,d)=>{const e=document.getElementById(id);if(e){e.textContent=d.text;e.className='ss-delta '+d.cls}};
+  const setBias=(id,b)=>{const e=document.getElementById(id);if(e){e.textContent=b.text;e.className='signal-bias '+b.cls}};
+  const setAction=(id,sig,act,icon)=>{
+    const e=document.getElementById(id);if(!e)return;
+    if(!sig&&!act){e.textContent='—';e.className='signal-action';return}
+    const cls=act==='BUY'?'buy':act==='SELL'?'sell':'hold';
+    const ic=icon?icon+' ':'';
+    const parts=[];
+    if(sig)parts.push(sig);
+    if(act)parts.push(act);
+    e.textContent=ic+parts.join(' · ');
+    e.className='signal-action '+cls;
+  };
+
+  setText(prefix+'BuyScore',buyScore!==null?buyScore.toFixed(1):'—');
+  setText(prefix+'SellScore',sellScore!==null?sellScore.toFixed(1):'—');
+  setDelta(prefix+'BuyDelta',fmtDelta(buyDelta));
+  setDelta(prefix+'SellDelta',fmtDelta(sellDelta));
+  setBias(prefix+'Bias',biasLabel(combined));
+  setAction(prefix+'Action',scenSignal,scenAction,scenIcon);
+}
+function loadSignalCards(){
+  loadSignalCard('gold',
+    'https://raw.githubusercontent.com/jptrustlearning/gold/main/output_momentum_gold.csv',
+    'https://raw.githubusercontent.com/jptrustlearning/gold/main/output_momentum_gold_sell.csv',
+    'https://raw.githubusercontent.com/jptrustlearning/gold/main/output_momentum_gold_net.csv');
+  /* BTC signal fetch disabled — page shows "กำลังพัฒนา" state instead
+  loadSignalCard('btc',
+    'https://raw.githubusercontent.com/jptrustlearning/btc/main/output_momentum_btc.csv',
+    'https://raw.githubusercontent.com/jptrustlearning/btc/main/output_momentum_btc_sell.csv',
+    'https://raw.githubusercontent.com/jptrustlearning/btc/main/output_momentum_btc_net.csv');
+  */
+}
+function applySettings(){const n=userSettings.name||'Member';var el;el=document.getElementById('displayName');if(el)el.textContent=n;el=document.getElementById('settingsName');if(el)el.textContent=n;el=document.getElementById('settingsEmail');if(el)el.textContent=userSettings.email;el=document.getElementById('settingNameVal');if(el)el.textContent=n;const r={low:'ต่ำ (Low)',medium:'ปานกลาง (Medium)',high:'สูง (High)'};el=document.getElementById('settingRisk');if(el)el.textContent=r[userSettings.risk]||'ปานกลาง';el=document.getElementById('settingCapital');if(el)el.textContent='฿'+Number(userSettings.capital||0).toLocaleString();el=document.getElementById('settingBroker');if(el)el.textContent=userSettings.broker||'ยังไม่ระบุ';const i=n.slice(0,2).toUpperCase();document.querySelectorAll('.avatar,.profile-avatar').forEach(el=>el.textContent=i);el=document.getElementById('cardName');if(el)el.textContent=n}
+// LOCK ONLY — does NOT sign out from Supabase.
+// PIN stays in localStorage; Supabase session token stays in localStorage;
+// user_id remains identifiable on next entry → analytics continuity preserved.
+// Effect: hides app, shows PIN screen. User unlocks with PIN to come back.
+function doLogout(){
+  isLoggedIn=false;
+  logEvent('app_lock');
+  try{localStorage.removeItem('jpt_logged_in');sessionStorage.removeItem('jpt_session_active')}catch(e){}
+  // Close any open iframe sub-page so it doesn't keep running in background
+  const ifr=document.getElementById('iframeContent');
+  if(ifr)ifr.src='about:blank';
+  // Reset to home screen so next unlock lands clean
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const home=document.getElementById('screen-home');
+  if(home)home.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelector('.nav-item[data-screen="home"]')?.classList.add('active');
+  // Reset PIN input UI
+  const pinInput=document.getElementById('pinInput');
+  if(pinInput)pinInput.value='';
+  document.querySelectorAll('#pinDots .pin-dot').forEach(d=>d.classList.remove('filled'));
+  // Show login screen with PIN step active (savedPIN already in localStorage)
+  document.getElementById('mainApp').classList.remove('active');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.querySelectorAll('.login-step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('stepPin').classList.add('active');
+  window.scrollTo({top:0});
+  setTimeout(()=>pinInput?.focus(),100);
+}
+function navigateTo(screen){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const t=document.getElementById('screen-'+screen);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const b=document.querySelector('.nav-item[data-screen="'+screen+'"]');if(b)b.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});t?.querySelectorAll('.fade-up').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''});if(screen==='news'){loadNewsFeed()}if(screen==='home'){refreshTickerTape()}logEvent('screen_view',{screen:screen})}
+// ===== TRADINGVIEW TICKER TAPE =====
+// Free embed widget — real-time prices, no API key, auto-updating
+let _tickerLastLoad = 0;
+
+function renderTickerTape(){
+  const wrapper=document.querySelector('.ticker-tape-wrapper .tradingview-widget-container__widget');
+  if(!wrapper)return;
+  // Only inject once
+  if(wrapper.dataset.tvLoaded==='1')return;
+  wrapper.dataset.tvLoaded='1';
+  _tickerLastLoad = Date.now();
+
+  const config={
+    "symbols":[
+      {"description":"Gold","proName":"OANDA:XAUUSD"},
+      {"description":"S&P 500","proName":"FOREXCOM:SPX500"},
+      {"description":"Nasdaq 100","proName":"FOREXCOM:NSXUSD"},
+      {"description":"Dow Jones","proName":"FOREXCOM:DJI"},
+      {"description":"Bitcoin","proName":"BINANCE:BTCUSDT"},
+      {"description":"Ethereum","proName":"BINANCE:ETHUSDT"},
+      {"description":"Silver","proName":"OANDA:XAGUSD"},
+      {"description":"Oil WTI","proName":"TVC:USOIL"},
+      {"description":"US Dollar","proName":"CAPITALCOM:DXY"},
+      {"description":"VIX","proName":"CAPITALCOM:VIX"},
+      {"description":"20Y Bonds","proName":"NASDAQ:TLT"}
+    ],
+    "showSymbolLogo":true,
+    "isTransparent":false,
+    "displayMode":"adaptive",
+    "colorTheme":"dark",
+    "locale":"en"
+  };
+  const script=document.createElement('script');
+  script.type='text/javascript';
+  script.src='https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
+  script.async=true;
+  script.innerHTML=JSON.stringify(config);
+  wrapper.parentElement.appendChild(script);
+}
+
+// Re-inject the TradingView widget — fixes stale ticker after navigating
+// away and back. Throttled to once per 30s to avoid spam reloads.
+function refreshTickerTape(){
+  if(Date.now() - _tickerLastLoad < 30000) return;
+  const wrapper=document.querySelector('.ticker-tape-wrapper .tradingview-widget-container__widget');
+  if(!wrapper) return;
+  // Clear current widget DOM + the orphaned script-tag from prior load
+  wrapper.innerHTML='';
+  delete wrapper.dataset.tvLoaded;
+  const parent=wrapper.parentElement;
+  if(parent){
+    parent.querySelectorAll('script[src*="embed-widget-ticker-tape"]').forEach(s=>s.remove());
+  }
+  renderTickerTape();
+}
+
+// When user returns to the tab/app from background, refresh ticker if home is active
+document.addEventListener('visibilitychange', ()=>{
+  if(document.hidden) return;
+  const home=document.getElementById('screen-home');
+  if(home && home.classList.contains('active')) refreshTickerTape();
+});
+
+const NEWS_INDEX_URL='https://raw.githubusercontent.com/jptrustlearning/pages/main/news/news-index.json';
+let newsFeedCache=null;
+let newsSearchQuery='';
+let newsTimeRange='3day';
+let newsCustomStart=null;
+let newsCustomEnd=null;
+async function loadNewsFeed(force){
+  const listEl=document.getElementById('newsFeedList');
+  if(!listEl)return;
+  listEl.innerHTML='<div class="news-empty">🔄 กำลังโหลดข่าว...</div>';
+  try{
+    const res=await fetch('https://raw.githubusercontent.com/jptrustlearning/pages/main/news/news-index.json?t='+Date.now(),{cache:'no-store'});
+    if(!res.ok)throw new Error('Index fetch failed');
+    const data=await res.json();
+    newsFeedCache=data;
+    renderNewsFeed();
+  }catch(err){
+    listEl.innerHTML='<div class="dash-card" style="padding:20px;text-align:center;color:#C33A4E;font-size:13px">ไม่สามารถโหลดข่าวได้<br><span style="font-size:11px;color:var(--text-dark-muted);margin-top:6px;display:block">'+(err.message||'Unknown error')+'</span></div>';
+  }
+}
+function renderNewsFeed(){
+  const listEl=document.getElementById('newsFeedList');
+  if(!listEl||!newsFeedCache)return;
+  const allBatches=(newsFeedCache.batches||[]);
+  // Flatten every headline across all batches, enrich with {file, _origIndex, _pubDate}
+  let allHeadlines=[];
+  allBatches.forEach(b=>{
+    (b.headlines||[]).forEach((h,i)=>{
+      allHeadlines.push(Object.assign({},h,{
+        _file:b.file,
+        _origIndex:i,
+        _pubDate:parsePublishedDate(h.published)||new Date(b.date).getTime()
+      }));
+    });
+  });
+  // Time range filter based on _pubDate
+  // NOTE: when user has an active search query, we ignore time filter (show all matches)
+  if(!newsSearchQuery && newsTimeRange!=='all'){
+    if(newsTimeRange==='custom' && newsCustomStart && newsCustomEnd){
+      allHeadlines=allHeadlines.filter(h=>h._pubDate>=newsCustomStart && h._pubDate<=newsCustomEnd);
+    }else{
+      const now=Date.now();
+      const windows={today:24*3600*1000,'3day':3*24*3600*1000,week:7*24*3600*1000,month:30*24*3600*1000};
+      const cutoff=now-(windows[newsTimeRange]||0);
+      allHeadlines=allHeadlines.filter(h=>h._pubDate>=cutoff);
+    }
+  }
+  // Search filter
+  if(newsSearchQuery){
+    const q=newsSearchQuery.toLowerCase().trim();
+    allHeadlines=allHeadlines.filter(h=>{
+      if((h.title||'').toLowerCase().includes(q))return true;
+      if((h.source||'').toLowerCase().includes(q))return true;
+      const tks=normalizeTickers(h.tickers);
+      if(tks.some(t=>(t.symbol||'').toLowerCase().includes(q)))return true;
+      return false;
+    });
+  }
+  if(allHeadlines.length===0){
+    const msg=newsSearchQuery?'ไม่พบข่าวที่ตรงกับ "'+newsSearchQuery+'"':'ยังไม่มีข่าวในช่วงเวลานี้';
+    listEl.innerHTML='<div class="news-empty">'+msg+'</div>';
+    return;
+  }
+  // Group by published date label (falls back to published string itself)
+  const groups={};
+  const groupOrder=[];
+  allHeadlines.forEach(h=>{
+    const key=h.published||'ไม่ระบุวันที่';
+    if(!(key in groups)){groups[key]=[];groupOrder.push({key,sortKey:h._pubDate});}
+    groups[key].push(h);
+  });
+  // Sort groups newest-first
+  groupOrder.sort((a,b)=>b.sortKey-a.sortKey);
+  listEl.innerHTML=groupOrder.map(g=>renderDateGroup(g.key,groups[g.key])).join('');
+}
+// Parse Thai-style published date like "16 เม.ย. 2026" into timestamp
+function parsePublishedDate(s){
+  if(!s)return 0;
+  const thaiMonths={'ม.ค.':0,'ก.พ.':1,'มี.ค.':2,'เม.ย.':3,'พ.ค.':4,'มิ.ย.':5,'ก.ค.':6,'ส.ค.':7,'ก.ย.':8,'ต.ค.':9,'พ.ย.':10,'ธ.ค.':11};
+  const m=s.match(/(\d{1,2})\s+(\S+)\s+(\d{4})/);
+  if(m){
+    const day=parseInt(m[1],10);
+    const mon=thaiMonths[m[2]];
+    const year=parseInt(m[3],10);
+    if(mon!==undefined)return new Date(year,mon,day).getTime();
+  }
+  const t=Date.parse(s);
+  return isNaN(t)?0:t;
+}
+function renderDateGroup(dateLabel,headlines){
+  const dateHeader='<div class="news-batch-date">'+escapeText(dateLabel)+'</div>';
+  const cards=headlines.map(h=>renderHeadlineCard(h)).join('');
+  return '<div class="news-batch-group">'+dateHeader+'<div class="news-grid">'+cards+'</div></div>';
+}
+function renderHeadlineCard(h){
+  const safeFile=encodeURIComponent(h._file||'');
+  const tickers=normalizeTickers(h.tickers);
+  const tickerPills=tickers.map(t=>{
+    const s=t.sentiment||'neutral';
+    const star=s==='positive'?'<span class="tk-star positive">★</span>':s==='negative'?'<span class="tk-star negative">★</span>':'<span class="tk-star neutral">★</span>';
+    return '<span class="news-ticker-sm '+s+'">'+star+escapeText(t.symbol)+'</span>';
+  }).join('');
+  const metaLine=h.source?' <span class="news-src-inline">— '+escapeText(h.source)+'</span>':'';
+  return '<div class="news-dash-card" onclick="openNewsDetail(\''+safeFile+'\','+(h._origIndex||0)+')">'
+    +'<div class="news-dash-title">'+escapeText(h.title)+metaLine+'</div>'
+    +'<div class="news-item-tickers">'+tickerPills+'</div>'
+  +'</div>';
+}
+// Support both old (string) and new (object with sentiment) ticker formats
+function normalizeTickers(tickers){
+  if(!tickers)return[];
+  return tickers.map(t=>typeof t==='string'?{symbol:t,sentiment:'neutral'}:{symbol:t.symbol||'',sentiment:t.sentiment||'neutral'});
+}
+function escapeText(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function openNewsDetail(file,idx){
+  let url='news-detail.html?file='+file;
+  if(typeof idx==='number'&&idx>=0)url+='&idx='+idx;
+  openIframe('📰 News Detail',url);
+}
+function filterNewsFeed(){
+  const inp=document.getElementById('newsSearchInput');
+  const clear=document.getElementById('newsSearchClear');
+  newsSearchQuery=inp?inp.value:'';
+  if(clear)clear.style.display=newsSearchQuery?'flex':'none';
+  if(newsFeedCache)renderNewsFeed();
+}
+function clearNewsSearch(){
+  const inp=document.getElementById('newsSearchInput');
+  if(inp)inp.value='';
+  newsSearchQuery='';
+  document.getElementById('newsSearchClear').style.display='none';
+  if(newsFeedCache)renderNewsFeed();
+}
+function setNewsTimeRange(range){
+  newsTimeRange=range;
+  if(range!=='custom'){newsCustomStart=null;newsCustomEnd=null}
+  document.querySelectorAll('.time-chip').forEach(c=>c.classList.toggle('active',c.dataset.range===range));
+  // Reset custom chip label when switching away
+  const chip=document.getElementById('customDateChip');
+  if(chip && range!=='custom')chip.textContent='📅 ช่วงเวลาเอง';
+  if(newsFeedCache)renderNewsFeed();
+}
+function openCustomDateModal(){
+  const m=document.getElementById('dateRangeModal');
+  const err=document.getElementById('dateRangeError');
+  const startEl=document.getElementById('dateRangeStart');
+  const endEl=document.getElementById('dateRangeEnd');
+  if(err)err.textContent='';
+  // Pre-fill with last-used or sensible defaults (last 7 days)
+  const fmt=d=>d.toISOString().slice(0,10);
+  const today=new Date();
+  const weekAgo=new Date(today.getTime()-7*24*3600*1000);
+  if(newsCustomStart && startEl)startEl.value=fmt(new Date(newsCustomStart));
+  else if(startEl && !startEl.value)startEl.value=fmt(weekAgo);
+  if(newsCustomEnd && endEl)endEl.value=fmt(new Date(newsCustomEnd));
+  else if(endEl && !endEl.value)endEl.value=fmt(today);
+  m.classList.add('show');
+}
+function closeDateModal(e){
+  if(e&&e.target!==e.currentTarget)return;
+  document.getElementById('dateRangeModal').classList.remove('show');
+}
+function applyDateRange(){
+  const startEl=document.getElementById('dateRangeStart');
+  const endEl=document.getElementById('dateRangeEnd');
+  const err=document.getElementById('dateRangeError');
+  const chip=document.getElementById('customDateChip');
+  if(!startEl.value||!endEl.value){err.textContent='กรุณาเลือกวันที่ให้ครบ';return}
+  const start=new Date(startEl.value+'T00:00:00').getTime();
+  const end=new Date(endEl.value+'T23:59:59').getTime();
+  if(start>end){err.textContent='วันที่เริ่มต้นต้องมาก่อนวันที่สิ้นสุด';return}
+  newsCustomStart=start;
+  newsCustomEnd=end;
+  newsTimeRange='custom';
+  // Update chip label to show selected range
+  const thaiMonthsShort=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const fmt=ts=>{const d=new Date(ts);return d.getDate()+' '+thaiMonthsShort[d.getMonth()]};
+  if(chip)chip.textContent='📅 '+fmt(start)+' – '+fmt(end);
+  document.querySelectorAll('.time-chip').forEach(c=>c.classList.toggle('active',c.dataset.range==='custom'));
+  closeDateModal();
+  if(newsFeedCache)renderNewsFeed();
+}
+function openEditModal(field){const m=document.getElementById('editModal'),t=document.getElementById('modalTitle'),c=document.getElementById('modalContent');if(field==='name'){t.textContent='แก้ไขชื่อที่แสดง';c.innerHTML='<input class="modal-input" id="editValue" value="'+userSettings.name+'" placeholder="ชื่อของคุณ"><button class="modal-btn" onclick="userSettings.name=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}else if(field==='risk'){t.textContent='ระดับความเสี่ยง';c.innerHTML='<div style="display:flex;flex-direction:column;gap:8px"><button class="modal-btn" style="background:'+(userSettings.risk==='low'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='low'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'low\';saveSettings();closeModal();">ต่ำ (Low)</button><button class="modal-btn" style="background:'+(userSettings.risk==='medium'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='medium'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'medium\';saveSettings();closeModal();">ปานกลาง (Medium)</button><button class="modal-btn" style="background:'+(userSettings.risk==='high'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='high'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'high\';saveSettings();closeModal();">สูง (High)</button></div>'}else if(field==='capital'){t.textContent='ทุนเริ่มต้น (บาท)';c.innerHTML='<input class="modal-input" id="editValue" type="number" value="'+userSettings.capital+'" placeholder="100000"><button class="modal-btn" onclick="userSettings.capital=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}else if(field==='broker'){t.textContent='โบรกเกอร์ของคุณ';c.innerHTML='<input class="modal-input" id="editValue" value="'+userSettings.broker+'" placeholder="เช่น XM, Exness, IC Markets"><button class="modal-btn" onclick="userSettings.broker=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}m.classList.add('show')}
+function closeModal(e){if(e&&e.target!==e.currentTarget)return;document.getElementById('editModal').classList.remove('show')}
+function openNotifications(){jptToast('ยังไม่มีการแจ้งเตือนใหม่')}
+function openComingSoon(name){alert('กลยุทธ์ "'+name+'" กำลังพัฒนา — เร็วๆ นี้จะเปิดให้ใช้งาน')}
+function jptToast(msg){let t=document.getElementById('jpt-toast');if(!t){t=document.createElement('div');t.id='jpt-toast';document.body.appendChild(t)}t.textContent=msg;t.classList.add('show');clearTimeout(t._hideTimer);t._hideTimer=setTimeout(()=>t.classList.remove('show'),2800)}
+function btcComingSoon(e){if(e){e.stopPropagation();e.preventDefault()}jptToast('🚧 Bitcoin · กำลังพัฒนา · เร็วๆ นี้')}
+let lastScreen='home';
+function openIframe(title,url,navScreen){const tEl=document.getElementById('iframeTitle'),tb=document.getElementById('iframeTopbar'),ld=document.getElementById('iframeLoading'),ct=document.getElementById('iframeContainer'),ifr=document.getElementById('iframeContent');const cur=document.querySelector('.screen.active');if(cur)lastScreen=cur.id.replace('screen-','');if(tEl)tEl.textContent=title;/* Hide topbar only for pages that already own their header (sp500-combined-strategy); show for everything else including news-detail */if(tb){const hideTopbar=/sp500-combined-strategy|sp500-strategy-pro|sp500-rolling-6m-momentum|gold-momentum-app|roadmap\.html|portfolio-planner|finance-planner|my-portfolio/.test(url);tb.style.display=hideTopbar?'none':'flex'}ld.style.display='flex';ct.style.display='none';ifr.src='about:blank';document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-iframe').classList.add('active');/* Sync bottom nav highlight — auto-detect tab from URL when navScreen not explicitly passed */if(!navScreen){if(/sp500-(strategy-pro|combined-strategy|rolling-6m-momentum)|smc-patient-hunter|gold-swing-h1-sensitivity/.test(url))navScreen='lab';else if(/gold-momentum-app|Free_scannerSP500|my-portfolio/.test(url))navScreen='more';else if(/portfolio-planner|finance-planner/.test(url))navScreen='roadmap';else if(/news-detail/.test(url))navScreen='news'}document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));if(navScreen){const b=document.querySelector('.nav-item[data-screen="'+navScreen+'"]');if(b)b.classList.add('active')}setTimeout(()=>{ifr.src=url;ifr.onload=function(){ld.style.display='none';ct.style.display='block'}},100);window.scrollTo({top:0});/* Strip cache-bust ?v= for cleaner analytics URLs */const cleanUrl=url.replace(/\?v=\d+/,'');logEvent('page_view',{screen:'iframe',url:cleanUrl})}
+function closeIframe(){document.getElementById('iframeContent').src='about:blank';navigateTo(lastScreen)}
+/* Listen for openIframe requests from within child iframes (e.g. roadmap → portfolio planner) */
+window.addEventListener('message', function(ev) {
+  const d = ev.data;
+  if (d && d.type === 'openIframe' && typeof d.url === 'string') {
+    openIframe(d.title || '', d.url, d.navScreen || null);
+  }
+});
+// Splash screen — hide fast if session already active (pull-to-refresh), normal timing otherwise
+setTimeout(function(){
+    var splash=document.getElementById('splashScreen');
+    if(splash){splash.classList.add('hidden');setTimeout(function(){splash.style.display='none'},600)}
+},isLoggedIn?400:2200);
+
+if(isLoggedIn)showApp();
+else initLoginScreen();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+// PIN input filters
+['pinInput','newPinInput','confirmPinInput','loginOTP'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.addEventListener('input',function(){this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)});
+});
+updatePinDots('pinInput','pinDots');
+let deferredPrompt=null;const ib=document.getElementById('installBanner'),ibl=document.getElementById('installBannerLogin');
+function showIB(){if(ib)ib.classList.add('show');if(ibl)ibl.classList.add('show')}function hideIB(){if(ib)ib.classList.remove('show');if(ibl)ibl.classList.remove('show')}
+function isStandalone(){return window.matchMedia('(display-mode:standalone)').matches||window.navigator.standalone===true}
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;if(!isStandalone())showIB()});
+setTimeout(()=>{if(!deferredPrompt&&!isStandalone()&&/iPhone|iPad|iPod|Android/i.test(navigator.userAgent))showIB()},2000);
+// Cleanup any legacy dismiss flag from previous versions — banner now driven purely by standalone detection
+try{localStorage.removeItem('jpt_install_dismissed')}catch(e){}
+function handleInstallClick(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(r=>{if(r.outcome==='accepted'){hideIB();showInstallSuccessModal()}deferredPrompt=null})}else{const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent);const m=document.getElementById('editModal'),t=document.getElementById('modalTitle'),c=document.getElementById('modalContent');t.textContent='ติดตั้งแอป JP Trust';const steps=isIOS?[['1','กดปุ่ม <strong style="color:var(--gold-dark)">Share</strong> ↑ ด้านล่างของ Safari'],['2','เลื่อนลงแล้วกด <strong style="color:var(--gold-dark)">"Add to Home Screen"</strong>'],['3','กด <strong style="color:var(--gold-dark)">"Add"</strong> — เสร็จ!']]:[['1','กดเมนู <strong style="color:var(--gold-dark)">⋮</strong> มุมขวาบนของ Chrome'],['2','กด <strong style="color:var(--gold-dark)">"เพิ่มลงในหน้าจอหลัก"</strong>'],['3','กด <strong style="color:var(--gold-dark)">"เพิ่ม"</strong> — เสร็จ!']];c.innerHTML='<div class="ios-guide"><div style="font-size:40px;margin-bottom:12px"><span class="jpt-icon" style="width:40px;height:40px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="8" x2="12" y2="14"/><polyline points="9 12 12 15 15 12"/><line x1="9" y1="18" x2="15" y2="18"/></svg></span></div><div style="font-size:14px;color:var(--text-dark-muted);margin-bottom:20px">ทำตาม 3 ขั้นตอนนี้เพื่อเพิ่มแอปลงหน้าจอ</div>'+steps.map(s=>'<div class="ios-guide-step"><div class="ios-guide-num">'+s[0]+'</div><div class="ios-guide-text">'+s[1]+'</div></div>').join('')+'<button class="modal-btn" style="margin-top:16px" onclick="closeModal()">เข้าใจแล้ว</button></div>';m.classList.add('show')}}
+
+// Success modal after install completes (Chrome/Edge beforeinstallprompt flow)
+function showInstallSuccessModal(){
+    const m=document.getElementById('editModal'),t=document.getElementById('modalTitle'),c=document.getElementById('modalContent');
+    t.textContent='ติดตั้งสำเร็จ';
+    c.innerHTML=`<div style="text-align:center;padding:8px 4px 4px">
+        <div style="width:88px;height:88px;margin:0 auto 16px;background:linear-gradient(135deg,var(--maroon-dark,#1a0a0e),var(--burgundy,#722F37));border-radius:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(212,175,55,0.35),0 0 0 1.5px rgba(212,175,55,0.4)">
+            <img src="jpt-owl-logo.png" alt="JP Trust" style="width:60px;height:60px;object-fit:contain" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex'">
+            <span class="jpt-icon" style="display:none;width:46px;height:46px;color:var(--gold,#D4AF37);align-items:center;justify-content:center">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="8" x2="12" y2="14"/><polyline points="9 12 12 15 15 12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
+            </span>
+        </div>
+        <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;color:var(--gold-deep,#8B6914);text-transform:uppercase;margin-bottom:6px;font-weight:600">JP TRUST LEARNING</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--maroon,#722F37);margin-bottom:10px">พร้อมใช้งานแล้ว</div>
+        <div style="font-size:14px;color:var(--text-dark-muted);line-height:1.65;margin-bottom:22px;padding:0 6px">
+            แอป <strong style="color:var(--gold-dark)">JP Trust</strong> ถูกเพิ่มลงหน้าจอของคุณเรียบร้อย<br>
+            เปิดใช้งานได้แบบเต็มจอ ไม่มีแถบ URL รบกวน
+        </div>
+        <button onclick="openInstalledApp()" style="width:100%;padding:15px;background:linear-gradient(135deg,var(--gold,#D4AF37),var(--gold-dark,#B8860B));color:#1a0a0e;font-family:'Sarabun','Anuphan',sans-serif;font-size:15px;font-weight:700;border:none;border-radius:12px;cursor:pointer;box-shadow:0 6px 20px rgba(212,175,55,0.35);margin-bottom:10px;letter-spacing:0.3px">เปิดแอป JP Trust</button>
+        <button onclick="closeModal()" style="width:100%;padding:12px;background:transparent;color:var(--text-muted,#7A6F62);font-family:'Sarabun','Anuphan',sans-serif;font-size:13.5px;font-weight:500;border:1px solid rgba(212,175,55,0.3);border-radius:12px;cursor:pointer">ปิด</button>
+    </div>`;
+    m.classList.add('show');
+}
+
+// Attempt to open the installed PWA. Browsers can't reliably launch PWA from JS,
+// but window.open on Chrome may open in standalone; otherwise the user sees a fresh tab
+// and can close current + tap icon on home screen.
+function openInstalledApp(){
+    try{window.open(window.location.origin+window.location.pathname,'_blank')}catch(e){}
+    closeModal();
+}
+window.addEventListener('appinstalled',()=>{hideIB();showInstallSuccessModal()});
+// ===== HERO CHART LINES =====
+(function(){
+    const canvas=document.getElementById('heroCanvas');
+    if(!canvas)return;
+    const ctx=canvas.getContext('2d');
+    let w,h,lines=[];
+    function resize(){w=canvas.width=canvas.offsetWidth;h=canvas.height=canvas.offsetHeight}
+    class ChartLine{
+        constructor(yBase,speed,amplitude,color,lineWidth){
+            this.yBase=yBase;this.speed=speed;this.amplitude=amplitude;this.color=color;this.lineWidth=lineWidth;
+            this.offset=Math.random()*Math.PI*4;this.freq=0.003+Math.random()*0.004;this.freq2=0.001+Math.random()*0.002;
+        }
+        draw(t){
+            const baseY=h*this.yBase;
+            const shimmer=0.5+0.5*Math.sin(t*0.002+this.offset);
+            const alpha=parseFloat(this.color.match(/[\d.]+(?=\))/)[0])*shimmer;
+            const c=this.color.replace(/[\d.]+\)/,alpha.toFixed(3)+')');
+            ctx.beginPath();ctx.strokeStyle=c;ctx.lineWidth=this.lineWidth;
+            for(let x=0;x<=w;x+=2){
+                const y=baseY+Math.sin(x*this.freq+t*this.speed+this.offset)*this.amplitude+Math.sin(x*this.freq2+t*this.speed*0.7+this.offset*1.3)*this.amplitude*0.5+Math.sin(x*this.freq*2.5+t*this.speed*1.4)*this.amplitude*0.2;
+                if(x===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+            }
+            ctx.stroke();
+        }
+    }
+    function initLines(){
+        lines=[
+            new ChartLine(0.30,0.0006,28,'rgba(212,175,55,0.20)',0.8),
+            new ChartLine(0.45,0.0008,35,'rgba(212,175,55,0.25)',1.0),
+            new ChartLine(0.55,0.0005,40,'rgba(244,228,186,0.22)',1.2),
+            new ChartLine(0.65,0.0010,22,'rgba(184,134,11,0.18)',0.8),
+            new ChartLine(0.75,0.0007,32,'rgba(212,175,55,0.15)',1.0),
+        ];
+    }
+    // Gold fog clouds
+    let fogs=[];
+    class Fog{
+        constructor(){this.reset()}
+        reset(){this.x=-150-Math.random()*200;this.y=Math.random()*1;this.r=60+Math.random()*80;this.speed=0.15+Math.random()*0.25;this.alpha=0.04+Math.random()*0.06}
+        draw(t){
+            this.x+=this.speed;
+            if(this.x>w+200)this.reset();
+            const yy=h*this.y+Math.sin(t*0.0003+this.r)*15;
+            const g=ctx.createRadialGradient(this.x,yy,0,this.x,yy,this.r);
+            g.addColorStop(0,'rgba(212,175,55,'+this.alpha+')');
+            g.addColorStop(0.5,'rgba(244,228,186,'+(this.alpha*0.5)+')');
+            g.addColorStop(1,'rgba(212,175,55,0)');
+            ctx.fillStyle=g;ctx.fillRect(this.x-this.r,yy-this.r,this.r*2,this.r*2);
+        }
+    }
+    function initFogs(){fogs=[];for(let i=0;i<5;i++){const f=new Fog();f.x=Math.random()*800;fogs.push(f)}}
+    function animate(t){ctx.clearRect(0,0,w,h);fogs.forEach(f=>f.draw(t));lines.forEach(l=>l.draw(t));requestAnimationFrame(animate)}
+    window.addEventListener('resize',resize);
+    function startChart(){resize();if(w===0||h===0){setTimeout(startChart,200);return}initLines();initFogs();requestAnimationFrame(animate)}
+    setTimeout(startChart,300);
+})();
+</script>
+</body></html>
