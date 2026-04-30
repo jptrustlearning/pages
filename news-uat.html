@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Cinzel:wght@400;500;600;700&family=DM+Serif+Display&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -22,7 +23,7 @@
 html,body{font-family:'Anuphan','Sarabun',sans-serif;background:var(--cream);color:var(--text-dark);min-height:100vh;-webkit-font-smoothing:antialiased}
 body{padding:0 0 100px;max-width:480px;margin:0 auto;position:relative}
 
-/* ===== TOPBAR (matches home topbar) ===== */
+/* ===== TOPBAR ===== */
 .topbar{background:linear-gradient(180deg,var(--cream) 0%,var(--cream) 78%,rgba(250,246,237,0.85) 100%);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 14px rgba(114,47,55,0.04);position:sticky;top:0;z-index:50}
 .topbar-left{display:flex;align-items:center;gap:12px}
 .avatar{width:42px;height:42px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:#fff;box-shadow:0 3px 10px rgba(212,175,55,0.3)}
@@ -33,7 +34,6 @@ body{padding:0 0 100px;max-width:480px;margin:0 auto;position:relative}
 .icon-btn svg{width:20px;height:20px;color:var(--gold-deep);stroke:var(--gold-deep);fill:none;stroke-width:1.8}
 .notif-dot{position:absolute;top:8px;right:8px;width:8px;height:8px;background:var(--gold);border-radius:50%;border:2px solid var(--cream-card)}
 
-/* ===== PAGE CONTENT ===== */
 .page{padding:18px 16px 24px}
 
 /* ===== HEADER ===== */
@@ -55,10 +55,9 @@ body{padding:0 0 100px;max-width:480px;margin:0 auto;position:relative}
 /* ===== FILTER PILLS ===== */
 .filters{display:flex;gap:8px;overflow-x:auto;padding:0 0 4px;margin:0 -16px 18px;padding-left:16px;padding-right:16px;scrollbar-width:none}
 .filters::-webkit-scrollbar{display:none}
-.pill{flex-shrink:0;padding:8px 14px;border-radius:20px;background:var(--cream-card);border:1px solid var(--border-gold-soft);font-family:'Anuphan',sans-serif;font-size:12px;font-weight:500;color:var(--text-dark-sub);display:flex;align-items:center;gap:6px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.pill{flex-shrink:0;padding:8px 16px;border-radius:20px;background:var(--cream-card);border:1px solid var(--border-gold-soft);font-family:'Anuphan',sans-serif;font-size:12px;font-weight:500;color:var(--text-dark-sub);cursor:pointer;transition:all .2s;white-space:nowrap;letter-spacing:0.2px}
 .pill:hover{background:var(--cream-warm)}
 .pill.active{background:linear-gradient(135deg,var(--burgundy),var(--burgundy-mid));color:var(--text-light);border-color:var(--burgundy);box-shadow:0 2px 8px rgba(114,47,55,0.25)}
-.pill-emoji{font-size:13px;line-height:1}
 
 /* ===== SECTION HEAD ===== */
 .sect-hd{display:flex;justify-content:space-between;align-items:center;margin:18px 0 12px}
@@ -70,51 +69,57 @@ body{padding:0 0 100px;max-width:480px;margin:0 auto;position:relative}
 .story{position:relative;display:flex;gap:12px;background:var(--cream-card);border:1px solid var(--border-gold-soft);border-radius:14px;padding:14px 14px 14px 18px;margin-bottom:10px;overflow:hidden;box-shadow:0 1px 4px rgba(114,47,55,0.04);transition:all .2s;cursor:pointer}
 .story:hover{box-shadow:0 4px 14px rgba(114,47,55,0.08);transform:translateY(-1px)}
 .story::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--gold)}
-.story.hot::before{background:linear-gradient(180deg,#C62828 0%,#E55A2A 100%)}
 .story.bullish::before{background:linear-gradient(180deg,#D97706 0%,#F4A640 100%)}
-.story.tech::before{background:linear-gradient(180deg,#1976D2 0%,#5BA8E8 100%)}
-.story-rank{flex-shrink:0;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:var(--gold-deep);background:var(--cream-warm)}
-.story-rank.r-hot{border-color:var(--red);color:var(--red);background:rgba(198,40,40,0.06)}
+.story.bearish::before{background:linear-gradient(180deg,#C62828 0%,#E55A2A 100%)}
+.story.neutral::before{background:linear-gradient(180deg,#1976D2 0%,#5BA8E8 100%)}
+.story-rank{flex-shrink:0;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:var(--gold-deep);background:var(--cream-warm);align-self:flex-start;margin-top:2px}
 .story-rank.r-bullish{border-color:var(--orange);color:var(--orange);background:rgba(217,119,6,0.06)}
-.story-rank.r-tech{border-color:var(--blue);color:var(--blue);background:rgba(25,118,210,0.06)}
+.story-rank.r-bearish{border-color:var(--red);color:var(--red);background:rgba(198,40,40,0.06)}
+.story-rank.r-neutral{border-color:var(--blue);color:var(--blue);background:rgba(25,118,210,0.06)}
 .story-body{flex:1;min-width:0}
-.story-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:rgba(198,40,40,0.1);border:1px solid rgba(198,40,40,0.3);font-family:'Cinzel',serif;font-size:9px;font-weight:700;color:var(--red);letter-spacing:1.2px;margin-bottom:6px}
-.story-badge .flame{font-size:10px;line-height:1}
-.story-title{font-family:'Anuphan','Sarabun',sans-serif;font-size:14px;font-weight:700;color:var(--text-dark);line-height:1.35;margin-bottom:6px}
-.story-summary{font-family:'Anuphan',sans-serif;font-size:11.5px;color:var(--text-dark-muted);line-height:1.5;margin-bottom:8px}
+.story-title{font-family:'Anuphan','Sarabun',sans-serif;font-size:14px;font-weight:700;color:var(--text-dark);line-height:1.35;margin-bottom:6px;padding-right:18px}
+.story-summary{font-family:'Anuphan',sans-serif;font-size:11.5px;color:var(--text-dark-muted);line-height:1.55;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.story-summary.skel{color:var(--text-dark-muted);opacity:0.4;font-style:italic}
 .story-tags{display:flex;flex-wrap:wrap;gap:4px}
-.story-tag{padding:2px 8px;border-radius:6px;background:var(--cream-warm);border:1px solid var(--border-gold-soft);font-family:'Anuphan',sans-serif;font-size:9.5px;font-weight:600;color:var(--gold-deep);letter-spacing:0.4px}
-.story-meta{flex-shrink:0;width:90px;display:flex;flex-direction:column;gap:6px;padding-left:10px;border-left:1px dashed var(--border-gold-soft);font-family:'Anuphan',sans-serif}
+.story-tag{padding:2px 8px;border-radius:6px;font-family:'Anuphan',sans-serif;font-size:9.5px;font-weight:600;letter-spacing:0.4px;border:1px solid;background:var(--cream-warm)}
+.story-tag.positive{color:var(--green);background:rgba(46,125,50,0.07);border-color:rgba(46,125,50,0.32)}
+.story-tag.negative{color:var(--red);background:rgba(198,40,40,0.07);border-color:rgba(198,40,40,0.32)}
+.story-tag.neutral{color:var(--gold-deep);background:var(--cream-warm);border-color:var(--border-gold-soft)}
+.story-meta{flex-shrink:0;width:96px;display:flex;flex-direction:column;gap:6px;padding-left:10px;border-left:1px dashed var(--border-gold-soft);font-family:'Anuphan',sans-serif}
 .story-meta-time{font-size:10px;color:var(--text-dark-muted);margin-bottom:2px;line-height:1.3}
 .story-meta-row{display:flex;justify-content:space-between;align-items:center;font-size:10.5px}
 .story-meta-label{color:var(--text-dark-muted);font-size:9.5px}
 .story-meta-value{font-weight:600;font-size:11px}
 .story-meta-value.bullish{color:var(--green)}
 .story-meta-value.bearish{color:var(--red)}
-.story-meta-value.positive{color:var(--blue)}
+.story-meta-value.neutral{color:var(--blue)}
 .story-meta-value.high{color:var(--green)}
 .story-meta-value.medium{color:var(--orange)}
+.story-meta-value.low{color:var(--text-dark-muted)}
 .cdots{display:flex;gap:3px;margin-top:2px}
 .cdot{width:6px;height:6px;border-radius:50%;background:rgba(212,175,55,0.18)}
 .cdot.fh{background:var(--green)}
 .cdot.fm{background:var(--orange)}
+.cdot.fl{background:var(--text-dark-muted)}
 .story-bm{position:absolute;top:12px;right:12px;width:14px;height:16px;color:var(--gold-deep);opacity:0.4;cursor:pointer;transition:opacity .2s}
 .story-bm:hover{opacity:0.9}
 .story-bm svg{width:14px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
 
 /* ===== MARKET MOVERS ===== */
-.movers{display:flex;gap:10px;overflow-x:auto;padding:2px 16px 6px;margin:0 -16px;scrollbar-width:none}
+.movers{display:flex;gap:10px;overflow-x:auto;padding:2px 16px 6px;margin:0 -16px;scrollbar-width:none;min-height:100px}
 .movers::-webkit-scrollbar{display:none}
-.mover{flex-shrink:0;width:128px;background:var(--cream-card);border:1px solid var(--border-gold-soft);border-radius:12px;padding:10px 12px;box-shadow:0 1px 3px rgba(114,47,55,0.04);cursor:pointer;transition:all .2s}
+.mover{flex-shrink:0;width:130px;background:var(--cream-card);border:1px solid var(--border-gold-soft);border-radius:12px;padding:10px 12px;box-shadow:0 1px 3px rgba(114,47,55,0.04);cursor:pointer;transition:all .2s}
 .mover:hover{box-shadow:0 4px 12px rgba(114,47,55,0.08);transform:translateY(-1px)}
 .mover-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
 .mover-tk{font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:var(--text-dark);letter-spacing:0.6px}
-.mover-arrow{width:20px;height:20px;border-radius:50%;background:rgba(46,125,50,0.13);display:flex;align-items:center;justify-content:center;color:var(--green);font-size:11px;font-weight:700}
+.mover-arrow{width:20px;height:20px;border-radius:50%;background:rgba(46,125,50,0.13);display:flex;align-items:center;justify-content:center;color:var(--green)}
+.mover-arrow svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
 .mover-arrow.dn{background:rgba(198,40,40,0.13);color:var(--red)}
 .mover-status{font-family:'Anuphan',sans-serif;font-size:10.5px;color:var(--text-dark-muted);margin-bottom:3px}
 .mover-pct{font-family:'DM Serif Display',serif;font-size:18px;color:var(--green);font-weight:400;margin-bottom:6px;line-height:1;letter-spacing:0.3px}
 .mover-pct.dn{color:var(--red)}
 .mover-spark{width:100%;height:24px;display:block}
+.mover.skel .mover-pct,.mover.skel .mover-status{opacity:0.3}
 
 /* ===== AI INSIGHT ===== */
 .ai-card{background:linear-gradient(135deg,var(--cream-card) 0%,var(--cream-warm) 100%);border:1px solid var(--border-gold);border-radius:14px;padding:14px 16px;margin-top:18px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 2px 8px rgba(114,47,55,0.05);position:relative;overflow:hidden}
@@ -122,31 +127,40 @@ body{padding:0 0 100px;max-width:480px;margin:0 auto;position:relative}
 .ai-icon{flex-shrink:0;width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--burgundy),var(--burgundy-mid));display:flex;align-items:center;justify-content:center;color:var(--gold-light);position:relative;z-index:1;box-shadow:0 3px 10px rgba(114,47,55,0.25)}
 .ai-icon svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .ai-body{flex:1;position:relative;z-index:1;min-width:0}
-.ai-label{font-family:'Cinzel',serif;font-size:9.5px;font-weight:600;color:var(--gold-deep);letter-spacing:0.32em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:5px}
+.ai-label{font-family:'Cinzel',serif;font-size:9.5px;font-weight:600;color:var(--gold-deep);letter-spacing:0.32em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.ai-label-dot{width:5px;height:5px;background:var(--gold);border-radius:50%;box-shadow:0 0 4px rgba(212,175,55,0.6)}
 .ai-text{font-family:'Anuphan',sans-serif;font-size:12px;color:var(--text-dark);line-height:1.6;margin-bottom:10px}
 .ai-cta{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:999px;background:var(--cream);border:1px solid var(--border-gold);font-family:'Anuphan',sans-serif;font-size:11px;font-weight:500;color:var(--gold-deep);cursor:pointer;transition:all .2s}
 .ai-cta:hover{background:var(--cream-card);border-color:var(--gold);color:var(--gold-dark)}
 
-/* ===== BOTTOM NAV (matches home) ===== */
+/* ===== LOADING ===== */
+.loading{padding:30px 0;text-align:center;color:var(--text-dark-muted);font-size:12px;font-style:italic}
+.loading-row{display:flex;align-items:center;justify-content:center;gap:8px}
+.spinner{width:16px;height:16px;border:2px solid var(--border-gold-soft);border-top-color:var(--gold-dark);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ===== BOTTOM NAV ===== */
 .bottom-nav{position:fixed;bottom:12px;left:16px;right:16px;max-width:448px;margin:0 auto;background:linear-gradient(135deg,var(--burgundy-dark),#2d1018);border:1px solid rgba(212,175,55,0.15);border-radius:28px;display:flex;justify-content:space-around;padding:10px 8px;z-index:1000;box-shadow:0 8px 32px rgba(26,10,14,0.4),0 0 0 1px rgba(212,175,55,0.08)}
-.nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 10px;cursor:pointer;color:rgba(244,228,186,0.55);transition:color .2s;font-family:'Anuphan',sans-serif;font-size:10px;font-weight:500}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 10px;cursor:pointer;color:rgba(244,228,186,0.55);transition:color .2s;font-family:'Anuphan',sans-serif;font-size:10px;font-weight:500;position:relative}
 .nav-item.active{color:var(--gold)}
 .nav-item svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8}
-.nav-item.active::before{content:'';position:absolute;top:0;width:30px;height:3px;background:var(--gold);border-radius:0 0 3px 3px;transform:translateY(-10px)}
 .nav-owl{position:relative;width:46px;height:46px;border-radius:50%;background:transparent;display:flex;align-items:center;justify-content:center;color:var(--gold);transform:translateY(-2px)}
 .nav-owl svg{width:30px;height:30px;stroke:currentColor;fill:none;stroke-width:1.5}
 
-/* responsive small phone */
+/* ===== UAT BADGE ===== */
+.uat-badge{position:fixed;top:12px;right:12px;background:rgba(114,47,55,0.92);color:var(--gold-light);padding:4px 10px;border-radius:999px;font-family:'Cinzel',serif;font-size:9px;font-weight:600;letter-spacing:1.5px;z-index:9999;box-shadow:0 2px 10px rgba(114,47,55,0.3)}
+
 @media(max-width:380px){
   .news-title{font-size:1.2rem}
-  .story-meta{width:80px}
+  .story-meta{width:84px}
   .story-title{font-size:13px}
 }
 </style>
 </head>
 <body>
 
-<!-- ===== Topbar (mock — for context only) ===== -->
+<div class="uat-badge">UAT</div>
+
 <header class="topbar">
   <div class="topbar-left">
     <div class="avatar">JO</div>
@@ -163,173 +177,50 @@ body{padding:0 0 100px;max-width:480px;margin:0 auto;position:relative}
 
 <main class="page">
 
-  <!-- ===== Page Header ===== -->
   <header class="news-hdr">
     <div class="news-eyebrow">
-      <svg class="spark-icon" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2l1.7 5.3L19 9l-5.3 1.7L12 16l-1.7-5.3L5 9l5.3-1.7L12 2zm6 12l.8 2.5L21 17l-2.2.5L18 20l-.8-2.5L15 17l2.2-.5L18 14zM6 14l.6 1.9L8.5 16.5l-1.9.6L6 19l-.6-1.9L3.5 16.5l1.9-.6L6 14z"/>
-      </svg>
+      <svg class="spark-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.7 5.3L19 9l-5.3 1.7L12 16l-1.7-5.3L5 9l5.3-1.7L12 2zm6 12l.8 2.5L21 17l-2.2.5L18 20l-.8-2.5L15 17l2.2-.5L18 14zM6 14l.6 1.9L8.5 16.5l-1.9.6L6 19l-.6-1.9L3.5 16.5l1.9-.6L6 14z"/></svg>
       <div class="news-title">News Intelligence</div>
     </div>
     <div class="news-sub">ข่าวสารที่ขับเคลื่อนตลาด · คัดกรองโดย AI</div>
   </header>
 
-  <!-- ===== Search ===== -->
   <div class="search">
     <svg class="search-i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     <input placeholder="ค้นหาข่าว / ticker / theme เช่น NVDA, AI, Oil"/>
     <svg class="search-f" viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="14" y2="12"/><line x1="4" y1="18" x2="10" y2="18"/><circle cx="18" cy="12" r="2" fill="currentColor"/><circle cx="14" cy="18" r="2" fill="currentColor"/></svg>
   </div>
 
-  <!-- ===== Filter Pills ===== -->
   <div class="filters">
-    <div class="pill active"><span class="pill-emoji">🔥</span> Trending</div>
-    <div class="pill"><span class="pill-emoji">⚡</span> Momentum</div>
-    <div class="pill"><span class="pill-emoji">🤖</span> AI Picks</div>
-    <div class="pill"><span class="pill-emoji">🌍</span> Macro</div>
-    <div class="pill"><span class="pill-emoji">📅</span> Earnings</div>
+    <div class="pill active">Trending</div>
+    <div class="pill">Momentum</div>
+    <div class="pill">AI Picks</div>
+    <div class="pill">Macro</div>
+    <div class="pill">Earnings</div>
   </div>
 
-  <!-- ===== Top Stories ===== -->
   <div class="sect-hd">
     <div class="sect-label">Top Stories</div>
     <a class="sect-link">ดูทั้งหมด ›</a>
   </div>
 
-  <article class="story hot">
-    <svg class="story-bm" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-    <div class="story-rank r-hot">1</div>
-    <div class="story-body">
-      <div class="story-badge"><span class="flame">🔥</span> HOT</div>
-      <div class="story-title">Brent Crude Hits $126 as Middle East Tensions Escalate</div>
-      <div class="story-summary">ความกังวลด้านอุปทานหนุนราคาน้ำมันพุ่งสูงสุดในรอบหลายเดือน</div>
-      <div class="story-tags">
-        <span class="story-tag">OIL</span>
-        <span class="story-tag">USO</span>
-        <span class="story-tag">XLE</span>
-        <span class="story-tag">PTTEP</span>
-      </div>
-    </div>
-    <div class="story-meta">
-      <div class="story-meta-time">1h ago<br>· Reuters</div>
-      <div class="story-meta-row"><span class="story-meta-label">Impact</span><span class="story-meta-value bullish">Bullish</span></div>
-      <div class="story-meta-row"><span class="story-meta-label">Conf.</span><span class="story-meta-value high">High</span></div>
-      <div class="cdots"><span class="cdot fh"></span><span class="cdot fh"></span><span class="cdot fh"></span><span class="cdot fh"></span><span class="cdot fh"></span></div>
-    </div>
-  </article>
+  <div id="topStories">
+    <div class="loading"><div class="loading-row"><div class="spinner"></div><span>กำลังโหลดข่าวล่าสุด...</span></div></div>
+  </div>
 
-  <article class="story bullish">
-    <svg class="story-bm" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-    <div class="story-rank r-bullish">2</div>
-    <div class="story-body">
-      <div class="story-title">Eli Lilly Q1 Revenue Jumps 56% as Mounjaro Sales Surge</div>
-      <div class="story-summary">ยอดขาย Mounjaro โตแรงต่อเนื่อง · หนุนกำไรและรายได้พุ่ง</div>
-      <div class="story-tags">
-        <span class="story-tag">LLY</span>
-        <span class="story-tag">NVO</span>
-        <span class="story-tag">PHARMA</span>
-        <span class="story-tag">HEALTHCARE</span>
-      </div>
-    </div>
-    <div class="story-meta">
-      <div class="story-meta-time">2h ago<br>· CNBC</div>
-      <div class="story-meta-row"><span class="story-meta-label">Impact</span><span class="story-meta-value bullish">Bullish</span></div>
-      <div class="story-meta-row"><span class="story-meta-label">Conf.</span><span class="story-meta-value high">High</span></div>
-      <div class="cdots"><span class="cdot fh"></span><span class="cdot fh"></span><span class="cdot fh"></span><span class="cdot fh"></span><span class="cdot"></span></div>
-    </div>
-  </article>
-
-  <article class="story tech">
-    <svg class="story-bm" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-    <div class="story-rank r-tech">3</div>
-    <div class="story-body">
-      <div class="story-title">4 Hyperscaler รายงานพร้อมกัน — Capex AI ปี 2026 ทะลุ 700,000 ล้านดอลลาร์</div>
-      <div class="story-summary">GOOGL พุ่ง 7% นำกลุ่ม · META ดิ่งหลังประกาศเพิ่มค่าใช้จ่าย</div>
-      <div class="story-tags">
-        <span class="story-tag">GOOGL</span>
-        <span class="story-tag">META</span>
-        <span class="story-tag">AMZN</span>
-        <span class="story-tag">MSFT</span>
-        <span class="story-tag">AI</span>
-      </div>
-    </div>
-    <div class="story-meta">
-      <div class="story-meta-time">3h ago<br>· Bloomberg</div>
-      <div class="story-meta-row"><span class="story-meta-label">Impact</span><span class="story-meta-value positive">Positive</span></div>
-      <div class="story-meta-row"><span class="story-meta-label">Conf.</span><span class="story-meta-value medium">Medium</span></div>
-      <div class="cdots"><span class="cdot fm"></span><span class="cdot fm"></span><span class="cdot fm"></span><span class="cdot"></span><span class="cdot"></span></div>
-    </div>
-  </article>
-
-  <!-- ===== Market Movers ===== -->
   <div class="sect-hd">
     <div class="sect-label">Market Movers · จากข่าว</div>
     <a class="sect-link">ดูทั้งหมด ›</a>
   </div>
 
-  <div class="movers">
-    <div class="mover">
-      <div class="mover-hd">
-        <span class="mover-tk">NVDA</span>
-        <span class="mover-arrow">↗</span>
-      </div>
-      <div class="mover-status">Bullish</div>
-      <div class="mover-pct">+20.23%</div>
-      <svg class="mover-spark" viewBox="0 0 100 24" preserveAspectRatio="none"><polyline points="0,20 12,18 22,19 32,15 45,12 58,9 70,7 82,4 95,2" fill="none" stroke="#2E7D32" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>
-    </div>
-    <div class="mover">
-      <div class="mover-hd">
-        <span class="mover-tk">LLY</span>
-        <span class="mover-arrow">↗</span>
-      </div>
-      <div class="mover-status">Breakout</div>
-      <div class="mover-pct">+8.62%</div>
-      <svg class="mover-spark" viewBox="0 0 100 24" preserveAspectRatio="none"><polyline points="0,18 12,17 24,18 38,15 50,12 62,10 75,9 88,6 95,5" fill="none" stroke="#D97706" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>
-    </div>
-    <div class="mover">
-      <div class="mover-hd">
-        <span class="mover-tk">TSLA</span>
-        <span class="mover-arrow">↗</span>
-      </div>
-      <div class="mover-status">Momentum</div>
-      <div class="mover-pct">+6.31%</div>
-      <svg class="mover-spark" viewBox="0 0 100 24" preserveAspectRatio="none"><polyline points="0,16 14,17 26,14 38,16 50,12 64,11 76,8 88,9 95,6" fill="none" stroke="#2E7D32" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>
-    </div>
-    <div class="mover">
-      <div class="mover-hd">
-        <span class="mover-tk">COIN</span>
-        <span class="mover-arrow">↗</span>
-      </div>
-      <div class="mover-status">Bullish</div>
-      <div class="mover-pct">+11.45%</div>
-      <svg class="mover-spark" viewBox="0 0 100 24" preserveAspectRatio="none"><polyline points="0,19 12,17 24,15 36,17 48,13 60,9 72,8 85,5 95,3" fill="none" stroke="#2E7D32" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>
-    </div>
-    <div class="mover">
-      <div class="mover-hd">
-        <span class="mover-tk">XLE</span>
-        <span class="mover-arrow">↗</span>
-      </div>
-      <div class="mover-status">Bullish</div>
-      <div class="mover-pct">+4.82%</div>
-      <svg class="mover-spark" viewBox="0 0 100 24" preserveAspectRatio="none"><polyline points="0,17 14,16 28,15 42,13 56,12 70,10 84,9 95,7" fill="none" stroke="#2E7D32" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>
-    </div>
+  <div class="movers" id="movers">
+    <div class="loading" style="margin:0 auto"><div class="loading-row"><div class="spinner"></div><span>กำลังโหลดราคา...</span></div></div>
   </div>
 
-  <!-- ===== AI Insight ===== -->
-  <div class="ai-card">
-    <div class="ai-icon">
-      <svg viewBox="0 0 24 24"><path d="M9.5 2A2.5 2.5 0 0 0 7 4.5v.05A3 3 0 0 0 5 7.5v.5a3 3 0 0 0 1 2.236V13a3 3 0 0 0 1.5 2.6V18a2.5 2.5 0 0 0 2.5 2.5H10A1 1 0 0 0 11 22V12.5A2.5 2.5 0 0 1 13.5 10H14"/><path d="M14.5 2A2.5 2.5 0 0 1 17 4.5v.05A3 3 0 0 1 19 7.5v.5a3 3 0 0 1-1 2.236V13a3 3 0 0 1-1.5 2.6V18a2.5 2.5 0 0 1-2.5 2.5H14A1 1 0 0 1 13 22V12.5A2.5 2.5 0 0 0 10.5 10H10"/></svg>
-    </div>
-    <div class="ai-body">
-      <div class="ai-label"><span>✦</span> AI Insight</div>
-      <div class="ai-text">ตลาดให้น้ำหนักกับความเสี่ยงด้านอุปทาน (Energy) และการลงทุน AI ระยะยาว · กลุ่ม Tech และ Pharma ยังมีแรงหนุนจากรายได้ที่แข็งแกร่ง</div>
-      <button class="ai-cta">ดูรายละเอียด ›</button>
-    </div>
-  </div>
+  <div id="aiInsight"></div>
 
 </main>
 
-<!-- ===== Bottom Nav (mock — for context only) ===== -->
 <nav class="bottom-nav">
   <div class="nav-item">
     <svg viewBox="0 0 24 24"><polyline points="3 9 12 2 21 9 21 21 14 21 14 13 10 13 10 21 3 21 3 9"/></svg>
@@ -339,18 +230,366 @@ body{padding:0 0 100px;max-width:480px;margin:0 auto;position:relative}
     <svg viewBox="0 0 24 24"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6z"/></svg>
     News
   </div>
-  <div class="nav-owl">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="9" cy="11" r="2"/><circle cx="15" cy="11" r="2"/><path d="M12 14v3"/></svg>
-  </div>
-  <div class="nav-item">
-    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-    Lab
-  </div>
-  <div class="nav-item">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/><circle cx="5" cy="12" r="1.5" fill="currentColor"/></svg>
-    More
-  </div>
+  <div class="nav-owl"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="9" cy="11" r="2"/><circle cx="15" cy="11" r="2"/><path d="M12 14v3"/></svg></div>
+  <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Lab</div>
+  <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/><circle cx="5" cy="12" r="1.5" fill="currentColor"/></svg>More</div>
 </nav>
+
+<script>
+'use strict';
+
+const NEWS_INDEX_URL = 'https://raw.githubusercontent.com/jptrustlearning/pages/main/news/news-index.json';
+const NEWS_BASE      = 'https://raw.githubusercontent.com/jptrustlearning/pages/main/news/';
+const SP500_CSV_URL  = 'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_sp500_daily.csv';
+
+// ==== Helpers ====
+function timeAgo(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const now = new Date();
+  const diffH = (now - d) / 3600000;
+  if (diffH < 1) return Math.max(1, Math.floor(diffH * 60)) + 'm ago';
+  if (diffH < 24) return Math.floor(diffH) + 'h ago';
+  return Math.floor(diffH / 24) + 'd ago';
+}
+
+function shortSource(s) {
+  if (!s) return '';
+  return s.split(/[,;·]/)[0].trim();
+}
+
+// Sentiment majority → derive accent + impact + confidence
+function deriveTone(tickers) {
+  if (!tickers || !tickers.length) {
+    return {accent: 'neutral', impactText: 'Neutral', impactClass: 'neutral', confText: 'Low', confClass: 'low', dots: 1};
+  }
+  const counts = {positive:0, negative:0, neutral:0};
+  for (const t of tickers) counts[t.sentiment] = (counts[t.sentiment]||0) + 1;
+  const total = tickers.length;
+  const pos = counts.positive, neg = counts.negative;
+  const sentTickers = pos + neg;
+  const dominantPct = sentTickers > 0 ? Math.max(pos, neg) / sentTickers : 0;
+
+  let accent, impactText, impactClass;
+  if (pos > neg && pos >= sentTickers * 0.7) {
+    accent = 'bullish'; impactText = 'Bullish'; impactClass = 'bullish';
+  } else if (neg > pos && neg >= sentTickers * 0.7) {
+    accent = 'bearish'; impactText = 'Bearish'; impactClass = 'bearish';
+  } else {
+    accent = 'neutral'; impactText = 'Mixed'; impactClass = 'neutral';
+  }
+
+  let confText, confClass, dots;
+  if (sentTickers === 0) { confText = 'Low'; confClass = 'low'; dots = 1; }
+  else if (dominantPct >= 0.85) { confText = 'High'; confClass = 'high'; dots = 5; }
+  else if (dominantPct >= 0.65) { confText = 'Medium'; confClass = 'medium'; dots = 3; }
+  else { confText = 'Low'; confClass = 'low'; dots = 1; }
+
+  return {accent, impactText, impactClass, confText, confClass, dots};
+}
+
+// Parse markdown — extract lead paragraph after each ## heading
+function parseMdSummaries(md) {
+  const out = {};
+  const re = /^## (.+)$/gm;
+  const indices = [];
+  let m;
+  while ((m = re.exec(md)) !== null) {
+    indices.push({title: m[1].trim(), start: m.index, end: re.lastIndex});
+  }
+  for (let i = 0; i < indices.length; i++) {
+    const sectStart = indices[i].end;
+    const sectEnd = i + 1 < indices.length ? indices[i+1].start : md.length;
+    const section = md.slice(sectStart, sectEnd);
+    const lines = section.split('\n');
+    const para = [];
+    for (const line of lines) {
+      const t = line.trim();
+      if (t === '') {
+        if (para.length) break;
+        continue;
+      }
+      if (t.startsWith('**') || t.startsWith('---') || t.startsWith('#')) {
+        if (para.length) break;
+        continue;
+      }
+      para.push(t);
+    }
+    let text = para.join(' ').replace(/\*\*/g, '').replace(/\s+/g, ' ').trim();
+    if (text.length > 220) text = text.slice(0, 217) + '...';
+    out[indices[i].title] = text;
+  }
+  return out;
+}
+
+// Fuzzy title match — news-index title may be slightly truncated vs .md ## heading
+function findSummary(map, title) {
+  if (map[title]) return map[title];
+  // Try prefix match (some indices have "..." suffix)
+  const cleanTitle = title.replace(/\.\.\.$/, '').replace(/…$/, '').trim();
+  for (const k in map) {
+    if (k.startsWith(cleanTitle.slice(0, 40))) return map[k];
+    if (cleanTitle.startsWith(k.slice(0, 40))) return map[k];
+  }
+  return '';
+}
+
+// ==== Render: Top Stories ====
+function renderTopStories(headlines, summaries) {
+  const root = document.getElementById('topStories');
+  root.innerHTML = '';
+  headlines.forEach((h, i) => {
+    const tone = deriveTone(h.tickers);
+    const tagsHtml = (h.tickers || []).slice(0, 5).map(t =>
+      `<span class="story-tag ${t.sentiment}">${t.symbol}</span>`
+    ).join('');
+    const summary = summaries[h.title] || findSummary(summaries, h.title) || '';
+    const dotsHtml = Array(5).fill(0).map((_, k) =>
+      k < tone.dots ? `<span class="cdot ${tone.confClass === 'high' ? 'fh' : tone.confClass === 'medium' ? 'fm' : 'fl'}"></span>` : '<span class="cdot"></span>'
+    ).join('');
+    const sourceShort = shortSource(h.source);
+    const time = timeAgo(h.batchDate);
+    const card = document.createElement('article');
+    card.className = 'story ' + tone.accent;
+    card.dataset.idx = i;
+    card.innerHTML = `
+      <svg class="story-bm" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+      <div class="story-rank r-${tone.accent}">${i + 1}</div>
+      <div class="story-body">
+        <div class="story-title">${escapeHtml(h.title)}</div>
+        <div class="story-summary ${summary ? '' : 'skel'}">${summary ? escapeHtml(summary) : 'กำลังดึงสรุป...'}</div>
+        <div class="story-tags">${tagsHtml}</div>
+      </div>
+      <div class="story-meta">
+        <div class="story-meta-time">${time}<br>· ${escapeHtml(sourceShort)}</div>
+        <div class="story-meta-row"><span class="story-meta-label">Impact</span><span class="story-meta-value ${tone.impactClass}">${tone.impactText}</span></div>
+        <div class="story-meta-row"><span class="story-meta-label">Conf.</span><span class="story-meta-value ${tone.confClass}">${tone.confText}</span></div>
+        <div class="cdots">${dotsHtml}</div>
+      </div>`;
+    root.appendChild(card);
+  });
+}
+
+function escapeHtml(s) {
+  if (!s) return '';
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[c]);
+}
+
+// ==== Render: Movers ====
+function renderMoversSkeleton(n) {
+  const root = document.getElementById('movers');
+  root.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const card = document.createElement('div');
+    card.className = 'mover skel';
+    card.innerHTML = `
+      <div class="mover-hd"><span class="mover-tk">···</span><span class="mover-arrow"></span></div>
+      <div class="mover-status">กำลังโหลด</div>
+      <div class="mover-pct">···</div>
+      <svg class="mover-spark" viewBox="0 0 100 24"></svg>`;
+    root.appendChild(card);
+  }
+}
+
+function renderMovers(items) {
+  const root = document.getElementById('movers');
+  root.innerHTML = '';
+  if (!items.length) {
+    root.innerHTML = '<div class="loading" style="margin:0 auto">ไม่พบราคาของ ticker ในข่าวล่าสุดที่ตรงกับ S&amp;P 500 dataset</div>';
+    return;
+  }
+  items.forEach(it => {
+    const card = document.createElement('div');
+    card.className = 'mover';
+    const dn = it.pctChange < 0;
+    const arrowSvg = dn
+      ? '<svg viewBox="0 0 24 24"><polyline points="6 14 12 20 18 14"/><line x1="12" y1="20" x2="12" y2="4"/></svg>'
+      : '<svg viewBox="0 0 24 24"><polyline points="18 10 12 4 6 10"/><line x1="12" y1="4" x2="12" y2="20"/></svg>';
+    const pctStr = (dn ? '' : '+') + it.pctChange.toFixed(2) + '%';
+    card.innerHTML = `
+      <div class="mover-hd">
+        <span class="mover-tk">${escapeHtml(it.symbol)}</span>
+        <span class="mover-arrow ${dn ? 'dn' : ''}">${arrowSvg}</span>
+      </div>
+      <div class="mover-status">${escapeHtml(it.statusLabel)}</div>
+      <div class="mover-pct ${dn ? 'dn' : ''}">${pctStr}</div>
+      <svg class="mover-spark" viewBox="0 0 100 24" preserveAspectRatio="none">
+        <polyline points="${it.sparkPoints}" fill="none" stroke="${dn ? '#C62828' : '#2E7D32'}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+      </svg>`;
+    root.appendChild(card);
+  });
+}
+
+// Sentiment → status label
+function statusLabel(sentiment, pctChange) {
+  if (sentiment === 'positive') return pctChange >= 5 ? 'Breakout' : 'Bullish';
+  if (sentiment === 'negative') return pctChange <= -5 ? 'Breakdown' : 'Bearish';
+  return Math.abs(pctChange) >= 3 ? 'Momentum' : 'Watch';
+}
+
+// Build sparkline path from prices (last N closes)
+function makeSparkPoints(closes) {
+  if (!closes || closes.length < 2) return '0,12 100,12';
+  const n = closes.length;
+  const min = Math.min(...closes);
+  const max = Math.max(...closes);
+  const range = max - min || 1;
+  return closes.map((c, i) => {
+    const x = (i / (n - 1)) * 100;
+    const y = 22 - ((c - min) / range) * 20; // top padding 2, bottom padding 2
+    return x.toFixed(1) + ',' + y.toFixed(1);
+  }).join(' ');
+}
+
+// Parse SP500 CSV → group by ticker (only those we want), keep last N closes
+function parseSP500ForTickers(csvText, wantedSet, maxDays = 15) {
+  const parsed = window.Papa.parse(csvText.trim(), { header: true, skipEmptyLines: true });
+  const rows = parsed.data;
+  const tmp = {};
+  rows.forEach(row => {
+    const tk = (row.Ticker || '').trim();
+    if (!wantedSet.has(tk)) return;
+    const d = (row.Date || '').trim();
+    const c = parseFloat(row.Close);
+    if (!d || !isFinite(c) || c <= 0) return;
+    if (!tmp[tk]) tmp[tk] = [];
+    tmp[tk].push({ d, c });
+  });
+  const out = {};
+  for (const tk in tmp) {
+    tmp[tk].sort((a, b) => a.d < b.d ? -1 : 1);
+    out[tk] = tmp[tk].slice(-maxDays);
+  }
+  return out;
+}
+
+// ==== Render: AI Insight ====
+function renderAiInsight(latestBatch) {
+  const root = document.getElementById('aiInsight');
+  if (!latestBatch) { root.innerHTML = ''; return; }
+  // Aggregate sentiment from all headlines in the batch
+  let pos = 0, neg = 0, neu = 0;
+  const themes = new Set();
+  for (const h of latestBatch.headlines) {
+    for (const t of (h.tickers || [])) {
+      if (t.sentiment === 'positive') pos++;
+      else if (t.sentiment === 'negative') neg++;
+      else neu++;
+    }
+  }
+  const total = pos + neg + neu;
+  const tilt = pos > neg ? 'เชิงบวก' : neg > pos ? 'เชิงลบ' : 'ผสม';
+  const summary = latestBatch.summary || '';
+  const text = summary
+    ? `${escapeHtml(summary)} · โทนตลาดโดยรวม${tilt} (${pos} positive · ${neg} negative · ${neu} neutral จาก ${total} tickers)`
+    : `Batch ล่าสุดมี ${latestBatch.headlines.length} headlines · โทนรวม${tilt} (${pos} positive · ${neg} negative · ${neu} neutral)`;
+  root.innerHTML = `
+    <div class="ai-card">
+      <div class="ai-icon">
+        <svg viewBox="0 0 24 24"><path d="M9.5 2A2.5 2.5 0 0 0 7 4.5v.05A3 3 0 0 0 5 7.5v.5a3 3 0 0 0 1 2.236V13a3 3 0 0 0 1.5 2.6V18a2.5 2.5 0 0 0 2.5 2.5H10A1 1 0 0 0 11 22V12.5A2.5 2.5 0 0 1 13.5 10H14"/><path d="M14.5 2A2.5 2.5 0 0 1 17 4.5v.05A3 3 0 0 1 19 7.5v.5a3 3 0 0 1-1 2.236V13a3 3 0 0 1-1.5 2.6V18a2.5 2.5 0 0 1-2.5 2.5H14A1 1 0 0 1 13 22V12.5A2.5 2.5 0 0 0 10.5 10H10"/></svg>
+      </div>
+      <div class="ai-body">
+        <div class="ai-label"><span class="ai-label-dot"></span> AI Insight</div>
+        <div class="ai-text">${text}</div>
+        <button class="ai-cta">ดูรายละเอียด ›</button>
+      </div>
+    </div>`;
+}
+
+// ==== Init ====
+async function init() {
+  let idx;
+  try {
+    const resp = await fetch(NEWS_INDEX_URL + '?t=' + Date.now(), { cache: 'no-store' });
+    idx = await resp.json();
+  } catch (e) {
+    document.getElementById('topStories').innerHTML = '<div class="loading">โหลด news-index.json ไม่สำเร็จ</div>';
+    return;
+  }
+  if (!idx.batches || !idx.batches.length) {
+    document.getElementById('topStories').innerHTML = '<div class="loading">ไม่พบ batches</div>';
+    return;
+  }
+
+  // Pick top 3 headlines from latest batches
+  const headlines = [];
+  for (const b of idx.batches) {
+    for (const h of b.headlines) {
+      headlines.push({ ...h, batchFile: b.file, batchDate: b.date });
+      if (headlines.length >= 3) break;
+    }
+    if (headlines.length >= 3) break;
+  }
+
+  // Render shells immediately
+  renderTopStories(headlines, {});
+
+  // Fetch .md files for summaries (parallel)
+  const uniqueFiles = [...new Set(headlines.map(h => h.batchFile))];
+  const summaries = {};
+  await Promise.all(uniqueFiles.map(async f => {
+    try {
+      const r = await fetch(NEWS_BASE + f + '?t=' + Date.now(), { cache: 'no-store' });
+      const md = await r.text();
+      Object.assign(summaries, parseMdSummaries(md));
+    } catch (e) { /* ignore — fallback shows skel text */ }
+  }));
+  // Re-render with summaries
+  renderTopStories(headlines, summaries);
+
+  // AI Insight from latest batch
+  renderAiInsight(idx.batches[0]);
+
+  // Movers — collect tickers from latest 2 batches
+  const tkSeen = new Set();
+  const tkOrdered = [];
+  for (const b of idx.batches.slice(0, 2)) {
+    for (const h of b.headlines) {
+      for (const t of (h.tickers || [])) {
+        if (!tkSeen.has(t.symbol)) {
+          tkSeen.add(t.symbol);
+          tkOrdered.push(t);
+        }
+      }
+    }
+  }
+
+  renderMoversSkeleton(Math.min(5, tkOrdered.length || 3));
+
+  // Fetch SP500 CSV
+  let prices;
+  try {
+    const r = await fetch(SP500_CSV_URL + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('CSV ' + r.status);
+    const csv = await r.text();
+    prices = parseSP500ForTickers(csv, tkSeen, 12);
+  } catch (e) {
+    document.getElementById('movers').innerHTML = '<div class="loading">โหลดราคา SP500 ไม่สำเร็จ</div>';
+    return;
+  }
+
+  // Build movers list — only tickers with price data
+  const moverItems = [];
+  for (const t of tkOrdered) {
+    const p = prices[t.symbol];
+    if (!p || p.length < 2) continue;
+    const closes = p.map(x => x.c);
+    const first = closes[0], last = closes[closes.length - 1];
+    const pct = ((last - first) / first) * 100;
+    moverItems.push({
+      symbol: t.symbol,
+      sentiment: t.sentiment,
+      pctChange: pct,
+      statusLabel: statusLabel(t.sentiment, pct),
+      sparkPoints: makeSparkPoints(closes),
+    });
+    if (moverItems.length >= 5) break;
+  }
+  renderMovers(moverItems);
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
 
 </body>
 </html>
