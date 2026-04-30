@@ -113,14 +113,14 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .rc-points-ring{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;border:1.5px solid transparent;border-top-color:rgba(212,175,55,0.7);border-right-color:rgba(244,228,186,0.3);animation:pointsSpin 3s linear infinite;filter:drop-shadow(0 0 4px rgba(212,175,55,0.4))}
 .rc-points-ring2{position:absolute;inset:7%;border-radius:50%;border:1px solid transparent;border-bottom-color:rgba(244,228,186,0.5);border-left-color:rgba(212,175,55,0.2);animation:pointsSpin 5s linear infinite reverse;filter:drop-shadow(0 0 3px rgba(212,175,55,0.3))}
 .rc-points-glow{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,0.18) 0%,rgba(212,175,55,0.06) 50%,transparent 72%);animation:pointsPulse 2.5s ease-in-out infinite}
-.rc-points-num{font-family:'DM Serif Display',serif;font-size:10cqw;color:var(--gold-light);line-height:1;position:relative;z-index:1;text-shadow:0 0 13px rgba(212,175,55,0.55),0 2px 6px rgba(0,0,0,0.35)}
+.rc-points-num{font-family:'DM Serif Display',serif;font-size:8cqw;color:var(--gold-light);line-height:1;position:relative;z-index:1;text-shadow:0 0 13px rgba(212,175,55,0.55),0 2px 6px rgba(0,0,0,0.35)}
 /* Static "POINTS" label is baked into new card image — hide JS label to prevent duplication */
 .rc-points-label{display:none}
 @keyframes pointsSpin{to{transform:rotate(360deg)}}
 @keyframes pointsPulse{0%,100%{opacity:0.6;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
 
 /* User Guide link on home card (lower-right gold area, vertically aligned under owl) */
-.rc-guide-link{position:absolute;left:76%;top:50%;display:flex;flex-direction:column;align-items:center;gap:0.6cqw;cursor:pointer;z-index:5;width:13%;-webkit-tap-highlight-color:transparent;transition:transform 0.25s ease}
+.rc-guide-link{position:absolute;left:76%;top:55%;display:flex;flex-direction:column;align-items:center;gap:0.6cqw;cursor:pointer;z-index:5;width:13%;-webkit-tap-highlight-color:transparent;transition:transform 0.25s ease}
 .rc-guide-link:active{transform:scale(0.94)}
 .rc-guide-icon-wrap{position:relative;width:100%;aspect-ratio:1}
 .rc-guide-glow{position:absolute;inset:-14%;border-radius:50%;background:radial-gradient(circle,rgba(244,228,186,0.55) 0%,rgba(212,175,55,0.32) 30%,rgba(212,175,55,0.10) 55%,transparent 78%);animation:guideGlow 2.4s ease-in-out infinite;pointer-events:none}
@@ -440,7 +440,6 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             <div class="rc-member-name" id="cardName">Joonstinn</div>
             <div class="rc-points"><div class="rc-points-glow"></div><div class="rc-points-ring"></div><div class="rc-points-ring2"></div><div class="rc-points-num" id="cardPoints">100</div><div class="rc-points-label">Points</div></div>
             <div class="rc-guide-link" onclick="openIframe('คู่มือการใช้งาน','https://jptrustlearning.github.io/pages/user-guide.html?v=1777561550')" role="button" tabindex="0" aria-label="คู่มือการใช้งาน">
-                <div class="rc-guide-label">คู่มือการใช้งาน</div>
                 <div class="rc-guide-icon-wrap">
                     <div class="rc-guide-glow"></div>
                     <svg class="rc-guide-icon" viewBox="0 0 64 64" fill="none" stroke="#B8860B" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -461,6 +460,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                         <path class="rc-guide-page" d="M 32 22 Q 39 13 48 16 L 49 18 Q 41 17 32 22 Z" fill="#FAF6ED" stroke="#B8860B" stroke-width="1.5"/>
                     </svg>
                 </div>
+                <div class="rc-guide-label">คู่มือการใช้งาน</div>
             </div>
         </div>
         <div class="home-content">
