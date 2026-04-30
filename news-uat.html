@@ -273,6 +273,22 @@ function deriveTone(tickers) {
   return {accent, impactText, impactClass, confText, confClass, dots};
 }
 
+// ==== Open news detail ====
+function openDetail(file, origIdx) {
+  if (!file) return;
+  let url = 'news-detail.html?file=' + encodeURIComponent(file);
+  if (typeof origIdx === 'number' && origIdx >= 0) url += '&idx=' + origIdx;
+  // If we're inside member-dashboard's iframe, navigate parent through openIframe;
+  // otherwise navigate this window directly.
+  try {
+    if (window.parent && window.parent !== window && typeof window.parent.openNewsDetail === 'function') {
+      window.parent.openNewsDetail(file, origIdx);
+      return;
+    }
+  } catch (e) { /* cross-origin guard */ }
+  window.location.href = url;
+}
+
 // ==== Render: Top Stories ====
 function renderTopStories(headlines) {
   const root = document.getElementById('topStories');
@@ -287,6 +303,7 @@ function renderTopStories(headlines) {
     const card = document.createElement('article');
     card.className = 'story ' + tone.accent;
     card.dataset.idx = i;
+    card.onclick = () => openDetail(h.batchFile, h.origIdx);
     card.innerHTML = `
       <svg class="story-bm" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
       <div class="story-rank r-${tone.accent}">${i + 1}</div>
@@ -445,8 +462,8 @@ async function init() {
   // Pick top 5 headlines from latest batches
   const headlines = [];
   for (const b of idx.batches) {
-    for (const h of b.headlines) {
-      headlines.push({ ...h, batchFile: b.file, batchDate: b.date });
+    for (let hi = 0; hi < b.headlines.length; hi++) {
+      headlines.push({ ...b.headlines[hi], batchFile: b.file, batchDate: b.date, origIdx: hi });
       if (headlines.length >= 5) break;
     }
     if (headlines.length >= 5) break;
