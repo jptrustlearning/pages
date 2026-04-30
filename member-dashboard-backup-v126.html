@@ -154,15 +154,14 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .section-title{font-size:16px;font-weight:600;color:var(--text-dark)}.section-link{font-size:13px;color:var(--gold-dark);cursor:pointer;font-weight:500}
 
 /* About Us section (replaces former Dashboard grid on home) */
-.about-section{position:relative;margin:4px 4px 24px;padding:14px 14px 12px;background:linear-gradient(135deg,var(--cream-card) 0%,var(--cream) 100%);border:1px solid rgba(212,175,55,0.32);border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(114,47,55,0.05),0 1px 3px rgba(114,47,55,0.04),inset 0 1px 0 rgba(255,255,255,0.65);text-align:left}
-.about-chart-deco{position:absolute;right:-4px;top:0;bottom:0;width:42%;height:100%;pointer-events:none;z-index:0;opacity:0.85;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 40%,#000 100%);mask-image:linear-gradient(to right,transparent 0%,#000 40%,#000 100%)}
-.about-content{position:relative;z-index:1;max-width:78%}
-.about-eyebrow{font-family:'Cinzel',serif;font-size:10.5px;color:var(--gold-deep);letter-spacing:0.32em;text-transform:uppercase;margin-bottom:5px;font-weight:600}
-.about-title{font-family:'DM Serif Display','Anuphan',serif;font-size:21px;color:var(--burgundy);line-height:1.15;letter-spacing:0.3px;margin:0 0 8px;font-weight:400}
-.about-intro{font-family:'Anuphan','Sarabun',sans-serif;font-size:12.5px;color:var(--text-dark);line-height:1.55;margin:0 0 7px;font-weight:500}
-.about-disclaimer{font-family:'Anuphan','Sarabun',sans-serif;font-size:9.5px;color:var(--text-dark-muted);line-height:1.5;margin:0;font-style:italic;letter-spacing:0.2px;padding-top:6px;border-top:1px dashed rgba(212,175,55,0.2)}
-@media(max-width:380px){.about-content{max-width:75%}.about-title{font-size:19px}.about-chart-deco{width:38%}}
-@media(max-width:340px){.about-content{max-width:72%}.about-chart-deco{width:34%}}
+.about-section{position:relative;margin:4px 4px 24px;padding:18px 18px 16px;background:linear-gradient(135deg,var(--cream-card) 0%,var(--cream) 100%);border:1px solid rgba(212,175,55,0.32);border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(114,47,55,0.05),0 1px 3px rgba(114,47,55,0.04),inset 0 1px 0 rgba(255,255,255,0.65);text-align:left}
+.about-chart-deco{position:absolute;right:-6px;top:0;bottom:0;width:55%;height:100%;pointer-events:none;z-index:0;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 32%,#000 100%);mask-image:linear-gradient(to right,transparent 0%,#000 32%,#000 100%)}
+.about-content{position:relative;z-index:1;max-width:66%}
+.about-eyebrow{font-family:'Cinzel',serif;font-size:10.5px;color:var(--gold-deep);letter-spacing:0.32em;text-transform:uppercase;margin-bottom:6px;font-weight:600}
+.about-title{font-family:'DM Serif Display','Anuphan',serif;font-size:22px;color:var(--burgundy);line-height:1.18;letter-spacing:0.3px;margin:0 0 10px;font-weight:400}
+.about-intro{font-family:'Anuphan','Sarabun',sans-serif;font-size:13px;color:var(--text-dark);line-height:1.6;margin:0 0 8px;font-weight:500}
+.about-disclaimer{font-family:'Anuphan','Sarabun',sans-serif;font-size:10px;color:var(--text-dark-muted);line-height:1.5;margin:0;font-style:italic;letter-spacing:0.2px;padding-top:8px;border-top:1px dashed rgba(212,175,55,0.2)}
+@media(max-width:380px){.about-content{max-width:62%}.about-title{font-size:20px}.about-chart-deco{width:50%}}
 /* Legacy about-* rules below — dormant but kept in case design reverts */
 .about-body{font-family:'Anuphan','Sarabun',sans-serif;font-size:13.5px;color:var(--text-dark-muted);line-height:1.75;margin:0 0 6px;padding:0 4px}
 .about-divider{display:flex;align-items:center;justify-content:center;gap:10px;margin:22px auto 18px;max-width:200px}
@@ -517,34 +516,34 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                     <defs>
                         <linearGradient id="aboutBgGrad" x1="0" y1="0" x2="1" y2="0">
                             <stop offset="0%" stop-color="#FAF6ED" stop-opacity="0"/>
-                            <stop offset="55%" stop-color="#F4E4BA" stop-opacity="0.32"/>
-                            <stop offset="100%" stop-color="#EDD89A" stop-opacity="0.42"/>
+                            <stop offset="50%" stop-color="#F4E4BA" stop-opacity="0.5"/>
+                            <stop offset="100%" stop-color="#D4AF37" stop-opacity="0.4"/>
                         </linearGradient>
                         <linearGradient id="aboutBarGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stop-color="#F4E4BA" stop-opacity="0.85"/>
-                            <stop offset="100%" stop-color="#D4AF37" stop-opacity="0.18"/>
+                            <stop offset="0%" stop-color="#D4AF37" stop-opacity="0.95"/>
+                            <stop offset="100%" stop-color="#B8860B" stop-opacity="0.65"/>
                         </linearGradient>
                     </defs>
                     <rect width="200" height="100" fill="url(#aboutBgGrad)"/>
                     <g>
-                        <rect x="76" y="74" width="13" height="26" rx="1.5" fill="url(#aboutBarGrad)" opacity="0.32"/>
-                        <rect x="94" y="62" width="13" height="38" rx="1.5" fill="url(#aboutBarGrad)" opacity="0.36"/>
-                        <rect x="112" y="50" width="13" height="50" rx="1.5" fill="url(#aboutBarGrad)" opacity="0.42"/>
-                        <rect x="130" y="38" width="13" height="62" rx="1.5" fill="url(#aboutBarGrad)" opacity="0.48"/>
-                        <rect x="148" y="26" width="13" height="74" rx="1.5" fill="url(#aboutBarGrad)" opacity="0.54"/>
-                        <rect x="166" y="14" width="13" height="86" rx="1.5" fill="url(#aboutBarGrad)" opacity="0.6"/>
+                        <rect x="76" y="74" width="13" height="26" rx="1.5" fill="url(#aboutBarGrad)" opacity="0.5"/>
+                        <rect x="94" y="62" width="13" height="38" rx="1.5" fill="url(#aboutBarGrad)" opacity="0.55"/>
+                        <rect x="112" y="50" width="13" height="50" rx="1.5" fill="url(#aboutBarGrad)" opacity="0.62"/>
+                        <rect x="130" y="38" width="13" height="62" rx="1.5" fill="url(#aboutBarGrad)" opacity="0.68"/>
+                        <rect x="148" y="26" width="13" height="74" rx="1.5" fill="url(#aboutBarGrad)" opacity="0.74"/>
+                        <rect x="166" y="14" width="13" height="86" rx="1.5" fill="url(#aboutBarGrad)" opacity="0.8"/>
                     </g>
-                    <polyline points="83,68 100,56 118,44 137,32 155,20 173,8" fill="none" stroke="#C9A85F" stroke-width="1.2" opacity="0.55" stroke-linecap="round" stroke-linejoin="round"/>
+                    <polyline points="83,68 100,56 118,44 137,32 155,20 173,8" fill="none" stroke="#D4AF37" stroke-width="1.5" opacity="0.85" stroke-linecap="round" stroke-linejoin="round"/>
                     <g>
-                        <circle cx="83" cy="68" r="1.8" fill="#FFFEF8" stroke="#C9A85F" stroke-width="0.7" opacity="0.7"/>
-                        <circle cx="100" cy="56" r="1.8" fill="#FFFEF8" stroke="#C9A85F" stroke-width="0.7" opacity="0.7"/>
-                        <circle cx="118" cy="44" r="1.8" fill="#FFFEF8" stroke="#C9A85F" stroke-width="0.7" opacity="0.75"/>
-                        <circle cx="137" cy="32" r="1.8" fill="#FFFEF8" stroke="#C9A85F" stroke-width="0.7" opacity="0.8"/>
-                        <circle cx="155" cy="20" r="1.8" fill="#FFFEF8" stroke="#C9A85F" stroke-width="0.7" opacity="0.85"/>
-                        <circle cx="173" cy="8" r="2.5" fill="#FFFEF8" stroke="#D4AF37" stroke-width="1" opacity="0.9"/>
-                        <circle cx="173" cy="8" r="2.5" fill="none" stroke="#D4AF37" stroke-width="0.6" opacity="0.5">
-                            <animate attributeName="r" values="2.5;6;2.5" dur="2.4s" repeatCount="indefinite"/>
-                            <animate attributeName="opacity" values="0.5;0;0.5" dur="2.4s" repeatCount="indefinite"/>
+                        <circle cx="83" cy="68" r="2.2" fill="#FFFEF8" stroke="#D4AF37" stroke-width="0.9"/>
+                        <circle cx="100" cy="56" r="2.2" fill="#FFFEF8" stroke="#D4AF37" stroke-width="0.9"/>
+                        <circle cx="118" cy="44" r="2.2" fill="#FFFEF8" stroke="#D4AF37" stroke-width="0.9"/>
+                        <circle cx="137" cy="32" r="2.2" fill="#FFFEF8" stroke="#D4AF37" stroke-width="0.9"/>
+                        <circle cx="155" cy="20" r="2.2" fill="#FFFEF8" stroke="#D4AF37" stroke-width="0.9"/>
+                        <circle cx="173" cy="8" r="3" fill="#FFFEF8" stroke="#D4AF37" stroke-width="1.3"/>
+                        <circle cx="173" cy="8" r="3" fill="none" stroke="#D4AF37" stroke-width="0.8" opacity="0.6">
+                            <animate attributeName="r" values="3;7;3" dur="2.4s" repeatCount="indefinite"/>
+                            <animate attributeName="opacity" values="0.6;0;0.6" dur="2.4s" repeatCount="indefinite"/>
                         </circle>
                     </g>
                 </svg>
