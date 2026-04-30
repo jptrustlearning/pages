@@ -152,24 +152,6 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 
 .section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .section-title{font-size:16px;font-weight:600;color:var(--text-dark)}.section-link{font-size:13px;color:var(--gold-dark);cursor:pointer;font-weight:500}
-
-/* About Us section (replaces former Dashboard grid on home) */
-.about-section{margin:4px 4px 28px;text-align:center}
-.about-eyebrow{font-family:'Cinzel',serif;font-size:11px;color:var(--gold-deep);letter-spacing:0.3em;text-transform:uppercase;margin-bottom:8px;font-weight:600}
-.about-title{font-family:'DM Serif Display','Anuphan',serif;font-size:26px;color:var(--burgundy);line-height:1.2;letter-spacing:0.4px;margin:0 0 14px;font-weight:400}
-.about-intro{font-family:'Anuphan','Sarabun',sans-serif;font-size:15px;color:var(--text-dark);line-height:1.65;margin:0 0 14px;font-weight:500;padding:0 4px}
-.about-body{font-family:'Anuphan','Sarabun',sans-serif;font-size:13.5px;color:var(--text-dark-muted);line-height:1.75;margin:0 0 6px;padding:0 4px}
-.about-divider{display:flex;align-items:center;justify-content:center;gap:10px;margin:22px auto 18px;max-width:200px}
-.about-divider::before,.about-divider::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dark) 50%,transparent)}
-.about-diamond{width:6px;height:6px;background:var(--gold-dark);transform:rotate(45deg);box-shadow:0 0 6px rgba(212,175,55,0.4)}
-.about-services-label{font-family:'Cinzel',serif;font-size:11px;color:var(--gold-deep);letter-spacing:0.28em;text-transform:uppercase;margin-bottom:14px;font-weight:600}
-.about-services{list-style:none;padding:0;margin:0 0 18px;text-align:left}
-.about-services li{padding:11px 4px;border-bottom:1px dashed rgba(212,175,55,0.25)}
-.about-services li:last-child{border-bottom:none}
-.about-services strong{font-family:'Anuphan','Sarabun',sans-serif;color:var(--burgundy);font-weight:700;letter-spacing:0.2px;display:block;margin-bottom:3px;font-size:14px}
-.about-services .svc-desc{font-family:'Anuphan','Sarabun',sans-serif;color:var(--text-dark-muted);font-size:13px;line-height:1.6;display:block}
-.about-closing{font-family:'Anuphan','Sarabun',sans-serif;font-size:13px;color:var(--gold-deep);font-style:italic;margin:14px 0 0;line-height:1.6;font-weight:500;letter-spacing:0.3px}
-
 .dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
 .dash-card{background:var(--cream-card);border:1.5px solid rgba(212,175,55,0.45);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all .2s;display:block;box-shadow:0 6px 20px rgba(114,47,55,0.15),0 2px 6px rgba(114,47,55,0.08),inset 0 0 0 1px rgba(255,255,255,0.5);position:relative;overflow:hidden}
 .dash-card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:60%;background:linear-gradient(180deg,transparent 0%,rgba(237,225,200,0.3) 100%);pointer-events:none;border-radius:0 0 var(--radius) var(--radius);z-index:0}
@@ -506,21 +488,13 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
               </div>
               <div class="ticker-owl-badge" onclick="event.stopPropagation();return false"><span class="ticker-live-dot"></span><span class="ticker-live-text">LIVE</span></div>
             </div>
-            <div class="about-section fade-up fade-up-3">
-                <div class="about-eyebrow">เกี่ยวกับเรา</div>
-                <h2 class="about-title">JP Trust Learning</h2>
-                <p class="about-intro">แพลตฟอร์มการศึกษาและเครื่องมือวิเคราะห์การลงทุน สำหรับนักลงทุนรายย่อยในไทย ที่ต้องการตัดสินใจด้วยข้อมูลจริง</p>
-                <p class="about-body">เราเชื่อว่านักลงทุนทุกคนควรเข้าถึงเครื่องมือคุณภาพระดับสถาบันการเงินได้ — ไม่ว่าจะเป็นนักลงทุนมือใหม่หรือมีประสบการณ์ เพราะการตัดสินใจที่ดีเริ่มต้นจากข้อมูลที่ถูกต้อง วินัยที่ชัดเจน และความเข้าใจในตลาดที่ลึกพอ</p>
-                <div class="about-divider"><span class="about-diamond"></span></div>
-                <div class="about-services-label">บริการของเรา</div>
-                <ul class="about-services">
-                    <li><strong>Insight Terminal</strong><span class="svc-desc">แดชบอร์ดวิเคราะห์ทองคำและหุ้น S&amp;P 500 พร้อม Momentum Score แนวรับแนวต้าน และการอ่าน Macro แบบเรียลไทม์</span></li>
-                    <li><strong>Backtest Lab</strong><span class="svc-desc">ทดสอบกลยุทธ์การลงทุนเชิงระบบกับข้อมูลย้อนหลังจริงหลายสิบปี เห็นผลก่อนตัดสินใจลงเงินจริง</span></li>
-                    <li><strong>My Portfolio</strong><span class="svc-desc">บันทึกและวิเคราะห์พอร์ตการลงทุน คำนวณ Realized และ Unrealized P&amp;L แยกรายไม้อัตโนมัติ</span></li>
-                    <li><strong>Planning Toolkit</strong><span class="svc-desc">เครื่องมือวางแผนการเงินส่วนบุคคลและจัดสรรพอร์ตการลงทุน เพื่อให้เห็นเส้นทางถึงเป้าหมายชัดเจน</span></li>
-                    <li><strong>News &amp; Analysis</strong><span class="svc-desc">บทวิเคราะห์ตลาดและข่าวการลงทุนในภาษาไทยที่อ่านง่าย สไตล์รายงานจากธนาคาร</span></li>
-                </ul>
-                <p class="about-closing">ความรู้ · ข้อมูล · วินัย — สามองค์ประกอบที่ทำให้การลงทุนยั่งยืน</p>
+            <div class="section-header fade-up fade-up-3"><div class="section-title">แดชบอร์ด</div><div class="section-link">ดูทั้งหมด ›</div></div>
+            <div class="dashboard-grid fade-up fade-up-3">
+                <div class="dash-card signal-card" id="signalCardGold" onclick="openIframe('Gold Momentum Dashboard','https://jptrustlearning.github.io/pages/gold-momentum-app.html?v=1777514526')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span></div><div class="dash-card-title">Gold XAU/USD</div><div class="signal-scores"><div class="signal-score buy"><div class="ss-label">BUY SCORE</div><div class="ss-val" id="goldBuyScore">—</div><div class="ss-delta" id="goldBuyDelta">—</div></div><div class="signal-score sell"><div class="ss-label">SELL SCORE</div><div class="ss-val" id="goldSellScore">—</div><div class="ss-delta" id="goldSellDelta">—</div></div></div><div class="signal-bias" id="goldBias">— Loading —</div><div class="signal-action" id="goldAction">—</div></div>
+                <div class="dash-card signal-card coming-soon" id="signalCardBTC" onclick="btcComingSoon(event)"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 8h5a3 3 0 0 1 0 6H9V8z"/><path d="M9 14h5.5a3 3 0 0 1 0 6H9v-6z"/><line x1="11" y1="5" x2="11" y2="8"/><line x1="13" y1="5" x2="13" y2="8"/><line x1="11" y1="20" x2="11" y2="23"/><line x1="13" y1="20" x2="13" y2="23"/><line x1="7" y1="8" x2="9" y2="8"/><line x1="7" y1="14" x2="9" y2="14"/><line x1="7" y1="20" x2="9" y2="20"/></svg></span></div><div class="dash-card-title">Bitcoin BTC</div><div class="signal-scores"><div class="signal-score buy"><div class="ss-label">BUY SCORE</div><div class="ss-val" id="btcBuyScore">—</div><div class="ss-delta" id="btcBuyDelta">—</div></div><div class="signal-score sell"><div class="ss-label">SELL SCORE</div><div class="ss-val" id="btcSellScore">—</div><div class="ss-delta" id="btcSellDelta">—</div></div></div><div class="signal-bias coming-soon-status" id="btcBias">🚧 กำลังพัฒนา</div><div class="signal-action coming-soon-sub" id="btcAction">เร็วๆ นี้</div></div>
+                <div class="dash-card" onclick="navigateTo('lab')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="7 14 10 10 13 13 17 9"/><line x1="17" y1="9" x2="17" y2="13"/><line x1="13" y1="9" x2="17" y2="9"/></svg></span></div><div class="dash-card-title">Backtest Lab</div><div class="dash-card-desc">ทดสอบกลยุทธ์การเทรด</div></div>
+                <div class="dash-card" onclick="openIframe('S&P 500 Daily Scanner','https://jptrustlearning.github.io/pages/Free_scannerSP500%20(6).html?v=1777309146')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16" y1="16" x2="21" y2="21"/><line x1="8" y1="11" x2="14" y2="11"/><line x1="11" y1="8" x2="11" y2="14"/></svg></span></div><div class="dash-card-title">SP500 Scanner</div><div class="dash-card-desc">สแกนหุ้น S&P 500</div></div>
+                <div class="dash-card coming-soon" onclick="event.stopPropagation();jptToast('🚧 Newstum · กำลังพัฒนา · เร็วๆ นี้')"><div class="dash-card-icon"><span class="jpt-icon" style="width:28px;height:28px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="M2 15h6"/><path d="M5 12v6"/><polyline points="10 18 12 16 14 18 16 14"/></svg></span></div><div class="dash-card-title">Newstum</div><div class="dash-card-desc">News + Momentum Score</div></div>
             </div>
             <div class="section-header fade-up fade-up-3"><div class="section-title">Planning Toolkit</div></div>
             <div class="planning-stack fade-up fade-up-3">
