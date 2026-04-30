@@ -25,8 +25,7 @@
     --text-light:#E8E4DC;--text-light-sub:#F4E4BA;--text-light-muted:#A09B92;
     --green:#2E7D32;--green-light:#4CAF50;--red:#C62828;
     --radius:16px;--radius-sm:12px;--radius-xs:8px;
-    --safe-bottom:env(safe-area-inset-bottom,0px);
-    --topbar-h:70px
+    --safe-bottom:env(safe-area-inset-bottom,0px)
 }
 html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);color:var(--text-dark);overflow-x:hidden;min-height:100vh;min-height:100dvh}
 
@@ -69,10 +68,10 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .install-banner-btn{padding:8px 16px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border:none;border-radius:20px;color:#1a0a0e;font-family:'Sarabun','Anuphan',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0}
 
 /* App Shell */
-.app{display:none;flex-direction:column;min-height:100vh;min-height:100dvh;padding-top:var(--topbar-h);padding-bottom:calc(90px + var(--safe-bottom))}.app.active{display:flex}
+.app{display:none;flex-direction:column;min-height:100vh;min-height:100dvh;padding-bottom:calc(90px + var(--safe-bottom))}.app.active{display:flex}
 
-/* Top Bar (fixed — always at top of viewport) */
-.topbar{background:linear-gradient(180deg,var(--cream) 0%,var(--cream) 78%,rgba(250,246,237,0.85) 100%);padding:14px 20px 14px;position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 14px rgba(114,47,55,0.04)}
+/* Top Bar */
+.topbar{background:linear-gradient(180deg,var(--cream-bg) 0%,var(--cream-bg) 78%,rgba(250,246,237,0.85) 100%);padding:14px 20px 10px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 14px rgba(114,47,55,0.04)}
 .topbar-left{display:flex;align-items:center;gap:12px}
 .avatar{width:42px;height:42px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:#fff;box-shadow:0 3px 10px rgba(212,175,55,0.3)}
 .greeting{font-size:12px;color:var(--text-light-muted)}.user-name{font-size:16px;font-weight:700;background:linear-gradient(135deg,#8B2A35 0%,#C4526A 35%,#D4AF37 65%,#F4E4BA 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-shadow:0 1px 2px rgba(0,0,0,0.15);letter-spacing:0.3px}
@@ -91,7 +90,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 
 /* Home screen ambient gold BG — soft blur layer behind card + objects, fades out before ticker tape */
 #screen-home{position:relative}
-#screen-home::before{content:'';position:absolute;top:0;left:0;right:0;height:480px;background:url('home-bg-gold.png?v=1777565685') center top/cover no-repeat;pointer-events:none;z-index:0;opacity:0.6;-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,1) 0%,rgba(0,0,0,1) 60%,rgba(0,0,0,0) 100%);mask-image:linear-gradient(to bottom,rgba(0,0,0,1) 0%,rgba(0,0,0,1) 60%,rgba(0,0,0,0) 100%)}
+#screen-home::before{content:'';position:absolute;top:14px;left:0;right:0;height:480px;background:url('home-bg-gold.png?v=1777565685') center top/cover no-repeat;pointer-events:none;z-index:0;opacity:0.6;-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,1) 0%,rgba(0,0,0,1) 60%,rgba(0,0,0,0) 100%);mask-image:linear-gradient(to bottom,rgba(0,0,0,1) 0%,rgba(0,0,0,1) 60%,rgba(0,0,0,0) 100%)}
 @media(min-width:600px){#screen-home::before{height:540px}}
 .screen-content{padding:0 20px 24px}
 
