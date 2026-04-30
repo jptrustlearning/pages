@@ -3404,9 +3404,29 @@ function renderAIAnalysis(){
   const contextText = ctx.length ? ctx.join(' ') : 'บริบทตลาดโดยรวมยังไม่มีสัญญาณที่บ่งชี้การเปลี่ยนแปลงอย่างมีนัยสำคัญ';
 
   // Signals/Macro - ภาษาธรรมชาติ
+  // ⚠️ Each exhaustion sub-signal has a distinct meaning — do NOT collapse to "หมดแรง" for all.
+  // Bear Exhaustion = bears tiring (BULLISH for buy side); Sell Recovery = sellers regaining strength (BEARISH).
+  const exBuyLabelMap = {
+    'Bull Exhaustion': 'การหมดแรงฝั่งซื้อ',
+    'Bear Exhaustion': 'การฟื้นตัวฝั่งซื้อ',
+    'Topping':         'การอ่อนตัวจากจุดสูงของฝั่งซื้อ',
+    'Vol Shift':       'การเปลี่ยนโครงสร้างโมเมนตัมฝั่งซื้อ'
+  };
+  const exSellLabelMap = {
+    'Sell Exhaustion': 'การหมดแรงฝั่งขาย',
+    'Sell Recovery':   'การฟื้นตัวฝั่งขาย',
+    'Sell Topping':    'การคลี่คลายของแรงขายจากจุดสูง',
+    'Vol Shift':       'การเปลี่ยนโครงสร้างโมเมนตัมฝั่งขาย'
+  };
   const warnParts = [];
-  if(exBuy && exBuy !== 'None' && exBuy !== '') warnParts.push(`พบสัญญาณ${hlGold('การหมดแรงฝั่งซื้อ')} (${exBuy})${exBuyAct?' แนะนำให้ '+exBuyAct:''}`);
-  if(exSell && exSell !== 'None' && exSell !== '') warnParts.push(`พบสัญญาณ${hlGold('การหมดแรงฝั่งขาย')} (${exSell})${exSellAct?' แนะนำให้ '+exSellAct:''}`);
+  if(exBuy && exBuy !== 'None' && exBuy !== ''){
+    const lbl = exBuyLabelMap[exBuy] || 'การเปลี่ยนแปลงโมเมนตัมฝั่งซื้อ';
+    warnParts.push(`พบสัญญาณ${hlGold(lbl)} (${exBuy})${exBuyAct?' แนะนำให้ '+exBuyAct:''}`);
+  }
+  if(exSell && exSell !== 'None' && exSell !== ''){
+    const lbl = exSellLabelMap[exSell] || 'การเปลี่ยนแปลงโมเมนตัมฝั่งขาย';
+    warnParts.push(`พบสัญญาณ${hlGold(lbl)} (${exSell})${exSellAct?' แนะนำให้ '+exSellAct:''}`);
+  }
   // DXY interpretation — use numeric value (matches Macro tab logic)
   const dxyPct = parseFloat(D.DXY_1M_Pct||0);
   if(dxyPct >= 2) warnParts.push(`ดัชนีดอลลาร์สหรัฐ (DXY) ${hlNeg('แข็งค่าอย่างมีนัยสำคัญ +'+dxyPct.toFixed(2)+'% — กดดันราคาทอง')}`);
@@ -3452,7 +3472,7 @@ function renderAIAnalysis(){
     } else if(buyS < 45 && sellS < 45){
       verdict = `<strong>มุมมองรอจังหวะ</strong> ตลาดอยู่ใน ${hlGold('Dead Zone')} ทั้งสองฝั่งอ่อนแรงพร้อมกัน (Buy ${buyS.toFixed(0)} / Sell ${sellS.toFixed(0)}) ยังไม่มีทิศทางที่ชัดเจน แนะนำให้รอจังหวะ breakout ที่ยืนยันก่อนเปิด position ใหม่`;
     } else {
-      verdict = `<strong>มุมมองรอสัญญาณยืนยัน</strong> ${DN.Scenario_Signal||'Mixed Signal'} โดย Net Bias อยู่ที่ ${nb>=0?'+':''}${nb.toFixed(0)} คะแนน ${Math.abs(nb)<20?hlGold('ยังไม่ผ่านระดับยืนยันที่ ±20'):''} ${exBuy!=='None'||exSell!=='None'?'อีกทั้งยังพบสัญญาณการหมดแรงเตือนอยู่':'แนะนำให้ติดตามตัวเลขในอีก 1-2 วันข้างหน้า'}`;
+      verdict = `<strong>มุมมองรอสัญญาณยืนยัน</strong> ${DN.Scenario_Signal||'Mixed Signal'} โดย Net Bias อยู่ที่ ${nb>=0?'+':''}${nb.toFixed(0)} คะแนน ${Math.abs(nb)<20?hlGold('ยังไม่ผ่านระดับยืนยันที่ ±20'):''} ${exBuy!=='None'||exSell!=='None'?'อีกทั้งยังพบสัญญาณเตือนการเปลี่ยนโมเมนตัมเพิ่มเติม':'แนะนำให้ติดตามตัวเลขในอีก 1-2 วันข้างหน้า'}`;
     }
   }
 
