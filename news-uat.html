@@ -46,26 +46,52 @@ body::before{content:'';position:absolute;top:0;left:0;right:0;height:480px;back
 .news-sub{font-family:'Anuphan',sans-serif;font-size:0.82rem;color:var(--text-dark-muted);letter-spacing:0.2px;margin-left:28px}
 
 /* ===== SEARCH ===== */
-.search{background:var(--cream-card);border:1px solid var(--border-gold);border-radius:14px;padding:11px 14px;display:flex;align-items:center;gap:10px;margin:14px 0 14px;box-shadow:0 1px 3px rgba(114,47,55,0.04);transition:all .2s}
+.search{background:var(--cream-card);border:1px solid var(--border-gold);border-radius:14px;padding:11px 14px;display:flex;align-items:center;gap:10px;margin:14px 0 12px;box-shadow:0 1px 3px rgba(114,47,55,0.04);transition:all .2s;position:relative;z-index:2}
 .search:focus-within{border-color:var(--gold);box-shadow:0 2px 12px rgba(212,175,55,0.18)}
 .search svg{flex-shrink:0;color:var(--gold-deep);stroke:var(--gold-deep);fill:none;stroke-width:2}
 .search-i{width:17px;height:17px}
-.search-f{width:18px;height:18px}
 .search input{flex:1;border:none;outline:none;background:transparent;font-family:'Anuphan',sans-serif;font-size:13px;color:var(--text-dark)}
 .search input::placeholder{color:var(--text-dark-muted)}
+.search-clear{flex-shrink:0;width:22px;height:22px;border:none;border-radius:50%;background:rgba(114,47,55,0.08);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.search-clear svg{width:12px;height:12px;color:var(--burgundy);stroke-width:2}
 
-/* ===== FILTER PILLS ===== */
-.filters{display:flex;gap:8px;overflow-x:auto;padding:0 0 4px;margin:0 -16px 18px;padding-left:16px;padding-right:16px;scrollbar-width:none}
-.filters::-webkit-scrollbar{display:none}
-.pill{flex-shrink:0;padding:8px 16px;border-radius:20px;background:var(--cream-card);border:1px solid var(--border-gold-soft);font-family:'Anuphan',sans-serif;font-size:12px;font-weight:500;color:var(--text-dark-sub);cursor:pointer;transition:all .2s;white-space:nowrap;letter-spacing:0.2px}
-.pill:hover{background:var(--cream-warm)}
-.pill.active{background:linear-gradient(135deg,var(--burgundy),var(--burgundy-mid));color:var(--text-light);border-color:var(--burgundy);box-shadow:0 2px 8px rgba(114,47,55,0.25)}
+/* ===== TIME CHIPS ===== */
+.time-filter{display:flex;gap:6px;margin:0 -16px 14px;padding:2px 16px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:relative;z-index:2}
+.time-filter::-webkit-scrollbar{display:none}
+.time-chip{flex-shrink:0;padding:7px 14px;border-radius:18px;border:1px solid rgba(212,175,55,0.32);background:rgba(255,254,248,0.7);color:var(--text-dark-sub);font-family:'Anuphan',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap}
+.time-chip:hover{background:rgba(212,175,55,0.1);color:var(--text-dark-sub)}
+.time-chip.active{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#fff;border-color:var(--gold-dark);font-weight:600;box-shadow:0 2px 8px rgba(212,175,55,0.35)}
+.time-chip-custom{border-style:dashed;border-color:rgba(212,175,55,0.5);background:rgba(255,254,248,0.4)}
+.time-chip-custom.active{border-style:solid}
 
 /* ===== SECTION HEAD ===== */
-.sect-hd{display:flex;justify-content:space-between;align-items:center;margin:18px 0 12px}
+.sect-hd{display:flex;justify-content:space-between;align-items:center;margin:18px 0 12px;position:relative;z-index:2}
 .sect-label{font-family:'Cinzel',serif;font-size:11px;font-weight:600;color:var(--gold-deep);letter-spacing:0.32em;text-transform:uppercase;display:flex;align-items:center;gap:10px}
 .sect-label::before{content:'';width:3px;height:14px;background:linear-gradient(180deg,var(--gold),var(--gold-dark));border-radius:2px}
 .sect-link{font-family:'Anuphan',sans-serif;font-size:12px;color:var(--gold-deep);font-weight:500;cursor:pointer}
+.refresh-btn{background:rgba(212,175,55,0.13);border:1px solid rgba(212,175,55,0.25);color:var(--burgundy);width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;padding:0}
+.refresh-btn:hover{background:rgba(212,175,55,0.22)}
+.refresh-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ===== BATCH DATE GROUP HEADERS ===== */
+.batch-group{margin-bottom:18px}
+.batch-date{font-family:'Cinzel',serif;font-size:10.5px;letter-spacing:2.5px;color:var(--gold-deep);text-transform:uppercase;font-weight:600;padding:0 4px 8px 4px;margin:0 0 8px 0;border-bottom:1px solid rgba(212,175,55,0.3);display:flex;align-items:center;gap:10px}
+.batch-date::before{content:'◆';color:var(--gold);font-size:9px}
+
+/* ===== EMPTY / ERROR ===== */
+.feed-empty{padding:30px 20px;text-align:center;color:var(--text-dark-muted);font-size:13px;font-family:'Anuphan',sans-serif;background:var(--cream-card);border:1px dashed var(--border-gold-soft);border-radius:14px}
+
+/* ===== DATE RANGE MODAL ===== */
+.modal-overlay{position:fixed;inset:0;background:rgba(26,10,14,0.55);display:none;align-items:flex-end;justify-content:center;z-index:9000;backdrop-filter:blur(2px)}
+.modal-overlay.show{display:flex}
+.modal-sheet{background:var(--cream-card);width:100%;max-width:480px;border-radius:24px 24px 0 0;padding:18px 22px 28px;box-shadow:0 -8px 32px rgba(26,10,14,0.25);animation:sheetIn .25s ease}
+@keyframes sheetIn{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-handle{width:40px;height:4px;background:rgba(212,175,55,0.3);border-radius:4px;margin:0 auto 14px}
+.modal-title{font-family:'Cinzel',serif;font-size:13px;letter-spacing:2.5px;color:var(--burgundy);text-transform:uppercase;font-weight:600;text-align:center;margin-bottom:8px}
+.date-input{width:100%;padding:12px 14px;border:1.5px solid rgba(212,175,55,0.4);border-radius:12px;font-family:'Anuphan',sans-serif;font-size:14px;background:var(--cream-card);color:var(--text-dark);outline:none;box-sizing:border-box}
+.date-input:focus{border-color:var(--gold)}
+.modal-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--burgundy),var(--burgundy-mid));border:none;border-radius:12px;color:var(--text-light);font-family:'Anuphan',sans-serif;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:0.4px}
+.modal-btn:hover{filter:brightness(1.08)}
 
 /* ===== STORY CARD — DARK BURGUNDY · BLACK · GOLD SHEEN ===== */
 .story{position:relative;display:flex;gap:12px;background:linear-gradient(135deg,#3a141d 0%,#4a1923 28%,#2a0e15 60%,#160709 100%);border:1px solid rgba(212,175,55,0.22);border-radius:14px;padding:14px 14px 14px 18px;margin-bottom:10px;overflow:hidden;box-shadow:0 4px 14px rgba(26,10,14,0.28),inset 0 1px 0 rgba(244,228,186,0.05);transition:all .25s;cursor:pointer}
@@ -185,30 +211,54 @@ body::before{content:'';position:absolute;top:0;left:0;right:0;height:480px;back
 
   <div class="search">
     <svg class="search-i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input placeholder="ค้นหาข่าว / ticker / theme เช่น NVDA, Tech, Oil"/>
-    <svg class="search-f" viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="14" y2="12"/><line x1="4" y1="18" x2="10" y2="18"/><circle cx="18" cy="12" r="2" fill="currentColor"/><circle cx="14" cy="18" r="2" fill="currentColor"/></svg>
+    <input id="newsSearchInput" placeholder="ค้นหาข่าว / ticker เช่น NVDA, Tech, Oil" oninput="filterNewsFeed()"/>
+    <button class="search-clear" id="newsSearchClear" onclick="clearNewsSearch()" style="display:none">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
   </div>
 
-  <div class="filters">
-    <div class="pill active">Trending</div>
-    <div class="pill">Momentum</div>
-    <div class="pill">Picks</div>
-    <div class="pill">Macro</div>
-    <div class="pill">Earnings</div>
+  <div class="time-filter">
+    <button class="time-chip active" data-range="3day" onclick="setNewsTimeRange('3day')">3 วันล่าสุด</button>
+    <button class="time-chip" data-range="today" onclick="setNewsTimeRange('today')">วันนี้</button>
+    <button class="time-chip" data-range="week" onclick="setNewsTimeRange('week')">7 วัน</button>
+    <button class="time-chip" data-range="month" onclick="setNewsTimeRange('month')">30 วัน</button>
+    <button class="time-chip time-chip-custom" data-range="custom" onclick="openCustomDateModal()" id="customDateChip">ช่วงเวลาเอง</button>
   </div>
 
   <div id="insight"></div>
 
   <div class="sect-hd">
-    <div class="sect-label">Top Stories</div>
-    <a class="sect-link">ดูทั้งหมด ›</a>
+    <div class="sect-label" id="newsSectLabel">Latest Dispatches</div>
+    <button class="refresh-btn" onclick="loadNewsFeed()" title="รีเฟรช">
+      <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+    </button>
   </div>
 
-  <div id="topStories">
+  <div id="newsFeedList">
     <div class="loading"><div class="loading-row"><div class="spinner"></div><span>กำลังโหลดข่าวล่าสุด...</span></div></div>
   </div>
 
 </main>
+
+<!-- Custom Date Range Modal -->
+<div class="modal-overlay" id="dateRangeModal" onclick="closeDateModal(event)">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">เลือกช่วงเวลา</div>
+    <div style="padding:8px 4px 4px 4px">
+      <div style="margin-bottom:14px">
+        <label style="font-size:12px;color:var(--text-dark-muted);margin-bottom:6px;display:block">วันที่เริ่มต้น</label>
+        <input type="date" id="dateRangeStart" class="date-input">
+      </div>
+      <div style="margin-bottom:10px">
+        <label style="font-size:12px;color:var(--text-dark-muted);margin-bottom:6px;display:block">วันที่สิ้นสุด</label>
+        <input type="date" id="dateRangeEnd" class="date-input">
+      </div>
+      <div id="dateRangeError" style="color:#C62828;font-size:12px;min-height:18px;margin-bottom:8px"></div>
+      <button class="modal-btn" onclick="applyDateRange()">นำไปใช้</button>
+    </div>
+  </div>
+</div>
 
 <nav class="bottom-nav">
   <div class="nav-item">
@@ -316,42 +366,124 @@ function openDetail(file, origIdx) {
   window.location.href = url;
 }
 
-// ==== Render: Top Stories ====
-function renderTopStories(headlines) {
-  const root = document.getElementById('topStories');
-  root.innerHTML = '';
-  headlines.forEach((h, i) => {
-    const tone = deriveTone(h.tickers);
-    const tagsHtml = (h.tickers || []).slice(0, 5).map(t =>
-      `<span class="story-tag ${t.sentiment}">${t.symbol}</span>`
-    ).join('');
-    const sourceShort = shortSource(h.source);
-    const time = timeAgo(h.batchDate);
-    const card = document.createElement('article');
-    card.className = 'story ' + tone.accent;
-    card.dataset.idx = i;
-    card.onclick = () => openDetail(h.batchFile, h.origIdx);
-    card.innerHTML = `
-      <svg class="story-bm" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-      <div class="story-rank r-${tone.accent}">${i + 1}</div>
-      <div class="story-body">
-        <div class="story-title">${escapeHtml(h.title)}</div>
-        <div class="story-tags">${tagsHtml}</div>
+// ==== Render: News Feed (production-style: time-range filter + group by date) ====
+function renderNewsCard(h) {
+  const tone = deriveTone(h.tickers);
+  const tagsHtml = (h.tickers || []).slice(0, 5).map(t =>
+    `<span class="story-tag ${t.sentiment || 'neutral'}">${escapeHtml(t.symbol)}</span>`
+  ).join('');
+  const sourceShort = shortSource(h.source);
+  const time = timeAgo(h._batchDate);
+  const card = document.createElement('article');
+  card.className = 'story';
+  card.onclick = () => openDetail(h._file, h._origIdx);
+  card.innerHTML = `
+    <svg class="story-bm" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+    <div class="story-body">
+      <div class="story-title">${escapeHtml(h.title)}</div>
+      <div class="story-tags">${tagsHtml}</div>
+    </div>
+    <div class="story-meta">
+      <div class="story-meta-time">${time}<span class="src">${escapeHtml(sourceShort)}</span></div>
+      <div class="story-meta-impact">
+        <span class="story-meta-impact-label">Impact</span>
+        <span class="story-meta-impact-value ${tone.impactClass}">${tone.impactText}</span>
       </div>
-      <div class="story-meta">
-        <div class="story-meta-time">${time}<span class="src">${escapeHtml(sourceShort)}</span></div>
-        <div class="story-meta-impact">
-          <span class="story-meta-impact-label">Impact</span>
-          <span class="story-meta-impact-value ${tone.impactClass}">${tone.impactText}</span>
-        </div>
-      </div>`;
-    root.appendChild(card);
+    </div>`;
+  return card;
+}
+
+function renderNewsFeed() {
+  const root = document.getElementById('newsFeedList');
+  if (!root || !newsFeedCache) return;
+  const allBatches = newsFeedCache.batches || [];
+
+  // Flatten every headline across all batches
+  let all = [];
+  allBatches.forEach(b => {
+    (b.headlines || []).forEach((h, i) => {
+      all.push(Object.assign({}, h, {
+        _file: b.file,
+        _origIndex: i,
+        _origIdx: i,
+        _batchDate: b.date,
+        _pubDate: parsePublishedDate(h.published) || (parseBatchDate(b.date) || new Date(b.date)).getTime(),
+      }));
+    });
+  });
+
+  // Time-range filter (skip when search is active — show all matches)
+  if (!newsSearchQuery && newsTimeRange !== 'all') {
+    if (newsTimeRange === 'custom' && newsCustomStart && newsCustomEnd) {
+      all = all.filter(h => h._pubDate >= newsCustomStart && h._pubDate <= newsCustomEnd);
+    } else {
+      const now = Date.now();
+      const windows = { today: 24*3600*1000, '3day': 3*24*3600*1000, week: 7*24*3600*1000, month: 30*24*3600*1000 };
+      const cutoff = now - (windows[newsTimeRange] || 0);
+      all = all.filter(h => h._pubDate >= cutoff);
+    }
+  }
+
+  // Search filter
+  if (newsSearchQuery) {
+    const q = newsSearchQuery.toLowerCase().trim();
+    all = all.filter(h => {
+      if ((h.title || '').toLowerCase().includes(q)) return true;
+      if ((h.source || '').toLowerCase().includes(q)) return true;
+      if ((h.tickers || []).some(t => (t.symbol || '').toLowerCase().includes(q))) return true;
+      return false;
+    });
+  }
+
+  if (all.length === 0) {
+    const msg = newsSearchQuery ? `ไม่พบข่าวที่ตรงกับ "${escapeHtml(newsSearchQuery)}"` : 'ยังไม่มีข่าวในช่วงเวลานี้';
+    root.innerHTML = `<div class="feed-empty">${msg}</div>`;
+    return;
+  }
+
+  // Group by published date
+  const groups = {};
+  const order = [];
+  all.forEach(h => {
+    const key = h.published || 'ไม่ระบุวันที่';
+    if (!(key in groups)) { groups[key] = []; order.push({ key, sortKey: h._pubDate }); }
+    groups[key].push(h);
+  });
+  order.sort((a, b) => b.sortKey - a.sortKey);
+
+  root.innerHTML = '';
+  order.forEach(g => {
+    const group = document.createElement('div');
+    group.className = 'batch-group';
+    const dateHd = document.createElement('div');
+    dateHd.className = 'batch-date';
+    dateHd.textContent = g.key;
+    group.appendChild(dateHd);
+    groups[g.key].forEach(h => group.appendChild(renderNewsCard(h)));
+    root.appendChild(group);
   });
 }
 
 function escapeHtml(s) {
   if (!s) return '';
-  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[c]);
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[c]);
+}
+
+// Parse Thai-style published date like "30 เม.ย. 2026" into timestamp
+function parsePublishedDate(s) {
+  if (!s) return 0;
+  const thaiMonths = {'ม.ค.':0,'ก.พ.':1,'มี.ค.':2,'เม.ย.':3,'พ.ค.':4,'มิ.ย.':5,'ก.ค.':6,'ส.ค.':7,'ก.ย.':8,'ต.ค.':9,'พ.ย.':10,'ธ.ค.':11};
+  const m = s.match(/(\d{1,2})\s+(\S+)\s+(\d{4})/);
+  if (m) {
+    const day = parseInt(m[1], 10);
+    const mon = thaiMonths[m[2]];
+    let year = parseInt(m[3], 10);
+    // Thai year (พ.ศ.) handling — if year > 2400 assume Buddhist Era, convert
+    if (year > 2400) year -= 543;
+    if (mon !== undefined) return new Date(year, mon, day).getTime();
+  }
+  const t = Date.parse(s);
+  return isNaN(t) ? 0 : t;
 }
 
 // ==== Render: Movers ====
@@ -474,66 +606,118 @@ function renderInsight(latestBatch) {
     </div>`;
 }
 
+// ==== State ====
+let newsFeedCache = null;
+let newsSearchQuery = '';
+let newsTimeRange = '3day';
+let newsCustomStart = null;
+let newsCustomEnd = null;
+
+// ==== Search / time-range / custom date handlers (production-style) ====
+function filterNewsFeed() {
+  const inp = document.getElementById('newsSearchInput');
+  const clear = document.getElementById('newsSearchClear');
+  newsSearchQuery = inp ? inp.value : '';
+  if (clear) clear.style.display = newsSearchQuery ? 'flex' : 'none';
+  if (newsFeedCache) renderNewsFeed();
+}
+function clearNewsSearch() {
+  const inp = document.getElementById('newsSearchInput');
+  if (inp) inp.value = '';
+  newsSearchQuery = '';
+  const clear = document.getElementById('newsSearchClear');
+  if (clear) clear.style.display = 'none';
+  if (newsFeedCache) renderNewsFeed();
+}
+function setNewsTimeRange(range) {
+  newsTimeRange = range;
+  if (range !== 'custom') { newsCustomStart = null; newsCustomEnd = null; }
+  document.querySelectorAll('.time-chip').forEach(c => c.classList.toggle('active', c.dataset.range === range));
+  const chip = document.getElementById('customDateChip');
+  if (chip && range !== 'custom') chip.textContent = 'ช่วงเวลาเอง';
+  if (newsFeedCache) renderNewsFeed();
+}
+function openCustomDateModal() {
+  const m = document.getElementById('dateRangeModal');
+  const err = document.getElementById('dateRangeError');
+  const startEl = document.getElementById('dateRangeStart');
+  const endEl = document.getElementById('dateRangeEnd');
+  if (err) err.textContent = '';
+  const fmt = d => d.toISOString().slice(0, 10);
+  const today = new Date();
+  const weekAgo = new Date(today.getTime() - 7*24*3600*1000);
+  if (newsCustomStart && startEl) startEl.value = fmt(new Date(newsCustomStart));
+  else if (startEl && !startEl.value) startEl.value = fmt(weekAgo);
+  if (newsCustomEnd && endEl) endEl.value = fmt(new Date(newsCustomEnd));
+  else if (endEl && !endEl.value) endEl.value = fmt(today);
+  m.classList.add('show');
+}
+function closeDateModal(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById('dateRangeModal').classList.remove('show');
+}
+function applyDateRange() {
+  const startEl = document.getElementById('dateRangeStart');
+  const endEl = document.getElementById('dateRangeEnd');
+  const err = document.getElementById('dateRangeError');
+  const chip = document.getElementById('customDateChip');
+  if (!startEl.value || !endEl.value) { err.textContent = 'กรุณาเลือกวันที่ให้ครบ'; return; }
+  const start = new Date(startEl.value + 'T00:00:00').getTime();
+  const end = new Date(endEl.value + 'T23:59:59').getTime();
+  if (start > end) { err.textContent = 'วันที่เริ่มต้นต้องมาก่อนวันที่สิ้นสุด'; return; }
+  newsCustomStart = start;
+  newsCustomEnd = end;
+  newsTimeRange = 'custom';
+  const months = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const fmt = ts => { const d = new Date(ts); return d.getDate() + ' ' + months[d.getMonth()]; };
+  if (chip) chip.textContent = fmt(start) + ' – ' + fmt(end);
+  document.querySelectorAll('.time-chip').forEach(c => c.classList.toggle('active', c.dataset.range === 'custom'));
+  closeDateModal();
+  if (newsFeedCache) renderNewsFeed();
+}
+
+async function loadNewsFeed() {
+  const root = document.getElementById('newsFeedList');
+  if (root) root.innerHTML = '<div class="loading"><div class="loading-row"><div class="spinner"></div><span>กำลังโหลดข่าว...</span></div></div>';
+  try {
+    const r = await fetch(NEWS_INDEX_URL + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('Index ' + r.status);
+    newsFeedCache = await r.json();
+    renderNewsFeed();
+    renderInsight((newsFeedCache.batches || [])[0]);
+  } catch (e) {
+    if (root) root.innerHTML = '<div class="feed-empty">โหลดข่าวไม่สำเร็จ — ' + escapeHtml(e.message || '') + '</div>';
+  }
+}
+
 // ==== Init ====
 async function init() {
-  let idx;
-  try {
-    const resp = await fetch(NEWS_INDEX_URL + '?t=' + Date.now(), { cache: 'no-store' });
-    idx = await resp.json();
-  } catch (e) {
-    document.getElementById('topStories').innerHTML = '<div class="loading">โหลด news-index.json ไม่สำเร็จ</div>';
-    return;
-  }
-  if (!idx.batches || !idx.batches.length) {
-    document.getElementById('topStories').innerHTML = '<div class="loading">ไม่พบ batches</div>';
-    return;
-  }
+  // Step 1: load news feed (sets cache + renders feed + insight)
+  await loadNewsFeed();
+  if (!newsFeedCache || !newsFeedCache.batches || !newsFeedCache.batches.length) return;
 
-  // Pick top 5 headlines from latest batches
-  const headlines = [];
-  for (const b of idx.batches) {
-    for (let hi = 0; hi < b.headlines.length; hi++) {
-      headlines.push({ ...b.headlines[hi], batchFile: b.file, batchDate: b.date, origIdx: hi });
-      if (headlines.length >= 5) break;
-    }
-    if (headlines.length >= 5) break;
-  }
-
-  // Render stories (no .md fetch needed — summary removed)
-  renderTopStories(headlines);
-
-  // Insight from latest batch
-  renderInsight(idx.batches[0]);
-
-  // Movers — collect tickers from latest 2 batches
+  // Step 2: Movers — collect tickers from latest 2 batches
   const tkSeen = new Set();
   const tkOrdered = [];
-  for (const b of idx.batches.slice(0, 2)) {
+  for (const b of newsFeedCache.batches.slice(0, 2)) {
     for (const h of b.headlines) {
       for (const t of (h.tickers || [])) {
-        if (!tkSeen.has(t.symbol)) {
-          tkSeen.add(t.symbol);
-          tkOrdered.push(t);
-        }
+        if (!tkSeen.has(t.symbol)) { tkSeen.add(t.symbol); tkOrdered.push(t); }
       }
     }
   }
-
   renderMoversSkeleton(Math.min(5, tkOrdered.length || 3));
 
-  // Fetch SP500 CSV
+  // Step 3: Fetch SP500 CSV → render real sparklines
   let prices;
   try {
     const r = await fetch(SP500_CSV_URL + '?t=' + Date.now(), { cache: 'no-store' });
     if (!r.ok) throw new Error('CSV ' + r.status);
-    const csv = await r.text();
-    prices = parseSP500ForTickers(csv, tkSeen, 12);
+    prices = parseSP500ForTickers(await r.text(), tkSeen, 12);
   } catch (e) {
     document.getElementById('movers').innerHTML = '<div class="loading">โหลดราคา SP500 ไม่สำเร็จ</div>';
     return;
   }
-
-  // Build movers list — only tickers with price data
   const moverItems = [];
   for (const t of tkOrdered) {
     const p = prices[t.symbol];
