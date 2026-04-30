@@ -106,7 +106,9 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 /* Reward Card */
 .reward-card{width:auto;overflow:hidden;position:relative;border-radius:16px;container-type:inline-size}
 .reward-card img{width:100%;display:block}
-.rc-member-name{position:absolute;left:5%;bottom:38%;font-family:'Anuphan',sans-serif;font-size:4.5cqw;font-weight:500;color:var(--text-light);letter-spacing:1px;text-shadow:0 1px 4px rgba(0,0,0,0.4)}
+.rc-member-name{position:absolute;right:5%;top:36%;font-family:'Anuphan',sans-serif;font-size:3.5cqw;font-weight:600;color:var(--maroon);letter-spacing:0.5px;text-align:right;text-shadow:0 1px 2px rgba(255,254,248,0.6);max-width:42%}
+/* Points overlay: baked into new card image — kept in DOM for future Supabase wire-up */
+.rc-points{display:none}
 .rc-points{position:absolute;right:22%;top:6%;transform:translateX(50%);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;width:22%;aspect-ratio:1}
 .rc-points-ring{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;border:1.5px solid transparent;border-top-color:rgba(212,175,55,0.7);border-right-color:rgba(244,228,186,0.3);animation:pointsSpin 3s linear infinite;filter:drop-shadow(0 0 4px rgba(212,175,55,0.4))}
 .rc-points-ring2{position:absolute;inset:7%;border-radius:50%;border:1px solid transparent;border-bottom-color:rgba(244,228,186,0.5);border-left-color:rgba(212,175,55,0.2);animation:pointsSpin 5s linear infinite reverse;filter:drop-shadow(0 0 3px rgba(212,175,55,0.3))}
@@ -419,7 +421,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 
     <div class="screen active" id="screen-home">
         <div class="reward-card fade-up fade-up-1" style="margin:0 16px;overflow:hidden;border-radius:16px;">
-            <img src="member-card-gold.png" alt="Gold Member Card" style="width:100%;display:block;">
+            <img src="member-card-gold-v2.png?v=1777514700" alt="JP Trust Rewards Card" style="width:100%;display:block;">
             <canvas id="heroCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;"></canvas>
             <div class="rc-member-name" id="cardName">Joonstinn</div>
             <div class="rc-points"><div class="rc-points-glow"></div><div class="rc-points-ring"></div><div class="rc-points-ring2"></div><div class="rc-points-num" id="cardPoints">100</div><div class="rc-points-label">Points</div></div>
