@@ -119,14 +119,10 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 @keyframes pointsSpin{to{transform:rotate(360deg)}}
 @keyframes pointsPulse{0%,100%{opacity:0.6;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
 
-/* User Guide link on home card (lower-right gold area, vertically aligned under owl) */
-.rc-guide-link{position:absolute;left:70%;top:55%;display:flex;flex-direction:column;align-items:center;gap:0.6cqw;cursor:pointer;z-index:5;width:13%;-webkit-tap-highlight-color:transparent;transition:transform 0.25s ease}
+/* User Guide link on home card (lower-right gold area) */
+.rc-guide-link{position:absolute;left:65%;top:56%;display:flex;flex-direction:column;align-items:center;gap:0.6cqw;cursor:pointer;z-index:5;width:14%;-webkit-tap-highlight-color:transparent;transition:transform 0.25s ease}
 .rc-guide-link:active{transform:scale(0.94)}
-.rc-guide-icon-wrap{position:relative;width:100%;aspect-ratio:1}
-.rc-guide-glow{position:absolute;inset:-14%;border-radius:50%;background:radial-gradient(circle,rgba(244,228,186,0.55) 0%,rgba(212,175,55,0.32) 30%,rgba(212,175,55,0.10) 55%,transparent 78%);animation:guideGlow 2.4s ease-in-out infinite;pointer-events:none}
-@keyframes guideGlow{0%,100%{opacity:0.55;transform:scale(0.96)}50%{opacity:1;transform:scale(1.12)}}
-.rc-guide-icon{position:relative;width:100%;height:100%;display:block;filter:drop-shadow(0 0 6px rgba(244,228,186,0.6)) drop-shadow(0 3px 6px rgba(184,134,11,0.4));animation:guideBounce 2.4s ease-in-out infinite;z-index:1}
-@keyframes guideBounce{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.04)}}
+.rc-guide-icon{width:100%;height:auto;aspect-ratio:1;display:block;filter:drop-shadow(0 3px 6px rgba(184,134,11,0.35))}
 .rc-guide-icon .rc-guide-page{transform-origin:32px 22px;transform-box:fill-box;animation:pageFlip 2.6s ease-in-out infinite}
 @keyframes pageFlip{0%,100%{transform:rotate(0) translateY(0)}30%{transform:rotate(-7deg) translateY(-0.5px)}55%{transform:rotate(2deg)}80%{transform:rotate(-3deg)}}
 .rc-guide-label{font-family:'Cinzel','Anuphan',serif;font-size:max(10px,2cqw);color:#8B6914;letter-spacing:0.04em;text-align:center;text-shadow:0 1px 2px rgba(255,254,248,0.6);font-weight:600;line-height:1.2;white-space:nowrap}
@@ -440,26 +436,23 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             <div class="rc-member-name" id="cardName">Joonstinn</div>
             <div class="rc-points"><div class="rc-points-glow"></div><div class="rc-points-ring"></div><div class="rc-points-ring2"></div><div class="rc-points-num" id="cardPoints">100</div><div class="rc-points-label">Points</div></div>
             <div class="rc-guide-link" onclick="openIframe('คู่มือการใช้งาน','https://jptrustlearning.github.io/pages/user-guide.html?v=1777561550')" role="button" tabindex="0" aria-label="คู่มือการใช้งาน">
-                <div class="rc-guide-icon-wrap">
-                    <div class="rc-guide-glow"></div>
-                    <svg class="rc-guide-icon" viewBox="0 0 64 64" fill="none" stroke="#B8860B" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <ellipse cx="32" cy="54.5" rx="22" ry="1.6" fill="#8B6914" opacity="0.18" stroke="none"/>
-                        <path d="M 8 16 L 32 22 L 32 50 L 8 46 Z" fill="#FFFEF8" stroke="#B8860B" stroke-width="1.8"/>
-                        <path d="M 56 16 L 32 22 L 32 50 L 56 46 Z" fill="#FFFEF8" stroke="#B8860B" stroke-width="1.8"/>
-                        <g stroke="#D4AF37" stroke-width="0.95" opacity="0.55">
-                            <line x1="13" y1="28" x2="28" y2="30"/>
-                            <line x1="13" y1="33" x2="28" y2="35"/>
-                            <line x1="13" y1="38" x2="28" y2="40"/>
-                        </g>
-                        <g stroke="#D4AF37" stroke-width="0.95" opacity="0.55">
-                            <line x1="36" y1="30" x2="51" y2="28"/>
-                            <line x1="36" y1="35" x2="51" y2="33"/>
-                            <line x1="36" y1="40" x2="51" y2="38"/>
-                        </g>
-                        <line x1="32" y1="22" x2="32" y2="50" stroke="#8B6914" stroke-width="1.3" opacity="0.55"/>
-                        <path class="rc-guide-page" d="M 32 22 Q 39 13 48 16 L 49 18 Q 41 17 32 22 Z" fill="#FAF6ED" stroke="#B8860B" stroke-width="1.5"/>
-                    </svg>
-                </div>
+                <svg class="rc-guide-icon" viewBox="0 0 64 64" fill="none" stroke="#B8860B" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <ellipse cx="32" cy="54.5" rx="22" ry="1.6" fill="#8B6914" opacity="0.18" stroke="none"/>
+                    <path d="M 8 16 L 32 22 L 32 50 L 8 46 Z" fill="#FFFEF8" stroke="#B8860B" stroke-width="1.8"/>
+                    <path d="M 56 16 L 32 22 L 32 50 L 56 46 Z" fill="#FFFEF8" stroke="#B8860B" stroke-width="1.8"/>
+                    <g stroke="#D4AF37" stroke-width="0.95" opacity="0.55">
+                        <line x1="13" y1="28" x2="28" y2="30"/>
+                        <line x1="13" y1="33" x2="28" y2="35"/>
+                        <line x1="13" y1="38" x2="28" y2="40"/>
+                    </g>
+                    <g stroke="#D4AF37" stroke-width="0.95" opacity="0.55">
+                        <line x1="36" y1="30" x2="51" y2="28"/>
+                        <line x1="36" y1="35" x2="51" y2="33"/>
+                        <line x1="36" y1="40" x2="51" y2="38"/>
+                    </g>
+                    <line x1="32" y1="22" x2="32" y2="50" stroke="#8B6914" stroke-width="1.3" opacity="0.55"/>
+                    <path class="rc-guide-page" d="M 32 22 Q 39 13 48 16 L 49 18 Q 41 17 32 22 Z" fill="#FAF6ED" stroke="#B8860B" stroke-width="1.5"/>
+                </svg>
                 <div class="rc-guide-label">คู่มือการใช้งาน</div>
             </div>
         </div>
