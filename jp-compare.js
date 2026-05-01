@@ -1,29 +1,25 @@
-/* jp-compare.js — Strategy comparison module for JP Trust Learning
+/* jp-compare.js — Strategy comparison module for JP Trust Learning (v2)
  *
- * Stores user-saved backtest results in localStorage (key: jpt_compare_list_v1)
- * and renders a cross-strategy comparison panel via FAB + modal.
- *
- * Usage in strategy page (placed AFTER CONFIG + KPI elements exist):
- *   JPCompare.init({
- *     strategyKey:    'sp500-strategy-pro',           // unique id, drives badge color
- *     strategyLabel:  '6M Momentum',                   // display name in current-card
- *     getCurrentResult: () => ({
- *       cagr:    46.9,                                 // % (positive = profit)
- *       maxDD:  -15.2,                                 // % (negative)
- *       summary: '3 ม.ค. 2565 → 30 เม.ย. 2569 · 9 รอบ', // optional period string
- *       config:  { 'จำนวนหุ้น': 15, 'ทุน': '$15,000', ... } // ordered key→value
- *     })
- *   });
- *
- * The module:
- *   - Auto-injects a "compare" FAB at the TOP of the existing .fab-stack
- *   - Owns its own modal markup, CSS, and toast
- *   - Writes to localStorage via _read/_write (handles quota errors)
- *   - Provides sort (CAGR ↑↓ / DD ↑↓ / saved date) + filter (per strategyKey)
- *   - Allows expand-to-detail per entry (config + summary + saved-at)
+ * v2 (table redesign):
+ *   - Saved entries render as a 3-column TABLE (ชื่อ / CAGR / Max DD)
+ *   - Click any column header to sort (toggle asc/desc)
+ *   - Cells render data bars behind numbers (Excel-style, anchored right)
+ *     with width proportional to the max in the visible set
+ *   - Click any row to expand a detail panel beneath it (Excel-pivot style)
+ *     with period summary, full CONFIG grid, saved-at, and delete button
+ *   - Long names truncate with ellipsis
  *
  * Storage shape (each entry):
  *   { id, strategyKey, strategyLabel, listName, cagr, maxDD, summary, config, savedAt }
+ *
+ * Key (localStorage): jpt_compare_list_v1
+ *
+ * Usage in strategy page:
+ *   JPCompare.init({
+ *     strategyKey:    'sp500-strategy-pro',
+ *     strategyLabel:  '6M Momentum',
+ *     getCurrentResult: () => ({ cagr, maxDD, summary, config: {...} })
+ *   });
  */
 (function(){
   'use strict';
@@ -35,7 +31,10 @@
   let _modalEl = null;
   let _backdrop = null;
   let _injected = false;
-  let _sortKey = 'cagr_desc';
+
+  // Sort state — column key + direction
+  let _sortBy = 'cagr';        // 'name' | 'cagr' | 'dd'
+  let _sortDesc = true;        // true = desc, false = asc
   let _filterKey = 'all';
   let _expandedId = null;
 
@@ -97,7 +96,7 @@
 .jpc-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:1500;backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity 0.3s ease}
 .jpc-backdrop.show{opacity:1;pointer-events:auto}
 
-.jpc-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(0.96);z-index:1600;width:min(560px,calc(100vw - 24px));max-height:calc(100vh - 60px);overflow:hidden;background:linear-gradient(180deg,#FFFEF8 0%,#FAF6ED 70%,#F5EDD8 100%);border:1.5px solid rgba(212,175,55,0.45);border-radius:18px;box-shadow:0 20px 60px rgba(114,47,55,0.25),0 4px 16px rgba(114,47,55,0.1);opacity:0;pointer-events:none;transition:opacity 0.25s ease, transform 0.25s ease;display:flex;flex-direction:column;font-family:'Anuphan',sans-serif;color:#3D3228}
+.jpc-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(0.96);z-index:1600;width:min(580px,calc(100vw - 24px));max-height:calc(100vh - 60px);overflow:hidden;background:linear-gradient(180deg,#FFFEF8 0%,#FAF6ED 70%,#F5EDD8 100%);border:1.5px solid rgba(212,175,55,0.45);border-radius:18px;box-shadow:0 20px 60px rgba(114,47,55,0.25),0 4px 16px rgba(114,47,55,0.1);opacity:0;pointer-events:none;transition:opacity 0.25s ease, transform 0.25s ease;display:flex;flex-direction:column;font-family:'Anuphan',sans-serif;color:#3D3228}
 .jpc-modal.show{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:auto}
 
 .jpc-modal-header{padding:18px 22px 14px;border-bottom:1px solid rgba(212,175,55,0.3);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;background:linear-gradient(180deg,rgba(255,254,248,0.9) 0%,rgba(250,246,237,0.7) 100%)}
@@ -135,62 +134,92 @@
 
 .jpc-divider{height:1px;background:linear-gradient(90deg,transparent 0%,rgba(212,175,55,0.4) 50%,transparent 100%);margin:18px 0 14px}
 
-.jpc-controls{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.jpc-controls{display:flex;gap:8px;margin-bottom:12px}
 .jpc-controls select{flex:1;min-width:0;padding:8px 12px;border:1px solid rgba(212,175,55,0.4);border-radius:8px;background:#FFFEF8;font-family:'Anuphan',sans-serif;font-size:0.8rem;color:#3D3228;cursor:pointer;outline:none;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238B6914' stroke-width='2.5' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px}
 .jpc-controls select:focus{border-color:#D4AF37}
-
-.jpc-list{display:flex;flex-direction:column;gap:10px}
 
 .jpc-empty{text-align:center;padding:32px 16px;color:#7A6F62;font-size:0.88rem;line-height:1.6;background:#FFFEF8;border:1px dashed rgba(212,175,55,0.4);border-radius:12px}
 .jpc-empty-icon{font-size:1.8rem;color:#D4AF37;margin-bottom:8px;opacity:0.65;line-height:1}
 .jpc-empty-sub{font-size:0.78rem;opacity:0.7;margin-top:4px;display:block}
 
-.jpc-entry{background:#FFFEF8;border:1.5px solid rgba(212,175,55,0.35);border-radius:12px;overflow:hidden;transition:border-color 0.2s, box-shadow 0.2s}
-.jpc-entry:hover{border-color:rgba(212,175,55,0.55);box-shadow:0 4px 12px rgba(114,47,55,0.06)}
-.jpc-entry.expanded{border-color:rgba(212,175,55,0.65);box-shadow:0 4px 16px rgba(114,47,55,0.1)}
+/* ─── TABLE ───────────────────────────────────────────── */
+.jpc-table-wrap{background:#FFFEF8;border:1.5px solid rgba(212,175,55,0.4);border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(114,47,55,0.04)}
+.jpc-table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed;font-family:'Anuphan',sans-serif}
 
-.jpc-entry-head{padding:12px 14px;cursor:pointer;display:flex;flex-direction:column;gap:8px}
-.jpc-entry-row1{display:flex;align-items:center;gap:8px}
-.jpc-entry-badge{font-family:'Cinzel',serif;font-size:0.62rem;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:6px;background:rgba(139,34,82,0.1);color:#722F37;text-transform:uppercase;flex-shrink:0;border:1px solid rgba(139,34,82,0.2)}
-.jpc-entry-badge[data-strategy="sp500-strategy-pro"]{background:rgba(46,159,95,0.12);color:#1F7D49;border-color:rgba(46,159,95,0.25)}
-.jpc-entry-badge[data-strategy="sp500-rolling-6m-momentum"]{background:rgba(212,175,55,0.18);color:#8B6914;border-color:rgba(212,175,55,0.4)}
-.jpc-entry-name{flex:1;min-width:0;font-size:0.95rem;color:#3D3228;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.jpc-entry-delete{background:transparent;border:none;color:#7A6F62;cursor:pointer;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background 0.2s, color 0.2s;flex-shrink:0;padding:0}
-.jpc-entry-delete:hover{background:rgba(193,69,69,0.1);color:#9C2B2B}
+.jpc-thead{background:linear-gradient(180deg,#FFFEF8 0%,#F5EDD8 100%)}
+.jpc-th{padding:12px 14px;font-family:'Cinzel',serif;font-size:0.66rem;font-weight:700;color:#8B6914;letter-spacing:1.3px;text-transform:uppercase;cursor:pointer;user-select:none;border-bottom:1.5px solid rgba(212,175,55,0.45);position:relative;transition:background 0.15s,color 0.15s;text-align:left;line-height:1.3}
+.jpc-th:hover{background:rgba(212,175,55,0.12);color:#722F37}
+.jpc-th.numeric{text-align:right;padding-right:26px}
+.jpc-th:not(.numeric){padding-right:24px}
+.jpc-th.active{color:#722F37;background:rgba(212,175,55,0.08)}
+.jpc-arrow{position:absolute;top:50%;right:8px;transform:translateY(-50%);font-size:0.55rem;opacity:0;pointer-events:none;transition:opacity 0.2s;color:#722F37;line-height:1}
+.jpc-th.active .jpc-arrow{opacity:1}
+.jpc-th.active.desc .jpc-arrow::before{content:'\\25BC'}
+.jpc-th.active.asc .jpc-arrow::before{content:'\\25B2'}
 
-.jpc-entry-row2{display:flex;align-items:center;gap:10px;justify-content:space-between}
-.jpc-pills{display:flex;gap:8px;flex-wrap:wrap;flex:1}
-.jpc-pill{font-size:0.95rem;padding:4px 10px;border-radius:8px;background:#FAF6ED;border:1px solid rgba(212,175,55,0.3);display:inline-flex;align-items:baseline;gap:5px;font-family:'DM Serif Display',serif}
-.jpc-pill-label{font-family:'Cinzel',serif;font-size:0.6rem;font-weight:700;color:#8B6914;letter-spacing:0.8px;text-transform:uppercase}
-.jpc-pill-value.pos{color:#1F7D49}
-.jpc-pill-value.neg{color:#9C2B2B}
-.jpc-pill-value.neutral{color:#5A3D20}
+.jpc-tr-data{cursor:pointer}
+.jpc-tr-data > .jpc-td{transition:background 0.15s}
+.jpc-tr-data:hover > .jpc-td{background:rgba(212,175,55,0.06)}
+.jpc-tr-data.expanded > .jpc-td{background:rgba(212,175,55,0.1)}
+.jpc-tr-data.expanded > .jpc-td:first-child{box-shadow:inset 3px 0 0 0 #D4AF37}
 
-.jpc-expand-btn{background:transparent;border:none;cursor:pointer;color:#8B6914;width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:transform 0.2s, background 0.2s;flex-shrink:0;padding:0}
-.jpc-expand-btn:hover{background:rgba(212,175,55,0.12)}
-.jpc-entry.expanded .jpc-expand-btn{transform:rotate(180deg)}
+.jpc-td{padding:12px 14px;border-bottom:1px solid rgba(212,175,55,0.18);position:relative;vertical-align:middle}
 
-.jpc-entry-detail{padding:0 14px 14px;border-top:1px dashed rgba(212,175,55,0.3);margin-top:0;display:none}
-.jpc-entry.expanded .jpc-entry-detail{display:block}
-.jpc-summary-line{font-size:0.78rem;color:#7A6F62;padding:10px 0 8px;line-height:1.5;border-bottom:1px dashed rgba(212,175,55,0.2);margin-bottom:10px}
-.jpc-config-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+/* Name cell */
+.jpc-td.name{display:flex;align-items:center;gap:8px;overflow:hidden}
+.jpc-entry-badge{font-family:'Cinzel',serif;font-size:0.6rem;font-weight:700;letter-spacing:0.9px;padding:3px 7px;border-radius:6px;background:rgba(139,34,82,0.1);color:#722F37;text-transform:uppercase;flex-shrink:0;border:1px solid rgba(139,34,82,0.22);line-height:1}
+.jpc-entry-badge[data-strategy="sp500-strategy-pro"]{background:rgba(46,159,95,0.13);color:#1F7D49;border-color:rgba(46,159,95,0.28)}
+.jpc-entry-badge[data-strategy="sp500-rolling-6m-momentum"]{background:rgba(212,175,55,0.18);color:#8B6914;border-color:rgba(212,175,55,0.42)}
+.jpc-name-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:0.92rem;color:#3D3228;font-weight:500}
+.jpc-row-chevron{color:#8B6914;opacity:0.45;transition:transform 0.25s ease,opacity 0.2s;flex-shrink:0;width:13px;height:13px}
+.jpc-tr-data:hover .jpc-row-chevron{opacity:0.8}
+.jpc-tr-data.expanded .jpc-row-chevron{transform:rotate(180deg);opacity:1;color:#722F37}
+
+/* Numeric cells with data bars */
+.jpc-td.numeric{text-align:right;padding:12px 14px;font-family:'DM Serif Display',serif}
+.jpc-bar{position:absolute;top:6px;bottom:6px;right:6px;border-radius:5px;z-index:0;pointer-events:none;transition:width 0.45s cubic-bezier(0.25,0.46,0.45,0.94)}
+.jpc-bar.cagr-pos{background:linear-gradient(270deg,rgba(46,159,95,0.34) 0%,rgba(46,159,95,0.16) 100%)}
+.jpc-bar.cagr-neg{background:linear-gradient(270deg,rgba(193,69,69,0.32) 0%,rgba(193,69,69,0.14) 100%)}
+.jpc-bar.dd{background:linear-gradient(270deg,rgba(193,69,69,0.32) 0%,rgba(193,69,69,0.14) 100%)}
+.jpc-val{position:relative;z-index:1;font-size:1rem;line-height:1;letter-spacing:0.3px;font-feature-settings:"tnum" 1}
+.jpc-val.pos{color:#1F7D49}
+.jpc-val.neg{color:#9C2B2B}
+
+/* Detail (expanded) row */
+.jpc-detail-row{display:none}
+.jpc-detail-row.show{display:table-row}
+.jpc-detail-row > td{padding:0;background:linear-gradient(180deg,rgba(245,237,216,0.5) 0%,rgba(255,254,248,0.7) 100%);border-bottom:1px solid rgba(212,175,55,0.25);box-shadow:inset 3px 0 0 0 #D4AF37}
+.jpc-detail-inner{padding:14px 18px 16px}
+.jpc-summary-line{font-size:0.8rem;color:#7A6F62;padding:0 0 10px;line-height:1.55;border-bottom:1px dashed rgba(212,175,55,0.28);margin-bottom:12px}
+.jpc-config-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px}
 .jpc-config-item{display:flex;flex-direction:column;gap:2px;min-width:0}
-.jpc-config-key{font-family:'Cinzel',serif;font-size:0.62rem;font-weight:700;color:#8B6914;letter-spacing:0.8px;text-transform:uppercase}
+.jpc-config-key{font-family:'Cinzel',serif;font-size:0.6rem;font-weight:700;color:#8B6914;letter-spacing:0.8px;text-transform:uppercase}
 .jpc-config-val{font-size:0.85rem;color:#3D3228;font-weight:500;word-break:break-word}
-.jpc-saved-at{margin-top:10px;padding-top:8px;border-top:1px dashed rgba(212,175,55,0.2);font-size:0.72rem;color:#7A6F62;text-align:right}
+.jpc-saved-at{margin-top:12px;padding-top:9px;border-top:1px dashed rgba(212,175,55,0.25);font-size:0.72rem;color:#7A6F62;text-align:right}
+.jpc-detail-actions{display:flex;justify-content:flex-end;margin-top:12px;padding-top:10px;border-top:1px dashed rgba(212,175,55,0.25)}
+.jpc-row-delete{background:#FFFEF8;border:1px solid rgba(193,69,69,0.4);color:#9C2B2B;padding:7px 14px;border-radius:8px;font-family:'Anuphan',sans-serif;font-size:0.8rem;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background 0.15s,border-color 0.15s,transform 0.1s}
+.jpc-row-delete:hover{background:rgba(193,69,69,0.08);border-color:rgba(193,69,69,0.6)}
+.jpc-row-delete:active{transform:scale(0.97)}
 
 @media (max-width:600px){
   .jpc-modal{width:calc(100vw - 16px);max-height:calc(100vh - 32px)}
-  .jpc-modal-body{padding:16px 18px}
+  .jpc-modal-body{padding:16px 16px}
   .jpc-modal-header{padding:16px 18px 12px}
   .jpc-modal-title{font-size:1.15rem}
-  .jpc-config-grid{grid-template-columns:1fr}
-  .jpc-controls{flex-direction:column;gap:8px}
-  .jpc-controls select{width:100%}
+  .jpc-config-grid{grid-template-columns:1fr;gap:10px}
   .jpc-kpi-cell-value{font-size:1.4rem}
-  .jpc-pill{font-size:0.9rem}
+  .jpc-th{padding:11px 10px;font-size:0.62rem;letter-spacing:1px}
+  .jpc-th.numeric{padding-right:22px}
+  .jpc-th:not(.numeric){padding-right:20px}
+  .jpc-td{padding:11px 10px}
+  .jpc-td.numeric{padding:11px 10px}
+  .jpc-name-text{font-size:0.88rem}
+  .jpc-val{font-size:0.95rem}
+  .jpc-entry-badge{font-size:0.55rem;padding:3px 6px;letter-spacing:0.6px}
+  .jpc-detail-inner{padding:12px 14px 14px}
 }
 
+/* Toast */
 .jpc-toast{position:fixed;left:50%;top:24px;transform:translate(-50%,-100%);z-index:2000;padding:12px 18px;background:#FFFEF8;border:1.5px solid rgba(212,175,55,0.5);border-radius:10px;box-shadow:0 8px 24px rgba(114,47,55,0.2);font-family:'Anuphan',sans-serif;font-size:0.88rem;color:#3D3228;opacity:0;transition:opacity 0.25s, transform 0.25s;pointer-events:none;max-width:90vw;text-align:center}
 .jpc-toast.show{opacity:1;transform:translate(-50%,0)}
 .jpc-toast.ok{border-color:rgba(46,159,95,0.5);color:#1F7D49;background:#F4FBF6}
@@ -223,7 +252,6 @@
       <span class="jpc-fab-tooltip">เปรียบเทียบกลยุทธ์</span>
     `;
     btn.addEventListener('click', _openModal);
-    // Insert at TOP of stack (above About + Settings)
     stack.insertBefore(btn, stack.firstChild);
   }
 
@@ -267,14 +295,6 @@
         <div class="jpc-divider"></div>
         <div class="jpc-section-label">รายการที่บันทึกไว้ <span id="jpc-count" class="jpc-count-tag"></span></div>
         <div class="jpc-controls">
-          <select id="jpc-sort">
-            <option value="cagr_desc">CAGR สูง → ต่ำ</option>
-            <option value="cagr_asc">CAGR ต่ำ → สูง</option>
-            <option value="dd_asc">Max DD น้อย → มาก (ดีที่สุดก่อน)</option>
-            <option value="dd_desc">Max DD มาก → น้อย</option>
-            <option value="newest">บันทึกล่าสุด</option>
-            <option value="oldest">บันทึกแรกสุด</option>
-          </select>
           <select id="jpc-filter">
             <option value="all">ทุกกลยุทธ์</option>
             <option value="sp500-strategy-pro">6M Momentum</option>
@@ -282,7 +302,7 @@
             <option value="sp500-rolling-6m-momentum">Rolling 6M</option>
           </select>
         </div>
-        <div class="jpc-list" id="jpc-list"></div>
+        <div id="jpc-list"></div>
       </div>
     `;
     document.body.appendChild(_modalEl);
@@ -291,10 +311,6 @@
     _modalEl.querySelector('#jpc-add').addEventListener('click', _addEntry);
     _modalEl.querySelector('#jpc-name').addEventListener('keydown', e => {
       if(e.key === 'Enter') _addEntry();
-    });
-    _modalEl.querySelector('#jpc-sort').addEventListener('change', e => {
-      _sortKey = e.target.value;
-      _renderList();
     });
     _modalEl.querySelector('#jpc-filter').addEventListener('change', e => {
       _filterKey = e.target.value;
@@ -309,7 +325,6 @@
   function _openModal(){
     _renderCurrent();
     _renderList();
-    _modalEl.querySelector('#jpc-sort').value = _sortKey;
     _modalEl.querySelector('#jpc-filter').value = _filterKey;
     _modalEl.querySelector('#jpc-name').value = '';
     _backdrop.classList.add('show');
@@ -323,17 +338,16 @@
     document.body.style.overflow = '';
   }
 
-  // ─── RENDER ──────────────────────────────────────────────
+  // ─── RENDER: CURRENT ─────────────────────────────────────
   function _renderCurrent(){
     const result = _config.getCurrentResult() || {};
     const cur = _modalEl.querySelector('#jpc-current');
     const cagr = Number(result.cagr) || 0;
     const maxDD = Number(result.maxDD) || 0;
     const cagrPos = cagr >= 0;
-    const cagrSign = cagrPos ? '+' : '';
-    const cagrStr = cagrSign + cagr.toFixed(1) + '%';
-    const ddSign = maxDD <= 0 ? '−' : '+';
-    const ddStr = ddSign + Math.abs(maxDD).toFixed(1) + '%';
+    const cagrSign = cagrPos ? '+' : '−';
+    const cagrStr = cagrSign + Math.abs(cagr).toFixed(1) + '%';
+    const ddStr = '−' + Math.abs(maxDD).toFixed(1) + '%';
     const summaryHtml = result.summary ? `<div class="jpc-current-summary">${_esc(result.summary)}</div>` : '';
     cur.innerHTML = `
       <div class="jpc-current-strategy">${_esc(_config.strategyLabel)}</div>
@@ -355,6 +369,7 @@
     addBtn.title = isStub ? 'รอผลแบ็คเทสคำนวณเสร็จก่อน' : '';
   }
 
+  // ─── RENDER: TABLE ───────────────────────────────────────
   function _renderList(){
     const list = _modalEl.querySelector('#jpc-list');
     const countEl = _modalEl.querySelector('#jpc-count');
@@ -365,21 +380,9 @@
       arr = arr.filter(e => e.strategyKey === _filterKey);
     }
 
-    arr.sort((a,b) => {
-      switch(_sortKey){
-        case 'cagr_desc': return (b.cagr||0) - (a.cagr||0);
-        case 'cagr_asc':  return (a.cagr||0) - (b.cagr||0);
-        case 'dd_asc':    return Math.abs(a.maxDD||0) - Math.abs(b.maxDD||0);
-        case 'dd_desc':   return Math.abs(b.maxDD||0) - Math.abs(a.maxDD||0);
-        case 'newest':    return (b.savedAt||0) - (a.savedAt||0);
-        case 'oldest':    return (a.savedAt||0) - (b.savedAt||0);
-      }
-      return 0;
-    });
+    arr.sort(_sortFn);
 
-    countEl.textContent = arr.length === total
-      ? `(${total})`
-      : `(${arr.length} / ${total})`;
+    countEl.textContent = arr.length === total ? `(${total})` : `(${arr.length} / ${total})`;
 
     if(arr.length === 0){
       const emptyMsg = total === 0
@@ -389,67 +392,138 @@
       return;
     }
 
-    list.innerHTML = arr.map(e => _entryHtml(e)).join('');
-    list.querySelectorAll('.jpc-entry').forEach(el => {
-      const id = el.dataset.id;
-      el.querySelector('.jpc-entry-head').addEventListener('click', ev => {
-        if(ev.target.closest('.jpc-entry-delete')) return;
-        _toggleExpand(id);
+    // Compute max for data bars
+    const maxCagrAbs = Math.max.apply(null, arr.map(e => Math.abs(Number(e.cagr) || 0)).concat([0.01]));
+    const maxDDAbs = Math.max.apply(null, arr.map(e => Math.abs(Number(e.maxDD) || 0)).concat([0.01]));
+
+    // Header
+    const cols = [
+      { key: 'name', label: 'ชื่อ', cls: '' },
+      { key: 'cagr', label: 'CAGR', cls: 'numeric' },
+      { key: 'dd',   label: 'Max DD', cls: 'numeric' }
+    ];
+    const headerHtml = '<thead class="jpc-thead"><tr>' + cols.map(c => {
+      const active = _sortBy === c.key;
+      const cls = ['jpc-th', c.cls, active ? 'active' : '', active ? (_sortDesc ? 'desc' : 'asc') : ''].filter(Boolean).join(' ');
+      return `<th class="${cls}" data-sort="${c.key}">${c.label}<span class="jpc-arrow"></span></th>`;
+    }).join('') + '</tr></thead>';
+
+    const bodyHtml = '<tbody>' + arr.map(e => _entryHtml(e, maxCagrAbs, maxDDAbs)).join('') + '</tbody>';
+
+    list.innerHTML = `
+      <div class="jpc-table-wrap">
+        <table class="jpc-table">
+          <colgroup><col><col style="width:96px"><col style="width:96px"></colgroup>
+          ${headerHtml}
+          ${bodyHtml}
+        </table>
+      </div>
+    `;
+
+    // Bind events
+    list.querySelectorAll('.jpc-th[data-sort]').forEach(th => {
+      th.addEventListener('click', () => _setSort(th.dataset.sort));
+    });
+    list.querySelectorAll('.jpc-tr-data').forEach(tr => {
+      tr.addEventListener('click', ev => {
+        if(ev.target.closest('.jpc-row-delete')) return;
+        _toggleExpand(tr.dataset.id);
       });
-      el.querySelector('.jpc-entry-delete').addEventListener('click', ev => {
+    });
+    list.querySelectorAll('.jpc-row-delete').forEach(btn => {
+      btn.addEventListener('click', ev => {
         ev.stopPropagation();
-        _deleteEntry(id);
+        _deleteEntry(btn.dataset.id);
       });
     });
   }
 
-  function _entryHtml(e){
+  function _entryHtml(e, maxCagrAbs, maxDDAbs){
     const cagr = Number(e.cagr) || 0;
     const maxDD = Number(e.maxDD) || 0;
     const cagrPos = cagr >= 0;
-    const cagrSign = cagrPos ? '+' : '';
-    const cagrStr = cagrSign + cagr.toFixed(1) + '%';
-    const ddSign = maxDD <= 0 ? '−' : '+';
-    const ddStr = ddSign + Math.abs(maxDD).toFixed(1) + '%';
+    const cagrSign = cagrPos ? '+' : '−';
+    const cagrStr = cagrSign + Math.abs(cagr).toFixed(1) + '%';
+    const ddStr = '−' + Math.abs(maxDD).toFixed(1) + '%';
     const expanded = _expandedId === e.id;
     const badgeShort = _shortLabel(e.strategyKey);
+
+    // Bar widths — proportional to max in visible set; min 5%, max 100%
+    const cagrPct = Math.min(100, Math.max(5, Math.abs(cagr) / maxCagrAbs * 100));
+    const ddPct = Math.min(100, Math.max(5, Math.abs(maxDD) / maxDDAbs * 100));
+
     const cfg = e.config || {};
     const cfgItems = Object.keys(cfg).map(k =>
       `<div class="jpc-config-item"><div class="jpc-config-key">${_esc(k)}</div><div class="jpc-config-val">${_esc(String(cfg[k]))}</div></div>`
     ).join('');
     const summaryHtml = e.summary ? `<div class="jpc-summary-line">${_esc(e.summary)}</div>` : '';
     const savedDate = e.savedAt ? _fmtSavedAt(e.savedAt) : '';
-    return `
-<div class="jpc-entry${expanded ? ' expanded' : ''}" data-id="${_esc(e.id)}">
-  <div class="jpc-entry-head">
-    <div class="jpc-entry-row1">
-      <span class="jpc-entry-badge" data-strategy="${_esc(e.strategyKey)}">${_esc(badgeShort)}</span>
-      <span class="jpc-entry-name">${_esc(e.listName)}</span>
-      <button class="jpc-entry-delete" aria-label="ลบ" title="ลบ">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="jpc-entry-row2">
-      <div class="jpc-pills">
-        <span class="jpc-pill"><span class="jpc-pill-label">CAGR</span><span class="jpc-pill-value ${cagrPos ? 'pos' : 'neg'}">${cagrStr}</span></span>
-        <span class="jpc-pill"><span class="jpc-pill-label">DD</span><span class="jpc-pill-value neg">${ddStr}</span></span>
+
+    return `<tr class="jpc-tr-data${expanded ? ' expanded' : ''}" data-id="${_esc(e.id)}">
+  <td class="jpc-td name">
+    <span class="jpc-entry-badge" data-strategy="${_esc(e.strategyKey)}">${_esc(badgeShort)}</span>
+    <span class="jpc-name-text" title="${_esc(e.listName)}">${_esc(e.listName)}</span>
+    <svg class="jpc-row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+  </td>
+  <td class="jpc-td numeric">
+    <div class="jpc-bar ${cagrPos ? 'cagr-pos' : 'cagr-neg'}" style="width:${cagrPct.toFixed(1)}%"></div>
+    <span class="jpc-val ${cagrPos ? 'pos' : 'neg'}">${cagrStr}</span>
+  </td>
+  <td class="jpc-td numeric">
+    <div class="jpc-bar dd" style="width:${ddPct.toFixed(1)}%"></div>
+    <span class="jpc-val neg">${ddStr}</span>
+  </td>
+</tr>
+<tr class="jpc-detail-row${expanded ? ' show' : ''}" data-for="${_esc(e.id)}">
+  <td colspan="3">
+    <div class="jpc-detail-inner">
+      ${summaryHtml}
+      ${cfgItems ? `<div class="jpc-config-grid">${cfgItems}</div>` : ''}
+      ${savedDate ? `<div class="jpc-saved-at">บันทึกเมื่อ ${savedDate}</div>` : ''}
+      <div class="jpc-detail-actions">
+        <button class="jpc-row-delete" data-id="${_esc(e.id)}" aria-label="ลบรายการนี้">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
+          ลบรายการ
+        </button>
       </div>
-      <button class="jpc-expand-btn" aria-label="${expanded ? 'ซ่อน' : 'ดูรายละเอียด'}" title="${expanded ? 'ซ่อน' : 'ดูรายละเอียด'}">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
     </div>
-  </div>
-  <div class="jpc-entry-detail">
-    ${summaryHtml}
-    ${cfgItems ? `<div class="jpc-config-grid">${cfgItems}</div>` : ''}
-    ${savedDate ? `<div class="jpc-saved-at">บันทึกเมื่อ ${savedDate}</div>` : ''}
-  </div>
-</div>`;
+  </td>
+</tr>`;
   }
 
   function _toggleExpand(id){
     _expandedId = (_expandedId === id) ? null : id;
     _renderList();
+  }
+
+  // ─── SORT ────────────────────────────────────────────────
+  function _setSort(by){
+    if(_sortBy === by){
+      _sortDesc = !_sortDesc;
+    } else {
+      _sortBy = by;
+      // Sensible default per column on first click — show "best/most useful" first
+      _sortDesc = (by === 'cagr');     // CAGR: high → low (best first)
+      // Name: asc (ก→อ / A→Z), DD: asc by |DD| (smallest loss first = best)
+    }
+    _renderList();
+  }
+
+  function _sortFn(a, b){
+    let cmp = 0;
+    switch(_sortBy){
+      case 'name':
+        cmp = (a.listName || '').localeCompare(b.listName || '', 'th');
+        break;
+      case 'cagr':
+        cmp = (Number(a.cagr) || 0) - (Number(b.cagr) || 0);
+        break;
+      case 'dd':
+        cmp = Math.abs(Number(a.maxDD) || 0) - Math.abs(Number(b.maxDD) || 0);
+        break;
+    }
+    if(cmp === 0) cmp = (a.savedAt || 0) - (b.savedAt || 0);
+    return _sortDesc ? -cmp : cmp;
   }
 
   // ─── ACTIONS ─────────────────────────────────────────────
