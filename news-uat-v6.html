@@ -109,7 +109,7 @@ body::before{content:'';position:absolute;top:0;left:0;right:0;height:480px;back
 .story-meta{flex-shrink:0;width:84px;display:flex;flex-direction:column;justify-content:center;gap:6px;padding-left:11px;border-left:1px dashed rgba(212,175,55,0.28);font-family:'Sarabun','Anuphan',sans-serif;position:relative;z-index:1}
 .story-meta-time{font-size:10.5px;color:rgba(244,228,186,0.62);line-height:1.45;font-weight:400;text-align:center}
 .impact-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;padding-top:7px;border-top:1px dashed rgba(212,175,55,0.18)}
-.impact-icon{width:42px;height:42px;display:block;object-fit:contain}
+.impact-icon{width:34px;height:34px;display:block}
 .impact-wrap.bullish{color:#6FD774}
 .impact-wrap.bearish{color:#FF8484}
 .impact-wrap.neutral{color:#F4E4BA}
@@ -365,13 +365,32 @@ function openDetail(file, origIdx) {
   window.location.href = url;
 }
 
-// SVG/PNG icons for impact (bull / bear / moon)
+// SVG icons for impact (bull / bear / moon)
 function impactIcon(impactClass) {
   if (impactClass === 'bullish') {
-    return '<img class="impact-icon" src="icon-bull-green.png?v=1777571800" alt="Bullish" loading="lazy">';
+    // Green bull — sharp outward-curving horns + face
+    return '<svg class="impact-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'
+      + '<path d="M10 13 Q 5 10, 1 4 Q 3 7, 9.5 11.5 Z" fill="currentColor" fill-opacity="0.42"/>'
+      + '<path d="M22 13 Q 27 10, 31 4 Q 29 7, 22.5 11.5 Z" fill="currentColor" fill-opacity="0.42"/>'
+      + '<ellipse cx="16" cy="20" rx="7.5" ry="7.8"/>'
+      + '<ellipse cx="16" cy="23.5" rx="3.6" ry="2.3" fill="currentColor" fill-opacity="0.22"/>'
+      + '<circle cx="14.6" cy="23" r="0.55" fill="currentColor"/>'
+      + '<circle cx="17.4" cy="23" r="0.55" fill="currentColor"/>'
+      + '<circle cx="13" cy="19" r="0.9" fill="currentColor"/>'
+      + '<circle cx="19" cy="19" r="0.9" fill="currentColor"/>'
+      + '</svg>';
   }
   if (impactClass === 'bearish') {
-    return '<img class="impact-icon" src="icon-bear-red.png?v=1777571800" alt="Bearish" loading="lazy">';
+    // Red bear — round ears + face
+    return '<svg class="impact-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">'
+      + '<circle cx="9" cy="10" r="3.8" fill="currentColor" fill-opacity="0.18"/>'
+      + '<circle cx="23" cy="10" r="3.8" fill="currentColor" fill-opacity="0.18"/>'
+      + '<circle cx="16" cy="19" r="9"/>'
+      + '<ellipse cx="16" cy="22.5" rx="3.2" ry="2.2" fill="currentColor" fill-opacity="0.22"/>'
+      + '<circle cx="16" cy="20.5" r="0.7" fill="currentColor"/>'
+      + '<circle cx="13" cy="18" r="0.9" fill="currentColor"/>'
+      + '<circle cx="19" cy="18" r="0.9" fill="currentColor"/>'
+      + '</svg>';
   }
   // Mixed → gold full moon with subtle craters
   return '<svg class="impact-icon" viewBox="0 0 32 32">'
