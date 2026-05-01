@@ -301,32 +301,6 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 /* Empty/no-results states */
 .news-empty{text-align:center;padding:40px 20px;color:var(--text-dark-muted,#7A6F62);font-size:13px;font-family:'Anuphan',sans-serif}
 
-/* ===== MARKET MOVERS — horizontal scroll, cream cards on bg ===== */
-.movers{display:flex;gap:10px;overflow-x:auto;padding:2px 0 6px;margin:0 0 18px;scrollbar-width:none;min-height:108px;-webkit-overflow-scrolling:touch}
-.movers::-webkit-scrollbar{display:none}
-.mover{flex-shrink:0;width:130px;background:var(--cream-card,#FFFEF8);border:1px solid rgba(212,175,55,0.22);border-radius:12px;padding:10px 12px;box-shadow:0 1px 4px rgba(114,47,55,0.04);cursor:pointer;transition:all .2s}
-.mover:hover{box-shadow:0 4px 12px rgba(114,47,55,0.1);transform:translateY(-1px);border-color:rgba(212,175,55,0.4)}
-.mover-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
-.mover-tk{font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:var(--text-dark,#3D3228);letter-spacing:0.6px}
-.mover-arrow{width:20px;height:20px;border-radius:50%;background:rgba(46,125,50,0.13);display:flex;align-items:center;justify-content:center;color:#2E7D32}
-.mover-arrow svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
-.mover-arrow.dn{background:rgba(198,40,40,0.13);color:#C62828}
-.mover-status{font-family:'Anuphan',sans-serif;font-size:10.5px;color:var(--text-dark-muted,#7A6F62);margin-bottom:3px}
-.mover-pct{font-family:'DM Serif Display',serif;font-size:18px;color:#2E7D32;font-weight:400;margin-bottom:6px;line-height:1;letter-spacing:0.3px}
-.mover-pct.dn{color:#C62828}
-.mover-spark{width:100%;height:24px;display:block}
-.mover.skel .mover-pct,.mover.skel .mover-status{opacity:0.3}
-
-/* ===== INSIGHT — cream card with gold sheen ===== */
-.insight-card{background:linear-gradient(135deg,var(--cream-card,#FFFEF8) 0%,var(--cream-warm,#F5EFE0) 100%);border:1px solid rgba(212,175,55,0.32);border-radius:14px;padding:14px 16px;margin:0 0 18px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 2px 8px rgba(114,47,55,0.05);position:relative;overflow:hidden}
-.insight-card::before{content:'';position:absolute;top:-25px;right:-25px;width:90px;height:90px;background:radial-gradient(circle,rgba(212,175,55,0.2) 0%,transparent 70%);border-radius:50%;pointer-events:none}
-.insight-icon{flex-shrink:0;width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#722F37,#8B3A45);display:flex;align-items:center;justify-content:center;color:#F4E4BA;position:relative;z-index:1;box-shadow:0 3px 10px rgba(114,47,55,0.25)}
-.insight-icon svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
-.insight-body{flex:1;position:relative;z-index:1;min-width:0}
-.insight-label{font-family:'Cinzel',serif;font-size:9.5px;font-weight:600;color:#8B6914;letter-spacing:0.32em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:6px}
-.insight-label-dot{width:5px;height:5px;background:#D4AF37;border-radius:50%;box-shadow:0 0 4px rgba(212,175,55,0.6)}
-.insight-text{font-family:'Anuphan',sans-serif;font-size:12px;color:var(--text-dark,#3D3228);line-height:1.6}
-
 @media (max-width:380px){
   .story-meta{width:74px;padding-left:9px}
   .news-dash-title{font-size:13px}
@@ -736,18 +710,6 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
       </div>
       <div class="screen-content">
         <div class="news-sect-hd">
-          <div class="news-sect-label">Market Movers · จากข่าว</div>
-          <button class="news-refresh-btn" onclick="loadMovers()" title="รีเฟรช">
-            <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-          </button>
-        </div>
-        <div class="movers" id="movers">
-          <div class="news-empty">กำลังโหลดราคา...</div>
-        </div>
-
-        <div id="insight"></div>
-
-        <div class="news-sect-hd">
           <div class="news-sect-label">Latest Dispatches</div>
           <button class="news-refresh-btn" onclick="loadNewsFeed()" title="รีเฟรช">
             <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
@@ -834,7 +796,6 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 </div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script>
 // Supabase client init
 var supabaseClient=(function(){
@@ -1465,171 +1426,6 @@ function applyDateRange(){
   closeDateModal();
   if(newsFeedCache)renderNewsFeed();
 }
-
-/* ===== INSIGHT (renders from latest batch summary + sentiment tally) ===== */
-function renderInsight(latestBatch){
-  const root=document.getElementById('insight');
-  if(!root)return;
-  if(!latestBatch){root.innerHTML='';return}
-  let pos=0,neg=0,neu=0;
-  for(const h of (latestBatch.headlines||[])){
-    for(const t of (h.tickers||[])){
-      if(t.sentiment==='positive')pos++;
-      else if(t.sentiment==='negative')neg++;
-      else neu++;
-    }
-  }
-  const total=pos+neg+neu;
-  const tilt=pos>neg?'เชิงบวก':neg>pos?'เชิงลบ':'ผสม';
-  const summary=latestBatch.summary||'';
-  const text=summary
-    ? escapeText(summary)+' · โทนตลาดโดยรวม'+tilt+' ('+pos+' positive · '+neg+' negative · '+neu+' neutral จาก '+total+' tickers)'
-    : 'Batch ล่าสุดมี '+(latestBatch.headlines||[]).length+' headlines · โทนรวม'+tilt+' ('+pos+' positive · '+neg+' negative · '+neu+' neutral)';
-  root.innerHTML='<div class="insight-card">'
-    +'<div class="insight-icon">'
-      +'<svg viewBox="0 0 24 24"><path d="M9.5 2A2.5 2.5 0 0 0 7 4.5v.05A3 3 0 0 0 5 7.5v.5a3 3 0 0 0 1 2.236V13a3 3 0 0 0 1.5 2.6V18a2.5 2.5 0 0 0 2.5 2.5H10A1 1 0 0 0 11 22V12.5A2.5 2.5 0 0 1 13.5 10H14"/><path d="M14.5 2A2.5 2.5 0 0 1 17 4.5v.05A3 3 0 0 1 19 7.5v.5a3 3 0 0 1-1 2.236V13a3 3 0 0 1-1.5 2.6V18a2.5 2.5 0 0 1-2.5 2.5H14A1 1 0 0 1 13 22V12.5A2.5 2.5 0 0 0 10.5 10H10"/></svg>'
-    +'</div>'
-    +'<div class="insight-body">'
-      +'<div class="insight-label"><span class="insight-label-dot"></span> Insight</div>'
-      +'<div class="insight-text">'+text+'</div>'
-    +'</div>'
-  +'</div>';
-}
-
-/* ===== MARKET MOVERS (SP500 daily CSV via Papa Parse) ===== */
-const SP500_CSV_URL='https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_sp500_daily.csv';
-function renderMoversSkeleton(n){
-  const root=document.getElementById('movers');
-  if(!root)return;
-  root.innerHTML='';
-  for(let i=0;i<n;i++){
-    const card=document.createElement('div');
-    card.className='mover skel';
-    card.innerHTML='<div class="mover-hd"><span class="mover-tk">···</span><span class="mover-arrow"></span></div>'
-      +'<div class="mover-status">กำลังโหลด</div>'
-      +'<div class="mover-pct">···</div>'
-      +'<svg class="mover-spark" viewBox="0 0 100 24"></svg>';
-    root.appendChild(card);
-  }
-}
-function renderMovers(items){
-  const root=document.getElementById('movers');
-  if(!root)return;
-  root.innerHTML='';
-  if(!items.length){
-    root.innerHTML='<div class="news-empty" style="margin:0">ไม่พบราคาของ ticker ในข่าวล่าสุดที่ตรงกับ S&amp;P 500 dataset</div>';
-    return;
-  }
-  items.forEach(it=>{
-    const card=document.createElement('div');
-    card.className='mover';
-    const dn=it.pctChange<0;
-    const arrowSvg=dn
-      ?'<svg viewBox="0 0 24 24"><polyline points="6 14 12 20 18 14"/><line x1="12" y1="20" x2="12" y2="4"/></svg>'
-      :'<svg viewBox="0 0 24 24"><polyline points="18 10 12 4 6 10"/><line x1="12" y1="4" x2="12" y2="20"/></svg>';
-    const pctStr=(dn?'':'+')+it.pctChange.toFixed(2)+'%';
-    card.innerHTML='<div class="mover-hd">'
-        +'<span class="mover-tk">'+escapeText(it.symbol)+'</span>'
-        +'<span class="mover-arrow '+(dn?'dn':'')+'">'+arrowSvg+'</span>'
-      +'</div>'
-      +'<div class="mover-status">'+escapeText(it.statusLabel)+'</div>'
-      +'<div class="mover-pct '+(dn?'dn':'')+'">'+pctStr+'</div>'
-      +'<svg class="mover-spark" viewBox="0 0 100 24" preserveAspectRatio="none">'
-        +'<polyline points="'+it.sparkPoints+'" fill="none" stroke="'+(dn?'#C62828':'#2E7D32')+'" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>'
-      +'</svg>';
-    root.appendChild(card);
-  });
-}
-function statusLabel(sentiment,pct){
-  if(sentiment==='positive')return pct>=5?'Breakout':'Bullish';
-  if(sentiment==='negative')return pct<=-5?'Breakdown':'Bearish';
-  return Math.abs(pct)>=3?'Momentum':'Watch';
-}
-function makeSparkPoints(closes){
-  if(!closes||closes.length<2)return '0,12 100,12';
-  const n=closes.length;
-  const min=Math.min.apply(null,closes);
-  const max=Math.max.apply(null,closes);
-  const range=max-min||1;
-  return closes.map((c,i)=>{
-    const x=(i/(n-1))*100;
-    const y=22-((c-min)/range)*20;
-    return x.toFixed(1)+','+y.toFixed(1);
-  }).join(' ');
-}
-function parseSP500ForTickers(csvText,wantedSet,maxDays){
-  maxDays=maxDays||12;
-  if(!window.Papa){console.warn('Papa Parse not loaded');return{}}
-  const parsed=window.Papa.parse(csvText.trim(),{header:true,skipEmptyLines:true});
-  const rows=parsed.data;
-  const tmp={};
-  rows.forEach(row=>{
-    const tk=(row.Ticker||'').trim();
-    if(!wantedSet.has(tk))return;
-    const d=(row.Date||'').trim();
-    const c=parseFloat(row.Close);
-    if(!d||!isFinite(c)||c<=0)return;
-    if(!tmp[tk])tmp[tk]=[];
-    tmp[tk].push({d,c});
-  });
-  const out={};
-  for(const tk in tmp){
-    tmp[tk].sort((a,b)=>a.d<b.d?-1:1);
-    out[tk]=tmp[tk].slice(-maxDays);
-  }
-  return out;
-}
-async function loadMovers(){
-  if(!newsFeedCache||!newsFeedCache.batches||!newsFeedCache.batches.length)return;
-  // Collect tickers from latest 2 batches in order seen
-  const tkSeen=new Set();
-  const tkOrdered=[];
-  for(const b of newsFeedCache.batches.slice(0,2)){
-    for(const h of (b.headlines||[])){
-      for(const t of (h.tickers||[])){
-        if(!tkSeen.has(t.symbol)){tkSeen.add(t.symbol);tkOrdered.push(t)}
-      }
-    }
-  }
-  renderMoversSkeleton(Math.min(5,tkOrdered.length||3));
-  let prices;
-  try{
-    const r=await fetch(SP500_CSV_URL+'?t='+Date.now(),{cache:'no-store'});
-    if(!r.ok)throw new Error('CSV '+r.status);
-    prices=parseSP500ForTickers(await r.text(),tkSeen,12);
-  }catch(e){
-    document.getElementById('movers').innerHTML='<div class="news-empty" style="margin:0">โหลดราคา SP500 ไม่สำเร็จ</div>';
-    return;
-  }
-  const moverItems=[];
-  for(const t of tkOrdered){
-    const p=prices[t.symbol];
-    if(!p||p.length<2)continue;
-    const closes=p.map(x=>x.c);
-    const first=closes[0],last=closes[closes.length-1];
-    const pct=((last-first)/first)*100;
-    moverItems.push({
-      symbol:t.symbol,
-      sentiment:t.sentiment,
-      pctChange:pct,
-      statusLabel:statusLabel(t.sentiment,pct),
-      sparkPoints:makeSparkPoints(closes),
-    });
-    if(moverItems.length>=5)break;
-  }
-  renderMovers(moverItems);
-}
-
-/* ===== Hook Movers + Insight into news load ===== */
-const _origLoadNewsFeed=loadNewsFeed;
-loadNewsFeed=async function(){
-  await _origLoadNewsFeed.apply(this,arguments);
-  if(newsFeedCache && newsFeedCache.batches && newsFeedCache.batches.length){
-    renderInsight(newsFeedCache.batches[0]);
-    loadMovers();
-  }
-};
-
 function openEditModal(field){const m=document.getElementById('editModal'),t=document.getElementById('modalTitle'),c=document.getElementById('modalContent');if(field==='name'){t.textContent='แก้ไขชื่อที่แสดง';c.innerHTML='<input class="modal-input" id="editValue" value="'+userSettings.name+'" placeholder="ชื่อของคุณ"><button class="modal-btn" onclick="userSettings.name=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}else if(field==='risk'){t.textContent='ระดับความเสี่ยง';c.innerHTML='<div style="display:flex;flex-direction:column;gap:8px"><button class="modal-btn" style="background:'+(userSettings.risk==='low'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='low'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'low\';saveSettings();closeModal();">ต่ำ (Low)</button><button class="modal-btn" style="background:'+(userSettings.risk==='medium'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='medium'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'medium\';saveSettings();closeModal();">ปานกลาง (Medium)</button><button class="modal-btn" style="background:'+(userSettings.risk==='high'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='high'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'high\';saveSettings();closeModal();">สูง (High)</button></div>'}else if(field==='capital'){t.textContent='ทุนเริ่มต้น (บาท)';c.innerHTML='<input class="modal-input" id="editValue" type="number" value="'+userSettings.capital+'" placeholder="100000"><button class="modal-btn" onclick="userSettings.capital=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}else if(field==='broker'){t.textContent='โบรกเกอร์ของคุณ';c.innerHTML='<input class="modal-input" id="editValue" value="'+userSettings.broker+'" placeholder="เช่น XM, Exness, IC Markets"><button class="modal-btn" onclick="userSettings.broker=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}m.classList.add('show')}
 function closeModal(e){if(e&&e.target!==e.currentTarget)return;document.getElementById('editModal').classList.remove('show')}
 function openNotifications(){jptToast('ยังไม่มีการแจ้งเตือนใหม่')}
