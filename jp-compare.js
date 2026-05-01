@@ -132,6 +132,18 @@
 .jpc-add-btn:active:not(:disabled){transform:translateY(0)}
 .jpc-add-btn:disabled{opacity:0.45;cursor:not-allowed}
 
+/* ─── COLLAPSIBLE ADD PANEL (trigger button + slide-down form) ─── */
+.jpc-add-trigger{width:100%;padding:13px 16px;background:linear-gradient(135deg,#722F37 0%,#8B2252 55%,#D4AF37 100%);color:#FFF5E1;border:none;border-radius:12px;font-family:'Cinzel','Anuphan',sans-serif;font-size:0.86rem;font-weight:700;letter-spacing:1.3px;cursor:pointer;transition:transform 0.15s,box-shadow 0.2s;display:flex;align-items:center;justify-content:center;gap:10px;text-transform:uppercase;position:relative;box-shadow:0 4px 12px rgba(139,34,82,0.18)}
+.jpc-add-trigger:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(139,34,82,0.32)}
+.jpc-add-trigger:active{transform:translateY(0)}
+.jpc-add-trigger.expanded{box-shadow:0 4px 12px rgba(139,34,82,0.25),inset 0 2px 6px rgba(0,0,0,0.12)}
+.jpc-trigger-icon{width:22px;height:22px;background:rgba(255,245,225,0.18);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);flex-shrink:0;color:#FFF5E1}
+.jpc-add-trigger.expanded .jpc-trigger-icon{transform:rotate(135deg);background:rgba(255,245,225,0.28)}
+
+.jpc-add-panel{max-height:0;overflow:hidden;opacity:0;margin-top:0;transition:max-height 0.4s cubic-bezier(0.25,0.46,0.45,0.94),opacity 0.25s ease 0.05s,margin-top 0.3s ease}
+.jpc-add-panel.show{max-height:640px;opacity:1;margin-top:14px}
+.jpc-add-panel-inner{padding:0}
+
 .jpc-divider{height:1px;background:linear-gradient(90deg,transparent 0%,rgba(212,175,55,0.4) 50%,transparent 100%);margin:18px 0 14px}
 
 .jpc-controls{display:flex;gap:8px;margin-bottom:12px}
@@ -282,15 +294,25 @@
         <button class="jpc-modal-close" aria-label="ปิด">✕</button>
       </div>
       <div class="jpc-modal-body">
-        <div class="jpc-section-label">ผลปัจจุบัน</div>
-        <div class="jpc-current-card" id="jpc-current"></div>
-        <div class="jpc-name-input-wrap">
-          <div class="jpc-name-input-label">ตั้งชื่อสำหรับเปรียบเทียบ <span class="jpc-hint">(สูงสุด 40 ตัวอักษร)</span></div>
-          <input type="text" class="jpc-name-input" id="jpc-name" placeholder="เช่น 6M Top 15 Default" maxlength="40">
-          <button class="jpc-add-btn" id="jpc-add">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            บันทึกเข้ารายการเปรียบเทียบ
-          </button>
+        <button class="jpc-add-trigger" id="jpc-add-trigger" aria-expanded="false">
+          <span class="jpc-trigger-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+          เพิ่มรายการเปรียบเทียบ
+        </button>
+        <div class="jpc-add-panel" id="jpc-add-panel">
+          <div class="jpc-add-panel-inner">
+            <div class="jpc-section-label">ผลปัจจุบัน</div>
+            <div class="jpc-current-card" id="jpc-current"></div>
+            <div class="jpc-name-input-wrap">
+              <div class="jpc-name-input-label">ตั้งชื่อสำหรับเปรียบเทียบ <span class="jpc-hint">(สูงสุด 40 ตัวอักษร)</span></div>
+              <input type="text" class="jpc-name-input" id="jpc-name" placeholder="เช่น 6M Top 15 Default" maxlength="40">
+              <button class="jpc-add-btn" id="jpc-add">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                บันทึกเข้ารายการเปรียบเทียบ
+              </button>
+            </div>
+          </div>
         </div>
         <div class="jpc-divider"></div>
         <div class="jpc-section-label">รายการที่บันทึกไว้ <span id="jpc-count" class="jpc-count-tag"></span></div>
@@ -308,6 +330,7 @@
     document.body.appendChild(_modalEl);
 
     _modalEl.querySelector('.jpc-modal-close').addEventListener('click', _closeModal);
+    _modalEl.querySelector('#jpc-add-trigger').addEventListener('click', () => _toggleAddPanel());
     _modalEl.querySelector('#jpc-add').addEventListener('click', _addEntry);
     _modalEl.querySelector('#jpc-name').addEventListener('keydown', e => {
       if(e.key === 'Enter') _addEntry();
@@ -323,13 +346,37 @@
 
   // ─── MODAL OPEN/CLOSE ────────────────────────────────────
   function _openModal(){
-    _renderCurrent();
     _renderList();
     _modalEl.querySelector('#jpc-filter').value = _filterKey;
     _modalEl.querySelector('#jpc-name').value = '';
+    _toggleAddPanel(false);  // ensure add-form starts collapsed
     _backdrop.classList.add('show');
     _modalEl.classList.add('show');
     document.body.style.overflow = 'hidden';
+  }
+
+  function _toggleAddPanel(forceState){
+    const trigger = _modalEl.querySelector('#jpc-add-trigger');
+    const panel = _modalEl.querySelector('#jpc-add-panel');
+    if(!trigger || !panel) return;
+    const isOpen = panel.classList.contains('show');
+    const targetOpen = (typeof forceState === 'boolean') ? forceState : !isOpen;
+
+    if(targetOpen){
+      _renderCurrent();  // refresh snapshot with live values from page
+      panel.classList.add('show');
+      trigger.classList.add('expanded');
+      trigger.setAttribute('aria-expanded', 'true');
+      // Focus name input once the panel is visible enough to receive caret
+      setTimeout(() => {
+        const inp = _modalEl.querySelector('#jpc-name');
+        if(inp) inp.focus();
+      }, 220);
+    } else {
+      panel.classList.remove('show');
+      trigger.classList.remove('expanded');
+      trigger.setAttribute('aria-expanded', 'false');
+    }
   }
 
   function _closeModal(){
@@ -562,6 +609,7 @@
       nameInput.value = '';
       _expandedId = entry.id;
       _renderList();
+      _toggleAddPanel(false);  // collapse the add form so only the trigger button remains
     }
   }
 
