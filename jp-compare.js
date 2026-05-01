@@ -202,6 +202,9 @@
 .jpc-detail-row.show{display:table-row}
 .jpc-detail-row > td{padding:0;background:linear-gradient(180deg,rgba(245,237,216,0.5) 0%,rgba(255,254,248,0.7) 100%);border-bottom:1px solid rgba(212,175,55,0.25);box-shadow:inset 3px 0 0 0 #D4AF37}
 .jpc-detail-inner{padding:14px 18px 16px}
+.jpc-detail-name{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap;font-family:'Anuphan',sans-serif;font-size:1rem;font-weight:600;color:#5A3D20;line-height:1.4;margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed rgba(212,175,55,0.28)}
+.jpc-detail-name .jpc-entry-badge{margin-top:3px}
+.jpc-detail-name-text{flex:1;min-width:0;word-break:break-word}
 .jpc-summary-line{font-size:0.8rem;color:#7A6F62;padding:0 0 10px;line-height:1.55;border-bottom:1px dashed rgba(212,175,55,0.28);margin-bottom:12px}
 .jpc-config-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px}
 .jpc-config-item{display:flex;flex-direction:column;gap:2px;min-width:0}
@@ -524,6 +527,10 @@
 <tr class="jpc-detail-row${expanded ? ' show' : ''}" data-for="${_esc(e.id)}">
   <td colspan="3">
     <div class="jpc-detail-inner">
+      <div class="jpc-detail-name">
+        <span class="jpc-entry-badge" data-strategy="${_esc(e.strategyKey)}">${_esc(badgeShort)}</span>
+        <span class="jpc-detail-name-text">${_esc(e.listName)}</span>
+      </div>
       ${summaryHtml}
       ${cfgItems ? `<div class="jpc-config-grid">${cfgItems}</div>` : ''}
       ${savedDate ? `<div class="jpc-saved-at">บันทึกเมื่อ ${savedDate}</div>` : ''}
