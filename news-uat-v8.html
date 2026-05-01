@@ -129,9 +129,8 @@ body::before{content:'';position:absolute;top:0;left:0;right:0;height:480px;back
 .mover-arrow svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
 .mover-arrow.dn{background:rgba(198,40,40,0.13);color:var(--red)}
 .mover-status{font-family:'Anuphan',sans-serif;font-size:10.5px;color:var(--text-dark-muted);margin-bottom:3px}
-.mover-pct{font-family:'DM Serif Display',serif;font-size:18px;color:var(--green);font-weight:400;margin-bottom:2px;line-height:1;letter-spacing:0.3px}
+.mover-pct{font-family:'DM Serif Display',serif;font-size:18px;color:var(--green);font-weight:400;margin-bottom:6px;line-height:1;letter-spacing:0.3px}
 .mover-pct.dn{color:var(--red)}
-.mover-pct-sub{font-family:'Anuphan',sans-serif;font-size:9.5px;color:var(--text-dark-muted);letter-spacing:0.5px;margin-bottom:6px;text-transform:uppercase;opacity:0.85}
 .mover-spark{width:100%;height:24px;display:block}
 .mover.skel .mover-pct,.mover.skel .mover-status{opacity:0.3}
 
@@ -539,7 +538,6 @@ function renderMovers(items) {
       </div>
       <div class="mover-status">${escapeHtml(it.statusLabel)}</div>
       <div class="mover-pct ${dn ? 'dn' : ''}">${pctStr}</div>
-      <div class="mover-pct-sub">1 week chg</div>
       <svg class="mover-spark" viewBox="0 0 100 24" preserveAspectRatio="none">
         <polyline points="${it.sparkPoints}" fill="none" stroke="${dn ? '#C62828' : '#2E7D32'}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
       </svg>`;
@@ -729,7 +727,7 @@ async function init() {
   try {
     const r = await fetch(SP500_CSV_URL + '?t=' + Date.now(), { cache: 'no-store' });
     if (!r.ok) throw new Error('CSV ' + r.status);
-    prices = parseSP500ForTickers(await r.text(), tkSeen, 6);
+    prices = parseSP500ForTickers(await r.text(), tkSeen, 12);
   } catch (e) {
     document.getElementById('movers').innerHTML = '<div class="loading">โหลดราคา SP500 ไม่สำเร็จ</div>';
     return;
