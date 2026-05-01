@@ -4607,5 +4607,44 @@ function updateMarket() {
   }
 }
 </script>
+<!-- ─── COMPARE FEATURE (jp-compare.js) ─────────────────── -->
+<script src="https://jptrustlearning.github.io/pages/jp-compare.js?v=1777659638"></script>
+<script>
+(function(){
+  if(!window.JPCompare) return;
+  function parsePct(el){
+    if(!el) return 0;
+    var s = (el.innerText || el.textContent || '').replace('%','').replace(/,/g,'').trim();
+    var n = parseFloat(s);
+    return isNaN(n) ? 0 : n;
+  }
+  function txt(id){
+    var el = document.getElementById(id);
+    return el ? (el.innerText || el.textContent || '').trim() : '';
+  }
+    JPCompare.init({
+    strategyKey: 'sp500-combined-strategy',
+    strategyLabel: 'Weekly Momentum',
+    getCurrentResult: function(){
+      var ddEl = document.getElementById('kpi-maxdd') || document.getElementById('rscMaxDD');
+      return {
+        cagr: parsePct(document.getElementById('kpi-cagr')),
+        maxDD: parsePct(ddEl),
+        summary: txt('rscPeriod'),
+        config: {
+          'ทุนต่อรอบ': '$' + CONFIG.capital,
+          'โหมดจัดสรร': CONFIG.allocMode === 'split' ? 'แยกสายอิสระ (Split)' : 'ปรับตาม Regime (Dynamic)',
+          'Stop Loss': CONFIG.stoploss + '%',
+          'Mom · Top / Hold': CONFIG.momTopN + ' ตัว / ' + CONFIG.momHoldWeeks + ' สัปดาห์',
+          'DH · Top / Hold': CONFIG.dhTopN + ' ตัว / ' + CONFIG.dhHoldWeeks + ' สัปดาห์',
+          'ปีเริ่มต้น': CONFIG.startYear,
+          'Regime EMA': CONFIG.regimeEma === 0 ? 'ปิด' : (CONFIG.regimeEma + ' วัน')
+        }
+      };
+    }
+  });
+})();
+</script>
+
 </body>
 </html>

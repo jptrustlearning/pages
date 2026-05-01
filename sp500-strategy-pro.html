@@ -3916,5 +3916,46 @@ window.switchStatsTab = function(tab) {
 </script>
 
 
+<!-- ─── COMPARE FEATURE (jp-compare.js) ─────────────────── -->
+<script src="https://jptrustlearning.github.io/pages/jp-compare.js?v=1777659638"></script>
+<script>
+(function(){
+  if(!window.JPCompare) return;
+  function parsePct(el){
+    if(!el) return 0;
+    var s = (el.innerText || el.textContent || '').replace('%','').replace(/,/g,'').trim();
+    var n = parseFloat(s);
+    return isNaN(n) ? 0 : n;
+  }
+  function txt(id){
+    var el = document.getElementById(id);
+    return el ? (el.innerText || el.textContent || '').trim() : '';
+  }
+    function fmtMonths(arr){
+    var names = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    return (arr || []).slice().sort(function(a,b){return a-b;}).map(function(m){return names[m];}).join(' + ');
+  }
+  JPCompare.init({
+    strategyKey: 'sp500-strategy-pro',
+    strategyLabel: '6M Momentum',
+    getCurrentResult: function(){
+      return {
+        cagr: parsePct(document.getElementById('kpi-cagr')),
+        maxDD: parsePct(document.getElementById('rscMaxDD')),
+        summary: txt('rscPeriod'),
+        config: {
+          'จำนวนหุ้นต่อรอบ': CONFIG.topN + ' ตัว',
+          'ทุนเริ่มต้น': '$' + (CONFIG.initialCapital || 0).toLocaleString(),
+          'น้ำหนัก Return / Volume': Math.round((CONFIG.weightRet||0)*100) + '% / ' + Math.round((CONFIG.weightVol||0)*100) + '%',
+          'Lookback': CONFIG.lookbackWeeks + ' สัปดาห์',
+          'Re-balance': fmtMonths(CONFIG.rebalanceMonths || []),
+          'ปีเริ่มต้น': CONFIG.startYear
+        }
+      };
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
