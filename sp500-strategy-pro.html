@@ -3597,7 +3597,7 @@ function _fmtVol(v) {
 }
 
 function _buildOhlvTable(date, tickers) {
-  // Build HTML table of OHLV for tickers on date
+  // Build HTML table of OHLCV for tickers on date
   const dayData = state.marketData[date];
   if (!dayData) {
     return '<div style="color:#9c2b2b;padding:8px;">ไม่มีข้อมูลของวันที่นี้</div>';
@@ -3606,13 +3606,13 @@ function _buildOhlvTable(date, tickers) {
   tickers.forEach(t => {
     const d = dayData[t];
     if (d) {
-      rows += `<tr><td class="ticker">${t}</td><td>${_fmtNum(d.o)}</td><td>${_fmtNum(d.h)}</td><td>${_fmtNum(d.l)}</td><td class="vol">${_fmtVol(d.v)}</td></tr>`;
+      rows += `<tr><td class="ticker">${t}</td><td>${_fmtNum(d.o)}</td><td>${_fmtNum(d.h)}</td><td>${_fmtNum(d.l)}</td><td class="close-col">${_fmtNum(d.c)}</td><td class="vol">${_fmtVol(d.v)}</td></tr>`;
     } else {
-      rows += `<tr><td class="ticker">${t}</td><td colspan="4" style="color:#9c2b2b;text-align:center;">— ไม่มีข้อมูล —</td></tr>`;
+      rows += `<tr><td class="ticker">${t}</td><td colspan="5" style="color:#9c2b2b;text-align:center;">— ไม่มีข้อมูล —</td></tr>`;
     }
   });
   return `<table>
-    <thead><tr><th class="ticker">Ticker</th><th>Open</th><th>High</th><th>Low</th><th class="vol">Volume</th></tr></thead>
+    <thead><tr><th class="ticker">Ticker</th><th>Open</th><th>High</th><th>Low</th><th class="close-col">Close</th><th class="vol">Volume</th></tr></thead>
     <tbody>${rows}</tbody>
   </table>`;
 }
@@ -3652,29 +3652,34 @@ window.downloadDetailsPdf = function(event, entryDate, isPending) {
     <div class="date-section">
       <div class="date-header">${s.label} — <strong>${s.date}</strong></div>
       <div class="date-note">${s.note}</div>
-      ${_buildOhlvTable(s.date, tickers)}
+      <div class="table-wrap">${_buildOhlvTable(s.date, tickers)}</div>
     </div>
   `).join('');
 
   const html = `<!DOCTYPE html>
 <html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JPT-6M-Details-${dateLabel}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Cinzel:wght@600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <style>
-  body { font-family: 'Sarabun', sans-serif; padding: 24px; color: #2a1f1a; background: #faf6ed; max-width: 800px; margin: 0 auto; }
-  h1 { font-family: 'DM Serif Display', serif; color: #5a1f26; margin: 0 0 4px; font-size: 1.8rem; }
+  body { font-family: 'Sarabun', sans-serif; padding: 24px; color: #2a1f1a; background: #faf6ed; max-width: 800px; margin: 0 auto; box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; }
+  h1 { font-family: 'DM Serif Display', serif; color: #5a1f26; margin: 0 0 4px; font-size: 1.8rem; line-height: 1.2; }
   .subtitle { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 2px; color: #8b6914; text-transform: uppercase; margin-bottom: 16px; }
-  .meta { background: rgba(212,175,55,0.08); border-left: 3px solid #d4af37; padding: 10px 14px; border-radius: 4px; margin-bottom: 24px; font-size: 0.88rem; color: #5a3d20; line-height: 1.6; }
+  .meta { background: rgba(212,175,55,0.08); border-left: 3px solid #d4af37; padding: 10px 14px; border-radius: 4px; margin-bottom: 24px; font-size: 0.88rem; color: #5a3d20; line-height: 1.6; word-break: break-word; }
   .date-section { margin-bottom: 28px; page-break-inside: avoid; }
   .date-header { background: linear-gradient(135deg, #5a1f26, #722f37); color: #f4e4ba; padding: 8px 14px; border-radius: 4px 4px 0 0; font-weight: 600; font-size: 0.95rem; }
   .date-note { font-size: 0.74rem; color: #7a6f62; padding: 4px 14px 8px; background: rgba(212,175,55,0.05); }
+  .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
   table { width: 100%; border-collapse: collapse; }
-  th, td { padding: 6px 10px; border-bottom: 1px solid rgba(212,175,55,0.3); text-align: right; font-size: 0.85rem; }
+  th, td { padding: 6px 10px; border-bottom: 1px solid rgba(212,175,55,0.3); text-align: right; font-size: 0.85rem; white-space: nowrap; }
   th { background: #faf3e6; color: #8b6914; font-weight: 600; font-family: 'Cinzel', serif; font-size: 0.74rem; letter-spacing: 0.5px; text-transform: uppercase; }
   th.ticker, td.ticker { text-align: left; }
   td.ticker { font-weight: 600; color: #5a1f26; font-family: 'Cinzel', serif; }
   td.vol, th.vol { font-variant-numeric: tabular-nums; }
+  td.close-col { font-weight: 700; color: #5a1f26; }
+  th.close-col { color: #5a1f26; }
   .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 16px 0; border-bottom: 1px dashed rgba(212,175,55,0.4); margin-bottom: 20px; }
   .actions button { padding: 10px 22px; border: none; border-radius: 6px; font-family: 'Sarabun', sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 6px; }
   .actions .btn-print { background: linear-gradient(135deg, #5a1f26, #722f37); color: #f4e4ba; }
@@ -3698,10 +3703,34 @@ window.downloadDetailsPdf = function(event, entryDate, isPending) {
     100% { background-position: 0% 50%; }
   }
   .footer { text-align: center; font-size: 0.7rem; color: #8b6914; font-family: 'Cinzel', serif; letter-spacing: 1px; margin-top: 32px; padding-top: 16px; border-top: 1px solid rgba(212,175,55,0.3); }
+
+  /* Mobile responsive — fit fully within phone screen */
+  @media (max-width: 600px) {
+    body { padding: 12px; }
+    h1 { font-size: 1.35rem; }
+    .subtitle { font-size: 0.62rem; letter-spacing: 1.5px; }
+    .meta { font-size: 0.78rem; padding: 8px 11px; line-height: 1.55; margin-bottom: 18px; }
+    .date-section { margin-bottom: 18px; }
+    .date-header { font-size: 0.85rem; padding: 7px 11px; }
+    .date-note { font-size: 0.68rem; padding: 4px 11px 6px; }
+    th, td { padding: 5px 7px; font-size: 0.74rem; }
+    th { font-size: 0.66rem; }
+    .actions { padding: 10px 0; gap: 8px; margin-bottom: 14px; }
+    .actions button { padding: 8px 14px; font-size: 0.78rem; flex: 1 1 auto; justify-content: center; }
+    .footer { font-size: 0.62rem; margin-top: 22px; padding-top: 12px; }
+  }
+  @media (max-width: 380px) {
+    body { padding: 8px; }
+    h1 { font-size: 1.2rem; }
+    th, td { padding: 4px 5px; font-size: 0.68rem; }
+    th { font-size: 0.6rem; }
+  }
+
   @media print {
     body { background: white; padding: 12px; max-width: 100%; }
     .actions, .no-print { display: none !important; }
     .date-section { page-break-inside: avoid; }
+    .table-wrap { overflow-x: visible; }
   }
 </style>
 </head><body>
