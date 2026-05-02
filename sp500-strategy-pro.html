@@ -1345,18 +1345,25 @@
     font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;
   }
   .trade-summary strong { color: var(--text-dark); font-weight: 700; }
-  .trade-recheck-btn {
-    background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.4);
-    border-radius: 4px; padding: 4px 9px;
+  .trade-details-btn {
+    background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+    border: none; color: #FFFFFF;
+    border-radius: 4px; padding: 5px 11px;
     font-family: 'Cinzel','Anuphan',serif; font-size: 0.62rem; font-weight: 700;
-    color: var(--gold-deep); letter-spacing: 1px; text-transform: uppercase;
+    letter-spacing: 1px; text-transform: uppercase;
     cursor: pointer; flex-shrink: 0; line-height: 1.4;
-    transition: background 0.18s, border-color 0.18s;
+    box-shadow: 0 1px 2px rgba(185,28,28,0.3);
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s;
   }
-  .trade-recheck-btn:hover {
-    background: rgba(212,175,55,0.22); border-color: rgba(212,175,55,0.6);
+  .trade-details-btn:hover {
+    background: linear-gradient(135deg, #B91C1C 0%, #991B1B 100%);
+    box-shadow: 0 2px 5px rgba(185,28,28,0.4);
   }
-  .trade-recheck-btn svg {
+  .trade-details-btn:active { transform: translateY(1px); }
+  .trade-details-btn:disabled {
+    cursor: wait; opacity: 0.65;
+  }
+  .trade-details-btn svg {
     vertical-align: -2px; margin-right: 4px;
   }
   .trade-section {
@@ -3382,8 +3389,8 @@ function renderTradeLog() {
         'ซื้อรวม <strong>' + ps.picks.length + ' ตัว</strong> · งบ <strong>$' + Math.round(ps.capital).toLocaleString() + '</strong>' +
         ' · รอเปิดวัน' + entryDayName + ' · เข้ารอบ <strong>' + ps.nextRebalLabel + '</strong> (' + daysLabel + ')' +
         '</div></div>' +
-        '<button class="trade-recheck-btn" onclick="openRecheckPdf(null, true)" title="พิมพ์รายละเอียดเพื่อตรวจสอบ">' +
-          '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>Recheck PDF' +
+        '<button class="trade-details-btn" onclick="downloadDetailsPdf(event, null, true)" title="ดาวน์โหลดรายละเอียดเป็น PDF">' +
+          '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>Details PDF' +
         '</button>' +
         '</div>';
 
@@ -3499,8 +3506,8 @@ function renderTradeLog() {
       header += ` · <span style="color:var(--gold-deep);font-weight:600;">ล่าสุด:</span> <span class="${retCls}"><strong>$${Math.round(r.pnl).toLocaleString()}</strong> (${r.pnlPct>=0?'+':''}${r.pnlPct.toFixed(2)}%)</span>`;
     }
     header += `</div></div>
-      <button class="trade-recheck-btn" onclick="openRecheckPdf('${r.date}', false)" title="พิมพ์รายละเอียดเพื่อตรวจสอบ">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>Recheck PDF
+      <button class="trade-details-btn" onclick="downloadDetailsPdf(event, '${r.date}', false)" title="ดาวน์โหลดรายละเอียดเป็น PDF">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>Details PDF
       </button>
     </div>`;
 
@@ -3610,92 +3617,132 @@ function _buildOhlvTable(date, tickers) {
   </table>`;
 }
 
-window.openRecheckPdf = function(entryDate, isPending) {
+// Lazy-load html2pdf.js from CDN on first use
+let _html2pdfLoadPromise = null;
+function _loadHtml2Pdf() {
+  if (window.html2pdf) return Promise.resolve();
+  if (_html2pdfLoadPromise) return _html2pdfLoadPromise;
+  _html2pdfLoadPromise = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+    s.onload = resolve;
+    s.onerror = () => { _html2pdfLoadPromise = null; reject(new Error('โหลด html2pdf.js ไม่สำเร็จ')); };
+    document.head.appendChild(s);
+  });
+  return _html2pdfLoadPromise;
+}
+
+// Auto-download "Details PDF" — generates PDF and triggers browser download (no print dialog).
+window.downloadDetailsPdf = async function(event, entryDate, isPending) {
+  const btn = event && event.target ? event.target.closest('button') : null;
+  const origLabel = btn ? btn.innerHTML : null;
+
   const dates = isPending ? _getRecheckDatesForPending() : _getRecheckDatesForEntry(entryDate);
   if (!dates) {
-    alert('ไม่สามารถสร้าง recheck ได้ — ข้อมูลไม่พอ');
+    alert('ไม่สามารถสร้างไฟล์ได้ — ข้อมูลไม่พอ');
     return;
   }
-  let tickers;
-  let title;
+
+  let tickers, title, dateLabel;
   if (isPending) {
     tickers = (state.pendingSignal?.picks || []).map(p => p.ticker);
     title = 'PENDING — รอบถัดไป (' + (state.pendingSignal?.nextRebalLabel || '') + ')';
+    dateLabel = 'PENDING-' + (state.pendingSignal?.signalDate || 'unknown');
   } else {
     const entry = state.tradeLog.find(t => t.date === entryDate);
     tickers = entry ? entry.stocks : [];
     title = 'รอบ ' + entryDate;
+    dateLabel = entryDate;
   }
-  if (tickers.length === 0) {
-    alert('ไม่มีรายชื่อหุ้น');
-    return;
-  }
+  if (tickers.length === 0) { alert('ไม่มีรายชื่อหุ้น'); return; }
 
-  const sections = [];
-  sections.push({ label: '① วันเริ่มนับจัดอันดับ', date: dates.lookbackStart, note: '(2nd biz day ของ rebal month รอบก่อน — START price + วันแรกที่บวก volume)' });
-  sections.push({ label: '② วันสิ้นสุดการนับจัดอันดับ', date: dates.lookbackEnd, note: '(วันก่อน rebal — END price + วันสุดท้ายที่บวก volume)' });
-  if (dates.holdingEnd) {
-    sections.push({ label: '③ วันสิ้นสุดการถือครอง', date: dates.holdingEnd, note: isPending ? '' : '(วัน rebal รอบถัดไป หรือล่าสุดถ้ายังถืออยู่)' });
+  // Set button loading state
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.2-8.55" opacity="0.3"/><path d="M21 12a9 9 0 0 1-3 6.7"/></svg>กำลังสร้าง...';
   }
 
-  const sectionsHtml = sections.map(s => `
-    <div class="date-section">
-      <div class="date-header">${s.label} — <strong>${s.date}</strong></div>
-      <div class="date-note">${s.note}</div>
-      ${_buildOhlvTable(s.date, tickers)}
-    </div>
-  `).join('');
+  try {
+    const sections = [];
+    sections.push({ label: '① วันเริ่มนับจัดอันดับ', date: dates.lookbackStart, note: '(2nd biz day ของ rebal month รอบก่อน — START price + วันแรกที่บวก volume)' });
+    sections.push({ label: '② วันสิ้นสุดการนับจัดอันดับ', date: dates.lookbackEnd, note: '(วันก่อน rebal — END price + วันสุดท้ายที่บวก volume)' });
+    if (dates.holdingEnd) {
+      sections.push({ label: '③ วันสิ้นสุดการถือครอง', date: dates.holdingEnd, note: isPending ? '' : '(วัน rebal รอบถัดไป หรือล่าสุดถ้ายังถืออยู่)' });
+    }
 
-  const html = `<!DOCTYPE html>
-<html lang="th"><head><meta charset="UTF-8">
-<title>JPT 6M Momentum — Recheck ${title}</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Cinzel:wght@600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    const sectionsHtml = sections.map(s => `
+      <div class="ds-section">
+        <div class="ds-section-header">${s.label} — <strong>${s.date}</strong></div>
+        <div class="ds-section-note">${s.note}</div>
+        ${_buildOhlvTable(s.date, tickers)}
+      </div>
+    `).join('');
+
+    // Build offscreen container — html2pdf will render its DOM into PDF
+    const container = document.createElement('div');
+    container.id = '_jpt_pdf_temp';
+    container.style.cssText = 'position:fixed;left:-99999px;top:0;width:800px;background:#faf6ed;';
+    container.innerHTML = `
 <style>
-  body { font-family: 'Sarabun', sans-serif; padding: 24px; color: #2a1f1a; background: #faf6ed; max-width: 800px; margin: 0 auto; }
-  h1 { font-family: 'DM Serif Display', serif; color: #5a1f26; margin: 0 0 4px; font-size: 1.8rem; }
-  .subtitle { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 2px; color: #8b6914; text-transform: uppercase; margin-bottom: 16px; }
-  .meta { background: rgba(212,175,55,0.08); border-left: 3px solid #d4af37; padding: 10px 14px; border-radius: 4px; margin-bottom: 24px; font-size: 0.88rem; color: #5a3d20; line-height: 1.6; }
-  .date-section { margin-bottom: 28px; page-break-inside: avoid; }
-  .date-header { background: linear-gradient(135deg, #5a1f26, #722f37); color: #f4e4ba; padding: 8px 14px; border-radius: 4px 4px 0 0; font-weight: 600; font-size: 0.95rem; }
-  .date-note { font-size: 0.74rem; color: #7a6f62; padding: 4px 14px 8px; background: rgba(212,175,55,0.05); }
-  table { width: 100%; border-collapse: collapse; }
-  th, td { padding: 6px 10px; border-bottom: 1px solid rgba(212,175,55,0.3); text-align: right; font-size: 0.85rem; }
-  th { background: #faf3e6; color: #8b6914; font-weight: 600; font-family: 'Cinzel', serif; font-size: 0.74rem; letter-spacing: 0.5px; text-transform: uppercase; }
-  th.ticker, td.ticker { text-align: left; }
-  td.ticker { font-weight: 600; color: #5a1f26; font-family: 'Cinzel', serif; }
-  td.vol, th.vol { font-variant-numeric: tabular-nums; }
-  .actions { text-align: center; padding: 16px 0; border-bottom: 1px dashed rgba(212,175,55,0.4); margin-bottom: 20px; }
-  .actions button { padding: 10px 24px; background: linear-gradient(135deg, #5a1f26, #722f37); color: #f4e4ba; border: none; border-radius: 6px; font-family: 'Sarabun', sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer; letter-spacing: 0.5px; }
-  .actions button:hover { background: linear-gradient(135deg, #722f37, #8b6914); }
-  .footer { text-align: center; font-size: 0.7rem; color: #8b6914; font-family: 'Cinzel', serif; letter-spacing: 1px; margin-top: 32px; padding-top: 16px; border-top: 1px solid rgba(212,175,55,0.3); }
-  @media print {
-    body { background: white; padding: 12px; max-width: 100%; }
-    .actions, .no-print { display: none !important; }
-    .date-section { page-break-inside: avoid; }
-  }
+  #_jpt_pdf_temp { font-family: 'Sarabun','Anuphan',sans-serif; padding: 24px; color: #2a1f1a; }
+  #_jpt_pdf_temp h1 { font-family: 'DM Serif Display','Sarabun',serif; color: #5a1f26; margin: 0 0 4px; font-size: 28px; line-height: 1.2; }
+  #_jpt_pdf_temp .ds-subtitle { font-family: 'Cinzel','Sarabun',serif; font-size: 11px; letter-spacing: 2px; color: #8b6914; text-transform: uppercase; margin-bottom: 16px; font-weight: 700; }
+  #_jpt_pdf_temp .ds-meta { background: rgba(212,175,55,0.08); border-left: 3px solid #d4af37; padding: 10px 14px; border-radius: 4px; margin-bottom: 18px; font-size: 13px; color: #5a3d20; line-height: 1.6; }
+  #_jpt_pdf_temp .ds-section { margin-bottom: 14px; page-break-inside: avoid; }
+  #_jpt_pdf_temp .ds-section-header { background: #5a1f26; color: #f4e4ba; padding: 8px 14px; border-radius: 4px 4px 0 0; font-weight: 600; font-size: 14px; }
+  #_jpt_pdf_temp .ds-section-note { font-size: 11px; color: #7a6f62; padding: 4px 14px 6px; background: rgba(212,175,55,0.05); }
+  #_jpt_pdf_temp table { width: 100%; border-collapse: collapse; }
+  #_jpt_pdf_temp th, #_jpt_pdf_temp td { padding: 5px 10px; border-bottom: 1px solid rgba(212,175,55,0.3); text-align: right; font-size: 12px; }
+  #_jpt_pdf_temp th { background: #faf3e6; color: #8b6914; font-weight: 600; font-family: 'Cinzel','Sarabun',serif; font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; }
+  #_jpt_pdf_temp th.ticker, #_jpt_pdf_temp td.ticker { text-align: left; }
+  #_jpt_pdf_temp td.ticker { font-weight: 600; color: #5a1f26; font-family: 'Cinzel','Sarabun',serif; }
+  #_jpt_pdf_temp td.vol, #_jpt_pdf_temp th.vol { font-variant-numeric: tabular-nums; }
+  #_jpt_pdf_temp .ds-footer { text-align: center; font-size: 10px; color: #8b6914; font-family: 'Cinzel','Sarabun',serif; letter-spacing: 1px; margin-top: 22px; padding-top: 12px; border-top: 1px solid rgba(212,175,55,0.3); }
 </style>
-</head><body>
-  <div class="actions no-print">
-    <button onclick="window.print()">บันทึกเป็น PDF / พิมพ์</button>
-  </div>
-  <div class="subtitle">JPT 6M MOMENTUM · TRADE RECHECK</div>
-  <h1>${title}</h1>
-  <div class="meta">
-    <div><strong>หุ้นที่จัดอันดับ:</strong> ${tickers.length} ตัว · ${tickers.join(', ')}</div>
-    <div style="margin-top:6px;"><strong>หน้าต่าง lookback:</strong> ${dates.lookbackStart} → ${dates.lookbackEnd}${dates.holdingEnd ? ' · <strong>ถือถึง:</strong> ' + dates.holdingEnd : ' · ยังไม่ได้เริ่มถือ'}</div>
-  </div>
-  ${sectionsHtml}
-  <div class="footer">JP Trust Learning · jptrustlearning.com</div>
-</body></html>`;
+<div class="ds-subtitle">JPT 6M MOMENTUM · TRADE DETAILS</div>
+<h1>${title}</h1>
+<div class="ds-meta">
+  <div><strong>หุ้นที่จัดอันดับ:</strong> ${tickers.length} ตัว · ${tickers.join(', ')}</div>
+  <div style="margin-top:6px;"><strong>หน้าต่าง lookback:</strong> ${dates.lookbackStart} → ${dates.lookbackEnd}${dates.holdingEnd ? ' · <strong>ถือถึง:</strong> ' + dates.holdingEnd : ' · ยังไม่ได้เริ่มถือ'}</div>
+</div>
+${sectionsHtml}
+<div class="ds-footer">JP Trust Learning · jptrustlearning.com</div>
+    `;
+    document.body.appendChild(container);
 
-  const w = window.open('', '_blank');
-  if (!w) {
-    alert('Pop-up ถูก browser block — กรุณา allow pop-up ของหน้านี้ก่อน');
-    return;
+    // Wait for fonts to be loaded so html2canvas captures them correctly
+    if (document.fonts && document.fonts.ready) {
+      try { await document.fonts.ready; } catch(e) {}
+    }
+
+    // Lazy-load html2pdf.js if needed
+    await _loadHtml2Pdf();
+
+    const filename = `JPT-6M-Details-${dateLabel}.pdf`;
+
+    await window.html2pdf().set({
+      margin: [10, 10, 10, 10],
+      filename,
+      image: { type: 'jpeg', quality: 0.95 },
+      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#faf6ed', logging: false },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    }).from(container).save();
+
+    // Cleanup
+    document.body.removeChild(container);
+
+  } catch (err) {
+    console.error('Details PDF generation failed:', err);
+    alert('ไม่สามารถสร้าง PDF ได้: ' + (err.message || err));
+    const stale = document.getElementById('_jpt_pdf_temp');
+    if (stale) document.body.removeChild(stale);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      if (origLabel) btn.innerHTML = origLabel;
+    }
   }
-  w.document.write(html);
-  w.document.close();
 };
 
 function renderEquityChart() {
