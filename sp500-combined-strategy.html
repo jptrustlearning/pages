@@ -495,6 +495,23 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
 .trade-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
 .trade-date { font-family:var(--font-heading); font-weight:700; font-size:0.88rem; color:var(--text-dark); }
 .trade-summary { font-size:0.72rem; color:var(--text-muted); }
+.trade-details-btn {
+  background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+  border: none; color: #FFFFFF;
+  border-radius: 4px; padding: 5px 11px;
+  font-family: 'Cinzel','Anuphan',serif; font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  cursor: pointer; flex-shrink: 0; line-height: 1.4;
+  box-shadow: 0 1px 2px rgba(185,28,28,0.3);
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s;
+}
+.trade-details-btn:hover {
+  background: linear-gradient(135deg, #B91C1C 0%, #991B1B 100%);
+  box-shadow: 0 2px 5px rgba(185,28,28,0.4);
+}
+.trade-details-btn:active { transform: translateY(1px); }
+.trade-details-btn:disabled { cursor: wait; opacity: 0.65; }
+.trade-details-btn svg { vertical-align: -2px; margin-right: 4px; }
 .trade-section { margin-top:8px; padding-top:8px; border-top:1px solid rgba(244,228,186,0.05); }
 .trade-section-label { font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px; display:flex; align-items:center; gap:5px; }
 .trade-section-label.mom { color:var(--accent); }
@@ -2827,9 +2844,9 @@ function processCSV(csv) {
     const row = lines[i].split(',');
     if(row.length<7) continue;
     const ticker=row[0].trim(), date=row[1].trim();
-    const open=parseFloat(row[2]), close=parseFloat(row[5]), volume=parseFloat(row[6]);
+    const open=parseFloat(row[2]), high=parseFloat(row[3]), low=parseFloat(row[4]), close=parseFloat(row[5]), volume=parseFloat(row[6]);
     if(!state.dailyData[date]) state.dailyData[date]={};
-    state.dailyData[date][ticker] = { o:open, c:close, v:volume };
+    state.dailyData[date][ticker] = { o:open, h:high, l:low, c:close, v:volume };
     dateSet.add(date);
   }
   state.sortedDates = Array.from(dateSet).sort();
@@ -3273,7 +3290,8 @@ function runCombinedBacktest() {
             type: 'mom', entryDate, exitDate: momExitDate, fridayDate: friday,
             stocks: stockReturns, pnl: roundPnl, retPct: roundRetPct,
             cumulPnl: isOpen ? cumulPnl + roundPnl : cumulPnl,
-            isOpen, slHits, capital: momCapital
+            isOpen, slHits, capital: momCapital,
+            lookbackWeeks: CONFIG.momRocLookback   // snapshot — for Details PDF
           });
 
           if(!isOpen) state.cumulativePnl.push({ date: momExitDate, pnl: cumulPnl, type: 'mom' });
@@ -3325,7 +3343,8 @@ function runCombinedBacktest() {
             stocks: stockReturns, pnl: roundPnl, retPct: roundRetPct,
             cumulPnl: isActuallyOpen ? cumulPnl + roundPnl : cumulPnl,
             isOpen: isActuallyOpen, slHits, capital: dhCapital,
-            confirmedCount
+            confirmedCount,
+            lookbackWeeks: CONFIG.momRocLookback   // snapshot — for Details PDF (DH uses 5d ROC, but we record momentum's lookback for the combined window display)
           });
 
           if(!isActuallyOpen) state.cumulativePnl.push({ date: dhExitDate, pnl: cumulPnl, type: 'dh' });
@@ -3377,7 +3396,8 @@ function runCombinedBacktest() {
               ticker: dh.ticker, ret5d: dh.ret5d, volRatio: dh.volRatio,
               isConfirmed: momTop20Set.has(dh.ticker)
             })),
-            momCapital: pMomCap, dhCapital: pDhCap
+            momCapital: pMomCap, dhCapital: pDhCap,
+            lookbackWeeks: CONFIG.momRocLookback   // snapshot — for Details PDF
           };
         }
       }
@@ -4245,6 +4265,316 @@ function tlpGoTo(page) {
   if(container) container.scrollTop = 0;
 }
 
+// ============================================================
+// DETAILS PDF — recheck/verify dates for a specific weekly entry
+// 3 sections: lookback start Friday, signal Friday, exit
+// Lookback weeks comes from snapshot stored at backtest time (not current CONFIG)
+// since user may change momRocLookback dropdown without re-running backtest.
+// ============================================================
+function _getRecheckDatesForEntry(weekDate) {
+  // Find all records for this entry week (mom + dh) — they share the same fridayDate + lookbackWeeks
+  const records = (state.allResults || []).filter(r => r.entryDate === weekDate);
+  if (records.length === 0) return null;
+  const sample = records[0];
+  const fridayDate = sample.fridayDate;
+  const lookbackWeeks = sample.lookbackWeeks || CONFIG.momRocLookback || 8;
+  const fridayIdx = state.fridayDates.indexOf(fridayDate);
+  if (fridayIdx < 0) return null;
+  const lookbackStartFridayIdx = fridayIdx - lookbackWeeks;
+  if (lookbackStartFridayIdx < 0) return null;
+  const lookbackStart = state.fridayDates[lookbackStartFridayIdx];
+  const lookbackEnd = fridayDate;
+
+  // Holding end: the LATER of mom and dh exit dates (matches what trade card displays)
+  const exitCandidates = [];
+  for (const r of records) {
+    if (r.isOpen) {
+      // Compute planned exit (similar logic to renderTradeLog's plannedExit)
+      const holdWeeks = r.type === 'mom' ? CONFIG.momHoldWeeks : CONFIG.dhHoldWeeks;
+      const d = new Date(weekDate + 'T00:00:00Z');
+      d.setUTCDate(d.getUTCDate() + holdWeeks * 7);
+      // Find first available trading date >= d in our data (else fall back to last data)
+      const planned = d.toISOString().substring(0, 10);
+      exitCandidates.push({ date: planned, isPlanned: true });
+    } else {
+      exitCandidates.push({ date: r.exitDate, isPlanned: false });
+    }
+  }
+  exitCandidates.sort((a,b) => a.date < b.date ? 1 : -1);  // descending
+  const holdingEntry = exitCandidates[0];
+  let holdingEnd = holdingEntry?.date || null;
+  let holdingEndIsPlanned = !!holdingEntry?.isPlanned;
+  // If planned exit is in the future (no data yet), fall back to last available date
+  if (holdingEnd && state.sortedDates.indexOf(holdingEnd) < 0) {
+    holdingEnd = state.sortedDates[state.sortedDates.length - 1];
+    holdingEndIsPlanned = true;
+  }
+
+  // Combined tickers (union across all records that week, preserving type info for grouping)
+  const tickers = [];
+  const tickerTypes = {};   // ticker → 'mom' | 'dh' | 'both'
+  for (const r of records) {
+    for (const s of r.stocks) {
+      if (!tickers.includes(s.ticker)) tickers.push(s.ticker);
+      if (!tickerTypes[s.ticker]) tickerTypes[s.ticker] = r.type;
+      else if (tickerTypes[s.ticker] !== r.type) tickerTypes[s.ticker] = 'both';
+    }
+  }
+
+  return {
+    lookbackStart, lookbackEnd, holdingEnd, holdingEndIsPlanned,
+    tickers, tickerTypes, lookbackWeeks
+  };
+}
+
+function _getRecheckDatesForPending() {
+  if (!state.pendingSignal) return null;
+  const ps = state.pendingSignal;
+  const lookbackWeeks = ps.lookbackWeeks || CONFIG.momRocLookback || 8;
+  const fridayIdx = state.fridayDates.indexOf(ps.signalDate);
+  if (fridayIdx < 0) return null;
+  const lookbackStartFridayIdx = fridayIdx - lookbackWeeks;
+  if (lookbackStartFridayIdx < 0) return null;
+
+  const tickers = [];
+  const tickerTypes = {};
+  for (const m of (ps.momPicks || [])) {
+    if (!tickers.includes(m.ticker)) tickers.push(m.ticker);
+    tickerTypes[m.ticker] = 'mom';
+  }
+  for (const dh of (ps.dhPicks || [])) {
+    if (!tickers.includes(dh.ticker)) tickers.push(dh.ticker);
+    tickerTypes[dh.ticker] = tickerTypes[dh.ticker] === 'mom' ? 'both' : 'dh';
+  }
+
+  return {
+    lookbackStart: state.fridayDates[lookbackStartFridayIdx],
+    lookbackEnd: ps.signalDate,
+    holdingEnd: null,   // not yet held
+    holdingEndIsPlanned: false,
+    tickers, tickerTypes, lookbackWeeks
+  };
+}
+
+function _fmtNum(n, decimals) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  if (decimals === undefined) decimals = 2;
+  return n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+
+function _fmtVol(v) {
+  if (v === null || v === undefined || isNaN(v)) return '—';
+  return Math.round(v).toLocaleString('en-US');
+}
+
+function _buildOhlvTable(date, tickers, tickerTypes) {
+  const dayData = state.dailyData[date];
+  if (!dayData) {
+    return '<div style="color:#9c2b2b;padding:8px;">ไม่มีข้อมูลของวันที่นี้</div>';
+  }
+  let rows = '';
+  tickers.forEach(t => {
+    const d = dayData[t];
+    const typ = tickerTypes && tickerTypes[t];
+    let badgeHtml = '';
+    if (typ === 'mom')   badgeHtml = '<span class="ttype mom">MOM</span>';
+    else if (typ === 'dh')  badgeHtml = '<span class="ttype dh">DH</span>';
+    else if (typ === 'both') badgeHtml = '<span class="ttype mom">MOM</span><span class="ttype dh">DH</span>';
+    if (d) {
+      rows += `<tr><td class="ticker">${t} ${badgeHtml}</td><td>${_fmtNum(d.o)}</td><td>${_fmtNum(d.h)}</td><td>${_fmtNum(d.l)}</td><td class="close-col">${_fmtNum(d.c)}</td><td class="vol">${_fmtVol(d.v)}</td></tr>`;
+    } else {
+      rows += `<tr><td class="ticker">${t} ${badgeHtml}</td><td colspan="5" style="color:#9c2b2b;text-align:center;">— ไม่มีข้อมูล —</td></tr>`;
+    }
+  });
+  return `<table>
+    <thead><tr><th class="ticker">Ticker</th><th>Open</th><th>High</th><th>Low</th><th class="close-col">Close</th><th class="vol">Volume</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+window.downloadDetailsPdf = function(event, weekDate, isPending) {
+  const dates = isPending ? _getRecheckDatesForPending() : _getRecheckDatesForEntry(weekDate);
+  if (!dates) {
+    alert('ไม่สามารถสร้าง Details PDF ได้ — ข้อมูลไม่พอ');
+    return;
+  }
+  const tickers = dates.tickers || [];
+  if (tickers.length === 0) {
+    alert('ไม่มีรายชื่อหุ้น');
+    return;
+  }
+  let title, dateLabel;
+  if (isPending) {
+    title = 'PENDING — สัปดาห์ถัดไป (Signal ' + (state.pendingSignal?.signalDate || '') + ')';
+    dateLabel = 'PENDING-' + (state.pendingSignal?.signalDate || 'unknown');
+  } else {
+    title = 'รอบสัปดาห์ ' + weekDate;
+    dateLabel = weekDate;
+  }
+
+  const sections = [];
+  sections.push({
+    label: '① วันเริ่มต้นนับ ROC (Friday ' + dates.lookbackWeeks + ' สัปดาห์ก่อนสัญญาณ)',
+    date: dates.lookbackStart,
+    note: '(ใช้ราคา close วันนี้เป็น START price ของ ROC ranking สำหรับ Momentum picks)'
+  });
+  sections.push({
+    label: '② Signal Friday — วันคำนวณอันดับ',
+    date: dates.lookbackEnd,
+    note: '(ใช้ราคา close วันนี้เป็น END price · DH picks อ้างอิง 5-day ROC จากวันนี้ + volume ratio)'
+  });
+  if (dates.holdingEnd) {
+    const note = isPending ? '' :
+      (dates.holdingEndIsPlanned ? '(วันขายตามแผนของ Mom/DH — แต่ยังไม่ถึง แสดงข้อมูลล่าสุดที่มี)' : '(วันขายล่าสุดในรอบนี้ — ฝั่งที่ถือนานกว่าระหว่าง Mom กับ DH)');
+    sections.push({ label: '③ วันสิ้นสุดการถือครอง', date: dates.holdingEnd, note });
+  }
+
+  const sectionsHtml = sections.map(s => `
+    <div class="date-section">
+      <div class="date-header">${s.label} — <strong>${s.date}</strong></div>
+      <div class="date-note">${s.note}</div>
+      <div class="table-wrap">${_buildOhlvTable(s.date, tickers, dates.tickerTypes)}</div>
+    </div>
+  `).join('');
+
+  // Build ticker list with type tags
+  const tickerListHtml = tickers.map(t => {
+    const typ = dates.tickerTypes[t];
+    if (typ === 'both') return t + ' (MOM+DH)';
+    if (typ === 'mom') return t + ' (MOM)';
+    if (typ === 'dh') return t + ' (DH)';
+    return t;
+  }).join(', ');
+
+  const html = `<!DOCTYPE html>
+<html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JPT-Weekly-Details-${dateLabel}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Cinzel:wght@600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Sarabun', sans-serif; padding: 24px; color: #2a1f1a; background: #faf6ed; max-width: 800px; margin: 0 auto; box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; }
+  h1 { font-family: 'DM Serif Display', serif; color: #5a1f26; margin: 0 0 4px; font-size: 1.8rem; line-height: 1.2; }
+  .subtitle { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 2px; color: #8b6914; text-transform: uppercase; margin-bottom: 16px; }
+  .meta { background: rgba(212,175,55,0.08); border-left: 3px solid #d4af37; padding: 10px 14px; border-radius: 4px; margin-bottom: 18px; font-size: 0.88rem; color: #5a3d20; line-height: 1.6; word-break: break-word; }
+  .legend { font-size: 0.78rem; color: #5a3d20; padding: 8px 12px; background: rgba(212,175,55,0.05); border-radius: 4px; margin-bottom: 24px; line-height: 1.55; }
+  .legend strong { color: #5a1f26; }
+  .date-section { margin-bottom: 28px; page-break-inside: avoid; }
+  .date-header { background: linear-gradient(135deg, #5a1f26, #722f37); color: #f4e4ba; padding: 8px 14px; border-radius: 4px 4px 0 0; font-weight: 600; font-size: 0.95rem; }
+  .date-note { font-size: 0.74rem; color: #7a6f62; padding: 4px 14px 8px; background: rgba(212,175,55,0.05); }
+  .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 6px 10px; border-bottom: 1px solid rgba(212,175,55,0.3); text-align: right; font-size: 0.85rem; white-space: nowrap; }
+  th { background: #faf3e6; color: #8b6914; font-weight: 600; font-family: 'Cinzel', serif; font-size: 0.74rem; letter-spacing: 0.5px; text-transform: uppercase; }
+  th.ticker, td.ticker { text-align: left; }
+  td.ticker { font-weight: 600; color: #5a1f26; font-family: 'Cinzel', serif; }
+  td.vol, th.vol { font-variant-numeric: tabular-nums; }
+  td.close-col { font-weight: 700; color: #5a1f26; }
+  th.close-col { color: #5a1f26; }
+  .ttype { display:inline-block; font-family:'Cinzel',serif; font-size:0.55rem; font-weight:700; letter-spacing:0.08em; padding:1px 5px; border-radius:3px; margin-left:5px; vertical-align:1px; }
+  .ttype.mom { background:rgba(212,175,55,0.15); color:#8b6914; border:1px solid rgba(212,175,55,0.4); }
+  .ttype.dh { background:rgba(200,90,74,0.12); color:#9c4a3a; border:1px solid rgba(200,90,74,0.35); margin-left:3px; }
+  .footer { text-align: center; font-size: 0.7rem; color: #8b6914; font-family: 'Cinzel', serif; letter-spacing: 1px; margin-top: 32px; padding-top: 16px; border-top: 1px solid rgba(212,175,55,0.3); }
+
+  @media (max-width: 600px) {
+    body { padding: 12px; }
+    h1 { font-size: 1.35rem; }
+    .subtitle { font-size: 0.62rem; letter-spacing: 1.5px; }
+    .meta { font-size: 0.78rem; padding: 8px 11px; line-height: 1.55; margin-bottom: 14px; }
+    .legend { font-size: 0.7rem; padding: 7px 10px; margin-bottom: 18px; }
+    .date-section { margin-bottom: 18px; }
+    .date-header { font-size: 0.85rem; padding: 7px 11px; }
+    .date-note { font-size: 0.68rem; padding: 4px 11px 6px; }
+    th, td { padding: 5px 7px; font-size: 0.74rem; }
+    th { font-size: 0.66rem; }
+    .footer { font-size: 0.62rem; margin-top: 22px; padding-top: 12px; }
+  }
+  @media (max-width: 380px) {
+    body { padding: 8px; }
+    h1 { font-size: 1.2rem; }
+    th, td { padding: 4px 5px; font-size: 0.68rem; }
+    th { font-size: 0.6rem; }
+  }
+
+  @media print {
+    body { background: white; padding: 12px; max-width: 100%; }
+    .date-section { page-break-inside: avoid; }
+    .table-wrap { overflow-x: visible; }
+  }
+</style>
+</head><body>
+  <div class="subtitle">JPT WEEKLY MOMENTUM + DARK HORSE · TRADE DETAILS</div>
+  <h1>${title}</h1>
+  <div class="meta">
+    <div><strong>หุ้นที่จัดอันดับ:</strong> ${tickers.length} ตัว · ${tickerListHtml}</div>
+    <div style="margin-top:6px;"><strong>หน้าต่าง:</strong> ${dates.lookbackStart} → ${dates.lookbackEnd}${dates.holdingEnd ? ' · <strong>ถือถึง:</strong> ' + dates.holdingEnd + (dates.holdingEndIsPlanned ? ' (ตามแผน)' : '') : ' · ยังไม่ได้เริ่มถือ'}</div>
+  </div>
+  <div class="legend">
+    <strong>MOM</strong> = Momentum picks · จัดอันดับด้วย ROC ${dates.lookbackWeeks} สัปดาห์ (Friday-to-Friday close-to-close) · กรอง RSI ≤ ceiling
+    <br><strong>DH</strong> = Dark Horse picks · จัดอันดับด้วย 5-day return + volume ratio ที่ Signal Friday (ไม่อ้างอิงสัปดาห์ ${dates.lookbackWeeks})
+  </div>
+  ${sectionsHtml}
+  <div class="footer">JP Trust Learning · jptrustlearning.com</div>
+</body></html>`;
+
+  // Render in iframe modal overlay — no URL bar visible
+  const existingOverlay = document.getElementById('_jpt_details_overlay');
+  if (existingOverlay) existingOverlay.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = '_jpt_details_overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;animation:_jptOverlayIn 0.2s ease-out;';
+
+  if (!document.getElementById('_jpt_overlay_keyframes')) {
+    const kf = document.createElement('style');
+    kf.id = '_jpt_overlay_keyframes';
+    kf.textContent = '@keyframes _jptOverlayIn { from { opacity: 0; } to { opacity: 1; } } @keyframes _jptCosmicShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }';
+    document.head.appendChild(kf);
+  }
+
+  const topBar = document.createElement('div');
+  topBar.style.cssText = 'background:#0a0a0a;color:white;padding:10px 14px;flex-shrink:0;display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-bottom:1px solid rgba(212,175,55,0.3);';
+
+  const backBtn = document.createElement('button');
+  backBtn.style.cssText = 'background:linear-gradient(135deg,#EC4899 0%,#C026D3 22%,#DC2626 42%,#8B5CF6 65%,#6366F1 82%,#D4AF37 100%);background-size:220% 220%;color:#FFF;text-shadow:0 1px 2px rgba(0,0,0,0.35);box-shadow:0 0 12px rgba(236,72,153,0.35),0 0 22px rgba(139,92,246,0.25),0 4px 8px rgba(0,0,0,0.15);animation:_jptCosmicShift 5s ease-in-out infinite;border:none;border-radius:6px;padding:9px 16px;font-family:Sarabun,sans-serif;font-weight:600;font-size:0.82rem;cursor:pointer;letter-spacing:0.5px;display:inline-flex;align-items:center;gap:6px;';
+  backBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>ย้อนกลับเข้าแอป';
+  backBtn.onclick = () => overlay.remove();
+
+  const printBtn = document.createElement('button');
+  printBtn.style.cssText = 'background:linear-gradient(135deg,#5a1f26,#722f37);color:#f4e4ba;border:none;border-radius:6px;padding:9px 16px;font-family:Sarabun,sans-serif;font-weight:600;font-size:0.82rem;cursor:pointer;letter-spacing:0.5px;';
+  printBtn.textContent = 'บันทึกเป็น PDF / พิมพ์';
+
+  topBar.appendChild(backBtn);
+  topBar.appendChild(printBtn);
+
+  const iframe = document.createElement('iframe');
+  iframe.srcdoc = html;
+  iframe.style.cssText = 'flex:1;border:none;width:100%;background:white;display:block;';
+  iframe.setAttribute('title', 'JPT Weekly Details Preview');
+
+  printBtn.onclick = () => {
+    try {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    } catch (e) {
+      alert('ไม่สามารถเปิดหน้าต่างพิมพ์ได้: ' + e.message);
+    }
+  };
+
+  overlay.appendChild(topBar);
+  overlay.appendChild(iframe);
+  document.body.appendChild(overlay);
+
+  const escHandler = (e) => {
+    if (e.key === 'Escape') {
+      overlay.remove();
+      document.removeEventListener('keydown', escHandler);
+    }
+  };
+  document.addEventListener('keydown', escHandler);
+};
+
 function buildPaginationBar(currentPage, totalPages, totalWeeks) {
   // Build number buttons with ellipsis: « ‹ 1 … 3 4 [5] 6 7 … 12 › »
   const maxButtons = 5; // how many numeric buttons to show around current
@@ -4342,6 +4672,9 @@ function renderTradeLog() {
         <div style="font-family:'Cinzel','Anuphan',serif;font-size:0.7rem;font-weight:700;color:var(--gold-deep);letter-spacing:0.1em;text-transform:uppercase;margin-top:5px;opacity:0.85;">Signal Date · ${ps.signalDate}</div>
         <div class="trade-summary">ซื้อรวม <strong>${totalStocks} ตัว</strong> · งบ <strong>$${Math.round(totalCap).toLocaleString()}</strong> · รอราคาเปิดวัน${entryDayName}${confirmedCount > 0 ? ' · <span class="text-green">★ ' + confirmedCount + ' confirmed</span>' : ''} · Regime: ${ps.regime}</div>
       </div>
+      <button class="trade-details-btn" onclick="downloadDetailsPdf(event, null, true)" title="ดาวน์โหลดรายละเอียดเป็น PDF">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>Details PDF
+      </button>
     </div>`;
 
     let momHtml = '';
@@ -4457,6 +4790,9 @@ function renderTradeLog() {
         <div class="trade-date"><span class="trade-date-tag">Entry</span>${weekDate}${exitDateDisplay ? '<span class="trade-date-arrow">→</span><span class="trade-date-tag">Exit</span><span class="exit-date">' + exitDateDisplay + '</span>' : ''}${anyOpen ? ' <span class="open-badge">OPEN</span>' : ''}</div>
         <div class="trade-summary">ซื้อรวม <strong>${totalStocks} ตัว</strong> · ใช้เงิน <strong>$${Math.round(totalCapital).toLocaleString()}</strong> · P&L: <span class="${retCls}"><strong>$${Math.round(totalPnl).toLocaleString()}</strong> (${retPct>=0?'+':''}${retPct.toFixed(2)}%)</span></div>
       </div>
+      <button class="trade-details-btn" onclick="downloadDetailsPdf(event, '${weekDate}', false)" title="ดาวน์โหลดรายละเอียดเป็น PDF">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>Details PDF
+      </button>
     </div>`;
 
     // Momentum section
