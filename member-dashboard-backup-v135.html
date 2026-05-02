@@ -1242,16 +1242,7 @@ function timeAgo(iso){
   if(diffD<7)return Math.floor(diffD)+'d ago';
   return shortDate(d);
 }
-function deriveTone(tickers,override){
-  // Manual override from batch JSON wins over rule-based derivation.
-  // Allowed values: 'bullish' | 'bearish' | 'mixed' | 'neutral'
-  if(override){
-    const o=String(override).toLowerCase();
-    if(o==='bullish')return{impactClass:'bullish',impactText:'Bullish'};
-    if(o==='bearish')return{impactClass:'bearish',impactText:'Bearish'};
-    if(o==='mixed')return{impactClass:'neutral',impactText:'Mixed'};
-    if(o==='neutral')return{impactClass:'neutral',impactText:'Neutral'};
-  }
+function deriveTone(tickers){
   if(!tickers||!tickers.length)return{impactClass:'neutral',impactText:'Neutral'};
   const c={positive:0,negative:0,neutral:0};
   for(const t of tickers)c[t.sentiment||'neutral']=(c[t.sentiment||'neutral']||0)+1;
@@ -1365,7 +1356,7 @@ function renderDateGroup(dateLabel,headlines){
 function renderHeadlineCard(h){
   const safeFile=encodeURIComponent(h._file||'');
   const tickers=normalizeTickers(h.tickers);
-  const tone=deriveTone(tickers,h.tone_override);
+  const tone=deriveTone(tickers);
   const tagsHtml=tickers.slice(0,5).map(t=>'<span class="story-tag '+(t.sentiment||'neutral')+'">'+escapeText(t.symbol)+'</span>').join('');
   const time=timeAgo(h._batchDate);
   return '<article class="news-dash-card" onclick="openNewsDetail(\''+safeFile+'\','+(h._origIndex||0)+')">'

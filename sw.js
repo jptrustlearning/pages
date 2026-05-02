@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jptrust-member-v4';  // bumped 2026-04-23 — fix POST caching crash
+const CACHE_NAME = 'jptrust-member-v5';  // bumped 2026-05-02 — tone_override support
 const ASSETS = [
   './',
   './member-dashboard.html',
