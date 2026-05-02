@@ -328,11 +328,11 @@
         <div class="jpc-defs">
           <div class="jpc-def-item">
             <span class="jpc-def-key">%Return</span>
-            <span class="jpc-def-text">ผลตอบแทนเฉลี่ยต่อปีจากการแบ็คเทส — กลยุทธ์ทบต้น (6M / Rolling 6M) คำนวณแบบ CAGR · กลยุทธ์ไม่ทบต้น (Weekly) คำนวณจากกำไรรวมหารด้วยจำนวนปี ของเงินทุนตั้งต้น</span>
+            <span class="jpc-def-text">ผลตอบแทนเฉลี่ยต่อปีจากการทดสอบกลยุทธ์ย้อนหลัง</span>
           </div>
           <div class="jpc-def-item">
-            <span class="jpc-def-key">Max DD</span>
-            <span class="jpc-def-text">Max Drawdown — การลดลงสูงสุดของพอร์ตจากจุดสูงสุดในช่วงทดสอบ ใช้วัดความเสี่ยงด้าน downside (ยิ่งใกล้ 0% ยิ่งเสี่ยงต่ำ)</span>
+            <span class="jpc-def-key">%Max DD</span>
+            <span class="jpc-def-text">Max Drawdown — การลดลงสูงสุดของพอร์ตจากจุดสูงสุดในช่วงทดสอบ ใช้วัดความเสี่ยงด้าน downside</span>
           </div>
         </div>
         <div class="jpc-controls">
@@ -423,7 +423,7 @@
           <div class="jpc-kpi-cell-value ${cagrPos ? 'pos' : 'neg'}">${cagrStr}</div>
         </div>
         <div class="jpc-kpi-cell">
-          <div class="jpc-kpi-cell-label">Max DD</div>
+          <div class="jpc-kpi-cell-label">%Max DD</div>
           <div class="jpc-kpi-cell-value neg">${ddStr}</div>
         </div>
       </div>
@@ -466,7 +466,7 @@
     const cols = [
       { key: 'name', label: 'ชื่อ', cls: '' },
       { key: 'cagr', label: '%Return', cls: 'numeric' },
-      { key: 'dd',   label: 'Max DD', cls: 'numeric' }
+      { key: 'dd',   label: '%Max DD', cls: 'numeric' }
     ];
     const headerHtml = '<thead class="jpc-thead"><tr>' + cols.map(c => {
       const active = _sortBy === c.key;
