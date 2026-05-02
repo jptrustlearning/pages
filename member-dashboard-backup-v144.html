@@ -385,11 +385,12 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .mover-arrow{width:20px;height:20px;border-radius:50%;background:rgba(46,125,50,0.13);display:flex;align-items:center;justify-content:center;color:#2E7D32}
 .mover-arrow svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
 .mover-arrow.dn{background:rgba(198,40,40,0.13);color:#C62828}
-.mover.skel .mover-pct{opacity:0.3}
+.mover-status{font-family:'Anuphan',sans-serif;font-size:10.5px;color:var(--text-dark-muted,#7A6F62);margin-bottom:3px}
 .mover-pct{font-family:'DM Serif Display',serif;font-size:18px;color:#2E7D32;font-weight:400;margin-bottom:2px;line-height:1;letter-spacing:0.3px}
 .mover-pct.dn{color:#C62828}
 .mover-pct-sub{font-family:'Anuphan',sans-serif;font-size:9.5px;color:var(--text-dark-muted,#7A6F62);letter-spacing:0.5px;margin-bottom:6px;text-transform:uppercase;opacity:0.85}
 .mover-spark{width:100%;height:24px;display:block}
+.mover.skel .mover-pct,.mover.skel .mover-status{opacity:0.3}
 
 /* ===== INSIGHT — cream card with gold sheen ===== */
 .insight-card{background:linear-gradient(135deg,var(--cream-card,#FFFEF8) 0%,var(--cream-warm,#F5EFE0) 100%);border:1px solid rgba(212,175,55,0.32);border-radius:14px;padding:14px 16px;margin:0 0 18px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 2px 8px rgba(114,47,55,0.05);position:relative;overflow:hidden}
@@ -1687,6 +1688,7 @@ function renderMoversSkeleton(n){
     const card=document.createElement('div');
     card.className='mover skel';
     card.innerHTML='<div class="mover-hd"><span class="mover-tk">···</span><span class="mover-arrow"></span></div>'
+      +'<div class="mover-status">กำลังโหลด</div>'
       +'<div class="mover-pct">···</div>'
       +'<svg class="mover-spark" viewBox="0 0 100 24"></svg>';
     root.appendChild(card);
@@ -1712,6 +1714,7 @@ function renderMovers(items){
         +'<span class="mover-tk">'+escapeText(it.symbol)+'</span>'
         +'<span class="mover-arrow '+(dn?'dn':'')+'">'+arrowSvg+'</span>'
       +'</div>'
+      +'<div class="mover-status">'+escapeText(it.statusLabel)+'</div>'
       +'<div class="mover-pct '+(dn?'dn':'')+'">'+pctStr+'</div>'
       +'<div class="mover-pct-sub">1 week chg</div>'
       +'<svg class="mover-spark" viewBox="0 0 100 24" preserveAspectRatio="none">'
@@ -1719,6 +1722,11 @@ function renderMovers(items){
       +'</svg>';
     root.appendChild(card);
   });
+}
+function statusLabel(sentiment,pct){
+  if(sentiment==='positive')return pct>=5?'Breakout':'Bullish';
+  if(sentiment==='negative')return pct<=-5?'Breakdown':'Bearish';
+  return Math.abs(pct)>=3?'Momentum':'Watch';
 }
 function makeSparkPoints(closes){
   if(!closes||closes.length<2)return '0,12 100,12';
@@ -1787,6 +1795,7 @@ async function loadMovers(){
       symbol:t.symbol,
       sentiment:t.sentiment,
       pctChange:pct,
+      statusLabel:statusLabel(t.sentiment,pct),
       sparkPoints:makeSparkPoints(closes),
     });
     if(moverItems.length>=5)break;
