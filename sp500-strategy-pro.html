@@ -3751,13 +3751,19 @@ window.downloadDetailsPdf = function(event, entryDate, isPending) {
   <div class="footer">JP Trust Learning · jptrustlearning.com</div>
 </body></html>`;
 
-  const w = window.open('', '_blank');
+  // Use Blob URL instead of document.write — fixes mobile viewport rendering bug
+  // (Mobile browsers sometimes don't re-evaluate viewport meta after document.write,
+  // causing inconsistent zoom-out behavior. Blob URL loads as a real document.)
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const w = window.open(url, '_blank');
   if (!w) {
+    URL.revokeObjectURL(url);
     alert('Pop-up ถูก browser block — กรุณา allow pop-up ของหน้านี้ก่อน');
     return;
   }
-  w.document.write(html);
-  w.document.close();
+  // Revoke the Blob URL after 60s — gives the new window plenty of time to fully load
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
 };
 
 function renderEquityChart() {
