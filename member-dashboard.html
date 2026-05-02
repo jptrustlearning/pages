@@ -413,7 +413,10 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .nav-home.active .nav-owl-img{opacity:1}
 .page-header{padding:8px 20px 16px}.page-title{font-size:22px;font-weight:700;color:var(--text-dark)}.page-subtitle{font-size:13px;color:var(--text-dark-muted);margin-top:2px}
 .placeholder-hero{background:linear-gradient(160deg,var(--burgundy-dark),var(--burgundy-mid));padding:20px;border-radius:28px;margin:0 16px 16px;box-shadow:0 8px 32px rgba(26,10,14,0.4),0 0 0 1px rgba(212,175,55,0.08)}
-#screen-lab .placeholder-hero{background:linear-gradient(160deg,rgba(26,10,14,0.55),rgba(58,20,29,0.35)),url('lab-hero-bg.jpg?v=1777734103') center/cover no-repeat;margin-top:14px}
+#screen-lab .placeholder-hero{background:linear-gradient(160deg,rgba(26,10,14,0.55),rgba(58,20,29,0.35)),url('lab-hero-bg.jpg?v=1777734103') center/cover no-repeat;margin-top:14px;position:relative;overflow:hidden}
+.lab-flask{position:absolute;top:12px;right:20px;width:64px;height:auto;pointer-events:none;z-index:1;filter:drop-shadow(0 4px 10px rgba(212,175,55,0.5));transform-origin:50% 100%;animation:lab-flask-wiggle 2.6s ease-in-out infinite;will-change:transform}
+@keyframes lab-flask-wiggle{0%,100%{transform:rotate(-15deg) translateY(0)}20%{transform:rotate(-22deg) translateY(2px)}50%{transform:rotate(-8deg) translateY(-4px)}80%{transform:rotate(-22deg) translateY(2px)}}
+@media (prefers-reduced-motion: reduce){.lab-flask{animation:none;transform:rotate(-12deg)}}
 
 /* Modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);z-index:20000;display:none;align-items:flex-end;justify-content:center}.modal-overlay.show{display:flex}
@@ -764,7 +767,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
     <div class="screen" id="screen-gold"><div class="placeholder-hero"><div class="balance-card"><div class="balance-label">Gold Price</div><div class="balance-row"><div class="balance-amount">2,485</div><div class="balance-currency">USD</div></div><div class="balance-change up">▲ +1.2%</div></div></div></div>
     <div class="screen" id="screen-bitcoin"><div class="placeholder-hero"><div class="balance-card"><div class="balance-label">Bitcoin Price</div><div class="balance-row"><div class="balance-amount">107,250</div><div class="balance-currency">USD</div></div><div class="balance-change up">▲ +2.8%</div></div></div></div>
     <div class="screen" id="screen-lab">
-        <div class="placeholder-hero"><div class="balance-card"><div class="balance-label">Lab</div><div class="balance-row"><div class="balance-amount">5</div><div class="balance-currency">กลยุทธ์</div></div><div class="balance-change up">Momentum + Gold Studies</div></div></div>
+        <div class="placeholder-hero"><div class="balance-card"><div class="balance-label">Lab</div><div class="balance-row"><div class="balance-amount">5</div><div class="balance-currency">กลยุทธ์</div></div><div class="balance-change up">Momentum + Gold Studies</div></div><img class="lab-flask" src="lab-flask.png?v=1777734103" alt="" aria-hidden="true"></div>
         <div class="screen-content">
             <div class="section-header fade-up fade-up-1"><div class="section-title">Momentum Strategies</div></div>
             <div class="dashboard-grid fade-up fade-up-2">
