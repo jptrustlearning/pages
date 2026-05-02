@@ -671,6 +671,86 @@ git push origin main
 
 ---
 
+## ⏰ 9.6 Timestamp Convention — HHMM ต้องเป็นเวลา BKK ก่อน push (เพิ่ม 2 พ.ค. 2026)
+
+### ปัญหาที่แก้
+
+`member-dashboard.html → parseBatchDate()` แปลง `Z` (UTC) เป็น `+07:00` (BKK) — ดังนั้นทุก timestamp `2026-MM-DDTHH:MM:00Z` ในระบบถูกอ่านเป็น **เวลา BKK ตามตัวอักษร** (ไม่ใช่ UTC)
+
+`member-dashboard.html → timeAgo()` มี guard บรรทัดแรก:
+```javascript
+if(diffMs<0)return shortDate(d);  // future timestamp → fallback
+```
+
+ผลคือ ถ้า batch มี timestamp อยู่ใน "อนาคต" เทียบกับเวลาปัจจุบัน → card จะแสดงแค่ **"2 พ.ค."** (shortDate) แทนที่จะเป็น `"Xh ago"` / `"Xm ago"` ตามที่ควรเป็น
+
+**ตัวอย่างเคสที่เจอ (2 พ.ค. 2026):** Claude session push 3 batches ที่เวลา BKK 12:25, 13:23, 21:21 แต่ใส่ timestamp 22:30, 23:45, 23:55 (ตามเวลาเหตุการณ์ข่าวสหรัฐฯ ปลาย session) → ทุก batch อยู่ในอนาคตของเวลา BKK ที่ user เปิดดู → ทุก card แสดง "2 พ.ค." แทน "Xh ago"
+
+### กฎการตั้ง Timestamp
+
+**HHMM ของ batch = เวลา BKK ที่จะ push จริง** ไม่ใช่:
+- ❌ เวลาเหตุการณ์ข่าวเกิด (US after-hours = 03:00-04:00 BKK วันถัดไป → อนาคตของเวลา BKK ขณะ publish)
+- ❌ เวลาประมาณการ "ให้ดูสมจริง" (เช่น "ใส่ 22:00 ให้ดูเหมือน prime time")
+- ❌ เวลา UTC (ระบบอ่าน Z เป็น BKK ไม่ใช่ UTC)
+
+**ที่ถูก:**
+- ✅ เช็คเวลา BKK ปัจจุบันก่อนตั้ง HHMM: `TZ=Asia/Bangkok date`
+- ✅ ใช้เวลา **5-15 นาทีก่อนเวลาจริง** เผื่อ rebase + push delay
+- ✅ ถ้าข่าวจริงเกิดในอเมริกาช่วงดึก BKK → publish batch ตอนเช้า BKK ก็ได้ (ใช้ HHMM เช้า) เนื้อข่าวยังคงสะท้อนเหตุการณ์ก่อนหน้าได้ตามปกติ
+
+### Workflow บังคับก่อน Step 3 (สร้างไฟล์ Batch)
+
+```bash
+# Step 2.5: เช็คเวลา BKK ปัจจุบันก่อนเลือก HHMM
+TZ=Asia/Bangkok date
+# ตัวอย่าง output: Sat May  2 23:02:00 +07 2026
+# → เลือก HHMM ≤ 22:55 (เผื่อ buffer 7 นาที)
+```
+
+จากนั้นใช้ HHMM ที่ปลอดภัย (≤ ปัจจุบัน) ทั้งใน:
+1. ชื่อไฟล์: `news/2026-MM-DD-HHMM.md`
+2. Frontmatter: `date: 2026-MM-DDTHH:MM:00Z` + `date_display: D MMM 2026 · HH:MM`
+3. Footer: `*สรุปโดย JP Trust Learning · D MMM 2026 · HH:MM*`
+4. news-index.json: `date`, `date_display`, `file`
+
+### Validation Script (เพิ่มใน Step 4)
+
+```python
+from datetime import datetime, timedelta
+
+# Parse HHMM from filename
+import re
+m = re.search(r'(\d{4})-(\d{2})-(\d{2})-(\d{2})(\d{2})\.md', filepath)
+y, mo, d, hh, mm = map(int, m.groups())
+batch_bkk = datetime(y, mo, d, hh, mm)
+
+# Current BKK time
+now_utc = datetime.utcnow()
+now_bkk = now_utc + timedelta(hours=7)
+
+assert batch_bkk <= now_bkk, \
+    f"❌ Batch timestamp {batch_bkk} อยู่ในอนาคต (now BKK: {now_bkk}) — timeAgo จะ fallback เป็น '2 พ.ค.'"
+print(f"✓ Timestamp OK — {(now_bkk - batch_bkk).total_seconds()/60:.0f} นาทีในอดีต")
+```
+
+### Recovery — แก้ batch ที่ใส่ timestamp อนาคต
+
+ถ้าเผลอ push batch ที่อยู่ในอนาคตไปแล้ว (user รายงานว่า card ขึ้น "2 พ.ค." ไม่มีเวลา):
+
+1. Backup `news-index.json` ก่อน
+2. Rename ไฟล์ `.md` ให้ HHMM ใหม่ตรงกับเวลา BKK ที่ push จริง (ดูจาก `git log --pretty=format:"%h | %ai | %s"`)
+3. แก้ frontmatter: `date`, `date_display`
+4. แก้ footer: `*สรุปโดย JP Trust Learning · D MMM YYYY · HH:MM*`
+5. แก้ index entry: `file`, `date`, `date_display` — แล้ว re-sort batches by date desc
+6. Commit message ใช้ prefix `fix(news):` ไม่ใช่ `feat(news):`
+
+### Code reference
+
+`member-dashboard.html:1222` — `function parseBatchDate(iso)` — แปลง Z → +07:00
+`member-dashboard.html:1231` — `function timeAgo(iso)` — มี guard `if(diffMs<0)return shortDate(d)`
+
+---
+
 ## ⚠️ 9. ข้อห้ามเด็ดขาด
 
 ### ห้ามแก้ไข
@@ -822,9 +902,11 @@ for b in data['batches'][:5]:
 
 - [ ] Pull latest จาก origin/main แล้ว
 - [ ] ข่าวเป็นข่าวจริง (จาก web search ที่เชื่อถือได้)
+- [ ] **HHMM ของ batch ≤ เวลา BKK ปัจจุบัน** (ดู §9.6 — เช็คด้วย `TZ=Asia/Bangkok date`)
 - [ ] Validate ไฟล์ .md ผ่าน (headlines, footer, no bad phrases)
 - [ ] Update news-index.json (backup ก่อนแก้)
 - [ ] Sentiment ถูกต้องตาม context (ดู §6)
+- [ ] Tone simulation ตรงกับใจความข่าว (ดู §9.5 — ใส่ `tone_override` ถ้าไม่ตรง)
 - [ ] ไม่ซ้ำหัวข้อเก่า
 - [ ] Footer มี `*สรุปโดย JP Trust Learning · DD ...*`
 - [ ] Commit message ชัดเจน
@@ -853,6 +935,8 @@ for b in data['batches'][:5]:
 | — | — | หลัง bug fix GLD sentiment logic (energy war) |
 | — | — | หลัง rewrite 22:30 batch เป็น plain Thai |
 | 1.1 | 21 เม.ย. 2026 | เพิ่ม §0 ปรัชญาพื้นฐาน — สังเคราะห์ ไม่ใช่แปล (Cross-reference, Value-add analysis, Thai investor angle, Checklist) |
+| 1.2 | 2 พ.ค. 2026 | เพิ่ม §9.5 Tone Override Workflow — `tone_override` field สำหรับกรณี deriveTone rule ไม่ตรงกับใจความข่าว |
+| 1.3 | 2 พ.ค. 2026 | เพิ่ม §9.6 Timestamp Convention — HHMM ต้อง ≤ เวลา BKK ปัจจุบัน, แก้ปัญหา card แสดง "2 พ.ค." แทน "Xh ago"; อัพเดท §13 checklist |
 
 ---
 
