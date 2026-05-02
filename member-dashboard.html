@@ -201,16 +201,16 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .lab-see-all:hover{color:var(--gold-dark)}
 
 /* Filter chips */
-.lab-chips{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px}
-.lab-chip{display:flex;align-items:center;gap:9px;padding:13px 11px;border-radius:14px;background:var(--cream-card);border:1.5px solid rgba(212,175,55,0.30);cursor:pointer;transition:all .18s;text-align:left;font-family:inherit;color:inherit;box-shadow:0 2px 8px rgba(114,47,55,0.05)}
+.lab-chips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:18px}
+.lab-chip{display:flex;align-items:center;gap:6px;padding:11px 8px;border-radius:14px;background:var(--cream-card);border:1.5px solid rgba(212,175,55,0.30);cursor:pointer;transition:all .18s;text-align:left;font-family:inherit;color:inherit;box-shadow:0 2px 8px rgba(114,47,55,0.05);min-width:0}
 .lab-chip:hover{border-color:var(--gold)}
 .lab-chip:active{transform:scale(.97)}
 .lab-chip.active{background:linear-gradient(135deg,#5A1F26 0%,#722F37 60%,#4A2318 100%);border-color:transparent;box-shadow:0 4px 12px rgba(90,31,38,0.3)}
-.lab-chip svg{width:22px;height:22px;flex-shrink:0;color:var(--gold-dark);stroke-width:1.7}
+.lab-chip svg{width:18px;height:18px;flex-shrink:0;color:var(--gold-dark);stroke-width:1.7}
 .lab-chip.active svg{color:var(--gold-light)}
 .lab-chip .chip-meta{flex:1;min-width:0}
-.chip-title{font-size:13px;font-weight:700;color:var(--text-dark);line-height:1.15}
-.chip-sub{font-size:10.5px;color:var(--text-dark-muted);margin-top:1px;font-weight:500}
+.chip-title{font-size:12.5px;font-weight:700;color:var(--text-dark);line-height:1.18;word-break:break-word}
+.chip-sub{font-size:10px;color:var(--text-dark-muted);margin-top:2px;font-weight:500;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lab-chip.active .chip-title{color:#FFF}
 .lab-chip.active .chip-sub{color:rgba(244,228,186,0.78)}
 
