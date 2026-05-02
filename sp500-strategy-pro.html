@@ -1345,6 +1345,20 @@
     font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;
   }
   .trade-summary strong { color: var(--text-dark); font-weight: 700; }
+  .trade-recheck-btn {
+    background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.4);
+    border-radius: 4px; padding: 4px 9px;
+    font-family: 'Cinzel','Anuphan',serif; font-size: 0.62rem; font-weight: 700;
+    color: var(--gold-deep); letter-spacing: 1px; text-transform: uppercase;
+    cursor: pointer; flex-shrink: 0; line-height: 1.4;
+    transition: background 0.18s, border-color 0.18s;
+  }
+  .trade-recheck-btn:hover {
+    background: rgba(212,175,55,0.22); border-color: rgba(212,175,55,0.6);
+  }
+  .trade-recheck-btn svg {
+    vertical-align: -2px; margin-right: 4px;
+  }
   .trade-section {
     margin-top: 8px; padding-top: 8px;
     border-top: 1px solid rgba(212,175,55,0.15);
@@ -2453,10 +2467,13 @@ function processData(csv) {
     if(row.length < 7) continue;
     const ticker = row[0].trim();
     const date = row[1].trim();
+    const open = parseFloat(row[2]);
+    const high = parseFloat(row[3]);
+    const low = parseFloat(row[4]);
     const close = parseFloat(row[5]);
     const volume = parseFloat(row[6]);
     if (!state.marketData[date]) state.marketData[date] = {};
-    state.marketData[date][ticker] = { c: close, v: volume };
+    state.marketData[date][ticker] = { o: open, h: high, l: low, c: close, v: volume };
     dateSet.add(date);
   }
   state.sortedDates = Array.from(dateSet).sort();
@@ -3364,7 +3381,11 @@ function renderTradeLog() {
         '<div class="trade-summary">' +
         'ซื้อรวม <strong>' + ps.picks.length + ' ตัว</strong> · งบ <strong>$' + Math.round(ps.capital).toLocaleString() + '</strong>' +
         ' · รอเปิดวัน' + entryDayName + ' · เข้ารอบ <strong>' + ps.nextRebalLabel + '</strong> (' + daysLabel + ')' +
-        '</div></div></div>';
+        '</div></div>' +
+        '<button class="trade-recheck-btn" onclick="openRecheckPdf(null, true)" title="พิมพ์รายละเอียดเพื่อตรวจสอบ">' +
+          '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>Recheck PDF' +
+        '</button>' +
+        '</div>';
 
       const badges = ps.picks.map(p => {
         const retPct = (p.ret * 100).toFixed(1);
@@ -3477,7 +3498,11 @@ function renderTradeLog() {
       // OPEN position: show unrealized P&L with "ล่าสุด" label
       header += ` · <span style="color:var(--gold-deep);font-weight:600;">ล่าสุด:</span> <span class="${retCls}"><strong>$${Math.round(r.pnl).toLocaleString()}</strong> (${r.pnlPct>=0?'+':''}${r.pnlPct.toFixed(2)}%)</span>`;
     }
-    header += `</div></div></div>`;
+    header += `</div></div>
+      <button class="trade-recheck-btn" onclick="openRecheckPdf('${r.date}', false)" title="พิมพ์รายละเอียดเพื่อตรวจสอบ">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>Recheck PDF
+      </button>
+    </div>`;
 
     const section = `<div class="trade-section">
       <div class="trade-section-label mom">MOMENTUM — ${r.stocks.length} ตัว
@@ -3500,6 +3525,177 @@ window.gotoTradeLogPage = function(p) {
   renderTradeLog();
   const container = document.getElementById('tradeLogContainer');
   if (container) container.scrollTop = 0;
+};
+
+// ============================================================
+// RECHECK PDF — open a print-ready window showing OHLV at the 3 key dates
+// (lookback start, lookback end, holding end) for the top N stocks of an entry.
+// ============================================================
+
+function _getRecheckDatesForEntry(entryDate) {
+  // entryDate = ISO date string (e.g. '2026-02-02') of a rebalance day
+  const entryIdx = state.sortedDates.indexOf(entryDate);
+  if (entryIdx < 0) return null;
+  const entryDateObj = new Date(entryDate);
+  const prevAnchor = getPrevRebalAnchor(entryDateObj.getFullYear(), entryDateObj.getMonth());
+  if (!prevAnchor) return null;
+  const prevRebalFirstIdx = firstDayIdxInMonth(prevAnchor.year, prevAnchor.month);
+  if (prevRebalFirstIdx < 0) return null;
+  const lookbackStartIdx = prevRebalFirstIdx + 1;
+  const lookbackEndIdx = entryIdx - 1;
+  if (lookbackStartIdx >= lookbackEndIdx) return null;
+
+  // Holding end: find next trade log entry; if last → use latest available date (OPEN)
+  const tradeIdx = state.tradeLog.findIndex(t => t.date === entryDate);
+  let holdingEndIdx;
+  if (tradeIdx >= 0 && tradeIdx + 1 < state.tradeLog.length) {
+    holdingEndIdx = state.sortedDates.indexOf(state.tradeLog[tradeIdx + 1].date);
+  } else {
+    holdingEndIdx = state.sortedDates.length - 1;
+  }
+
+  return {
+    lookbackStart: state.sortedDates[lookbackStartIdx],
+    lookbackEnd: state.sortedDates[lookbackEndIdx],
+    holdingEnd: holdingEndIdx >= 0 ? state.sortedDates[holdingEndIdx] : null
+  };
+}
+
+function _getRecheckDatesForPending() {
+  if (!state.pendingSignal) return null;
+  const ps = state.pendingSignal;
+  const lastIdx = state.sortedDates.length - 1;
+  const prevAnchor = getPrevRebalAnchor(ps.nextRebalYear, ps.nextRebalMonth);
+  if (!prevAnchor) return null;
+  const prevRebalFirstIdx = firstDayIdxInMonth(prevAnchor.year, prevAnchor.month);
+  if (prevRebalFirstIdx < 0) return null;
+  const lookbackStartIdx = prevRebalFirstIdx + 1;
+  if (lookbackStartIdx >= lastIdx) return null;
+  return {
+    lookbackStart: state.sortedDates[lookbackStartIdx],
+    lookbackEnd: state.sortedDates[lastIdx],
+    holdingEnd: null   // not yet held — only 2 dates
+  };
+}
+
+function _fmtNum(n, decimals) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  if (decimals === undefined) decimals = 2;
+  return n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+
+function _fmtVol(v) {
+  if (v === null || v === undefined || isNaN(v)) return '—';
+  return Math.round(v).toLocaleString('en-US');
+}
+
+function _buildOhlvTable(date, tickers) {
+  // Build HTML table of OHLV for tickers on date
+  const dayData = state.marketData[date];
+  if (!dayData) {
+    return '<div style="color:#9c2b2b;padding:8px;">ไม่มีข้อมูลของวันที่นี้</div>';
+  }
+  let rows = '';
+  tickers.forEach(t => {
+    const d = dayData[t];
+    if (d) {
+      rows += `<tr><td class="ticker">${t}</td><td>${_fmtNum(d.o)}</td><td>${_fmtNum(d.h)}</td><td>${_fmtNum(d.l)}</td><td class="vol">${_fmtVol(d.v)}</td></tr>`;
+    } else {
+      rows += `<tr><td class="ticker">${t}</td><td colspan="4" style="color:#9c2b2b;text-align:center;">— ไม่มีข้อมูล —</td></tr>`;
+    }
+  });
+  return `<table>
+    <thead><tr><th class="ticker">Ticker</th><th>Open</th><th>High</th><th>Low</th><th class="vol">Volume</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+window.openRecheckPdf = function(entryDate, isPending) {
+  const dates = isPending ? _getRecheckDatesForPending() : _getRecheckDatesForEntry(entryDate);
+  if (!dates) {
+    alert('ไม่สามารถสร้าง recheck ได้ — ข้อมูลไม่พอ');
+    return;
+  }
+  let tickers;
+  let title;
+  if (isPending) {
+    tickers = (state.pendingSignal?.picks || []).map(p => p.ticker);
+    title = 'PENDING — รอบถัดไป (' + (state.pendingSignal?.nextRebalLabel || '') + ')';
+  } else {
+    const entry = state.tradeLog.find(t => t.date === entryDate);
+    tickers = entry ? entry.stocks : [];
+    title = 'รอบ ' + entryDate;
+  }
+  if (tickers.length === 0) {
+    alert('ไม่มีรายชื่อหุ้น');
+    return;
+  }
+
+  const sections = [];
+  sections.push({ label: '① วันเริ่มนับจัดอันดับ', date: dates.lookbackStart, note: '(2nd biz day ของ rebal month รอบก่อน — START price + วันแรกที่บวก volume)' });
+  sections.push({ label: '② วันสิ้นสุดการนับจัดอันดับ', date: dates.lookbackEnd, note: '(วันก่อน rebal — END price + วันสุดท้ายที่บวก volume)' });
+  if (dates.holdingEnd) {
+    sections.push({ label: '③ วันสิ้นสุดการถือครอง', date: dates.holdingEnd, note: isPending ? '' : '(วัน rebal รอบถัดไป หรือล่าสุดถ้ายังถืออยู่)' });
+  }
+
+  const sectionsHtml = sections.map(s => `
+    <div class="date-section">
+      <div class="date-header">${s.label} — <strong>${s.date}</strong></div>
+      <div class="date-note">${s.note}</div>
+      ${_buildOhlvTable(s.date, tickers)}
+    </div>
+  `).join('');
+
+  const html = `<!DOCTYPE html>
+<html lang="th"><head><meta charset="UTF-8">
+<title>JPT 6M Momentum — Recheck ${title}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Cinzel:wght@600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Sarabun', sans-serif; padding: 24px; color: #2a1f1a; background: #faf6ed; max-width: 800px; margin: 0 auto; }
+  h1 { font-family: 'DM Serif Display', serif; color: #5a1f26; margin: 0 0 4px; font-size: 1.8rem; }
+  .subtitle { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 2px; color: #8b6914; text-transform: uppercase; margin-bottom: 16px; }
+  .meta { background: rgba(212,175,55,0.08); border-left: 3px solid #d4af37; padding: 10px 14px; border-radius: 4px; margin-bottom: 24px; font-size: 0.88rem; color: #5a3d20; line-height: 1.6; }
+  .date-section { margin-bottom: 28px; page-break-inside: avoid; }
+  .date-header { background: linear-gradient(135deg, #5a1f26, #722f37); color: #f4e4ba; padding: 8px 14px; border-radius: 4px 4px 0 0; font-weight: 600; font-size: 0.95rem; }
+  .date-note { font-size: 0.74rem; color: #7a6f62; padding: 4px 14px 8px; background: rgba(212,175,55,0.05); }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 6px 10px; border-bottom: 1px solid rgba(212,175,55,0.3); text-align: right; font-size: 0.85rem; }
+  th { background: #faf3e6; color: #8b6914; font-weight: 600; font-family: 'Cinzel', serif; font-size: 0.74rem; letter-spacing: 0.5px; text-transform: uppercase; }
+  th.ticker, td.ticker { text-align: left; }
+  td.ticker { font-weight: 600; color: #5a1f26; font-family: 'Cinzel', serif; }
+  td.vol, th.vol { font-variant-numeric: tabular-nums; }
+  .actions { text-align: center; padding: 16px 0; border-bottom: 1px dashed rgba(212,175,55,0.4); margin-bottom: 20px; }
+  .actions button { padding: 10px 24px; background: linear-gradient(135deg, #5a1f26, #722f37); color: #f4e4ba; border: none; border-radius: 6px; font-family: 'Sarabun', sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer; letter-spacing: 0.5px; }
+  .actions button:hover { background: linear-gradient(135deg, #722f37, #8b6914); }
+  .footer { text-align: center; font-size: 0.7rem; color: #8b6914; font-family: 'Cinzel', serif; letter-spacing: 1px; margin-top: 32px; padding-top: 16px; border-top: 1px solid rgba(212,175,55,0.3); }
+  @media print {
+    body { background: white; padding: 12px; max-width: 100%; }
+    .actions, .no-print { display: none !important; }
+    .date-section { page-break-inside: avoid; }
+  }
+</style>
+</head><body>
+  <div class="actions no-print">
+    <button onclick="window.print()">บันทึกเป็น PDF / พิมพ์</button>
+  </div>
+  <div class="subtitle">JPT 6M MOMENTUM · TRADE RECHECK</div>
+  <h1>${title}</h1>
+  <div class="meta">
+    <div><strong>หุ้นที่จัดอันดับ:</strong> ${tickers.length} ตัว · ${tickers.join(', ')}</div>
+    <div style="margin-top:6px;"><strong>หน้าต่าง lookback:</strong> ${dates.lookbackStart} → ${dates.lookbackEnd}${dates.holdingEnd ? ' · <strong>ถือถึง:</strong> ' + dates.holdingEnd : ' · ยังไม่ได้เริ่มถือ'}</div>
+  </div>
+  ${sectionsHtml}
+  <div class="footer">JP Trust Learning · jptrustlearning.com</div>
+</body></html>`;
+
+  const w = window.open('', '_blank');
+  if (!w) {
+    alert('Pop-up ถูก browser block — กรุณา allow pop-up ของหน้านี้ก่อน');
+    return;
+  }
+  w.document.write(html);
+  w.document.close();
 };
 
 function renderEquityChart() {
