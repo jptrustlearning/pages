@@ -75,25 +75,23 @@ body > * { position: relative; z-index: 1; }
 }
 .roadmap-map {
   position: absolute;
-  top: 12px;
-  right: 20px;
-  width: 64px;
+  top: 10px;
+  right: 14px;
+  width: 100px;
   height: auto;
   pointer-events: none;
   z-index: 1;
-  filter: drop-shadow(0 4px 10px rgba(212,175,55,0.5));
-  transform-origin: 50% 100%;
-  animation: roadmap-map-wiggle 2.6s ease-in-out infinite;
+  filter: drop-shadow(0 4px 12px rgba(212,175,55,0.55));
+  transform-origin: 50% 50%;
+  animation: roadmap-map-wiggle 3s ease-in-out infinite;
   will-change: transform;
 }
 @keyframes roadmap-map-wiggle {
-  0%, 100% { transform: rotate(-15deg) translateY(0); }
-  20%      { transform: rotate(-22deg) translateY(2px); }
-  50%      { transform: rotate(-8deg)  translateY(-4px); }
-  80%      { transform: rotate(-22deg) translateY(2px); }
+  0%, 100% { transform: rotate(-10deg) translateY(0); }
+  50%      { transform: rotate(-7deg)  translateY(-5px); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .roadmap-map { animation: none; transform: rotate(-12deg); }
+  .roadmap-map { animation: none; transform: rotate(-9deg); }
 }
 .hero-inner { position: relative; z-index: 2; max-width: 900px; margin: 0 auto; }
 .hero-label {
