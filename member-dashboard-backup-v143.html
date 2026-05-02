@@ -970,7 +970,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                   <div class="cs-title">เปรียบเทียบกลยุทธ์</div>
                   <span class="cs-count-badge empty" id="labCompareCount">ยังว่าง</span>
                 </div>
-                <div class="cs-desc" id="labCompareDesc">กดปุ่มบันทึกในหน้ากลยุทธ์<br>เพื่อนำมาเปรียบเทียบ</div>
+                <div class="cs-desc" id="labCompareDesc">กดปุ่ม “บันทึก” ในหน้ากลยุทธ์<br>เพื่อเก็บผลแบ็คเทสไว้เปรียบเทียบ</div>
               </div>
               <div class="cs-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
             </a>
@@ -1965,11 +1965,11 @@ window.addEventListener('appinstalled',()=>{hideIB();showInstallSuccessModal()})
     if(n > 0){
       badge.textContent = n + ' รายการ';
       badge.classList.remove('empty');
-      desc.innerHTML = 'นำผลแบ็คเทสที่บันทึกไว้<br>มาเทียบ CAGR และ Max DD';
+      desc.innerHTML = 'นำผลแบ็คเทสที่บันทึกไว้มาเทียบ CAGR กับ Max DD<br>ในตารางเดียว — เรียงตามผลตอบแทนหรือความเสี่ยงได้';
     } else {
       badge.textContent = 'ยังว่าง';
       badge.classList.add('empty');
-      desc.innerHTML = 'กดปุ่มบันทึกในหน้ากลยุทธ์<br>เพื่อนำมาเปรียบเทียบ';
+      desc.innerHTML = 'กดปุ่ม “บันทึก” ในหน้ากลยุทธ์<br>เพื่อเก็บผลแบ็คเทสไว้เปรียบเทียบ';
     }
   }
   // Expose CTA click handler (referenced by inline onclick in markup)
