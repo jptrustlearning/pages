@@ -2498,6 +2498,10 @@ function simulateStrategy(wRet, nStocks) {
 
   let lastRebalancedMonth = -1;
 
+  // ⚠️ BUG FIX: CONFIG.lookbackWeeks is in WEEKS but state.sortedDates is daily.
+  // Convert to trading days (5/week) so 26 weeks → 130 days = ~6 months as intended.
+  const lookbackDays = CONFIG.lookbackWeeks * 5;
+
   for (let i = startIndex; i < state.sortedDates.length; i++) {
     const dateStr = state.sortedDates[i];
     const dateObj = new Date(dateStr);
@@ -2516,9 +2520,9 @@ function simulateStrategy(wRet, nStocks) {
     const isFirstWeek = dateObj.getDate() <= 7;
     const notAlreadyRebalanced = currentMonthKey !== lastRebalancedMonth;
 
-    if (isRebalance && isFirstWeek && notAlreadyRebalanced && i > CONFIG.lookbackWeeks) {
+    if (isRebalance && isFirstWeek && notAlreadyRebalanced && i > lookbackDays) {
       const signalIdx = i - 1;
-      const startIdx = signalIdx - CONFIG.lookbackWeeks;
+      const startIdx = signalIdx - lookbackDays;
       if (startIdx >= 0) {
         // USE SHARED rankStocks (with override weight) — identical to runBacktest
         const candidates = rankStocks(signalIdx, startIdx, wRet);
@@ -2681,6 +2685,10 @@ function runBacktest() {
 
   let lastRebalancedMonth = -1;  // track to prevent duplicate rebalances in same month
 
+  // ⚠️ BUG FIX: CONFIG.lookbackWeeks is in WEEKS but state.sortedDates is daily.
+  // Convert to trading days (5/week) so 26 weeks → 130 days = ~6 months as intended.
+  const lookbackDays = CONFIG.lookbackWeeks * 5;
+
   for (let i = startIndex; i < state.sortedDates.length; i++) {
     const dateStr = state.sortedDates[i];
     const dateObj = new Date(dateStr);
@@ -2700,9 +2708,9 @@ function runBacktest() {
 
     // Ensure lookback works even if i is near start of filtered period 
     // (i is index in FULL sortedDates, so lookback logic works fine)
-    if (isRebalanceMonth && isFirstWeek && notAlreadyRebalanced && i > CONFIG.lookbackWeeks) {
+    if (isRebalanceMonth && isFirstWeek && notAlreadyRebalanced && i > lookbackDays) {
       const signalIdx = i - 1;
-      const startIdx = signalIdx - CONFIG.lookbackWeeks;
+      const startIdx = signalIdx - lookbackDays;
       if (startIdx >= 0) {
         const candidates = rankStocks(signalIdx, startIdx);
         const selected = candidates.slice(0, CONFIG.topN);
@@ -2725,7 +2733,7 @@ function runBacktest() {
   // =========================================================
   state.pendingSignal = null;
   try {
-    if (state.sortedDates.length > CONFIG.lookbackWeeks + 5) {
+    if (state.sortedDates.length > lookbackDays + 5) {
       const lastIdx = state.sortedDates.length - 1;
       const lastDate = state.sortedDates[lastIdx];
       const lastDateObj = new Date(lastDate);
@@ -2753,7 +2761,7 @@ function runBacktest() {
       const daysUntil = Math.max(0, Math.ceil((nextRebalDate - lastDateObj) / 86400000));
 
       const signalIdx = lastIdx;
-      const startIdx = signalIdx - CONFIG.lookbackWeeks;
+      const startIdx = signalIdx - lookbackDays;
       if (startIdx >= 0 && state.sortedDates[signalIdx] && state.sortedDates[startIdx] && state.marketData[state.sortedDates[signalIdx]] && state.marketData[state.sortedDates[startIdx]]) {
         const candidates = rankStocks(signalIdx, startIdx);
         if (candidates && candidates.length > 0) {
