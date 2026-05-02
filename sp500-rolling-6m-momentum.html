@@ -2741,7 +2741,7 @@ window.downloadDetailsPdf = function(event, entryDate, exitDate, isPending) {
   const backBtn = document.createElement('button');
   backBtn.style.cssText = 'background:linear-gradient(135deg,#EC4899 0%,#C026D3 22%,#DC2626 42%,#8B5CF6 65%,#6366F1 82%,#D4AF37 100%);background-size:220% 220%;color:#FFF;text-shadow:0 1px 2px rgba(0,0,0,0.35);box-shadow:0 0 12px rgba(236,72,153,0.35),0 0 22px rgba(139,92,246,0.25),0 4px 8px rgba(0,0,0,0.15);animation:_jptCosmicShift 5s ease-in-out infinite;border:none;border-radius:6px;padding:9px 16px;font-family:Sarabun,sans-serif;font-weight:600;font-size:0.82rem;cursor:pointer;letter-spacing:0.5px;display:inline-flex;align-items:center;gap:6px;';
   backBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>ย้อนกลับเข้าแอป';
-  backBtn.onclick = () => overlay.remove();
+  // backBtn.onclick assigned later (after blob URL is created, so cleanup can revoke it)
 
   const printBtn = document.createElement('button');
   printBtn.style.cssText = 'background:linear-gradient(135deg,#5a1f26,#722f37);color:#f4e4ba;border:none;border-radius:6px;padding:9px 16px;font-family:Sarabun,sans-serif;font-weight:600;font-size:0.82rem;cursor:pointer;letter-spacing:0.5px;';
@@ -2751,9 +2751,17 @@ window.downloadDetailsPdf = function(event, entryDate, exitDate, isPending) {
   topBar.appendChild(printBtn);
 
   const iframe = document.createElement('iframe');
-  iframe.srcdoc = html;
   iframe.style.cssText = 'flex:1;border:none;width:100%;background:white;display:block;';
   iframe.setAttribute('title', 'JPT Rolling 6M Details Preview');
+
+  // Build blob URL — more reliable than srcdoc across browsers (esp. iOS Safari/PWA)
+  const _blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const _blobUrl = URL.createObjectURL(_blob);
+
+  // Cleanup function: revoke blob URL
+  const _cleanup = () => {
+    try { URL.revokeObjectURL(_blobUrl); } catch (e) {}
+  };
 
   printBtn.onclick = () => {
     try {
@@ -2764,13 +2772,22 @@ window.downloadDetailsPdf = function(event, entryDate, exitDate, isPending) {
     }
   };
 
+  // Override backBtn click to also revoke blob URL
+  backBtn.onclick = () => { overlay.remove(); _cleanup(); };
+
   overlay.appendChild(topBar);
   overlay.appendChild(iframe);
   document.body.appendChild(overlay);
 
+  // CRITICAL: set src AFTER iframe is in the DOM tree.
+  // Setting srcdoc/src before appendChild can race in some browsers (Safari iOS, Chrome PWA),
+  // causing the iframe to render blank while the topBar buttons still work.
+  iframe.src = _blobUrl;
+
   const escHandler = (e) => {
     if (e.key === 'Escape') {
       overlay.remove();
+      _cleanup();
       document.removeEventListener('keydown', escHandler);
     }
   };
