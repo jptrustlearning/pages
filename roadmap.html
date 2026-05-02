@@ -62,8 +62,8 @@ body > * { position: relative; z-index: 1; }
 .hero {
   position: relative;
   padding: 36px 26px 30px;
-  background: linear-gradient(120deg, rgba(20,8,12,0.62) 0%, rgba(40,15,20,0.42) 50%, rgba(58,20,29,0.18) 100%),
-              url('roadmap-hero-bg.jpg?v=1777735819') center/cover no-repeat;
+  background: linear-gradient(160deg, rgba(26,10,14,0.55), rgba(58,20,29,0.35)),
+              url('lab-hero-bg.jpg?v=1777734103') center/cover no-repeat;
   border-radius: 16px;
   margin: 14px 16px 0;
   overflow: hidden;
@@ -72,6 +72,28 @@ body > * { position: relative; z-index: 1; }
 .hero::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
   background: linear-gradient(90deg, transparent, var(--gold-sheen), var(--gold), var(--gold-sheen), transparent);
+}
+.roadmap-map {
+  position: absolute;
+  top: 12px;
+  right: 20px;
+  width: 64px;
+  height: auto;
+  pointer-events: none;
+  z-index: 1;
+  filter: drop-shadow(0 4px 10px rgba(212,175,55,0.5));
+  transform-origin: 50% 100%;
+  animation: roadmap-map-wiggle 2.6s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes roadmap-map-wiggle {
+  0%, 100% { transform: rotate(-15deg) translateY(0); }
+  20%      { transform: rotate(-22deg) translateY(2px); }
+  50%      { transform: rotate(-8deg)  translateY(-4px); }
+  80%      { transform: rotate(-22deg) translateY(2px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .roadmap-map { animation: none; transform: rotate(-12deg); }
 }
 .hero-inner { position: relative; z-index: 2; max-width: 900px; margin: 0 auto; }
 .hero-label {
@@ -1094,6 +1116,7 @@ body > * { position: relative; z-index: 1; }
     <div class="hero-label">JP Trust Learning</div>
     <h1 class="hero-title">Roadmap <span class="th">90 วัน</span><br><span class="th hero-title-sub">สู่พอร์ตการลงทุนที่ยั่งยืน</span></h1>
   </div>
+  <img class="roadmap-map" src="roadmap-map.png?v=1777734103" alt="" aria-hidden="true">
 </div>
 
 <!-- ===== PLANNING DASHBOARDS (top of roadmap) ===== -->
