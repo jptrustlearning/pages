@@ -2170,7 +2170,7 @@
 let CONFIG = {
   perLotCapital: 600,          // default per-lot USD (user editable)
   topN: 10,                    // default top 10 stocks per lot
-  lookbackWeeks: 26,           // 6 months (~130 trading days) — same as 6M Momentum
+  lookbackWeeks: 26,           // DEPRECATED — no longer used (replaced by calendar-based lookback: 6 calendar months back). Kept for compat.
   holdMonths: 6,               // hold each lot for 6 months
   rebalanceMonths: [0,1,2,3,4,5,6,7,8,9,10,11], // every month (first biz day)
   weightRet: 0.5,
@@ -2476,6 +2476,38 @@ function processData(csv) {
   if (matchYear) el.inputStartYear.value = matchYear;
 }
 
+// ============================================================
+// CALENDAR-BASED LOOKBACK HELPERS
+// Each Rolling-6M rebalance ranks stocks using the 6-calendar-month
+// holding period of the lot that's about to mature this month.
+// e.g. Aug rebal → window = [2nd biz day of Feb (same year)] → [day before Aug rebal]
+//      Mar rebal → window = [2nd biz day of Sep (prev year)] → [day before Mar rebal]
+// "2nd biz day" because 1st biz day is the transaction day (buy at close), so the
+// market exposure of the prior lot starts from the 2nd biz day onward.
+// ============================================================
+function firstDayIdxInMonth(year, monthIdx) {
+  // Returns index of first sortedDates entry whose Date is in (year, monthIdx).
+  // monthIdx is 0-indexed (Jan=0, Feb=1, ..., Dec=11). Returns -1 if data doesn't reach that month.
+  for (let k = 0; k < state.sortedDates.length; k++) {
+    const d = new Date(state.sortedDates[k]);
+    const y = d.getFullYear(), m = d.getMonth();
+    if (y === year && m === monthIdx) return k;
+    if (y > year || (y === year && m > monthIdx)) return -1;  // passed without finding
+  }
+  return -1;
+}
+
+function getPrevRebalAnchor(currentYear, currentMonth) {
+  // Rolling 6M: each lot holds for 6 calendar months. The lot maturing in (currentYear, currentMonth)
+  // was bought 6 months ago. So the prev rebal anchor is exactly 6 calendar months earlier.
+  // Example: currentMonth=7 (Aug) → prev=1 (Feb), same year
+  // Example: currentMonth=2 (Mar) → prev=8 (Sep), previous year
+  let prevMonth = currentMonth - 6;
+  let prevYear = currentYear;
+  if (prevMonth < 0) { prevMonth += 12; prevYear -= 1; }
+  return { year: prevYear, month: prevMonth };
+}
+
 function simulateStrategy(wRet, nStocks) {
   // SENSITIVITY SIMULATOR — mirrors runRollingBacktest but with override weight + topN.
   // Must produce identical CAGR/DD/Sharpe as main run when wRet=CONFIG.weightRet, nStocks=CONFIG.topN.
@@ -2510,10 +2542,14 @@ function simulateStrategy(wRet, nStocks) {
     const isFirstWeek = dateObj.getDate() <= 7;
     const notAlreadyRebalanced = currentMonthKey !== lastRebalancedMonth;
 
-    if (isFirstWeek && notAlreadyRebalanced && i > CONFIG.lookbackWeeks) {
+    if (isFirstWeek && notAlreadyRebalanced) {
+      // Calendar-based lookback: 6 calendar months back (matches the lot maturing this month).
+      // Window = [2nd biz day of (currentMonth - 6)] → [day before this rebal day]
       const signalIdx = i - 1;
-      const startIdx = signalIdx - CONFIG.lookbackWeeks;
-      if (startIdx >= 0) {
+      const prevAnchor = getPrevRebalAnchor(dateObj.getFullYear(), dateObj.getMonth());
+      const prevRebalFirstIdx = firstDayIdxInMonth(prevAnchor.year, prevAnchor.month);
+      const startIdx = prevRebalFirstIdx >= 0 ? prevRebalFirstIdx + 1 : -1;
+      if (startIdx >= 0 && startIdx < signalIdx) {
         // Sell matured lots
         let saleProceeds = 0;
         const maturing = lots.filter(lot => (currentMonthKey - lot.entryMonthKey) >= CONFIG.holdMonths);
@@ -2669,7 +2705,7 @@ function runRollingBacktest() {
   // ROLLING 6M MOMENTUM — LOGIC
   //
   // Entry: first business day of every month
-  // Ranking: identical to 6M Momentum (rankStocks with signalIdx = i-1, startIdx = i-1-lookbackWeeks)
+  // Ranking: identical to 6M Momentum (rankStocks with signalIdx = i-1, calendar-based startIdx = 2nd biz day of 6 months back)
   // Hold: exactly `holdMonths` months per lot (no early exit)
   // Ramp-up (months 1-6): draw `perLotCapital` from parked cash reserve → open new lot
   // Steady-state (month 7+): matured lot sells → proceeds become next new lot's capital (compounding chain)
@@ -2738,10 +2774,14 @@ function runRollingBacktest() {
     const isFirstWeek = dateObj.getDate() <= 7;
     const notAlreadyRebalanced = currentMonthKey !== lastRebalancedMonth;
 
-    if (isFirstWeek && notAlreadyRebalanced && i > CONFIG.lookbackWeeks) {
+    if (isFirstWeek && notAlreadyRebalanced) {
+      // Calendar-based lookback: 6 calendar months back (matches the lot maturing this month).
+      // Window = [2nd biz day of (currentMonth - 6)] → [day before this rebal day]
       const signalIdx = i - 1;
-      const startIdx = signalIdx - CONFIG.lookbackWeeks;
-      if (startIdx >= 0) {
+      const prevAnchor = getPrevRebalAnchor(dateObj.getFullYear(), dateObj.getMonth());
+      const prevRebalFirstIdx = firstDayIdxInMonth(prevAnchor.year, prevAnchor.month);
+      const startIdx = prevRebalFirstIdx >= 0 ? prevRebalFirstIdx + 1 : -1;
+      if (startIdx >= 0 && startIdx < signalIdx) {
 
         // === 3. Sell any lot that has matured (age ≥ holdMonths) ===
         let saleProceeds = 0;
@@ -2841,7 +2881,7 @@ function runRollingBacktest() {
   // =========================================================
   state.pendingSignal = null;
   try {
-    if (state.sortedDates.length > CONFIG.lookbackWeeks + 5) {
+    if (state.sortedDates.length > 5) {
       const lastIdx = state.sortedDates.length - 1;
       const lastDate = state.sortedDates[lastIdx];
       const lastDateObj = new Date(lastDate);
@@ -2865,9 +2905,14 @@ function runRollingBacktest() {
       const nextRebalDate = new Date(nextRebalYear, nextRebalMonth, 1);
       const daysUntil = Math.max(0, Math.ceil((nextRebalDate - lastDateObj) / 86400000));
 
+      // Calendar-based lookback for PENDING:
+      // Window = [2nd biz day of (nextRebalMonth - 6)] → [lastIdx (today)]
+      // i.e., uses "elastic" data — preview becomes more complete as we approach the next rebal date.
       const signalIdx = lastIdx;
-      const startIdx = signalIdx - CONFIG.lookbackWeeks;
-      if (startIdx >= 0 && state.sortedDates[signalIdx] && state.sortedDates[startIdx] && state.marketData[state.sortedDates[signalIdx]] && state.marketData[state.sortedDates[startIdx]]) {
+      const prevAnchor = getPrevRebalAnchor(nextRebalYear, nextRebalMonth);
+      const prevRebalFirstIdx = firstDayIdxInMonth(prevAnchor.year, prevAnchor.month);
+      const startIdx = prevRebalFirstIdx >= 0 ? prevRebalFirstIdx + 1 : -1;
+      if (startIdx >= 0 && startIdx < signalIdx && state.sortedDates[signalIdx] && state.sortedDates[startIdx] && state.marketData[state.sortedDates[signalIdx]] && state.marketData[state.sortedDates[startIdx]]) {
         const candidates = rankStocks(signalIdx, startIdx);
         if (candidates && candidates.length > 0) {
           const picks = candidates.slice(0, CONFIG.topN);
@@ -4132,7 +4177,7 @@ window.switchStatsTab = function(tab) {
           'จำนวนหุ้นต่อล็อต': CONFIG.topN + ' ตัว',
           'น้ำหนัก Return / Volume': Math.round((CONFIG.weightRet||0)*100) + '% / ' + Math.round((CONFIG.weightVol||0)*100) + '%',
           'ระยะถือครอง': CONFIG.holdMonths + ' เดือน',
-          'Lookback': CONFIG.lookbackWeeks + ' สัปดาห์',
+          'Lookback': 'ย้อน 6 เดือนปฏิทิน (ตามล็อตที่ครบกำหนด)',
           'ปีเริ่มต้น': CONFIG.startYear
         }
       };
