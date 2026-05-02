@@ -1345,6 +1345,23 @@
     font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;
   }
   .trade-summary strong { color: var(--text-dark); font-weight: 700; }
+  .trade-details-btn {
+    background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+    border: none; color: #FFFFFF;
+    border-radius: 4px; padding: 5px 11px;
+    font-family: 'Cinzel','Anuphan',serif; font-size: 0.62rem; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    cursor: pointer; flex-shrink: 0; line-height: 1.4;
+    box-shadow: 0 1px 2px rgba(185,28,28,0.3);
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s;
+  }
+  .trade-details-btn:hover {
+    background: linear-gradient(135deg, #B91C1C 0%, #991B1B 100%);
+    box-shadow: 0 2px 5px rgba(185,28,28,0.4);
+  }
+  .trade-details-btn:active { transform: translateY(1px); }
+  .trade-details-btn:disabled { cursor: wait; opacity: 0.65; }
+  .trade-details-btn svg { vertical-align: -2px; margin-right: 4px; }
   .trade-section {
     margin-top: 8px; padding-top: 8px;
     border-top: 1px solid rgba(212,175,55,0.15);
@@ -2447,10 +2464,13 @@ function processData(csv) {
     if(row.length < 7) continue;
     const ticker = row[0].trim();
     const date = row[1].trim();
+    const open = parseFloat(row[2]);
+    const high = parseFloat(row[3]);
+    const low = parseFloat(row[4]);
     const close = parseFloat(row[5]);
     const volume = parseFloat(row[6]);
     if (!state.marketData[date]) state.marketData[date] = {};
-    state.marketData[date][ticker] = { c: close, v: volume };
+    state.marketData[date][ticker] = { o: open, h: high, l: low, c: close, v: volume };
     dateSet.add(date);
   }
   state.sortedDates = Array.from(dateSet).sort();
@@ -2507,6 +2527,255 @@ function getPrevRebalAnchor(currentYear, currentMonth) {
   if (prevMonth < 0) { prevMonth += 12; prevYear -= 1; }
   return { year: prevYear, month: prevMonth };
 }
+
+// ============================================================
+// DETAILS PDF — recheck/verify dates for a specific trade entry
+// Three dates per entry: lookback start, lookback end, holding end (6 months later).
+// For pending: only 2 dates (no holding end yet).
+// ============================================================
+function _getRecheckDatesForEntry(entryDate, exitDate) {
+  // entryDate = ISO date (e.g. '2026-02-02') of a rebalance day; exitDate = lot's exit ISO date
+  const entryIdx = state.sortedDates.indexOf(entryDate);
+  if (entryIdx < 0) return null;
+  const entryDateObj = new Date(entryDate);
+  const prevAnchor = getPrevRebalAnchor(entryDateObj.getFullYear(), entryDateObj.getMonth());
+  const prevRebalFirstIdx = firstDayIdxInMonth(prevAnchor.year, prevAnchor.month);
+  if (prevRebalFirstIdx < 0) return null;
+  const lookbackStartIdx = prevRebalFirstIdx + 1;
+  const lookbackEndIdx = entryIdx - 1;
+  if (lookbackStartIdx >= lookbackEndIdx) return null;
+
+  // Holding end: prefer the actual exitDate passed from the render context (closed lot or planned).
+  // If exitDate isn't in our data yet (future date for OPEN lot), fall back to last available date.
+  let holdingEnd = null;
+  if (exitDate) {
+    const exitIdx = state.sortedDates.indexOf(exitDate);
+    if (exitIdx >= 0) {
+      holdingEnd = exitDate;  // exact exit day exists in data
+    } else {
+      holdingEnd = state.sortedDates[state.sortedDates.length - 1];  // future exit → use latest available
+    }
+  } else {
+    holdingEnd = state.sortedDates[state.sortedDates.length - 1];
+  }
+
+  return {
+    lookbackStart: state.sortedDates[lookbackStartIdx],
+    lookbackEnd: state.sortedDates[lookbackEndIdx],
+    holdingEnd: holdingEnd,
+    holdingEndIsPlanned: !!exitDate && state.sortedDates.indexOf(exitDate) < 0
+  };
+}
+
+function _getRecheckDatesForPending() {
+  if (!state.pendingSignal) return null;
+  const ps = state.pendingSignal;
+  const lastIdx = state.sortedDates.length - 1;
+  const prevAnchor = getPrevRebalAnchor(ps.nextRebalYear, ps.nextRebalMonth);
+  const prevRebalFirstIdx = firstDayIdxInMonth(prevAnchor.year, prevAnchor.month);
+  if (prevRebalFirstIdx < 0) return null;
+  const lookbackStartIdx = prevRebalFirstIdx + 1;
+  if (lookbackStartIdx >= lastIdx) return null;
+  return {
+    lookbackStart: state.sortedDates[lookbackStartIdx],
+    lookbackEnd: state.sortedDates[lastIdx],
+    holdingEnd: null   // not yet held — only 2 dates
+  };
+}
+
+function _fmtNum(n, decimals) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  if (decimals === undefined) decimals = 2;
+  return n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+
+function _fmtVol(v) {
+  if (v === null || v === undefined || isNaN(v)) return '—';
+  return Math.round(v).toLocaleString('en-US');
+}
+
+function _buildOhlvTable(date, tickers) {
+  const dayData = state.marketData[date];
+  if (!dayData) {
+    return '<div style="color:#9c2b2b;padding:8px;">ไม่มีข้อมูลของวันที่นี้</div>';
+  }
+  let rows = '';
+  tickers.forEach(t => {
+    const d = dayData[t];
+    if (d) {
+      rows += `<tr><td class="ticker">${t}</td><td>${_fmtNum(d.o)}</td><td>${_fmtNum(d.h)}</td><td>${_fmtNum(d.l)}</td><td class="close-col">${_fmtNum(d.c)}</td><td class="vol">${_fmtVol(d.v)}</td></tr>`;
+    } else {
+      rows += `<tr><td class="ticker">${t}</td><td colspan="5" style="color:#9c2b2b;text-align:center;">— ไม่มีข้อมูล —</td></tr>`;
+    }
+  });
+  return `<table>
+    <thead><tr><th class="ticker">Ticker</th><th>Open</th><th>High</th><th>Low</th><th class="close-col">Close</th><th class="vol">Volume</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+window.downloadDetailsPdf = function(event, entryDate, exitDate, isPending) {
+  const dates = isPending ? _getRecheckDatesForPending() : _getRecheckDatesForEntry(entryDate, exitDate);
+  if (!dates) {
+    alert('ไม่สามารถสร้าง Details PDF ได้ — ข้อมูลไม่พอ');
+    return;
+  }
+  let tickers;
+  let title;
+  let dateLabel;
+  if (isPending) {
+    tickers = (state.pendingSignal?.picks || []).map(p => p.ticker);
+    title = 'PENDING — ล็อตใหม่รอบถัดไป (' + (state.pendingSignal?.nextRebalLabel || '') + ')';
+    dateLabel = 'PENDING-' + (state.pendingSignal?.signalDate || 'unknown');
+  } else {
+    const entry = state.tradeLog.find(t => t.date === entryDate);
+    tickers = entry ? entry.stocks : [];
+    title = 'ล็อต ' + entryDate;
+    dateLabel = entryDate;
+  }
+  if (tickers.length === 0) {
+    alert('ไม่มีรายชื่อหุ้น');
+    return;
+  }
+
+  const sections = [];
+  sections.push({ label: '① วันเริ่มนับจัดอันดับ', date: dates.lookbackStart, note: '(2nd biz day ของเดือนเริ่มนับ — START price + วันแรกที่บวก volume)' });
+  sections.push({ label: '② วันสิ้นสุดการนับจัดอันดับ', date: dates.lookbackEnd, note: '(วันก่อนเข้า rebal — END price + วันสุดท้ายที่บวก volume)' });
+  if (dates.holdingEnd) {
+    const note = isPending
+      ? ''
+      : (dates.holdingEndIsPlanned
+          ? '(วันขายตามแผน 6 เดือนหลังเข้าซื้อ — แต่ยังไม่ถึงวันนั้น แสดงข้อมูลล่าสุดที่มี)'
+          : '(วันขายล็อต — 6 เดือนเต็มหลังเข้าซื้อ)');
+    sections.push({ label: '③ วันสิ้นสุดการถือครอง', date: dates.holdingEnd, note: note });
+  }
+
+  const sectionsHtml = sections.map(s => `
+    <div class="date-section">
+      <div class="date-header">${s.label} — <strong>${s.date}</strong></div>
+      <div class="date-note">${s.note}</div>
+      <div class="table-wrap">${_buildOhlvTable(s.date, tickers)}</div>
+    </div>
+  `).join('');
+
+  const html = `<!DOCTYPE html>
+<html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JPT-Rolling6M-Details-${dateLabel}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Cinzel:wght@600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Sarabun', sans-serif; padding: 24px; color: #2a1f1a; background: #faf6ed; max-width: 800px; margin: 0 auto; box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; }
+  h1 { font-family: 'DM Serif Display', serif; color: #5a1f26; margin: 0 0 4px; font-size: 1.8rem; line-height: 1.2; }
+  .subtitle { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 2px; color: #8b6914; text-transform: uppercase; margin-bottom: 16px; }
+  .meta { background: rgba(212,175,55,0.08); border-left: 3px solid #d4af37; padding: 10px 14px; border-radius: 4px; margin-bottom: 24px; font-size: 0.88rem; color: #5a3d20; line-height: 1.6; word-break: break-word; }
+  .date-section { margin-bottom: 28px; page-break-inside: avoid; }
+  .date-header { background: linear-gradient(135deg, #5a1f26, #722f37); color: #f4e4ba; padding: 8px 14px; border-radius: 4px 4px 0 0; font-weight: 600; font-size: 0.95rem; }
+  .date-note { font-size: 0.74rem; color: #7a6f62; padding: 4px 14px 8px; background: rgba(212,175,55,0.05); }
+  .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 6px 10px; border-bottom: 1px solid rgba(212,175,55,0.3); text-align: right; font-size: 0.85rem; white-space: nowrap; }
+  th { background: #faf3e6; color: #8b6914; font-weight: 600; font-family: 'Cinzel', serif; font-size: 0.74rem; letter-spacing: 0.5px; text-transform: uppercase; }
+  th.ticker, td.ticker { text-align: left; }
+  td.ticker { font-weight: 600; color: #5a1f26; font-family: 'Cinzel', serif; }
+  td.vol, th.vol { font-variant-numeric: tabular-nums; }
+  td.close-col { font-weight: 700; color: #5a1f26; }
+  th.close-col { color: #5a1f26; }
+  .footer { text-align: center; font-size: 0.7rem; color: #8b6914; font-family: 'Cinzel', serif; letter-spacing: 1px; margin-top: 32px; padding-top: 16px; border-top: 1px solid rgba(212,175,55,0.3); }
+
+  @media (max-width: 600px) {
+    body { padding: 12px; }
+    h1 { font-size: 1.35rem; }
+    .subtitle { font-size: 0.62rem; letter-spacing: 1.5px; }
+    .meta { font-size: 0.78rem; padding: 8px 11px; line-height: 1.55; margin-bottom: 18px; }
+    .date-section { margin-bottom: 18px; }
+    .date-header { font-size: 0.85rem; padding: 7px 11px; }
+    .date-note { font-size: 0.68rem; padding: 4px 11px 6px; }
+    th, td { padding: 5px 7px; font-size: 0.74rem; }
+    th { font-size: 0.66rem; }
+    .footer { font-size: 0.62rem; margin-top: 22px; padding-top: 12px; }
+  }
+  @media (max-width: 380px) {
+    body { padding: 8px; }
+    h1 { font-size: 1.2rem; }
+    th, td { padding: 4px 5px; font-size: 0.68rem; }
+    th { font-size: 0.6rem; }
+  }
+
+  @media print {
+    body { background: white; padding: 12px; max-width: 100%; }
+    .date-section { page-break-inside: avoid; }
+    .table-wrap { overflow-x: visible; }
+  }
+</style>
+</head><body>
+  <div class="subtitle">JPT ROLLING 6M MOMENTUM · LOT DETAILS</div>
+  <h1>${title}</h1>
+  <div class="meta">
+    <div><strong>หุ้นในล็อต:</strong> ${tickers.length} ตัว · ${tickers.join(', ')}</div>
+    <div style="margin-top:6px;"><strong>หน้าต่าง lookback:</strong> ${dates.lookbackStart} → ${dates.lookbackEnd}${dates.holdingEnd ? ' · <strong>ถือถึง:</strong> ' + dates.holdingEnd + (dates.holdingEndIsPlanned ? ' (ตามแผน)' : '') : ' · ยังไม่ได้เริ่มถือ'}</div>
+  </div>
+  ${sectionsHtml}
+  <div class="footer">JP Trust Learning · jptrustlearning.com</div>
+</body></html>`;
+
+  // Render in iframe modal overlay — no URL bar visible (iframe doesn't show github.io)
+  const existingOverlay = document.getElementById('_jpt_details_overlay');
+  if (existingOverlay) existingOverlay.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = '_jpt_details_overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;animation:_jptOverlayIn 0.2s ease-out;';
+
+  if (!document.getElementById('_jpt_overlay_keyframes')) {
+    const kf = document.createElement('style');
+    kf.id = '_jpt_overlay_keyframes';
+    kf.textContent = '@keyframes _jptOverlayIn { from { opacity: 0; } to { opacity: 1; } } @keyframes _jptCosmicShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }';
+    document.head.appendChild(kf);
+  }
+
+  const topBar = document.createElement('div');
+  topBar.style.cssText = 'background:#0a0a0a;color:white;padding:10px 14px;flex-shrink:0;display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-bottom:1px solid rgba(212,175,55,0.3);';
+
+  const backBtn = document.createElement('button');
+  backBtn.style.cssText = 'background:linear-gradient(135deg,#EC4899 0%,#C026D3 22%,#DC2626 42%,#8B5CF6 65%,#6366F1 82%,#D4AF37 100%);background-size:220% 220%;color:#FFF;text-shadow:0 1px 2px rgba(0,0,0,0.35);box-shadow:0 0 12px rgba(236,72,153,0.35),0 0 22px rgba(139,92,246,0.25),0 4px 8px rgba(0,0,0,0.15);animation:_jptCosmicShift 5s ease-in-out infinite;border:none;border-radius:6px;padding:9px 16px;font-family:Sarabun,sans-serif;font-weight:600;font-size:0.82rem;cursor:pointer;letter-spacing:0.5px;display:inline-flex;align-items:center;gap:6px;';
+  backBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>ย้อนกลับเข้าแอป';
+  backBtn.onclick = () => overlay.remove();
+
+  const printBtn = document.createElement('button');
+  printBtn.style.cssText = 'background:linear-gradient(135deg,#5a1f26,#722f37);color:#f4e4ba;border:none;border-radius:6px;padding:9px 16px;font-family:Sarabun,sans-serif;font-weight:600;font-size:0.82rem;cursor:pointer;letter-spacing:0.5px;';
+  printBtn.textContent = 'บันทึกเป็น PDF / พิมพ์';
+
+  topBar.appendChild(backBtn);
+  topBar.appendChild(printBtn);
+
+  const iframe = document.createElement('iframe');
+  iframe.srcdoc = html;
+  iframe.style.cssText = 'flex:1;border:none;width:100%;background:white;display:block;';
+  iframe.setAttribute('title', 'JPT Rolling 6M Details Preview');
+
+  printBtn.onclick = () => {
+    try {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    } catch (e) {
+      alert('ไม่สามารถเปิดหน้าต่างพิมพ์ได้: ' + e.message);
+    }
+  };
+
+  overlay.appendChild(topBar);
+  overlay.appendChild(iframe);
+  document.body.appendChild(overlay);
+
+  const escHandler = (e) => {
+    if (e.key === 'Escape') {
+      overlay.remove();
+      document.removeEventListener('keydown', escHandler);
+    }
+  };
+  document.addEventListener('keydown', escHandler);
+};
 
 function simulateStrategy(wRet, nStocks) {
   // SENSITIVITY SIMULATOR — mirrors runRollingBacktest but with override weight + topN.
@@ -3498,7 +3767,11 @@ function renderTradeLog() {
         '<div class="trade-summary">' +
         'ซื้อรวม <strong>' + ps.picks.length + ' ตัว</strong> · งบ <strong>$' + Math.round(ps.capital).toLocaleString() + '</strong>' +
         ' · รอเปิดวัน' + entryDayName + ' · ล็อตใหม่รอบ <strong>' + ps.nextRebalLabel + '</strong> (' + daysLabel + ')' +
-        '</div></div></div>';
+        '</div></div>' +
+        '<button class="trade-details-btn" onclick="downloadDetailsPdf(event, null, null, true)" title="ดาวน์โหลดรายละเอียดเป็น PDF">' +
+          '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>Details PDF' +
+        '</button>' +
+        '</div>';
 
       const badges = ps.picks.map(p => {
         const retPct = (p.ret * 100).toFixed(1);
@@ -3625,7 +3898,11 @@ function renderTradeLog() {
     } else {
       header += ` · <span style="color:var(--gold-deep);font-weight:600;">ยังถืออยู่:</span> <span class="${retCls}"><strong>$${Math.round(r.pnl).toLocaleString()}</strong> (${r.pnlPct>=0?'+':''}${r.pnlPct.toFixed(2)}%)</span>`;
     }
-    header += `</div></div></div>`;
+    header += `</div></div>
+      <button class="trade-details-btn" onclick="downloadDetailsPdf(event, '${r.date}', '${r.exitDate || ''}', false)" title="ดาวน์โหลดรายละเอียดเป็น PDF">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>Details PDF
+      </button>
+    </div>`;
 
     const section = `<div class="trade-section">
       <div class="trade-section-label mom">MOMENTUM — ${r.stocks.length} ตัว
