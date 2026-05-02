@@ -3680,28 +3680,6 @@ window.downloadDetailsPdf = function(event, entryDate, isPending) {
   td.vol, th.vol { font-variant-numeric: tabular-nums; }
   td.close-col { font-weight: 700; color: #5a1f26; }
   th.close-col { color: #5a1f26; }
-  .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 16px 0; border-bottom: 1px dashed rgba(212,175,55,0.4); margin-bottom: 20px; }
-  .actions button { padding: 10px 22px; border: none; border-radius: 6px; font-family: 'Sarabun', sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 6px; }
-  .actions .btn-print { background: linear-gradient(135deg, #5a1f26, #722f37); color: #f4e4ba; }
-  .actions .btn-print:hover { background: linear-gradient(135deg, #722f37, #8b6914); }
-  .actions .btn-back-app {
-    background: linear-gradient(135deg, #EC4899 0%, #C026D3 22%, #DC2626 42%, #8B5CF6 65%, #6366F1 82%, #D4AF37 100%);
-    background-size: 220% 220%;
-    color: #FFFFFF; text-shadow: 0 1px 2px rgba(0,0,0,0.35);
-    box-shadow: 0 0 12px rgba(236,72,153,0.35), 0 0 22px rgba(139,92,246,0.25), 0 4px 8px rgba(0,0,0,0.15);
-    animation: cosmic-shift 5s ease-in-out infinite;
-    transition: transform 0.15s, box-shadow 0.2s;
-  }
-  .actions .btn-back-app:hover {
-    box-shadow: 0 0 18px rgba(236,72,153,0.5), 0 0 30px rgba(139,92,246,0.4), 0 4px 12px rgba(0,0,0,0.2);
-    transform: translateY(-1px);
-  }
-  .actions .btn-back-app svg { vertical-align: -2px; }
-  @keyframes cosmic-shift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
   .footer { text-align: center; font-size: 0.7rem; color: #8b6914; font-family: 'Cinzel', serif; letter-spacing: 1px; margin-top: 32px; padding-top: 16px; border-top: 1px solid rgba(212,175,55,0.3); }
 
   /* Mobile responsive — fit fully within phone screen */
@@ -3715,8 +3693,6 @@ window.downloadDetailsPdf = function(event, entryDate, isPending) {
     .date-note { font-size: 0.68rem; padding: 4px 11px 6px; }
     th, td { padding: 5px 7px; font-size: 0.74rem; }
     th { font-size: 0.66rem; }
-    .actions { padding: 10px 0; gap: 8px; margin-bottom: 14px; }
-    .actions button { padding: 8px 14px; font-size: 0.78rem; flex: 1 1 auto; justify-content: center; }
     .footer { font-size: 0.62rem; margin-top: 22px; padding-top: 12px; }
   }
   @media (max-width: 380px) {
@@ -3728,19 +3704,11 @@ window.downloadDetailsPdf = function(event, entryDate, isPending) {
 
   @media print {
     body { background: white; padding: 12px; max-width: 100%; }
-    .actions, .no-print { display: none !important; }
     .date-section { page-break-inside: avoid; }
     .table-wrap { overflow-x: visible; }
   }
 </style>
 </head><body>
-  <div class="actions no-print">
-    <button class="btn-back-app" onclick="window.close()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-      ย้อนกลับเข้า JP Trust App
-    </button>
-    <button class="btn-print" onclick="window.print()">บันทึกเป็น PDF / พิมพ์</button>
-  </div>
   <div class="subtitle">JPT 6M MOMENTUM · TRADE DETAILS</div>
   <h1>${title}</h1>
   <div class="meta">
@@ -3751,19 +3719,67 @@ window.downloadDetailsPdf = function(event, entryDate, isPending) {
   <div class="footer">JP Trust Learning · jptrustlearning.com</div>
 </body></html>`;
 
-  // Use Blob URL instead of document.write — fixes mobile viewport rendering bug
-  // (Mobile browsers sometimes don't re-evaluate viewport meta after document.write,
-  // causing inconsistent zoom-out behavior. Blob URL loads as a real document.)
-  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const w = window.open(url, '_blank');
-  if (!w) {
-    URL.revokeObjectURL(url);
-    alert('Pop-up ถูก browser block — กรุณา allow pop-up ของหน้านี้ก่อน');
-    return;
+  // Render in iframe modal overlay — no URL bar visible (iframe doesn't show github.io)
+  // Iframe with srcdoc loads the HTML directly without any external URL.
+  // Buttons live in the modal's top bar (not in iframe content) so they don't print.
+
+  // Remove any existing overlay first
+  const existingOverlay = document.getElementById('_jpt_details_overlay');
+  if (existingOverlay) existingOverlay.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = '_jpt_details_overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;animation:_jptOverlayIn 0.2s ease-out;';
+
+  // Inject keyframes for smooth open animation (idempotent)
+  if (!document.getElementById('_jpt_overlay_keyframes')) {
+    const kf = document.createElement('style');
+    kf.id = '_jpt_overlay_keyframes';
+    kf.textContent = '@keyframes _jptOverlayIn { from { opacity: 0; } to { opacity: 1; } } @keyframes _jptCosmicShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }';
+    document.head.appendChild(kf);
   }
-  // Revoke the Blob URL after 60s — gives the new window plenty of time to fully load
-  setTimeout(() => URL.revokeObjectURL(url), 60000);
+
+  const topBar = document.createElement('div');
+  topBar.style.cssText = 'background:#0a0a0a;color:white;padding:10px 14px;flex-shrink:0;display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-bottom:1px solid rgba(212,175,55,0.3);';
+
+  const backBtn = document.createElement('button');
+  backBtn.style.cssText = 'background:linear-gradient(135deg,#EC4899 0%,#C026D3 22%,#DC2626 42%,#8B5CF6 65%,#6366F1 82%,#D4AF37 100%);background-size:220% 220%;color:#FFF;text-shadow:0 1px 2px rgba(0,0,0,0.35);box-shadow:0 0 12px rgba(236,72,153,0.35),0 0 22px rgba(139,92,246,0.25),0 4px 8px rgba(0,0,0,0.15);animation:_jptCosmicShift 5s ease-in-out infinite;border:none;border-radius:6px;padding:9px 16px;font-family:Sarabun,sans-serif;font-weight:600;font-size:0.82rem;cursor:pointer;letter-spacing:0.5px;display:inline-flex;align-items:center;gap:6px;';
+  backBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>ย้อนกลับเข้าแอป';
+  backBtn.onclick = () => overlay.remove();
+
+  const printBtn = document.createElement('button');
+  printBtn.style.cssText = 'background:linear-gradient(135deg,#5a1f26,#722f37);color:#f4e4ba;border:none;border-radius:6px;padding:9px 16px;font-family:Sarabun,sans-serif;font-weight:600;font-size:0.82rem;cursor:pointer;letter-spacing:0.5px;';
+  printBtn.textContent = 'บันทึกเป็น PDF / พิมพ์';
+
+  topBar.appendChild(backBtn);
+  topBar.appendChild(printBtn);
+
+  const iframe = document.createElement('iframe');
+  iframe.srcdoc = html;
+  iframe.style.cssText = 'flex:1;border:none;width:100%;background:white;display:block;';
+  iframe.setAttribute('title', 'JPT 6M Details Preview');
+
+  printBtn.onclick = () => {
+    try {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    } catch (e) {
+      alert('ไม่สามารถเปิดหน้าต่างพิมพ์ได้: ' + e.message);
+    }
+  };
+
+  overlay.appendChild(topBar);
+  overlay.appendChild(iframe);
+  document.body.appendChild(overlay);
+
+  // Esc to close
+  const escHandler = (e) => {
+    if (e.key === 'Escape') {
+      overlay.remove();
+      document.removeEventListener('keydown', escHandler);
+    }
+  };
+  document.addEventListener('keydown', escHandler);
 };
 
 function renderEquityChart() {
