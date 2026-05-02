@@ -4608,7 +4608,7 @@ function updateMarket() {
 }
 </script>
 <!-- ─── COMPARE FEATURE (jp-compare.js) ─────────────────── -->
-<script src="https://jptrustlearning.github.io/pages/jp-compare.js?v=1777663434"></script>
+<script src="https://jptrustlearning.github.io/pages/jp-compare.js?v=1777705218"></script>
 <script>
 (function(){
   if(!window.JPCompare) return;
@@ -4627,8 +4627,10 @@ function updateMarket() {
     strategyLabel: 'Weekly Momentum',
     getCurrentResult: function(){
       var ddEl = document.getElementById('kpi-maxdd') || document.getElementById('rscMaxDD');
+      // Weekly = non-compounding fixed-capital model. Use annualized ROI (kpi-annroi).
+      var retEl = document.getElementById('kpi-annroi') || document.getElementById('kpi-cagr');
       return {
-        cagr: parsePct(document.getElementById('kpi-cagr')),
+        cagr: parsePct(retEl),
         maxDD: parsePct(ddEl),
         summary: txt('rscPeriod'),
         config: {

@@ -146,6 +146,12 @@
 
 .jpc-divider{height:1px;background:linear-gradient(90deg,transparent 0%,rgba(212,175,55,0.4) 50%,transparent 100%);margin:18px 0 14px}
 
+.jpc-defs{background:rgba(212,175,55,0.06);border:1px solid rgba(212,175,55,0.22);border-radius:10px;padding:11px 13px;margin:10px 0 14px;font-family:'Anuphan',sans-serif;font-size:0.78rem;line-height:1.55;color:#5A3D20}
+.jpc-def-item{display:flex;gap:10px;margin-bottom:6px;align-items:flex-start}
+.jpc-def-item:last-child{margin-bottom:0}
+.jpc-def-key{font-family:'Cinzel','Anuphan',serif;font-weight:700;color:#8B6914;letter-spacing:0.04em;flex-shrink:0;min-width:64px;font-size:0.74rem;padding-top:1px;text-transform:none}
+.jpc-def-text{color:#5A3D20;flex:1;min-width:0}
+
 .jpc-controls{display:flex;gap:8px;margin-bottom:12px}
 .jpc-controls select{flex:1;min-width:0;padding:8px 12px;border:1px solid rgba(212,175,55,0.4);border-radius:8px;background:#FFFEF8;font-family:'Anuphan',sans-serif;font-size:0.8rem;color:#3D3228;cursor:pointer;outline:none;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238B6914' stroke-width='2.5' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px}
 .jpc-controls select:focus{border-color:#D4AF37}
@@ -319,6 +325,16 @@
         </div>
         <div class="jpc-divider"></div>
         <div class="jpc-section-label">รายการที่บันทึกไว้ <span id="jpc-count" class="jpc-count-tag"></span></div>
+        <div class="jpc-defs">
+          <div class="jpc-def-item">
+            <span class="jpc-def-key">%Return</span>
+            <span class="jpc-def-text">ผลตอบแทนเฉลี่ยต่อปีจากการแบ็คเทส — กลยุทธ์ทบต้น (6M / Rolling 6M) คำนวณแบบ CAGR · กลยุทธ์ไม่ทบต้น (Weekly) คำนวณจากกำไรรวมหารด้วยจำนวนปี ของเงินทุนตั้งต้น</span>
+          </div>
+          <div class="jpc-def-item">
+            <span class="jpc-def-key">Max DD</span>
+            <span class="jpc-def-text">Max Drawdown — การลดลงสูงสุดของพอร์ตจากจุดสูงสุดในช่วงทดสอบ ใช้วัดความเสี่ยงด้าน downside (ยิ่งใกล้ 0% ยิ่งเสี่ยงต่ำ)</span>
+          </div>
+        </div>
         <div class="jpc-controls">
           <select id="jpc-filter">
             <option value="all">ทุกกลยุทธ์</option>
@@ -403,7 +419,7 @@
       <div class="jpc-current-strategy">${_esc(_config.strategyLabel)}</div>
       <div class="jpc-kpi-row">
         <div class="jpc-kpi-cell">
-          <div class="jpc-kpi-cell-label">CAGR</div>
+          <div class="jpc-kpi-cell-label">%Return</div>
           <div class="jpc-kpi-cell-value ${cagrPos ? 'pos' : 'neg'}">${cagrStr}</div>
         </div>
         <div class="jpc-kpi-cell">
@@ -449,7 +465,7 @@
     // Header
     const cols = [
       { key: 'name', label: 'ชื่อ', cls: '' },
-      { key: 'cagr', label: 'CAGR', cls: 'numeric' },
+      { key: 'cagr', label: '%Return', cls: 'numeric' },
       { key: 'dd',   label: 'Max DD', cls: 'numeric' }
     ];
     const headerHtml = '<thead class="jpc-thead"><tr>' + cols.map(c => {
