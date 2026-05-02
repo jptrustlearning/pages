@@ -47,6 +47,9 @@ body {
   /* overflow-x hidden on body only (not html) to prevent sticky breakage */
   overflow-x: clip;
   position: relative;
+  /* flow-root creates a BFC — prevents the hero's margin-top:14 from
+     collapsing through body and shifting the body::before gold layer down */
+  display: flow-root;
 }
 body::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 480px;
