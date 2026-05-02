@@ -2159,7 +2159,7 @@
       </div>
     </div>
 
-    <p>กลยุทธ์นี้ <strong>Re-balance ทุก 6 เดือน</strong> (ก.พ. และ ส.ค.) โดยใช้ข้อมูลย้อนหลัง 26 สัปดาห์ในการจัดอันดับหุ้น · ทุกครั้งที่ re-balance จะ<strong>ขายของเก่าหมด</strong>แล้ว<strong>ซื้อ Top N ใหม่</strong>ตามอันดับปัจจุบัน · ระหว่างรอบถือครองหุ้นเดิมโดยไม่มีการซื้อขาย</p>
+    <p>กลยุทธ์นี้ <strong>Re-balance ทุก 6 เดือน</strong> (ก.พ. และ ส.ค.) โดยใช้ข้อมูลของ<strong>รอบถือครองก่อนหน้า</strong> ในการจัดอันดับหุ้น (เช่น รอบ ก.พ. ใช้ข้อมูล ส.ค. ปีก่อน → ม.ค. ปีนี้) · ทุกครั้งที่ re-balance จะ<strong>ขายของเก่าหมด</strong>แล้ว<strong>ซื้อ Top N ใหม่</strong>ตามอันดับปัจจุบัน · ระหว่างรอบถือครองหุ้นเดิมโดยไม่มีการซื้อขาย</p>
 
     <p>ปรับ <strong>Ranking Weight</strong> เพื่อสร้างกลยุทธ์ที่เข้ากับสไตล์คุณ · ปรับ <strong>Portfolio Size</strong> เพื่อสมดุลระหว่างความเสี่ยงกับ upside · ปรับ <strong>Start Year</strong> เพื่อดูผลในรอบเวลาต่าง ๆ</p>
   </div>
@@ -2170,7 +2170,7 @@
 let CONFIG = {
   initialCapital: 15000,
   topN: 15,
-  lookbackWeeks: 26,
+  lookbackWeeks: 26,           // DEPRECATED — no longer used (replaced by calendar-based lookback from prev rebal month). Kept for compat.
   rebalanceMonths: [1, 7], // Feb(1), Aug(7)
   weightRet: 0.5,
   weightVol: 0.5,
@@ -2498,10 +2498,6 @@ function simulateStrategy(wRet, nStocks) {
 
   let lastRebalancedMonth = -1;
 
-  // ⚠️ BUG FIX: CONFIG.lookbackWeeks is in WEEKS but state.sortedDates is daily.
-  // Convert to trading days (5/week) so 26 weeks → 130 days = ~6 months as intended.
-  const lookbackDays = CONFIG.lookbackWeeks * 5;
-
   for (let i = startIndex; i < state.sortedDates.length; i++) {
     const dateStr = state.sortedDates[i];
     const dateObj = new Date(dateStr);
@@ -2520,25 +2516,30 @@ function simulateStrategy(wRet, nStocks) {
     const isFirstWeek = dateObj.getDate() <= 7;
     const notAlreadyRebalanced = currentMonthKey !== lastRebalancedMonth;
 
-    if (isRebalance && isFirstWeek && notAlreadyRebalanced && i > lookbackDays) {
+    if (isRebalance && isFirstWeek && notAlreadyRebalanced) {
+      // Calendar-based lookback: ranks stocks using their performance during the previous holding period.
+      // Window = [2nd biz day of previous rebal month] → [day before this rebal day]
       const signalIdx = i - 1;
-      const startIdx = signalIdx - lookbackDays;
-      if (startIdx >= 0) {
-        // USE SHARED rankStocks (with override weight) — identical to runBacktest
-        const candidates = rankStocks(signalIdx, startIdx, wRet);
-        const selected = candidates.slice(0, nStocks);
+      const prevAnchor = getPrevRebalAnchor(dateObj.getFullYear(), dateObj.getMonth());
+      if (!prevAnchor) continue;
+      const prevRebalFirstIdx = firstDayIdxInMonth(prevAnchor.year, prevAnchor.month);
+      if (prevRebalFirstIdx < 0) continue;  // data doesn't reach previous rebal month → skip
+      const startIdx = prevRebalFirstIdx + 1;  // 2nd biz day of previous rebal month
+      if (startIdx >= signalIdx) continue;  // window too small → skip
+      // USE SHARED rankStocks (with override weight) — identical to runBacktest
+      const candidates = rankStocks(signalIdx, startIdx, wRet);
+      const selected = candidates.slice(0, nStocks);
 
-        cash = val;
-        holdings = {};
-        const alloc = cash / nStocks;
-        selected.forEach(st => {
-          if (dayData[st.ticker]) {
-            holdings[st.ticker] = alloc / dayData[st.ticker].c;
-            cash -= alloc;
-          }
-        });
-        lastRebalancedMonth = currentMonthKey;
-      }
+      cash = val;
+      holdings = {};
+      const alloc = cash / nStocks;
+      selected.forEach(st => {
+        if (dayData[st.ticker]) {
+          holdings[st.ticker] = alloc / dayData[st.ticker].c;
+          cash -= alloc;
+        }
+      });
+      lastRebalancedMonth = currentMonthKey;
     }
   }
 
@@ -2685,10 +2686,6 @@ function runBacktest() {
 
   let lastRebalancedMonth = -1;  // track to prevent duplicate rebalances in same month
 
-  // ⚠️ BUG FIX: CONFIG.lookbackWeeks is in WEEKS but state.sortedDates is daily.
-  // Convert to trading days (5/week) so 26 weeks → 130 days = ~6 months as intended.
-  const lookbackDays = CONFIG.lookbackWeeks * 5;
-
   for (let i = startIndex; i < state.sortedDates.length; i++) {
     const dateStr = state.sortedDates[i];
     const dateObj = new Date(dateStr);
@@ -2706,25 +2703,28 @@ function runBacktest() {
     const isFirstWeek = dateObj.getDate() <= 7;
     const notAlreadyRebalanced = currentMonthKey !== lastRebalancedMonth;
 
-    // Ensure lookback works even if i is near start of filtered period 
-    // (i is index in FULL sortedDates, so lookback logic works fine)
-    if (isRebalanceMonth && isFirstWeek && notAlreadyRebalanced && i > lookbackDays) {
+    if (isRebalanceMonth && isFirstWeek && notAlreadyRebalanced) {
+      // Calendar-based lookback: ranks stocks using their performance during the previous holding period.
+      // Window = [2nd biz day of previous rebal month] → [day before this rebal day]
       const signalIdx = i - 1;
-      const startIdx = signalIdx - lookbackDays;
-      if (startIdx >= 0) {
-        const candidates = rankStocks(signalIdx, startIdx);
-        const selected = candidates.slice(0, CONFIG.topN);
-        state.tradeLog.push({ date: dateStr, equity: currentEquity, stocks: selected.map(s => s.ticker) });
-        cash = currentEquity; holdings = {};
-        const alloc = cash / CONFIG.topN;
-        selected.forEach(st => {
-          if (dayData[st.ticker]) {
-            holdings[st.ticker] = alloc / dayData[st.ticker].c;
-            cash -= alloc;
-          }
-        });
-        lastRebalancedMonth = currentMonthKey;  // prevent duplicate rebalance this month
-      }
+      const prevAnchor = getPrevRebalAnchor(dateObj.getFullYear(), dateObj.getMonth());
+      if (!prevAnchor) continue;
+      const prevRebalFirstIdx = firstDayIdxInMonth(prevAnchor.year, prevAnchor.month);
+      if (prevRebalFirstIdx < 0) continue;  // data doesn't reach previous rebal month → skip
+      const startIdx = prevRebalFirstIdx + 1;  // 2nd biz day of previous rebal month
+      if (startIdx >= signalIdx) continue;  // window too small → skip
+      const candidates = rankStocks(signalIdx, startIdx);
+      const selected = candidates.slice(0, CONFIG.topN);
+      state.tradeLog.push({ date: dateStr, equity: currentEquity, stocks: selected.map(s => s.ticker) });
+      cash = currentEquity; holdings = {};
+      const alloc = cash / CONFIG.topN;
+      selected.forEach(st => {
+        if (dayData[st.ticker]) {
+          holdings[st.ticker] = alloc / dayData[st.ticker].c;
+          cash -= alloc;
+        }
+      });
+      lastRebalancedMonth = currentMonthKey;  // prevent duplicate rebalance this month
     }
   }
 
@@ -2733,7 +2733,7 @@ function runBacktest() {
   // =========================================================
   state.pendingSignal = null;
   try {
-    if (state.sortedDates.length > lookbackDays + 5) {
+    if (state.sortedDates.length > 10) {
       const lastIdx = state.sortedDates.length - 1;
       const lastDate = state.sortedDates[lastIdx];
       const lastDateObj = new Date(lastDate);
@@ -2760,29 +2760,38 @@ function runBacktest() {
       const nextRebalDate = new Date(nextRebalYear, nextRebalMonth, 1);
       const daysUntil = Math.max(0, Math.ceil((nextRebalDate - lastDateObj) / 86400000));
 
+      // Calendar-based lookback for PENDING:
+      // Window = [2nd biz day of previous rebal month relative to next rebal] → [lastIdx (today)]
+      // i.e., uses "elastic" data — preview becomes more complete as we approach the next rebal date.
       const signalIdx = lastIdx;
-      const startIdx = signalIdx - lookbackDays;
-      if (startIdx >= 0 && state.sortedDates[signalIdx] && state.sortedDates[startIdx] && state.marketData[state.sortedDates[signalIdx]] && state.marketData[state.sortedDates[startIdx]]) {
-        const candidates = rankStocks(signalIdx, startIdx);
-        if (candidates && candidates.length > 0) {
-          const picks = candidates.slice(0, CONFIG.topN);
-          const lastEquity = state.equityCurve.length > 0
-            ? state.equityCurve[state.equityCurve.length - 1].equity
-            : CONFIG.initialCapital;
+      const prevAnchor = getPrevRebalAnchor(nextRebalYear, nextRebalMonth);
+      if (prevAnchor) {
+        const prevRebalFirstIdx = firstDayIdxInMonth(prevAnchor.year, prevAnchor.month);
+        if (prevRebalFirstIdx >= 0) {
+          const startIdx = prevRebalFirstIdx + 1;  // 2nd biz day of previous rebal month
+          if (startIdx < signalIdx && state.sortedDates[startIdx] && state.marketData[state.sortedDates[startIdx]]) {
+            const candidates = rankStocks(signalIdx, startIdx);
+            if (candidates && candidates.length > 0) {
+              const picks = candidates.slice(0, CONFIG.topN);
+              const lastEquity = state.equityCurve.length > 0
+                ? state.equityCurve[state.equityCurve.length - 1].equity
+                : CONFIG.initialCapital;
 
-          state.pendingSignal = {
-            signalDate: lastDate,
-            nextRebalLabel: nextRebalLabel,
-            nextRebalYear: nextRebalYear,
-            nextRebalMonth: nextRebalMonth,
-            daysUntil: daysUntil,
-            capital: lastEquity,
-            picks: picks.map(p => ({
-              ticker: p.ticker || '?',
-              ret: typeof p.ret === 'number' ? p.ret : 0,
-              score: typeof p.score === 'number' ? p.score : 0
-            }))
-          };
+              state.pendingSignal = {
+                signalDate: lastDate,
+                nextRebalLabel: nextRebalLabel,
+                nextRebalYear: nextRebalYear,
+                nextRebalMonth: nextRebalMonth,
+                daysUntil: daysUntil,
+                capital: lastEquity,
+                picks: picks.map(p => ({
+                  ticker: p.ticker || '?',
+                  ret: typeof p.ret === 'number' ? p.ret : 0,
+                  score: typeof p.score === 'number' ? p.score : 0
+                }))
+              };
+            }
+          }
         }
       }
     }
@@ -2793,6 +2802,35 @@ function runBacktest() {
 
   calculateStats();
   renderAll();
+}
+
+function firstDayIdxInMonth(year, monthIdx) {
+  // Returns index of first sortedDates entry whose Date is in (year, monthIdx).
+  // monthIdx is 0-indexed (Jan=0, Feb=1, Aug=7).
+  // Returns -1 if data doesn't reach that month.
+  for (let k = 0; k < state.sortedDates.length; k++) {
+    const d = new Date(state.sortedDates[k]);
+    const y = d.getFullYear(), m = d.getMonth();
+    if (y === year && m === monthIdx) return k;
+    if (y > year || (y === year && m > monthIdx)) return -1;  // passed without finding
+  }
+  return -1;
+}
+
+function getPrevRebalAnchor(currentYear, currentMonth) {
+  // For a rebalance happening in (currentYear, currentMonth),
+  // returns the {year, month} of the PREVIOUS scheduled rebalance month.
+  // Returns null if currentMonth is not in CONFIG.rebalanceMonths (defensive).
+  // Example: rebalanceMonths=[1,7], currentMonth=1 (Feb) → prev is month 7 (Aug) of previous year.
+  // Example: rebalanceMonths=[1,7], currentMonth=7 (Aug) → prev is month 1 (Feb) of same year.
+  const sortedRebalMonths = [...CONFIG.rebalanceMonths].sort((a,b) => a-b);
+  const idx = sortedRebalMonths.indexOf(currentMonth);
+  if (idx === -1) return null;
+  const prevIdx = (idx - 1 + sortedRebalMonths.length) % sortedRebalMonths.length;
+  const prevMonth = sortedRebalMonths[prevIdx];
+  // If we wrapped around to the end, prev rebal was in previous calendar year
+  const prevYear = (prevIdx >= idx) ? currentYear - 1 : currentYear;
+  return { year: prevYear, month: prevMonth };
 }
 
 function rankStocks(endIdx, startIdx, weightRetOverride) {
@@ -3993,7 +4031,7 @@ window.switchStatsTab = function(tab) {
           'จำนวนหุ้นต่อรอบ': CONFIG.topN + ' ตัว',
           'ทุนเริ่มต้น': '$' + (CONFIG.initialCapital || 0).toLocaleString(),
           'น้ำหนัก Return / Volume': Math.round((CONFIG.weightRet||0)*100) + '% / ' + Math.round((CONFIG.weightVol||0)*100) + '%',
-          'Lookback': CONFIG.lookbackWeeks + ' สัปดาห์',
+          'Lookback': 'ตามรอบ rebalance',
           'Re-balance': fmtMonths(CONFIG.rebalanceMonths || []),
           'ปีเริ่มต้น': CONFIG.startYear
         }
