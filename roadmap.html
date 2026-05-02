@@ -69,10 +69,7 @@ body > * { position: relative; z-index: 1; }
   overflow: hidden;
   box-shadow: 0 8px 32px rgba(26,10,14,0.4), 0 0 0 1px rgba(212,175,55,0.10);
 }
-.hero::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, transparent, var(--gold-sheen), var(--gold), var(--gold-sheen), transparent);
-}
+.hero::before { content: none; }
 .roadmap-map {
   position: absolute;
   top: 10px;
