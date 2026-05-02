@@ -1114,7 +1114,33 @@ body > * { position: relative; z-index: 1; }
     <div class="hero-label">JP Trust Learning</div>
     <h1 class="hero-title">Roadmap <span class="th">90 วัน</span><br><span class="th hero-title-sub">สู่พอร์ตการลงทุนที่ยั่งยืน</span></h1>
   </div>
-  <img class="roadmap-map" src="roadmap-map.png?v=1777734103" alt="" aria-hidden="true">
+  <svg class="roadmap-map" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <filter id="rmGoldGlow" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="1.4" result="blur"/>
+        <feFlood flood-color="#D4AF37" flood-opacity="0.85" result="goldColor"/>
+        <feComposite in="goldColor" in2="blur" operator="in" result="goldGlow"/>
+        <feMerge>
+          <feMergeNode in="goldGlow"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+    <g stroke="#F4E4BA" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#rmGoldGlow)">
+      <!-- Folded paper map: outer outline -->
+      <path d="M 10 30 L 35 23 L 65 30 L 90 23 L 90 68 L 65 75 L 35 68 L 10 75 Z"/>
+      <!-- Fold lines -->
+      <line x1="35" y1="23" x2="35" y2="68"/>
+      <line x1="65" y1="30" x2="65" y2="75"/>
+      <!-- Dashed route across the map -->
+      <path d="M 17 60 Q 28 54 38 57 T 58 58 T 82 53" stroke-dasharray="2.5 2.8" stroke-width="1.4" opacity="0.85"/>
+      <!-- Location pin -->
+      <circle cx="50" cy="14" r="7"/>
+      <circle cx="50" cy="14" r="2.4" fill="#F4E4BA" stroke="none"/>
+      <path d="M 50 21 L 50 32"/>
+      <ellipse cx="50" cy="35" rx="3.5" ry="1.2"/>
+    </g>
+  </svg>
 </div>
 
 <!-- ===== PLANNING DASHBOARDS (top of roadmap) ===== -->
