@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>JPT Roadmap — 90 วัน สู่พอร์ตการลงทุนที่ยั่งยืน</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600;700&family=DM+Serif+Display&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./jp-settings.js?v=1776968647"></script>
+<style>
+:root {
+  --gold: #D4AF37;
+  --gold-dark: #B8860B;
+  --gold-deep: #8B6914;
+  --gold-light: #F4E4BA;
+  --gold-sheen: #E8D48B;
+  --maroon: #722F37;
+  --maroon-dk: #5A3D20;
+  --burgundy: #C14545;
+  --burgundy-dk: #9C2B2B;
+  --emerald: #2E9F5F;
+  --emerald-dk: #1F7D49;
+  --cream: #FAF6ED;
+  --cream-card: #FFFEF8;
+  --cream-deep: #F5EDD8;
+  --text: #3D3228;
+  --text-dark: #5A3D20;
+  --text-muted: #7A6F62;
+  --border-gold: rgba(212,175,55,0.4);
+  --border-gold-strong: rgba(212,175,55,0.55);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  /* Keep html free of overflow rules — sticky needs the root scroll container clean */
+  scroll-padding-top: 0;
+}
+body {
+  font-family: 'Sarabun', 'Anuphan', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+  /* overflow-x hidden on body only (not html) to prevent sticky breakage */
+  overflow-x: clip;
+}
+
+/* ===== HERO ===== */
+.hero {
+  position: relative;
+  padding: 40px 22px 32px;
+  background: linear-gradient(180deg, #FFFEF8 0%, #FAF6ED 70%, #F5EDD8 100%);
+  border-bottom: 1.5px solid var(--border-gold);
+  overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold-sheen), var(--gold), var(--gold-sheen), transparent);
+}
+.hero-inner { position: relative; z-index: 2; max-width: 900px; margin: 0 auto; }
+.hero-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  margin-bottom: 10px;
+}
+.hero-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2.2rem, 6vw, 3.2rem);
+  line-height: 1.15;
+  color: var(--maroon);
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+.hero-title .th {
+  font-family: 'Anuphan', 'Sarabun', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0;
+  font-size: 0.88em;
+}
+.hero-sub {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin-bottom: 26px;
+  max-width: 620px;
+}
+
+/* Progress */
+.progress-card {
+  background: linear-gradient(180deg, #FFFEF8 0%, #FAF6ED 70%, #F5EDD8 100%);
+  border: 1.5px solid var(--border-gold-strong);
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: 0 4px 16px rgba(114,47,55,0.06), inset 0 1px 0 rgba(255,255,255,0.7);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.progress-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.progress-current {
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+}
+.progress-current strong {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.3rem;
+  color: var(--maroon);
+  margin: 0 4px;
+}
+.progress-pct {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.6rem;
+  color: var(--maroon);
+}
+.progress-bar {
+  height: 10px;
+  background: rgba(212,175,55,0.12);
+  border-radius: 100px;
+  overflow: hidden;
+  position: relative;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-sheen));
+  border-radius: 100px;
+  transition: width 0.6s cubic-bezier(.16,1,.3,1);
+  width: 0%;
+  position: relative;
+}
+.progress-fill::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  animation: shimmer 2.4s linear infinite;
+}
+@keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+.continue-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 13px 22px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #722F37 0%, #8B2252 55%, #D4AF37 100%);
+  color: #FFF5E1;
+  font-family: 'Sarabun', 'Anuphan', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 16px rgba(139,34,82,0.3);
+  align-self: flex-start;
+}
+.continue-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(139,34,82,0.4); }
+.continue-btn svg { width: 18px; height: 18px; stroke-width: 2.5; }
+
+/* ===== PLANNING SECTION (top of roadmap) ===== */
+.planning-section {
+  padding: 26px 18px 10px;
+  background: var(--cream);
+}
+.planning-inner { max-width: 900px; margin: 0 auto; }
+.planning-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  font-weight: 600;
+  padding: 0 4px 10px 4px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(212,175,55,0.3);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.planning-label::before {
+  content: '◆';
+  color: var(--gold);
+  font-size: 9px;
+}
+.planning-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 640px) { .planning-grid { grid-template-columns: repeat(2, 1fr); } }
+.planning-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  background: linear-gradient(180deg, #FFFEF8 0%, #FAF6ED 70%, #F5EDD8 100%);
+  border: 1.5px solid var(--border-gold-strong);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 14px rgba(114,47,55,0.06), inset 0 1px 0 rgba(255,255,255,0.7);
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  font-family: inherit;
+  color: var(--text);
+}
+.planning-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(114,47,55,0.14), inset 0 1px 0 rgba(255,255,255,0.8);
+  border-color: var(--gold);
+}
+.planning-icon {
+  width: 48px; height: 48px;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #722F37, #8B2252, #D4AF37);
+  border-radius: 12px;
+  color: #FFF5E1;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(139,34,82,0.25);
+}
+.planning-icon svg { width: 26px; height: 26px; }
+.planning-meta { flex: 1; min-width: 0; }
+.planning-title {
+  font-family: 'Sarabun', 'Anuphan', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--maroon);
+  margin-bottom: 2px;
+  line-height: 1.3;
+}
+.planning-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+.planning-arrow {
+  width: 18px; height: 18px;
+  color: var(--gold-deep);
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+.planning-card:hover .planning-arrow { transform: translateX(4px); color: var(--maroon); }
+
+/* ===== JPTRUST LEARNING SECTION HEADER (before cycles) ===== */
+.jpt-learning-header {
+  padding: 28px 18px 10px;
+  background: var(--cream);
+  margin-top: 12px;
+}
+.jpt-learning-inner { max-width: 900px; margin: 0 auto; }
+
+/* ===== CYCLES TABS — sticky filter ===== */
+.cycles-nav {
+  background: rgba(250, 246, 237, 0.94);
+  border-bottom: 1.5px solid var(--border-gold);
+  padding: 10px 18px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.cycles-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.cycle-tab {
+  padding: 12px 10px 14px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(212,175,55,0.45);
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 55%, #F5EDD8 100%);
+  font-family: 'Cinzel', 'Anuphan', serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  line-height: 1.2;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(114,47,55,0.06), inset 0 0 0 1px rgba(255,255,255,0.55);
+}
+/* Mountain art layer (non-active) */
+.cycle-tab::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 44px;
+  pointer-events: none;
+  z-index: 0;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 70' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'%3E%3Cpath d='M0,55 C20,50 40,40 70,35 C100,30 130,38 160,30 C180,25 195,32 200,28 L200,70 L0,70 Z' fill='rgba(218,195,148,0.18)'/%3E%3Cpath d='M0,60 C30,52 60,45 100,40 C140,35 170,42 200,36 L200,70 L0,70 Z' fill='rgba(232,220,192,0.28)'/%3E%3Cpath d='M0,45 C25,42 50,30 80,28 C110,26 140,35 170,22 C190,15 200,20 200,18 L200,70 L0,70 Z' fill='rgba(212,175,55,0.08)'/%3E%3Cpath d='M0,40 Q50,25 100,30 Q150,35 200,20' fill='none' stroke='rgba(184,134,11,0.14)' stroke-width='1'/%3E%3Cpath d='M0,50 Q60,38 120,42 Q180,46 200,35' fill='none' stroke='rgba(184,134,11,0.1)' stroke-width='0.7'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
+  border-radius: 0 0 12px 12px;
+}
+.cycle-tab > * { position: relative; z-index: 1; }
+.cycle-tab:hover {
+  border-color: var(--gold);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(114,47,55,0.1), inset 0 0 0 1px rgba(255,255,255,0.7);
+}
+.cycle-tab.active {
+  background: linear-gradient(135deg, #5A1F26 0%, #722F37 50%, #4A2318 100%);
+  color: #FFF5E1;
+  border-color: transparent;
+  box-shadow: 0 8px 22px rgba(90,31,38,0.45), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+/* Mountain art on active — darker maroon undertone */
+.cycle-tab.active::after {
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 70' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'%3E%3Cpath d='M0,55 C20,50 40,40 70,35 C100,30 130,38 160,30 C180,25 195,32 200,28 L200,70 L0,70 Z' fill='rgba(0,0,0,0.12)'/%3E%3Cpath d='M0,60 C30,52 60,45 100,40 C140,35 170,42 200,36 L200,70 L0,70 Z' fill='rgba(0,0,0,0.18)'/%3E%3Cpath d='M0,45 C25,42 50,30 80,28 C110,26 140,35 170,22 C190,15 200,20 200,18 L200,70 L0,70 Z' fill='rgba(212,175,55,0.1)'/%3E%3Cpath d='M0,40 Q50,25 100,30 Q150,35 200,20' fill='none' stroke='rgba(255,245,225,0.3)' stroke-width='1'/%3E%3Cpath d='M0,50 Q60,38 120,42 Q180,46 200,35' fill='none' stroke='rgba(255,245,225,0.2)' stroke-width='0.7'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
+}
+.cycle-tab .ct-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.15rem;
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: 1;
+  color: var(--maroon);
+}
+.cycle-tab.active .ct-num { color: #FFF5E1; }
+.cycle-tab .ct-range {
+  font-family: 'DM Serif Display', serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.3px;
+  text-transform: none;
+  opacity: 0.8;
+  color: var(--text-muted);
+}
+.cycle-tab.active .ct-range { color: #FFF5E1; opacity: 0.9; }
+
+/* ===== MAIN CONTENT ===== */
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 16px 18px 80px;
+}
+/* Day grid sits inset from the container edges — creates clear 'subset' visual
+   on mobile where cycle tabs extend to page edges */
+.day-grid-wrap {
+  padding: 0 20px;
+}
+.cycle-panel { display: none; }
+.cycle-panel.active { display: block; }
+
+/* Phase sections */
+.phase-section { margin-bottom: 32px; }
+.phase-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1.5px solid var(--border-gold);
+}
+.phase-letter {
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.6rem;
+  color: #FFF5E1;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.phase-section[data-phase="J"] .phase-letter { background: linear-gradient(135deg, #722F37, #9C2B2B); }
+.phase-section[data-phase="P"] .phase-letter { background: linear-gradient(135deg, #8B6914, #D4AF37); }
+.phase-section[data-phase="T"] .phase-letter { background: linear-gradient(135deg, #1F7D49, #2E9F5F); }
+.phase-title-group { flex: 1; min-width: 0; }
+.phase-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+}
+.phase-subtitle { font-size: 0.85rem; color: var(--text-muted); margin-top: 2px; }
+.phase-range {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.05rem;
+  color: var(--maroon);
+  flex-shrink: 0;
+}
+
+/* Day grid */
+.day-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.day-card {
+  min-height: 88px;
+  padding: 9px 11px 9px;
+  border-radius: 10px;
+  background: var(--cream-card);
+  border: 1.5px solid var(--border-gold);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(114,47,55,0.04);
+}
+.day-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(114,47,55,0.1);
+  border-color: var(--gold);
+}
+.day-card .dc-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+}
+.day-card .dc-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--maroon);
+}
+/* Big centered lock icon */
+.day-card .dc-lock {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(184,134,11,0.28);
+  transition: color 0.2s ease, opacity 0.2s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+.day-card:hover .dc-lock { color: rgba(184,134,11,0.5); }
+.day-card .dc-lock svg { width: 26px; height: 26px; stroke-width: 1.7; display: block; }
+
+/* Phase mini-badges row — all 3 highlighted (each day = full JPT mini-cycle) */
+.day-card .dc-phases {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+.day-card .dc-mini {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  font-family: 'DM Serif Display', serif;
+  font-size: 0.75rem;
+  line-height: 1;
+  font-weight: 600;
+  color: #FFF5E1;
+  border: none;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+.day-card .dc-mini.jpt-J {
+  background: linear-gradient(135deg, #5A1F26, #7A2530);
+  box-shadow: 0 1px 3px rgba(90,31,38,0.4);
+}
+.day-card .dc-mini.jpt-P {
+  background: linear-gradient(135deg, #6B4A0C, #A8800E);
+  box-shadow: 0 1px 3px rgba(107,74,12,0.4);
+}
+.day-card .dc-mini.jpt-T {
+  background: linear-gradient(135deg, #145A34, #1F7D49);
+  box-shadow: 0 1px 3px rgba(20,90,52,0.4);
+}
+
+/* Rest day (every 7th day) — deeper rose-gold tint background, only J + P badges */
+.day-card.rest-day {
+  background: linear-gradient(135deg, #F9D9C8 0%, #F4D4A8 50%, #EFC08A 100%);
+  border-color: rgba(201,140,100,0.6);
+  box-shadow: 0 2px 8px rgba(201,140,100,0.15), inset 0 1px 0 rgba(255,255,255,0.4);
+}
+.day-card.rest-day:hover {
+  border-color: #B87850;
+  box-shadow: 0 4px 14px rgba(201,140,100,0.25), inset 0 1px 0 rgba(255,255,255,0.5);
+}
+.day-card.rest-day .dc-num { color: #7A2A1E; }
+.day-card.rest-day .dc-lock { color: rgba(122,42,30,0.35); }
+
+.day-card.done {
+  background: linear-gradient(135deg, #FFFEF8 0%, #F5EDD8 100%);
+  border-color: var(--gold);
+}
+.day-card.done .dc-lock { display: none; }
+.day-card.done::after {
+  content: '✓';
+  position: absolute;
+  top: 8px; right: 10px;
+  color: var(--emerald-dk);
+  font-size: 1rem;
+  font-weight: 900;
+  z-index: 3;
+}
+.day-card.current {
+  border-color: var(--maroon);
+  border-width: 2px;
+  box-shadow: 0 0 0 3px rgba(114,47,55,0.15), 0 4px 12px rgba(114,47,55,0.18);
+}
+
+/* ===== DAY DETAIL MODAL ===== */
+.day-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 16, 10, 0.72);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  backdrop-filter: blur(6px);
+}
+.day-modal.open { display: flex; }
+.day-modal-inner {
+  background: linear-gradient(180deg, #FFFEF8 0%, #FAF6ED 100%);
+  border: 1.5px solid var(--border-gold-strong);
+  border-radius: 16px;
+  max-width: 560px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+  position: relative;
+  box-shadow: 0 24px 72px rgba(0,0,0,0.35);
+}
+.day-modal-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1.5px solid var(--border-gold);
+}
+.dm-day-big {
+  font-family: 'DM Serif Display', serif;
+  font-size: 3.2rem;
+  line-height: 1;
+  color: var(--maroon);
+  flex-shrink: 0;
+}
+.dm-head-meta { flex: 1; min-width: 0; padding-top: 6px; }
+.dm-phase-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  color: #FFF5E1;
+}
+[data-phase="J"] .dm-phase-tag, .dm-phase-tag.phase-J { background: linear-gradient(135deg, #722F37, #9C2B2B); }
+[data-phase="P"] .dm-phase-tag, .dm-phase-tag.phase-P { background: linear-gradient(135deg, #8B6914, #D4AF37); }
+[data-phase="T"] .dm-phase-tag, .dm-phase-tag.phase-T { background: linear-gradient(135deg, #1F7D49, #2E9F5F); }
+.dm-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.3rem;
+  color: var(--maroon);
+  line-height: 1.25;
+}
+.dm-close {
+  position: absolute;
+  top: 14px; right: 14px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(212,175,55,0.12);
+  color: var(--maroon);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.dm-close:hover { background: rgba(212,175,55,0.25); }
+
+.dm-desc {
+  font-size: 0.98rem;
+  color: var(--text);
+  margin-bottom: 22px;
+  line-height: 1.7;
+  padding: 16px 18px;
+  background: rgba(244,228,186,0.18);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 10px 10px 0;
+}
+
+/* Checkbox */
+.dm-check-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: var(--cream);
+  border: 1.5px solid var(--border-gold);
+  border-radius: 10px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: all 0.2s;
+}
+.dm-check-wrap:hover { border-color: var(--gold); }
+.dm-check {
+  width: 24px; height: 24px;
+  border-radius: 6px;
+  border: 2px solid var(--gold-deep);
+  flex-shrink: 0;
+  position: relative;
+  transition: all 0.2s;
+}
+.dm-check-wrap.checked .dm-check {
+  background: linear-gradient(135deg, var(--emerald), var(--emerald-dk));
+  border-color: var(--emerald-dk);
+}
+.dm-check-wrap.checked .dm-check::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 10px; height: 6px;
+  border-left: 2.5px solid #FFF5E1;
+  border-bottom: 2.5px solid #FFF5E1;
+  transform: translate(-50%, -65%) rotate(-45deg);
+}
+.dm-check-label {
+  font-weight: 600;
+  color: var(--text-dark);
+  flex: 1;
+}
+.dm-check-wrap.checked .dm-check-label { color: var(--emerald-dk); }
+
+/* Journal */
+.dm-journal-label {
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  margin-bottom: 8px;
+}
+.dm-journal {
+  width: 100%;
+  min-height: 160px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border-gold);
+  border-radius: 10px;
+  background: var(--cream-card);
+  font-family: 'Anuphan', 'Sarabun', sans-serif;
+  font-size: 0.95rem;
+  color: var(--text);
+  resize: vertical;
+  line-height: 1.6;
+}
+.dm-journal:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212,175,55,0.15);
+}
+.dm-journal-hint { font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; }
+.dm-journal-ts {
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  color: var(--gold-deep);
+  margin-top: 8px;
+}
+
+/* Footer */
+.dm-footer {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1.5px solid var(--border-gold);
+}
+.dm-nav {
+  flex: 0 0 auto;
+  padding: 11px 16px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border-gold);
+  background: var(--cream-card);
+  color: var(--text-dark);
+  font-family: 'Anuphan','Sarabun',sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 6px;
+}
+.dm-nav:hover:not(:disabled) { border-color: var(--gold); background: var(--cream-deep); color: var(--maroon); }
+.dm-nav:disabled { opacity: 0.35; cursor: not-allowed; }
+.dm-nav svg { width: 16px; height: 16px; stroke-width: 2.5; }
+.dm-save {
+  flex: 1;
+  padding: 11px 18px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #722F37 0%, #8B2252 55%, #D4AF37 100%);
+  color: #FFF5E1;
+  font-family: 'Sarabun','Anuphan',sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(139,34,82,0.25);
+}
+.dm-save:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(139,34,82,0.38); }
+
+/* ===== ABOUT MODAL (Philosophy) ===== */
+.about-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 16, 10, 0.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  backdrop-filter: blur(6px);
+}
+.about-modal.open { display: flex; }
+.about-inner {
+  background: linear-gradient(180deg, #FFFEF8 0%, #FAF6ED 100%);
+  border: 1.5px solid var(--border-gold-strong);
+  border-radius: 16px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 32px;
+  position: relative;
+}
+.about-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  letter-spacing: 2.2px;
+  color: var(--gold-deep);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.about-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2rem;
+  color: var(--maroon);
+  margin-bottom: 6px;
+  line-height: 1.1;
+}
+.about-sub { color: var(--text-muted); margin-bottom: 22px; }
+
+.jpt-pillars {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+@media (min-width: 640px) { .jpt-pillars { grid-template-columns: repeat(3, 1fr); } }
+.jpt-pillar {
+  padding: 16px 14px;
+  border-radius: 12px;
+  background: var(--cream-card);
+  border-left: 3px solid;
+}
+.jpt-pillar.p-j { border-color: var(--maroon); }
+.jpt-pillar.p-p { border-color: var(--gold); }
+.jpt-pillar.p-t { border-color: var(--emerald); }
+.jpt-pillar-letter {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2rem;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.jpt-pillar.p-j .jpt-pillar-letter { color: var(--maroon); }
+.jpt-pillar.p-p .jpt-pillar-letter { color: var(--gold-deep); }
+.jpt-pillar.p-t .jpt-pillar-letter { color: var(--emerald-dk); }
+.jpt-pillar-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  margin-bottom: 4px;
+}
+.jpt-pillar-desc { font-size: 0.88rem; color: var(--text); line-height: 1.5; }
+
+.about-body p {
+  color: var(--text);
+  margin-bottom: 14px;
+  line-height: 1.7;
+}
+
+/* Section label — minor heading inside about modal */
+.about-section-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gold-deep);
+  letter-spacing: 2.6px;
+  text-transform: uppercase;
+  text-align: center;
+  margin: 26px 0 12px;
+  padding-bottom: 10px;
+  border-bottom: 1.5px solid rgba(212,175,55,0.25);
+}
+.about-section-label:first-child { margin-top: 6px; }
+
+/* Weekly-strategy style step diagram */
+.strategy-diagram {
+  background: linear-gradient(135deg, rgba(212,175,55,0.06), rgba(114,47,55,0.08));
+  border: 1px solid var(--border-gold);
+  border-radius: 14px;
+  padding: 22px 18px;
+  margin-bottom: 18px;
+  position: relative;
+  overflow: hidden;
+}
+.strategy-diagram::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--maroon), var(--gold), transparent);
+}
+.diagram-flow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  align-items: stretch;
+  position: relative;
+}
+.diagram-step {
+  background: rgba(255,254,248,0.6);
+  border: 1.5px solid rgba(212,175,55,0.35);
+  border-radius: 12px;
+  padding: 16px 12px;
+  text-align: center;
+  position: relative;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 6px rgba(114,47,55,0.04);
+}
+.diagram-step:hover {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(212,175,55,0.15);
+}
+.diagram-step-num {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+  color: #FFF5E1;
+  font-family: 'DM Serif Display', serif;
+  font-size: 0.95rem;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(212,175,55,0.35);
+}
+.diagram-step-icon { font-size: 1.6rem; line-height: 1; }
+.diagram-step-day {
+  font-family: 'Cinzel', serif;
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: var(--gold-deep);
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+.diagram-step-title {
+  font-family: 'Sarabun', 'Anuphan', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--maroon);
+  line-height: 1.35;
+}
+.diagram-step-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+.diagram-step-arrow {
+  position: absolute;
+  right: -10px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--gold-deep);
+  font-size: 1.1rem;
+  z-index: 2;
+  background: var(--cream);
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 1.5px solid var(--gold);
+  font-weight: 700;
+}
+.diagram-step:last-child .diagram-step-arrow { display: none; }
+
+/* JP Week flow — 2 cols instead of 3 */
+.diagram-flow.jp-week-flow {
+  grid-template-columns: 2fr 1fr;
+}
+.diagram-step.jp-week-step.is-jp-day {
+  background: linear-gradient(135deg, #F9D9C8 0%, #F4D4A8 50%, #EFC08A 100%);
+  border-color: rgba(201,140,100,0.6);
+}
+.diagram-step.jp-week-step.is-jp-day .diagram-step-day {
+  color: #7A2A1E;
+}
+.diagram-step.jp-week-step.is-jp-day .diagram-step-title {
+  color: #5A1F26;
+}
+
+/* Highlight callout — pull-quote style */
+.about-highlight {
+  padding: 14px 16px;
+  margin: 0 0 22px;
+  background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(212,175,55,0.04));
+  border-left: 3px solid var(--gold);
+  border-radius: 0 10px 10px 0;
+  color: var(--text);
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+.about-highlight strong { color: var(--maroon); }
+.about-highlight em {
+  font-style: italic;
+  color: var(--gold-deep);
+  font-weight: 600;
+}
+
+/* Mode item — badge + description for Cycle stages */
+.about-mode-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  background: var(--cream-card);
+  border: 1.5px solid var(--border-gold);
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+.about-mode-item:hover {
+  border-color: var(--gold);
+  transform: translateX(3px);
+}
+.about-mode-item .mode-badge {
+  flex-shrink: 0;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--maroon) 0%, #8B2252 60%, var(--gold) 100%);
+  color: #FFF5E1;
+  font-family: 'DM Serif Display', serif;
+  font-size: 0.95rem;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(114,47,55,0.2);
+}
+.about-mode-item strong {
+  color: var(--maroon);
+  font-weight: 700;
+}
+.about-mode-item em {
+  font-style: italic;
+  color: var(--gold-deep);
+}
+
+/* ===== FAB ===== */
+.fab-stack {
+  position: fixed;
+  right: 20px;
+  bottom: 24px;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.fab {
+  width: 54px; height: 54px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #722F37 0%, #8B2252 55%, #D4AF37 100%);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(114,47,55,0.4);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.fab:hover { transform: translateY(-2px) scale(1.05); box-shadow: 0 10px 28px rgba(114,47,55,0.5); }
+.fab svg { filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3)); }
+
+/* ===== Login banner ===== */
+.login-banner {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 14px 20px;
+  background: linear-gradient(180deg, rgba(193,69,69,0.08), rgba(193,69,69,0.03));
+  border: 1.5px solid rgba(193,69,69,0.3);
+  border-radius: 10px;
+  color: var(--burgundy-dk);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* ===== Toast ===== */
+#jpt-toast {
+  position: fixed; bottom: 30px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: linear-gradient(135deg, #722F37 0%, #8B2252 55%, #D4AF37 100%);
+  color: #FFF5E1;
+  padding: 13px 26px;
+  border-radius: 10px;
+  font-family: 'Anuphan','Sarabun',sans-serif;
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  z-index: 10000;
+  box-shadow: 0 8px 32px rgba(114,47,55,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+#jpt-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Responsive */
+@media (max-width: 500px) {
+  .hero { padding: 32px 18px 26px; }
+  .hero-title { font-size: 2rem; }
+  .day-grid { gap: 7px; }
+  .day-card { padding: 8px 9px; min-height: 70px; }
+  .day-card .dc-num { font-size: 1.1rem; }
+  .day-card .dc-mini { width: 16px; height: 16px; font-size: 0.65rem; }
+  .cycle-tab { font-size: 0.66rem; padding: 8px 10px; min-width: 100px; }
+  .cycle-tab .ct-num { font-size: 0.9rem; }
+  .container { padding: 20px 14px 120px; }
+  .planning-section { padding: 20px 14px 4px; }
+  .planning-card { padding: 14px; gap: 12px; }
+  .planning-icon { width: 42px; height: 42px; }
+  .planning-icon svg { width: 22px; height: 22px; }
+  /* Diagram — stack vertically on mobile */
+  .diagram-flow { grid-template-columns: 1fr !important; gap: 10px; }
+  .diagram-step-arrow { display: none !important; }
+  .strategy-diagram { padding: 18px 14px; }
+}
+@media (min-width: 501px) {
+  .container { padding: 26px 18px 120px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">JP Trust Learning · JPT Framework</div>
+    <h1 class="hero-title">Roadmap <span class="th">90 วัน</span><br><span class="th">สู่พอร์ตการลงทุนที่ยั่งยืน</span></h1>
+    <p class="hero-sub">Journal · Plan · Trade · ลูปต่อเนื่อง · จากมือใหม่สู่ระบบของตัวเอง</p>
+  </div>
+</div>
+
+<!-- ===== PLANNING DASHBOARDS (top of roadmap) ===== -->
+<section class="planning-section">
+  <div class="planning-inner">
+    <div class="planning-label">Planning Toolkit</div>
+    <div class="planning-grid">
+      <button class="planning-card" onclick="openPlanningDashboard('finance')">
+        <div class="planning-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 7v10"/>
+            <path d="M15 9.5a2.5 2.5 0 0 0-2.5-2.5h-1a2 2 0 0 0 0 4h1a2.5 2.5 0 0 1 0 5h-1a2.5 2.5 0 0 1-2.5-2.5"/>
+          </svg>
+        </div>
+        <div class="planning-meta">
+          <div class="planning-title">วางแผนการเงินส่วนบุคคล</div>
+          <div class="planning-desc">รายรับ · รายจ่าย · เงินสำรอง · เป้าหมายการเงิน</div>
+        </div>
+        <svg class="planning-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+      <button class="planning-card" onclick="openPlanningDashboard('portfolio')">
+        <div class="planning-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3v18h18"/>
+            <rect x="7" y="12" width="3" height="6"/>
+            <rect x="12" y="8" width="3" height="10"/>
+            <rect x="17" y="5" width="3" height="13"/>
+          </svg>
+        </div>
+        <div class="planning-meta">
+          <div class="planning-title">วางแผนพอร์ตการลงทุน</div>
+          <div class="planning-desc">Asset allocation · risk budget · rebalancing plan</div>
+        </div>
+        <svg class="planning-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION BREAK + HEADER before cycles ===== -->
+<section class="jpt-learning-header">
+  <div class="jpt-learning-inner">
+    <div class="planning-label">JPTrust Learning</div>
+  </div>
+</section>
+
+<!-- ===== CYCLES NAV ===== -->
+<nav class="cycles-nav">
+  <div class="cycles-tabs">
+    <button class="cycle-tab active" data-cycle="1" onclick="switchCycle(1)">
+      <span class="ct-num">Cycle 1</span>
+      <span class="ct-range">Day 1–30</span>
+    </button>
+    <button class="cycle-tab" data-cycle="2" onclick="switchCycle(2)">
+      <span class="ct-num">Cycle 2</span>
+      <span class="ct-range">Day 31–60</span>
+    </button>
+    <button class="cycle-tab" data-cycle="3" onclick="switchCycle(3)">
+      <span class="ct-num">Cycle 3</span>
+      <span class="ct-range">Day 61–90</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ===== MAIN ===== -->
+<div id="loginBanner" class="login-banner" style="display:none;">
+  ⚠️ คุณยังไม่ได้ login — สามารถอ่านเนื้อหาได้ แต่ความคืบหน้าจะไม่ถูกบันทึก
+</div>
+
+<main class="container">
+  <div class="cycle-panel active" id="cyclePanel-1"></div>
+  <div class="cycle-panel" id="cyclePanel-2"></div>
+  <div class="cycle-panel" id="cyclePanel-3"></div>
+</main>
+
+<!-- ===== DAY DETAIL MODAL ===== -->
+<!-- ===== ABOUT MODAL ===== -->
+<div class="about-modal" id="aboutModal" onclick="if(event.target===this) closeAboutModal()">
+  <div class="about-inner">
+    <button class="dm-close" onclick="closeAboutModal()" aria-label="ปิด">✕</button>
+
+    <div class="about-label">JP Trust Philosophy</div>
+    <h2 class="about-title">JPT Framework</h2>
+    <div class="about-sub">ทุกวันทำ J · P · T ครบลูป — ทุก 7 วันมี JP Day ให้หยุดเทรด · ทบทวนลึก · ยกระดับแผน</div>
+
+    <div class="jpt-pillars">
+      <div class="jpt-pillar p-j">
+        <div class="jpt-pillar-letter">J</div>
+        <div class="jpt-pillar-title">Journal &amp; Justify</div>
+        <div class="jpt-pillar-desc">ทบทวนและให้เหตุผล · ทุก decision ต้องมี why ที่ชัดเจน</div>
+      </div>
+      <div class="jpt-pillar p-p">
+        <div class="jpt-pillar-letter">P</div>
+        <div class="jpt-pillar-title">Plan &amp; Power</div>
+        <div class="jpt-pillar-desc">วางแผนและยกระดับความรู้สู่แผนที่ทำได้จริง</div>
+      </div>
+      <div class="jpt-pillar p-t">
+        <div class="jpt-pillar-letter">T</div>
+        <div class="jpt-pillar-title">Trade &amp; Trust</div>
+        <div class="jpt-pillar-desc">ลงมือและเชื่อระบบของตัวเองอย่างมีวินัย</div>
+      </div>
+    </div>
+
+    <div class="about-body">
+
+      <!-- ═══ DAILY JPT ROUTINE ═══ -->
+      <div class="about-section-label">กิจวัตรประจำวัน · ทำครบ J → P → T ทุกวัน</div>
+      <div class="strategy-diagram">
+        <div class="diagram-flow">
+          <div class="diagram-step">
+            <div class="diagram-step-num">1</div>
+            <div class="diagram-step-day">เช้า · J</div>
+            <div class="diagram-step-title">Journal &amp; Justify</div>
+            <div class="diagram-step-desc">ทบทวนวันก่อน · รู้ทันอารมณ์ · ระบุ why ของทุก decision ที่จะเกิดวันนี้</div>
+            <div class="diagram-step-arrow">→</div>
+          </div>
+          <div class="diagram-step">
+            <div class="diagram-step-num">2</div>
+            <div class="diagram-step-day">กลางวัน · P</div>
+            <div class="diagram-step-title">Plan &amp; Power</div>
+            <div class="diagram-step-desc">วางแผนวันนี้ · ยกระดับความรู้ · setup ที่รอเข้า พร้อม stop-loss &amp; target</div>
+            <div class="diagram-step-arrow">→</div>
+          </div>
+          <div class="diagram-step">
+            <div class="diagram-step-num">3</div>
+            <div class="diagram-step-day">ตลาดเปิด · T</div>
+            <div class="diagram-step-title">Trade &amp; Trust</div>
+            <div class="diagram-step-desc">ลงมือตามแผน · เชื่อระบบ · ไม่ override · บันทึกผลทันทีหลัง close</div>
+            <div class="diagram-step-arrow">→</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="about-highlight">
+        <strong>หลักการ:</strong> เทรดเดอร์ส่วนใหญ่ล้มเหลวเพราะทำไม่ครบ 3 เสา — เทรด (T) โดยไม่ journal (J) = ผิดซ้ำเดิม · วางแผน (P) โดยไม่ลงมือ (T) = ไม่มีทางพิสูจน์ · ครบทั้ง 3 <strong>ทุกวัน</strong> = ระบบปิด ไม่ปล่อยให้ด้านใดอ่อนแอจนดึงทั้งระบบลง
+      </div>
+
+      <!-- ═══ WEEKLY RHYTHM ═══ -->
+      <div class="about-section-label">จังหวะรายสัปดาห์ · 6 วันทำ 1 วัน JP Day</div>
+      <div class="strategy-diagram">
+        <div class="diagram-flow jp-week-flow">
+          <div class="diagram-step jp-week-step">
+            <div class="diagram-step-day">Day 1-6</div>
+            <div class="diagram-step-title">Full JPT Loop</div>
+            <div class="diagram-step-desc">ทำ Journal · Plan · Trade ครบทุกวันตามกิจวัตรข้างต้น</div>
+            <div class="diagram-step-arrow">→</div>
+          </div>
+          <div class="diagram-step jp-week-step is-jp-day">
+            <div class="diagram-step-day">Day 7 · JP DAY</div>
+            <div class="diagram-step-title">หยุดเทรด · Deep J + P</div>
+            <div class="diagram-step-desc">ไม่ลงมือเทรดวันนี้ · รวบรวม data ของสัปดาห์ · วัด expectancy · ปรับแผนสำหรับรอบถัดไป</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="about-highlight" style="background:linear-gradient(135deg, rgba(114,47,55,0.1), rgba(212,175,55,0.1)); border-left-color:var(--maroon);">
+        <strong>ทำไม JP Day ถึงสำคัญ:</strong> ถ้าเทรดโดยไม่หยุดคิด = กลายเป็น gambler · JP Day บังคับให้ถอยออกมา ดูภาพใหญ่ ตรวจสอบว่า edge ของเรายัง work อยู่หรือเปล่า · นี่คือสิ่งที่แยก <em>merchant</em> ออกจาก <em>professional</em>
+      </div>
+
+      <!-- ═══ 90-DAY STRUCTURE ═══ -->
+      <div class="about-section-label">โครงสร้าง 90 วัน · 3 Cycles ที่ลึกขึ้นเรื่อยๆ</div>
+      <div class="about-mode-item">
+        <span class="mode-badge">1</span>
+        <strong>Foundation (Day 1-30)</strong> — รู้จักตัวเอง · วาง trading plan v1 · ฝึก TA พื้นฐาน · เริ่ม paper trade ด้วย 1-2% risk ต่อ trade
+      </div>
+      <div class="about-mode-item">
+        <span class="mode-badge">2</span>
+        <strong>Intermediate (Day 31-60)</strong> — วิเคราะห์ data ของตัวเอง 30 วันแรก · คำนวณ expectancy · ศึกษา momentum &amp; sector rotation · เริ่มเทรดตามระบบด้วย size เล็ก
+      </div>
+      <div class="about-mode-item">
+        <span class="mode-badge">3</span>
+        <strong>Advanced (Day 61-90)</strong> — portfolio mindset · performance attribution (skill vs luck) · risk budgeting · เขียน trading plan v3 ที่ ready-to-scale
+      </div>
+
+      <div class="about-highlight" style="background:linear-gradient(135deg, rgba(31,125,73,0.08), rgba(212,175,55,0.1)); border-left-color:var(--emerald);">
+        <strong>Loop ไม่มีจุดจบ:</strong> จบ Day 90 = เริ่ม Cycle 4 ด้วยมุมมองที่ลึกขึ้น · แต่ละรอบที่ผ่าน = เห็นช่องว่างใหม่ ที่รอบก่อนไม่เห็น · Trading คือ skill ที่ฝึกตลอดชีวิต · JPT วนต่อเนื่องไม่มีวันจบ
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===== FAB ===== -->
+<div class="fab-stack">
+  <button class="fab" onclick="openAboutModal()" aria-label="ปรัชญา JPT Framework">
+    <svg width="28" height="28" viewBox="0 0 64 64" fill="none" stroke="#FFF5E1" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="32" cy="26" r="20"/>
+      <circle cx="32" cy="26" r="14"/>
+      <circle cx="32" cy="26" r="8"/>
+      <circle cx="32" cy="26" r="2.5" fill="#FFF5E1"/>
+      <line x1="32" y1="46" x2="22" y2="60"/>
+      <line x1="32" y1="46" x2="42" y2="60"/>
+      <line x1="20" y1="60" x2="44" y2="60"/>
+    </svg>
+  </button>
+</div>
+
+<script>
+// ========================================
+// METADATA (phase labels + cycle metadata)
+// ========================================
+const PHASE_LABELS = {
+  J: {title:'Journal & Justify', subtitle:'ทบทวน · ให้เหตุผล'},
+  P: {title:'Plan & Power', subtitle:'วางแผน · ยกระดับความรู้'},
+  T: {title:'Trade & Trust', subtitle:'ลงมือ · เข้าใจระบบตนเอง'}
+};
+const CYCLE_META = {
+  1: {label:'Cycle 1 · Foundation', title:'Foundation — พื้นฐาน', desc:'รู้จักตัวเอง · เรียนพื้นฐาน · ลงมือ paper trade'},
+  2: {label:'Cycle 2 · Intermediate', title:'Intermediate — ระดับกลาง', desc:'วิเคราะห์ตัวเองจากข้อมูลจริง · กลยุทธ์ momentum · เทรดตามระบบ'},
+  3: {label:'Cycle 3 · Advanced', title:'Advanced — มืออาชีพ', desc:'Portfolio mindset · performance attribution · professional discipline'}
+};
+
+// ========================================
+// STATE
+// ========================================
+let progress = {}; // { "1": {done: true, journal: "...", at: "..."}, ... }
+let currentModalDay = null;
+
+// ========================================
+// JPSettings INIT
+// ========================================
+if (window.JPSettings && window.supabase) {
+  window.JPSettings.init({
+    url: 'https://rcdukwwcbyryauhqlzmx.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZHVrd3djYnlyeWF1aHFsem14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MTY0MDAsImV4cCI6MjA4NTQ5MjQwMH0.rprPmudJYyb6dyhXb9Z9GrtQWEeIX99A2Wrj55PvS54'
+  });
+}
+
+function jptToast(msg) {
+  let t = document.getElementById('jpt-toast');
+  if (!t) { t = document.createElement('div'); t.id = 'jpt-toast'; document.body.appendChild(t); }
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ========================================
+// PHASE ROTATION — J/P/T cycles daily
+// Day 1 = J, Day 2 = P, Day 3 = T, Day 4 = J, ...
+// ========================================
+function phaseForDay(day) {
+  return ['J', 'P', 'T'][(day - 1) % 3];
+}
+
+// ========================================
+// RENDER
+// ========================================
+function renderAllCycles() {
+  for (let c = 1; c <= 3; c++) {
+    const panel = document.getElementById('cyclePanel-' + c);
+    const startDay = (c - 1) * 30 + 1;
+    const endDay = c * 30;
+
+    let html = '<div class="day-grid-wrap"><div class="day-grid">';
+    for (let d = startDay; d <= endDay; d++) {
+      html += renderDayCard(d);
+    }
+    html += '</div></div>';
+    panel.innerHTML = html;
+  }
+}
+
+function renderDayCard(day) {
+  const p = progress[day] || {};
+  const done = p.done ? 'done' : '';
+  const isRest = day % 7 === 0;
+  const restClass = isRest ? 'rest-day' : '';
+  const badges = isRest
+    ? '<span class="dc-mini jpt-J">J</span><span class="dc-mini jpt-P">P</span>'
+    : '<span class="dc-mini jpt-J">J</span><span class="dc-mini jpt-P">P</span><span class="dc-mini jpt-T">T</span>';
+  return `
+    <div class="day-card locked ${done} ${restClass}" data-day="${day}" onclick="openDayModal(${day})">
+      <div class="dc-top">
+        <div class="dc-num">${day}</div>
+      </div>
+      <div class="dc-lock">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="11" width="16" height="10" rx="2"/>
+          <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+        </svg>
+      </div>
+      <div class="dc-phases">${badges}</div>
+    </div>
+  `;
+}
+
+function refreshAllCards() {
+  document.querySelectorAll('.day-card').forEach(card => {
+    const day = parseInt(card.dataset.day, 10);
+    const p = progress[day] || {};
+    card.classList.toggle('done', !!p.done);
+    card.classList.toggle('has-journal', !!(p.journal && p.journal.trim()));
+  });
+}
+
+function updateProgressUI() {
+  const doneCount = Object.values(progress).filter(p => p.done).length;
+  const pct = Math.round((doneCount / 90) * 100);
+  document.getElementById('progDone').textContent = doneCount;
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('progFill').style.width = pct + '%';
+
+  // Current cycle label — based on the next unfinished day
+  const next = nextUnfinishedDay();
+  let currentCycle = 1;
+  if (next) {
+    const t = TASKS.find(x => x.day === next);
+    currentCycle = t ? t.cycle : 1;
+  } else {
+    currentCycle = 3;
+  }
+  document.getElementById('progCycle').textContent = CYCLE_META[currentCycle].label;
+
+  // Continue button label
+  const contLabel = document.getElementById('continueLabel');
+  if (doneCount === 90) {
+    contLabel.textContent = 'จบครบ 90 วัน — เริ่ม Cycle 4';
+  } else if (next === 1 && doneCount === 0) {
+    contLabel.textContent = 'เริ่มวันที่ 1';
+  } else {
+    contLabel.textContent = 'ไปต่อวันที่ ' + next;
+  }
+}
+
+function nextUnfinishedDay() {
+  for (let d = 1; d <= 90; d++) {
+    const p = progress[d] || {};
+    if (!p.done) return d;
+  }
+  return 90;
+}
+
+function continueBookmark() {
+  const next = nextUnfinishedDay();
+  openDayModal(next);
+}
+
+// ========================================
+// CYCLE TABS
+// ========================================
+function switchCycle(n) {
+  document.querySelectorAll('.cycle-tab').forEach(t => t.classList.toggle('active', parseInt(t.dataset.cycle) === n));
+  document.querySelectorAll('.cycle-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('cyclePanel-' + n).classList.add('active');
+  // Only scroll up if we're below the nav bar — otherwise let user stay where they are
+  const nav = document.querySelector('.cycles-nav');
+  const navTop = nav.getBoundingClientRect().top;
+  if (navTop < -20) {
+    // User has scrolled past the nav — scroll back so cards start right below sticky bar
+    const absTop = window.pageYOffset + navTop;
+    window.scrollTo({ top: absTop, behavior: 'smooth' });
+  }
+}
+
+// ========================================
+// DAY MODAL (currently locked — content coming later)
+// ========================================
+function openDayModal(day) {
+  jptToast('🔒 Day ' + day + ' · เนื้อหากำลังพัฒนา เร็วๆ นี้');
+}
+
+// ========================================
+// PLANNING DASHBOARDS (placeholder for future)
+// ========================================
+function openPlanningDashboard(type) {
+  const TARGETS = {
+    finance:   { title: 'วางแผนการเงินส่วนบุคคล', file: 'finance-planner.html' },
+    portfolio: { title: 'วางแผนพอร์ตการลงทุน',    file: 'portfolio-planner.html' }
+  };
+  const t = TARGETS[type];
+  if (!t) return;
+  const url = 'https://jptrustlearning.github.io/pages/' + t.file + '?v=' + Date.now();
+  if (window.parent && window.parent !== window) {
+    // Inside an iframe — ask parent to open
+    window.parent.postMessage({ type: 'openIframe', title: t.title, url: url }, '*');
+  } else {
+    window.location.href = t.file;
+  }
+}
+
+// ========================================
+// ABOUT MODAL
+// ========================================
+function openAboutModal() {
+  document.getElementById('aboutModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeAboutModal() {
+  document.getElementById('aboutModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ========================================
+// LOAD ON START
+// ========================================
+async function loadProgress() {
+  if (!window.JPSettings) return;
+  try {
+    const data = await window.JPSettings.load();
+    if (data && data.roadmap) {
+      progress = data.roadmap;
+      console.log('[roadmap] loaded progress from cloud');
+    }
+    const user = await window.JPSettings.getUser();
+    if (!user) {
+      document.getElementById('loginBanner').style.display = 'block';
+    }
+  } catch (e) {
+    console.warn('[roadmap] load error:', e);
+  }
+}
+
+// ========================================
+// INIT
+// ========================================
+document.addEventListener('DOMContentLoaded', async () => {
+  renderAllCycles();
+  await loadProgress();
+  // Re-render cards to reflect any loaded done state
+  document.querySelectorAll('.day-card').forEach(card => {
+    const day = parseInt(card.dataset.day, 10);
+    const p = progress[day] || {};
+    card.classList.toggle('done', !!p.done);
+  });
+});
+
+// Close modals with Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const about = document.getElementById('aboutModal');
+    if (about && about.classList.contains('open')) closeAboutModal();
+  }
+});
+</script>
+
+</body>
+</html>
