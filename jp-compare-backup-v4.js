@@ -1,4 +1,4 @@
-/* jp-compare.js — Strategy comparison module for JP Trust Learning (v3)
+/* jp-compare.js — Strategy comparison module for JP Trust Learning (v2)
  *
  * v2 (table redesign):
  *   - Saved entries render as a 3-column TABLE (ชื่อ / CAGR / Max DD)
@@ -9,31 +9,17 @@
  *     with period summary, full CONFIG grid, saved-at, and delete button
  *   - Long names truncate with ellipsis
  *
- * v3 (list-only mode):
- *   - New listOnly:true mode for hubs (e.g. Lab CTA in member-dashboard)
- *     where there's no "current backtest" to add. Skips FAB injection
- *     and hides the Add panel inside the modal — only the saved-list
- *     table is shown.
- *   - New public methods: openList() and getCount() for hub UIs that
- *     want to programmatically open the modal and display a live count
- *     badge.
- *
  * Storage shape (each entry):
  *   { id, strategyKey, strategyLabel, listName, cagr, maxDD, summary, config, savedAt }
  *
  * Key (localStorage): jpt_compare_list_v1
  *
- * Usage in strategy page (full mode — adds FAB, lets user save current):
+ * Usage in strategy page:
  *   JPCompare.init({
  *     strategyKey:    'sp500-strategy-pro',
  *     strategyLabel:  '6M Momentum',
  *     getCurrentResult: () => ({ cagr, maxDD, summary, config: {...} })
  *   });
- *
- * Usage in hub page (list-only mode — no FAB, no Add panel):
- *   JPCompare.init({ listOnly: true });
- *   JPCompare.openList();      // open modal on demand
- *   JPCompare.getCount();      // → number of saved entries
  */
 (function(){
   'use strict';
@@ -45,7 +31,6 @@
   let _modalEl = null;
   let _backdrop = null;
   let _injected = false;
-  let _listOnly = false;
 
   // Sort state — column key + direction
   let _sortBy = 'cagr';        // 'name' | 'cagr' | 'dd'
@@ -55,19 +40,11 @@
 
   // ─── PUBLIC ──────────────────────────────────────────────
   function init(opts){
-    opts = opts || {};
-    if(opts.listOnly){
-      // List-only: no FAB, no Add panel — for hubs that just want to
-      // open the saved-list view (e.g. Lab CTA in member-dashboard).
-      _listOnly = true;
-      _config = { strategyKey: '__list_only__', strategyLabel: 'List Only' };
-    } else {
-      if(!opts.strategyKey || !opts.strategyLabel || typeof opts.getCurrentResult !== 'function'){
-        console.warn('[jp-compare] init requires {strategyKey, strategyLabel, getCurrentResult} — or pass {listOnly:true}');
-        return;
-      }
-      _config = opts;
+    if(!opts || !opts.strategyKey || !opts.strategyLabel || typeof opts.getCurrentResult !== 'function'){
+      console.warn('[jp-compare] init requires {strategyKey, strategyLabel, getCurrentResult}');
+      return;
     }
+    _config = opts;
     if(_injected) return;
     if(document.readyState === 'loading'){
       document.addEventListener('DOMContentLoaded', _bootstrap);
@@ -79,7 +56,7 @@
   function _bootstrap(){
     if(_injected) return;
     _injectStyles();
-    if(!_listOnly) _injectFab();
+    _injectFab();
     _injectModal();
     _injected = true;
   }
@@ -168,12 +145,6 @@
 .jpc-add-panel-inner{padding:0}
 
 .jpc-divider{height:1px;background:linear-gradient(90deg,transparent 0%,rgba(212,175,55,0.4) 50%,transparent 100%);margin:18px 0 14px}
-
-/* ── List-only mode: hide Add panel + divider so the modal opens directly to the saved list ── */
-.jpc-modal.jpc-list-only .jpc-add-trigger,
-.jpc-modal.jpc-list-only .jpc-add-panel,
-.jpc-modal.jpc-list-only .jpc-add-panel-inner,
-.jpc-modal.jpc-list-only > .jpc-modal-body > .jpc-divider:first-of-type{display:none !important}
 
 .jpc-defs{background:rgba(212,175,55,0.06);border:1px solid rgba(212,175,55,0.22);border-radius:10px;padding:11px 13px;margin:10px 0 14px;font-family:'Anuphan',sans-serif;font-size:0.78rem;line-height:1.55;color:#5A3D20}
 .jpc-def-item{display:flex;gap:10px;margin-bottom:6px;align-items:flex-start}
@@ -313,7 +284,7 @@
     document.body.appendChild(_backdrop);
 
     _modalEl = document.createElement('div');
-    _modalEl.className = 'jpc-modal' + (_listOnly ? ' jpc-list-only' : '');
+    _modalEl.className = 'jpc-modal';
     _modalEl.setAttribute('role', 'dialog');
     _modalEl.setAttribute('aria-labelledby', 'jpc-modal-title');
     _modalEl.innerHTML = `
@@ -378,13 +349,11 @@
     document.body.appendChild(_modalEl);
 
     _modalEl.querySelector('.jpc-modal-close').addEventListener('click', _closeModal);
-    if(!_listOnly){
-      _modalEl.querySelector('#jpc-add-trigger').addEventListener('click', () => _toggleAddPanel());
-      _modalEl.querySelector('#jpc-add').addEventListener('click', _addEntry);
-      _modalEl.querySelector('#jpc-name').addEventListener('keydown', e => {
-        if(e.key === 'Enter') _addEntry();
-      });
-    }
+    _modalEl.querySelector('#jpc-add-trigger').addEventListener('click', () => _toggleAddPanel());
+    _modalEl.querySelector('#jpc-add').addEventListener('click', _addEntry);
+    _modalEl.querySelector('#jpc-name').addEventListener('keydown', e => {
+      if(e.key === 'Enter') _addEntry();
+    });
     _modalEl.querySelector('#jpc-filter').addEventListener('change', e => {
       _filterKey = e.target.value;
       _renderList();
@@ -397,13 +366,9 @@
   // ─── MODAL OPEN/CLOSE ────────────────────────────────────
   function _openModal(){
     _renderList();
-    const filterEl = _modalEl.querySelector('#jpc-filter');
-    if(filterEl) filterEl.value = _filterKey;
-    if(!_listOnly){
-      const nameEl = _modalEl.querySelector('#jpc-name');
-      if(nameEl) nameEl.value = '';
-      _toggleAddPanel(false);  // ensure add-form starts collapsed
-    }
+    _modalEl.querySelector('#jpc-filter').value = _filterKey;
+    _modalEl.querySelector('#jpc-name').value = '';
+    _toggleAddPanel(false);  // ensure add-form starts collapsed
     _backdrop.classList.add('show');
     _modalEl.classList.add('show');
     document.body.style.overflow = 'hidden';
@@ -725,18 +690,5 @@
     t._timer = setTimeout(() => t.classList.remove('show'), 2400);
   }
 
-  // ─── PUBLIC HELPERS ──────────────────────────────────────
-  function openList(){
-    if(!_injected){
-      console.warn('[jp-compare] openList() called before init() finished');
-      return;
-    }
-    _openModal();
-  }
-
-  function getCount(){
-    return _read().length;
-  }
-
-  window.JPCompare = { init, openList, getCount };
+  window.JPCompare = { init };
 })();

@@ -248,7 +248,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .lc-title{font-size:13px;font-weight:700;color:var(--text-dark);margin-top:1px}
 .lc-sub{font-size:10px;color:var(--text-dark-muted);font-weight:500}
 
-/* Lab bottom CTA (currently used by Compare Strategies — class name kept generic for reuse) */
+/* Create New Strategy CTA */
 .create-strategy-cta{display:flex;align-items:center;gap:13px;padding:16px 16px 16px 16px;background:linear-gradient(135deg,#5A1F26 0%,#722F37 50%,#4A2318 100%);border-radius:18px;text-decoration:none;color:#FFF;cursor:pointer;margin-bottom:24px;box-shadow:0 6px 20px rgba(90,31,38,0.25);position:relative;overflow:hidden}
 .create-strategy-cta::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 12% 70%,rgba(212,175,55,0.18),transparent 35%);pointer-events:none}
 .create-strategy-cta>*{position:relative;z-index:1}
@@ -256,10 +256,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .cs-plus{width:46px;height:46px;border-radius:50%;background:rgba(212,175,55,0.16);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;color:var(--gold-light);flex-shrink:0;box-shadow:0 0 0 6px rgba(212,175,55,0.06)}
 .cs-plus svg{width:22px;height:22px;stroke-width:2.2}
 .cs-text{flex:1;min-width:0}
-.cs-title-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:4px}
-.cs-title{font-size:16px;font-weight:700;color:#FFF;font-family:'DM Serif Display',serif;letter-spacing:0.2px}
-.cs-count-badge{display:inline-flex;align-items:center;padding:2.5px 9px;border-radius:999px;background:rgba(212,175,55,0.20);color:#F4E4BA;font-family:'Anuphan',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.2px;border:1px solid rgba(212,175,55,0.35);line-height:1.4;white-space:nowrap}
-.cs-count-badge.empty{background:rgba(255,255,255,0.05);color:rgba(244,228,186,0.55);border-color:rgba(255,255,255,0.10)}
+.cs-title{font-size:16px;font-weight:700;color:#FFF;margin-bottom:3px;font-family:'DM Serif Display',serif;letter-spacing:0.2px}
 .cs-desc{font-size:11.5px;color:rgba(244,228,186,0.78);line-height:1.45}
 .cs-arrow{width:38px;height:38px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;color:var(--maroon);flex-shrink:0;box-shadow:0 4px 10px rgba(212,175,55,0.4)}
 .cs-arrow svg{width:16px;height:16px;stroke-width:2.5}
@@ -926,7 +923,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
               </a>
               <!-- Experiment (empty placeholder, hidden by default) -->
               <div class="strategy-empty filter-experiment" style="display:none">
-                ยังไม่มีกลยุทธ์ทดลอง · ฟีเจอร์สร้างกลยุทธ์เร็วๆ นี้
+                ยังไม่มีกลยุทธ์ทดลอง · กดปุ่ม "Create New Strategy" เพื่อเริ่ม
               </div>
             </div>
 
@@ -953,24 +950,12 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
               </a>
             </div>
 
-            <!-- ===== Compare Strategies CTA (reads jpt_compare_list_v1 from localStorage) ===== -->
-            <a class="create-strategy-cta fade-up fade-up-4" id="labCompareCTA" onclick="openLabCompare()">
-              <div class="cs-plus">
-                <!-- Comparison icon: two grouped bars (short + tall) — semantic for "compare" -->
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="6" y1="20" x2="6" y2="14"/>
-                  <line x1="10" y1="20" x2="10" y2="9"/>
-                  <line x1="15" y1="20" x2="15" y2="11"/>
-                  <line x1="19" y1="20" x2="19" y2="6"/>
-                  <line x1="3" y1="20" x2="21" y2="20"/>
-                </svg>
-              </div>
+            <!-- ===== Create New Strategy CTA ===== -->
+            <a class="create-strategy-cta fade-up fade-up-4" onclick="jptToast('🚧 Create Strategy · เร็วๆ นี้')">
+              <div class="cs-plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
               <div class="cs-text">
-                <div class="cs-title-row">
-                  <div class="cs-title">เปรียบเทียบกลยุทธ์</div>
-                  <span class="cs-count-badge empty" id="labCompareCount">ยังว่าง</span>
-                </div>
-                <div class="cs-desc" id="labCompareDesc">กดปุ่ม “บันทึก” ในหน้ากลยุทธ์<br>เพื่อเก็บผลแบ็คเทสไว้เปรียบเทียบ</div>
+                <div class="cs-title">Create New Strategy</div>
+                <div class="cs-desc">ทดลองระบบใหม่ของคุณ<br>เริ่มต้นสร้างกลยุทธ์ของคุณเอง</div>
               </div>
               <div class="cs-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
             </a>
@@ -1346,7 +1331,7 @@ function doLogout(){
   window.scrollTo({top:0});
   setTimeout(()=>pinInput?.focus(),100);
 }
-function navigateTo(screen){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const t=document.getElementById('screen-'+screen);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const b=document.querySelector('.nav-item[data-screen="'+screen+'"]');if(b)b.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});t?.querySelectorAll('.fade-up').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''});if(screen==='news'){loadNewsFeed()}if(screen==='home'){refreshTickerTape()}if(screen==='lab'&&typeof window.refreshLabCompareCTA==='function'){window.refreshLabCompareCTA()}logEvent('screen_view',{screen:screen})}
+function navigateTo(screen){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const t=document.getElementById('screen-'+screen);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const b=document.querySelector('.nav-item[data-screen="'+screen+'"]');if(b)b.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});t?.querySelectorAll('.fade-up').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''});if(screen==='news'){loadNewsFeed()}if(screen==='home'){refreshTickerTape()}logEvent('screen_view',{screen:screen})}
 // ===== TRADINGVIEW TICKER TAPE =====
 // Free embed widget — real-time prices, no API key, auto-updating
 let _tickerLastLoad = 0;
@@ -1940,58 +1925,6 @@ window.addEventListener('appinstalled',()=>{hideIB();showInstallSuccessModal()})
     window.addEventListener('resize',resize);
     function startChart(){resize();if(w===0||h===0){setTimeout(startChart,200);return}initLines();initFogs();requestAnimationFrame(animate)}
     setTimeout(startChart,300);
-})();
-</script>
-
-<!-- ─── COMPARE FEATURE — list-only mode for Lab CTA (jp-compare.js) ─── -->
-<script src="https://jptrustlearning.github.io/pages/jp-compare.js?v=1777747901"></script>
-<script>
-(function(){
-  // jp-compare.js exposes JPCompare.init({listOnly:true}), .openList(), .getCount().
-  // The compare list is shared across this app via localStorage on the same origin,
-  // so entries the user saves from inside an iframed strategy page (sp500-strategy-pro,
-  // sp500-combined-strategy, sp500-rolling-6m-momentum) are visible here too.
-  if(!window.JPCompare){
-    console.warn('[lab-compare] JPCompare module did not load');
-    return;
-  }
-  JPCompare.init({ listOnly: true });
-
-  function refreshLabCompareCTA(){
-    const badge = document.getElementById('labCompareCount');
-    const desc  = document.getElementById('labCompareDesc');
-    if(!badge || !desc) return;
-    const n = JPCompare.getCount();
-    if(n > 0){
-      badge.textContent = n + ' รายการ';
-      badge.classList.remove('empty');
-      desc.innerHTML = 'นำผลแบ็คเทสที่บันทึกไว้มาเทียบ CAGR กับ Max DD<br>ในตารางเดียว — เรียงตามผลตอบแทนหรือความเสี่ยงได้';
-    } else {
-      badge.textContent = 'ยังว่าง';
-      badge.classList.add('empty');
-      desc.innerHTML = 'กดปุ่ม “บันทึก” ในหน้ากลยุทธ์<br>เพื่อเก็บผลแบ็คเทสไว้เปรียบเทียบ';
-    }
-  }
-  // Expose CTA click handler (referenced by inline onclick in markup)
-  window.openLabCompare = function(){
-    JPCompare.openList();
-  };
-  // Expose refresh so Lab tab navigation can pick up entries added in iframed pages
-  window.refreshLabCompareCTA = refreshLabCompareCTA;
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', refreshLabCompareCTA);
-  } else {
-    refreshLabCompareCTA();
-  }
-  // Same-origin iframe writes fire 'storage' events on this window
-  window.addEventListener('storage', e => {
-    if(e.key === 'jpt_compare_list_v1') refreshLabCompareCTA();
-  });
-  // Refresh on tab focus (covers OS-level returns)
-  document.addEventListener('visibilitychange', () => {
-    if(!document.hidden) refreshLabCompareCTA();
-  });
 })();
 </script>
 </body></html>
