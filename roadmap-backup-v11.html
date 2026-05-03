@@ -1104,658 +1104,6 @@ body > * { position: relative; z-index: 1; }
 @media (min-width: 501px) {
   .container { padding: 26px 18px 120px; }
 }
-
-/* ============================================================
-   NEW JPTRUST LEARNING SECTION — Calendar redesign (v11)
-   ============================================================ */
-
-/* ===== Brand header (owl + JP TRUST + bell + settings) ===== */
-.learning-section {
-  max-width: 900px;
-  margin: 16px auto 0;
-  padding: 0 18px;
-}
-.learning-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 6px 2px 14px;
-}
-.lh-brand { display: flex; align-items: center; gap: 12px; }
-.lh-owl {
-  width: 56px; height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #E8C56A 0%, #D4AF37 50%, #B8860B 100%);
-  display: grid; place-items: center;
-  box-shadow: 0 6px 16px rgba(184,134,11,0.32), inset 0 1px 0 rgba(255,255,255,0.45);
-  flex-shrink: 0;
-}
-.lh-owl svg { width: 36px; height: 36px; color: #FFFEF8; }
-.lh-text { line-height: 1.15; }
-.lh-title {
-  font-family: 'DM Serif Display', serif;
-  font-size: 1.45rem;
-  color: var(--maroon);
-  letter-spacing: 0.5px;
-  font-weight: 400;
-}
-.lh-tagline {
-  font-family: 'Anuphan', sans-serif;
-  font-size: 0.78rem;
-  color: var(--gold-deep);
-  font-style: italic;
-  margin-top: 2px;
-  font-weight: 500;
-}
-.lh-actions { display: flex; gap: 10px; }
-.lh-btn {
-  width: 42px; height: 42px;
-  border-radius: 50%;
-  border: 1.5px solid var(--border-gold);
-  background: var(--cream-card);
-  display: grid; place-items: center;
-  cursor: pointer;
-  position: relative;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(114,47,55,0.06);
-}
-.lh-btn:hover {
-  border-color: var(--gold);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(114,47,55,0.1);
-}
-.lh-btn svg { width: 20px; height: 20px; color: var(--maroon); stroke-width: 1.7; }
-.lh-btn.has-dot::after {
-  content: '';
-  position: absolute;
-  top: 9px; right: 9px;
-  width: 8px; height: 8px;
-  background: var(--burgundy);
-  border-radius: 50%;
-  border: 1.5px solid var(--cream-card);
-}
-
-/* ===== Greeting + Progress 2-col cards ===== */
-.hero-cards {
-  display: grid;
-  grid-template-columns: 1fr 1.45fr;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-.greet-card,
-.progress-card {
-  background: linear-gradient(180deg, var(--cream-card) 0%, var(--cream) 70%, var(--cream-deep) 100%);
-  border: 1.5px solid var(--border-gold);
-  border-radius: 14px;
-  padding: 16px 14px;
-  box-shadow: 0 4px 14px rgba(114,47,55,0.06), inset 0 0 0 1px rgba(255,255,255,0.55);
-  position: relative;
-  overflow: hidden;
-}
-.greet-line {
-  font-family: 'Anuphan', sans-serif;
-  font-size: 0.82rem;
-  color: var(--text-muted);
-  font-weight: 500;
-  margin-bottom: 4px;
-}
-.greet-name {
-  font-family: 'DM Serif Display', serif;
-  font-size: 1.55rem;
-  color: var(--maroon);
-  line-height: 1.1;
-  margin-bottom: 12px;
-  word-break: break-all;
-}
-.greet-tag {
-  font-family: 'Anuphan', sans-serif;
-  font-size: 0.74rem;
-  color: var(--gold-deep);
-  line-height: 1.4;
-  display: flex;
-  align-items: flex-start;
-  gap: 6px;
-  font-weight: 500;
-}
-.greet-tag .gt-star {
-  width: 14px; height: 14px; flex-shrink: 0; color: var(--gold);
-  margin-top: 1px;
-}
-
-/* Progress card */
-.pc-label {
-  font-family: 'Anuphan', sans-serif;
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  font-weight: 500;
-  margin-bottom: 4px;
-}
-.pc-numbers { display: flex; align-items: baseline; gap: 4px; margin-bottom: 8px; }
-.pc-big {
-  font-family: 'DM Serif Display', serif;
-  font-size: 2.4rem;
-  color: var(--maroon);
-  line-height: 1;
-}
-.pc-divider {
-  font-family: 'DM Serif Display', serif;
-  font-size: 1.4rem;
-  color: var(--text-muted);
-  margin: 0 2px;
-}
-.pc-total {
-  font-family: 'Anuphan', sans-serif;
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  font-weight: 500;
-}
-.pc-spark {
-  position: absolute;
-  top: 14px; right: 14px;
-  width: 100px; height: 50px;
-  pointer-events: none;
-}
-.pc-spark svg { width: 100%; height: 100%; overflow: visible; }
-.pc-bar-wrap { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
-.pc-bar {
-  flex: 1;
-  display: grid;
-  grid-template-columns: repeat(15, 1fr);
-  gap: 3px;
-  height: 12px;
-}
-.pc-bar-seg {
-  background: var(--cream-deep);
-  border-radius: 2px;
-  transition: background 0.3s ease;
-}
-.pc-bar-seg.filled {
-  background: linear-gradient(135deg, #5A1F26 0%, #722F37 60%, #8B2252 100%);
-}
-.pc-pct {
-  font-family: 'DM Serif Display', serif;
-  font-size: 1.25rem;
-  color: var(--gold-dark);
-  white-space: nowrap;
-}
-
-@media (max-width: 480px) {
-  .hero-cards { grid-template-columns: 1fr; gap: 10px; }
-  .greet-name { font-size: 1.45rem; }
-  .pc-big { font-size: 2.6rem; }
-  .pc-spark { width: 90px; height: 44px; top: 16px; right: 14px; }
-}
-
-/* ===== Status legend ===== */
-.legend-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  gap: 6px;
-  padding: 12px 14px;
-  margin: 0 auto 12px;
-  max-width: 900px;
-  background: var(--cream-card);
-  border: 1.5px solid var(--border-gold);
-  border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(114,47,55,0.04);
-}
-.lg-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-family: 'Anuphan', sans-serif;
-  font-size: 0.78rem;
-  color: var(--text-dark);
-  font-weight: 500;
-}
-.lg-dot {
-  width: 22px; height: 22px;
-  border-radius: 50%;
-  display: grid; place-items: center;
-  flex-shrink: 0;
-  border: 1.5px solid transparent;
-}
-.lg-dot svg { width: 12px; height: 12px; stroke-width: 2.5; }
-.lg-today {
-  background: linear-gradient(135deg, #E8C56A 0%, #D4AF37 100%);
-  border-color: #B8860B;
-}
-.lg-completed {
-  background: var(--emerald);
-  color: #FFFEF8;
-}
-.lg-locked {
-  background: var(--cream-deep);
-  border-color: rgba(184,134,11,0.35);
-  color: var(--gold-deep);
-}
-.lg-missed {
-  background: rgba(193,69,69,0.1);
-  border-color: var(--burgundy);
-  color: var(--burgundy);
-}
-
-@media (max-width: 480px) {
-  .legend-row { padding: 10px 8px; gap: 4px; }
-  .lg-item { font-size: 0.72rem; gap: 5px; }
-  .lg-dot { width: 20px; height: 20px; }
-}
-
-/* ===== Calendar grid ===== */
-.cal-grid {
-  background: var(--cream-card);
-  border: 1.5px solid var(--border-gold);
-  border-radius: 14px;
-  padding: 12px 10px 16px;
-  box-shadow: 0 4px 14px rgba(114,47,55,0.06);
-}
-.cal-headers {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-  padding: 6px 2px 10px;
-  border-bottom: 1px solid var(--border-gold);
-  margin-bottom: 8px;
-}
-.cal-headers > div {
-  font-family: 'Cinzel', sans-serif;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-align: center;
-  letter-spacing: 0.5px;
-}
-.cal-week {
-  position: relative;
-  margin-top: 22px;
-}
-.cal-week:first-of-type { margin-top: 14px; }
-.cal-week-tag {
-  position: absolute;
-  top: -16px;
-  left: -2px;
-  background: linear-gradient(135deg, #E8C56A 0%, #D4AF37 100%);
-  color: #FFFEF8;
-  font-family: 'Cinzel', sans-serif;
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.6px;
-  padding: 4px 10px 4px 8px;
-  border-radius: 0 6px 6px 0;
-  box-shadow: 0 2px 6px rgba(184,134,11,0.25);
-  z-index: 2;
-}
-.cal-week-tag::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 0;
-  width: 4px; height: 100%;
-  background: var(--maroon);
-  border-radius: 0 0 0 0;
-}
-.cal-cells {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-}
-.cal-cell {
-  aspect-ratio: 1 / 1.05;
-  border-radius: 10px;
-  background: var(--cream-card);
-  border: 1.5px solid rgba(184,134,11,0.18);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 6px 4px 5px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
-}
-.cal-cell.empty {
-  background: transparent;
-  border: 1.5px dashed transparent;
-  cursor: default;
-  pointer-events: none;
-}
-.cal-cell:not(.empty):hover {
-  transform: translateY(-1px);
-  border-color: var(--gold);
-  box-shadow: 0 4px 10px rgba(114,47,55,0.1);
-}
-.cal-num {
-  font-family: 'DM Serif Display', serif;
-  font-size: 1.05rem;
-  color: var(--text-dark);
-  line-height: 1;
-  text-align: center;
-  margin-top: 1px;
-}
-.cal-status {
-  width: 18px; height: 18px;
-  border-radius: 50%;
-  display: grid; place-items: center;
-  margin: 0 auto 1px;
-  flex-shrink: 0;
-}
-.cal-status svg { width: 10px; height: 10px; stroke-width: 2.5; }
-
-/* States */
-.cal-cell.locked { background: var(--cream); }
-.cal-cell.locked .cal-status {
-  background: var(--cream-deep);
-  border: 1.2px solid rgba(184,134,11,0.32);
-  color: var(--gold-deep);
-}
-
-.cal-cell.completed .cal-status { background: var(--emerald); color: #FFFEF8; border: 1.2px solid var(--emerald-dk); }
-.cal-cell.completed .cal-num { color: var(--text-dark); }
-
-.cal-cell.missed .cal-status { background: var(--burgundy); color: #FFFEF8; border: 1.2px solid var(--burgundy-dk); }
-
-.cal-cell.today {
-  background: linear-gradient(150deg, #E8C56A 0%, #D4AF37 70%, #B8860B 100%);
-  border-color: #B8860B;
-  box-shadow: 0 4px 14px rgba(184,134,11,0.35);
-}
-.cal-cell.today .cal-num { color: #FFFEF8; font-weight: 600; }
-.cal-cell.today .cal-status {
-  background: rgba(255,254,248,0.95);
-  border: 1.5px solid #FFFEF8;
-  color: var(--maroon);
-}
-.cal-cell.today::before {
-  content: '★';
-  position: absolute;
-  top: 2px; right: 4px;
-  font-size: 0.7rem;
-  color: #FFFEF8;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-}
-
-@media (max-width: 480px) {
-  .cal-grid { padding: 10px 6px 14px; }
-  .cal-headers { gap: 4px; padding: 4px 2px 8px; }
-  .cal-headers > div { font-size: 0.62rem; }
-  .cal-cells { gap: 4px; }
-  .cal-cell { padding: 4px 2px 4px; }
-  .cal-num { font-size: 0.92rem; }
-  .cal-status { width: 16px; height: 16px; }
-  .cal-status svg { width: 9px; height: 9px; }
-  .cal-week { margin-top: 20px; }
-  .cal-week-tag { font-size: 0.55rem; padding: 3px 8px 3px 6px; top: -14px; }
-}
-
-/* ===== Today summary card (bottom) ===== */
-.today-card {
-  margin: 18px auto 0;
-  max-width: 900px;
-  background: var(--cream-card);
-  border: 1.5px solid var(--border-gold);
-  border-radius: 14px;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  overflow: hidden;
-  box-shadow: 0 4px 14px rgba(114,47,55,0.06);
-  position: relative;
-}
-.tc-badge {
-  background: linear-gradient(135deg, #5A1F26 0%, #722F37 60%, #4A2318 100%);
-  color: #FFFEF8;
-  padding: 18px 18px 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  min-width: 110px;
-  position: relative;
-}
-.tc-badge::after {
-  content: '';
-  position: absolute;
-  right: -1px; top: 0; bottom: 0;
-  width: 14px;
-  background: var(--cream-card);
-  clip-path: polygon(100% 0, 0 50%, 100% 100%);
-}
-.tc-day-num {
-  font-family: 'DM Serif Display', serif;
-  font-size: 2.3rem;
-  line-height: 1;
-  color: #FFFEF8;
-}
-.tc-day-label {
-  font-family: 'Anuphan', sans-serif;
-  font-size: 0.85rem;
-  color: var(--gold-light);
-  font-weight: 500;
-  margin-top: 2px;
-}
-.tc-tag {
-  font-family: 'Cinzel', sans-serif;
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.8px;
-  background: var(--gold);
-  color: var(--maroon);
-  padding: 3px 8px;
-  border-radius: 3px;
-  margin-top: 6px;
-}
-.tc-body { padding: 14px 16px 14px 24px; }
-.tc-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-.tc-title {
-  font-family: 'Anuphan', sans-serif;
-  font-size: 0.92rem;
-  color: var(--text-dark);
-  font-weight: 600;
-}
-.tc-view {
-  font-family: 'Anuphan', sans-serif;
-  font-size: 0.78rem;
-  color: var(--maroon);
-  text-decoration: none;
-  font-weight: 600;
-  white-space: nowrap;
-}
-.tc-view:hover { color: var(--gold-dark); }
-.tc-pills {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.tc-pill { display: flex; align-items: center; gap: 6px; }
-.tcp-letter {
-  width: 26px; height: 26px;
-  border-radius: 50%;
-  display: grid; place-items: center;
-  font-family: 'Cinzel', serif;
-  font-weight: 700;
-  font-size: 0.78rem;
-  color: #FFFEF8;
-  flex-shrink: 0;
-}
-.tcp-letter.j { background: linear-gradient(135deg, #5A1F26 0%, #7A2530 100%); }
-.tcp-letter.p { background: linear-gradient(135deg, #6B4A0C 0%, #A8800E 100%); }
-.tcp-letter.t { background: linear-gradient(135deg, #145A34 0%, #1F7D49 100%); }
-.tcp-text {
-  display: flex; flex-direction: column; line-height: 1.1;
-}
-.tcp-name {
-  font-family: 'Anuphan', sans-serif;
-  font-size: 0.82rem;
-  color: var(--text-dark);
-  font-weight: 600;
-}
-.tcp-sub {
-  font-family: 'Anuphan', sans-serif;
-  font-size: 0.68rem;
-  color: var(--text-muted);
-  margin-top: 1px;
-}
-.tcp-check {
-  width: 18px; height: 18px;
-  border-radius: 50%;
-  border: 1.5px solid var(--border-gold);
-  background: var(--cream-card);
-  display: grid; place-items: center;
-  margin-left: 4px;
-  flex-shrink: 0;
-}
-.tcp-check svg { width: 10px; height: 10px; color: transparent; stroke-width: 3; }
-.tc-pill.done .tcp-check {
-  background: var(--emerald);
-  border-color: var(--emerald-dk);
-}
-.tc-pill.done .tcp-check svg { color: #FFFEF8; }
-
-/* When no day is "today" (program not started or finished) */
-.today-card.inactive .tc-badge {
-  background: linear-gradient(135deg, #5a4a3a 0%, #7a6f62 100%);
-}
-.today-card.inactive .tc-tag {
-  background: var(--cream-deep);
-  color: var(--text-muted);
-}
-
-@media (max-width: 480px) {
-  .tc-badge { padding: 14px 14px 12px; min-width: 96px; }
-  .tc-day-num { font-size: 2rem; }
-  .tc-body { padding: 12px 12px 12px 20px; }
-  .tc-pills { gap: 10px; }
-  .tcp-letter { width: 24px; height: 24px; font-size: 0.72rem; }
-  .tcp-name { font-size: 0.78rem; }
-  .tcp-sub { font-size: 0.66rem; }
-}
-
-/* ===== Roadmap settings modal ===== */
-.rms-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(20,8,12,0.62);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  z-index: 1000;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-.rms-overlay.show { display: flex; }
-.rms-card {
-  background: var(--cream-card);
-  border-radius: 16px;
-  width: 100%;
-  max-width: 380px;
-  padding: 0;
-  border: 1.5px solid var(--border-gold);
-  box-shadow: 0 20px 60px rgba(20,8,12,0.4);
-  overflow: hidden;
-}
-.rms-card::before {
-  content: '';
-  display: block;
-  height: 3px;
-  background: linear-gradient(90deg, transparent 0%, var(--gold) 30%, var(--gold-dark) 50%, var(--gold) 70%, transparent 100%);
-}
-.rms-header {
-  padding: 18px 20px 8px;
-  text-align: center;
-}
-.rms-title {
-  font-family: 'DM Serif Display', serif;
-  font-size: 1.3rem;
-  color: var(--maroon);
-}
-.rms-sub {
-  font-family: 'Anuphan', sans-serif;
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  margin-top: 4px;
-}
-.rms-body { padding: 14px 20px 18px; }
-.rms-field {
-  margin-bottom: 14px;
-}
-.rms-label {
-  font-family: 'Anuphan', sans-serif;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--text-dark);
-  margin-bottom: 6px;
-  display: block;
-}
-.rms-input {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1.5px solid var(--border-gold);
-  border-radius: 10px;
-  background: var(--cream);
-  font-family: 'Anuphan', 'Sarabun', sans-serif;
-  font-size: 1rem;
-  color: var(--text-dark);
-}
-.rms-input:focus {
-  outline: none;
-  border-color: var(--gold);
-  background: var(--cream-card);
-}
-.rms-help {
-  font-family: 'Anuphan', sans-serif;
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  margin-top: 6px;
-  line-height: 1.4;
-}
-.rms-preview {
-  background: var(--cream-deep);
-  border: 1px solid var(--border-gold);
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-family: 'Anuphan', sans-serif;
-  font-size: 0.82rem;
-  color: var(--text-dark);
-  margin-bottom: 14px;
-}
-.rms-preview strong { color: var(--maroon); font-weight: 700; }
-.rms-actions {
-  display: grid;
-  grid-template-columns: 1fr 1.4fr;
-  gap: 10px;
-  padding: 0 20px 18px;
-}
-.rms-btn {
-  padding: 12px;
-  border-radius: 10px;
-  font-family: 'Anuphan', sans-serif;
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  border: 1.5px solid var(--border-gold);
-  background: var(--cream-card);
-  color: var(--text-dark);
-  transition: all 0.2s ease;
-}
-.rms-btn:hover { border-color: var(--gold); }
-.rms-btn.primary {
-  background: linear-gradient(135deg, #5A1F26 0%, #722F37 60%, #4A2318 100%);
-  color: #FFFEF8;
-  border-color: transparent;
-  box-shadow: 0 4px 12px rgba(90,31,38,0.3);
-}
-.rms-btn.primary:hover {
-  box-shadow: 0 6px 16px rgba(90,31,38,0.42);
-  transform: translateY(-1px);
-}
-
-
 </style>
 </head>
 <body>
@@ -1837,80 +1185,10 @@ body > * { position: relative; z-index: 1; }
   </div>
 </section>
 
-<!-- ===== JPTRUST LEARNING SECTION (NEW DESIGN — calendar + progress) ===== -->
-<section class="learning-section">
-
-  <!-- Brand header -->
-  <div class="learning-header">
-    <div class="lh-brand">
-      <div class="lh-owl">
-        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4">
-          <!-- owl body silhouette -->
-          <path d="M32 8 C20 8, 12 18, 12 32 C12 46, 20 56, 32 56 C44 56, 52 46, 52 32 C52 18, 44 8, 32 8 Z"/>
-          <!-- ear tufts -->
-          <path d="M18 12 L22 6 L24 14"/>
-          <path d="M46 12 L42 6 L40 14"/>
-          <!-- left eye -->
-          <circle cx="24" cy="28" r="6.5"/>
-          <circle cx="24" cy="28" r="2.2" fill="currentColor"/>
-          <!-- right eye -->
-          <circle cx="40" cy="28" r="6.5"/>
-          <circle cx="40" cy="28" r="2.2" fill="currentColor"/>
-          <!-- beak -->
-          <path d="M32 33 L29 38 L35 38 Z" fill="currentColor"/>
-        </svg>
-      </div>
-      <div class="lh-text">
-        <div class="lh-title">JP TRUST</div>
-        <div class="lh-tagline">Discipline Today, Freedom Tomorrow.</div>
-      </div>
-    </div>
-    <div class="lh-actions">
-      <button class="lh-btn has-dot" id="bellBtn" onclick="onBellClick()" aria-label="Notifications">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
-          <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
-        </svg>
-      </button>
-      <button class="lh-btn" id="settingsBtn" onclick="openRoadmapSettings()" aria-label="Settings">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-        </svg>
-      </button>
-    </div>
-  </div>
-
-  <!-- Greeting + Progress row -->
-  <div class="hero-cards">
-
-    <!-- Greeting card -->
-    <div class="greet-card">
-      <div class="greet-line">สวัสดี, ยินดีต้อนรับ</div>
-      <div class="greet-name" id="greetName">@JPtrust</div>
-      <div class="greet-tag">
-        <svg class="gt-star" viewBox="0 0 24 24" fill="currentColor">
-          <polygon points="12,2 15,8.5 22,9.3 17,14.2 18.2,21 12,17.8 5.8,21 7,14.2 2,9.3 9,8.5"/>
-        </svg>
-        <span>Stay Consistent,<br>Get Closer to Freedom.</span>
-      </div>
-    </div>
-
-    <!-- Progress card -->
-    <div class="progress-card">
-      <div class="pc-label">Cycle <span id="pcCycleNum">1</span> Progress</div>
-      <div class="pc-numbers">
-        <span class="pc-big" id="pcDayNum">—</span>
-        <span class="pc-divider">/</span>
-        <span class="pc-total"><span id="pcDayTotal">30</span> Days</span>
-      </div>
-      <div class="pc-spark" id="pcSpark"></div>
-      <div class="pc-bar-wrap">
-        <div class="pc-bar" id="pcBar"></div>
-        <div class="pc-pct" id="pcPct">0%</div>
-      </div>
-    </div>
-
+<!-- ===== SECTION BREAK + HEADER before cycles ===== -->
+<section class="jpt-learning-header">
+  <div class="jpt-learning-inner">
+    <div class="planning-label">JPTrust Learning</div>
   </div>
 </section>
 
@@ -1932,35 +1210,7 @@ body > * { position: relative; z-index: 1; }
   </div>
 </nav>
 
-<!-- ===== STATUS LEGEND ===== -->
-<div style="max-width: 900px; margin: 14px auto 0; padding: 0 18px;">
-  <div class="legend-row">
-    <div class="lg-item">
-      <span class="lg-dot lg-today"></span>
-      <span>Today</span>
-    </div>
-    <div class="lg-item">
-      <span class="lg-dot lg-completed">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 10 17 19 7"/></svg>
-      </span>
-      <span>Completed</span>
-    </div>
-    <div class="lg-item">
-      <span class="lg-dot lg-locked">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-      </span>
-      <span>Locked</span>
-    </div>
-    <div class="lg-item">
-      <span class="lg-dot lg-missed">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
-      </span>
-      <span>Missed</span>
-    </div>
-  </div>
-</div>
-
-<!-- ===== MAIN: CALENDAR PER CYCLE ===== -->
+<!-- ===== MAIN ===== -->
 <div id="loginBanner" class="login-banner" style="display:none;">
   ⚠️ คุณยังไม่ได้ login — สามารถอ่านเนื้อหาได้ แต่ความคืบหน้าจะไม่ถูกบันทึก
 </div>
@@ -1969,64 +1219,7 @@ body > * { position: relative; z-index: 1; }
   <div class="cycle-panel active" id="cyclePanel-1"></div>
   <div class="cycle-panel" id="cyclePanel-2"></div>
   <div class="cycle-panel" id="cyclePanel-3"></div>
-
-  <!-- Today summary card -->
-  <div class="today-card" id="todayCard">
-    <div class="tc-badge">
-      <div class="tc-day-num" id="tcDayNum">—</div>
-      <div class="tc-day-label" id="tcDayLabel">รอเริ่มต้น</div>
-      <div class="tc-tag" id="tcTag">START</div>
-    </div>
-    <div class="tc-body">
-      <div class="tc-row">
-        <div class="tc-title">Your Progress</div>
-        <a href="#" class="tc-view" onclick="onTodayClick(); return false;">View Details ›</a>
-      </div>
-      <div class="tc-pills">
-        <div class="tc-pill" id="tcPillJ">
-          <div class="tcp-letter j">J</div>
-          <div class="tcp-text"><div class="tcp-name">Journal</div><div class="tcp-sub">บันทึกการเทรด</div></div>
-          <div class="tcp-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 10 17 19 7"/></svg></div>
-        </div>
-        <div class="tc-pill" id="tcPillP">
-          <div class="tcp-letter p">P</div>
-          <div class="tcp-text"><div class="tcp-name">Plan</div><div class="tcp-sub">วางแผนการเทรด</div></div>
-          <div class="tcp-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 10 17 19 7"/></svg></div>
-        </div>
-        <div class="tc-pill" id="tcPillT">
-          <div class="tcp-letter t">T</div>
-          <div class="tcp-text"><div class="tcp-name">Trade</div><div class="tcp-sub">ดำเนินการเทรด</div></div>
-          <div class="tcp-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 10 17 19 7"/></svg></div>
-        </div>
-      </div>
-    </div>
-  </div>
 </main>
-
-<!-- ===== ROADMAP SETTINGS MODAL (Day 1 calendar date picker) ===== -->
-<div class="rms-overlay" id="roadmapSettingsModal" role="dialog" aria-modal="true">
-  <div class="rms-card">
-    <div class="rms-header">
-      <div class="rms-title">ตั้งค่า Roadmap</div>
-      <div class="rms-sub">เลือกว่า Day 1 ตรงกับวันไหน — ทุก Day ถัดไปจะนับตามปฏิทินจริง</div>
-    </div>
-    <div class="rms-body">
-      <div class="rms-field">
-        <label class="rms-label" for="rmsStartDate">วันเริ่มต้น (Day 1)</label>
-        <input type="date" class="rms-input" id="rmsStartDate" oninput="updateRmsPreview()">
-        <div class="rms-help">ถ้ายังไม่ตั้ง ระบบจะใช้วันที่วันนี้เป็น Day 1 อัตโนมัติ</div>
-      </div>
-      <div class="rms-preview" id="rmsPreview">
-        Day 1 = <strong>—</strong> · Day 90 = <strong>—</strong>
-      </div>
-    </div>
-    <div class="rms-actions">
-      <button class="rms-btn" onclick="closeRoadmapSettings()">ยกเลิก</button>
-      <button class="rms-btn primary" onclick="saveRoadmapSettings()">บันทึก</button>
-    </div>
-  </div>
-</div>
-
 
 <!-- ===== DAY DETAIL MODAL ===== -->
 <!-- ===== ABOUT MODAL ===== -->
@@ -2199,410 +1392,97 @@ function phaseForDay(day) {
 }
 
 // ========================================
-// RENDER + CALENDAR LOGIC (v11 — calendar-mapped redesign)
-// ========================================
-
-// ========================================
-// ROADMAP CONFIG + STATE (v11 — calendar-mapped)
-// ========================================
-const ROADMAP_CONFIG = {
-  totalDays: 90,
-  cycleDays: 30,
-  storageKeyStart: 'jpt_roadmap_start_date_v1'
-};
-
-// Default start date = today (user can change via Settings)
-let roadmapStart = null; // Date object
-
-function getStartDate() {
-  if (roadmapStart) return roadmapStart;
-  // Try localStorage first
-  try {
-    const v = localStorage.getItem(ROADMAP_CONFIG.storageKeyStart);
-    if (v) {
-      const d = new Date(v);
-      if (!isNaN(d.getTime())) {
-        roadmapStart = startOfDay(d);
-        return roadmapStart;
-      }
-    }
-  } catch (e) {}
-  // Fallback = today
-  roadmapStart = startOfDay(new Date());
-  return roadmapStart;
-}
-
-function setStartDate(date) {
-  roadmapStart = startOfDay(date);
-  try {
-    localStorage.setItem(ROADMAP_CONFIG.storageKeyStart, ymd(roadmapStart));
-  } catch (e) {}
-  // Sync to cloud (best-effort, fire and forget)
-  if (window.JPSettings && typeof window.JPSettings.save === 'function') {
-    try {
-      window.JPSettings.save({ roadmapStartDate: ymd(roadmapStart) }).catch(()=>{});
-    } catch (e) {}
-  }
-}
-
-function startOfDay(d) {
-  const x = new Date(d);
-  x.setHours(0, 0, 0, 0);
-  return x;
-}
-
-function ymd(d) {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
-}
-
-function sameDate(a, b) {
-  return a.getFullYear() === b.getFullYear()
-      && a.getMonth() === b.getMonth()
-      && a.getDate() === b.getDate();
-}
-
-function dateForDay(dayN) {
-  const start = getStartDate();
-  const d = new Date(start);
-  d.setDate(d.getDate() + (dayN - 1));
-  return startOfDay(d);
-}
-
-function dayForToday() {
-  const start = getStartDate();
-  const today = startOfDay(new Date());
-  const diffMs = today - start;
-  const diffDays = Math.round(diffMs / 86400000);
-  const dayN = diffDays + 1;
-  if (dayN < 1) return null; // not started yet
-  if (dayN > ROADMAP_CONFIG.totalDays) return null; // already finished
-  return dayN;
-}
-
-function getDayState(dayN) {
-  // Currently all days are LOCKED except today (per Joon's spec — content not built yet)
-  // Future: when content is built, switch logic to read from progress[]:
-  //   - past dates with progress.done = 'completed', without = 'missed'
-  //   - today = 'today'
-  //   - future = 'locked'
-  const today = startOfDay(new Date());
-  const dDate = dateForDay(dayN);
-  if (sameDate(today, dDate)) return 'today';
-  return 'locked';
-}
-
-function getCurrentCycle() {
-  const t = dayForToday();
-  if (t == null) {
-    // If not started → cycle 1; if finished → cycle 3
-    const today = startOfDay(new Date());
-    const start = getStartDate();
-    return today < start ? 1 : 3;
-  }
-  return Math.ceil(t / ROADMAP_CONFIG.cycleDays);
-}
-
-// ========================================
-// CALENDAR LAYOUT — group cycle's 30 days into Mon-Sun rows
-// ========================================
-function buildCalendarRows(cycle) {
-  const startDay = (cycle - 1) * ROADMAP_CONFIG.cycleDays + 1;
-  const endDay = cycle * ROADMAP_CONFIG.cycleDays;
-
-  const days = [];
-  for (let d = startDay; d <= endDay; d++) {
-    days.push({ day: d, date: dateForDay(d) });
-  }
-
-  const firstDate = days[0].date;
-  const lastDate = days[days.length - 1].date;
-
-  // Find Monday of week containing firstDate
-  // JS getDay: 0=Sun, 1=Mon ... 6=Sat → convert to 0=Mon...6=Sun
-  const firstDow = (firstDate.getDay() + 6) % 7;
-  const weekStart = startOfDay(firstDate);
-  weekStart.setDate(weekStart.getDate() - firstDow);
-
-  const rows = [];
-  let weekNum = 1;
-  let cursor = startOfDay(weekStart);
-  let safety = 0;
-
-  while (safety++ < 8) {
-    const cells = [];
-    for (let i = 0; i < 7; i++) {
-      const cellDate = startOfDay(cursor);
-      cellDate.setDate(cellDate.getDate() + i);
-      const match = days.find(x => sameDate(x.date, cellDate));
-      cells.push(match ? { day: match.day, date: cellDate } : null);
-    }
-    rows.push({ weekNum, cells });
-    weekNum++;
-
-    cursor.setDate(cursor.getDate() + 7);
-    if (cursor > lastDate) break;
-  }
-
-  return rows;
-}
-
-function statusIconSvg(state) {
-  if (state === 'completed') {
-    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 10 17 19 7"/></svg>';
-  }
-  if (state === 'missed') {
-    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>';
-  }
-  if (state === 'today') {
-    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.5" fill="currentColor"/></svg>';
-  }
-  // locked (default)
-  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
-}
-
-// ========================================
-// RENDER (replaces old renderAllCycles)
+// RENDER
 // ========================================
 function renderAllCycles() {
   for (let c = 1; c <= 3; c++) {
     const panel = document.getElementById('cyclePanel-' + c);
-    panel.innerHTML = renderCalendarForCycle(c);
-  }
-}
+    const startDay = (c - 1) * 30 + 1;
+    const endDay = c * 30;
 
-function renderCalendarForCycle(cycle) {
-  const rows = buildCalendarRows(cycle);
-
-  let html = '<div class="cal-grid">';
-
-  // Mon-Sun headers
-  html += '<div class="cal-headers">'
-       + '<div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div><div>SUN</div>'
-       + '</div>';
-
-  // Week rows
-  rows.forEach(row => {
-    html += `<div class="cal-week"><span class="cal-week-tag">WEEK ${row.weekNum}</span><div class="cal-cells">`;
-    row.cells.forEach(cell => {
-      if (!cell) {
-        html += '<div class="cal-cell empty"></div>';
-        return;
-      }
-      const state = getDayState(cell.day);
-      const dd = String(cell.day).padStart(2, '0');
-      html += `<div class="cal-cell ${state}" data-day="${cell.day}" onclick="openDayModal(${cell.day})">`
-            + `<div class="cal-num">${dd}</div>`
-            + `<div class="cal-status">${statusIconSvg(state)}</div>`
-            + `</div>`;
-    });
+    let html = '<div class="day-grid-wrap"><div class="day-grid">';
+    for (let d = startDay; d <= endDay; d++) {
+      html += renderDayCard(d);
+    }
     html += '</div></div>';
-  });
-
-  html += '</div>';
-  return html;
+    panel.innerHTML = html;
+  }
 }
 
-// ========================================
-// HEADER + TODAY CARD UPDATES
-// ========================================
-function updateLearningHeader() {
-  // Greeting name from Supabase user (best-effort)
-  const greetEl = document.getElementById('greetName');
-  if (greetEl && window.JPSettings && typeof window.JPSettings.getUser === 'function') {
-    window.JPSettings.getUser().then(user => {
-      if (user) {
-        // Prefer display_name from user_metadata, fall back to email local part
-        const meta = user.user_metadata || {};
-        const display = meta.display_name || meta.username || meta.name;
-        if (display) {
-          greetEl.textContent = '@' + display.replace(/^@/, '');
-        } else if (user.email) {
-          greetEl.textContent = '@' + user.email.split('@')[0];
-        }
-      }
-    }).catch(()=>{});
-  }
-
-  // Cycle progress numbers
-  const today = startOfDay(new Date());
-  const start = getStartDate();
-  const todayDay = dayForToday();
-  const currentCycle = getCurrentCycle();
-
-  document.getElementById('pcCycleNum').textContent = currentCycle;
-  document.getElementById('pcDayTotal').textContent = ROADMAP_CONFIG.cycleDays;
-
-  // Day-within-cycle number (for big number display)
-  let dayInCycle = 0;
-  if (todayDay != null) {
-    const cycleStartDay = (currentCycle - 1) * ROADMAP_CONFIG.cycleDays + 1;
-    dayInCycle = todayDay - cycleStartDay + 1;
-    if (dayInCycle < 1) dayInCycle = 0;
-    if (dayInCycle > ROADMAP_CONFIG.cycleDays) dayInCycle = ROADMAP_CONFIG.cycleDays;
-  } else if (today < start) {
-    // Not started yet
-    dayInCycle = 0;
-  } else {
-    // Finished
-    dayInCycle = ROADMAP_CONFIG.cycleDays;
-  }
-  document.getElementById('pcDayNum').textContent = dayInCycle;
-
-  // Progress bar
-  const pct = Math.round((dayInCycle / ROADMAP_CONFIG.cycleDays) * 100);
-  document.getElementById('pcPct').textContent = pct + '%';
-  renderProgressBar(dayInCycle);
-
-  // Sparkline (decorative — show ascending pattern)
-  renderSparkline();
-
-  // Today summary card
-  updateTodayCard(todayDay, today, start);
-}
-
-function renderProgressBar(dayInCycle) {
-  const bar = document.getElementById('pcBar');
-  if (!bar) return;
-  const total = 15; // 15 segments map nicely to a 30-day cycle (1 seg = 2 days)
-  const filled = Math.round((dayInCycle / ROADMAP_CONFIG.cycleDays) * total);
-  let html = '';
-  for (let i = 0; i < total; i++) {
-    html += `<div class="pc-bar-seg ${i < filled ? 'filled' : ''}"></div>`;
-  }
-  bar.innerHTML = html;
-}
-
-function renderSparkline() {
-  const el = document.getElementById('pcSpark');
-  if (!el) return;
-  // Decorative ascending sparkline — positions are scaled to 100x50 SVG
-  const pts = [
-    [4, 42], [16, 35], [28, 38], [40, 28],
-    [52, 32], [64, 22], [76, 18], [88, 14], [96, 10]
-  ];
-  const path = pts.map((p, i) => (i === 0 ? `M ${p[0]} ${p[1]}` : `L ${p[0]} ${p[1]}`)).join(' ');
-  const dots = pts.map((p, i) => {
-    const isLast = i === pts.length - 1;
-    return `<circle cx="${p[0]}" cy="${p[1]}" r="${isLast ? 3.5 : 2}" fill="${isLast ? '#D4AF37' : '#B8860B'}" ${isLast ? 'stroke="#FFFEF8" stroke-width="1.5"' : ''}/>`;
-  }).join('');
-  el.innerHTML = `
-    <svg viewBox="0 0 100 50" preserveAspectRatio="none">
-      <path d="${path}" stroke="#B8860B" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      ${dots}
-    </svg>
+function renderDayCard(day) {
+  const p = progress[day] || {};
+  const done = p.done ? 'done' : '';
+  const isRest = day % 7 === 0;
+  const restClass = isRest ? 'rest-day' : '';
+  const badges = isRest
+    ? '<span class="dc-mini jpt-J">J</span><span class="dc-mini jpt-P">P</span>'
+    : '<span class="dc-mini jpt-J">J</span><span class="dc-mini jpt-P">P</span><span class="dc-mini jpt-T">T</span>';
+  return `
+    <div class="day-card locked ${done} ${restClass}" data-day="${day}" onclick="openDayModal(${day})">
+      <div class="dc-top">
+        <div class="dc-num">${day}</div>
+      </div>
+      <div class="dc-lock">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="11" width="16" height="10" rx="2"/>
+          <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+        </svg>
+      </div>
+      <div class="dc-phases">${badges}</div>
+    </div>
   `;
 }
 
-function updateTodayCard(todayDay, today, start) {
-  const card = document.getElementById('todayCard');
-  if (!card) return;
-  card.classList.remove('inactive');
-
-  if (todayDay == null) {
-    // Program not started or finished
-    card.classList.add('inactive');
-    if (today < start) {
-      // Not started — show countdown
-      const diff = Math.round((start - today) / 86400000);
-      document.getElementById('tcDayNum').textContent = '—';
-      document.getElementById('tcDayLabel').textContent = `เริ่มในอีก ${diff} วัน`;
-      document.getElementById('tcTag').textContent = 'WAITING';
-    } else {
-      // Finished
-      document.getElementById('tcDayNum').textContent = '90';
-      document.getElementById('tcDayLabel').textContent = 'ครบ 90 วันแล้ว';
-      document.getElementById('tcTag').textContent = 'CYCLE 4 ?';
-    }
-    // Reset pills
-    ['tcPillJ', 'tcPillP', 'tcPillT'].forEach(id => {
-      document.getElementById(id).classList.remove('done');
-    });
-    return;
-  }
-
-  const dd = String(todayDay).padStart(2, '0');
-  document.getElementById('tcDayNum').textContent = dd;
-  document.getElementById('tcDayLabel').textContent = 'Day ' + todayDay;
-  document.getElementById('tcTag').textContent = 'TODAY';
-
-  // J/P/T pills — currently always "not done" since content is locked.
-  // When content is built, this should read from progress[todayDay].journalDone/.planDone/.tradeDone
-  ['tcPillJ', 'tcPillP', 'tcPillT'].forEach(id => {
-    document.getElementById(id).classList.remove('done');
+function refreshAllCards() {
+  document.querySelectorAll('.day-card').forEach(card => {
+    const day = parseInt(card.dataset.day, 10);
+    const p = progress[day] || {};
+    card.classList.toggle('done', !!p.done);
+    card.classList.toggle('has-journal', !!(p.journal && p.journal.trim()));
   });
 }
 
-function onTodayClick() {
-  const t = dayForToday();
-  if (t != null) {
-    openDayModal(t);
+function updateProgressUI() {
+  const doneCount = Object.values(progress).filter(p => p.done).length;
+  const pct = Math.round((doneCount / 90) * 100);
+  document.getElementById('progDone').textContent = doneCount;
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('progFill').style.width = pct + '%';
+
+  // Current cycle label — based on the next unfinished day
+  const next = nextUnfinishedDay();
+  let currentCycle = 1;
+  if (next) {
+    const t = TASKS.find(x => x.day === next);
+    currentCycle = t ? t.cycle : 1;
   } else {
-    jptToast('🔒 Roadmap ยังไม่เริ่มหรือจบแล้ว — ตั้งค่าวันเริ่มต้นใหม่ได้ที่ปุ่ม ⚙️');
+    currentCycle = 3;
+  }
+  document.getElementById('progCycle').textContent = CYCLE_META[currentCycle].label;
+
+  // Continue button label
+  const contLabel = document.getElementById('continueLabel');
+  if (doneCount === 90) {
+    contLabel.textContent = 'จบครบ 90 วัน — เริ่ม Cycle 4';
+  } else if (next === 1 && doneCount === 0) {
+    contLabel.textContent = 'เริ่มวันที่ 1';
+  } else {
+    contLabel.textContent = 'ไปต่อวันที่ ' + next;
   }
 }
 
-function onBellClick() {
-  jptToast('🔔 การแจ้งเตือน · เร็วๆ นี้');
-}
-
-// ========================================
-// ROADMAP SETTINGS MODAL
-// ========================================
-function openRoadmapSettings() {
-  const modal = document.getElementById('roadmapSettingsModal');
-  const input = document.getElementById('rmsStartDate');
-  input.value = ymd(getStartDate());
-  updateRmsPreview();
-  modal.classList.add('show');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeRoadmapSettings() {
-  document.getElementById('roadmapSettingsModal').classList.remove('show');
-  document.body.style.overflow = '';
-}
-
-function updateRmsPreview() {
-  const input = document.getElementById('rmsStartDate');
-  const previewEl = document.getElementById('rmsPreview');
-  const v = input.value;
-  if (!v) { previewEl.innerHTML = 'Day 1 = <strong>—</strong> · Day 90 = <strong>—</strong>'; return; }
-  const d1 = startOfDay(new Date(v));
-  if (isNaN(d1.getTime())) { previewEl.innerHTML = 'Day 1 = <strong>—</strong> · Day 90 = <strong>—</strong>'; return; }
-  const d90 = new Date(d1);
-  d90.setDate(d90.getDate() + 89);
-  previewEl.innerHTML = `Day 1 = <strong>${formatThaiDate(d1)}</strong><br>Day 90 = <strong>${formatThaiDate(d90)}</strong>`;
-}
-
-function formatThaiDate(d) {
-  const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
-  const dows = ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'];
-  const dow = dows[d.getDay()];
-  return `${dow} ${d.getDate()} ${months[d.getMonth()]} ${(d.getFullYear() + 543) % 100}`;
-}
-
-function saveRoadmapSettings() {
-  const input = document.getElementById('rmsStartDate');
-  const v = input.value;
-  if (!v) { jptToast('⚠️ กรุณาเลือกวันเริ่มต้น'); return; }
-  const d = new Date(v);
-  if (isNaN(d.getTime())) { jptToast('⚠️ วันที่ไม่ถูกต้อง'); return; }
-  setStartDate(d);
-  closeRoadmapSettings();
-  // Re-render with new dates
-  renderAllCycles();
-  updateLearningHeader();
-  // Switch to the cycle containing today (if applicable)
-  const cur = getCurrentCycle();
-  if (cur && cur >= 1 && cur <= 3) {
-    switchCycle(cur);
+function nextUnfinishedDay() {
+  for (let d = 1; d <= 90; d++) {
+    const p = progress[d] || {};
+    if (!p.done) return d;
   }
-  jptToast('✅ บันทึกวันเริ่มต้นเรียบร้อย');
+  return 90;
 }
 
+function continueBookmark() {
+  const next = nextUnfinishedDay();
+  openDayModal(next);
+}
 
 // ========================================
 // CYCLE TABS
@@ -2670,14 +1550,6 @@ async function loadProgress() {
       progress = data.roadmap;
       console.log('[roadmap] loaded progress from cloud');
     }
-    // Pull saved roadmap start date from cloud (overrides localStorage if newer)
-    if (data && data.roadmapStartDate) {
-      const cloudDate = new Date(data.roadmapStartDate);
-      if (!isNaN(cloudDate.getTime())) {
-        roadmapStart = startOfDay(cloudDate);
-        try { localStorage.setItem(ROADMAP_CONFIG.storageKeyStart, ymd(roadmapStart)); } catch(e){}
-      }
-    }
     const user = await window.JPSettings.getUser();
     if (!user) {
       document.getElementById('loginBanner').style.display = 'block';
@@ -2691,18 +1563,14 @@ async function loadProgress() {
 // INIT
 // ========================================
 document.addEventListener('DOMContentLoaded', async () => {
-  // Load progress + start date from cloud first (best-effort)
-  await loadProgress();
-  // Render with current dates
   renderAllCycles();
-  updateLearningHeader();
-  // Auto-switch to the cycle containing today (if applicable)
-  const cur = getCurrentCycle();
-  if (cur >= 1 && cur <= 3) {
-    document.querySelectorAll('.cycle-tab').forEach(t => t.classList.toggle('active', parseInt(t.dataset.cycle) === cur));
-    document.querySelectorAll('.cycle-panel').forEach(p => p.classList.remove('active'));
-    document.getElementById('cyclePanel-' + cur).classList.add('active');
-  }
+  await loadProgress();
+  // Re-render cards to reflect any loaded done state
+  document.querySelectorAll('.day-card').forEach(card => {
+    const day = parseInt(card.dataset.day, 10);
+    const p = progress[day] || {};
+    card.classList.toggle('done', !!p.done);
+  });
 });
 
 // Close modals with Escape
@@ -2710,8 +1578,6 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     const about = document.getElementById('aboutModal');
     if (about && about.classList.contains('open')) closeAboutModal();
-    const rms = document.getElementById('roadmapSettingsModal');
-    if (rms && rms.classList.contains('show')) closeRoadmapSettings();
   }
 });
 </script>
