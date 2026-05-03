@@ -402,18 +402,6 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 </div>
 
 <script>
-// ============ Pre-fill email from URL (when redirected from member-dashboard login) ============
-(function(){
-    try{
-        var p=new URLSearchParams(location.search);
-        var em=p.get('email');
-        if(em){
-            var el=document.getElementById('email');
-            if(el)el.value=em.trim();
-        }
-    }catch(e){}
-})();
-
 // ============ Config ============
 const SUPABASE_URL = 'https://rcdukwwcbyryauhqlzmx.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZHVrd3djYnlyeWF1aHFsem14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MTY0MDAsImV4cCI6MjA4NTQ5MjQwMH0.rprPmudJYyb6dyhXb9Z9GrtQWEeIX99A2Wrj55PvS54';

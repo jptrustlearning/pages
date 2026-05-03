@@ -551,14 +551,14 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             <button class="login-btn" onclick="checkPIN()">เข้าสู่ระบบ</button>
             <div class="login-link" id="pinError" style="color:#EA4335;display:none;">PIN ไม่ถูกต้อง</div>
             <div class="login-link" onclick="showForgotPIN()">ลืม PIN? <span>ยืนยันด้วย OTP</span></div>
-            <div class="login-link" onclick="location.href='signup.html?v=1777779762'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
+            <div class="login-link" onclick="location.href='signup.html?v=1777021838'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
         </div>
 
         <!-- Step 1: Email for OTP (ครั้งแรก / ลืม PIN) -->
         <div class="login-step" id="stepEmail">
             <input type="email" class="login-input" id="loginEmail" placeholder="กรอกอีเมลสมาชิก" autocomplete="email">
             <button class="login-btn" onclick="sendOTP()">ส่งรหัสยืนยัน</button>
-            <div class="login-link" onclick="location.href='signup.html?v=1777779762'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
+            <div class="login-link" onclick="location.href='signup.html?v=1777021838'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
         </div>
 
         <!-- Step 2: OTP Verify -->
@@ -1153,14 +1153,9 @@ async function sendOTP(){
     try{
         var res=await supabaseClient.auth.signInWithOtp({email:e,options:{shouldCreateUser:false}});
         if(res.error){
-            // New customer (email not registered) → bounce to signup page with email pre-filled
-            if(res.error.message.includes('not allowed')||res.error.message.includes('Signups not allowed')||res.error.message.includes('User not found')){
-                if(btn){btn.textContent='กำลังพาไปหน้าสมัคร...';}
-                jptToast('ยังไม่พบบัญชี · กำลังพาไปหน้าสมัครสมาชิก');
-                setTimeout(function(){location.href='signup.html?v=1777779762&email='+encodeURIComponent(e);},1300);
-                return;
-            }
-            alert('เกิดข้อผิดพลาด กรุณาลองใหม่');
+            var msg='เกิดข้อผิดพลาด กรุณาลองใหม่';
+            if(res.error.message.includes('not allowed')||res.error.message.includes('Signups not allowed')||res.error.message.includes('User not found'))msg='อีเมลนี้ไม่ได้รับอนุญาต กรุณาติดต่อผู้ดูแลระบบ';
+            alert(msg);
             if(btn){btn.disabled=false;btn.textContent='ส่งรหัสยืนยัน';}
             return;
         }
