@@ -1367,27 +1367,6 @@ body > * { position: relative; z-index: 1; }
   text-align: center;
   letter-spacing: 0.5px;
 }
-.cal-month {
-  margin-top: 18px;
-}
-.cal-month:first-of-type { margin-top: 4px; }
-.cal-month-title {
-  font-family: 'DM Serif Display', serif;
-  font-size: 1.1rem;
-  color: var(--maroon);
-  text-align: center;
-  padding: 8px 8px 10px;
-  margin: 0 6px 10px;
-  border-bottom: 1px dashed rgba(184,134,11,0.32);
-  letter-spacing: 0.2px;
-}
-.cal-month-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-  padding: 0 4px;
-}
-
 .cal-week {
   position: relative;
   margin-top: 22px;
@@ -1422,27 +1401,17 @@ body > * { position: relative; z-index: 1; }
   gap: 6px;
 }
 .cal-cell {
-  aspect-ratio: 1 / 1.18;
+  aspect-ratio: 1 / 1.24;
   border-radius: 10px;
   background: var(--cream-card);
-  border: 1.5px solid rgba(184,134,11,0.16);
+  border: 1.5px solid rgba(184,134,11,0.18);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 5px 3px 4px;
-  cursor: default;
+  cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
-}
-.cal-cell.program,
-.cal-cell.today {
-  cursor: pointer;
-}
-.cal-cell.program:hover,
-.cal-cell.today:hover {
-  transform: translateY(-1px);
-  border-color: var(--gold);
-  box-shadow: 0 4px 10px rgba(114,47,55,0.1);
 }
 .cal-cell.empty {
   background: transparent;
@@ -1450,31 +1419,32 @@ body > * { position: relative; z-index: 1; }
   cursor: default;
   pointer-events: none;
 }
-/* hover handled per-state above */
+.cal-cell:not(.empty):hover {
+  transform: translateY(-1px);
+  border-color: var(--gold);
+  box-shadow: 0 4px 10px rgba(114,47,55,0.1);
+}
 .cal-num {
   font-family: 'DM Serif Display', serif;
-  font-size: 1rem;
+  font-size: 0.98rem;
   color: var(--text-dark);
   line-height: 1;
   text-align: center;
   margin-top: 1px;
 }
-.cal-day-label {
-  font-family: 'Cinzel', sans-serif;
-  font-size: 0.54rem;
-  color: var(--maroon);
-  font-weight: 700;
-  text-align: center;
-  letter-spacing: 0.3px;
-  line-height: 1;
-  margin-top: 1px;
-  white-space: nowrap;
-}
-.cal-day-label.other {
+.cal-date {
+  font-family: 'Anuphan', sans-serif;
+  font-size: 0.6rem;
   color: var(--text-muted);
-  opacity: 0.55;
   font-weight: 500;
-  letter-spacing: 0.15px;
+  text-align: center;
+  line-height: 1;
+  letter-spacing: 0.1px;
+  margin: 1px 0 0;
+}
+.cal-date.month-mark {
+  color: var(--gold-deep);
+  font-weight: 700;
 }
 .cal-status {
   width: 18px; height: 18px;
@@ -1485,55 +1455,29 @@ body > * { position: relative; z-index: 1; }
 }
 .cal-status svg { width: 10px; height: 10px; stroke-width: 2.5; }
 
-/* ===== Cell states (calendar-first paradigm) ===== */
-
-/* Program cell — soft gold-pink tint (the "from Day 1 onwards" fill) */
-.cal-cell.program {
-  background: linear-gradient(160deg, #FFF1D8 0%, #FCE4CB 60%, #F8D5BC 100%);
-  border-color: rgba(218,160,120,0.42);
-}
-.cal-cell.program .cal-num {
-  color: var(--maroon);
-  font-weight: 600;
-}
-.cal-cell.program .cal-status {
-  background: rgba(255,254,248,0.78);
+/* States */
+.cal-cell.locked { background: var(--cream); }
+.cal-cell.locked .cal-status {
+  background: var(--cream-deep);
   border: 1.2px solid rgba(184,134,11,0.32);
   color: var(--gold-deep);
 }
 
-/* Out-of-cycle (other cycle's program days, viewed from this cycle) — muted neutral */
-.cal-cell.out-of-cycle {
-  background: var(--cream);
-  border-color: rgba(184,134,11,0.1);
-  cursor: default;
-  pointer-events: none;
-}
-.cal-cell.out-of-cycle .cal-num {
-  color: var(--text-muted);
-  opacity: 0.65;
-}
+.cal-cell.completed .cal-status { background: var(--emerald); color: #FFFEF8; border: 1.2px solid var(--emerald-dk); }
+.cal-cell.completed .cal-num { color: var(--text-dark); }
 
-/* Out-of-program — outside the 90-day window */
-.cal-cell.out-of-program {
-  background: transparent;
-  border-color: rgba(184,134,11,0.07);
-  cursor: default;
-  pointer-events: none;
-}
-.cal-cell.out-of-program .cal-num {
-  color: var(--text-muted);
-  opacity: 0.42;
-}
+.cal-cell.missed .cal-status { background: var(--burgundy); color: #FFFEF8; border: 1.2px solid var(--burgundy-dk); }
 
-/* Today — full gold (overrides program tint) */
 .cal-cell.today {
   background: linear-gradient(150deg, #E8C56A 0%, #D4AF37 70%, #B8860B 100%);
   border-color: #B8860B;
   box-shadow: 0 4px 14px rgba(184,134,11,0.35);
 }
 .cal-cell.today .cal-num { color: #FFFEF8; font-weight: 600; }
-.cal-cell.today .cal-day-label { color: #FFFEF8; }
+.cal-cell.today .cal-date { color: rgba(255,254,248,0.92); }
+.cal-cell.today .cal-date.month-mark { color: #FFFEF8; }
+.cal-cell.completed .cal-date { color: var(--text-muted); }
+.cal-cell.missed .cal-date { color: var(--burgundy); }
 .cal-cell.today .cal-status {
   background: rgba(255,254,248,0.95);
   border: 1.5px solid #FFFEF8;
@@ -1548,40 +1492,18 @@ body > * { position: relative; z-index: 1; }
   text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
-/* Today but in another cycle (viewed from current cycle tab) — gold ring on the muted cell */
-.cal-cell.today-other-cycle {
-  border: 2px solid var(--gold);
-  box-shadow: 0 0 0 1px rgba(212,175,55,0.5);
-}
-.cal-cell.today-other-cycle .cal-num {
-  color: var(--gold-deep);
-  opacity: 1;
-  font-weight: 600;
-}
-
-/* JP Day (every 7th program day) — a subtle deeper rose tint within program */
-.cal-cell.program.jp-day {
-  background: linear-gradient(160deg, #F9D9C8 0%, #F4D4A8 60%, #EFC08A 100%);
-  border-color: rgba(201,140,100,0.6);
-}
-.cal-cell.program.jp-day .cal-day-label::after {
-  content: ' · JP';
-  color: var(--maroon-dk);
-  font-weight: 800;
-}
-
 @media (max-width: 480px) {
-  .cal-grid { padding: 10px 4px 14px; }
+  .cal-grid { padding: 10px 6px 14px; }
   .cal-headers { gap: 4px; padding: 4px 2px 8px; }
   .cal-headers > div { font-size: 0.62rem; }
-  .cal-month-grid { gap: 4px; padding: 0 2px; }
+  .cal-cells { gap: 4px; }
   .cal-cell { padding: 4px 2px 3px; }
-  .cal-num { font-size: 0.9rem; }
-  .cal-day-label { font-size: 0.5rem; letter-spacing: 0.2px; }
-  .cal-status { width: 14px; height: 14px; }
-  .cal-status svg { width: 8px; height: 8px; }
-  .cal-month { margin-top: 14px; }
-  .cal-month-title { font-size: 0.96rem; padding: 6px 6px 8px; margin-bottom: 8px; }
+  .cal-num { font-size: 0.88rem; }
+  .cal-date { font-size: 0.55rem; margin-top: 0; }
+  .cal-status { width: 15px; height: 15px; }
+  .cal-status svg { width: 8.5px; height: 8.5px; }
+  .cal-week { margin-top: 20px; }
+  .cal-week-tag { font-size: 0.55rem; padding: 3px 8px 3px 6px; top: -14px; }
   .cal-range { font-size: 0.7rem !important; padding: 6px 6px 10px !important; }
 }
 
@@ -2498,116 +2420,53 @@ function renderAllCycles() {
 }
 
 const THAI_MONTHS_SHORT = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
-const THAI_MONTHS_LONG = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
-
-// Build list of distinct {year, month} pairs from sd through ed inclusive
-function monthsBetween(sd, ed) {
-  const months = [];
-  let cur = new Date(sd.getFullYear(), sd.getMonth(), 1);
-  const stop = new Date(ed.getFullYear(), ed.getMonth(), 1);
-  while (cur <= stop) {
-    months.push({ y: cur.getFullYear(), m: cur.getMonth() });
-    cur.setMonth(cur.getMonth() + 1);
-  }
-  return months;
-}
 
 function renderCalendarForCycle(cycle) {
   const startDay = (cycle - 1) * ROADMAP_CONFIG.cycleDays + 1;
   const endDay = cycle * ROADMAP_CONFIG.cycleDays;
   const sd = dateForDay(startDay);
   const ed = dateForDay(endDay);
+  const rows = buildCalendarRows(cycle);
 
   let html = '<div class="cal-grid">';
 
-  // Cycle date range header
+  // Cycle date range header — shows users the actual calendar window of this cycle
   const rangeStart = `${sd.getDate()} ${THAI_MONTHS_SHORT[sd.getMonth()]} ${(sd.getFullYear() + 543) % 100}`;
   const rangeEnd = `${ed.getDate()} ${THAI_MONTHS_SHORT[ed.getMonth()]} ${(ed.getFullYear() + 543) % 100}`;
   html += `<div class="cal-range">ช่วงเวลาของ Cycle ${cycle} · <strong>${rangeStart}</strong><span class="cal-range-sep">—</span><strong>${rangeEnd}</strong></div>`;
 
-  // Render each month that this cycle touches as a full calendar grid
-  const months = monthsBetween(sd, ed);
-  months.forEach(({y, m}) => {
-    html += renderMonthGrid(y, m, startDay, endDay);
-  });
-
-  html += '</div>';
-  return html;
-}
-
-function renderMonthGrid(year, month, cycleStartDay, cycleEndDay) {
-  const today = startOfDay(new Date());
-  const start = getStartDate();
-
-  let html = '<div class="cal-month">';
-  html += `<div class="cal-month-title">${THAI_MONTHS_LONG[month]} ${(year + 543) % 100}</div>`;
+  // Mon-Sun headers
   html += '<div class="cal-headers">'
        + '<div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div><div>SUN</div>'
        + '</div>';
 
-  const first = new Date(year, month, 1);
-  const firstDow = (first.getDay() + 6) % 7; // 0=Mon ... 6=Sun
-  const lastDom = new Date(year, month + 1, 0).getDate();
+  // Week rows
+  rows.forEach(row => {
+    html += `<div class="cal-week"><span class="cal-week-tag">WEEK ${row.weekNum}</span><div class="cal-cells">`;
+    row.cells.forEach(cell => {
+      if (!cell) {
+        html += '<div class="cal-cell empty"></div>';
+        return;
+      }
+      const state = getDayState(cell.day);
+      const dd = String(cell.day).padStart(2, '0');
+      const dom = cell.date.getDate();
+      const isFirstOfMonth = dom === 1;
+      // Show "DD MMM" on 1st of month; just "DD" otherwise — keeps cells readable
+      const dateLabel = isFirstOfMonth
+        ? `${dom} ${THAI_MONTHS_SHORT[cell.date.getMonth()]}`
+        : String(dom);
+      const dateClass = isFirstOfMonth ? 'cal-date month-mark' : 'cal-date';
+      html += `<div class="cal-cell ${state}" data-day="${cell.day}" onclick="openDayModal(${cell.day})">`
+            + `<div class="cal-num">${dd}</div>`
+            + `<div class="${dateClass}">${dateLabel}</div>`
+            + `<div class="cal-status">${statusIconSvg(state)}</div>`
+            + `</div>`;
+    });
+    html += '</div></div>';
+  });
 
-  html += '<div class="cal-month-grid">';
-
-  // Leading empty cells (days from prev month)
-  for (let i = 0; i < firstDow; i++) {
-    html += '<div class="cal-cell empty"></div>';
-  }
-
-  // Date cells
-  for (let dom = 1; dom <= lastDom; dom++) {
-    const cellDate = startOfDay(new Date(year, month, dom));
-    const diffDays = Math.round((cellDate - start) / 86400000);
-    const programDay = diffDays + 1;
-    const inProgram = programDay >= 1 && programDay <= ROADMAP_CONFIG.totalDays;
-    const inThisCycle = inProgram && programDay >= cycleStartDay && programDay <= cycleEndDay;
-    const isToday = sameDate(cellDate, today);
-    const isJpDay = inThisCycle && (programDay % 7 === 0);
-
-    let cls = 'cal-cell';
-    let inner = `<div class="cal-num">${dom}</div>`;
-    let click = '';
-    let dataDay = '';
-
-    if (isToday && inThisCycle) {
-      cls += ' today';
-      inner += `<div class="cal-day-label">Day ${programDay}</div>`;
-      const state = 'today';
-      inner += `<div class="cal-status">${statusIconSvg(state)}</div>`;
-      click = `onclick="openDayModal(${programDay})"`;
-      dataDay = ` data-day="${programDay}"`;
-    } else if (inThisCycle) {
-      cls += isJpDay ? ' program jp-day' : ' program';
-      inner += `<div class="cal-day-label">Day ${programDay}</div>`;
-      const state = 'locked'; // future: read from progress[]
-      inner += `<div class="cal-status">${statusIconSvg(state)}</div>`;
-      click = `onclick="openDayModal(${programDay})"`;
-      dataDay = ` data-day="${programDay}"`;
-    } else if (inProgram) {
-      // Other cycle's program day — show muted with small "Day N" hint
-      cls += ' out-of-cycle';
-      if (isToday) cls += ' today-other-cycle';
-      inner += `<div class="cal-day-label other">D${programDay}</div>`;
-    } else {
-      // Outside the 90-day program entirely
-      cls += ' out-of-program';
-      if (isToday) cls += ' today-other-cycle';
-    }
-
-    html += `<div class="${cls}"${dataDay} ${click}>${inner}</div>`;
-  }
-
-  // Trailing empty cells to complete the last row (so the grid bottom is straight)
-  const totalCells = firstDow + lastDom;
-  const trail = (7 - (totalCells % 7)) % 7;
-  for (let i = 0; i < trail; i++) {
-    html += '<div class="cal-cell empty"></div>';
-  }
-
-  html += '</div>'; // .cal-month-grid
-  html += '</div>'; // .cal-month
+  html += '</div>';
   return html;
 }
 
