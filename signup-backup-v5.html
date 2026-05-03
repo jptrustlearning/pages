@@ -335,7 +335,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                     </div>
                     <div class="form-group">
                         <div class="promo-wrap">
-                            <input type="text" id="promoCode" placeholder="กรอกรหัสโปรโมชัน (ถ้ามี)" value="JPTFREE2026" oninput="resetPromoApply()" autocomplete="off">
+                            <input type="text" id="promoCode" placeholder="กรอกรหัสโปรโมชัน (ถ้ามี)" value="JPTGOLD2026" oninput="resetPromoApply()" autocomplete="off">
                             <div class="promo-status" id="promoStatus"></div>
                         </div>
                         <button type="button" class="promo-apply-btn" id="promoApplyBtn" onclick="checkPromo()">ใช้รหัสโปรโมชัน</button>
@@ -436,7 +436,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 const SUPABASE_URL = 'https://rcdukwwcbyryauhqlzmx.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZHVrd3djYnlyeWF1aHFsem14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MTY0MDAsImV4cCI6MjA4NTQ5MjQwMH0.rprPmudJYyb6dyhXb9Z9GrtQWEeIX99A2Wrj55PvS54';
 const SIGNUP_ENDPOINT = `${SUPABASE_URL}/functions/v1/signup-webhook`;
-const PROMO_CODE = 'JPTFREE2026';
+const PROMO_CODE = 'JPTGOLD2026';
 
 let uploadedFileBase64 = null, uploadedFileName = null, promoApplied = false;
 
