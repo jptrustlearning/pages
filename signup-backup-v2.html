@@ -141,21 +141,6 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .promo-status.valid{display:block;background:var(--emerald-dim);color:var(--emerald-dk)}
 .promo-status.invalid{display:block;background:var(--red-dim);color:var(--red)}
 .promo-hint{font-size:11.5px;color:var(--text-muted);margin-top:6px;line-height:1.5}
-.promo-apply-btn{
-    display:block;width:100%;margin-top:10px;padding:11px 16px;
-    background:linear-gradient(135deg,var(--gold),var(--gold-dark));
-    color:#1a0a0e;border:none;border-radius:10px;
-    font-family:inherit;font-size:14px;font-weight:600;letter-spacing:0.3px;
-    cursor:pointer;transition:all .25s;
-    box-shadow:0 4px 14px rgba(212,175,55,0.28);
-}
-.promo-apply-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(212,175,55,0.4)}
-.promo-apply-btn:active{transform:translateY(0)}
-.promo-apply-btn.applied{
-    background:linear-gradient(135deg,var(--emerald-dim),var(--emerald-dim));
-    color:var(--emerald-dk);box-shadow:none;cursor:default;
-}
-.promo-apply-btn.applied:hover{transform:none;box-shadow:none}
 
 /* ===== Upload ===== */
 .upload-zone{
@@ -335,10 +320,9 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                     </div>
                     <div class="form-group">
                         <div class="promo-wrap">
-                            <input type="text" id="promoCode" placeholder="กรอกรหัสโปรโมชัน (ถ้ามี)" value="JPTGOLD2026" oninput="resetPromoApply()" autocomplete="off">
+                            <input type="text" id="promoCode" placeholder="กรอกรหัสโปรโมชัน (ถ้ามี)" oninput="checkPromo()" autocomplete="off">
                             <div class="promo-status" id="promoStatus"></div>
                         </div>
-                        <button type="button" class="promo-apply-btn" id="promoApplyBtn" onclick="checkPromo()">ใช้รหัสโปรโมชัน</button>
                         <div class="promo-hint">หากมีรหัสโปรโมชันที่ใช้ได้ ไม่จำเป็นต้องแนบสลิปการโอนเงิน</div>
                     </div>
                 </div>
@@ -442,14 +426,11 @@ let uploadedFileBase64 = null, uploadedFileName = null, promoApplied = false;
 function checkPromo() {
     const val = document.getElementById('promoCode').value.trim().toUpperCase();
     const st = document.getElementById('promoStatus');
-    const btn = document.getElementById('promoApplyBtn');
 
     if (!val) {
         st.className = 'promo-status';
-        st.textContent = '';
         unlockConfirms();
         promoApplied = false;
-        if (btn) { btn.classList.remove('applied'); btn.textContent = 'ใช้รหัสโปรโมชัน'; }
         checkReady();
         return;
     }
@@ -465,29 +446,14 @@ function checkPromo() {
         document.getElementById('confirmPayBox').classList.add('checked','locked');
         cs.disabled = true; cp.disabled = true;
         document.getElementById('uploadSection').style.display = 'none';
-        if (btn) { btn.classList.add('applied'); btn.textContent = '✓ ใช้รหัสนี้แล้ว'; }
     } else {
         st.className = 'promo-status invalid';
         st.textContent = 'ไม่ถูกต้อง';
         promoApplied = false;
         unlockConfirms();
         document.getElementById('uploadSection').style.display = '';
-        if (btn) { btn.classList.remove('applied'); btn.textContent = 'ใช้รหัสโปรโมชัน'; }
     }
     checkReady();
-}
-
-// Called when user edits promo input — revert any applied state until they click OK again
-function resetPromoApply() {
-    const st = document.getElementById('promoStatus');
-    const btn = document.getElementById('promoApplyBtn');
-    if (st) { st.className = 'promo-status'; st.textContent = ''; }
-    if (btn) { btn.classList.remove('applied'); btn.textContent = 'ใช้รหัสโปรโมชัน'; }
-    if (promoApplied) {
-        promoApplied = false;
-        unlockConfirms();
-        checkReady();
-    }
 }
 
 function unlockConfirms() {
