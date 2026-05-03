@@ -1353,7 +1353,7 @@ body > * { position: relative; z-index: 1; }
 }
 .cal-headers {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 6px;
   padding: 6px 2px 10px;
   border-bottom: 1px solid var(--border-gold);
@@ -1383,7 +1383,7 @@ body > * { position: relative; z-index: 1; }
 }
 .cal-month-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 6px;
   padding: 0 4px;
 }
@@ -1418,7 +1418,7 @@ body > * { position: relative; z-index: 1; }
 }
 .cal-cells {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 6px;
 }
 .cal-cell {
@@ -1429,10 +1429,12 @@ body > * { position: relative; z-index: 1; }
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 5px 3px 4px;
+  padding: 5px 2px 4px;
   cursor: default;
   transition: all 0.2s ease;
   position: relative;
+  min-width: 0;
+  overflow: hidden;
 }
 .cal-cell.program,
 .cal-cell.today {
@@ -1465,16 +1467,20 @@ body > * { position: relative; z-index: 1; }
   color: var(--maroon);
   font-weight: 700;
   text-align: center;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
   line-height: 1;
   margin-top: 1px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  max-width: 100%;
+  padding: 0 1px;
 }
 .cal-day-label.other {
   color: var(--text-muted);
   opacity: 0.55;
   font-weight: 500;
-  letter-spacing: 0.15px;
+  letter-spacing: 0.1px;
 }
 .cal-status {
   width: 18px; height: 18px;
@@ -1564,20 +1570,17 @@ body > * { position: relative; z-index: 1; }
   background: linear-gradient(160deg, #F9D9C8 0%, #F4D4A8 60%, #EFC08A 100%);
   border-color: rgba(201,140,100,0.6);
 }
-.cal-cell.program.jp-day .cal-day-label::after {
-  content: ' · JP';
-  color: var(--maroon-dk);
-  font-weight: 800;
-}
+/* JP Day signal lives in the deeper rose background tint (above) — no text suffix
+   to keep the day-label compact on narrow cells. */
 
 @media (max-width: 480px) {
   .cal-grid { padding: 10px 4px 14px; }
-  .cal-headers { gap: 4px; padding: 4px 2px 8px; }
-  .cal-headers > div { font-size: 0.62rem; }
-  .cal-month-grid { gap: 4px; padding: 0 2px; }
-  .cal-cell { padding: 4px 2px 3px; }
-  .cal-num { font-size: 0.9rem; }
-  .cal-day-label { font-size: 0.5rem; letter-spacing: 0.2px; }
+  .cal-headers { gap: 3px; padding: 4px 2px 8px; }
+  .cal-headers > div { font-size: 0.6rem; }
+  .cal-month-grid { gap: 3px; padding: 0 2px; }
+  .cal-cell { padding: 4px 1px 3px; }
+  .cal-num { font-size: 0.88rem; }
+  .cal-day-label { font-size: 0.48rem; letter-spacing: 0.1px; }
   .cal-status { width: 14px; height: 14px; }
   .cal-status svg { width: 8px; height: 8px; }
   .cal-month { margin-top: 14px; }

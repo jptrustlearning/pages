@@ -1422,14 +1422,16 @@ body > * { position: relative; z-index: 1; }
   gap: 6px;
 }
 .cal-cell {
-  aspect-ratio: 1 / 1.18;
+  aspect-ratio: 1 / 1.05;
   border-radius: 10px;
   background: var(--cream-card);
   border: 1.5px solid rgba(184,134,11,0.16);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 5px 2px 4px;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px 2px;
   cursor: default;
   transition: all 0.2s ease;
   position: relative;
@@ -1578,11 +1580,11 @@ body > * { position: relative; z-index: 1; }
   .cal-headers { gap: 3px; padding: 4px 2px 8px; }
   .cal-headers > div { font-size: 0.6rem; }
   .cal-month-grid { gap: 3px; padding: 0 2px; }
-  .cal-cell { padding: 4px 1px 3px; }
+  .cal-cell { padding: 3px 1px; gap: 1px; }
   .cal-num { font-size: 0.88rem; }
-  .cal-day-label { font-size: 0.48rem; letter-spacing: 0.1px; }
-  .cal-status { width: 14px; height: 14px; }
-  .cal-status svg { width: 8px; height: 8px; }
+  .cal-day-label { font-size: 0.46rem; letter-spacing: 0.1px; }
+  .cal-status { width: 11px; height: 11px; }
+  .cal-status svg { width: 7px; height: 7px; }
   .cal-month { margin-top: 14px; }
   .cal-month-title { font-size: 0.96rem; padding: 6px 6px 8px; margin-bottom: 8px; }
   .cal-range { font-size: 0.7rem !important; padding: 6px 6px 10px !important; }
@@ -2579,15 +2581,15 @@ function renderMonthGrid(year, month, cycleStartDay, cycleEndDay) {
     if (isToday && inThisCycle) {
       cls += ' today';
       inner += `<div class="cal-day-label">Day ${programDay}</div>`;
-      const state = 'today';
-      inner += `<div class="cal-status">${statusIconSvg(state)}</div>`;
+      // Today keeps the inner status dot for the focal "you are here" indicator
+      inner += `<div class="cal-status">${statusIconSvg('today')}</div>`;
       click = `onclick="openDayModal(${programDay})"`;
       dataDay = ` data-day="${programDay}"`;
     } else if (inThisCycle) {
       cls += isJpDay ? ' program jp-day' : ' program';
       inner += `<div class="cal-day-label">Day ${programDay}</div>`;
-      const state = 'locked'; // future: read from progress[]
-      inner += `<div class="cal-status">${statusIconSvg(state)}</div>`;
+      // No status icon for locked program cells — the gold-pink tint already says "this is a program day".
+      // When content goes live, switch this to render statusIconSvg() for completed/missed states.
       click = `onclick="openDayModal(${programDay})"`;
       dataDay = ` data-day="${programDay}"`;
     } else if (inProgram) {
