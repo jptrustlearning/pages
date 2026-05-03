@@ -2362,11 +2362,9 @@ function setStartDate(date) {
     localStorage.setItem(ROADMAP_CONFIG.storageKeyStart, ymd(roadmapStart));
   } catch (e) {}
   // Sync to cloud (best-effort, fire and forget)
-  // CRITICAL: use patch() not save() — save() OVERWRITES the full data column
-  // which would wipe other dashboards' settings (name, risk, capital, etc.)
-  if (window.JPSettings && typeof window.JPSettings.patch === 'function') {
+  if (window.JPSettings && typeof window.JPSettings.save === 'function') {
     try {
-      window.JPSettings.patch({ roadmapStartDate: ymd(roadmapStart) }).catch(()=>{});
+      window.JPSettings.save({ roadmapStartDate: ymd(roadmapStart) }).catch(()=>{});
     } catch (e) {}
   }
 }
