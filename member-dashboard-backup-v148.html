@@ -523,65 +523,6 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .dash-card.coming-soon:hover{transform:none}
 .signal-bias.coming-soon-status{background:rgba(212,175,55,0.12);color:var(--gold-deep)!important;padding:6px 12px;border-radius:20px;font-family:'Cinzel','Anuphan',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.2px;text-align:center;display:inline-block;margin:4px auto}
 .signal-action.coming-soon-sub{color:var(--text-dark-muted)!important;font-size:11px;text-align:center}
-
-/* ============ Redirect-to-signup modal (centered, white, owl + spinner) ============ */
-.jpt-redirect-overlay{
-    position:fixed;inset:0;z-index:99999;
-    background:rgba(20,8,12,0.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
-    display:none;align-items:center;justify-content:center;
-    padding:24px;
-    animation:jptOvFade .25s ease-out;
-}
-.jpt-redirect-overlay.show{display:flex}
-@keyframes jptOvFade{from{opacity:0}to{opacity:1}}
-.jpt-redirect-card{
-    background:#FFFEF8;
-    border-radius:20px;
-    padding:32px 28px 28px;
-    max-width:340px;width:100%;
-    text-align:center;
-    box-shadow:0 20px 60px rgba(0,0,0,0.4),0 0 0 1px rgba(212,175,55,0.4);
-    animation:jptCardPop .35s cubic-bezier(.2,.9,.3,1.2);
-    position:relative;overflow:hidden;
-}
-@keyframes jptCardPop{from{opacity:0;transform:scale(.88) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.jpt-redirect-card::before{
-    content:'';position:absolute;top:0;left:0;right:0;height:3px;
-    background:linear-gradient(90deg,#E8D48B,#D4AF37,#B8860B,#D4AF37,#E8D48B);
-}
-.jpt-redirect-owl{
-    width:72px;height:72px;margin:6px auto 16px;
-    border-radius:50%;
-    background:linear-gradient(135deg,#FFFEF8,#FAF6ED);
-    display:flex;align-items:center;justify-content:center;
-    box-shadow:0 4px 14px rgba(212,175,55,0.25),0 0 0 1px rgba(212,175,55,0.35);
-}
-.jpt-redirect-owl img{width:54px;height:54px;object-fit:contain}
-.jpt-redirect-title{
-    font-family:'DM Serif Display','Anuphan',serif;
-    font-size:20px;font-weight:400;
-    color:#722F37;
-    margin-bottom:6px;letter-spacing:0.3px;
-}
-.jpt-redirect-sub{
-    font-family:'Anuphan','Sarabun',sans-serif;
-    font-size:13px;color:#7A6F62;line-height:1.55;
-    margin-bottom:22px;
-}
-.jpt-redirect-spinner{
-    width:42px;height:42px;margin:0 auto;
-    border:3.5px solid rgba(212,175,55,0.18);
-    border-top-color:#D4AF37;
-    border-radius:50%;
-    animation:jptSpin .85s linear infinite;
-}
-@keyframes jptSpin{to{transform:rotate(360deg)}}
-.jpt-redirect-foot{
-    margin-top:14px;
-    font-family:'Cinzel','Anuphan',serif;
-    font-size:10px;letter-spacing:2.4px;
-    color:#B89568;text-transform:uppercase;
-}
 </style>
 </head>
 <body>
@@ -1216,10 +1157,8 @@ async function sendOTP(){
             // New customer (email not registered) → bounce to signup page with email pre-filled
             if(res.error.message.includes('not allowed')||res.error.message.includes('Signups not allowed')||res.error.message.includes('User not found')){
                 if(btn){btn.textContent='กำลังพาไปหน้าสมัคร...';}
-                var rm=document.getElementById('jptRedirectModal');
-                if(rm)rm.classList.add('show');
-                // Spinner stays spinning until signup.html paints (browser shows current page until next loads)
-                setTimeout(function(){location.href='signup.html?v=1777781658&email='+encodeURIComponent(e);},1600);
+                jptToast('ยังไม่พบบัญชี · กำลังพาไปหน้าสมัครสมาชิก');
+                setTimeout(function(){location.href='signup.html?v=1777781658&email='+encodeURIComponent(e);},1300);
                 return;
             }
             alert('เกิดข้อผิดพลาด กรุณาลองใหม่');
@@ -2052,17 +1991,4 @@ window.addEventListener('appinstalled',()=>{hideIB();showInstallSuccessModal()})
   });
 })();
 </script>
-<!-- Redirect-to-signup modal -->
-<div class="jpt-redirect-overlay" id="jptRedirectModal" role="dialog" aria-live="polite">
-    <div class="jpt-redirect-card">
-        <div class="jpt-redirect-owl">
-            <img src="jpt-owl-logo.png" alt="JP Trust" onerror="this.style.display='none'">
-        </div>
-        <div class="jpt-redirect-title">ยังไม่พบบัญชีสมาชิก</div>
-        <div class="jpt-redirect-sub">กำลังพาคุณไปหน้าสมัครสมาชิก<br>กรุณารอสักครู่...</div>
-        <div class="jpt-redirect-spinner"></div>
-        <div class="jpt-redirect-foot">JP TRUST LEARNING</div>
-    </div>
-</div>
-
 </body></html>
