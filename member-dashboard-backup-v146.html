@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JP Trust</title>
-    <meta name="application-name" content="JP Trust">
+    <title>JP Trust Learning — Member Dashboard</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a0a0e">
     <meta name="mobile-web-app-capable" content="yes">
@@ -558,7 +557,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
         <!-- Step 1: Email for OTP (ครั้งแรก / ลืม PIN) -->
         <div class="login-step" id="stepEmail">
             <input type="email" class="login-input" id="loginEmail" placeholder="กรอกอีเมลสมาชิก" autocomplete="email">
-            <button class="login-btn" onclick="sendOTP()">ขอรับรหัส OTP ยืนยัน</button>
+            <button class="login-btn" onclick="sendOTP()">ส่งรหัสยืนยัน</button>
             <div class="login-link" onclick="location.href='signup.html?v=1777779762'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
         </div>
 
@@ -1162,11 +1161,11 @@ async function sendOTP(){
                 return;
             }
             alert('เกิดข้อผิดพลาด กรุณาลองใหม่');
-            if(btn){btn.disabled=false;btn.textContent='ขอรับรหัส OTP ยืนยัน';}
+            if(btn){btn.disabled=false;btn.textContent='ส่งรหัสยืนยัน';}
             return;
         }
-    }catch(err){alert('เกิดข้อผิดพลาด กรุณาลองใหม่');if(btn){btn.disabled=false;btn.textContent='ขอรับรหัส OTP ยืนยัน';}return;}
-    if(btn){btn.disabled=false;btn.textContent='ขอรับรหัส OTP ยืนยัน';}
+    }catch(err){alert('เกิดข้อผิดพลาด กรุณาลองใหม่');if(btn){btn.disabled=false;btn.textContent='ส่งรหัสยืนยัน';}return;}
+    if(btn){btn.disabled=false;btn.textContent='ส่งรหัสยืนยัน';}
     userSettings.email=e;
     document.getElementById('otpEmail').textContent=e;
     document.querySelectorAll('.login-step').forEach(s=>s.classList.remove('active'));
