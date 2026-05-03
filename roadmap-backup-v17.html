@@ -1500,6 +1500,25 @@ body > * { position: relative; z-index: 1; }
   background: linear-gradient(160deg, #FFF1D8 0%, #FCE4CB 60%, #F8D5BC 100%);
   border-color: rgba(218,160,120,0.42);
 }
+/* Faint lock watermark — sits behind text, conveys "locked" without taking content space.
+   Inline SVG via data URI; stroke color = gold-deep (#8B6914 → URL-encoded). */
+.cal-cell.program::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238B6914' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='11' width='14' height='9' rx='2'/><path d='M8 11V7a4 4 0 0 1 8 0v4'/></svg>") center/74% no-repeat;
+  opacity: 0.28;
+  pointer-events: none;
+  z-index: 0;
+}
+/* JP day uses a slightly higher opacity since its bg is deeper */
+.cal-cell.program.jp-day::after { opacity: 0.34; }
+/* Make sure text sits above the watermark */
+.cal-cell.program .cal-num,
+.cal-cell.program .cal-day-label {
+  position: relative;
+  z-index: 1;
+}
 .cal-cell.program .cal-num {
   color: var(--maroon);
   font-weight: 600;
@@ -1508,6 +1527,8 @@ body > * { position: relative; z-index: 1; }
   background: rgba(255,254,248,0.78);
   border: 1.2px solid rgba(184,134,11,0.32);
   color: var(--gold-deep);
+  position: relative;
+  z-index: 1;
 }
 
 /* Out-of-cycle (other cycle's program days, viewed from this cycle) — muted neutral */
@@ -2588,8 +2609,8 @@ function renderMonthGrid(year, month, cycleStartDay, cycleEndDay) {
     } else if (inThisCycle) {
       cls += isJpDay ? ' program jp-day' : ' program';
       inner += `<div class="cal-day-label">Day ${programDay}</div>`;
-      // Small lock icon at the bottom — Joon prefers the inline indicator over a bg watermark
-      inner += `<div class="cal-status">${statusIconSvg('locked')}</div>`;
+      // No status icon for locked program cells — the gold-pink tint already says "this is a program day".
+      // When content goes live, switch this to render statusIconSvg() for completed/missed states.
       click = `onclick="openDayModal(${programDay})"`;
       dataDay = ` data-day="${programDay}"`;
     } else if (inProgram) {
