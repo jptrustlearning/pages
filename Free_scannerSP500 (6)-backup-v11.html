@@ -87,41 +87,6 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .controls-row input[type="text"]:focus{border-color:var(--gold)}
 .controls-row select{background:var(--cream);border:1px solid var(--border-gold);border-radius:8px;padding:8px 14px;color:var(--text-dark);font-family:var(--font-thai);font-size:0.8rem;outline:none;cursor:pointer}
 .controls-row select:focus{border-color:var(--gold)}
-
-/* ===== CUSTOM PICKER (cream-themed, replaces native select for Sector + Sub-Industry) ===== */
-.cust-picker-trigger{background:var(--cream);border:1px solid var(--border-gold);border-radius:8px;padding:8px 12px;color:var(--text-dark);font-family:var(--font-thai);font-size:0.8rem;cursor:pointer;display:inline-flex;align-items:center;gap:8px;min-width:170px;max-width:240px;transition:border-color .2s;outline:none}
-.cust-picker-trigger:hover, .cust-picker-trigger:focus{border-color:var(--gold)}
-.cpt-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
-.cpt-chev{width:14px;height:14px;color:var(--gold-dark);flex-shrink:0;transition:transform .2s}
-
-.cust-picker-overlay{position:fixed;inset:0;background:rgba(26,10,14,0.55);z-index:9999;display:none;align-items:flex-end;justify-content:center}
-.cust-picker-overlay.show{display:flex}
-.cust-picker-sheet{background:linear-gradient(180deg,#FFFEF8 0%,#FAF6ED 100%);border-top-left-radius:18px;border-top-right-radius:18px;width:100%;max-width:520px;max-height:80vh;display:flex;flex-direction:column;border:1.5px solid rgba(212,175,55,0.40);border-bottom:none;box-shadow:0 -4px 28px rgba(26,10,14,0.32);animation:cpSlideUp .25s ease}
-@keyframes cpSlideUp{from{transform:translateY(20px);opacity:.6}to{transform:translateY(0);opacity:1}}
-.cp-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 18px 12px;border-bottom:1px solid rgba(212,175,55,0.25);background:linear-gradient(180deg,rgba(244,228,186,0.22),transparent);border-radius:18px 18px 0 0}
-.cp-title{font-family:'Cinzel','Anuphan',serif;font-size:0.78rem;font-weight:700;color:#5A3D20;letter-spacing:1.6px;text-transform:uppercase}
-.cp-close{background:rgba(114,47,55,0.08);border:none;width:34px;height:34px;border-radius:50%;color:#722F37;cursor:pointer;font-size:1.45rem;line-height:1;font-weight:300;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0}
-.cp-close:hover{background:rgba(114,47,55,0.18)}
-.cp-body{overflow-y:auto;flex:1;padding:6px 0 22px}
-.cp-option{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 18px;background:transparent;border:none;font-family:'Anuphan',sans-serif;font-size:0.92rem;color:#3D3228;text-align:left;cursor:pointer;border-bottom:1px solid rgba(212,175,55,0.06);transition:background .12s}
-.cp-option:hover{background:rgba(212,175,55,0.08)}
-.cp-option:active{background:rgba(212,175,55,0.16)}
-.cp-option.is-selected{background:rgba(212,175,55,0.13);color:#722F37;font-weight:700}
-.cp-option-sub{padding-left:30px;font-size:0.88rem;color:#5A3D20}
-.cp-opt-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cp-opt-count{margin-left:8px;flex-shrink:0;font-family:'DM Serif Display','Sarabun',serif;color:#8B6914;font-size:0.92rem;font-weight:400;letter-spacing:0}
-.cp-group-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 18px 7px;font-family:'Cinzel','Anuphan',serif;font-size:0.7rem;font-weight:700;color:#8B6914;letter-spacing:1.6px;text-transform:uppercase;background:linear-gradient(90deg,rgba(212,175,55,0.13) 0%,rgba(212,175,55,0.02) 100%);border-top:1px solid rgba(212,175,55,0.30);border-left:3px solid #D4AF37;margin-top:6px;pointer-events:none}
-.cp-group-header:first-of-type{margin-top:8px}
-.cp-group-count{font-family:'DM Serif Display','Sarabun',serif;color:#B8860B;font-size:0.95rem;font-weight:400;letter-spacing:0;text-transform:none}
-
-@media(min-width:601px){
-  .cust-picker-overlay{align-items:center;padding:20px}
-  .cust-picker-sheet{border-radius:18px;border-bottom:1.5px solid rgba(212,175,55,0.40);max-height:70vh}
-  .cp-head{border-radius:16px 16px 0 0}
-}
-@media(max-width:600px){
-  .cust-picker-trigger{min-width:0;flex:1;max-width:100%}
-}
 table{width:100%;border-collapse:collapse;font-size:0.8rem}
 thead th{text-align:left;padding:10px 12px;color:var(--gold-dark);font-weight:600;font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid rgba(212,175,55,0.15);white-space:nowrap;cursor:pointer;user-select:none}
 thead th:hover{color:var(--maroon)}
@@ -604,16 +569,14 @@ function renderDashboard(metrics, latestDate) {
           <option value="os">RSI < 30 (Oversold)</option>
           <option value="neutral">RSI 30-70</option>
         </select>
-        <button type="button" class="cust-picker-trigger" id="filterSectorBtn" onclick="openPicker('Sector')">
-          <span class="cpt-label" id="filterSectorLabel">อุตสาหกรรมทั้งหมด</span>
-          <svg class="cpt-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <input type="hidden" id="filterSector" value="all">
-        <button type="button" class="cust-picker-trigger" id="filterSubSectorBtn" onclick="openPicker('SubSector')">
-          <span class="cpt-label" id="filterSubSectorLabel">หมวดย่อยทั้งหมด</span>
-          <svg class="cpt-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <input type="hidden" id="filterSubSector" value="all">
+        <select id="filterSector" onchange="onSectorChange()">
+          <option value="all">อุตสาหกรรมทั้งหมด</option>
+          ${allSectors.map(s => `<option value="${s}">${s} (${sectorStockCount[s]||0})</option>`).join('')}
+        </select>
+        <select id="filterSubSector" onchange="filterTable()">
+          <option value="all">หมวดย่อยทั้งหมด</option>
+          ${Object.keys(allSubSectorsByMain).sort().map(sec => `<optgroup label="${sec} (${sectorStockCount[sec]||0})">${allSubSectorsByMain[sec].map(sub => `<option value="${sub.name}">${sub.name} (${sub.count})</option>`).join('')}</optgroup>`).join('')}
+        </select>
       </div>
       <div style="overflow-x:auto;">
         <table id="stockTable">
@@ -999,141 +962,8 @@ function setupTableSort(metrics) {
   });
 }
 
-// ============================================================
-//  CUSTOM PICKER (replaces native select for Sector/SubSector)
-// ============================================================
-const PICKER_STATE = {
-  Sector:    { value: 'all', label: 'อุตสาหกรรมทั้งหมด', title: 'อุตสาหกรรมหลัก' },
-  SubSector: { value: 'all', label: 'หมวดย่อยทั้งหมด',   title: 'หมวดอุตสาหกรรมย่อย' }
-};
-
-function escapeAttr(s){
-  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;');
-}
-function escapeText(s){
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-function buildSectorBody(){
-  const sel = PICKER_STATE.Sector.value;
-  const totalCount = (typeof currentMetrics !== 'undefined' && currentMetrics) ? currentMetrics.length : '';
-  let h = `<button class="cp-option ${sel==='all'?'is-selected':''}" data-v="all" data-l="อุตสาหกรรมทั้งหมด">
-    <span class="cp-opt-text">อุตสาหกรรมทั้งหมด</span>
-    <span class="cp-opt-count">${totalCount}</span>
-  </button>`;
-  allSectors.forEach(s => {
-    const cnt = sectorStockCount[s]||0;
-    const lbl = `${s} (${cnt})`;
-    h += `<button class="cp-option ${sel===s?'is-selected':''}" data-v="${escapeAttr(s)}" data-l="${escapeAttr(lbl)}">
-      <span class="cp-opt-text">${escapeText(s)}</span>
-      <span class="cp-opt-count">${cnt}</span>
-    </button>`;
-  });
-  return h;
-}
-
-function buildSubBody(){
-  const sectorVal = PICKER_STATE.Sector.value;
-  const sel = PICKER_STATE.SubSector.value;
-  let h = `<button class="cp-option ${sel==='all'?'is-selected':''}" data-v="all" data-l="หมวดย่อยทั้งหมด">
-    <span class="cp-opt-text">หมวดย่อยทั้งหมด</span>
-  </button>`;
-  if (sectorVal === 'all') {
-    Object.keys(allSubSectorsByMain).sort().forEach(sec => {
-      const secCnt = sectorStockCount[sec]||0;
-      h += `<div class="cp-group-header"><span>${escapeText(sec)}</span><span class="cp-group-count">${secCnt}</span></div>`;
-      allSubSectorsByMain[sec].forEach(sub => {
-        const lbl = `${sub.name} (${sub.count})`;
-        h += `<button class="cp-option cp-option-sub ${sel===sub.name?'is-selected':''}" data-v="${escapeAttr(sub.name)}" data-l="${escapeAttr(lbl)}">
-          <span class="cp-opt-text">${escapeText(sub.name)}</span>
-          <span class="cp-opt-count">${sub.count}</span>
-        </button>`;
-      });
-    });
-  } else if (allSubSectorsByMain[sectorVal]) {
-    allSubSectorsByMain[sectorVal].forEach(sub => {
-      const lbl = `${sub.name} (${sub.count})`;
-      h += `<button class="cp-option ${sel===sub.name?'is-selected':''}" data-v="${escapeAttr(sub.name)}" data-l="${escapeAttr(lbl)}">
-        <span class="cp-opt-text">${escapeText(sub.name)}</span>
-        <span class="cp-opt-count">${sub.count}</span>
-      </button>`;
-    });
-  }
-  return h;
-}
-
-function openPicker(which){
-  const overlay = document.getElementById('cpOverlay');
-  const body = document.getElementById('cpBody');
-  const title = document.getElementById('cpTitle');
-  if (!overlay || !body || !title) return;
-  title.textContent = PICKER_STATE[which].title;
-  body.innerHTML = which==='Sector' ? buildSectorBody() : buildSubBody();
-  overlay.dataset.which = which;
-  overlay.classList.add('show');
-  document.body.style.overflow = 'hidden';
-  // Wire option click handlers
-  body.querySelectorAll('.cp-option').forEach(btn => {
-    btn.addEventListener('click', () => {
-      selectOption(which, btn.dataset.v, btn.dataset.l);
-    });
-  });
-  // Scroll to selected (if any)
-  setTimeout(() => {
-    const selEl = body.querySelector('.cp-option.is-selected');
-    if (selEl) selEl.scrollIntoView({block:'center', behavior:'auto'});
-  }, 30);
-}
-
-function closePicker(){
-  const overlay = document.getElementById('cpOverlay');
-  if (!overlay) return;
-  overlay.classList.remove('show');
-  document.body.style.overflow = '';
-}
-
-function selectOption(which, value, label){
-  PICKER_STATE[which].value = value;
-  PICKER_STATE[which].label = label;
-  const hidden = document.getElementById('filter'+which);
-  const btnLbl = document.getElementById('filter'+which+'Label');
-  if (hidden) hidden.value = value;
-  if (btnLbl) btnLbl.textContent = label;
-  // Cascading: when sector changes, reset sub-filter
-  if (which === 'Sector') {
-    PICKER_STATE.SubSector.value = 'all';
-    PICKER_STATE.SubSector.label = 'หมวดย่อยทั้งหมด';
-    const subH = document.getElementById('filterSubSector');
-    const subL = document.getElementById('filterSubSectorLabel');
-    if (subH) subH.value = 'all';
-    if (subL) subL.textContent = 'หมวดย่อยทั้งหมด';
-  }
-  closePicker();
-  filterTable();
-}
-
-// Backdrop click + ESC close
-document.addEventListener('click', e => {
-  const overlay = document.getElementById('cpOverlay');
-  if (overlay && e.target === overlay) closePicker();
-});
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closePicker();
-});
-
 // INIT
 init();
 </script>
-
-<!-- ===== Custom Picker Overlay (shared by Sector + Sub-Industry) ===== -->
-<div class="cust-picker-overlay" id="cpOverlay" role="dialog" aria-modal="true">
-  <div class="cust-picker-sheet">
-    <div class="cp-head">
-      <span class="cp-title" id="cpTitle"></span>
-      <button class="cp-close" type="button" onclick="closePicker()" aria-label="ปิด">×</button>
-    </div>
-    <div class="cp-body" id="cpBody"></div>
-  </div>
-</div>
 </body>
 </html>
