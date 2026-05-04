@@ -204,8 +204,7 @@ let chartInstances = {};
 let sectorMap = {};       // ticker -> GICS Sector
 let subSectorMap = {};    // ticker -> GICS Sub-Industry
 let allSectors = [];      // sorted unique sectors
-let sectorStockCount = {}; // sector -> count of tickers in this scan
-let allSubSectorsByMain = {}; // sector -> [{name, count}] sorted desc by count
+let allSubSectorsByMain = {}; // sector -> sorted unique sub-industries (for grouped dropdown)
 
 function destroyChart(id) {
   if (chartInstances[id]) { chartInstances[id].destroy(); delete chartInstances[id]; }
@@ -349,29 +348,21 @@ function processCSV(text) {
   // Compute metrics for each ticker
   const metrics = computeAllMetrics(validTickers);
 
-  // Build sorted unique sector list + count per sector
+  // Build sorted unique sector list
   const sectorSet = new Set(metrics.map(m => m.sector));
   allSectors = [...sectorSet].filter(s => s !== 'Unknown').sort();
   if (sectorSet.has('Unknown')) allSectors.push('Unknown');
 
-  sectorStockCount = {};
-  metrics.forEach(m => {
-    sectorStockCount[m.sector] = (sectorStockCount[m.sector] || 0) + 1;
-  });
-
-  // Build sub-industry list grouped by parent sector — sorted DESC by count
-  // Format: { sector: [{name, count}, ...] }
-  const subCountByMain = {}; // {sector: {sub: count}}
+  // Build sub-industry list grouped by parent sector (for grouped dropdown)
+  allSubSectorsByMain = {};
   metrics.forEach(m => {
     if (!m.subSector || m.subSector === 'Unknown') return;
-    if (!subCountByMain[m.sector]) subCountByMain[m.sector] = {};
-    subCountByMain[m.sector][m.subSector] = (subCountByMain[m.sector][m.subSector] || 0) + 1;
+    if (!allSubSectorsByMain[m.sector]) allSubSectorsByMain[m.sector] = new Set();
+    allSubSectorsByMain[m.sector].add(m.subSector);
   });
-  allSubSectorsByMain = {};
-  Object.keys(subCountByMain).forEach(sec => {
-    allSubSectorsByMain[sec] = Object.entries(subCountByMain[sec])
-      .map(([name, count]) => ({name, count}))
-      .sort((a, b) => b.count - a.count); // most stocks first
+  // Convert sets to sorted arrays
+  Object.keys(allSubSectorsByMain).forEach(k => {
+    allSubSectorsByMain[k] = [...allSubSectorsByMain[k]].sort();
   });
 
   renderDashboard(metrics, latest);
@@ -571,11 +562,11 @@ function renderDashboard(metrics, latestDate) {
         </select>
         <select id="filterSector" onchange="onSectorChange()">
           <option value="all">อุตสาหกรรมทั้งหมด</option>
-          ${allSectors.map(s => `<option value="${s}">${s} (${sectorStockCount[s]||0})</option>`).join('')}
+          ${allSectors.map(s => `<option value="${s}">${s}</option>`).join('')}
         </select>
         <select id="filterSubSector" onchange="filterTable()">
           <option value="all">หมวดย่อยทั้งหมด</option>
-          ${Object.keys(allSubSectorsByMain).sort().map(sec => `<optgroup label="${sec} (${sectorStockCount[sec]||0})">${allSubSectorsByMain[sec].map(sub => `<option value="${sub.name}">${sub.name} (${sub.count})</option>`).join('')}</optgroup>`).join('')}
+          ${Object.keys(allSubSectorsByMain).sort().map(sec => `<optgroup label="${sec}">${allSubSectorsByMain[sec].map(sub => `<option value="${sub}">${sub}</option>`).join('')}</optgroup>`).join('')}
         </select>
       </div>
       <div style="overflow-x:auto;">
@@ -928,7 +919,6 @@ window.gotoScannerPage = function(p) {
 function filterTable() { _scannerPage = 1; renderTable(); }
 
 // Cascading: when sector picked, rebuild sub-filter to that sector's sub-industries only.
-// Sub-industries sorted DESC by stock count (most stocks first), counts shown.
 // 'all' restores full grouped list.
 function onSectorChange() {
   const sectorVal = document.getElementById('filterSector').value;
@@ -937,10 +927,10 @@ function onSectorChange() {
   let optionsHtml = '<option value="all">หมวดย่อยทั้งหมด</option>';
   if (sectorVal === 'all') {
     optionsHtml += Object.keys(allSubSectorsByMain).sort().map(sec =>
-      `<optgroup label="${sec} (${sectorStockCount[sec]||0})">${allSubSectorsByMain[sec].map(sub => `<option value="${sub.name}">${sub.name} (${sub.count})</option>`).join('')}</optgroup>`
+      `<optgroup label="${sec}">${allSubSectorsByMain[sec].map(sub => `<option value="${sub}">${sub}</option>`).join('')}</optgroup>`
     ).join('');
   } else if (allSubSectorsByMain[sectorVal]) {
-    optionsHtml += allSubSectorsByMain[sectorVal].map(sub => `<option value="${sub.name}">${sub.name} (${sub.count})</option>`).join('');
+    optionsHtml += allSubSectorsByMain[sectorVal].map(sub => `<option value="${sub}">${sub}</option>`).join('');
   }
   subSel.innerHTML = optionsHtml;
   subSel.value = 'all';
