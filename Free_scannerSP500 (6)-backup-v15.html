@@ -609,24 +609,17 @@ function renderDashboard(metrics, latestDate) {
           <input type="text" id="searchInput" placeholder="ค้นหา Ticker..." oninput="filterTable()">
         </div>
         <select id="filterSMA" onchange="filterTable()">
-          <option value="all">SMA ทั้งหมด</option>
+          <option value="all">ทั้งหมด</option>
           <option value="above200">Above SMA200</option>
           <option value="below200">Below SMA200</option>
           <option value="above50">Above SMA50</option>
-          <option value="golden">Golden Cross (50&gt;200)</option>
+          <option value="golden">Golden Cross (50>200)</option>
         </select>
         <select id="filterRSI" onchange="filterTable()">
           <option value="all">RSI ทั้งหมด</option>
-          <option value="ob">RSI &gt; 70 (Overbought)</option>
-          <option value="os">RSI &lt; 30 (Oversold)</option>
+          <option value="ob">RSI > 70 (Overbought)</option>
+          <option value="os">RSI < 30 (Oversold)</option>
           <option value="neutral">RSI 30-70</option>
-        </select>
-        <select id="filterVol" onchange="filterTable()">
-          <option value="all">ความผันผวนทั้งหมด</option>
-          <option value="low">ต่ำ (&lt; 25%)</option>
-          <option value="mid">ปานกลาง (25-40%)</option>
-          <option value="high">สูง (40-60%)</option>
-          <option value="vhigh">สูงมาก (≥ 60%)</option>
         </select>
         <button type="button" class="cust-picker-trigger" id="filterSectorBtn" onclick="openPicker('Sector')">
           <span class="cpt-label" id="filterSectorLabel">อุตสาหกรรมทั้งหมด</span>
@@ -972,7 +965,6 @@ function renderTable() {
   const rsiFilter = document.getElementById('filterRSI')?.value || 'all';
   const sectorFilter = document.getElementById('filterSector')?.value || 'all';
   const subSectorFilter = document.getElementById('filterSubSector')?.value || 'all';
-  const volFilter = document.getElementById('filterVol')?.value || 'all';
 
   let filtered = currentMetrics.filter(m => {
     if (search && !m.ticker.includes(search)) return false;
@@ -985,10 +977,6 @@ function renderTable() {
     if (rsiFilter === 'neutral' && (m.rsi < 30 || m.rsi > 70)) return false;
     if (sectorFilter !== 'all' && m.sector !== sectorFilter) return false;
     if (subSectorFilter !== 'all' && m.subSector !== subSectorFilter) return false;
-    if (volFilter === 'low'   && !(m.vol20 < 25)) return false;
-    if (volFilter === 'mid'   && !(m.vol20 >= 25 && m.vol20 < 40)) return false;
-    if (volFilter === 'high'  && !(m.vol20 >= 40 && m.vol20 < 60)) return false;
-    if (volFilter === 'vhigh' && !(m.vol20 >= 60)) return false;
     return true;
   });
 
