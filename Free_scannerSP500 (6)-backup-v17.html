@@ -608,16 +608,6 @@ function renderDashboard(metrics, latestDate) {
           <svg class="search-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
           <input type="text" id="searchInput" placeholder="ค้นหา Ticker..." oninput="filterTable()">
         </div>
-        <button type="button" class="cust-picker-trigger" id="filterSectorBtn" onclick="openPicker('Sector')">
-          <span class="cpt-label" id="filterSectorLabel">อุตสาหกรรมทั้งหมด</span>
-          <svg class="cpt-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <input type="hidden" id="filterSector" value="all">
-        <button type="button" class="cust-picker-trigger" id="filterSubSectorBtn" onclick="openPicker('SubSector')">
-          <span class="cpt-label" id="filterSubSectorLabel">หมวดย่อยทั้งหมด</span>
-          <svg class="cpt-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <input type="hidden" id="filterSubSector" value="all">
         <select id="filterSMA" onchange="filterTable()">
           <option value="all">SMA ทั้งหมด</option>
           <option value="above200">Above SMA200</option>
@@ -645,6 +635,16 @@ function renderDashboard(metrics, latestDate) {
           <option value="normal">Volume ปกติ (0.8-1.2×)</option>
           <option value="drying">Volume แห้ง (&lt; 0.8×)</option>
         </select>
+        <button type="button" class="cust-picker-trigger" id="filterSectorBtn" onclick="openPicker('Sector')">
+          <span class="cpt-label" id="filterSectorLabel">อุตสาหกรรมทั้งหมด</span>
+          <svg class="cpt-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <input type="hidden" id="filterSector" value="all">
+        <button type="button" class="cust-picker-trigger" id="filterSubSectorBtn" onclick="openPicker('SubSector')">
+          <span class="cpt-label" id="filterSubSectorLabel">หมวดย่อยทั้งหมด</span>
+          <svg class="cpt-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <input type="hidden" id="filterSubSector" value="all">
       </div>
       <div class="table-scroll-host">
         <div class="table-scroll-container" id="tableScrollContainer">
