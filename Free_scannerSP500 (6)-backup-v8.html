@@ -31,9 +31,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .ranking-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
 .ranking-title{font-size:1rem;font-weight:700;color:var(--text-heading);letter-spacing:1px;margin:0}
 .ranking-title .rank-mode-label{color:var(--gold-dark);font-weight:600}
-.rank-tabs{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.rank-group-label{font-family:'Cinzel',serif;font-size:0.66rem;color:var(--gold-dark);letter-spacing:1.4px;text-transform:uppercase;font-weight:700;padding:0 4px;display:inline-flex;align-items:center;white-space:nowrap}
-.rank-group-label::before{content:'';display:inline-block;width:1px;height:14px;background:rgba(139,105,20,0.35);margin-right:10px}
+.rank-tabs{display:flex;gap:6px;flex-wrap:wrap}
 .rank-tab{background:var(--cream);border:1px solid var(--border-gold);border-radius:18px;padding:5px 12px;font-family:var(--font-thai);font-size:0.74rem;font-weight:600;color:var(--text-muted);cursor:pointer;transition:all 0.18s ease;letter-spacing:.3px}
 .rank-tab:hover{border-color:var(--gold);color:var(--maroon)}
 .rank-tab.active{background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF5E1;border-color:transparent;box-shadow:0 2px 8px rgba(139,34,82,0.25)}
@@ -137,7 +135,6 @@ tbody td.ticker{font-weight:700;color:var(--maroon)}
       <h2 class="ranking-title">Top 10 vs Bottom 10 — <span class="rank-mode-label" id="rankModeLabel">Momentum Score</span></h2>
       <div class="rank-tabs" id="rankTabs">
         <button class="rank-tab active" data-mode="momScore" onclick="setRankMode('momScore', this)">Momentum Score</button>
-        <span class="rank-group-label">% ผลตอบแทน</span>
         <button class="rank-tab" data-mode="ret1d" onclick="setRankMode('ret1d', this)">1 วัน</button>
         <button class="rank-tab" data-mode="ret5d" onclick="setRankMode('ret5d', this)">5 วัน</button>
         <button class="rank-tab" data-mode="ret1m" onclick="setRankMode('ret1m', this)">1 เดือน</button>
@@ -585,11 +582,11 @@ function renderDashboard(metrics, latestDate) {
 const rankingState = { metrics: [], mode: 'momScore' };
 
 const RANK_MODE_META = {
-  momScore: { label: 'Momentum Score', short: 'Momentum Score',         isPercent: false },
-  ret1d:    { label: '1 วัน',          short: '%ผลตอบแทน 1 วัน',         isPercent: true  },
-  ret5d:    { label: '5 วัน',          short: '%ผลตอบแทน 5 วัน',         isPercent: true  },
-  ret1m:    { label: '1 เดือน',        short: '%ผลตอบแทน 1 เดือน',       isPercent: true  },
-  ret3m:    { label: '3 เดือน',        short: '%ผลตอบแทน 3 เดือน',       isPercent: true  }
+  momScore: { label: 'Momentum Score', short: 'Momentum Score', isPercent: false },
+  ret1d:    { label: '1 วัน',          short: '1 Day Return',   isPercent: true  },
+  ret5d:    { label: '5 วัน',          short: '5 Day Return',   isPercent: true  },
+  ret1m:    { label: '1 เดือน',        short: '1 Month Return', isPercent: true  },
+  ret3m:    { label: '3 เดือน',        short: '3 Month Return', isPercent: true  }
 };
 
 function setRankMode(mode, btn) {
