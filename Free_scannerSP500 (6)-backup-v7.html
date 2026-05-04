@@ -16,6 +16,9 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .sec-dark{background:linear-gradient(160deg,#1a0a0e,#2d1018 25%,#3a1520 45%,#2d1018 65%,#1a0a0e);color:var(--text-light);position:relative}
 .sec-dark::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 30%,rgba(114,47,55,0.25),transparent 50%),radial-gradient(ellipse at 70% 60%,rgba(90,30,40,0.2),transparent 50%);pointer-events:none}
 .gold-line{height:2px;background:linear-gradient(90deg,transparent,var(--gold),#E8D48B,var(--gold),transparent)}
+.star-field{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+.star{position:absolute;border-radius:50%;pointer-events:none}
+@keyframes twinkle{0%,100%{opacity:0;transform:scale(0.3)}20%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(0.8)}80%{opacity:1;transform:scale(1.1)}}
 .header-section{padding:50px 24px 40px;position:relative;z-index:2;text-align:center}
 .header-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(212,175,55,0.05);border:1px solid rgba(212,175,55,0.2);border-radius:100px;padding:5px 18px;font-size:11px;color:#C4B88A;margin-bottom:20px;letter-spacing:3px;text-transform:uppercase;font-family:var(--font-label)}
 .header-title{font-size:clamp(26px,4.5vw,48px);font-weight:600;line-height:1.25;margin-bottom:14px;background:linear-gradient(135deg,var(--gold),var(--gold-light),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -24,19 +27,6 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .header-meta .logo{font-family:var(--font-label);font-size:0.65rem;letter-spacing:3px;color:var(--gold);border:1px solid rgba(212,175,55,0.2);padding:4px 14px;border-radius:4px}
 .header-meta .date{font-family:var(--font-number);font-size:0.85rem}
 .status-wrap{background:var(--cream);padding:16px 24px 8px}
-
-/* TOP-LEVEL RANKING SECTION (above status chips) */
-.ranking-wrap{background:var(--cream);padding:18px 24px 4px}
-.ranking-inner{max-width:1400px;margin:0 auto;background:linear-gradient(160deg,var(--cream-card),#F8F2E4);border:1px solid rgba(212,175,55,0.18);border-radius:14px;padding:18px 20px 16px;box-shadow:0 2px 12px rgba(114,47,55,0.04)}
-.ranking-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
-.ranking-title{font-size:1rem;font-weight:700;color:var(--text-heading);letter-spacing:1px;margin:0}
-.ranking-title .rank-mode-label{color:var(--gold-dark);font-weight:600}
-.rank-tabs{display:flex;gap:6px;flex-wrap:wrap}
-.rank-tab{background:var(--cream);border:1px solid var(--border-gold);border-radius:18px;padding:5px 12px;font-family:var(--font-thai);font-size:0.74rem;font-weight:600;color:var(--text-muted);cursor:pointer;transition:all 0.18s ease;letter-spacing:.3px}
-.rank-tab:hover{border-color:var(--gold);color:var(--maroon)}
-.rank-tab.active{background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF5E1;border-color:transparent;box-shadow:0 2px 8px rgba(139,34,82,0.25)}
-.ranking-chart-container{position:relative;width:100%;min-height:340px;height:50vw;max-height:440px}
-@media(max-width:600px){.ranking-wrap{padding:14px 12px 4px}.ranking-inner{padding:14px 12px 12px}.ranking-title{font-size:0.88rem}.rank-tab{padding:5px 10px;font-size:0.7rem}}
 .status-inner{max-width:1400px;margin:0 auto;display:flex;gap:8px;flex-wrap:wrap}
 .status-chip{display:flex;align-items:center;gap:7px;padding:5px 14px;background:var(--cream-card);border:1px solid var(--border-gold);border-radius:18px;font-size:0.73rem;color:var(--text-muted)}
 .status-chip .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite}
@@ -115,6 +105,10 @@ tbody td.ticker{font-weight:700;color:var(--maroon)}
 </style>
 </head>
 <body>
+<div class="star-field" id="star-field"></div>
+<script>
+(function(){const sf=document.getElementById('star-field');for(let i=0;i<40;i++){const s=document.createElement('div');s.className='star';const sz=Math.random()>0.85?4:Math.random()*2.5+1;s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;background:${Math.random()>0.7?'var(--gold)':'rgba(244,228,186,0.6)'};animation:twinkle ${3+Math.random()*5}s ${Math.random()*5}s ease-in-out infinite`;sf.appendChild(s)}})();
+</script>
 
 <section class="sec-dark">
   <div class="header-section">
@@ -128,22 +122,6 @@ tbody td.ticker{font-weight:700;color:var(--maroon)}
   </div>
 </section>
 <div class="gold-line"></div>
-
-<div class="ranking-wrap" id="rankingWrap" style="display:none">
-  <div class="ranking-inner">
-    <div class="ranking-head">
-      <h2 class="ranking-title">Top 10 vs Bottom 10 — <span class="rank-mode-label" id="rankModeLabel">Momentum Score</span></h2>
-      <div class="rank-tabs" id="rankTabs">
-        <button class="rank-tab active" data-mode="momScore" onclick="setRankMode('momScore', this)">Momentum Score</button>
-        <button class="rank-tab" data-mode="ret1d" onclick="setRankMode('ret1d', this)">1 วัน</button>
-        <button class="rank-tab" data-mode="ret5d" onclick="setRankMode('ret5d', this)">5 วัน</button>
-        <button class="rank-tab" data-mode="ret1m" onclick="setRankMode('ret1m', this)">1 เดือน</button>
-        <button class="rank-tab" data-mode="ret3m" onclick="setRankMode('ret3m', this)">3 เดือน</button>
-      </div>
-    </div>
-    <div class="ranking-chart-container"><canvas id="chartTopBottom"></canvas></div>
-  </div>
-</div>
 
 <div class="status-wrap" id="statusWrap" style="display:none">
   <div class="status-inner" id="statusBar"></div>
@@ -484,9 +462,15 @@ function renderDashboard(metrics, latestDate) {
     <!-- CHARTS ROW 1 -->
     <div class="chart-section">
       <h2>MARKET OVERVIEW</h2>
-      <div>
-        <div style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:8px;">การกระจายผลตอบแทน 1 เดือน</div>
-        <div class="chart-container"><canvas id="chartRetDist"></canvas></div>
+      <div class="chart-row">
+        <div>
+          <div style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:8px;">การกระจายผลตอบแทน 1 เดือน</div>
+          <div class="chart-container"><canvas id="chartRetDist"></canvas></div>
+        </div>
+        <div>
+          <div style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:8px;">Top 10 vs Bottom 10 — Momentum Score</div>
+          <div class="chart-container"><canvas id="chartTopBottom"></canvas></div>
+        </div>
       </div>
     </div>
 
@@ -571,82 +555,6 @@ function renderDashboard(metrics, latestDate) {
   renderCharts(metrics, retBuckets, top5, bottom5);
   populateTable(metrics);
   setupTableSort(metrics);
-
-  // Show + render top-level ranking chart (independent of MARKET OVERVIEW)
-  rankingState.metrics = metrics;
-  document.getElementById('rankingWrap').style.display = '';
-  renderRankingChart();
-}
-
-// ===== TOP/BOTTOM RANKING CHART (with mode tabs) =====
-const rankingState = { metrics: [], mode: 'momScore' };
-
-const RANK_MODE_META = {
-  momScore: { label: 'Momentum Score', short: 'Momentum Score', isPercent: false },
-  ret1d:    { label: '1 วัน',          short: '1 Day Return',   isPercent: true  },
-  ret5d:    { label: '5 วัน',          short: '5 Day Return',   isPercent: true  },
-  ret1m:    { label: '1 เดือน',        short: '1 Month Return', isPercent: true  },
-  ret3m:    { label: '3 เดือน',        short: '3 Month Return', isPercent: true  }
-};
-
-function setRankMode(mode, btn) {
-  if (!RANK_MODE_META[mode]) return;
-  rankingState.mode = mode;
-  document.querySelectorAll('#rankTabs .rank-tab').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  renderRankingChart();
-}
-
-function renderRankingChart() {
-  const { metrics, mode } = rankingState;
-  if (!metrics || !metrics.length) return;
-  const meta = RANK_MODE_META[mode];
-
-  // Re-rank by current mode (filter NaN/null), pick top 5 + bottom 5
-  const valid = metrics.filter(m => typeof m[mode] === 'number' && !isNaN(m[mode]));
-  const sorted = [...valid].sort((a, b) => b[mode] - a[mode]);
-  const top5 = sorted.slice(0, 5);
-  const bottom5 = sorted.slice(-5);
-  // Display order: top first (high to low), then bottom (high to low among bottom)
-  const combined = [...top5, ...bottom5];
-
-  document.getElementById('rankModeLabel').textContent = meta.short;
-
-  destroyChart('chartTopBottom');
-  const ctxTB = document.getElementById('chartTopBottom').getContext('2d');
-  const fmt = v => meta.isPercent ? (v >= 0 ? '+' : '') + v.toFixed(2) + '%' : v.toFixed(2);
-  chartInstances['chartTopBottom'] = new Chart(ctxTB, {
-    type: 'bar',
-    data: {
-      labels: combined.map(m => m.ticker),
-      datasets: [{
-        label: meta.short,
-        data: combined.map(m => m[mode]),
-        backgroundColor: combined.map(m => m[mode] >= 0 ? 'rgba(76,175,80,0.75)' : 'rgba(239,83,80,0.75)'),
-        borderRadius: 4,
-        borderSkipped: false
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: '#1a0a0e', titleColor: '#D4A847', bodyColor: '#F5DEB3',
-          borderColor: '#D4A847', borderWidth: 1,
-          callbacks: { label: ctx => `${meta.short}: ${fmt(ctx.parsed.x)}` }
-        }
-      },
-      scales: {
-        x: {
-          grid: { color: 'rgba(212,168,71,0.08)' },
-          ticks: { font: { size: 10 }, callback: v => meta.isPercent ? v + '%' : v }
-        },
-        y: { grid: { display: false }, ticks: { font: { size: 11, family: "'Anuphan'" } } }
-      }
-    }
-  });
 }
 
 function renderCharts(metrics, retBuckets, top5, bottom5) {
@@ -677,7 +585,36 @@ function renderCharts(metrics, retBuckets, top5, bottom5) {
     }
   });
 
-  // 2) RSI Distribution
+  // 2) Top/Bottom momentum
+  destroyChart('chartTopBottom');
+  const ctxTB = document.getElementById('chartTopBottom').getContext('2d');
+  const combined = [...top5, ...bottom5.reverse()];
+  chartInstances['chartTopBottom'] = new Chart(ctxTB, {
+    type: 'bar',
+    data: {
+      labels: combined.map(m => m.ticker),
+      datasets: [{
+        label: 'Momentum Score',
+        data: combined.map(m => m.momScore),
+        backgroundColor: combined.map(m => m.momScore >= 0 ? 'rgba(76,175,80,0.7)' : 'rgba(239,83,80,0.7)'),
+        borderRadius: 4,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+        tooltip: { backgroundColor: '#1a0a0e', titleColor: '#D4A847', bodyColor: '#F5DEB3', borderColor: '#D4A847', borderWidth: 1 }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(212,168,71,0.08)' } },
+        y: { grid: { display: false }, ticks: { font: { size: 10, family: "'Anuphan'" } } }
+      }
+    }
+  });
+
+  // 3) RSI Distribution
   destroyChart('chartRSI');
   const ctxRSI = document.getElementById('chartRSI').getContext('2d');
   const rsiBuckets = [0,0,0,0,0,0,0];
