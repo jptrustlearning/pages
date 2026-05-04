@@ -396,10 +396,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .mover-pct{font-family:'DM Serif Display',serif;font-size:18px;color:#2E7D32;font-weight:400;margin-bottom:2px;line-height:1;letter-spacing:0.3px}
 .mover-pct.dn{color:#C62828}
 .mover-pct-sub{font-family:'Anuphan',sans-serif;font-size:9.5px;color:var(--text-dark-muted,#7A6F62);letter-spacing:0.5px;margin-bottom:6px;text-transform:uppercase;opacity:0.85}
-.mover-price{font-family:'DM Serif Display','Sarabun',serif;font-size:13.5px;color:#5A3D20;font-weight:400;margin-bottom:6px;letter-spacing:0.2px;line-height:1.1}
 .mover-spark{width:100%;height:24px;display:block}
-.movers-as-of{font-family:'Anuphan',sans-serif;font-size:10.5px;color:#8B6914;letter-spacing:0.4px;margin:-6px 0 10px 2px;font-weight:500;display:none}
-.movers-as-of.show{display:block}
 
 /* ===== INSIGHT — cream card with gold sheen ===== */
 .insight-card{background:linear-gradient(135deg,var(--cream-card,#FFFEF8) 0%,var(--cream-warm,#F5EFE0) 100%);border:1px solid rgba(212,175,55,0.32);border-radius:14px;padding:14px 16px;margin:0 0 18px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 2px 8px rgba(114,47,55,0.05);position:relative;overflow:hidden}
@@ -888,7 +885,6 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
           </button>
         </div>
-        <div class="movers-as-of" id="moversAsOf"></div>
         <div class="movers" id="movers">
           <div class="news-empty">กำลังโหลดราคา...</div>
         </div>
@@ -1793,14 +1789,12 @@ function renderMovers(items){
       ?'<svg viewBox="0 0 24 24"><polyline points="6 14 12 20 18 14"/><line x1="12" y1="20" x2="12" y2="4"/></svg>'
       :'<svg viewBox="0 0 24 24"><polyline points="18 10 12 4 6 10"/><line x1="12" y1="4" x2="12" y2="20"/></svg>';
     const pctStr=(dn?'':'+')+it.pctChange.toFixed(2)+'%';
-    const priceStr=(typeof it.lastPrice==='number')?'$'+it.lastPrice.toFixed(2):'';
     card.innerHTML='<div class="mover-hd">'
         +'<span class="mover-tk">'+escapeText(it.symbol)+'</span>'
         +'<span class="mover-arrow '+(dn?'dn':'')+'">'+arrowSvg+'</span>'
       +'</div>'
       +'<div class="mover-pct '+(dn?'dn':'')+'">'+pctStr+'</div>'
       +'<div class="mover-pct-sub">1 week chg</div>'
-      +(priceStr?'<div class="mover-price">'+priceStr+'</div>':'')
       +'<svg class="mover-spark" viewBox="0 0 100 24" preserveAspectRatio="none">'
         +'<polyline points="'+it.sparkPoints+'" fill="none" stroke="'+(dn?'#C62828':'#2E7D32')+'" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>'
       +'</svg>';
@@ -1864,41 +1858,21 @@ async function loadMovers(){
     return;
   }
   const moverItems=[];
-  let latestDate='';
   for(const t of tkOrdered){
     const p=prices[t.symbol];
     if(!p||p.length<2)continue;
     const closes=p.map(x=>x.c);
     const first=closes[0],last=closes[closes.length-1];
     const pct=((last-first)/first)*100;
-    const lastPoint=p[p.length-1];
-    if(lastPoint && lastPoint.d > latestDate) latestDate = lastPoint.d;
     moverItems.push({
       symbol:t.symbol,
       sentiment:t.sentiment,
       pctChange:pct,
-      lastPrice:last,
       sparkPoints:makeSparkPoints(closes),
     });
     if(moverItems.length>=5)break;
   }
   renderMovers(moverItems);
-  // Render "as of" line — uses the latest date present in the loaded prices
-  const asOfEl=document.getElementById('moversAsOf');
-  if(asOfEl){
-    if(latestDate){
-      const d=new Date(latestDate+'T00:00:00');
-      if(!isNaN(d)){
-        const buddhistYY=String((d.getFullYear()+543)%100).padStart(2,'0');
-        asOfEl.textContent='ราคาปิด ณ วันที่ '+shortDate(d)+' '+buddhistYY;
-        asOfEl.classList.add('show');
-      } else {
-        asOfEl.classList.remove('show');
-      }
-    } else {
-      asOfEl.classList.remove('show');
-    }
-  }
 }
 
 /* ===== Hook Movers + Insight into news load ===== */
