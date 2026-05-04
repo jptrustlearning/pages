@@ -64,9 +64,6 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .table-section h2{font-size:1rem;font-weight:700;color:var(--text-heading);letter-spacing:1px;margin-bottom:6px}
 .table-section .table-sub{font-size:0.72rem;color:var(--text-muted);margin-bottom:16px}
 .controls-row{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
-.search-input-wrap{position:relative;display:inline-flex;align-items:center;width:200px}
-.search-input-icon{position:absolute;left:11px;width:14px;height:14px;color:var(--gold-dark);pointer-events:none;flex-shrink:0}
-.search-input-wrap input[type="text"]{padding-left:32px !important;width:100% !important}
 .controls-row input[type="text"]{background:var(--cream);border:1px solid var(--border-gold);border-radius:8px;padding:8px 14px;color:var(--text-dark);font-family:var(--font-thai);font-size:0.8rem;outline:none;width:200px;transition:border-color 0.3s}
 .controls-row input[type="text"]::placeholder{color:var(--text-muted)}
 .controls-row input[type="text"]:focus{border-color:var(--gold)}
@@ -101,7 +98,7 @@ tbody td.ticker{font-weight:700;color:var(--maroon)}
 .footer-sec .disc{font-size:0.7rem;color:var(--text-light-muted);line-height:1.7}
 @media(max-width:1024px){.metrics-grid{grid-template-columns:repeat(3,1fr)}.chart-container{min-height:240px;height:35vw}}
 @media(max-width:768px){.chart-row{grid-template-columns:1fr}.metrics-grid{grid-template-columns:repeat(2,1fr)}.chart-container{min-height:220px;height:50vw;max-height:350px}.main-wrap{padding:0 12px 20px}.chart-section,.table-section{padding:16px}}
-@media(max-width:480px){.metrics-grid{grid-template-columns:1fr}.chart-container{min-height:200px;height:60vw}.header-title{font-size:1.4rem}.controls-row input[type="text"]{width:100%}.search-input-wrap{width:100%}.controls-row{flex-direction:column}}
+@media(max-width:480px){.metrics-grid{grid-template-columns:1fr}.chart-container{min-height:200px;height:60vw}.header-title{font-size:1.4rem}.controls-row input[type="text"]{width:100%}.controls-row{flex-direction:column}}
 </style>
 </head>
 <body>
@@ -112,11 +109,11 @@ tbody td.ticker{font-weight:700;color:var(--maroon)}
 
 <section class="sec-dark">
   <div class="header-section">
-    <div class="header-badge">S&P 500 Daily Scanner</div>
+    <div class="header-badge">✦ S&P 500 Daily Scanner</div>
     <h2 class="header-title">Momentum · Volume<br>Performance Screening</h2>
     <p class="header-subtitle">สแกนหุ้น S&P 500 ทุกตัว วิเคราะห์โมเมนตัม ปริมาณซื้อขาย และสัญญาณทางเทคนิค อัปเดตทุกวัน</p>
     <div class="header-meta">
-      <span class="logo">JP TRUST LEARNING</span>
+      <span class="logo">✦ JP TRUST LEARNING</span>
       <span class="date" id="dateDisplay">—</span>
     </div>
   </div>
@@ -239,7 +236,7 @@ async function init() {
     console.error(e);
     document.getElementById('mainContent').innerHTML = `
       <div class="loading-overlay">
-        <div style="color:var(--red);font-size:1.4rem;margin-bottom:12px;">CONNECT FAILED</div>
+        <div style="color:var(--red);font-size:1.4rem;margin-bottom:12px;">⚠ CONNECT FAILED</div>
         <div style="color:var(--text-secondary);font-size:0.85rem;max-width:500px;text-align:center;line-height:1.8;">
           <div style="margin-bottom:12px;">${e.message}</div>
           <div style="margin-top:16px;padding:14px;background:rgba(212,168,71,0.08);border:1px solid var(--border);border-radius:8px;">
@@ -302,11 +299,11 @@ function processCSV(text) {
   document.getElementById('dateDisplay').textContent = latest;
   document.getElementById('statusBar').innerHTML = `
     <div class="status-chip"><span class="dot"></span> DATA LOADED</div>
-    <div class="status-chip">${validTickers.length} หุ้น</div>
-    <div class="status-chip">${earliest} → ${latest}</div>
-    <div class="status-chip">${allDates.length} วันทำการ</div>
-    <div class="status-chip">${rows.length.toLocaleString()} แถวข้อมูล</div>
-    <div class="status-chip">${Object.keys(sectorMap).length > 0 ? new Set(Object.values(sectorMap)).size + ' Sectors' : 'No Sector Data'}</div>
+    <div class="status-chip">📊 ${validTickers.length} หุ้น</div>
+    <div class="status-chip">📅 ${earliest} → ${latest}</div>
+    <div class="status-chip">📈 ${allDates.length} วันทำการ</div>
+    <div class="status-chip">📋 ${rows.length.toLocaleString()} แถวข้อมูล</div>
+    <div class="status-chip">🏭 ${Object.keys(sectorMap).length > 0 ? new Set(Object.values(sectorMap)).size + ' Sectors' : 'No Sector Data'}</div>
   `;
   document.getElementById('statusWrap').style.display = '';
 
@@ -461,7 +458,7 @@ function renderDashboard(metrics, latestDate) {
 
     <!-- CHARTS ROW 1 -->
     <div class="chart-section">
-      <h2>MARKET OVERVIEW</h2>
+      <h2><span class="icon">📊</span> MARKET OVERVIEW</h2>
       <div class="chart-row">
         <div>
           <div style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:8px;">การกระจายผลตอบแทน 1 เดือน</div>
@@ -476,7 +473,7 @@ function renderDashboard(metrics, latestDate) {
 
     <!-- CHARTS ROW 2 -->
     <div class="chart-section">
-      <h2>MOMENTUM & RISK ANALYSIS</h2>
+      <h2><span class="icon">⚡</span> MOMENTUM & RISK ANALYSIS</h2>
       <div class="chart-row">
         <div>
           <div style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:8px;">RSI Distribution</div>
@@ -491,7 +488,7 @@ function renderDashboard(metrics, latestDate) {
 
     <!-- CHARTS ROW 3 - sector breadth -->
     <div class="chart-section">
-      <h2>PERFORMANCE HEATMAP</h2>
+      <h2><span class="icon">📈</span> PERFORMANCE HEATMAP</h2>
       <div style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:12px;">Top 20 หุ้นที่มี Momentum Score สูงสุด — ผลตอบแทนแต่ละช่วงเวลา</div>
       <div class="chart-container" style="min-height:300px;height:45vw;max-height:500px;"><canvas id="chartHeatBar"></canvas></div>
     </div>
@@ -501,10 +498,7 @@ function renderDashboard(metrics, latestDate) {
       <h2>STOCK SCANNER TABLE</h2>
       <div class="table-sub">เรียงตาม Momentum Score · คลิกหัวคอลัมน์เพื่อเรียงข้อมูล</div>
       <div class="controls-row">
-        <div class="search-input-wrap">
-          <svg class="search-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-          <input type="text" id="searchInput" placeholder="ค้นหา Ticker..." oninput="filterTable()">
-        </div>
+        <input type="text" id="searchInput" placeholder="🔍 ค้นหา Ticker..." oninput="filterTable()">
         <select id="filterSMA" onchange="filterTable()">
           <option value="all">ทั้งหมด</option>
           <option value="above200">Above SMA200</option>
