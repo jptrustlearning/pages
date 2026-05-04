@@ -2457,6 +2457,7 @@ function handleUpload(e) {
 function processData(csv) {
   const lines = csv.trim().split('\n');
   state.marketData = {};
+  state.volPrefix = null;  // invalidate cumulative-volume cache — rebuilt on next sensitivity run
   const dateSet = new Set();
   
   for(let i=1; i<lines.length; i++) {
@@ -2916,30 +2917,50 @@ function simulateStrategy(wRet, nStocks) {
   return { cagr, dd: maxDD, sharpe, win: winRate };
 }
 
-window.runOptimization = function() {
+window.runOptimization = async function() {
   if(state.sortedDates.length === 0) return;
   el.optLoading.style.display = 'block';
+  el.optLoading.innerHTML = '/// SIMULATING MULTIPLE SCENARIOS...';
   el.optResults.style.display = 'none';
 
-  setTimeout(() => {
-    const results = [];
-    const stockSteps = [5, 10, 15, 20, 25, 30];
-    const weightSteps = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
+  // Yield once so the loading state actually paints before we start CPU-heavy work
+  await new Promise(r => setTimeout(r, 30));
 
-    stockSteps.forEach(n => {
-      const row = { n, cols: [] };
-      weightSteps.forEach(w => {
-         const res = simulateStrategy(w, n);
-         row.cols.push(res);
-      });
-      results.push(row);
-    });
+  // Build per-ticker cumulative-volume cache on first run (≈300–600 ms one time).
+  // Rolling 6M rebalances MONTHLY → ~120 rebals over 10 yr × 66 sims = ~8000 rankStocks
+  // calls. Without prefix cache, each rank loops O(tickers × days) → freezes UI thread.
+  if (!state.volPrefix) {
+    el.optLoading.innerHTML = '/// PREPARING VOLUME CACHE...';
+    await new Promise(r => setTimeout(r, 30));
+    buildVolumePrefix();
+  }
 
-    state.optResults = results;
-    renderOptimizationTable();
-    el.optLoading.style.display = 'none';
-    el.optResults.style.display = 'block';
-  }, 100);
+  const stockSteps  = [5, 10, 15, 20, 25, 30];
+  const weightSteps = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
+  const total = stockSteps.length * weightSteps.length;
+  let done = 0;
+  const results = [];
+
+  for (const n of stockSteps) {
+    const row = { n, cols: [] };
+    for (const w of weightSteps) {
+      const res = simulateStrategy(w, n);
+      row.cols.push(res);
+      done++;
+    }
+    results.push(row);
+    // Yield + repaint progress after each row (every 11 sims) so the user sees
+    // motion and can still scroll/tap. Browsers throttle setTimeout to ~4 ms
+    // minimum which is fine — we only have 6 yield points total.
+    const pct = Math.round((done / total) * 100);
+    el.optLoading.innerHTML = `/// SIMULATING MULTIPLE SCENARIOS... ${pct}%`;
+    await new Promise(r => setTimeout(r, 0));
+  }
+
+  state.optResults = results;
+  renderOptimizationTable();
+  el.optLoading.style.display = 'none';
+  el.optResults.style.display = 'block';
 }
 
 function renderOptimizationTable() {
@@ -3249,6 +3270,35 @@ function currentMonthKeyOfLast(dateObj) {
 }
 
 
+// === Per-ticker cumulative volume cache ===
+// rankStocks() needs SUM(volume) over [startIdx..endIdx] for every (ticker × rebal date).
+// Naively that's O(tickers × days) per call — for the SENSITIVITY GRID (66 simulations
+// × ~120 monthly rebals × 500 tickers × ~20 days) that's ~80M inner-loop ops, freezing
+// the UI thread on phones. Replacing with a prefix sum makes each rankStocks call
+// O(tickers) instead. Built lazily (first sensitivity run) and reused thereafter.
+// Invalidated to null in processData() whenever new CSV data is loaded.
+function buildVolumePrefix() {
+  const dates = state.sortedDates;
+  const N = dates.length;
+  const allTickers = new Set();
+  for (let i = 0; i < N; i++) {
+    const dd = state.marketData[dates[i]];
+    if (dd) for (const t in dd) allTickers.add(t);
+  }
+  const prefix = {};
+  allTickers.forEach(t => {
+    const cum = new Float64Array(N);
+    let total = 0;
+    for (let i = 0; i < N; i++) {
+      const dd = state.marketData[dates[i]];
+      if (dd && dd[t]) total += dd[t].v;
+      cum[i] = total;
+    }
+    prefix[t] = cum;
+  });
+  state.volPrefix = prefix;
+}
+
 function rankStocks(endIdx, startIdx, weightRetOverride) {
   // SHARED ranking function — used by both runBacktest (main) AND simulateStrategy (sensitivity grid).
   // Logic MUST be identical across both code paths.
@@ -3257,10 +3307,11 @@ function rankStocks(endIdx, startIdx, weightRetOverride) {
   // 1. For each ticker with data at both start and end date:
   //    - return = (priceEnd - priceStart) / priceStart   [total return over lookback period]
   //    - volume = SUM of daily volume across ALL trading days in [startIdx, endIdx]  [full daily sum, no sampling]
-  // 2. Rank tickers by return (descending) → rankRet: 0 = highest return
-  // 3. Rank tickers by volume (descending) → rankVol: 0 = highest volume
-  // 4. Composite score = rankRet × weightRet + rankVol × weightVol   [lower = better]
-  // 5. Sort ascending by score, return full list. Caller takes slice(0, topN).
+  //      Uses state.volPrefix (cumulative-sum cache) when available — same numeric result, O(1) per ticker.
+  // 3. Rank tickers by return (descending) → rankRet: 0 = highest return
+  // 4. Rank tickers by volume (descending) → rankVol: 0 = highest volume
+  // 5. Composite score = rankRet × weightRet + rankVol × weightVol   [lower = better]
+  // 6. Sort ascending by score, return full list. Caller takes slice(0, topN).
 
   const wRet = (typeof weightRetOverride === 'number') ? weightRetOverride : CONFIG.weightRet;
   const wVol = 1 - wRet;
@@ -3268,6 +3319,7 @@ function rankStocks(endIdx, startIdx, weightRetOverride) {
   const endD = state.sortedDates[endIdx];
   const startD = state.sortedDates[startIdx];
   const tickers = Object.keys(state.marketData[endD]);
+  const prefix = state.volPrefix;
   const stats = [];
   tickers.forEach(t => {
     if (state.marketData[startD][t]) {
@@ -3275,9 +3327,15 @@ function rankStocks(endIdx, startIdx, weightRetOverride) {
       const pStart = state.marketData[startD][t].c;
       const ret = (pEnd - pStart) / pStart;
       let vol = 0;
-      for (let k = startIdx; k <= endIdx; k++) {
-        const d = state.sortedDates[k];
-        if (state.marketData[d][t]) vol += state.marketData[d][t].v;
+      const cum = prefix && prefix[t];
+      if (cum) {
+        // Inclusive sum [startIdx..endIdx] = cum[endIdx] - (startIdx>0 ? cum[startIdx-1] : 0)
+        vol = cum[endIdx] - (startIdx > 0 ? cum[startIdx - 1] : 0);
+      } else {
+        for (let k = startIdx; k <= endIdx; k++) {
+          const d = state.sortedDates[k];
+          if (state.marketData[d][t]) vol += state.marketData[d][t].v;
+        }
       }
       stats.push({ ticker: t, ret, vol });
     }
