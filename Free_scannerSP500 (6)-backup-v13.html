@@ -132,20 +132,6 @@ thead th.sorted-asc::after{content:' ▲';font-size:0.55rem}thead th.sorted-desc
 tbody tr{transition:background 0.2s}tbody tr:hover{background:rgba(212,175,55,0.05)}
 tbody td{padding:10px 12px;border-bottom:1px solid rgba(212,175,55,0.06);font-size:0.76rem;white-space:nowrap;color:var(--text-dark)}
 tbody td.ticker{font-weight:700;color:var(--maroon)}
-
-/* ===== STICKY TICKER COLUMN (left-frozen on horizontal scroll) ===== */
-thead .col-sticky, tbody .col-sticky{position:sticky;left:0;z-index:2;background-color:#FFFEF8;box-shadow:4px 0 6px -3px rgba(114,47,55,0.12)}
-thead .col-sticky{z-index:3;background-color:#FAF6ED}
-tbody tr:hover td.col-sticky{background-color:#FBF4DC}
-
-/* ===== SWIPE-RIGHT HINT (briefly shown when table first renders) ===== */
-.table-scroll-host{position:relative}
-.table-scroll-container{overflow-x:auto;max-width:100%}
-.swipe-hint{position:absolute;top:54%;left:50%;transform:translate(-50%,-50%);z-index:10;background:rgba(26,10,14,0.88);color:#F4E4BA;padding:11px 20px;border-radius:999px;font-family:'Anuphan',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:0.4px;box-shadow:0 6px 22px rgba(26,10,14,0.40),0 0 0 1px rgba(212,175,55,0.35);display:none;align-items:center;gap:10px;pointer-events:none;white-space:nowrap;opacity:0;transition:opacity .35s ease}
-.swipe-hint.show{display:inline-flex;opacity:1}
-.swipe-hint.fade-out{opacity:0}
-.sh-icon{width:30px;height:15px;flex-shrink:0;color:#F4E4BA;animation:shSlide 1.4s ease-in-out infinite}
-@keyframes shSlide{0%,100%{transform:translateX(-4px);opacity:.55}50%{transform:translateX(5px);opacity:1}}
 .scanner-pagination{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px;padding:10px 12px;background:linear-gradient(180deg,rgba(255,254,248,0.98),rgba(255,254,248,0.95));border:1px solid var(--border-gold);border-radius:12px;margin-top:14px;box-shadow:0 3px 12px rgba(114,47,55,0.08)}
 .scnr-info{font-family:var(--font-thai);font-size:0.72rem;color:var(--text-muted);margin-right:auto;padding-left:6px;letter-spacing:0.02em}
 .scnr-info strong{color:var(--maroon);font-weight:700}
@@ -632,13 +618,12 @@ function renderDashboard(metrics, latestDate) {
         </button>
         <input type="hidden" id="filterSubSector" value="all">
       </div>
-      <div class="table-scroll-host">
-        <div class="table-scroll-container" id="tableScrollContainer">
+      <div style="overflow-x:auto;">
         <table id="stockTable">
           <thead>
             <tr>
               <th data-col="rank">#</th>
-              <th data-col="ticker" class="col-sticky">Ticker</th>
+              <th data-col="ticker">Ticker</th>
               <th data-col="sector">Sector</th>
               <th data-col="latest">Price</th>
               <th data-col="ret1d">1D %</th>
@@ -656,15 +641,6 @@ function renderDashboard(metrics, latestDate) {
           </thead>
           <tbody id="tableBody"></tbody>
         </table>
-        </div>
-        <div class="swipe-hint" id="swipeHint">
-          <svg class="sh-icon" viewBox="0 0 32 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="5" cy="8" r="2.5" fill="currentColor"/>
-            <line x1="9" y1="8" x2="24" y2="8"/>
-            <polyline points="20 4 24 8 20 12"/>
-          </svg>
-          <span>เลื่อนดูข้อมูลทางขวา</span>
-        </div>
       </div>
       <div id="paginationBar" class="scanner-pagination" style="display:none"></div>
       <div class="tooltip-note">แสดง Momentum Score = 15%×1M + 25%×3M + 35%×6M + 25%×1Y</div>
@@ -674,38 +650,11 @@ function renderDashboard(metrics, latestDate) {
   renderCharts(metrics, retBuckets, top5, bottom5);
   populateTable(metrics);
   setupTableSort(metrics);
-  setupSwipeHint();
 
   // Show + render top-level ranking chart (independent of MARKET OVERVIEW)
   rankingState.metrics = metrics;
   document.getElementById('rankingWrap').style.display = '';
   renderRankingChart();
-}
-
-// Show a brief "swipe right" overlay over the stock table the first time it
-// renders, to signal that columns extend off-screen. Auto-hides after 5s OR
-// on first horizontal scroll (whichever comes first). Re-shows on every page
-// open (e.g. when the user re-clicks the Library card).
-function setupSwipeHint() {
-  const hint = document.getElementById('swipeHint');
-  const scrollWrap = document.getElementById('tableScrollContainer');
-  if (!hint || !scrollWrap) return;
-  // Show with a slight delay so layout settles
-  setTimeout(() => {
-    hint.classList.add('show');
-  }, 250);
-  let dismissed = false;
-  const dismiss = () => {
-    if (dismissed) return;
-    dismissed = true;
-    hint.classList.add('fade-out');
-    setTimeout(() => { hint.style.display = 'none'; }, 400);
-    scrollWrap.removeEventListener('scroll', onScroll);
-  };
-  const onScroll = () => { if (scrollWrap.scrollLeft > 5) dismiss(); };
-  scrollWrap.addEventListener('scroll', onScroll, { passive: true });
-  // Auto-dismiss timeout
-  setTimeout(dismiss, 5000);
 }
 
 // ===== TOP/BOTTOM RANKING CHART (with mode tabs) =====
@@ -966,7 +915,7 @@ function renderTable() {
     const momCls = m.momScore >= 0 ? 'pos' : 'neg';
     return `<tr>
       <td>${startIdx + i + 1}</td>
-      <td class="ticker col-sticky">${m.ticker}</td>
+      <td class="ticker">${m.ticker}</td>
       <td class="sector-cell">${m.sector}</td>
       <td>$${m.latest.toFixed(2)}</td>
       ${fmtPct(m.ret1d)}
