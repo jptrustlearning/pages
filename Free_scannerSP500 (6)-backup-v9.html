@@ -57,19 +57,16 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .loader-dots-left,.loader-dots-right{display:inline-block;color:var(--green);animation:loaderDotsBlink 1.4s ease-in-out infinite;letter-spacing:2px;font-weight:700}
 .loader-dots-right{animation-delay:0.7s}
 @keyframes loaderDotsBlink{0%,100%{opacity:0.25;transform:translateY(0)}50%{opacity:1;transform:translateY(-2px)}}
-.metrics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
-.summary-card{background:linear-gradient(180deg,#FFFFFF 0%,#FFFFFF 55%,#F5EDD8 100%);border:1.5px solid rgba(212,175,55,0.45);border-radius:12px;padding:14px 14px 18px;transition:all 0.3s ease;box-shadow:0 4px 14px rgba(114,47,55,0.08),0 1px 4px rgba(114,47,55,0.05),inset 0 0 0 1px rgba(255,255,255,0.6);position:relative;overflow:hidden;min-height:118px}
-.summary-card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:75%;background:linear-gradient(180deg,transparent 0%,rgba(245,237,216,0.15) 100%);pointer-events:none;border-radius:0 0 12px 12px;z-index:0}
-.summary-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:72px;pointer-events:none;z-index:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 70' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'%3E%3Cpath d='M0,55 C20,50 40,40 70,35 C100,30 130,38 160,30 C180,25 195,32 200,28 L200,70 L0,70 Z' fill='rgba(218,195,148,0.15)'/%3E%3Cpath d='M0,60 C30,52 60,45 100,40 C140,35 170,42 200,36 L200,70 L0,70 Z' fill='rgba(232,220,192,0.25)'/%3E%3Cpath d='M0,45 C25,42 50,30 80,28 C110,26 140,35 170,22 C190,15 200,20 200,18 L200,70 L0,70 Z' fill='rgba(212,175,55,0.06)'/%3E%3Cpath d='M0,40 Q50,25 100,30 Q150,35 200,20' fill='none' stroke='rgba(184,134,11,0.11)' stroke-width='1'/%3E%3Cpath d='M0,50 Q60,38 120,42 Q180,46 200,35' fill='none' stroke='rgba(184,134,11,0.08)' stroke-width='0.7'/%3E%3C/svg%3E");background-size:100% 100%;border-radius:0 0 12px 12px}
-.summary-card>*{position:relative;z-index:1}
-.summary-card:hover{border-color:rgba(212,175,55,0.7);box-shadow:0 6px 20px rgba(114,47,55,0.12),0 2px 6px rgba(114,47,55,0.08),inset 0 0 0 1px rgba(255,255,255,0.7);transform:translateY(-1px)}
-.sc-label{font-family:'Cinzel','Anuphan',serif;font-size:.65rem;font-weight:600;color:#8B6914;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
-.sc-value{font-family:'DM Serif Display','Sarabun',serif;font-size:1.6rem;font-weight:400;color:#5A3D20;line-height:1.15;letter-spacing:-0.01em;margin-bottom:6px}
-.sc-value.positive{color:#2E9F5F}
-.sc-value.negative{color:#C14545}
-.sc-value.neutral{color:#8B6914}
-.sc-desc{font-family:'Sarabun','Anuphan',sans-serif;font-size:.72rem;color:#7A6F62;line-height:1.5}
-.sc-desc strong{color:#5A3D20;font-weight:700}
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px}
+.metric-card{background:linear-gradient(160deg,var(--cream-card),#F8F2E4);border:1px solid rgba(212,175,55,0.18);border-radius:14px;padding:18px;position:relative;overflow:hidden;transition:all 0.3s;box-shadow:0 2px 12px rgba(114,47,55,0.04)}
+.metric-card:hover{border-color:rgba(212,175,55,0.35);transform:translateY(-3px);box-shadow:0 8px 28px rgba(114,47,55,0.08)}
+.metric-card .label{font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:500;margin-bottom:8px}
+.metric-card .value{font-family:var(--font-number);font-size:1.6rem;color:var(--text-heading)}
+.metric-card .value.positive{color:var(--green-dark)}.metric-card .value.negative{color:var(--red)}
+.metric-card .sub{font-size:0.7rem;color:var(--text-muted);margin-top:4px}
+.metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0}
+.metric-card.gold::before{background:linear-gradient(90deg,var(--gold-dark),var(--gold))}
+.metric-card.green-accent::before{background:var(--green)}.metric-card.red-accent::before{background:var(--red)}.metric-card.cyan-accent::before{background:var(--gold)}
 .chart-section{background:linear-gradient(160deg,var(--cream-card),#F8F2E4);border:1px solid rgba(212,175,55,0.15);border-radius:14px;padding:24px;margin-bottom:20px;box-shadow:0 2px 12px rgba(114,47,55,0.04)}
 .chart-section h2{font-size:1rem;font-weight:700;color:var(--text-heading);letter-spacing:1px;margin-bottom:16px;display:flex;align-items:center;gap:10px}
 .chart-section h2 .icon{width:24px;height:24px;background:var(--gold-dim);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.8rem}
@@ -115,8 +112,8 @@ tbody td.ticker{font-weight:700;color:var(--maroon)}
 .footer-sec .brand{font-weight:700;color:var(--gold);font-size:0.8rem;letter-spacing:0.15em;margin-bottom:6px}
 .footer-sec .disc{font-size:0.7rem;color:var(--text-light-muted);line-height:1.7}
 @media(max-width:1024px){.metrics-grid{grid-template-columns:repeat(3,1fr)}.chart-container{min-height:240px;height:35vw}}
-@media(max-width:768px){.chart-row{grid-template-columns:1fr}.metrics-grid{grid-template-columns:repeat(3,1fr);gap:10px}.summary-card{padding:12px 12px 16px;min-height:108px}.sc-value{font-size:1.3rem}.chart-container{min-height:220px;height:50vw;max-height:350px}.main-wrap{padding:0 12px 20px}.chart-section,.table-section{padding:16px}}
-@media(max-width:480px){.metrics-grid{grid-template-columns:repeat(2,1fr);gap:8px}.summary-card{padding:11px 11px 14px;min-height:100px}.sc-value{font-size:1.2rem}.sc-label{font-size:.58rem;letter-spacing:1.4px}.chart-container{min-height:200px;height:60vw}.header-title{font-size:1.4rem}.controls-row input[type="text"]{width:100%}.search-input-wrap{width:100%}.controls-row{flex-direction:column}}
+@media(max-width:768px){.chart-row{grid-template-columns:1fr}.metrics-grid{grid-template-columns:repeat(2,1fr)}.chart-container{min-height:220px;height:50vw;max-height:350px}.main-wrap{padding:0 12px 20px}.chart-section,.table-section{padding:16px}}
+@media(max-width:480px){.metrics-grid{grid-template-columns:1fr}.chart-container{min-height:200px;height:60vw}.header-title{font-size:1.4rem}.controls-row input[type="text"]{width:100%}.search-input-wrap{width:100%}.controls-row{flex-direction:column}}
 </style>
 </head>
 <body>
@@ -201,10 +198,8 @@ Chart.defaults.font.size = 11;
 let allStockData = {};
 let allDates = [];
 let chartInstances = {};
-let sectorMap = {};       // ticker -> GICS Sector
-let subSectorMap = {};    // ticker -> GICS Sub-Industry
-let allSectors = [];      // sorted unique sectors
-let allSubSectorsByMain = {}; // sector -> sorted unique sub-industries (for grouped dropdown)
+let sectorMap = {}; // ticker -> GICS Sector
+let allSectors = []; // sorted unique sectors
 
 function destroyChart(id) {
   if (chartInstances[id]) { chartInstances[id].destroy(); delete chartInstances[id]; }
@@ -245,23 +240,18 @@ async function init() {
     const csv = await res.text();
     rampOwlTo(65);
 
-    // Parse sector + sub-industry mapping
+    // Parse sector mapping
     if (sectorRes && sectorRes.ok) {
       const sectorCsv = await sectorRes.text();
       const sectorParsed = Papa.parse(sectorCsv.trim(), { header: true, skipEmptyLines: true });
       sectorParsed.data.forEach(row => {
         const sym = (row.Symbol || '').trim();
         const sector = (row['GICS Sector'] || '').trim();
-        const subSector = (row['GICS Sub-Industry'] || '').trim();
         if (sym && sector) sectorMap[sym] = sector;
-        if (sym && subSector) subSectorMap[sym] = subSector;
       });
-      // Handle BRK.B -> BRK-B style differences for both maps
+      // Handle BRK.B -> BRK-B style differences
       Object.keys(sectorMap).forEach(k => {
         if (k.includes('.')) sectorMap[k.replace('.', '-')] = sectorMap[k];
-      });
-      Object.keys(subSectorMap).forEach(k => {
-        if (k.includes('.')) subSectorMap[k.replace('.', '-')] = subSectorMap[k];
       });
     }
 
@@ -353,18 +343,6 @@ function processCSV(text) {
   allSectors = [...sectorSet].filter(s => s !== 'Unknown').sort();
   if (sectorSet.has('Unknown')) allSectors.push('Unknown');
 
-  // Build sub-industry list grouped by parent sector (for grouped dropdown)
-  allSubSectorsByMain = {};
-  metrics.forEach(m => {
-    if (!m.subSector || m.subSector === 'Unknown') return;
-    if (!allSubSectorsByMain[m.sector]) allSubSectorsByMain[m.sector] = new Set();
-    allSubSectorsByMain[m.sector].add(m.subSector);
-  });
-  // Convert sets to sorted arrays
-  Object.keys(allSubSectorsByMain).forEach(k => {
-    allSubSectorsByMain[k] = [...allSubSectorsByMain[k]].sort();
-  });
-
   renderDashboard(metrics, latest);
 }
 
@@ -437,14 +415,13 @@ function computeAllMetrics(tickers) {
     // Momentum score (composite)
     const momScore = (ret1m * 0.15 + ret3m * 0.25 + ret6m * 0.35 + ret1y * 0.25);
 
-    // Sector + Sub-Industry lookup
+    // Sector lookup
     const sector = sectorMap[ticker] || 'Unknown';
-    const subSector = subSectorMap[ticker] || 'Unknown';
 
     return {
       ticker, latest, ret1d, ret5d, ret1m, ret3m, ret6m, ret1y,
       vol20, sma50, sma200, aboveSma50, aboveSma200, rsi,
-      high52w, distFromHigh, momScore, volRatio, sector, subSector
+      high52w, distFromHigh, momScore, volRatio, sector
     };
   }).sort((a, b) => b.momScore - a.momScore);
 }
@@ -475,35 +452,35 @@ function renderDashboard(metrics, latestDate) {
   document.getElementById('mainContent').innerHTML = `
     <!-- METRIC CARDS -->
     <div class="metrics-grid">
-      <div class="summary-card">
-        <div class="sc-label">จำนวนหุ้นที่สแกน</div>
-        <div class="sc-value">${totalStocks}</div>
-        <div class="sc-desc">S&amp;P 500 Universe</div>
+      <div class="metric-card gold">
+        <div class="label">จำนวนหุ้นที่สแกน</div>
+        <div class="value">${totalStocks}</div>
+        <div class="sub">S&P 500 Universe</div>
       </div>
-      <div class="summary-card">
-        <div class="sc-label">Breadth (&gt; SMA200)</div>
-        <div class="sc-value ${bullish > bearish ? 'positive' : 'negative'}">${bullish} / ${totalStocks}</div>
-        <div class="sc-desc"><strong>${(bullish/totalStocks*100).toFixed(1)}%</strong> Bullish</div>
+      <div class="metric-card green-accent">
+        <div class="label">Breadth (> SMA200)</div>
+        <div class="value ${bullish > bearish ? 'positive' : 'negative'}">${bullish} / ${totalStocks}</div>
+        <div class="sub">${(bullish/totalStocks*100).toFixed(1)}% Bullish</div>
       </div>
-      <div class="summary-card">
-        <div class="sc-label">ผลตอบแทนเฉลี่ยวันนี้</div>
-        <div class="sc-value ${avgRet1d >= 0 ? 'positive' : 'negative'}">${avgRet1d >= 0 ? '+' : ''}${avgRet1d.toFixed(2)}%</div>
-        <div class="sc-desc">Equal-weighted Avg</div>
+      <div class="metric-card ${avgRet1d >= 0 ? 'green-accent' : 'red-accent'}">
+        <div class="label">ผลตอบแทนเฉลี่ยวันนี้</div>
+        <div class="value ${avgRet1d >= 0 ? 'positive' : 'negative'}">${avgRet1d >= 0 ? '+' : ''}${avgRet1d.toFixed(2)}%</div>
+        <div class="sub">Equal-weighted Avg</div>
       </div>
-      <div class="summary-card">
-        <div class="sc-label">AVG RSI (14)</div>
-        <div class="sc-value">${avgRSI.toFixed(1)}</div>
-        <div class="sc-desc">${avgRSI > 60 ? 'Overbought Zone' : avgRSI < 40 ? 'Oversold Zone' : 'Neutral Zone'}</div>
+      <div class="metric-card cyan-accent">
+        <div class="label">AVG RSI (14)</div>
+        <div class="value">${avgRSI.toFixed(1)}</div>
+        <div class="sub">${avgRSI > 60 ? 'Overbought Zone' : avgRSI < 40 ? 'Oversold Zone' : 'Neutral Zone'}</div>
       </div>
-      <div class="summary-card">
-        <div class="sc-label">Avg Momentum Score</div>
-        <div class="sc-value ${avgMom >= 0 ? 'positive' : 'negative'}">${avgMom >= 0 ? '+' : ''}${avgMom.toFixed(2)}</div>
-        <div class="sc-desc">Composite (1M&ndash;1Y weighted)</div>
+      <div class="metric-card ${avgMom >= 0 ? 'green-accent' : 'red-accent'}">
+        <div class="label">Avg Momentum Score</div>
+        <div class="value ${avgMom >= 0 ? 'positive' : 'negative'}">${avgMom >= 0 ? '+' : ''}${avgMom.toFixed(2)}</div>
+        <div class="sub">Composite (1M-1Y weighted)</div>
       </div>
-      <div class="summary-card">
-        <div class="sc-label">ข้อมูลวันล่าสุด</div>
-        <div class="sc-value" style="font-size:1.2rem">${latestDate}</div>
-        <div class="sc-desc">ย้อนหลัง 3 ปี</div>
+      <div class="metric-card gold">
+        <div class="label">ข้อมูลวันล่าสุด</div>
+        <div class="value" style="font-size:1.1rem;">${latestDate}</div>
+        <div class="sub">ย้อนหลัง 3 ปี</div>
       </div>
     </div>
 
@@ -560,13 +537,9 @@ function renderDashboard(metrics, latestDate) {
           <option value="os">RSI < 30 (Oversold)</option>
           <option value="neutral">RSI 30-70</option>
         </select>
-        <select id="filterSector" onchange="onSectorChange()">
+        <select id="filterSector" onchange="filterTable()">
           <option value="all">อุตสาหกรรมทั้งหมด</option>
           ${allSectors.map(s => `<option value="${s}">${s}</option>`).join('')}
-        </select>
-        <select id="filterSubSector" onchange="filterTable()">
-          <option value="all">หมวดย่อยทั้งหมด</option>
-          ${Object.keys(allSubSectorsByMain).sort().map(sec => `<optgroup label="${sec}">${allSubSectorsByMain[sec].map(sub => `<option value="${sub}">${sub}</option>`).join('')}</optgroup>`).join('')}
         </select>
       </div>
       <div style="overflow-x:auto;">
@@ -825,7 +798,6 @@ function renderTable() {
   const smaFilter = document.getElementById('filterSMA')?.value || 'all';
   const rsiFilter = document.getElementById('filterRSI')?.value || 'all';
   const sectorFilter = document.getElementById('filterSector')?.value || 'all';
-  const subSectorFilter = document.getElementById('filterSubSector')?.value || 'all';
 
   let filtered = currentMetrics.filter(m => {
     if (search && !m.ticker.includes(search)) return false;
@@ -837,7 +809,6 @@ function renderTable() {
     if (rsiFilter === 'os' && m.rsi >= 30) return false;
     if (rsiFilter === 'neutral' && (m.rsi < 30 || m.rsi > 70)) return false;
     if (sectorFilter !== 'all' && m.sector !== sectorFilter) return false;
-    if (subSectorFilter !== 'all' && m.subSector !== subSectorFilter) return false;
     return true;
   });
 
@@ -917,25 +888,6 @@ window.gotoScannerPage = function(p) {
 };
 
 function filterTable() { _scannerPage = 1; renderTable(); }
-
-// Cascading: when sector picked, rebuild sub-filter to that sector's sub-industries only.
-// 'all' restores full grouped list.
-function onSectorChange() {
-  const sectorVal = document.getElementById('filterSector').value;
-  const subSel = document.getElementById('filterSubSector');
-  if (!subSel) { filterTable(); return; }
-  let optionsHtml = '<option value="all">หมวดย่อยทั้งหมด</option>';
-  if (sectorVal === 'all') {
-    optionsHtml += Object.keys(allSubSectorsByMain).sort().map(sec =>
-      `<optgroup label="${sec}">${allSubSectorsByMain[sec].map(sub => `<option value="${sub}">${sub}</option>`).join('')}</optgroup>`
-    ).join('');
-  } else if (allSubSectorsByMain[sectorVal]) {
-    optionsHtml += allSubSectorsByMain[sectorVal].map(sub => `<option value="${sub}">${sub}</option>`).join('');
-  }
-  subSel.innerHTML = optionsHtml;
-  subSel.value = 'all';
-  filterTable();
-}
 
 function setupTableSort(metrics) {
   document.querySelectorAll('#stockTable thead th').forEach(th => {
