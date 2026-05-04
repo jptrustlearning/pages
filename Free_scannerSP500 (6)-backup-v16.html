@@ -622,18 +622,11 @@ function renderDashboard(metrics, latestDate) {
           <option value="neutral">RSI 30-70</option>
         </select>
         <select id="filterVol" onchange="filterTable()">
-          <option value="all">Volatility ทั้งหมด</option>
-          <option value="low">Volatility ต่ำ (&lt; 25%)</option>
-          <option value="mid">Volatility ปานกลาง (25-40%)</option>
-          <option value="high">Volatility สูง (40-60%)</option>
-          <option value="vhigh">Volatility สูงมาก (≥ 60%)</option>
-        </select>
-        <select id="filterVolRatio" onchange="filterTable()">
-          <option value="all">Volume Ratio ทั้งหมด</option>
-          <option value="surge">Volume Surge (≥ 1.5×)</option>
-          <option value="high">Volume สูงกว่าปกติ (1.2-1.5×)</option>
-          <option value="normal">Volume ปกติ (0.8-1.2×)</option>
-          <option value="drying">Volume แห้ง (&lt; 0.8×)</option>
+          <option value="all">ความผันผวนทั้งหมด</option>
+          <option value="low">ต่ำ (&lt; 25%)</option>
+          <option value="mid">ปานกลาง (25-40%)</option>
+          <option value="high">สูง (40-60%)</option>
+          <option value="vhigh">สูงมาก (≥ 60%)</option>
         </select>
         <button type="button" class="cust-picker-trigger" id="filterSectorBtn" onclick="openPicker('Sector')">
           <span class="cpt-label" id="filterSectorLabel">อุตสาหกรรมทั้งหมด</span>
@@ -662,8 +655,8 @@ function renderDashboard(metrics, latestDate) {
               <th data-col="ret6m">6M %</th>
               <th data-col="ret1y">1Y %</th>
               <th data-col="rsi">RSI</th>
-              <th data-col="vol20">Volatility 20D</th>
-              <th data-col="volRatio">Volume Ratio</th>
+              <th data-col="vol20">Vol 20D</th>
+              <th data-col="volRatio">Vol Ratio</th>
               <th data-col="distFromHigh">vs 52W High</th>
               <th data-col="momScore">Mom Score</th>
             </tr>
@@ -980,7 +973,6 @@ function renderTable() {
   const sectorFilter = document.getElementById('filterSector')?.value || 'all';
   const subSectorFilter = document.getElementById('filterSubSector')?.value || 'all';
   const volFilter = document.getElementById('filterVol')?.value || 'all';
-  const volRatioFilter = document.getElementById('filterVolRatio')?.value || 'all';
 
   let filtered = currentMetrics.filter(m => {
     if (search && !m.ticker.includes(search)) return false;
@@ -997,10 +989,6 @@ function renderTable() {
     if (volFilter === 'mid'   && !(m.vol20 >= 25 && m.vol20 < 40)) return false;
     if (volFilter === 'high'  && !(m.vol20 >= 40 && m.vol20 < 60)) return false;
     if (volFilter === 'vhigh' && !(m.vol20 >= 60)) return false;
-    if (volRatioFilter === 'surge'  && !(m.volRatio >= 1.5)) return false;
-    if (volRatioFilter === 'high'   && !(m.volRatio >= 1.2 && m.volRatio < 1.5)) return false;
-    if (volRatioFilter === 'normal' && !(m.volRatio >= 0.8 && m.volRatio < 1.2)) return false;
-    if (volRatioFilter === 'drying' && !(m.volRatio < 0.8)) return false;
     return true;
   });
 
