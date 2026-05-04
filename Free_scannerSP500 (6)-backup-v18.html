@@ -123,10 +123,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
   .cp-head{border-radius:16px 16px 0 0}
 }
 @media(max-width:600px){
-  .controls-row{flex-wrap:wrap;gap:10px}
-  .search-input-wrap{flex:1 1 100%;width:100%;max-width:100%;min-width:0}
-  .controls-row select,
-  .cust-picker-trigger{flex:1 1 calc(50% - 5px);min-width:0;max-width:calc(50% - 5px)}
+  .cust-picker-trigger{min-width:0;flex:1;max-width:100%}
 }
 table{width:100%;border-collapse:collapse;font-size:0.8rem}
 thead th{text-align:left;padding:10px 12px;color:var(--gold-dark);font-weight:600;font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid rgba(212,175,55,0.15);white-space:nowrap;cursor:pointer;user-select:none}
@@ -171,7 +168,7 @@ tbody tr:hover td.col-sticky{background-color:#FBF4DC}
 .footer-sec .disc{font-size:0.7rem;color:var(--text-light-muted);line-height:1.7}
 @media(max-width:1024px){.metrics-grid{grid-template-columns:repeat(3,1fr)}.chart-container{min-height:240px;height:35vw}}
 @media(max-width:768px){.chart-row{grid-template-columns:1fr}.metrics-grid{grid-template-columns:repeat(3,1fr);gap:10px}.summary-card{padding:12px 12px 16px;min-height:108px}.sc-value{font-size:1.3rem}.chart-container{min-height:220px;height:50vw;max-height:350px}.main-wrap{padding:0 12px 20px}.chart-section,.table-section{padding:16px}}
-@media(max-width:480px){.metrics-grid{grid-template-columns:repeat(2,1fr);gap:8px}.summary-card{padding:11px 11px 14px;min-height:100px}.sc-value{font-size:1.2rem}.sc-label{font-size:.58rem;letter-spacing:1.4px}.chart-container{min-height:200px;height:60vw}.header-title{font-size:1.4rem}}
+@media(max-width:480px){.metrics-grid{grid-template-columns:repeat(2,1fr);gap:8px}.summary-card{padding:11px 11px 14px;min-height:100px}.sc-value{font-size:1.2rem}.sc-label{font-size:.58rem;letter-spacing:1.4px}.chart-container{min-height:200px;height:60vw}.header-title{font-size:1.4rem}.controls-row input[type="text"]{width:100%}.search-input-wrap{width:100%}.controls-row{flex-direction:column}}
 </style>
 </head>
 <body>
