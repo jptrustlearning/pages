@@ -110,10 +110,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .cp-option-sub{padding-left:30px;font-size:0.88rem;color:#5A3D20}
 .cp-opt-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cp-opt-count{margin-left:8px;flex-shrink:0;font-family:'DM Serif Display','Sarabun',serif;color:#8B6914;font-size:0.92rem;font-weight:400;letter-spacing:0}
-.cp-group-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 18px 7px;font-family:'Cinzel','Anuphan',serif;font-size:0.7rem;font-weight:700;color:#8B6914;letter-spacing:1.6px;text-transform:uppercase;background:linear-gradient(90deg,rgba(212,175,55,0.13) 0%,rgba(212,175,55,0.02) 100%);border-top:1px solid rgba(212,175,55,0.30);border-left:3px solid #D4AF37;border-right:none;border-bottom:none;margin-top:6px;width:100%;cursor:pointer;text-align:left;font-family:'Cinzel','Anuphan',serif;transition:background .12s}
-.cp-group-header:hover{background:linear-gradient(90deg,rgba(212,175,55,0.24) 0%,rgba(212,175,55,0.06) 100%);color:#722F37}
-.cp-group-header:active{background:linear-gradient(90deg,rgba(212,175,55,0.32) 0%,rgba(212,175,55,0.10) 100%)}
-.cp-group-header.is-selected{background:linear-gradient(90deg,rgba(212,175,55,0.32) 0%,rgba(212,175,55,0.10) 100%);color:#722F37;border-left-width:4px}
+.cp-group-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 18px 7px;font-family:'Cinzel','Anuphan',serif;font-size:0.7rem;font-weight:700;color:#8B6914;letter-spacing:1.6px;text-transform:uppercase;background:linear-gradient(90deg,rgba(212,175,55,0.13) 0%,rgba(212,175,55,0.02) 100%);border-top:1px solid rgba(212,175,55,0.30);border-left:3px solid #D4AF37;margin-top:6px;pointer-events:none}
 .cp-group-header:first-of-type{margin-top:8px}
 .cp-group-count{font-family:'DM Serif Display','Sarabun',serif;color:#B8860B;font-size:0.95rem;font-weight:400;letter-spacing:0;text-transform:none}
 
@@ -1044,10 +1041,7 @@ function buildSubBody(){
   if (sectorVal === 'all') {
     Object.keys(allSubSectorsByMain).sort().forEach(sec => {
       const secCnt = sectorStockCount[sec]||0;
-      const headerSel = PICKER_STATE.Sector.value === sec ? 'is-selected' : '';
-      h += `<button type="button" class="cp-group-header ${headerSel}" data-sector="${escapeAttr(sec)}">
-        <span>${escapeText(sec)}</span><span class="cp-group-count">${secCnt}</span>
-      </button>`;
+      h += `<div class="cp-group-header"><span>${escapeText(sec)}</span><span class="cp-group-count">${secCnt}</span></div>`;
       allSubSectorsByMain[sec].forEach(sub => {
         const lbl = `${sub.name} (${sub.count})`;
         h += `<button class="cp-option cp-option-sub ${sel===sub.name?'is-selected':''}" data-v="${escapeAttr(sub.name)}" data-l="${escapeAttr(lbl)}">
@@ -1084,12 +1078,6 @@ function openPicker(which){
       selectOption(which, btn.dataset.v, btn.dataset.l);
     });
   });
-  // Wire group-header clicks (only present in Sub picker when sector='all')
-  body.querySelectorAll('.cp-group-header').forEach(btn => {
-    btn.addEventListener('click', () => {
-      pickMainFromSubPicker(btn.dataset.sector);
-    });
-  });
   // Scroll to selected (if any)
   setTimeout(() => {
     const selEl = body.querySelector('.cp-option.is-selected');
@@ -1120,29 +1108,6 @@ function selectOption(which, value, label){
     if (subH) subH.value = 'all';
     if (subL) subL.textContent = 'หมวดย่อยทั้งหมด';
   }
-  closePicker();
-  filterTable();
-}
-
-// Click a group header (parent sector) inside the Sub picker → filter by that
-// main sector with sub reset to 'all'. Quick shortcut so user doesn't have to
-// open the separate Sector picker just to filter by an entire group.
-function pickMainFromSubPicker(sectorName){
-  if (!sectorName) return;
-  const cnt = sectorStockCount[sectorName] || 0;
-  PICKER_STATE.Sector.value = sectorName;
-  PICKER_STATE.Sector.label = `${sectorName} (${cnt})`;
-  PICKER_STATE.SubSector.value = 'all';
-  PICKER_STATE.SubSector.label = 'หมวดย่อยทั้งหมด';
-  // Sync hidden inputs + button labels
-  const secH = document.getElementById('filterSector');
-  const secL = document.getElementById('filterSectorLabel');
-  const subH = document.getElementById('filterSubSector');
-  const subL = document.getElementById('filterSubSectorLabel');
-  if (secH) secH.value = sectorName;
-  if (secL) secL.textContent = PICKER_STATE.Sector.label;
-  if (subH) subH.value = 'all';
-  if (subL) subL.textContent = 'หมวดย่อยทั้งหมด';
   closePicker();
   filterTable();
 }
