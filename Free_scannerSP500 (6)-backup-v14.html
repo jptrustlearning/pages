@@ -141,7 +141,7 @@ tbody tr:hover td.col-sticky{background-color:#FBF4DC}
 /* ===== SWIPE-RIGHT HINT (briefly shown when table first renders) ===== */
 .table-scroll-host{position:relative}
 .table-scroll-container{overflow-x:auto;max-width:100%}
-.swipe-hint{position:absolute;top:56px;left:50%;transform:translateX(-50%);z-index:10;background:rgba(26,10,14,0.88);color:#F4E4BA;padding:11px 20px;border-radius:999px;font-family:'Anuphan',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:0.4px;box-shadow:0 6px 22px rgba(26,10,14,0.40),0 0 0 1px rgba(212,175,55,0.35);display:none;align-items:center;gap:10px;pointer-events:none;white-space:nowrap;opacity:0;transition:opacity .35s ease}
+.swipe-hint{position:absolute;top:54%;left:50%;transform:translate(-50%,-50%);z-index:10;background:rgba(26,10,14,0.88);color:#F4E4BA;padding:11px 20px;border-radius:999px;font-family:'Anuphan',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:0.4px;box-shadow:0 6px 22px rgba(26,10,14,0.40),0 0 0 1px rgba(212,175,55,0.35);display:none;align-items:center;gap:10px;pointer-events:none;white-space:nowrap;opacity:0;transition:opacity .35s ease}
 .swipe-hint.show{display:inline-flex;opacity:1}
 .swipe-hint.fade-out{opacity:0}
 .sh-icon{width:30px;height:15px;flex-shrink:0;color:#F4E4BA;animation:shSlide 1.4s ease-in-out infinite}
@@ -682,69 +682,30 @@ function renderDashboard(metrics, latestDate) {
   renderRankingChart();
 }
 
-// Show a brief "swipe right" overlay over the stock table to signal columns
-// extend off-screen. Re-triggers EVERY TIME the table re-enters the viewport
-// (e.g. user scrolled past then back, or clicked Library card again — iframe
-// reload also re-runs this function).
-//
-// Behavior:
-// - First time table is ≥15% visible → hint fades in.
-// - Hint auto-dismisses after 4.5s OR on first horizontal scroll (>5px).
-// - Subsequent enter-viewport events re-trigger hint, gated by a 2s cooldown
-//   from the last dismiss to prevent flickering on quick scroll up/down.
+// Show a brief "swipe right" overlay over the stock table the first time it
+// renders, to signal that columns extend off-screen. Auto-hides after 5s OR
+// on first horizontal scroll (whichever comes first). Re-shows on every page
+// open (e.g. when the user re-clicks the Library card).
 function setupSwipeHint() {
   const hint = document.getElementById('swipeHint');
   const scrollWrap = document.getElementById('tableScrollContainer');
-  if (!hint || !scrollWrap || !window.IntersectionObserver) return;
-
-  const REOPEN_COOLDOWN_MS = 2000;
-  const SHOW_DURATION_MS   = 4500;
-  const FADE_OUT_MS        = 400;
-
-  let isShowing = false;
-  let lastDismissedAt = 0;
-  let dismissTimer = null;
-  let fadeOutTimer = null;
-
-  function showHint() {
-    if (isShowing) return;
-    if (Date.now() - lastDismissedAt < REOPEN_COOLDOWN_MS) return;
-    isShowing = true;
-    if (fadeOutTimer) { clearTimeout(fadeOutTimer); fadeOutTimer = null; }
-    hint.style.display = 'inline-flex';
-    void hint.offsetWidth; // force reflow so transition triggers
-    hint.classList.remove('fade-out');
+  if (!hint || !scrollWrap) return;
+  // Show with a slight delay so layout settles
+  setTimeout(() => {
     hint.classList.add('show');
-    if (dismissTimer) clearTimeout(dismissTimer);
-    dismissTimer = setTimeout(dismissHint, SHOW_DURATION_MS);
-  }
-
-  function dismissHint() {
-    if (!isShowing) return;
-    isShowing = false;
-    lastDismissedAt = Date.now();
-    if (dismissTimer) { clearTimeout(dismissTimer); dismissTimer = null; }
+  }, 250);
+  let dismissed = false;
+  const dismiss = () => {
+    if (dismissed) return;
+    dismissed = true;
     hint.classList.add('fade-out');
-    if (fadeOutTimer) clearTimeout(fadeOutTimer);
-    fadeOutTimer = setTimeout(() => {
-      hint.style.display = 'none';
-      hint.classList.remove('show', 'fade-out');
-    }, FADE_OUT_MS);
-  }
-
-  // Horizontal scroll inside the table dismisses the hint immediately
-  scrollWrap.addEventListener('scroll', () => {
-    if (scrollWrap.scrollLeft > 5) dismissHint();
-  }, { passive: true });
-
-  // IntersectionObserver — fires every time the table crosses the visibility
-  // threshold (i.e. enters the viewport). Cooldown prevents rapid re-firing.
-  const io = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) showHint();
-    });
-  }, { threshold: 0.15 });
-  io.observe(scrollWrap);
+    setTimeout(() => { hint.style.display = 'none'; }, 400);
+    scrollWrap.removeEventListener('scroll', onScroll);
+  };
+  const onScroll = () => { if (scrollWrap.scrollLeft > 5) dismiss(); };
+  scrollWrap.addEventListener('scroll', onScroll, { passive: true });
+  // Auto-dismiss timeout
+  setTimeout(dismiss, 5000);
 }
 
 // ===== TOP/BOTTOM RANKING CHART (with mode tabs) =====
