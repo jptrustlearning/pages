@@ -1106,53 +1106,6 @@ body > * { position: relative; z-index: 1; }
 }
 
 /* ============================================================
-   QUOTE SECTION — between Planning Toolkit and Learning section (v18)
-   ============================================================ */
-.brand-quote {
-  max-width: 720px;
-  margin: 36px auto 26px;
-  padding: 0 28px;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  position: relative;
-}
-.brand-quote::before,
-.brand-quote::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, transparent 0%, rgba(184,134,11,0.4) 50%, transparent 100%);
-  max-width: 80px;
-}
-.bq-mark {
-  font-family: 'DM Serif Display', serif;
-  font-size: 2.4rem;
-  color: var(--gold);
-  line-height: 0;
-  position: relative;
-  top: 8px;
-}
-.bq-text {
-  font-family: 'DM Serif Display', serif;
-  font-style: italic;
-  font-size: 1.2rem;
-  color: var(--maroon);
-  letter-spacing: 0.4px;
-  line-height: 1.3;
-  white-space: nowrap;
-}
-@media (max-width: 480px) {
-  .brand-quote { margin: 26px auto 20px; padding: 0 16px; gap: 6px; }
-  .brand-quote::before,
-  .brand-quote::after { max-width: 28px; }
-  .bq-mark { font-size: 1.9rem; top: 6px; }
-  .bq-text { font-size: 0.98rem; letter-spacing: 0.2px; }
-}
-
-/* ============================================================
    NEW JPTRUST LEARNING SECTION — Calendar redesign (v11)
    ============================================================ */
 
@@ -1230,43 +1183,6 @@ body > * { position: relative; z-index: 1; }
   gap: 12px;
   margin-bottom: 18px;
 }
-.hero-cards.single {
-  grid-template-columns: 1fr;
-}
-
-/* Floating settings button — top-right corner of progress card */
-.pc-settings-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1.5px solid var(--border-gold);
-  background: rgba(255,254,248,0.85);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  z-index: 2;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(114,47,55,0.06);
-}
-.pc-settings-btn:hover {
-  border-color: var(--gold);
-  background: var(--cream-card);
-  transform: rotate(45deg);
-  box-shadow: 0 4px 10px rgba(114,47,55,0.1);
-}
-.pc-settings-btn svg {
-  width: 18px;
-  height: 18px;
-  color: var(--maroon);
-}
-@media (max-width: 480px) {
-  .pc-settings-btn { width: 32px; height: 32px; top: 10px; right: 10px; }
-  .pc-settings-btn svg { width: 16px; height: 16px; }
-}
-
 .greet-card,
 .progress-card {
   background: linear-gradient(180deg, var(--cream-card) 0%, var(--cream) 70%, var(--cream-deep) 100%);
@@ -1336,7 +1252,7 @@ body > * { position: relative; z-index: 1; }
 }
 .pc-spark {
   position: absolute;
-  top: 18px; right: 58px;
+  top: 14px; right: 14px;
   width: 100px; height: 50px;
   pointer-events: none;
 }
@@ -1368,7 +1284,7 @@ body > * { position: relative; z-index: 1; }
   .hero-cards { grid-template-columns: 1fr; gap: 10px; }
   .greet-name { font-size: 1.45rem; }
   .pc-big { font-size: 2.6rem; }
-  .pc-spark { width: 80px; height: 40px; top: 18px; right: 50px; }
+  .pc-spark { width: 90px; height: 44px; top: 16px; right: 14px; }
 }
 
 /* ===== Status legend ===== */
@@ -2050,25 +1966,67 @@ body > * { position: relative; z-index: 1; }
   </div>
 </section>
 
-<!-- ===== QUOTE — between Planning Toolkit and JPTrust Learning ===== -->
-<section class="brand-quote">
-  <span class="bq-mark bq-open">“</span>
-  <span class="bq-text">Discipline Today, Freedom Tomorrow.</span>
-  <span class="bq-mark bq-close">”</span>
-</section>
-
-<!-- ===== JPTRUST LEARNING SECTION (calendar + progress) ===== -->
+<!-- ===== JPTRUST LEARNING SECTION (NEW DESIGN — calendar + progress) ===== -->
 <section class="learning-section">
 
-  <!-- Cycle Progress card (full width) — settings gear floats top-right -->
-  <div class="hero-cards single">
-    <div class="progress-card">
-      <button class="pc-settings-btn" onclick="openRoadmapSettings()" aria-label="ตั้งค่า Roadmap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Brand header -->
+  <div class="learning-header">
+    <div class="lh-brand">
+      <div class="lh-owl">
+        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4">
+          <!-- owl body silhouette -->
+          <path d="M32 8 C20 8, 12 18, 12 32 C12 46, 20 56, 32 56 C44 56, 52 46, 52 32 C52 18, 44 8, 32 8 Z"/>
+          <!-- ear tufts -->
+          <path d="M18 12 L22 6 L24 14"/>
+          <path d="M46 12 L42 6 L40 14"/>
+          <!-- left eye -->
+          <circle cx="24" cy="28" r="6.5"/>
+          <circle cx="24" cy="28" r="2.2" fill="currentColor"/>
+          <!-- right eye -->
+          <circle cx="40" cy="28" r="6.5"/>
+          <circle cx="40" cy="28" r="2.2" fill="currentColor"/>
+          <!-- beak -->
+          <path d="M32 33 L29 38 L35 38 Z" fill="currentColor"/>
+        </svg>
+      </div>
+      <div class="lh-text">
+        <div class="lh-title">JP TRUST</div>
+        <div class="lh-tagline">Discipline Today, Freedom Tomorrow.</div>
+      </div>
+    </div>
+    <div class="lh-actions">
+      <button class="lh-btn has-dot" id="bellBtn" onclick="onBellClick()" aria-label="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+          <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+        </svg>
+      </button>
+      <button class="lh-btn" id="settingsBtn" onclick="openRoadmapSettings()" aria-label="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3"/>
           <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
         </svg>
       </button>
+    </div>
+  </div>
+
+  <!-- Greeting + Progress row -->
+  <div class="hero-cards">
+
+    <!-- Greeting card -->
+    <div class="greet-card">
+      <div class="greet-line">สวัสดี, ยินดีต้อนรับ</div>
+      <div class="greet-name" id="greetName">@JPtrust</div>
+      <div class="greet-tag">
+        <svg class="gt-star" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="12,2 15,8.5 22,9.3 17,14.2 18.2,21 12,17.8 5.8,21 7,14.2 2,9.3 9,8.5"/>
+        </svg>
+        <span>Stay Consistent,<br>Get Closer to Freedom.</span>
+      </div>
+    </div>
+
+    <!-- Progress card -->
+    <div class="progress-card">
       <div class="pc-label">Cycle <span id="pcCycleNum">1</span> Progress</div>
       <div class="pc-numbers">
         <span class="pc-big" id="pcDayNum">—</span>
@@ -2081,6 +2039,7 @@ body > * { position: relative; z-index: 1; }
         <div class="pc-pct" id="pcPct">0%</div>
       </div>
     </div>
+
   </div>
 </section>
 
