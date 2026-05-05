@@ -3414,22 +3414,19 @@ function runCombinedBacktest() {
     }
   }
 
-  // ===== PENDING SIGNAL: Check if the last Friday in data has a signal but no Monday entry yet =====
+  // ===== PENDING SIGNAL: elastic preview of the next Monday entry =====
+  // Mirrors the calendar-driven approach used by 6M Momentum and Rolling 6M:
+  //   - The pending card is ALWAYS shown once we're past the last consumed entry.
+  //   - plannedEntry is calendar-driven = lastEntryDate + 7 days, rolled forward
+  //     for US market holidays (e.g. MLK Day, Memorial Day, Good Friday).
+  //   - signalDate just records the "data through" date that picks are computed at,
+  //     so the preview becomes more accurate as the week progresses (Mon → Fri close).
   state.pendingSignal = null;
   if(state.fridayDates.length > 0) {
     const lastFriday = state.fridayDates[state.fridayDates.length - 1];
     const lastEntryDate = state.entryDates.length > 0 ? state.entryDates[state.entryDates.length - 1] : null;
-    // Pending requires BOTH:
-    //   (a) lastFriday is strictly LATER than the signal date that produced lastEntryDate
-    //       (i.e., a fresh signal not yet consumed by a Monday entry), AND
-    //   (b) lastFriday is the actual LAST TRADING DAY of its calendar week — Mon/Tue/Wed/Thu
-    //       of the current incomplete week must NOT trigger pending. Good Friday weeks correctly
-    //       qualify on Thursday because Friday is closed.
-    // The previous check `lastFriday >= lastEntryDate` falsely triggered on the same Monday a new
-    // entry was just opened (e.g., data through Mon MAY-04, entry MAY-04 → pending MAY-05).
-    const lastEntrySignal = lastEntryDate ? state.fridayForEntry[lastEntryDate] : null;
-    const isWeekComplete = _isLastTradingDayOfWeek(lastFriday);
-    const hasPendingWeek = !lastEntryDate || (lastFriday > (lastEntrySignal || '') && isWeekComplete);
+    // Loose gate: any data on/after the last entry → eligible for preview.
+    const hasPendingWeek = !lastEntryDate || lastFriday >= lastEntryDate;
 
     if(hasPendingWeek) {
       // Check regime
@@ -3459,8 +3456,25 @@ function runCombinedBacktest() {
             else if(momPicks.length === 0 && dhPicks.length > 0) { pDhCap += pMomCap; pMomCap = 0; }
           }
 
+          // Calendar-driven planned entry date — Monday after the last entry (or
+          // first trading day after lastFriday for cold start). Holiday-rolled so
+          // MLK Day / Memorial Day / Labor Day / Good Friday / etc. are skipped.
+          let plannedEntry;
+          if (lastEntryDate) {
+            const _pe = new Date(lastEntryDate + 'T00:00:00Z');
+            _pe.setUTCDate(_pe.getUTCDate() + 7);
+            while(_isUSMarketClosedShared(_pe)) _pe.setUTCDate(_pe.getUTCDate() + 1);
+            plannedEntry = _pe.toISOString().substring(0, 10);
+          } else {
+            const _pe = new Date(lastFriday + 'T00:00:00Z');
+            _pe.setUTCDate(_pe.getUTCDate() + 1);
+            while(_isUSMarketClosedShared(_pe)) _pe.setUTCDate(_pe.getUTCDate() + 1);
+            plannedEntry = _pe.toISOString().substring(0, 10);
+          }
+
           state.pendingSignal = {
             signalDate: lastFriday,
+            plannedEntry: plannedEntry,
             regime,
             momPicks: momPicks.map(s => ({ ticker: s.ticker, roc: s.roc, rsi: s.rsi })),
             dhPicks: dhPicks.map(dh => ({
@@ -4734,17 +4748,18 @@ function renderTradeLog() {
     const totalCap = (ps.momPicks.length > 0 ? ps.momCapital : 0) + (ps.dhPicks.length > 0 ? ps.dhCapital : 0);
     const confirmedCount = ps.dhPicks.filter(d => d.isConfirmed).length;
 
-    // Compute planned next entry date — first trading day after signal (typically Mon, but could be Tue after MLK / Memorial Day etc.)
-    // Defers to module-level _isUSMarketClosedShared which now also handles Good Friday.
+    // Calendar-driven planned entry — set during pendingSignal generation so the date is
+    // independent of signalDate and matches the 6M / Rolling 6M strategies' approach.
+    // Fallback (signal+1 trading day) preserved for any cached state that predates this field.
     const _isUSMarketClosed = _isUSMarketClosedShared;
-    const _nextEntryFromSignal = (signalStr) => {
-      const d = new Date(signalStr + 'T00:00:00Z');
-      d.setUTCDate(d.getUTCDate() + 1);
-      while(_isUSMarketClosed(d)) d.setUTCDate(d.getUTCDate() + 1);
-      return d;
-    };
-    const entryDateObj = _nextEntryFromSignal(ps.signalDate);
-    const plannedEntry = entryDateObj.toISOString().substring(0, 10);
+    let plannedEntry = ps.plannedEntry;
+    if (!plannedEntry) {
+      const _d = new Date(ps.signalDate + 'T00:00:00Z');
+      _d.setUTCDate(_d.getUTCDate() + 1);
+      while(_isUSMarketClosed(_d)) _d.setUTCDate(_d.getUTCDate() + 1);
+      plannedEntry = _d.toISOString().substring(0, 10);
+    }
+    const entryDateObj = new Date(plannedEntry + 'T00:00:00Z');
     const dayNamesThai = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
     const entryDayName = dayNamesThai[entryDateObj.getUTCDay()];
 
