@@ -2429,6 +2429,68 @@ let charts = {};
 let dataLoaded = false;
 let debounceTimer = null;
 
+// ============================================================
+// US market calendar helpers — shared across pendingSignal generation and trade-log rendering.
+// Includes Good Friday (movable feast computed via Anonymous Gregorian Easter algorithm)
+// so that "last trading day of the calendar week" detection is correct for Easter weeks.
+// ============================================================
+const _USMC_GOOD_FRIDAY_CACHE = {};
+function _USMC_goodFriday(year) {
+  if (_USMC_GOOD_FRIDAY_CACHE[year]) return _USMC_GOOD_FRIDAY_CACHE[year];
+  const a = year % 19, b = Math.floor(year / 100), c = year % 100;
+  const d = Math.floor(b / 4), e = b % 4;
+  const f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3);
+  const h = (19*a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4), k = c % 4;
+  const L = (32 + 2*e + 2*i - h - k) % 7;
+  const mm = Math.floor((a + 11*h + 22*L) / 451);
+  const easterMonth = Math.floor((h + L - 7*mm + 114) / 31); // 3=Mar, 4=Apr
+  const easterDay = ((h + L - 7*mm + 114) % 31) + 1;
+  const dt = new Date(Date.UTC(year, easterMonth - 1, easterDay));
+  dt.setUTCDate(dt.getUTCDate() - 2);  // Good Friday = Easter - 2 days
+  const result = { month: dt.getUTCMonth(), day: dt.getUTCDate() };
+  _USMC_GOOD_FRIDAY_CACHE[year] = result;
+  return result;
+}
+function _isUSMarketClosedShared(d) {
+  const y=d.getUTCFullYear(), m=d.getUTCMonth(), dd=d.getUTCDate(), wd=d.getUTCDay();
+  if(wd === 0 || wd === 6) return true; // weekends
+  if(wd === 1) {
+    if(m === 0 && dd >= 15 && dd <= 21) return true; // MLK Day (3rd Mon Jan)
+    if(m === 1 && dd >= 15 && dd <= 21) return true; // Presidents Day (3rd Mon Feb)
+    if(m === 4 && dd >= 25 && dd <= 31) return true; // Memorial Day (last Mon May)
+    if(m === 8 && dd >= 1 && dd <= 7)   return true; // Labor Day (1st Mon Sep)
+  }
+  if(wd === 4 && m === 10 && dd >= 22 && dd <= 28) return true; // Thanksgiving (4th Thu Nov)
+  const gf = _USMC_goodFriday(y);
+  if(m === gf.month && dd === gf.day) return true; // Good Friday
+  const fixed = [[0,1],[5,19],[6,4],[11,25]]; // Jan 1, Jun 19 (Juneteenth), Jul 4, Dec 25
+  for(const [fm, fd] of fixed) {
+    const real = new Date(Date.UTC(y, fm, fd));
+    let obsM = fm, obsD = fd;
+    if(real.getUTCDay() === 6) { obsD = fd - 1; }       // Sat → observed Fri
+    else if(real.getUTCDay() === 0) { obsD = fd + 1; }  // Sun → observed Mon
+    if(m === obsM && dd === obsD) return true;
+  }
+  return false;
+}
+// Returns true if `dateStr` (YYYY-MM-DD) is the last trading day of its calendar week.
+// Walks forward from the next day through Saturday, returning false if any
+// remaining weekday in this same week is a trading day (week not yet complete).
+// Handles the Good Friday case (Thu before Easter Friday → still last trading day).
+function _isLastTradingDayOfWeek(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00Z');
+  const dow = d.getUTCDay();
+  if (dow === 6 || dow === 0) return true;  // shouldn't reach here, but safe
+  const next = new Date(d);
+  next.setUTCDate(next.getUTCDate() + 1);
+  while (next.getUTCDay() !== 0 && next.getUTCDay() !== 6) {
+    if (!_isUSMarketClosedShared(next)) return false;
+    next.setUTCDate(next.getUTCDate() + 1);
+  }
+  return true;
+}
+
 // ====== DOM ======
 const el = {
   input: document.getElementById('csvFile'),
@@ -3357,8 +3419,17 @@ function runCombinedBacktest() {
   if(state.fridayDates.length > 0) {
     const lastFriday = state.fridayDates[state.fridayDates.length - 1];
     const lastEntryDate = state.entryDates.length > 0 ? state.entryDates[state.entryDates.length - 1] : null;
-    // If last Friday is AFTER the last entry date (or same week but no Open data), we have a pending signal
-    const hasPendingWeek = !lastEntryDate || lastFriday >= lastEntryDate;
+    // Pending requires BOTH:
+    //   (a) lastFriday is strictly LATER than the signal date that produced lastEntryDate
+    //       (i.e., a fresh signal not yet consumed by a Monday entry), AND
+    //   (b) lastFriday is the actual LAST TRADING DAY of its calendar week — Mon/Tue/Wed/Thu
+    //       of the current incomplete week must NOT trigger pending. Good Friday weeks correctly
+    //       qualify on Thursday because Friday is closed.
+    // The previous check `lastFriday >= lastEntryDate` falsely triggered on the same Monday a new
+    // entry was just opened (e.g., data through Mon MAY-04, entry MAY-04 → pending MAY-05).
+    const lastEntrySignal = lastEntryDate ? state.fridayForEntry[lastEntryDate] : null;
+    const isWeekComplete = _isLastTradingDayOfWeek(lastFriday);
+    const hasPendingWeek = !lastEntryDate || (lastFriday > (lastEntrySignal || '') && isWeekComplete);
 
     if(hasPendingWeek) {
       // Check regime
@@ -4664,26 +4735,8 @@ function renderTradeLog() {
     const confirmedCount = ps.dhPicks.filter(d => d.isConfirmed).length;
 
     // Compute planned next entry date — first trading day after signal (typically Mon, but could be Tue after MLK / Memorial Day etc.)
-    const _isUSMarketClosed = (d) => {
-      const y=d.getUTCFullYear(), m=d.getUTCMonth(), dd=d.getUTCDate(), wd=d.getUTCDay();
-      if(wd === 0 || wd === 6) return true;
-      if(wd === 1) {
-        if(m === 0 && dd >= 15 && dd <= 21) return true; // MLK
-        if(m === 1 && dd >= 15 && dd <= 21) return true; // Presidents
-        if(m === 4 && dd >= 25 && dd <= 31) return true; // Memorial
-        if(m === 8 && dd >= 1 && dd <= 7)   return true; // Labor
-      }
-      if(wd === 4 && m === 10 && dd >= 22 && dd <= 28) return true; // Thanksgiving
-      const fixed = [[0,1],[5,19],[6,4],[11,25]];
-      for(const [fm, fd] of fixed) {
-        const real = new Date(Date.UTC(y, fm, fd));
-        let obsM = fm, obsD = fd;
-        if(real.getUTCDay() === 6) { obsD = fd - 1; }
-        else if(real.getUTCDay() === 0) { obsD = fd + 1; }
-        if(m === obsM && dd === obsD) return true;
-      }
-      return false;
-    };
+    // Defers to module-level _isUSMarketClosedShared which now also handles Good Friday.
+    const _isUSMarketClosed = _isUSMarketClosedShared;
     const _nextEntryFromSignal = (signalStr) => {
       const d = new Date(signalStr + 'T00:00:00Z');
       d.setUTCDate(d.getUTCDate() + 1);
@@ -4774,30 +4827,9 @@ function renderTradeLog() {
     const retCls = totalPnl >= 0 ? 'text-green' : 'text-red';
     const retPct = totalCapital > 0 ? (totalPnl / totalCapital) * 100 : 0;
 
-    // Compute display exit date — actual for closed, planned (holiday-aware Monday) for open
-    const isUSMarketClosed = (d) => {
-      const y=d.getUTCFullYear(), m=d.getUTCMonth(), dd=d.getUTCDate(), wd=d.getUTCDay();
-      if(wd === 0 || wd === 6) return true; // weekend
-      // Floating Mondays
-      if(wd === 1) {
-        if(m === 0 && dd >= 15 && dd <= 21) return true; // MLK Day (3rd Mon Jan)
-        if(m === 1 && dd >= 15 && dd <= 21) return true; // Presidents Day (3rd Mon Feb)
-        if(m === 4 && dd >= 25 && dd <= 31) return true; // Memorial Day (last Mon May)
-        if(m === 8 && dd >= 1 && dd <= 7)   return true; // Labor Day (1st Mon Sep)
-      }
-      // Thanksgiving = 4th Thu Nov
-      if(wd === 4 && m === 10 && dd >= 22 && dd <= 28) return true;
-      // Fixed dates with Sat→Fri / Sun→Mon observance
-      const fixed = [[0,1],[5,19],[6,4],[11,25]]; // NewYear, Juneteenth, Independence, Christmas
-      for(const [fm, fd] of fixed) {
-        const real = new Date(Date.UTC(y, fm, fd));
-        let obsM = fm, obsD = fd;
-        if(real.getUTCDay() === 6) { obsD = fd - 1; }      // Sat → Fri
-        else if(real.getUTCDay() === 0) { obsD = fd + 1; } // Sun → Mon
-        if(m === obsM && dd === obsD) return true;
-      }
-      return false;
-    };
+    // Compute display exit date — actual for closed, planned (holiday-aware Monday) for open.
+    // Defers to module-level _isUSMarketClosedShared which now also handles Good Friday.
+    const isUSMarketClosed = _isUSMarketClosedShared;
     const plannedExit = (entryStr, holdWeeks) => {
       const d = new Date(entryStr + 'T00:00:00Z');
       d.setUTCDate(d.getUTCDate() + holdWeeks * 7);
