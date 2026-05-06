@@ -3154,26 +3154,56 @@ function runRollingBacktest() {
         const candidates = rankStocks(signalIdx, startIdx);
         const selected = candidates.slice(0, CONFIG.topN);
 
-        // === 6. Create new lot ===
+        // === 6. Pre-compute deployment ===
+        // Build the stocks-map and tally deployed BEFORE creating the lot, so we can
+        // detect the "0 stocks deployable" case and skip lot creation entirely.
+        const newLotStocks = {};
+        const alloc = newLotCapital / CONFIG.topN;
+        let deployed = 0;
+        for (const st of selected) {
+          if (dayData[st.ticker] && dayData[st.ticker].c > 0) {
+            newLotStocks[st.ticker] = alloc / dayData[st.ticker].c;
+            deployed += alloc;
+          }
+        }
+
+        // === 6a. Guard: skip phantom lot when 0 stocks could be deployed ===
+        // This happens if rankStocks returns no candidates (sparse lookback window) OR
+        // every top-N selected ticker lacks price data on the rebal day (delisting,
+        // data gap, etc.). Without this guard, a lot with $newLotCapital and no stocks
+        // would be created → 6 months later it "matures" with proceeds=$0 → fake -100%
+        // loss in closedLots, polluting the Win Rate / Best / Worst / Profit Factor KPIs
+        // and the Round Returns chart. Cash isn't actually lost — the upfront decrement
+        // is refunded here in full, so equity remains accurate.
+        if (deployed === 0) {
+          cash += newLotCapital;  // refund the upfront decrement at line above
+          console.warn('[Rolling 6M] Skipped phantom lot on', dateStr,
+            '(0 stocks deployable; rankStocks candidates =', candidates.length,
+            ', selected =', selected.length + ')');
+          lastRebalancedMonth = currentMonthKey;  // mark so we don't retry on day 2
+          // do NOT increment monthsElapsedAtEntry — no actual entry happened, the next
+          // valid rebal should keep its expected chainId in the rolling chain
+          continue;
+        }
+
+        // === 6b. Create new lot — use ACTUAL DEPLOYED capital ===
+        // initialCapital reflects what was truly invested (not what was allocated). For
+        // 100%-deploy lots (the common case) deployed === newLotCapital, so no behavior
+        // change. For rare partial-deploy lots (e.g. 7 of 10 tickers had price data),
+        // tracking initialCapital = deployed makes closedLot.returnPct and the trade-log
+        // %P&L row reflect true return on capital at risk, not a diluted figure that
+        // includes the unused alloc (which is refunded to cash below).
         const newLot = {
           chainId: monthsElapsedAtEntry % CONFIG.holdMonths,  // 0..5
           entryDate: dateStr,
           entryIdx: i,
           entryMonthKey: currentMonthKey,
-          initialCapital: newLotCapital,
+          initialCapital: deployed,
           isReinvest: isReinvest,
-          stocks: {},
+          stocks: newLotStocks,
           picks: selected.map(s => s.ticker)
         };
-        const alloc = newLotCapital / CONFIG.topN;
-        let deployed = 0;
-        for (const st of selected) {
-          if (dayData[st.ticker] && dayData[st.ticker].c > 0) {
-            newLot.stocks[st.ticker] = alloc / dayData[st.ticker].c;
-            deployed += alloc;
-          }
-        }
-        // Any leftover (tickers with no price) stays in cash
+        // Refund any non-deployed alloc (selected ticker missing price data) back to cash
         cash += (newLotCapital - deployed);
 
         state.lots.push(newLot);
@@ -3183,7 +3213,7 @@ function runRollingBacktest() {
           date: dateStr,
           equity: currentEquity,
           stocks: selected.map(s => s.ticker),
-          lotCapital: newLotCapital,
+          lotCapital: deployed,
           isReinvest: isReinvest,
           chainId: newLot.chainId
         });
