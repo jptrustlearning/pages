@@ -3592,30 +3592,62 @@ let charts = {};
 
 
 
-// === PHASE 6: ROUND RETURNS CHART (bar chart of per-round P&L%) ===
+// === PHASE 6: ROUND RETURNS CHART (bar chart of per-LOT P&L%) ===
+// Per-lot return = (exitValue - initialCapital) / initialCapital for closed lots,
+// or (MTM - initialCapital) / initialCapital for still-open lots.
+// MUST match the Win Rate / Best / Worst / Profit Factor KPI computation above
+// (lines 3411-3425). DO NOT use tradeLog equity diffs — that's monthly portfolio
+// return, not per-lot return.
 function renderRoundsChart() {
   const canvas = document.getElementById('roundsChart');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   if (charts.rounds) charts.rounds.destroy();
 
-  // Build closed rounds array from tradeLog
-  const logs = state.tradeLog || [];
-  const closed = [];
-  for (let i = 0; i < logs.length - 1; i++) {
-    const pnl = logs[i+1].equity - logs[i].equity;
-    const pct = logs[i].equity > 0 ? (pnl / logs[i].equity) * 100 : 0;
-    closed.push({ date: logs[i].date, pct });
-  }
+  const rounds = [];
+  // Closed lots — realized return
+  (state.closedLots || []).forEach(cl => {
+    if (cl.initialCapital > 0) {
+      rounds.push({
+        entryDate: cl.entryDate,
+        pct: (cl.returnPct || 0) * 100,
+        isOpen: false
+      });
+    }
+  });
+  // Open lots — MTM vs initialCapital (still inside 6mo window)
+  const lastDate = state.sortedDates && state.sortedDates.length > 0
+    ? state.sortedDates[state.sortedDates.length - 1] : null;
+  const lastDayData = lastDate ? (state.marketData[lastDate] || {}) : {};
+  (state.lots || []).forEach(lot => {
+    if (lot.initialCapital > 0) {
+      let mtm = 0;
+      for (const [t, shares] of Object.entries(lot.stocks)) {
+        const p = lastDayData[t] ? lastDayData[t].c : 0;
+        mtm += shares * (p || 0);
+      }
+      rounds.push({
+        entryDate: lot.entryDate,
+        pct: ((mtm - lot.initialCapital) / lot.initialCapital) * 100,
+        isOpen: true
+      });
+    }
+  });
+  // Sort by entry date ascending → oldest lot = #1
+  rounds.sort((a, b) => (a.entryDate || '').localeCompare(b.entryDate || ''));
 
   charts.rounds = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: closed.map((r, i) => '#' + (i + 1)),
+      labels: rounds.map((r, i) => '#' + (i + 1)),
       datasets: [{
         label: 'Round Return %',
-        data: closed.map(r => r.pct),
-        backgroundColor: closed.map(r => r.pct >= 0 ? 'rgba(212,175,55,0.7)' : 'rgba(193,69,69,0.55)'),
+        data: rounds.map(r => r.pct),
+        backgroundColor: rounds.map(r => {
+          // Open lots dimmer to signal "unrealized — still in 6-month window"
+          if (r.isOpen) return r.pct >= 0 ? 'rgba(212,175,55,0.32)' : 'rgba(193,69,69,0.28)';
+          return r.pct >= 0 ? 'rgba(212,175,55,0.7)' : 'rgba(193,69,69,0.55)';
+        }),
         borderRadius: 2
       }]
     },
@@ -3623,7 +3655,12 @@ function renderRoundsChart() {
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
-        tooltip: { callbacks: { label: c => closed[c.dataIndex].date + ': ' + c.parsed.y.toFixed(2) + '%' } }
+        tooltip: { callbacks: { label: c => {
+          const r = rounds[c.dataIndex];
+          if (!r) return '';
+          const tag = r.isOpen ? ' · กำลังถือ' : '';
+          return (r.entryDate || '') + tag + ': ' + c.parsed.y.toFixed(2) + '%';
+        } } }
       },
       scales: {
         x: { grid: { display: false }, ticks: { maxTicksLimit: 30, font: { size: 9 } } },
@@ -3633,20 +3670,32 @@ function renderRoundsChart() {
   });
 }
 
-// === PHASE 6: DISTRIBUTION CHART (histogram of per-round returns) ===
+// === PHASE 6: DISTRIBUTION CHART (histogram of per-LOT returns) ===
+// Same data source as renderRoundsChart — closed lots' returnPct + open lots' MTM.
+// Consistent with Win Rate / Best / Worst / Profit Factor KPIs.
 function renderDistChart() {
   const canvas = document.getElementById('distChart');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   if (charts.dist) charts.dist.destroy();
 
-  const logs = state.tradeLog || [];
   const rets = [];
-  for (let i = 0; i < logs.length - 1; i++) {
-    const pnl = logs[i+1].equity - logs[i].equity;
-    const pct = logs[i].equity > 0 ? (pnl / logs[i].equity) * 100 : 0;
-    rets.push(pct);
-  }
+  (state.closedLots || []).forEach(cl => {
+    if (cl.initialCapital > 0) rets.push((cl.returnPct || 0) * 100);
+  });
+  const lastDate = state.sortedDates && state.sortedDates.length > 0
+    ? state.sortedDates[state.sortedDates.length - 1] : null;
+  const lastDayData = lastDate ? (state.marketData[lastDate] || {}) : {};
+  (state.lots || []).forEach(lot => {
+    if (lot.initialCapital > 0) {
+      let mtm = 0;
+      for (const [t, shares] of Object.entries(lot.stocks)) {
+        const p = lastDayData[t] ? lastDayData[t].c : 0;
+        mtm += shares * (p || 0);
+      }
+      rets.push(((mtm - lot.initialCapital) / lot.initialCapital) * 100);
+    }
+  });
   if (rets.length === 0) return;
 
   const minR = Math.floor(Math.min(...rets));
