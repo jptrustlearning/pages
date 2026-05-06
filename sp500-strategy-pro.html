@@ -1709,7 +1709,7 @@
           <div class="rss-bench-header">
             <div>
               <div class="rss-bench-label">เทียบผลกับตลาด</div>
-              <div class="rss-bench-period" id="ma-period">S&amp;P 500 Universe · 10Y Rolling</div>
+              <div class="rss-bench-period" id="ma-period">SPY (SPDR S&amp;P 500 ETF) · 10Y Rolling</div>
             </div>
           </div>
           <div class="rss-compare-grid">
@@ -2196,8 +2196,11 @@ let CONFIG = {
   weightRet: 0.5,
   weightVol: 0.5,
   startYear: 2015,
-  cloudCsvUrl: 'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_sp500_daily.csv'
+  cloudCsvUrl: 'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_sp500_daily.csv',
+  cloudBenchUrl: 'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_benchmark_daily.csv'
 };
+
+const BENCHMARK_TICKERS = new Set(['SPY', 'QQQ', 'DIA']);
 
 // --- Default backtest settings (for Reset button) ---
 const DEFAULT_SP500_PRO = {
@@ -2357,6 +2360,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadDataFromCloud() {
   const fileUrl = CONFIG.cloudCsvUrl;
+  const benchUrl = CONFIG.cloudBenchUrl;
   
   // Kickoff progress animation — grows from 0 toward 70% during fetch
   let fetchPct = 0;
@@ -2366,13 +2370,25 @@ async function loadDataFromCloud() {
   }, 80);
 
   try {
-    const response = await fetch(fileUrl);
-    if (!response.ok) throw new Error('Network response was not ok');
+    // Fetch SP500 universe + benchmark (SPY/QQQ/DIA) in parallel
+    const [responseMain, responseBench] = await Promise.all([
+      fetch(fileUrl),
+      benchUrl ? fetch(benchUrl).catch(() => null) : Promise.resolve(null)
+    ]);
+    if (!responseMain.ok) throw new Error('Network response was not ok');
     
-    const csvText = await response.text();
+    const csvMain = await responseMain.text();
+    let csvCombined = csvMain;
+    if (responseBench && responseBench.ok) {
+      const csvBench = await responseBench.text();
+      const benchLines = csvBench.trim().split('\n');
+      if (benchLines.length > 1) {
+        csvCombined = csvMain.trim() + '\n' + benchLines.slice(1).join('\n');
+      }
+    }
     clearInterval(fetchInterval);
     if (typeof updateOwlProgress === 'function') updateOwlProgress(80);
-    processData(csvText);
+    processData(csvCombined);
     if (typeof updateOwlProgress === 'function') updateOwlProgress(95);
     
     // Update UI Status
@@ -2718,14 +2734,15 @@ function runBacktest() {
   let startIndex = state.sortedDates.findIndex(d => d.startsWith(CONFIG.startYear.toString()));
   if(startIndex === -1) startIndex = 0;
 
-  // Filter Universe Daily for Market Analyzer based on Start Year
+  // Build market benchmark series from REAL SPY (input_benchmark_daily.csv)
+  // Only includes dates where SPY data is present.
   if (state.sortedDates.length > 0) {
      if (state.universeDaily.length === 0) {
-        state.universeDaily = state.sortedDates.map(d => {
-            const tickers = Object.keys(state.marketData[d]);
-            const avg = tickers.reduce((s, t) => s + state.marketData[d][t].c, 0) / (tickers.length || 1);
-            return { date: d, val: avg };
-        });
+        state.universeDaily = [];
+        for (const d of state.sortedDates) {
+            const spyRow = state.marketData[d] && state.marketData[d]['SPY'];
+            if (spyRow) state.universeDaily.push({ date: d, val: spyRow.c });
+        }
      }
   }
 
@@ -2892,7 +2909,10 @@ function buildVolumePrefix() {
   const allTickers = new Set();
   for (let i = 0; i < N; i++) {
     const dd = state.marketData[dates[i]];
-    if (dd) for (const t in dd) allTickers.add(t);
+    if (dd) for (const t in dd) {
+      if (BENCHMARK_TICKERS.has(t)) continue;
+      allTickers.add(t);
+    }
   }
   const prefix = {};
   allTickers.forEach(t => {
@@ -2927,7 +2947,7 @@ function rankStocks(endIdx, startIdx, weightRetOverride) {
 
   const endD = state.sortedDates[endIdx];
   const startD = state.sortedDates[startIdx];
-  const tickers = Object.keys(state.marketData[endD]);
+  const tickers = Object.keys(state.marketData[endD]).filter(t => !BENCHMARK_TICKERS.has(t));
   const prefix = state.volPrefix;
   const stats = [];
   tickers.forEach(t => {
@@ -4195,7 +4215,7 @@ function updateMarketAnalyzer() {
       const months_th = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
       return `${months_th[d.getMonth()]} ${d.getFullYear()+543}`;
     };
-    maPeriod.innerText = `${fmtMonthTh(startDate)} → ${fmtMonthTh(endDate)} · ${years}Y · Equal-weighted avg`;
+    maPeriod.innerText = `${fmtMonthTh(startDate)} → ${fmtMonthTh(endDate)} · ${years}Y · SPY ETF`;
   }
 
   // Alpha: strategy annual return − market annual return
@@ -4237,7 +4257,7 @@ function updateMarketAnalyzer() {
   // ma-note (short summary)
   const maNote = document.getElementById('ma-note');
   if (maNote) {
-    maNote.innerHTML = `Market proxy = Equal-weighted avg ของหุ้น SP500 ทั้งหมดในชุดข้อมูล (ไม่ใช่ SPY ตัวจริง แต่ใช้เป็น benchmark เทียบได้)`;
+    maNote.innerHTML = `Benchmark = SPY (SPDR S&P 500 ETF) — ราคาปิดรายวันจริงจาก benchmark CSV`;
   }
 
   // Global rscNarrative at bottom of card

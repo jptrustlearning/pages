@@ -2302,6 +2302,8 @@ table.simple-table tfoot td { font-weight:700; border-top:2px solid rgba(212,175
 <script>
 // ====== CONFIG ======
 const CLOUD_URL = 'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_sp500_daily.csv';
+const BENCH_URL = 'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_benchmark_daily.csv';
+const BENCHMARK_TICKERS = new Set(['SPY', 'QQQ', 'DIA']);
 
 let CONFIG = {
   capital: 100,
@@ -2860,11 +2862,23 @@ async function loadCloudData() {
     updateOwlProgress(fetchPct);
   }, 80);
   try {
-    const res = await fetch(CLOUD_URL); if(!res.ok) throw new Error('fetch fail');
-    const csv = await res.text();
+    // Fetch SP500 universe + benchmark (SPY/QQQ/DIA) in parallel
+    const [resMain, resBench] = await Promise.all([
+      fetch(CLOUD_URL),
+      fetch(BENCH_URL).catch(() => null)  // benchmark is best-effort; fallback to proxy if it fails
+    ]);
+    if(!resMain.ok) throw new Error('fetch fail');
+    const csvMain = await resMain.text();
+    let csvCombined = csvMain;
+    if(resBench && resBench.ok) {
+      const csvBench = await resBench.text();
+      // Skip header row of bench CSV when concatenating
+      const benchLines = csvBench.trim().split('\n');
+      if(benchLines.length > 1) csvCombined = csvMain.trim() + '\n' + benchLines.slice(1).join('\n');
+    }
     clearInterval(fetchInterval);
     updateOwlProgress(75);
-    processCSV(csv);
+    processCSV(csvCombined);
     el.status.className='status-indicator success'; el.status.innerHTML='<span>●</span> Connected';
     postLoad();
   } catch(e) {
@@ -2946,18 +2960,11 @@ function processCSV(csv) {
     weeklyCache[ticker] = prices;
   }
 
-  // Market proxy
-  let prevMktWk = -1;
-  const marketProxy = [];
-  for(const d of state.sortedDates) {
-    const tickers = Object.keys(state.dailyData[d]);
-    if(tickers.length === 0) continue;
-    const avg = tickers.reduce((s,t) => s + state.dailyData[d][t].c, 0) / tickers.length;
-    const wk = dateToWeekKey[d];
-    if(wk !== prevMktWk) { marketProxy.push({ date:d, close:avg, volume:0 }); prevMktWk = wk; }
-    else { marketProxy[marketProxy.length-1] = { date:d, close:avg, volume:0 }; }
-  }
-  weeklyCache['_MARKET_'] = marketProxy;
+  // Market benchmark = real SPY weekly series (direct from input_benchmark_daily.csv)
+  // weeklyCache['SPY'] is already built above by the per-ticker loop.
+  // Alias as '_MARKET_' so downstream consumers (Alpha calc, RS calc, regime filter, etc.)
+  // continue to work without per-callsite changes.
+  weeklyCache['_MARKET_'] = weeklyCache['SPY'] || [];
 
   // Friday dates and entry dates for DH
   const weekMap = {};
@@ -3109,7 +3116,7 @@ function scanMomentum(dateStr) {
   const candidates = [];
   const minLen = lookbackWeeks + 20;
   for(const ticker of allTickers) {
-    if(ticker === 'SPY') continue;
+    if(BENCHMARK_TICKERS.has(ticker)) continue;
     const wk = weeklyCache[ticker];
     if(!wk || wk.length < minLen) continue;
     const endIdx = findWeekIdx(wk, dateStr);
@@ -4254,12 +4261,10 @@ function renderVsChart() {
   const years = Object.keys(yearPnl).sort();
   const strategyRets = years.map(y => (yearPnl[y] / capitalDeployed) * 100);
 
-  // S&P 500 yearly returns from SPY (or market proxy fallback)
-  const spyWk = (weeklyCache['SPY'] && weeklyCache['SPY'].length >= 50)
-    ? weeklyCache['SPY']
-    : weeklyCache['_MARKET_'];
+  // S&P 500 yearly returns from real SPY (input_benchmark_daily.csv)
+  const spyWk = weeklyCache['SPY'] || [];
   const marketRets = years.map(y => {
-    if(!spyWk || spyWk.length === 0) return 0;
+    if(spyWk.length === 0) return 0;
     const inYr = spyWk.filter(p => p.date.startsWith(y));
     if(inYr.length < 2) return 0;
     const startMkt = inYr[0].close;
@@ -4987,17 +4992,14 @@ function switchTab(evt, tabId) {
 function updateMarket() {
   if(state.sortedDates.length===0) return;
 
-  // Prefer real SPY ticker data; fallback to equal-weighted market proxy
-  const spyWk = weeklyCache['SPY'] && weeklyCache['SPY'].length >= 50
-    ? weeklyCache['SPY']
-    : weeklyCache['_MARKET_'];
-  const usingRealSpy = weeklyCache['SPY'] && weeklyCache['SPY'].length >= 50;
+  // Real SPY weekly series (input_benchmark_daily.csv)
+  const spyWk = weeklyCache['SPY'] || [];
 
-  if(!spyWk || spyWk.length < 50) {
+  if(spyWk.length < 50) {
     document.getElementById('ma-return').innerText = '—';
     document.getElementById('ma-vol').innerText = '—';
     document.getElementById('ma-dd').innerText = '—';
-    document.getElementById('ma-note').innerText = 'ข้อมูลไม่พอ';
+    document.getElementById('ma-note').innerText = 'ข้อมูล SPY ไม่พอ';
     return;
   }
 
@@ -5039,17 +5041,11 @@ function updateMarket() {
     const m = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
     return m[dt.getMonth()] + ' ' + dt.getFullYear();
   };
-  const src = usingRealSpy ? 'SPY ETF' : 'Equal-weighted avg';
   const yrsLabel = actualYears >= 9.5 ? '10Y' : actualYears.toFixed(1) + 'Y';
-  document.getElementById('ma-note').innerText = fmt(period[0].date) + ' → ' + fmt(period[period.length-1].date) + ' · ' + yrsLabel + ' · ' + src;
+  document.getElementById('ma-note').innerText = fmt(period[0].date) + ' → ' + fmt(period[period.length-1].date) + ' · ' + yrsLabel + ' · SPY ETF';
 
-  // Update the subtitle label if we fell back to proxy
   const periodLabel = document.getElementById('ma-period');
-  if(periodLabel) {
-    periodLabel.innerText = usingRealSpy
-      ? (yrsLabel + ' Rolling · SPDR S&P 500 ETF')
-      : (yrsLabel + ' Rolling · Market Proxy');
-  }
+  if(periodLabel) periodLabel.innerText = yrsLabel + ' Rolling · SPDR S&P 500 ETF';
 }
 </script>
 <!-- ─── COMPARE FEATURE (jp-compare.js) ─────────────────── -->
