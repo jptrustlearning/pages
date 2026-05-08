@@ -25,7 +25,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // ============ Config ============
 const GITHUB_REPO = "jptrustlearning/payment";
 const GITHUB_API = `https://api.github.com/repos/${GITHUB_REPO}/contents`;
-const PROMO_CODE = "JPTGOLD2026";
+const PROMO_CODE = "JPTFREE2026";
 const MAX_SLIP_BASE64 = 7 * 1024 * 1024; // ~5MB binary → ~6.7MB base64; pad to 7MB
 const APP_URL = "https://jptrustlearning.github.io/pages/member-dashboard.html";
 const EMAIL_FROM_NAME = "JP Trust Learning";
