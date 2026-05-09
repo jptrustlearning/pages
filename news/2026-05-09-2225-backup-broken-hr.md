@@ -11,6 +11,7 @@ sources: [Datadog Q1 2026 Earnings Release (8-K), Datadog Q1 2026 Earnings Trans
 
 แต่การพุ่ง 31% ในวันเดียวก็มาพร้อมคำถาม — **ธุรกิจจริงๆ ของ Datadog ทำอะไร? ทำไมงบ Q1 ถึงสำคัญขนาดนั้น? และความเสี่ยงที่ตลาดมองข้ามไปคืออะไร?**
 
+---
 
 **Datadog ทำธุรกิจอะไร — เข้าใจให้ชัดก่อนวิเคราะห์**
 
@@ -32,6 +33,7 @@ Datadog เป็นบริษัท SaaS (Software-as-a-Service) ที่ใ
 - **Land-and-Expand** — เริ่มจากซื้อ 1-2 ผลิตภัณฑ์ แล้วเพิ่มขึ้นเป็น 10+ products ตามเวลา
 - **Multi-Product Adoption** — ลูกค้าใหญ่ของ Datadog มักใช้ 6+ ผลิตภัณฑ์พร้อมกัน
 
+---
 
 **ตัวเลขสำคัญจากงบ Q1/2026 (วันที่ 7 พ.ค. 2026)**
 
@@ -52,6 +54,7 @@ Datadog เป็นบริษัท SaaS (Software-as-a-Service) ที่ใ
 - **FY 2026 Guidance:** รายได้ $4.30-$4.34 พันล้าน (โต 25-27% YoY) — ปรับขึ้นจากเป้าเดิม $4.06-$4.10 พันล้านที่ให้ไว้เดือน ก.พ. (ปรับขึ้นประมาณ $250 ล้าน หรือ 6%)
 - **FY 2026 EPS Guide:** $2.36-$2.44 — เพิ่มจากเดิม $2.08-$2.16 (ปรับขึ้น 13%)
 
+---
 
 **ปัจจัยที่ขับเคลื่อนการพุ่ง 31% (วิเคราะห์เชิงลึก)**
 
@@ -90,6 +93,7 @@ Datadog เป็นบริษัท SaaS (Software-as-a-Service) ที่ใ
 
 หุ้น DDOG ก่อนงบมี Short Interest ค่อนข้างสูง (จากกระแส OpenAI risk + Anthropic จะตัดงาน Observability) — เมื่อ Bear thesis ผิด → **Short Covering** ผสมกับ **Multiple Re-Rating** (ตลาดให้ valuation premium ใหม่) = แรงซื้อเร่งตัวเป็น 31% ในวันเดียว
 
+---
 
 **ปัจจัยเสี่ยง 6 ข้อที่นักลงทุนต้องระวังต่อจากนี้**
 
@@ -128,6 +132,7 @@ Datadog เป็นบริษัท SaaS (Software-as-a-Service) ที่ใ
 
 ทีมบริหารระบุชัดในการประชุม earnings ว่า Q2 จะมีค่าใช้จ่ายงาน DASH Conference (งานสัมมนาประจำปี) $15 ล้าน — ซึ่งจะกดดัน Operating Margin Q2 ลงเล็กน้อย · ไม่ใช่เรื่องใหญ่แต่ถ้านักลงทุนคาดหวัง Margin Expansion ต่อเนื่อง อาจผิดหวัง
 
+---
 
 **3 สถานการณ์ที่อาจเกิดขึ้นในช่วง 12 เดือนข้างหน้า**
 
@@ -137,6 +142,7 @@ Datadog เป็นบริษัท SaaS (Software-as-a-Service) ที่ใ
 
 (% เป็นการประเมินของ JP Trust Learning ไม่ได้มาจากแหล่งข่าวต้นทาง)
 
+---
 
 **ผลกระทบต่อนักลงทุนไทย**
 
@@ -164,6 +170,7 @@ Datadog เป็นบริษัท SaaS (Software-as-a-Service) ที่ใ
 - **Position Sizing:** หุ้น Single-Stock Tech ที่ Valuation สูงและ Customer Concentration risk ยังคงอยู่ — ไม่ควรเกิน 3-5% ของพอร์ตรวม
 - **ทางเลือกที่กระจายความเสี่ยง:** ETF เช่น **WCLD (WisdomTree Cloud Computing)**, **CLOU (Global X Cloud Computing)**, **IGV (iShares Expanded Tech-Software)** — มี DDOG อยู่ในส่วนผสม + กระจายไปยัง SNOW, MDB, NET, CRM อื่นๆ
 
+---
 
 **ปัจจัยที่ต้องติดตาม**
 
