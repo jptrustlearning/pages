@@ -1371,8 +1371,8 @@ function drawEquityChart(){
     ctx.fillText(series.dates[mid], padL + cw/2, H - padB + 6);
   }
 
-  // Cost line (gold dashed)
-  ctx.strokeStyle = '#B8860B';
+  // Cost line (maroon dashed — contrasts with gold equity line)
+  ctx.strokeStyle = '#722F37';
   ctx.lineWidth = 1.5;
   ctx.setLineDash([5,4]);
   ctx.beginPath();
@@ -1383,8 +1383,8 @@ function drawEquityChart(){
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // Equity line (maroon, thicker, with area fill)
-  // Area
+  // Equity line (gold — matches 6M Pro chart palette)
+  // Area fill — gold gradient 0.6 → 0.05 (same opacity ramp as 6M Pro)
   ctx.beginPath();
   for (let i=0; i<series.dates.length; i++){
     const x = xAt(i), y = yAt(series.equity[i]);
@@ -1394,12 +1394,12 @@ function drawEquityChart(){
   ctx.lineTo(xAt(0), padT + ch);
   ctx.closePath();
   const grad = ctx.createLinearGradient(0, padT, 0, padT + ch);
-  grad.addColorStop(0, 'rgba(114,47,55,0.18)');
-  grad.addColorStop(1, 'rgba(114,47,55,0.02)');
+  grad.addColorStop(0, 'rgba(212,175,55,0.55)');
+  grad.addColorStop(1, 'rgba(212,175,55,0.05)');
   ctx.fillStyle = grad;
   ctx.fill();
-  // Line
-  ctx.strokeStyle = '#722F37';
+  // Line — solid gold
+  ctx.strokeStyle = '#D4AF37';
   ctx.lineWidth = 2;
   ctx.beginPath();
   for (let i=0; i<series.dates.length; i++){
