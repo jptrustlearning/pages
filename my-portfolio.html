@@ -214,6 +214,55 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .gate-icon{font-size:3rem;margin-bottom:14px;opacity:.6}
 .gate-title{font-size:1.05rem;color:var(--maroon);margin-bottom:8px;font-weight:700}
 .gate-text{font-size:.85rem;color:var(--text-muted);margin-bottom:18px;line-height:1.6}
+
+/* ============================================================
+   PORTFOLIO SWITCHER (Phase 1 — multi-portfolio support)
+============================================================ */
+.port-switcher-row{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.port-switcher{display:inline-flex;align-items:center;gap:9px;background:var(--cream-card);border:1px solid var(--border-gold);border-radius:999px;padding:7px 14px 7px 11px;cursor:pointer;font-family:var(--font-thai);font-weight:600;font-size:.82rem;color:var(--text-heading);transition:all .15s;user-select:none;box-shadow:0 1px 4px rgba(114,47,55,0.05);max-width:100%;min-width:0}
+.port-switcher:hover{background:var(--cream-warm);border-color:var(--border-gold-strong)}
+.port-switcher:active{transform:scale(.98)}
+.port-switcher-dot{width:10px;height:10px;border-radius:50%;background:var(--maroon);box-shadow:0 0 0 2px rgba(114,47,55,0.10);flex-shrink:0}
+.port-switcher-dot.all{background:linear-gradient(135deg,var(--gold) 0%,var(--maroon) 100%)}
+.port-switcher-name{flex:1;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;max-width:200px}
+.port-switcher-chev{width:13px;height:13px;color:var(--gold-dark);flex-shrink:0;opacity:.65}
+
+/* === BOTTOM SHEET PICKER === */
+.port-backdrop{position:fixed;inset:0;background:rgba(45,16,24,0.5);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);display:none;align-items:flex-end;justify-content:center;z-index:998;padding:0}
+.port-backdrop.active{display:flex}
+.port-sheet{width:100%;max-width:500px;background:var(--cream-card);border-radius:18px 18px 0 0;padding:18px 18px 26px;max-height:80vh;overflow-y:auto;animation:portSheetIn .25s ease;box-shadow:0 -4px 24px rgba(45,16,24,0.18)}
+@keyframes portSheetIn{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.port-sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border-gold)}
+.port-sheet-title{font-family:var(--font-label);font-size:.7rem;letter-spacing:2.5px;color:var(--gold-dark);text-transform:uppercase}
+.port-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.port-item-wrap{display:flex;flex-direction:column}
+.port-item{display:flex;align-items:center;gap:10px;padding:11px 10px 11px 12px;background:var(--cream);border:1px solid var(--border-gold);border-radius:10px;transition:all .15s}
+.port-item.active{background:var(--cream-warm);border-color:var(--border-gold-strong);box-shadow:inset 0 0 0 1px var(--border-gold-strong)}
+.port-item-tap{display:flex;align-items:center;gap:10px;flex:1;cursor:pointer;min-width:0;padding:2px 0}
+.port-item-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 2px rgba(0,0,0,0.05)}
+.port-item-dot.all{background:linear-gradient(135deg,var(--gold) 0%,var(--maroon) 100%)}
+.port-item-name{flex:1;font-family:var(--font-thai);font-weight:600;font-size:.88rem;color:var(--text-dark);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.port-item-count{font-family:var(--font-thai);font-size:.7rem;color:var(--text-muted);flex-shrink:0;font-weight:500;letter-spacing:.2px}
+.port-item-check{color:var(--green);font-size:1rem;flex-shrink:0;font-weight:700}
+.port-item-menu{background:none;border:none;color:var(--text-muted);font-size:1.25rem;cursor:pointer;padding:2px 6px;border-radius:5px;transition:all .15s;line-height:1;flex-shrink:0}
+.port-item-menu:hover{background:var(--cream-deep);color:var(--maroon)}
+.port-item-virtual .port-item{background:linear-gradient(135deg,rgba(212,175,55,0.06),rgba(114,47,55,0.04));border-style:dashed}
+.port-item-virtual .port-item.active{border-style:solid}
+.port-item-actions{display:none;flex-direction:column;gap:2px;padding:2px 12px 8px;background:var(--cream-deep);border:1px solid var(--border-gold);border-top:none;border-radius:0 0 10px 10px;margin-top:-1px;animation:portMenuIn .15s ease}
+.port-item-actions.active{display:flex}
+@keyframes portMenuIn{from{opacity:0;max-height:0}to{opacity:1;max-height:120px}}
+.port-item-action{background:none;border:none;text-align:left;font-family:var(--font-thai);font-size:.78rem;color:var(--text-dark);padding:8px 6px;cursor:pointer;border-radius:5px;font-weight:500;transition:all .12s}
+.port-item-action:hover{background:var(--cream-card)}
+.port-item-action.danger{color:var(--red-dark)}
+.port-item-action.danger:hover{background:rgba(192,57,43,0.08)}
+.port-create-btn{width:100%;background:linear-gradient(135deg,rgba(46,159,95,0.08),rgba(212,175,55,0.08));border:1px dashed rgba(46,159,95,0.4);color:var(--green-dark);font-family:var(--font-thai);font-weight:600;font-size:.82rem;padding:11px;border-radius:10px;cursor:pointer;letter-spacing:.3px;transition:all .15s}
+.port-create-btn:hover{background:linear-gradient(135deg,rgba(46,159,95,0.15),rgba(212,175,55,0.15));border-color:rgba(46,159,95,0.6)}
+.port-create-btn:disabled{opacity:.45;cursor:not-allowed;background:var(--cream-deep);color:var(--text-muted);border-color:var(--border-gold);border-style:solid}
+.port-cap-hint{font-size:.68rem;color:var(--text-muted);text-align:center;margin-top:8px;letter-spacing:.2px}
+
+/* Add modal — destination portfolio dropdown (only visible in ทั้งหมด mode) */
+.add-port-select{font-family:var(--font-thai);font-size:.92rem;padding:10px 12px;border:1px solid var(--border-gold);border-radius:9px;background:var(--cream-card);color:var(--text-dark);width:100%;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238B6914' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
+.add-port-select:focus{outline:none;border-color:var(--gold-dark)}
 </style>
 </head>
 <body>
@@ -251,6 +300,15 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 ============================================================ -->
 <div id="appView" style="display:none">
   <div class="page-wrap">
+
+    <!-- PORTFOLIO SWITCHER (Phase 1) -->
+    <div class="port-switcher-row">
+      <div class="port-switcher" onclick="openPortPicker()">
+        <span id="portSwitcherDot" class="port-switcher-dot all"></span>
+        <span id="portSwitcherName" class="port-switcher-name">ทั้งหมด</span>
+        <svg class="port-switcher-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
 
     <!-- HERO -->
     <div class="hero">
@@ -328,6 +386,10 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
     <div class="modal-head">
       <div class="modal-title">บันทึกการซื้อใหม่</div>
       <button class="modal-close" onclick="closeAddModal()">×</button>
+    </div>
+    <div id="addPortField" class="field" style="display:none">
+      <label class="field-label">บันทึกในพอร์ต</label>
+      <select id="addPortSelect" class="add-port-select"></select>
     </div>
     <div class="field">
       <label class="field-label">Ticker</label>
@@ -419,6 +481,42 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
   </div>
 </div>
 
+<!-- ============================================================
+     PORTFOLIO PICKER BOTTOM SHEET (Phase 1)
+============================================================ -->
+<div id="portPickerBackdrop" class="port-backdrop" onclick="if(event.target===this)closePortPicker()">
+  <div class="port-sheet">
+    <div class="port-sheet-head">
+      <div class="port-sheet-title">เลือกพอร์ต</div>
+      <button class="modal-close" onclick="closePortPicker()">×</button>
+    </div>
+    <div id="portList" class="port-list"></div>
+    <button id="portCreateBtn" class="port-create-btn" onclick="openCreatePortModal()">+ พอร์ตใหม่</button>
+    <div class="port-cap-hint">สูงสุด 5 พอร์ตต่อบัญชี</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PORTFOLIO CREATE / RENAME MODAL (Phase 1)
+============================================================ -->
+<div id="portEditModal" class="modal-backdrop" onclick="if(event.target===this)closePortEditModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <div id="portEditTitle" class="modal-title">พอร์ตใหม่</div>
+      <button class="modal-close" onclick="closePortEditModal()">×</button>
+    </div>
+    <div class="field">
+      <label class="field-label">ชื่อพอร์ต</label>
+      <input id="portEditName" class="field-input" type="text" placeholder="เช่น Tech Stocks, Hold ยาว" maxlength="40" onkeydown="if(event.key==='Enter')submitPortEdit()">
+      <div class="field-hint">ตั้งชื่อได้ตามใจ — สูงสุด 40 ตัวอักษร</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closePortEditModal()">ยกเลิก</button>
+      <button id="portEditConfirm" class="btn-confirm" onclick="submitPortEdit()">บันทึก</button>
+    </div>
+  </div>
+</div>
+
 <!-- toast -->
 <div id="toast" class="toast"></div>
 
@@ -427,7 +525,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 ============================================================ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-<script src="my-portfolio.js?v=1777343748"></script>
+<script src="my-portfolio.js?v=1778434941"></script>
 
 </body>
 </html>

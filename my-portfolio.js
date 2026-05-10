@@ -11,6 +11,11 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 const PRICE_CSV   = 'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_sp500_daily.csv';
 const SECTOR_CSV  = 'https://raw.githubusercontent.com/datasets/s-and-p-500-companies/main/data/constituents.csv';
 
+/* === Phase 1: Multi-portfolio constants === */
+const PORTFOLIO_COLORS = ['#722F37','#B8860B','#2E9F5F','#8B2252','#5A3D20'];
+const PORTFOLIO_MAX    = 5;
+const VIRTUAL_ALL      = '__all__';
+
 let sb = null;
 try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON); }
 catch(e) { console.error('Supabase init failed', e); }
@@ -18,7 +23,11 @@ catch(e) { console.error('Supabase init failed', e); }
 /* Global state */
 const S = {
   user: null,
-  lots: [],          // [{id, ticker, entry_date, amount_usd, entry_price, shares, notes, created_at, sells:[]}]
+  // Phase 1: multi-portfolio
+  portfolios: [],            // [{id, name, color, sort_order}]
+  selectedPortfolioId: VIRTUAL_ALL,
+  allLots: [],               // raw fetched lots (full set for this user)
+  lots: [],                  // filtered view by selectedPortfolioId — all render code reads this
   // price data
   tickers: [],       // sorted unique tickers in CSV
   sectors: {},       // ticker -> sector
@@ -232,7 +241,7 @@ async function fetchLots(){
   (sells || []).forEach(s => {
     (sellsByLot[s.lot_id] = sellsByLot[s.lot_id] || []).push(s);
   });
-  S.lots = (lots || []).map(l => {
+  S.allLots = (lots || []).map(l => {
     l.amount_usd  = parseFloat(l.amount_usd);
     l.entry_price = parseFloat(l.entry_price);
     l.shares      = parseFloat(l.shares);
@@ -243,7 +252,269 @@ async function fetchLots(){
     }));
     return l;
   });
+  applyPortfolioFilter();
 }
+
+/* ============================================================
+   PHASE 1: PORTFOLIO MANAGEMENT
+============================================================ */
+function lsKeyForUser(){
+  return 'jpt_my_portfolio_selected_' + (S.user ? S.user.id : 'anon');
+}
+
+function pickColorByOrder(idx){
+  return PORTFOLIO_COLORS[idx % PORTFOLIO_COLORS.length];
+}
+
+function escapeHtml(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function fetchPortfolios(){
+  if (!sb || !S.user){ S.portfolios = []; return; }
+  const { data, error } = await sb.from('portfolios')
+    .select('*').eq('user_id', S.user.id).order('sort_order', {ascending: true});
+  if (error){
+    console.error(error);
+    toast('โหลดพอร์ตล้มเหลว: '+error.message, 'err');
+    S.portfolios = [];
+    return;
+  }
+  S.portfolios = data || [];
+}
+
+/* Auto-create "พอร์ตหลัก" for users with no portfolios (new user case).
+   Migration handled existing-user case at SQL level — this handles fresh signups. */
+async function ensureDefaultPortfolio(){
+  if (S.portfolios.length > 0) return;
+  if (!sb || !S.user) return;
+  const { data, error } = await sb.from('portfolios')
+    .insert({ user_id: S.user.id, name: 'พอร์ตหลัก', color: pickColorByOrder(0), sort_order: 0 })
+    .select().single();
+  if (error){ console.error('ensureDefaultPortfolio failed', error); return; }
+  S.portfolios = [data];
+}
+
+function applyPortfolioFilter(){
+  if (S.selectedPortfolioId === VIRTUAL_ALL){
+    S.lots = S.allLots.slice();
+  } else {
+    S.lots = S.allLots.filter(l => l.portfolio_id === S.selectedPortfolioId);
+  }
+}
+
+function getCurrentPortfolio(){
+  if (S.selectedPortfolioId === VIRTUAL_ALL) return null;
+  return S.portfolios.find(p => p.id === S.selectedPortfolioId) || null;
+}
+
+function setSelectedPortfolio(id){
+  // validate
+  if (id !== VIRTUAL_ALL && !S.portfolios.find(p => p.id === id)){
+    id = VIRTUAL_ALL;
+  }
+  S.selectedPortfolioId = id;
+  try { localStorage.setItem(lsKeyForUser(), id); } catch(e){}
+  applyPortfolioFilter();
+  updatePortSwitcherChip();
+  renderAll();
+}
+window.setSelectedPortfolio = setSelectedPortfolio;
+
+function updatePortSwitcherChip(){
+  const dot = document.getElementById('portSwitcherDot');
+  const name = document.getElementById('portSwitcherName');
+  if (!dot || !name) return;
+  const cur = getCurrentPortfolio();
+  if (!cur){
+    name.textContent = 'ทั้งหมด';
+    dot.className = 'port-switcher-dot all';
+    dot.style.background = '';
+  } else {
+    name.textContent = cur.name;
+    dot.className = 'port-switcher-dot';
+    dot.style.background = cur.color;
+  }
+}
+
+/* === BOTTOM SHEET PICKER === */
+function openPortPicker(){
+  renderPortList();
+  document.getElementById('portPickerBackdrop').classList.add('active');
+}
+window.openPortPicker = openPortPicker;
+
+function closePortPicker(){
+  document.getElementById('portPickerBackdrop').classList.remove('active');
+  document.querySelectorAll('.port-item-actions.active').forEach(el => el.classList.remove('active'));
+}
+window.closePortPicker = closePortPicker;
+
+function renderPortList(){
+  const list = document.getElementById('portList');
+  if (!list) return;
+  const items = [];
+  // virtual "ทั้งหมด"
+  const allActive = S.selectedPortfolioId === VIRTUAL_ALL;
+  items.push(`<div class="port-item-wrap port-item-virtual">
+    <div class="port-item ${allActive ? 'active' : ''}">
+      <div class="port-item-tap" onclick="setSelectedPortfolio('${VIRTUAL_ALL}'); closePortPicker()">
+        <span class="port-item-dot all"></span>
+        <span class="port-item-name">ทั้งหมด</span>
+        <span class="port-item-count">${S.allLots.length} ไม้</span>
+        ${allActive ? '<span class="port-item-check">✓</span>' : ''}
+      </div>
+    </div>
+  </div>`);
+  // each real portfolio
+  S.portfolios.forEach(p => {
+    const lotCount = S.allLots.filter(l => l.portfolio_id === p.id).length;
+    const active = p.id === S.selectedPortfolioId;
+    items.push(`<div class="port-item-wrap">
+      <div class="port-item ${active ? 'active' : ''}">
+        <div class="port-item-tap" onclick="setSelectedPortfolio('${p.id}'); closePortPicker()">
+          <span class="port-item-dot" style="background:${p.color || '#722F37'}"></span>
+          <span class="port-item-name">${escapeHtml(p.name)}</span>
+          <span class="port-item-count">${lotCount} ไม้</span>
+          ${active ? '<span class="port-item-check">✓</span>' : ''}
+        </div>
+        <button class="port-item-menu" onclick="event.stopPropagation(); togglePortItemActions('${p.id}')" title="จัดการพอร์ต">⋮</button>
+      </div>
+      <div class="port-item-actions" id="portActions-${p.id}">
+        <button class="port-item-action" onclick="openRenamePortModal('${p.id}')">เปลี่ยนชื่อ</button>
+        <button class="port-item-action danger" onclick="confirmDeletePortfolio('${p.id}')">ลบพอร์ต</button>
+      </div>
+    </div>`);
+  });
+  list.innerHTML = items.join('');
+  // Cap state on create button
+  const createBtn = document.getElementById('portCreateBtn');
+  if (createBtn){
+    createBtn.textContent = `+ พอร์ตใหม่ (${S.portfolios.length}/${PORTFOLIO_MAX})`;
+    createBtn.disabled = S.portfolios.length >= PORTFOLIO_MAX;
+  }
+}
+
+function togglePortItemActions(pid){
+  const el = document.getElementById('portActions-' + pid);
+  if (!el) return;
+  document.querySelectorAll('.port-item-actions.active').forEach(x => { if (x !== el) x.classList.remove('active'); });
+  el.classList.toggle('active');
+}
+window.togglePortItemActions = togglePortItemActions;
+
+/* === CREATE / RENAME MODAL === */
+let _portEditMode = 'create';
+let _portEditId = null;
+
+function openCreatePortModal(){
+  if (S.portfolios.length >= PORTFOLIO_MAX){
+    toast('มีพอร์ตครบ ' + PORTFOLIO_MAX + ' แล้ว', 'err');
+    return;
+  }
+  _portEditMode = 'create';
+  _portEditId = null;
+  document.getElementById('portEditTitle').textContent = 'พอร์ตใหม่';
+  document.getElementById('portEditName').value = '';
+  document.getElementById('portEditConfirm').textContent = 'สร้าง';
+  document.getElementById('portEditConfirm').disabled = false;
+  document.getElementById('portEditModal').classList.add('active');
+  setTimeout(() => { const n = document.getElementById('portEditName'); if (n) n.focus(); }, 60);
+}
+window.openCreatePortModal = openCreatePortModal;
+
+function openRenamePortModal(pid){
+  const p = S.portfolios.find(x => x.id === pid);
+  if (!p) return;
+  _portEditMode = 'rename';
+  _portEditId = pid;
+  document.getElementById('portEditTitle').textContent = 'เปลี่ยนชื่อพอร์ต';
+  document.getElementById('portEditName').value = p.name;
+  document.getElementById('portEditConfirm').textContent = 'บันทึก';
+  document.getElementById('portEditConfirm').disabled = false;
+  document.getElementById('portEditModal').classList.add('active');
+  setTimeout(() => { const n = document.getElementById('portEditName'); if (n){ n.focus(); n.select(); } }, 60);
+}
+window.openRenamePortModal = openRenamePortModal;
+
+function closePortEditModal(){
+  document.getElementById('portEditModal').classList.remove('active');
+}
+window.closePortEditModal = closePortEditModal;
+
+async function submitPortEdit(){
+  const name = document.getElementById('portEditName').value.trim();
+  if (!name){ toast('กรุณาใส่ชื่อพอร์ต', 'err'); return; }
+  if (name.length > 40){ toast('ชื่อพอร์ตยาวเกินไป', 'err'); return; }
+  const btn = document.getElementById('portEditConfirm');
+  btn.disabled = true;
+  if (_portEditMode === 'create'){
+    if (S.portfolios.length >= PORTFOLIO_MAX){
+      toast('มีพอร์ตครบ ' + PORTFOLIO_MAX + ' แล้ว', 'err');
+      btn.disabled = false;
+      return;
+    }
+    const sortOrder = S.portfolios.length;
+    const color = pickColorByOrder(sortOrder);
+    const { data, error } = await sb.from('portfolios')
+      .insert({ user_id: S.user.id, name, color, sort_order: sortOrder })
+      .select().single();
+    btn.disabled = false;
+    if (error){ toast('สร้างพอร์ตล้มเหลว: '+error.message, 'err'); return; }
+    S.portfolios.push(data);
+    closePortEditModal();
+    toast('สร้างพอร์ต "' + name + '" แล้ว', 'ok');
+    setSelectedPortfolio(data.id);  // auto-switch to new portfolio
+    if (document.getElementById('portPickerBackdrop').classList.contains('active')) renderPortList();
+  } else {
+    // rename
+    const { error } = await sb.from('portfolios').update({ name }).eq('id', _portEditId);
+    btn.disabled = false;
+    if (error){ toast('เปลี่ยนชื่อล้มเหลว: '+error.message, 'err'); return; }
+    const p = S.portfolios.find(x => x.id === _portEditId);
+    if (p) p.name = name;
+    closePortEditModal();
+    toast('เปลี่ยนชื่อแล้ว', 'ok');
+    updatePortSwitcherChip();
+    if (document.getElementById('portPickerBackdrop').classList.contains('active')) renderPortList();
+  }
+}
+window.submitPortEdit = submitPortEdit;
+
+function confirmDeletePortfolio(pid){
+  const p = S.portfolios.find(x => x.id === pid);
+  if (!p) return;
+  if (S.portfolios.length <= 1){
+    toast('ลบไม่ได้ — ต้องมีพอร์ตอย่างน้อย 1', 'err');
+    return;
+  }
+  const lotCount = S.allLots.filter(l => l.portfolio_id === pid).length;
+  const text = lotCount === 0
+    ? `พอร์ต "${escapeHtml(p.name)}" ไม่มีไม้ — ลบได้ทันที`
+    : `พอร์ต "${escapeHtml(p.name)}" มี <strong>${lotCount} ไม้</strong> — ไม้ทั้งหมดและประวัติการขายจะถูกลบด้วย<br><strong>การกระทำนี้ย้อนกลับไม่ได้</strong>`;
+  showConfirm({
+    title: 'ลบพอร์ตนี้?',
+    text,
+    okLabel: 'ลบพอร์ต',
+    onOk: async () => {
+      const { error } = await sb.from('portfolios').delete().eq('id', pid);
+      if (error){ toast('ลบล้มเหลว: '+error.message, 'err'); return; }
+      S.portfolios = S.portfolios.filter(x => x.id !== pid);
+      // if it was selected → switch to ทั้งหมด
+      if (S.selectedPortfolioId === pid){
+        S.selectedPortfolioId = VIRTUAL_ALL;
+        try { localStorage.setItem(lsKeyForUser(), VIRTUAL_ALL); } catch(e){}
+      }
+      toast('ลบพอร์ตแล้ว', 'ok');
+      // refresh lots (CASCADE removes lots+sells server-side; refetch to reflect locally)
+      await fetchLots();
+      updatePortSwitcherChip();
+      renderAll();
+      if (document.getElementById('portPickerBackdrop').classList.contains('active')) renderPortList();
+    }
+  });
+}
+window.confirmDeletePortfolio = confirmDeletePortfolio;
 
 /* ============================================================
    PER-LOT METRICS
@@ -688,6 +959,18 @@ function openAddModal(){
   _addAcHL = -1;
   _addPriceDate = null;
   _addRange = null;
+  // Phase 1: destination portfolio field — only shown in ทั้งหมด mode
+  const portField  = document.getElementById('addPortField');
+  const portSelect = document.getElementById('addPortSelect');
+  if (S.selectedPortfolioId === VIRTUAL_ALL && S.portfolios.length > 0){
+    portField.style.display = 'block';
+    portSelect.innerHTML = S.portfolios.map(p =>
+      `<option value="${p.id}">${escapeHtml(p.name)}</option>`
+    ).join('');
+    portSelect.value = S.portfolios[0].id;
+  } else {
+    portField.style.display = 'none';
+  }
   document.getElementById('addModal').classList.add('active');
   setTimeout(()=> document.getElementById('addTicker').focus(), 100);
 }
@@ -847,11 +1130,21 @@ async function submitAdd(){
     toast(`ราคาเกินช่วงที่อนุญาต ($${_addRange.min.toFixed(2)} — $${_addRange.max.toFixed(2)})`, 'err');
     return;
   }
+  // Phase 1: determine destination portfolio
+  let pid;
+  if (S.selectedPortfolioId === VIRTUAL_ALL){
+    pid = document.getElementById('addPortSelect').value;
+    if (!pid){ toast('กรุณาเลือกพอร์ตปลายทาง', 'err'); return; }
+  } else {
+    pid = S.selectedPortfolioId;
+  }
+  if (!pid){ toast('ไม่พบพอร์ตปลายทาง — โหลดหน้าใหม่', 'err'); return; }
   const shares = amt / price;
   const btn = document.getElementById('addConfirmBtn');
   btn.disabled = true; btn.textContent = 'กำลังบันทึก...';
   const { error } = await sb.from('portfolio_lots').insert({
     user_id: S.user.id,
+    portfolio_id: pid,
     ticker: tk,
     entry_date: p.date,
     amount_usd: amt,
@@ -1347,7 +1640,7 @@ async function init(){
   // 2. price CSV (the heavy one)
   try {
     await loadPriceCSV();
-    setProgress(70);
+    setProgress(60);
   } catch(e){
     console.error(e);
     document.querySelector('.owl-loader-text').innerHTML = '<span style="color:#922B21">โหลดข้อมูลราคาล้มเหลว</span>';
@@ -1355,14 +1648,26 @@ async function init(){
   }
   // 3. sector CSV (non-fatal)
   await loadSectorCSV();
-  setProgress(85);
-  // 4. user portfolio
+  setProgress(72);
+  // 4. Phase 1: portfolios — load + auto-create default for fresh users
+  await fetchPortfolios();
+  await ensureDefaultPortfolio();
+  setProgress(82);
+  // 5. Restore last-selected portfolio from localStorage
+  let lastSelected = VIRTUAL_ALL;
+  try { lastSelected = localStorage.getItem(lsKeyForUser()) || VIRTUAL_ALL; } catch(e){}
+  if (lastSelected !== VIRTUAL_ALL && !S.portfolios.find(p => p.id === lastSelected)){
+    lastSelected = VIRTUAL_ALL;  // fallback if previously-selected was deleted
+  }
+  S.selectedPortfolioId = lastSelected;
+  // 6. user lots (filter applied automatically by fetchLots → applyPortfolioFilter)
   await fetchLots();
   setProgress(100);
-  // 5. show
+  // 7. show
   setTimeout(() => {
     showApp();
     bindTfBar();
+    updatePortSwitcherChip();
     renderAll();
   }, 250);
 }
