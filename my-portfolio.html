@@ -233,8 +233,10 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .port-tab-add.disabled{opacity:.35;cursor:not-allowed;border-style:solid;border-color:var(--border-gold);color:var(--text-muted);background:var(--cream-deep)}
 .port-tab-add.disabled:hover{transform:none;background:var(--cream-deep)}
 
-/* Floating action menu (anchored to active tab's ⋮) */
-.port-tab-menu-popup{position:absolute;top:calc(100% + 6px);right:0;background:var(--cream-card);border:1px solid var(--border-gold-strong);border-radius:9px;box-shadow:0 6px 20px rgba(45,16,24,0.18);padding:4px;display:none;flex-direction:column;gap:2px;min-width:140px;z-index:50;animation:portMenuPopup .15s ease}
+/* Floating action menu — position:fixed so it escapes .port-tabs overflow-x clipping
+   (CSS spec: overflow-x:auto forces overflow-y to auto/hidden too, clipping any drop-down).
+   JS sets top/left via getBoundingClientRect when shown. */
+.port-tab-menu-popup{position:fixed;background:var(--cream-card);border:1px solid var(--border-gold-strong);border-radius:9px;box-shadow:0 6px 20px rgba(45,16,24,0.18);padding:4px;display:none;flex-direction:column;gap:2px;min-width:140px;z-index:100;animation:portMenuPopup .15s ease}
 .port-tab-menu-popup.active{display:flex}
 @keyframes portMenuPopup{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 .port-tab-menu-action{background:none;border:none;text-align:left;font-family:var(--font-thai);font-size:.8rem;font-weight:500;color:var(--text-dark);padding:9px 11px;border-radius:5px;cursor:pointer;transition:all .12s;white-space:nowrap}
@@ -486,7 +488,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 ============================================================ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-<script src="my-portfolio.js?v=1778435962"></script>
+<script src="my-portfolio.js?v=1778436367"></script>
 
 </body>
 </html>

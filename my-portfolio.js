@@ -343,7 +343,7 @@ function renderPortTabs(){
   S.portfolios.forEach(p => {
     const active = p.id === S.selectedPortfolioId;
     const menuHtml = active ? `
-      <button class="port-tab-menu" onclick="event.stopPropagation(); togglePortTabMenu('${p.id}')" title="จัดการพอร์ต">⋮</button>
+      <button class="port-tab-menu" onclick="event.stopPropagation(); togglePortTabMenu('${p.id}', this)" title="จัดการพอร์ต">⋮</button>
       <div class="port-tab-menu-popup" id="portMenuPopup-${p.id}">
         <button class="port-tab-menu-action" onclick="event.stopPropagation(); closePortTabMenu(); openRenamePortModal('${p.id}')">เปลี่ยนชื่อ</button>
         <button class="port-tab-menu-action danger" onclick="event.stopPropagation(); closePortTabMenu(); confirmDeletePortfolio('${p.id}')">ลบพอร์ต</button>
@@ -370,11 +370,26 @@ function renderPortTabs(){
 }
 window.renderPortTabs = renderPortTabs;
 
-function togglePortTabMenu(pid){
+function togglePortTabMenu(pid, btnEl){
   const popup = document.getElementById('portMenuPopup-' + pid);
   if (!popup) return;
+  // close other open ones
   document.querySelectorAll('.port-tab-menu-popup.active').forEach(x => { if (x !== popup) x.classList.remove('active'); });
-  popup.classList.toggle('active');
+  if (popup.classList.contains('active')){
+    popup.classList.remove('active');
+    return;
+  }
+  // Show first so we can measure offsetWidth, then position via fixed coords
+  popup.classList.add('active');
+  if (btnEl){
+    const rect = btnEl.getBoundingClientRect();
+    const popupW = popup.offsetWidth || 150;
+    let left = rect.right - popupW;  // right-align under the ⋮ button
+    // clamp to viewport with 8px gutter
+    left = Math.max(8, Math.min(window.innerWidth - popupW - 8, left));
+    popup.style.top  = (rect.bottom + 6) + 'px';
+    popup.style.left = left + 'px';
+  }
 }
 window.togglePortTabMenu = togglePortTabMenu;
 
@@ -389,6 +404,10 @@ document.addEventListener('click', (e) => {
     closePortTabMenu();
   }
 });
+
+// Close menu on viewport changes (since popup position is fixed and won't follow scroll)
+window.addEventListener('resize', closePortTabMenu);
+window.addEventListener('scroll', closePortTabMenu, {passive:true});
 
 /* === CREATE / RENAME MODAL === */
 let _portEditMode = 'create';
@@ -1653,6 +1672,9 @@ async function init(){
     bindTfBar();
     renderPortTabs();
     renderAll();
+    // Close popup if user scrolls the tab bar horizontally (internal scroll — window scroll listener doesn't catch this)
+    const tabsEl = document.getElementById('portTabs');
+    if (tabsEl) tabsEl.addEventListener('scroll', closePortTabMenu, {passive:true});
   }, 250);
 }
 
