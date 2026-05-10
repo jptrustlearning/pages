@@ -316,92 +316,79 @@ function setSelectedPortfolio(id){
   S.selectedPortfolioId = id;
   try { localStorage.setItem(lsKeyForUser(), id); } catch(e){}
   applyPortfolioFilter();
-  updatePortSwitcherChip();
+  closePortTabMenu();
+  renderPortTabs();
   renderAll();
 }
 window.setSelectedPortfolio = setSelectedPortfolio;
 
 function updatePortSwitcherChip(){
-  const dot = document.getElementById('portSwitcherDot');
-  const name = document.getElementById('portSwitcherName');
-  if (!dot || !name) return;
-  const cur = getCurrentPortfolio();
-  if (!cur){
-    name.textContent = 'ทั้งหมด';
-    dot.className = 'port-switcher-dot all';
-    dot.style.background = '';
-  } else {
-    name.textContent = cur.name;
-    dot.className = 'port-switcher-dot';
-    dot.style.background = cur.color;
-  }
+  // Phase 1.5: replaced by renderPortTabs — kept as no-op for safety in case any
+  // legacy call site still references it. Real rendering happens in renderPortTabs.
+  renderPortTabs();
 }
 
-/* === BOTTOM SHEET PICKER === */
-function openPortPicker(){
-  renderPortList();
-  document.getElementById('portPickerBackdrop').classList.add('active');
-}
-window.openPortPicker = openPortPicker;
-
-function closePortPicker(){
-  document.getElementById('portPickerBackdrop').classList.remove('active');
-  document.querySelectorAll('.port-item-actions.active').forEach(el => el.classList.remove('active'));
-}
-window.closePortPicker = closePortPicker;
-
-function renderPortList(){
-  const list = document.getElementById('portList');
-  if (!list) return;
+/* === PORTFOLIO TAB BAR (Phase 1.5) === */
+function renderPortTabs(){
+  const wrap = document.getElementById('portTabs');
+  if (!wrap) return;
   const items = [];
-  // virtual "ทั้งหมด"
+  // ทั้งหมด tab (virtual)
   const allActive = S.selectedPortfolioId === VIRTUAL_ALL;
-  items.push(`<div class="port-item-wrap port-item-virtual">
-    <div class="port-item ${allActive ? 'active' : ''}">
-      <div class="port-item-tap" onclick="setSelectedPortfolio('${VIRTUAL_ALL}'); closePortPicker()">
-        <span class="port-item-dot all"></span>
-        <span class="port-item-name">ทั้งหมด</span>
-        <span class="port-item-count">${S.allLots.length} ไม้</span>
-        ${allActive ? '<span class="port-item-check">✓</span>' : ''}
-      </div>
-    </div>
-  </div>`);
-  // each real portfolio
+  items.push(`<button class="port-tab ${allActive ? 'active' : ''}" onclick="setSelectedPortfolio('${VIRTUAL_ALL}')">
+    <span class="port-tab-dot all"></span>
+    <span class="port-tab-name">ทั้งหมด</span>
+  </button>`);
+  // Each portfolio
   S.portfolios.forEach(p => {
-    const lotCount = S.allLots.filter(l => l.portfolio_id === p.id).length;
     const active = p.id === S.selectedPortfolioId;
-    items.push(`<div class="port-item-wrap">
-      <div class="port-item ${active ? 'active' : ''}">
-        <div class="port-item-tap" onclick="setSelectedPortfolio('${p.id}'); closePortPicker()">
-          <span class="port-item-dot" style="background:${p.color || '#722F37'}"></span>
-          <span class="port-item-name">${escapeHtml(p.name)}</span>
-          <span class="port-item-count">${lotCount} ไม้</span>
-          ${active ? '<span class="port-item-check">✓</span>' : ''}
-        </div>
-        <button class="port-item-menu" onclick="event.stopPropagation(); togglePortItemActions('${p.id}')" title="จัดการพอร์ต">⋮</button>
-      </div>
-      <div class="port-item-actions" id="portActions-${p.id}">
-        <button class="port-item-action" onclick="openRenamePortModal('${p.id}')">เปลี่ยนชื่อ</button>
-        <button class="port-item-action danger" onclick="confirmDeletePortfolio('${p.id}')">ลบพอร์ต</button>
-      </div>
-    </div>`);
+    const menuHtml = active ? `
+      <button class="port-tab-menu" onclick="event.stopPropagation(); togglePortTabMenu('${p.id}')" title="จัดการพอร์ต">⋮</button>
+      <div class="port-tab-menu-popup" id="portMenuPopup-${p.id}">
+        <button class="port-tab-menu-action" onclick="event.stopPropagation(); closePortTabMenu(); openRenamePortModal('${p.id}')">เปลี่ยนชื่อ</button>
+        <button class="port-tab-menu-action danger" onclick="event.stopPropagation(); closePortTabMenu(); confirmDeletePortfolio('${p.id}')">ลบพอร์ต</button>
+      </div>` : '';
+    items.push(`<button class="port-tab ${active ? 'active' : ''}" onclick="setSelectedPortfolio('${p.id}')">
+      <span class="port-tab-dot" style="background:${p.color || '#722F37'}"></span>
+      <span class="port-tab-name">${escapeHtml(p.name)}</span>
+      ${menuHtml}
+    </button>`);
   });
-  list.innerHTML = items.join('');
-  // Cap state on create button
-  const createBtn = document.getElementById('portCreateBtn');
-  if (createBtn){
-    createBtn.textContent = `+ พอร์ตใหม่ (${S.portfolios.length}/${PORTFOLIO_MAX})`;
-    createBtn.disabled = S.portfolios.length >= PORTFOLIO_MAX;
+  // + tab (create new)
+  const atCap = S.portfolios.length >= PORTFOLIO_MAX;
+  if (atCap){
+    items.push(`<button class="port-tab-add disabled" onclick="toast('มีพอร์ตครบ ${PORTFOLIO_MAX} แล้ว','err')" title="มีพอร์ตครบ ${PORTFOLIO_MAX}">+</button>`);
+  } else {
+    items.push(`<button class="port-tab-add" onclick="openCreatePortModal()" title="สร้างพอร์ตใหม่">+</button>`);
   }
+  wrap.innerHTML = items.join('');
+  // Auto-scroll active tab into view (after DOM settles)
+  setTimeout(() => {
+    const activeEl = wrap.querySelector('.port-tab.active');
+    if (activeEl) activeEl.scrollIntoView({behavior:'smooth', block:'nearest', inline:'nearest'});
+  }, 50);
 }
+window.renderPortTabs = renderPortTabs;
 
-function togglePortItemActions(pid){
-  const el = document.getElementById('portActions-' + pid);
-  if (!el) return;
-  document.querySelectorAll('.port-item-actions.active').forEach(x => { if (x !== el) x.classList.remove('active'); });
-  el.classList.toggle('active');
+function togglePortTabMenu(pid){
+  const popup = document.getElementById('portMenuPopup-' + pid);
+  if (!popup) return;
+  document.querySelectorAll('.port-tab-menu-popup.active').forEach(x => { if (x !== popup) x.classList.remove('active'); });
+  popup.classList.toggle('active');
 }
-window.togglePortItemActions = togglePortItemActions;
+window.togglePortTabMenu = togglePortTabMenu;
+
+function closePortTabMenu(){
+  document.querySelectorAll('.port-tab-menu-popup.active').forEach(x => x.classList.remove('active'));
+}
+window.closePortTabMenu = closePortTabMenu;
+
+// Outside-click closes any open tab menu
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.port-tab-menu') && !e.target.closest('.port-tab-menu-popup')) {
+    closePortTabMenu();
+  }
+});
 
 /* === CREATE / RENAME MODAL === */
 let _portEditMode = 'create';
@@ -464,8 +451,7 @@ async function submitPortEdit(){
     S.portfolios.push(data);
     closePortEditModal();
     toast('สร้างพอร์ต "' + name + '" แล้ว', 'ok');
-    setSelectedPortfolio(data.id);  // auto-switch to new portfolio
-    if (document.getElementById('portPickerBackdrop').classList.contains('active')) renderPortList();
+    setSelectedPortfolio(data.id);  // auto-switch to new portfolio (also re-renders tabs)
   } else {
     // rename
     const { error } = await sb.from('portfolios').update({ name }).eq('id', _portEditId);
@@ -475,8 +461,7 @@ async function submitPortEdit(){
     if (p) p.name = name;
     closePortEditModal();
     toast('เปลี่ยนชื่อแล้ว', 'ok');
-    updatePortSwitcherChip();
-    if (document.getElementById('portPickerBackdrop').classList.contains('active')) renderPortList();
+    renderPortTabs();
   }
 }
 window.submitPortEdit = submitPortEdit;
@@ -508,9 +493,8 @@ function confirmDeletePortfolio(pid){
       toast('ลบพอร์ตแล้ว', 'ok');
       // refresh lots (CASCADE removes lots+sells server-side; refetch to reflect locally)
       await fetchLots();
-      updatePortSwitcherChip();
+      renderPortTabs();
       renderAll();
-      if (document.getElementById('portPickerBackdrop').classList.contains('active')) renderPortList();
     }
   });
 }
@@ -1667,7 +1651,7 @@ async function init(){
   setTimeout(() => {
     showApp();
     bindTfBar();
-    updatePortSwitcherChip();
+    renderPortTabs();
     renderAll();
   }, 250);
 }
