@@ -16,6 +16,9 @@ const PORTFOLIO_COLORS = ['#722F37','#B8860B','#2E9F5F','#8B2252','#5A3D20'];
 const PORTFOLIO_MAX    = 5;
 const VIRTUAL_ALL      = '__all__';
 
+/* === Phase 2: Categories — different palette so chips visually distinct from portfolio dots === */
+const CATEGORY_COLORS  = ['#2E9F5F','#B8860B','#8B2252','#5A3D20','#722F37','#1F7D49','#C0392B','#3D3228'];
+
 let sb = null;
 try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON); }
 catch(e) { console.error('Supabase init failed', e); }
@@ -28,6 +31,8 @@ const S = {
   selectedPortfolioId: VIRTUAL_ALL,
   allLots: [],               // raw fetched lots (full set for this user)
   lots: [],                  // filtered view by selectedPortfolioId — all render code reads this
+  // Phase 2: categories (flat list, all portfolios — filter by portfolio_id when needed)
+  categories: [],            // [{id, portfolio_id, name, color, sort_order}]
   // price data
   tickers: [],       // sorted unique tickers in CSV
   sectors: {},       // ticker -> sector
@@ -75,6 +80,7 @@ function toast(msg, kind){
   if (toastT) clearTimeout(toastT);
   toastT = setTimeout(()=>{ el.className = 'toast'; }, 2400);
 }
+window.toast = toast;
 
 /* ============================================================
    FORMATTERS
@@ -317,7 +323,9 @@ function setSelectedPortfolio(id){
   try { localStorage.setItem(lsKeyForUser(), id); } catch(e){}
   applyPortfolioFilter();
   closePortTabMenu();
+  closeLotCatPopup();
   renderPortTabs();
+  updateCategoryTabVisibility();
   renderAll();
 }
 window.setSelectedPortfolio = setSelectedPortfolio;
@@ -520,6 +528,319 @@ function confirmDeletePortfolio(pid){
 window.confirmDeletePortfolio = confirmDeletePortfolio;
 
 /* ============================================================
+   PHASE 2: CATEGORY MANAGEMENT
+============================================================ */
+
+async function fetchCategories(){
+  if (!sb || !S.user){ S.categories = []; return; }
+  const { data, error } = await sb.from('portfolio_categories')
+    .select('*').eq('user_id', S.user.id).order('sort_order', {ascending: true});
+  if (error){
+    console.error('fetchCategories failed', error);
+    toast('โหลดกลุ่มล้มเหลว: '+error.message, 'err');
+    S.categories = [];
+    return;
+  }
+  S.categories = data || [];
+}
+
+function pickCategoryColorByOrder(idx){
+  return CATEGORY_COLORS[idx % CATEGORY_COLORS.length];
+}
+
+function getCategoriesForPortfolio(pid){
+  return S.categories.filter(c => c.portfolio_id === pid);
+}
+
+function getCategoryById(catId){
+  return S.categories.find(c => c.id === catId) || null;
+}
+
+function getLotCategory(lot){
+  return lot.category_id ? getCategoryById(lot.category_id) : null;
+}
+
+async function createCategory(name){
+  if (!sb || !S.user) return null;
+  const cur = getCurrentPortfolio();
+  if (!cur){ toast('เลือกพอร์ตเฉพาะก่อน (ไม่ใช่ทั้งหมด)', 'err'); return null; }
+  const portCats = getCategoriesForPortfolio(cur.id);
+  const sortOrder = portCats.length;
+  const color = pickCategoryColorByOrder(sortOrder);
+  const { data, error } = await sb.from('portfolio_categories')
+    .insert({
+      user_id: S.user.id,
+      portfolio_id: cur.id,
+      name, color,
+      sort_order: sortOrder,
+    })
+    .select().single();
+  if (error){ toast('สร้างกลุ่มล้มเหลว: '+error.message, 'err'); return null; }
+  S.categories.push(data);
+  return data;
+}
+
+async function updateCategoryName(catId, name){
+  const { error } = await sb.from('portfolio_categories')
+    .update({ name }).eq('id', catId);
+  if (error){ toast('เปลี่ยนชื่อล้มเหลว: '+error.message, 'err'); return false; }
+  const c = S.categories.find(x => x.id === catId);
+  if (c) c.name = name;
+  return true;
+}
+
+async function deleteCategory(catId){
+  // ON DELETE SET NULL on lots → lots stay but become uncategorized
+  const { error } = await sb.from('portfolio_categories')
+    .delete().eq('id', catId);
+  if (error){ toast('ลบกลุ่มล้มเหลว: '+error.message, 'err'); return false; }
+  S.categories = S.categories.filter(c => c.id !== catId);
+  // Update local lots — server already null'd them via FK constraint
+  S.allLots.forEach(l => { if (l.category_id === catId) l.category_id = null; });
+  applyPortfolioFilter();
+  return true;
+}
+
+async function setLotCategory(lotId, catIdOrNull){
+  const { error } = await sb.from('portfolio_lots')
+    .update({ category_id: catIdOrNull })
+    .eq('id', lotId);
+  if (error){ toast('บันทึกกลุ่มล้มเหลว: '+error.message, 'err'); return false; }
+  const lot = S.allLots.find(l => l.id === lotId);
+  if (lot) lot.category_id = catIdOrNull;
+  applyPortfolioFilter();
+  return true;
+}
+
+/* === CATEGORY EDIT MODAL === */
+let _catEditMode = 'create';
+let _catEditId = null;
+let _pendingLotForNewCat = null;  // when creating from a lot's chip → assign new cat to this lot
+
+function openCreateCatModal(){
+  if (!getCurrentPortfolio()){ toast('เลือกพอร์ตเฉพาะก่อน (ไม่ใช่ทั้งหมด)', 'err'); return; }
+  _catEditMode = 'create';
+  _catEditId = null;
+  document.getElementById('catEditTitle').textContent = 'กลุ่มใหม่';
+  document.getElementById('catEditName').value = '';
+  document.getElementById('catEditConfirm').textContent = 'สร้าง';
+  document.getElementById('catEditConfirm').disabled = false;
+  document.getElementById('catEditModal').classList.add('active');
+  setTimeout(() => { const n = document.getElementById('catEditName'); if (n) n.focus(); }, 60);
+}
+window.openCreateCatModal = openCreateCatModal;
+
+function openCreateCatModalForLot(lotId){
+  _pendingLotForNewCat = lotId;
+  closeLotCatPopup();
+  openCreateCatModal();
+}
+window.openCreateCatModalForLot = openCreateCatModalForLot;
+
+function openRenameCatModal(catId){
+  const c = getCategoryById(catId);
+  if (!c) return;
+  _catEditMode = 'rename';
+  _catEditId = catId;
+  document.getElementById('catEditTitle').textContent = 'เปลี่ยนชื่อกลุ่ม';
+  document.getElementById('catEditName').value = c.name;
+  document.getElementById('catEditConfirm').textContent = 'บันทึก';
+  document.getElementById('catEditConfirm').disabled = false;
+  document.getElementById('catEditModal').classList.add('active');
+  setTimeout(() => { const n = document.getElementById('catEditName'); if (n){ n.focus(); n.select(); } }, 60);
+}
+window.openRenameCatModal = openRenameCatModal;
+
+function closeCatEditModal(){
+  document.getElementById('catEditModal').classList.remove('active');
+  _pendingLotForNewCat = null;  // clear pending state on cancel
+}
+window.closeCatEditModal = closeCatEditModal;
+
+async function submitCatEdit(){
+  const name = document.getElementById('catEditName').value.trim();
+  if (!name){ toast('กรุณาใส่ชื่อกลุ่ม', 'err'); return; }
+  if (name.length > 40){ toast('ชื่อกลุ่มยาวเกินไป (สูงสุด 40 ตัวอักษร)', 'err'); return; }
+  const btn = document.getElementById('catEditConfirm');
+  btn.disabled = true;
+  if (_catEditMode === 'create'){
+    const newCat = await createCategory(name);
+    btn.disabled = false;
+    if (!newCat) return;
+    document.getElementById('catEditModal').classList.remove('active');
+    toast('สร้างกลุ่ม "' + name + '" แล้ว', 'ok');
+    // If pending lot assignment from chip popup, do it now
+    if (_pendingLotForNewCat){
+      const lid = _pendingLotForNewCat;
+      _pendingLotForNewCat = null;
+      await setLotCategory(lid, newCat.id);
+      toast('ใส่กลุ่มให้ไม้แล้ว', 'ok');
+    }
+    if (document.getElementById('manageCatModal').classList.contains('active')) renderManageCatList();
+    renderAll();
+  } else {
+    const ok = await updateCategoryName(_catEditId, name);
+    btn.disabled = false;
+    if (!ok) return;
+    document.getElementById('catEditModal').classList.remove('active');
+    toast('เปลี่ยนชื่อแล้ว', 'ok');
+    if (document.getElementById('manageCatModal').classList.contains('active')) renderManageCatList();
+    renderAll();
+  }
+}
+window.submitCatEdit = submitCatEdit;
+
+function confirmDeleteCategory(catId){
+  const c = getCategoryById(catId);
+  if (!c) return;
+  const lotCount = S.allLots.filter(l => l.category_id === catId).length;
+  const text = lotCount === 0
+    ? `กลุ่ม "${escapeHtml(c.name)}" ไม่มีไม้ — ลบได้ทันที`
+    : `กลุ่ม "${escapeHtml(c.name)}" มี <strong>${lotCount} ไม้</strong> — ไม้จะกลับเป็น <em>"ยังไม่ได้จัดกลุ่ม"</em><br>(ไม้ไม่ถูกลบ)`;
+  showConfirm({
+    title: 'ลบกลุ่มนี้?',
+    text,
+    okLabel: 'ลบกลุ่ม',
+    onOk: async () => {
+      const ok = await deleteCategory(catId);
+      if (!ok) return;
+      toast('ลบกลุ่มแล้ว', 'ok');
+      if (document.getElementById('manageCatModal').classList.contains('active')) renderManageCatList();
+      renderAll();
+    }
+  });
+}
+window.confirmDeleteCategory = confirmDeleteCategory;
+
+/* === MANAGE CATEGORIES MODAL === */
+function openManageCatModal(){
+  if (!getCurrentPortfolio()){ toast('เลือกพอร์ตเฉพาะก่อน', 'err'); return; }
+  renderManageCatList();
+  document.getElementById('manageCatModal').classList.add('active');
+}
+window.openManageCatModal = openManageCatModal;
+
+function closeManageCatModal(){
+  document.getElementById('manageCatModal').classList.remove('active');
+}
+window.closeManageCatModal = closeManageCatModal;
+
+function renderManageCatList(){
+  const cur = getCurrentPortfolio();
+  const titleEl = document.getElementById('manageCatTitle');
+  if (titleEl) titleEl.textContent = cur ? `จัดการกลุ่ม · ${cur.name}` : 'จัดการกลุ่ม';
+  const list = document.getElementById('manageCatList');
+  if (!list) return;
+  if (!cur){
+    list.innerHTML = '<div class="manage-cat-empty">เลือกพอร์ตเฉพาะก่อน</div>';
+    return;
+  }
+  const cats = getCategoriesForPortfolio(cur.id);
+  if (cats.length === 0){
+    list.innerHTML = '<div class="manage-cat-empty">ยังไม่มีกลุ่มในพอร์ตนี้ — กดปุ่ม "+ กลุ่มใหม่" ด้านล่างเพื่อสร้าง</div>';
+    return;
+  }
+  list.innerHTML = cats.map(c => {
+    const lotCount = S.allLots.filter(l => l.category_id === c.id).length;
+    return `<div class="manage-cat-row">
+      <div class="manage-cat-info">
+        <span class="cat-section-dot" style="background:${c.color || '#722F37'}"></span>
+        <span class="manage-cat-name">${escapeHtml(c.name)}</span>
+        <span class="manage-cat-count">${lotCount} ไม้</span>
+      </div>
+      <div class="manage-cat-actions">
+        <button class="manage-cat-btn rename" onclick="openRenameCatModal('${c.id}')" title="เปลี่ยนชื่อ">เปลี่ยนชื่อ</button>
+        <button class="manage-cat-btn danger" onclick="confirmDeleteCategory('${c.id}')" title="ลบกลุ่ม">ลบ</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* === LOT CATEGORY POPUP (anchored chip on lot card) === */
+let _lotCatPopupLotId = null;
+
+function openLotCatPopup(lotId, btnEl){
+  // Only available in single-portfolio mode (categories are per-portfolio)
+  if (S.selectedPortfolioId === VIRTUAL_ALL){ return; }
+  _lotCatPopupLotId = lotId;
+  const lot = S.allLots.find(l => l.id === lotId);
+  if (!lot) return;
+  const cur = getCurrentPortfolio();
+  if (!cur) return;
+  const cats = getCategoriesForPortfolio(cur.id);
+  const popup = document.getElementById('lotCatPopup');
+  if (!popup) return;
+  // Build content
+  const items = [];
+  // "ไม่จัดกลุ่ม" option
+  const isNone = !lot.category_id;
+  items.push(`<button class="lot-cat-option ${isNone ? 'active' : ''}" onclick="event.stopPropagation(); pickLotCat(null)">
+    <span class="lot-cat-option-dot none"></span>
+    <span class="lot-cat-option-name">ไม่จัดกลุ่ม</span>
+    ${isNone ? '<span class="lot-cat-check">✓</span>' : ''}
+  </button>`);
+  // each existing category
+  cats.forEach(cat => {
+    const active = cat.id === lot.category_id;
+    items.push(`<button class="lot-cat-option ${active ? 'active' : ''}" onclick="event.stopPropagation(); pickLotCat('${cat.id}')">
+      <span class="lot-cat-option-dot" style="background:${cat.color || '#722F37'}"></span>
+      <span class="lot-cat-option-name">${escapeHtml(cat.name)}</span>
+      ${active ? '<span class="lot-cat-check">✓</span>' : ''}
+    </button>`);
+  });
+  // "+ สร้างกลุ่มใหม่"
+  items.push(`<button class="lot-cat-option create" onclick="event.stopPropagation(); openCreateCatModalForLot('${lotId}')">+ สร้างกลุ่มใหม่</button>`);
+  popup.innerHTML = items.join('');
+  // Show first to measure
+  popup.classList.add('active');
+  // Position via getBoundingClientRect
+  const rect = btnEl.getBoundingClientRect();
+  const popupW = popup.offsetWidth || 200;
+  const popupH = popup.offsetHeight || 200;
+  let left = rect.left;
+  let top  = rect.bottom + 6;
+  if (left + popupW > window.innerWidth - 8) left = window.innerWidth - popupW - 8;
+  if (left < 8) left = 8;
+  if (top + popupH > window.innerHeight - 8){
+    // flip up if it would overflow bottom
+    top = rect.top - popupH - 6;
+    if (top < 8) top = 8;
+  }
+  popup.style.top  = top + 'px';
+  popup.style.left = left + 'px';
+}
+window.openLotCatPopup = openLotCatPopup;
+
+function closeLotCatPopup(){
+  const popup = document.getElementById('lotCatPopup');
+  if (popup) popup.classList.remove('active');
+  _lotCatPopupLotId = null;
+}
+window.closeLotCatPopup = closeLotCatPopup;
+
+async function pickLotCat(catId){
+  const lotId = _lotCatPopupLotId;
+  closeLotCatPopup();
+  if (!lotId) return;
+  const ok = await setLotCategory(lotId, catId);
+  if (ok){
+    toast(catId ? 'ย้ายกลุ่มแล้ว' : 'นำออกจากกลุ่มแล้ว', 'ok');
+    renderAll();
+  }
+}
+window.pickLotCat = pickLotCat;
+
+// Outside-click closes lot cat popup
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.lot-cat-chip') && !e.target.closest('#lotCatPopup')) {
+    closeLotCatPopup();
+  }
+});
+
+window.addEventListener('resize', closeLotCatPopup);
+window.addEventListener('scroll', closeLotCatPopup, {passive:true});
+
+/* ============================================================
    PER-LOT METRICS
 ============================================================ */
 /* Dust threshold: half of fmtShares display precision (4 decimals).
@@ -598,6 +919,96 @@ function renderHero(){
 /* ============================================================
    RENDER: LOTS LIST
 ============================================================ */
+
+/* Renders a single lot card. Used by both renderLots (ดูเป็นไม้ tab)
+   and renderByCategory (ดูตามกลุ่ม tab). Category chip auto-hidden
+   in ทั้งหมด mode since categories are per-portfolio. */
+function lotCardHtml(lot){
+  const m = lotMetrics(lot);
+  const sector = S.sectors[lot.ticker] || '';
+  const badge = m.status === 'closed' ? '<span class="lot-badge closed">CLOSED</span>'
+              : m.status === 'partial' ? '<span class="lot-badge partial">PARTIAL</span>'
+              : '<span class="lot-badge open">OPEN</span>';
+  const pnlVal = m.totalPnl;
+  const pnlCls = pnlText(pnlVal);
+  // Category chip — only when in single-portfolio mode
+  const showChip = S.selectedPortfolioId !== VIRTUAL_ALL;
+  let chipHtml = '';
+  if (showChip){
+    const cat = getLotCategory(lot);
+    if (cat){
+      chipHtml = `<button class="lot-cat-chip has-cat" onclick="event.stopPropagation(); openLotCatPopup('${lot.id}', this)" title="เปลี่ยนกลุ่ม">
+        <span class="lot-cat-chip-dot" style="background:${cat.color || '#722F37'}"></span>
+        <span class="lot-cat-chip-name">${escapeHtml(cat.name)}</span>
+      </button>`;
+    } else {
+      chipHtml = `<button class="lot-cat-chip no-cat" onclick="event.stopPropagation(); openLotCatPopup('${lot.id}', this)" title="จัดกลุ่ม">+ จัดกลุ่ม</button>`;
+    }
+  }
+  const sellsHtml = lot.sells.length === 0 ? '' : '<div class="sell-history">' + lot.sells.map(s => {
+    const sellPnl = (s.exit_price - lot.entry_price) * s.shares_sold;
+    const cls = sellPnl >= 0 ? 'pnl-pos' : 'pnl-neg';
+    return `<div class="sell-row">
+      <div class="sell-row-left">
+        <span class="sell-row-tag">SOLD</span>
+        <span>${s.exit_date} · ${fmtShares(s.shares_sold)} Shares @ $${s.exit_price.toFixed(2)}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span class="sell-row-pnl ${cls}">${fmtUSDsigned(sellPnl)}</span>
+        <button class="sell-row-del" onclick="deleteSell('${s.id}')" title="ลบรายการขายนี้">✕</button>
+      </div>
+    </div>`;
+  }).join('') + '</div>';
+  const actions = m.status === 'closed'
+    ? `<div class="lot-actions">
+         <button class="lot-btn delete" onclick="confirmDeleteLot('${lot.id}','${lot.ticker}')">ลบไม้นี้</button>
+       </div>`
+    : `<div class="lot-actions">
+         <button class="lot-btn sell" onclick="openSellModal('${lot.id}')">+ ขายบางส่วน / ทั้งหมด</button>
+         <button class="lot-btn delete" onclick="confirmDeleteLot('${lot.id}','${lot.ticker}')">ลบ</button>
+       </div>`;
+  return `<div class="lot-card ${m.status === 'closed' ? 'closed' : ''}">
+    <div class="lot-head">
+      <div class="lot-head-left">
+        <div class="lot-ticker-row">
+          <span class="lot-ticker">${lot.ticker}</span>
+          ${badge}
+          ${chipHtml}
+        </div>
+        <div class="lot-meta">
+          ${sector ? sector + ' · ' : ''}ซื้อ ${lot.entry_date} @ $${lot.entry_price.toFixed(2)}<br>
+          ${fmtShares(lot.shares)} Shares · ลงทุน ${fmtUSD(lot.amount_usd)}
+        </div>
+      </div>
+      <div class="lot-pnl">
+        <div class="lot-pnl-val ${pnlCls}">${fmtUSDsigned(pnlVal)}</div>
+        <div class="lot-pnl-pct ${pnlCls}">${fmtPct(m.pctOriginal)}</div>
+      </div>
+    </div>
+    ${m.status === 'closed' ? '' : `
+    <div class="lot-detail-row">
+      <div>
+        <div class="lot-detail-label">ถืออยู่</div>
+        <div class="lot-detail-val">${fmtShares(m.effRemaining)} Shares</div>
+      </div>
+      <div>
+        <div class="lot-detail-label">ราคาตอนนี้</div>
+        <div class="lot-detail-val">${m.latest !== null ? '$'+m.latest.toFixed(2) : '—'}</div>
+      </div>
+      <div>
+        <div class="lot-detail-label">มูลค่าตอนนี้</div>
+        <div class="lot-detail-val">${fmtUSD(m.marketValue)}</div>
+      </div>
+      <div>
+        <div class="lot-detail-label">Unrealized</div>
+        <div class="lot-detail-val ${pnlText(m.unrealizedPnl)}">${fmtUSDsigned(m.unrealizedPnl)}</div>
+      </div>
+    </div>`}
+    ${sellsHtml}
+    ${actions}
+  </div>`;
+}
+
 function renderLots(){
   const wrap = document.getElementById('tabLots');
   if (!S.lots.length){
@@ -608,78 +1019,119 @@ function renderLots(){
     </div>`;
     return;
   }
-  const html = S.lots.map(lot => {
-    const m = lotMetrics(lot);
-    const sector = S.sectors[lot.ticker] || '';
-    const badge = m.status === 'closed' ? '<span class="lot-badge closed">CLOSED</span>'
-                : m.status === 'partial' ? '<span class="lot-badge partial">PARTIAL</span>'
-                : '<span class="lot-badge open">OPEN</span>';
-    const pnlVal = m.totalPnl;
-    const pnlCls = pnlText(pnlVal);
-    const pnlSym = pnlVal >= 0 ? '+' : '−';
-    const sellsHtml = lot.sells.length === 0 ? '' : '<div class="sell-history">' + lot.sells.map(s => {
-      const sellPnl = (s.exit_price - lot.entry_price) * s.shares_sold;
-      const cls = sellPnl >= 0 ? 'pnl-pos' : 'pnl-neg';
-      return `<div class="sell-row">
-        <div class="sell-row-left">
-          <span class="sell-row-tag">SOLD</span>
-          <span>${s.exit_date} · ${fmtShares(s.shares_sold)} Shares @ $${s.exit_price.toFixed(2)}</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px">
-          <span class="sell-row-pnl ${cls}">${fmtUSDsigned(sellPnl)}</span>
-          <button class="sell-row-del" onclick="deleteSell('${s.id}')" title="ลบรายการขายนี้">✕</button>
-        </div>
-      </div>`;
-    }).join('') + '</div>';
-    const actions = m.status === 'closed'
-      ? `<div class="lot-actions">
-           <button class="lot-btn delete" onclick="confirmDeleteLot('${lot.id}','${lot.ticker}')">ลบไม้นี้</button>
-         </div>`
-      : `<div class="lot-actions">
-           <button class="lot-btn sell" onclick="openSellModal('${lot.id}')">+ ขายบางส่วน / ทั้งหมด</button>
-           <button class="lot-btn delete" onclick="confirmDeleteLot('${lot.id}','${lot.ticker}')">ลบ</button>
-         </div>`;
-    return `<div class="lot-card ${m.status === 'closed' ? 'closed' : ''}">
-      <div class="lot-head">
-        <div class="lot-head-left">
-          <div class="lot-ticker-row">
-            <span class="lot-ticker">${lot.ticker}</span>
-            ${badge}
-          </div>
-          <div class="lot-meta">
-            ${sector ? sector + ' · ' : ''}ซื้อ ${lot.entry_date} @ $${lot.entry_price.toFixed(2)}<br>
-            ${fmtShares(lot.shares)} Shares · ลงทุน ${fmtUSD(lot.amount_usd)}
-          </div>
-        </div>
-        <div class="lot-pnl">
-          <div class="lot-pnl-val ${pnlCls}">${fmtUSDsigned(pnlVal)}</div>
-          <div class="lot-pnl-pct ${pnlCls}">${fmtPct(m.pctOriginal)}</div>
-        </div>
-      </div>
-      ${m.status === 'closed' ? '' : `
-      <div class="lot-detail-row">
-        <div>
-          <div class="lot-detail-label">ถืออยู่</div>
-          <div class="lot-detail-val">${fmtShares(m.effRemaining)} Shares</div>
-        </div>
-        <div>
-          <div class="lot-detail-label">ราคาตอนนี้</div>
-          <div class="lot-detail-val">${m.latest !== null ? '$'+m.latest.toFixed(2) : '—'}</div>
-        </div>
-        <div>
-          <div class="lot-detail-label">มูลค่าตอนนี้</div>
-          <div class="lot-detail-val">${fmtUSD(m.marketValue)}</div>
-        </div>
-        <div>
-          <div class="lot-detail-label">Unrealized</div>
-          <div class="lot-detail-val ${pnlText(m.unrealizedPnl)}">${fmtUSDsigned(m.unrealizedPnl)}</div>
-        </div>
-      </div>`}
-      ${sellsHtml}
-      ${actions}
-    </div>`;
-  }).join('');
+  const html = S.lots.map(lot => lotCardHtml(lot)).join('');
   wrap.innerHTML = `<div class="lots-list">${html}</div>`;
+}
+
+/* ============================================================
+   RENDER: BY CATEGORY (Phase 2)
+   - Only meaningful in single-portfolio mode (categories are per-portfolio)
+   - In ทั้งหมด mode, the tab itself is hidden via updateCategoryTabVisibility()
+============================================================ */
+function renderByCategory(){
+  const wrap = document.getElementById('tabCategory');
+  if (!wrap) return;
+  const cur = getCurrentPortfolio();
+  if (!cur){
+    // Should never render in ทั้งหมด mode (tab hidden); safety only
+    wrap.innerHTML = '';
+    return;
+  }
+  const cats = getCategoriesForPortfolio(cur.id);
+  // S.lots is already filtered to current portfolio (per applyPortfolioFilter)
+  const portLots = S.lots;
+  // Group lots by category
+  const byCat = {};
+  const uncat = [];
+  portLots.forEach(l => {
+    if (l.category_id){
+      (byCat[l.category_id] = byCat[l.category_id] || []).push(l);
+    } else {
+      uncat.push(l);
+    }
+  });
+
+  // Empty-empty state (no categories AND no lots)
+  if (cats.length === 0 && portLots.length === 0){
+    wrap.innerHTML = `<div class="empty">
+      <div class="empty-icon">📁</div>
+      <div class="empty-text">ยังไม่มีกลุ่มและยังไม่มีไม้</div>
+      <div class="empty-sub">เริ่มจากบันทึกการซื้อใหม่ในพอร์ตนี้ก่อน</div>
+    </div>`;
+    return;
+  }
+
+  // Toolbar
+  let html = `<div class="cat-toolbar">
+    <div class="cat-toolbar-title">กลุ่มในพอร์ต <strong>${escapeHtml(cur.name)}</strong></div>
+    <button class="cat-manage-btn" onclick="openManageCatModal()">⚙ จัดการกลุ่ม</button>
+  </div>`;
+
+  // Each category section (in sort_order)
+  cats.forEach(cat => {
+    const lots = byCat[cat.id] || [];
+    html += renderCatSection(cat, lots);
+  });
+
+  // Uncategorized section (only if any uncategorized lots exist)
+  if (uncat.length > 0){
+    html += renderCatSection(null, uncat);
+  }
+
+  // Hint when portfolio has lots but no categories
+  if (cats.length === 0 && portLots.length > 0){
+    html += `<div style="text-align:center;margin-top:14px">
+      <button class="cat-create-first-btn" onclick="openCreateCatModal()">+ สร้างกลุ่มแรก</button>
+      <div class="cat-create-first-hint">เพื่อจัดระเบียบไม้ในพอร์ต</div>
+    </div>`;
+  }
+
+  wrap.innerHTML = html;
+}
+
+function renderCatSection(cat, lots){
+  // Sum metrics for section header
+  let mv = 0, realized = 0, unrealized = 0, totalInvested = 0;
+  lots.forEach(lot => {
+    const m = lotMetrics(lot);
+    mv += m.marketValue;
+    realized += m.realizedPnl;
+    unrealized += m.unrealizedPnl;
+    totalInvested += lot.amount_usd;
+  });
+  const totalPnl = realized + unrealized;
+  const pctOnInvested = totalInvested > 0 ? (totalPnl / totalInvested) * 100 : 0;
+  const pnlCls = pnlText(totalPnl);
+  const pnlSym = totalPnl >= 0 ? '+' : '−';
+  const isUncat = !cat;
+
+  const headerHtml = isUncat
+    ? `<div class="cat-section-header uncat">
+        <span class="cat-section-dot uncat"></span>
+        <span class="cat-section-name">ยังไม่ได้จัดกลุ่ม</span>
+        <span class="cat-section-count">${lots.length} ไม้</span>
+      </div>`
+    : `<div class="cat-section-header">
+        <span class="cat-section-dot" style="background:${cat.color || '#722F37'}"></span>
+        <span class="cat-section-name">${escapeHtml(cat.name)}</span>
+        <span class="cat-section-count">${lots.length} ไม้</span>
+      </div>`;
+
+  const summaryHtml = lots.length === 0 ? '' : `<div class="cat-section-summary">
+    <div class="cat-summary-cell"><div class="cat-summary-label">ลงทุน</div><div class="cat-summary-val">${fmtUSD(totalInvested)}</div></div>
+    <div class="cat-summary-cell"><div class="cat-summary-label">มูลค่ารวม</div><div class="cat-summary-val">${fmtUSD(mv + realized)}</div></div>
+    <div class="cat-summary-cell"><div class="cat-summary-label">P&amp;L</div><div class="cat-summary-val ${pnlCls}">${pnlSym}${fmtUSD(Math.abs(totalPnl))} (${(totalPnl >= 0 ? '+' : '')}${pctOnInvested.toFixed(2)}%)</div></div>
+  </div>`;
+
+  const lotsHtml = lots.length === 0
+    ? '<div class="cat-section-empty">ไม่มีไม้ในกลุ่มนี้</div>'
+    : `<div class="cat-section-lots">${lots.map(l => lotCardHtml(l)).join('')}</div>`;
+
+  return `<div class="cat-section ${isUncat ? 'uncat-section' : ''}">
+    ${headerHtml}
+    ${summaryHtml}
+    ${lotsHtml}
+  </div>`;
 }
 
 /* ============================================================
@@ -937,15 +1389,32 @@ function drawEquityChart(){
    TABS
 ============================================================ */
 function switchTab(tab){
+  // In ทั้งหมด mode, the category tab is hidden — guard against accessing it
+  if (tab === 'category' && S.selectedPortfolioId === VIRTUAL_ALL){
+    tab = 'lots';
+  }
   S.currentTab = tab;
   document.querySelectorAll('.tab-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.tab === tab);
   });
-  document.getElementById('tabLots').style.display   = tab === 'lots' ? 'block' : 'none';
-  document.getElementById('tabTicker').style.display = tab === 'ticker' ? 'block' : 'none';
-  document.getElementById('tabSells').style.display  = tab === 'sells' ? 'block' : 'none';
+  document.getElementById('tabLots').style.display     = tab === 'lots' ? 'block' : 'none';
+  document.getElementById('tabTicker').style.display   = tab === 'ticker' ? 'block' : 'none';
+  document.getElementById('tabCategory').style.display = tab === 'category' ? 'block' : 'none';
+  document.getElementById('tabSells').style.display    = tab === 'sells' ? 'block' : 'none';
 }
 window.switchTab = switchTab;
+
+/* Hide ดูตามกลุ่ม tab in ทั้งหมด mode (categories are per-portfolio) */
+function updateCategoryTabVisibility(){
+  const btn = document.getElementById('tabBtnCategory');
+  if (!btn) return;
+  if (S.selectedPortfolioId === VIRTUAL_ALL){
+    btn.style.display = 'none';
+    if (S.currentTab === 'category') switchTab('lots');
+  } else {
+    btn.style.display = '';
+  }
+}
 
 /* ============================================================
    ADD MODAL
@@ -1613,6 +2082,7 @@ function renderAll(){
   renderHero();
   renderLots();
   renderByTicker();
+  renderByCategory();
   renderSells();
   drawEquityChart();
 }
@@ -1655,6 +2125,8 @@ async function init(){
   // 4. Phase 1: portfolios — load + auto-create default for fresh users
   await fetchPortfolios();
   await ensureDefaultPortfolio();
+  // 4b. Phase 2: categories
+  await fetchCategories();
   setProgress(82);
   // 5. Restore last-selected portfolio from localStorage
   let lastSelected = VIRTUAL_ALL;
@@ -1671,6 +2143,7 @@ async function init(){
     showApp();
     bindTfBar();
     renderPortTabs();
+    updateCategoryTabVisibility();
     renderAll();
     // Close popup if user scrolls the tab bar horizontally (internal scroll — window scroll listener doesn't catch this)
     const tabsEl = document.getElementById('portTabs');

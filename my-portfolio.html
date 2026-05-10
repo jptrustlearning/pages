@@ -247,6 +247,76 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 /* Add modal — destination portfolio dropdown (only visible in ทั้งหมด mode) */
 .add-port-select{font-family:var(--font-thai);font-size:.92rem;padding:10px 12px;border:1px solid var(--border-gold);border-radius:9px;background:var(--cream-card);color:var(--text-dark);width:100%;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238B6914' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
 .add-port-select:focus{outline:none;border-color:var(--gold-dark)}
+
+/* ============================================================
+   PHASE 2: CATEGORIES
+============================================================ */
+
+/* === Lot card category chip === */
+.lot-cat-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-family:var(--font-thai);font-size:.68rem;font-weight:600;line-height:1;cursor:pointer;border:1px solid var(--border-gold);background:var(--cream);color:var(--text-heading);transition:all .15s;letter-spacing:.2px;max-width:160px}
+.lot-cat-chip:hover{background:var(--cream-warm);border-color:var(--border-gold-strong)}
+.lot-cat-chip:active{transform:scale(.96)}
+.lot-cat-chip.has-cat{background:var(--cream-card);border-color:var(--border-gold-strong);box-shadow:0 1px 3px rgba(114,47,55,0.05)}
+.lot-cat-chip.no-cat{border-style:dashed;color:var(--text-muted);background:transparent;font-weight:500}
+.lot-cat-chip.no-cat:hover{color:var(--gold-dark);border-color:var(--gold-dark)}
+.lot-cat-chip-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 1.5px rgba(0,0,0,0.05)}
+.lot-cat-chip-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px}
+
+/* === ดูตามกลุ่ม tab — toolbar === */
+.cat-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:10px 12px;background:linear-gradient(160deg,var(--cream-card),#F8F2E4);border:1px solid var(--border-gold);border-radius:12px;gap:8px;flex-wrap:wrap}
+.cat-toolbar-title{font-family:var(--font-thai);font-size:.82rem;color:var(--text-heading);font-weight:500}
+.cat-toolbar-title strong{color:var(--maroon);font-weight:700}
+.cat-manage-btn{background:var(--cream);border:1px solid var(--border-gold-strong);color:var(--gold-dark);font-family:var(--font-thai);font-size:.74rem;font-weight:700;padding:7px 13px;border-radius:8px;cursor:pointer;letter-spacing:.3px;transition:all .15s;white-space:nowrap}
+.cat-manage-btn:hover{background:var(--gold-dark);color:#FFF5E1;border-color:var(--gold-dark)}
+.cat-manage-btn:active{transform:scale(.97)}
+
+/* === Category section (each group of lots) === */
+.cat-section{margin-bottom:18px}
+.cat-section-header{display:flex;align-items:center;gap:9px;padding:10px 14px;background:linear-gradient(135deg,var(--cream-card) 0%,var(--cream-warm) 100%);border:1px solid var(--border-gold-strong);border-radius:12px 12px 0 0;border-bottom:none}
+.cat-section-header.uncat{background:var(--cream);border-style:dashed}
+.cat-section-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 2px rgba(0,0,0,0.05)}
+.cat-section-dot.uncat{background:var(--text-muted);opacity:.5}
+.cat-section-name{flex:1;font-family:var(--font-thai);font-weight:700;font-size:.92rem;color:var(--text-heading);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cat-section-count{font-family:var(--font-label);font-size:.65rem;letter-spacing:1.5px;color:var(--gold-dark);text-transform:uppercase;flex-shrink:0;font-weight:700}
+.cat-section-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:11px 14px;background:var(--cream);border:1px solid var(--border-gold-strong);border-top:none;border-bottom:none;font-size:.74rem}
+.cat-summary-cell{text-align:left}
+.cat-summary-label{font-family:var(--font-label);font-size:.55rem;letter-spacing:1.6px;color:var(--gold-dark);margin-bottom:3px;text-transform:uppercase}
+.cat-summary-val{font-family:var(--font-number);font-size:.92rem;color:var(--text-heading);line-height:1.1}
+.cat-section-lots{padding:11px 12px 12px;background:var(--cream);border:1px solid var(--border-gold-strong);border-top:none;border-radius:0 0 12px 12px;display:flex;flex-direction:column;gap:10px}
+.cat-section-empty{padding:16px;text-align:center;color:var(--text-muted);font-size:.78rem;background:var(--cream);border:1px solid var(--border-gold-strong);border-top:none;border-radius:0 0 12px 12px}
+.uncat-section .cat-section-summary,.uncat-section .cat-section-lots,.uncat-section .cat-section-empty{border-style:dashed}
+.cat-create-first-btn{background:linear-gradient(135deg,rgba(46,159,95,0.12),rgba(212,175,55,0.12));border:1px dashed rgba(46,159,95,0.45);color:var(--green-dark);font-family:var(--font-thai);font-weight:700;font-size:.85rem;padding:11px 18px;border-radius:10px;cursor:pointer;letter-spacing:.3px;transition:all .15s}
+.cat-create-first-btn:hover{background:linear-gradient(135deg,rgba(46,159,95,0.2),rgba(212,175,55,0.2));border-color:rgba(46,159,95,0.65)}
+.cat-create-first-hint{margin-top:6px;font-size:.7rem;color:var(--text-muted)}
+
+/* === Manage Categories Modal === */
+.manage-cat-modal{max-width:480px}
+.manage-cat-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;max-height:55vh;overflow-y:auto}
+.manage-cat-empty{padding:18px;text-align:center;color:var(--text-muted);font-size:.82rem;background:var(--cream);border:1px dashed var(--border-gold);border-radius:9px}
+.manage-cat-row{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--cream);border:1px solid var(--border-gold);border-radius:10px}
+.manage-cat-info{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+.manage-cat-name{font-family:var(--font-thai);font-weight:600;font-size:.86rem;color:var(--text-dark);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+.manage-cat-count{font-family:var(--font-thai);font-size:.7rem;color:var(--text-muted);flex-shrink:0;font-weight:500}
+.manage-cat-actions{display:flex;gap:5px;flex-shrink:0}
+.manage-cat-btn{background:none;border:1px solid var(--border-gold);color:var(--text-heading);font-family:var(--font-thai);font-size:.7rem;font-weight:600;padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .15s;letter-spacing:.2px}
+.manage-cat-btn.rename:hover{background:var(--gold-dark);color:#FFF5E1;border-color:var(--gold-dark)}
+.manage-cat-btn.danger{color:var(--red-dark);border-color:rgba(192,57,43,0.3)}
+.manage-cat-btn.danger:hover{background:var(--red);color:#FFF;border-color:var(--red)}
+.manage-cat-create{width:100%;background:linear-gradient(135deg,rgba(46,159,95,0.08),rgba(212,175,55,0.08));border:1px dashed rgba(46,159,95,0.4);color:var(--green-dark);font-family:var(--font-thai);font-weight:600;font-size:.82rem;padding:11px;border-radius:10px;cursor:pointer;letter-spacing:.3px;transition:all .15s}
+.manage-cat-create:hover{background:linear-gradient(135deg,rgba(46,159,95,0.15),rgba(212,175,55,0.15));border-color:rgba(46,159,95,0.6)}
+
+/* === Lot Category Popup (single body-level, position:fixed) === */
+.lot-cat-popup{position:fixed;background:var(--cream-card);border:1px solid var(--border-gold-strong);border-radius:10px;box-shadow:0 8px 24px rgba(45,16,24,0.20);padding:5px;display:none;flex-direction:column;gap:2px;min-width:200px;max-width:260px;z-index:200;animation:portMenuPopup .15s ease;max-height:60vh;overflow-y:auto}
+.lot-cat-popup.active{display:flex}
+.lot-cat-option{display:flex;align-items:center;gap:8px;background:none;border:none;text-align:left;font-family:var(--font-thai);font-size:.8rem;font-weight:500;color:var(--text-dark);padding:9px 11px;border-radius:6px;cursor:pointer;transition:all .12s}
+.lot-cat-option:hover{background:var(--cream-deep)}
+.lot-cat-option.active{background:var(--cream-warm);font-weight:700;color:var(--maroon)}
+.lot-cat-option-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 1.5px rgba(0,0,0,0.06)}
+.lot-cat-option-dot.none{background:var(--text-muted);opacity:.4}
+.lot-cat-option-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.lot-cat-check{color:var(--green);font-weight:700;flex-shrink:0}
+.lot-cat-option.create{border-top:1px solid var(--border-gold);margin-top:3px;padding-top:11px;color:var(--green-dark);font-weight:700;justify-content:center}
+.lot-cat-option.create:hover{background:rgba(46,159,95,0.08)}
 </style>
 </head>
 <body>
@@ -345,12 +415,14 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
     <div class="tabs">
       <button class="tab-btn active" data-tab="lots" onclick="switchTab('lots')">ดูเป็นไม้</button>
       <button class="tab-btn" data-tab="ticker" onclick="switchTab('ticker')">ดูรวมต่อหุ้น</button>
+      <button class="tab-btn" data-tab="category" id="tabBtnCategory" onclick="switchTab('category')">ดูตามกลุ่ม</button>
       <button class="tab-btn" data-tab="sells" onclick="switchTab('sells')">รายการขายแล้ว</button>
     </div>
 
     <!-- TAB CONTENT -->
     <div id="tabLots" class="tab-content"></div>
     <div id="tabTicker" class="tab-content" style="display:none"></div>
+    <div id="tabCategory" class="tab-content" style="display:none"></div>
     <div id="tabSells" class="tab-content" style="display:none"></div>
 
   </div>
@@ -480,6 +552,46 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
   </div>
 </div>
 
+<!-- ============================================================
+     CATEGORY CREATE / RENAME MODAL (Phase 2)
+============================================================ -->
+<div id="catEditModal" class="modal-backdrop" onclick="if(event.target===this)closeCatEditModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <div id="catEditTitle" class="modal-title">กลุ่มใหม่</div>
+      <button class="modal-close" onclick="closeCatEditModal()">×</button>
+    </div>
+    <div class="field">
+      <label class="field-label">ชื่อกลุ่ม</label>
+      <input id="catEditName" class="field-input" type="text" placeholder="เช่น Tech Stocks, ปันผล, Hold ยาว" maxlength="40" onkeydown="if(event.key==='Enter')submitCatEdit()">
+      <div class="field-hint">ตั้งชื่อได้ตามใจ — สูงสุด 40 ตัวอักษร</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeCatEditModal()">ยกเลิก</button>
+      <button id="catEditConfirm" class="btn-confirm" onclick="submitCatEdit()">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MANAGE CATEGORIES MODAL (Phase 2)
+============================================================ -->
+<div id="manageCatModal" class="modal-backdrop" onclick="if(event.target===this)closeManageCatModal()">
+  <div class="modal manage-cat-modal">
+    <div class="modal-head">
+      <div id="manageCatTitle" class="modal-title">จัดการกลุ่ม</div>
+      <button class="modal-close" onclick="closeManageCatModal()">×</button>
+    </div>
+    <div id="manageCatList" class="manage-cat-list"></div>
+    <button class="manage-cat-create" onclick="openCreateCatModal()">+ กลุ่มใหม่</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     LOT CATEGORY POPUP (Phase 2 — body-level, position:fixed)
+============================================================ -->
+<div id="lotCatPopup" class="lot-cat-popup"></div>
+
 <!-- toast -->
 <div id="toast" class="toast"></div>
 
@@ -488,7 +600,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 ============================================================ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-<script src="my-portfolio.js?v=1778436367"></script>
+<script src="my-portfolio.js?v=1778437236"></script>
 
 </body>
 </html>
