@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>My Portfolio · JP Trust Learning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Cinzel:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--font-thai:'Anuphan',sans-serif;--font-label:'Cinzel',serif;--font-number:'DM Serif Display',serif;--gold:#D4AF37;--gold-dark:#B8860B;--gold-light:#F4E4BA;--maroon:#722F37;--maroon-mid:#2d1018;--cream:#FAF6ED;--cream-warm:#F5EFE0;--cream-deep:#EDE4D0;--cream-card:#FFFEF8;--text-dark:#3D3228;--text-heading:#5A3D20;--text-muted:#7A6F62;--green:#2E9F5F;--green-dark:#226F44;--red:#C0392B;--red-dark:#922B21;--border-gold:rgba(212,175,55,0.18);--border-gold-strong:rgba(212,175,55,0.4)}
+body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream);line-height:1.55;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--cream-deep)}::-webkit-scrollbar-thumb{background:rgba(114,47,55,0.25);border-radius:3px}
+
+/* ============================================================
+   LOADER (matches scanner / strategy-pro)
+============================================================ */
+.loader-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:18px}
+.owl-loader-stage{position:relative;width:200px;height:200px;display:flex;align-items:center;justify-content:center}
+.owl-loader-ring{position:absolute;inset:0;width:100%;height:100%;filter:drop-shadow(0 0 10px rgba(46,159,95,0.3)) drop-shadow(0 0 14px rgba(212,175,55,0.25))}
+.owl-loader-ring-bg{fill:none;stroke:rgba(139,105,20,0.25);stroke-width:8}
+.owl-loader-ring-fg{fill:none;stroke:url(#owlRingGrad);stroke-width:8;stroke-linecap:round;stroke-dasharray:0 565.48;transition:stroke-dasharray .35s ease}
+.owl-loader-img{width:100px;height:100px;object-fit:contain;animation:owlFloat 2.8s ease-in-out infinite;filter:drop-shadow(0 4px 12px rgba(46,159,95,0.25)) drop-shadow(0 2px 8px rgba(212,175,55,0.3));margin-top:-22px}
+@keyframes owlFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.owl-loader-pct{font-family:var(--font-number);font-size:1.75rem;color:var(--maroon);position:absolute;left:50%;top:62%;transform:translate(-50%,-50%);text-shadow:0 1px 6px rgba(255,254,248,0.8)}
+.owl-loader-text{font-family:var(--font-label);font-size:.95rem;font-weight:700;color:var(--gold-dark);letter-spacing:3px;text-align:center;text-transform:uppercase}
+.loader-dots-left,.loader-dots-right{display:inline-block;color:var(--green);animation:loaderDotsBlink 1.4s ease-in-out infinite;letter-spacing:2px;font-weight:700}
+.loader-dots-right{animation-delay:.7s}
+@keyframes loaderDotsBlink{0%,100%{opacity:.25;transform:translateY(0)}50%{opacity:1;transform:translateY(-2px)}}
+
+/* ============================================================
+   PAGE LAYOUT
+============================================================ */
+.page-wrap{padding:18px 18px 80px;max-width:900px;margin:0 auto}
+@media(max-width:500px){.page-wrap{padding:14px 14px 72px}}
+
+/* === HERO HEADER === */
+.hero{background:linear-gradient(135deg,var(--maroon-mid) 0%,var(--maroon) 60%,#8B2252 100%);border-radius:20px;padding:22px 22px 18px;margin-bottom:18px;color:#FFF5E1;position:relative;overflow:hidden;box-shadow:0 6px 24px rgba(114,47,55,0.18)}
+.hero::before{content:"";position:absolute;top:-30%;right:-20%;width:200px;height:200px;background:radial-gradient(circle,rgba(212,175,55,0.18),transparent 70%);pointer-events:none}
+.hero-label{font-family:var(--font-label);font-size:.62rem;letter-spacing:3px;color:var(--gold-light);opacity:.85;margin-bottom:6px}
+.hero-title{font-family:var(--font-thai);font-size:1.35rem;font-weight:700;margin-bottom:14px}
+.hero-value-row{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+.hero-value{font-family:var(--font-number);font-size:2.2rem;line-height:1;color:#FFF5E1}
+.hero-value-cur{font-family:var(--font-label);font-size:.85rem;color:var(--gold-light);opacity:.8;letter-spacing:1px}
+.hero-sub{font-size:.74rem;color:rgba(255,245,225,0.7);letter-spacing:.3px}
+
+.hero-pnl-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(212,175,55,0.18)}
+.pnl-cell{}
+.pnl-cell-label{font-family:var(--font-label);font-size:.6rem;letter-spacing:2.2px;color:var(--gold-light);opacity:.75;margin-bottom:4px}
+.pnl-cell-value{font-family:var(--font-number);font-size:1.15rem;line-height:1.1}
+.pnl-cell-pct{font-size:.7rem;color:rgba(255,245,225,0.6);margin-top:2px}
+.pnl-pos{color:#5BC48E}.pnl-neg{color:#FF8A85}.pnl-zero{color:rgba(255,245,225,0.6)}
+
+/* === ACTION BUTTON === */
+.action-row{display:flex;gap:10px;margin-bottom:18px}
+.btn-primary{flex:1;background:linear-gradient(135deg,var(--maroon),#8B2252,var(--gold-dark));color:#FFF0D4;border:none;padding:13px 16px;border-radius:12px;font-family:var(--font-thai);font-weight:600;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.3px;box-shadow:0 4px 14px rgba(114,47,55,0.22);transition:all .15s}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(114,47,55,0.28)}
+.btn-primary:active{transform:translateY(0) scale(.99)}
+.btn-primary svg{width:17px;height:17px}
+
+/* === EQUITY CURVE === */
+.eq-card{background:var(--cream-card);border:1px solid var(--border-gold);border-radius:14px;padding:16px 16px 12px;margin-bottom:18px;box-shadow:0 2px 10px rgba(114,47,55,0.04)}
+.eq-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.eq-title{font-family:var(--font-label);font-size:.7rem;letter-spacing:2.5px;color:var(--gold-dark);text-transform:uppercase}
+.eq-tf{display:flex;gap:3px;background:var(--cream-deep);padding:3px;border-radius:9px}
+.eq-tf-btn{background:none;border:none;font-family:var(--font-thai);font-size:.7rem;padding:5px 10px;border-radius:7px;color:var(--text-muted);cursor:pointer;font-weight:600;transition:all .15s}
+.eq-tf-btn.active{background:var(--maroon);color:#FFF5E1}
+.eq-canvas-wrap{position:relative;height:200px;width:100%}
+.eq-empty{display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);font-size:.78rem;text-align:center;padding:20px}
+.eq-legend{display:flex;gap:14px;justify-content:center;margin-top:6px;flex-wrap:wrap}
+.eq-leg-item{display:flex;align-items:center;gap:6px;font-size:.7rem;color:var(--text-muted)}
+.eq-leg-dot{width:10px;height:2px;border-radius:1px}
+
+/* === TABS === */
+.tabs{display:flex;gap:4px;margin-bottom:14px;background:var(--cream-deep);padding:4px;border-radius:11px}
+.tab-btn{flex:1;background:none;border:none;font-family:var(--font-thai);font-size:.78rem;font-weight:600;padding:9px 6px;border-radius:8px;color:var(--text-muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.tab-btn.active{background:var(--cream-card);color:var(--maroon);box-shadow:0 1px 3px rgba(114,47,55,0.08)}
+
+/* === SELLS STATS HEADER === */
+.sells-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;background:linear-gradient(160deg,var(--cream-card),#F8F2E4);border:1px solid var(--border-gold);border-radius:12px;padding:13px 12px;box-shadow:0 1px 6px rgba(114,47,55,0.04)}
+.ss-cell{text-align:center}
+.ss-label{font-family:var(--font-label);font-size:.55rem;letter-spacing:1.6px;color:var(--gold-dark);margin-bottom:4px;text-transform:uppercase}
+.ss-value{font-family:var(--font-number);font-size:1.05rem;color:var(--text-heading);line-height:1.1}
+
+/* === SEGMENTED CONTROL (sell mode toggle) === */
+.seg-control{display:flex;background:var(--cream-deep);border-radius:9px;padding:3px;gap:2px}
+.seg-btn{flex:1;background:none;border:none;font-family:var(--font-thai);font-size:.74rem;font-weight:600;padding:8px 10px;border-radius:7px;color:var(--text-muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.seg-btn.active{background:var(--cream-card);color:var(--maroon);box-shadow:0 1px 3px rgba(114,47,55,0.08)}
+
+/* === SELL ALL BUTTON === */
+.sell-all-btn{background:linear-gradient(135deg,rgba(46,159,95,0.12),rgba(212,175,55,0.12));border:1px solid rgba(46,159,95,0.3);color:var(--green-dark);font-family:var(--font-thai);font-size:.7rem;font-weight:700;padding:5px 12px;border-radius:7px;cursor:pointer;letter-spacing:.4px;transition:all .15s}
+.sell-all-btn:hover{background:linear-gradient(135deg,rgba(46,159,95,0.2),rgba(212,175,55,0.2));border-color:rgba(46,159,95,0.5)}
+.sell-all-btn:active{transform:scale(.96)}
+.sell-all-btn:disabled{opacity:.4;cursor:not-allowed;background:var(--cream-deep);border-color:var(--border-gold);color:var(--text-muted)}
+
+/* === LOT CARDS === */
+.lots-list{display:flex;flex-direction:column;gap:11px}
+.lot-card{background:var(--cream-card);border:1px solid var(--border-gold);border-radius:12px;padding:14px;box-shadow:0 1px 6px rgba(114,47,55,0.04);transition:all .15s}
+.lot-card.closed{opacity:.72;background:#FAF6ED}
+.lot-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
+.lot-head-left{flex:1;min-width:0}
+.lot-ticker-row{display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap}
+.lot-ticker{font-family:var(--font-number);font-size:1.25rem;color:var(--maroon);font-weight:400}
+.lot-badge{font-family:var(--font-label);font-size:.55rem;letter-spacing:1.5px;padding:3px 8px;border-radius:100px;font-weight:700;text-transform:uppercase}
+.lot-badge.open{background:rgba(46,159,95,0.12);color:var(--green-dark)}
+.lot-badge.closed{background:rgba(192,57,43,0.1);color:var(--red-dark)}
+.lot-badge.partial{background:rgba(212,175,55,0.15);color:var(--gold-dark)}
+.lot-meta{font-size:.72rem;color:var(--text-muted);line-height:1.5}
+.lot-pnl{text-align:right;flex-shrink:0}
+.lot-pnl-val{font-family:var(--font-number);font-size:1.05rem;line-height:1.1}
+.lot-pnl-pct{font-size:.7rem;margin-top:2px}
+.lot-detail-row{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;padding:10px 0;border-top:1px dashed var(--border-gold);margin-top:6px;font-size:.74rem;color:var(--text-dark)}
+.lot-detail-label{color:var(--text-muted);font-size:.68rem}
+.lot-detail-val{font-family:var(--font-number);font-size:.88rem;color:var(--text-heading)}
+.lot-actions{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--border-gold)}
+.lot-btn{flex:1;background:var(--cream-warm);border:1px solid var(--border-gold);color:var(--text-dark);padding:7px 10px;border-radius:8px;font-family:var(--font-thai);font-size:.76rem;font-weight:600;cursor:pointer;transition:all .15s}
+.lot-btn:hover{background:rgba(212,175,55,0.12);border-color:var(--gold)}
+.lot-btn.sell{color:var(--green-dark);border-color:rgba(46,159,95,0.25);background:rgba(46,159,95,0.06)}
+.lot-btn.sell:hover{background:rgba(46,159,95,0.12)}
+.lot-btn.delete{color:var(--red-dark);border-color:rgba(192,57,43,0.18);background:rgba(192,57,43,0.04);flex:0 0 auto;padding:7px 12px}
+.lot-btn.delete:hover{background:rgba(192,57,43,0.1)}
+
+/* sell history rows under lot */
+.sell-history{margin-top:8px;padding-top:8px;border-top:1px dashed var(--border-gold);display:flex;flex-direction:column;gap:5px}
+.sell-row{display:flex;align-items:center;justify-content:space-between;font-size:.7rem;color:var(--text-muted);background:rgba(212,175,55,0.05);padding:5px 9px;border-radius:6px;gap:8px;flex-wrap:wrap}
+.sell-row-left{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.sell-row-tag{font-family:var(--font-label);font-size:.55rem;letter-spacing:1.2px;color:var(--green-dark);background:rgba(46,159,95,0.12);padding:2px 6px;border-radius:4px;font-weight:700}
+.sell-row-pnl{font-family:var(--font-number);font-size:.78rem;font-weight:600}
+.sell-row-del{background:none;border:none;color:var(--red-dark);font-size:.68rem;cursor:pointer;padding:2px 6px;border-radius:4px;opacity:.6}
+.sell-row-del:hover{opacity:1;background:rgba(192,57,43,0.08)}
+
+/* === BY TICKER VIEW === */
+.ticker-card{background:var(--cream-card);border:1px solid var(--border-gold);border-radius:12px;padding:14px;box-shadow:0 1px 6px rgba(114,47,55,0.04)}
+.ticker-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+.ticker-card-name{font-family:var(--font-number);font-size:1.4rem;color:var(--maroon)}
+.ticker-card-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:6px 12px;font-size:.74rem;padding-top:8px;border-top:1px dashed var(--border-gold)}
+
+/* === EMPTY STATE === */
+.empty{text-align:center;padding:50px 20px;color:var(--text-muted)}
+.empty-icon{font-size:3rem;margin-bottom:14px;opacity:.5}
+.empty-text{font-size:.92rem;margin-bottom:6px;color:var(--text-heading);font-weight:600}
+.empty-sub{font-size:.78rem}
+
+/* === MODAL === */
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(20,10,15,0.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:1000;align-items:flex-end;justify-content:center;padding:0}
+.modal-backdrop.active{display:flex;animation:modalFadeIn .2s ease}
+@keyframes modalFadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:var(--cream-card);border-radius:18px 18px 0 0;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;padding:22px 20px 30px;animation:modalSlideUp .25s ease;box-shadow:0 -8px 30px rgba(0,0,0,0.18)}
+@keyframes modalSlideUp{from{transform:translateY(20px)}to{transform:translateY(0)}}
+@media(min-width:600px){.modal-backdrop{align-items:center;padding:20px}.modal{border-radius:18px;max-width:440px}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.modal-title{font-family:var(--font-thai);font-size:1.05rem;font-weight:700;color:var(--maroon)}
+.modal-close{background:none;border:none;font-size:1.5rem;color:var(--text-muted);cursor:pointer;line-height:1;padding:4px 8px;border-radius:6px}
+.modal-close:hover{color:var(--maroon);background:var(--cream-deep)}
+.field{margin-bottom:14px;position:relative}
+.field-label{display:block;font-family:var(--font-label);font-size:.62rem;letter-spacing:2px;color:var(--gold-dark);text-transform:uppercase;margin-bottom:6px;font-weight:700}
+.field-input{width:100%;background:var(--cream-warm);border:1.5px solid var(--border-gold);border-radius:10px;padding:11px 13px;font-family:var(--font-thai);font-size:.92rem;color:var(--text-dark);transition:all .15s;-webkit-appearance:none}
+.field-input:focus{outline:none;border-color:var(--maroon);background:#FFFEF8;box-shadow:0 0 0 3px rgba(114,47,55,0.08)}
+.field-input.num{font-family:var(--font-number);font-size:1.05rem}
+.field-hint{font-size:.7rem;color:var(--text-muted);margin-top:5px;line-height:1.4}
+.field-hint.err{color:var(--red-dark)}
+
+/* ticker autocomplete dropdown */
+.ac-list{position:absolute;top:100%;left:0;right:0;background:var(--cream-card);border:1.5px solid var(--border-gold);border-top:none;border-radius:0 0 10px 10px;max-height:240px;overflow-y:auto;z-index:10;box-shadow:0 6px 20px rgba(114,47,55,0.15);display:none}
+.ac-list.show{display:block}
+.ac-item{padding:9px 13px;cursor:pointer;border-bottom:1px solid var(--border-gold);display:flex;align-items:center;justify-content:space-between;gap:10px;transition:background .1s}
+.ac-item:last-child{border-bottom:none}
+.ac-item:hover,.ac-item.hl{background:rgba(212,175,55,0.1)}
+.ac-tk{font-family:var(--font-number);font-size:.95rem;color:var(--maroon);font-weight:400}
+.ac-sec{font-size:.7rem;color:var(--text-muted)}
+
+/* preview box (calc result) */
+.preview-box{background:linear-gradient(135deg,rgba(46,159,95,0.06),rgba(212,175,55,0.06));border:1px dashed rgba(46,159,95,0.3);border-radius:10px;padding:12px 14px;margin-top:6px}
+.preview-row{display:flex;justify-content:space-between;align-items:center;font-size:.78rem;margin-bottom:5px;gap:10px}
+.preview-row:last-child{margin-bottom:0;padding-top:5px;border-top:1px dashed rgba(46,159,95,0.2);margin-top:5px;font-weight:700}
+.preview-label{color:var(--text-muted)}
+.preview-value{font-family:var(--font-number);font-size:.95rem;color:var(--text-heading)}
+.preview-row:last-child .preview-value{color:var(--maroon);font-size:1.1rem}
+.preview-warn{color:var(--red-dark);font-size:.72rem;margin-top:6px}
+.preview-price-input{width:118px;text-align:right;background:#FFFEF8;border:1.5px solid var(--border-gold-strong);border-radius:7px;padding:5px 9px;font-family:var(--font-number);font-size:.95rem;color:var(--text-heading);transition:all .15s;-webkit-appearance:none;-moz-appearance:textfield}
+.preview-price-input::-webkit-outer-spin-button,.preview-price-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.preview-price-input:focus{outline:none;border-color:var(--maroon);box-shadow:0 0 0 3px rgba(114,47,55,0.08)}
+.preview-price-input.invalid{border-color:var(--red-dark);color:var(--red-dark);background:rgba(192,57,43,0.04)}
+.preview-hint{font-size:.66rem;color:var(--text-muted);text-align:right;margin:-2px 0 6px;line-height:1.3}
+.preview-hint.err{color:var(--red-dark);font-weight:600}
+
+.modal-actions{display:flex;gap:8px;margin-top:18px}
+.btn-secondary{flex:1;background:var(--cream-deep);border:1px solid var(--border-gold);color:var(--text-dark);padding:11px 14px;border-radius:10px;font-family:var(--font-thai);font-weight:600;font-size:.85rem;cursor:pointer;transition:all .15s}
+.btn-secondary:hover{background:#E8DDC8}
+.btn-confirm{flex:2;background:linear-gradient(135deg,var(--maroon),#8B2252);color:#FFF0D4;border:none;padding:11px 14px;border-radius:10px;font-family:var(--font-thai);font-weight:600;font-size:.9rem;cursor:pointer;transition:all .15s;box-shadow:0 3px 10px rgba(114,47,55,0.18)}
+.btn-confirm:hover{box-shadow:0 5px 14px rgba(114,47,55,0.25)}
+.btn-confirm:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+
+/* confirm dialog (destructive actions) */
+.confirm-modal{max-width:380px;text-align:center;padding:24px 22px 22px}
+.confirm-icon{width:54px;height:54px;border-radius:50%;background:rgba(192,57,43,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.confirm-icon svg{width:28px;height:28px;color:var(--red-dark)}
+.confirm-title{font-family:var(--font-thai);font-size:1.05rem;font-weight:700;color:var(--text-heading);margin-bottom:8px}
+.confirm-text{font-size:.85rem;color:var(--text-muted);line-height:1.55;margin-bottom:18px}
+.confirm-text strong{color:var(--maroon);font-weight:700}
+.btn-danger{flex:2;background:linear-gradient(135deg,var(--red-dark),var(--red));color:#FFF;border:none;padding:11px 14px;border-radius:10px;font-family:var(--font-thai);font-weight:600;font-size:.9rem;cursor:pointer;transition:all .15s;box-shadow:0 3px 10px rgba(192,57,43,0.22)}
+.btn-danger:hover{box-shadow:0 5px 14px rgba(192,57,43,0.3)}
+.btn-danger:disabled{opacity:.5;cursor:not-allowed}
+
+/* toast */
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--maroon-mid);color:#FFF5E1;padding:11px 22px;border-radius:100px;font-size:.82rem;z-index:2000;opacity:0;transition:all .25s;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,0.25)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.err{background:var(--red-dark)}
+.toast.ok{background:var(--green-dark)}
+
+/* auth gate */
+.gate{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;padding:30px}
+.gate-icon{font-size:3rem;margin-bottom:14px;opacity:.6}
+.gate-title{font-size:1.05rem;color:var(--maroon);margin-bottom:8px;font-weight:700}
+.gate-text{font-size:.85rem;color:var(--text-muted);margin-bottom:18px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     INITIAL LOADER
+============================================================ -->
+<div id="loaderView" class="loader-wrap">
+  <div class="owl-loader-stage">
+    <svg class="owl-loader-ring" viewBox="0 0 200 200">
+      <defs><linearGradient id="owlRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#2E9F5F"/><stop offset="40%" stop-color="#5BC48E"/>
+        <stop offset="75%" stop-color="#D4AF37"/><stop offset="100%" stop-color="#8B6914"/>
+      </linearGradient></defs>
+      <circle class="owl-loader-ring-bg" cx="100" cy="100" r="90"/>
+      <circle id="owlLoaderRingFg" class="owl-loader-ring-fg" cx="100" cy="100" r="90"/>
+    </svg>
+    <img src="jpt-owl-logo.png" alt="JP Trust" class="owl-loader-img">
+    <div id="owlLoaderPct" class="owl-loader-pct">0%</div>
+  </div>
+  <div class="owl-loader-text"><span class="loader-dots-left">...</span> Initializing <span class="loader-dots-right">...</span></div>
+</div>
+
+<!-- ============================================================
+     AUTH GATE (shown if not logged in)
+============================================================ -->
+<div id="gateView" class="gate" style="display:none">
+  <div class="gate-icon">🔐</div>
+  <div class="gate-title">กรุณาเข้าสู่ระบบ</div>
+  <div class="gate-text">หน้านี้ต้องเข้าสู่ระบบก่อนเพื่อบันทึกพอร์ตของคุณ<br>เปิดจาก Member Dashboard เพื่อเริ่มใช้งาน</div>
+</div>
+
+<!-- ============================================================
+     MAIN APP
+============================================================ -->
+<div id="appView" style="display:none">
+  <div class="page-wrap">
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-label">My Portfolio</div>
+      <div class="hero-title">มูลค่าพอร์ตปัจจุบัน</div>
+      <div class="hero-value-row">
+        <span id="heroValue" class="hero-value">$0.00</span>
+        <span class="hero-value-cur">USD</span>
+      </div>
+      <div id="heroSub" class="hero-sub">ยังไม่มีรายการ — เริ่มบันทึกการซื้อขายของคุณ</div>
+      <div class="hero-pnl-row">
+        <div class="pnl-cell">
+          <div class="pnl-cell-label">Realized P&amp;L</div>
+          <div id="heroRealized" class="pnl-cell-value pnl-zero">$0.00</div>
+          <div id="heroRealizedSub" class="pnl-cell-pct">จากการขายทั้งหมด</div>
+        </div>
+        <div class="pnl-cell">
+          <div class="pnl-cell-label">Unrealized P&amp;L</div>
+          <div id="heroUnrealized" class="pnl-cell-value pnl-zero">$0.00</div>
+          <div id="heroUnrealizedSub" class="pnl-cell-pct">จากที่ถืออยู่</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTION ROW -->
+    <div class="action-row">
+      <button class="btn-primary" onclick="openAddModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        บันทึกการซื้อใหม่
+      </button>
+    </div>
+
+    <!-- EQUITY CURVE -->
+    <div class="eq-card">
+      <div class="eq-head">
+        <div class="eq-title">Equity Curve</div>
+        <div class="eq-tf" id="eqTfBar">
+          <button class="eq-tf-btn" data-tf="1M">1M</button>
+          <button class="eq-tf-btn" data-tf="3M">3M</button>
+          <button class="eq-tf-btn" data-tf="6M">6M</button>
+          <button class="eq-tf-btn active" data-tf="YTD">YTD</button>
+          <button class="eq-tf-btn" data-tf="ALL">All</button>
+        </div>
+      </div>
+      <div class="eq-canvas-wrap">
+        <canvas id="eqCanvas"></canvas>
+        <div id="eqEmpty" class="eq-empty" style="display:none">ยังไม่มีข้อมูลในช่วงนี้</div>
+      </div>
+      <div class="eq-legend">
+        <div class="eq-leg-item"><span class="eq-leg-dot" style="background:var(--maroon)"></span>มูลค่าพอร์ต (open + cash)</div>
+        <div class="eq-leg-item"><span class="eq-leg-dot" style="background:var(--gold-dark)"></span>เงินลงทุนสะสม</div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="lots" onclick="switchTab('lots')">ดูเป็นไม้</button>
+      <button class="tab-btn" data-tab="ticker" onclick="switchTab('ticker')">ดูรวมต่อหุ้น</button>
+      <button class="tab-btn" data-tab="sells" onclick="switchTab('sells')">รายการขายแล้ว</button>
+    </div>
+
+    <!-- TAB CONTENT -->
+    <div id="tabLots" class="tab-content"></div>
+    <div id="tabTicker" class="tab-content" style="display:none"></div>
+    <div id="tabSells" class="tab-content" style="display:none"></div>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     ADD POSITION MODAL
+============================================================ -->
+<div id="addModal" class="modal-backdrop" onclick="if(event.target===this)closeAddModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">บันทึกการซื้อใหม่</div>
+      <button class="modal-close" onclick="closeAddModal()">×</button>
+    </div>
+    <div class="field">
+      <label class="field-label">Ticker</label>
+      <input id="addTicker" class="field-input" type="text" placeholder="เช่น AAPL, MSFT, NVDA" autocomplete="off" oninput="onTickerInput()" onkeydown="onTickerKeydown(event)">
+      <div id="addAcList" class="ac-list"></div>
+      <div id="addTickerHint" class="field-hint">พิมพ์อย่างน้อย 1 ตัวอักษร</div>
+    </div>
+    <div class="field">
+      <label class="field-label">วันที่ซื้อ</label>
+      <input id="addDate" class="field-input" type="date" oninput="recalcAddPreview()">
+      <div id="addDateHint" class="field-hint">วันที่ตลาดเปิด — ถ้าไม่ใช่วันทำการจะใช้ราคาปิดของวันก่อนหน้า</div>
+    </div>
+    <div class="field">
+      <label class="field-label">เงินลงทุน (USD)</label>
+      <input id="addAmount" class="field-input num" type="number" step="0.01" min="0.01" placeholder="500.00" oninput="recalcAddPreview()">
+    </div>
+    <div id="addPreview" class="preview-box" style="display:none">
+      <div class="preview-row"><span class="preview-label">วันที่ใช้คำนวณ</span><span id="prevDate" class="preview-value">—</span></div>
+      <div class="preview-row"><span class="preview-label">ราคา (USD)</span><input id="prevPrice" class="preview-price-input" type="number" step="0.01" min="0.01" oninput="onAddPriceEdit()"></div>
+      <div id="priceRangeHint" class="preview-hint">—</div>
+      <div class="preview-row"><span class="preview-label">จำนวนหุ้นที่จะได้</span><span id="prevShares" class="preview-value">—</span></div>
+    </div>
+    <div id="addPreviewWarn" class="preview-warn" style="display:none"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeAddModal()">ยกเลิก</button>
+      <button id="addConfirmBtn" class="btn-confirm" onclick="submitAdd()" disabled>บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SELL MODAL
+============================================================ -->
+<div id="sellModal" class="modal-backdrop" onclick="if(event.target===this)closeSellModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">บันทึกการขาย</div>
+      <button class="modal-close" onclick="closeSellModal()">×</button>
+    </div>
+    <div id="sellLotInfo" class="preview-box" style="margin-top:0;margin-bottom:14px;background:var(--cream-warm);border-style:solid;border-color:var(--border-gold)"></div>
+    <div class="field">
+      <label class="field-label">วันที่ขาย</label>
+      <input id="sellDate" class="field-input" type="date" oninput="recalcSellPreview()">
+      <div class="field-hint">วันที่ตลาดเปิด — ถ้าไม่ใช่วันทำการจะใช้ราคาปิดของวันก่อนหน้า</div>
+    </div>
+    <div class="field">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px">
+        <label class="field-label">จำนวนที่ขาย</label>
+        <button type="button" class="sell-all-btn" onclick="sellAll()">ขายทั้งหมด</button>
+      </div>
+      <div class="seg-control" style="margin-bottom:8px">
+        <button type="button" class="seg-btn active" data-mode="shares" onclick="setSellMode('shares')">จำนวนหุ้น</button>
+        <button type="button" class="seg-btn" data-mode="usd" onclick="setSellMode('usd')">จำนวนเงิน (USD)</button>
+      </div>
+      <input id="sellAmount" class="field-input num" type="number" step="0.0001" min="0.0001" oninput="onSellAmountInput()">
+      <div class="field-hint">ขายได้สูงสุด <span id="sellMaxLabel">—</span></div>
+    </div>
+    <div id="sellPreview" class="preview-box" style="display:none">
+      <div class="preview-row"><span class="preview-label">วันที่ใช้คำนวณ</span><span id="sellPrevDate" class="preview-value">—</span></div>
+      <div class="preview-row"><span class="preview-label">ราคา (USD)</span><input id="sellPrevPrice" class="preview-price-input" type="number" step="0.01" min="0.01" oninput="onSellPriceEdit()"></div>
+      <div id="sellPriceRangeHint" class="preview-hint">—</div>
+      <div class="preview-row"><span class="preview-label">เงินที่ได้รับ</span><span id="sellPrevProceeds" class="preview-value">—</span></div>
+      <div class="preview-row"><span class="preview-label">Realized P&amp;L</span><span id="sellPrevPnl" class="preview-value">—</span></div>
+    </div>
+    <div id="sellPreviewWarn" class="preview-warn" style="display:none"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeSellModal()">ยกเลิก</button>
+      <button id="sellConfirmBtn" class="btn-confirm" onclick="submitSell()" disabled>บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     CONFIRM MODAL (destructive actions)
+============================================================ -->
+<div id="confirmModal" class="modal-backdrop" onclick="if(event.target===this)closeConfirmModal()">
+  <div class="modal confirm-modal">
+    <div class="confirm-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
+      </svg>
+    </div>
+    <div id="confirmTitle" class="confirm-title">ยืนยันการลบ</div>
+    <div id="confirmText" class="confirm-text"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeConfirmModal()">ยกเลิก</button>
+      <button id="confirmOkBtn" class="btn-danger">ลบ</button>
+    </div>
+  </div>
+</div>
+
+<!-- toast -->
+<div id="toast" class="toast"></div>
+
+<!-- ============================================================
+     SCRIPTS — see my-portfolio.js
+============================================================ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="my-portfolio.js?v=1777343748"></script>
+
+</body>
+</html>
