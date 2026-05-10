@@ -317,6 +317,14 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .lot-cat-check{color:var(--green);font-weight:700;flex-shrink:0}
 .lot-cat-option.create{border-top:1px solid var(--border-gold);margin-top:3px;padding-top:11px;color:var(--green-dark);font-weight:700;justify-content:center}
 .lot-cat-option.create:hover{background:rgba(46,159,95,0.08)}
+
+/* === Modal stacking hierarchy ===
+   Base modals (.modal-backdrop default): z-index 1000
+   Sub-modals (popped from a parent modal):       z-index 1100
+   Confirmation dialogs (highest, can pop from any modal): z-index 1200
+   This keeps popped-out modals visually on top regardless of DOM order. */
+#portEditModal,#catEditModal{z-index:1100}
+#confirmModal{z-index:1200}
 </style>
 </head>
 <body>
@@ -600,7 +608,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 ============================================================ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-<script src="my-portfolio.js?v=1778437236"></script>
+<script src="my-portfolio.js?v=1778437631"></script>
 
 </body>
 </html>
