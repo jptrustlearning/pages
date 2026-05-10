@@ -1769,17 +1769,17 @@
             </div>
             <div class="rss-stat">
               <div class="rss-stat-label">Avg Monthly</div>
-              <div class="rss-stat-val" id="stat-avg">0.00%</div>
+              <div class="rss-stat-val" id="kpi-avg">0.00%</div>
               <div class="rss-stat-sub">ผลตอบแทนเฉลี่ย / เดือน</div>
             </div>
             <div class="rss-stat">
               <div class="rss-stat-label">Best Lot</div>
-              <div class="rss-stat-val text-green" id="stat-best">0.0%</div>
+              <div class="rss-stat-val text-green" id="kpi-best">0.0%</div>
               <div class="rss-stat-sub">ล็อตที่กำไรสูงสุด (6 เดือน)</div>
             </div>
             <div class="rss-stat">
               <div class="rss-stat-label">Worst Lot</div>
-              <div class="rss-stat-val text-red" id="stat-worst">0.0%</div>
+              <div class="rss-stat-val text-red" id="kpi-worst">0.0%</div>
               <div class="rss-stat-sub">ล็อตที่ขาดทุนสูงสุด (6 เดือน)</div>
             </div>
           </div>
@@ -1791,7 +1791,7 @@
           <div class="rss-stat-grid">
             <div class="rss-stat">
               <div class="rss-stat-label">Win Rate</div>
-              <div class="rss-stat-val text-green" id="stat-win">0%</div>
+              <div class="rss-stat-val text-green" id="kpi-win">0%</div>
               <div class="rss-stat-sub">สัดส่วนล็อตที่กำไร</div>
             </div>
             <div class="rss-stat">
@@ -1801,7 +1801,7 @@
             </div>
             <div class="rss-stat">
               <div class="rss-stat-label">Total Months</div>
-              <div class="rss-stat-val" id="stat-count">0</div>
+              <div class="rss-stat-val" id="kpi-rounds">0</div>
               <div class="rss-stat-sub">จำนวนเดือนทั้งหมด</div>
             </div>
             <div class="rss-stat">
@@ -1823,12 +1823,12 @@
             </div>
             <div class="rss-stat">
               <div class="rss-stat-label">Sharpe Ratio</div>
-              <div class="rss-stat-val" id="stat-sharpe">0.00</div>
+              <div class="rss-stat-val" id="kpi-sharpe">0.00</div>
               <div class="rss-stat-sub">ผลตอบแทน ÷ ความเสี่ยง</div>
             </div>
             <div class="rss-stat">
               <div class="rss-stat-label">Max Drawdown</div>
-              <div class="rss-stat-val text-red" id="stat-dd">0.0%</div>
+              <div class="rss-stat-val text-red" id="kpi-maxdd">0.0%</div>
               <div class="rss-stat-sub">ขาดทุนหนักสุดจากยอดสูง</div>
             </div>
             <div class="rss-stat">
@@ -3481,6 +3481,17 @@ function calculateStats() {
     document.getElementById('kpi-strat-vol').innerText = fmt(vol);
     document.getElementById('kpi-strat-dd').innerText = fmt(maxDD);
     document.getElementById('kpi-strat-sharpe').innerText = sharpe.toFixed(2);
+
+    // === Mirror to Summary card (4-tab) — kpi-* IDs ===
+    // (Statistics tab uses stat-* prefix; Summary tab uses kpi-* prefix to avoid duplicate IDs.
+    //  Pattern matches sp500-combined-strategy.html for consistency.)
+    document.getElementById('kpi-sharpe').innerText = sharpe.toFixed(2);
+    document.getElementById('kpi-maxdd').innerText = fmt(maxDD);
+    document.getElementById('kpi-win').innerText = fmt(winRate);
+    document.getElementById('kpi-rounds').innerText = roundReturns.length;
+    document.getElementById('kpi-avg').innerText = fmt(avgM, 2);
+    document.getElementById('kpi-best').innerText = fmt(best);
+    document.getElementById('kpi-worst').innerText = fmt(worst);
 
     // === Phase 4: Strategy side of "เทียบตลาด" compare card ===
     const benchCagr = document.getElementById('bench-strat-cagr');
