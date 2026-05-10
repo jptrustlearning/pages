@@ -114,10 +114,13 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .lot-detail-label{color:var(--text-muted);font-size:.68rem}
 .lot-detail-val{font-family:var(--font-number);font-size:.88rem;color:var(--text-heading)}
 .lot-actions{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--border-gold)}
+.lot-actions.closed .lot-btn{flex:1}
 .lot-btn{flex:1;background:var(--cream-warm);border:1px solid var(--border-gold);color:var(--text-dark);padding:7px 10px;border-radius:8px;font-family:var(--font-thai);font-size:.76rem;font-weight:600;cursor:pointer;transition:all .15s}
 .lot-btn:hover{background:rgba(212,175,55,0.12);border-color:var(--gold)}
 .lot-btn.sell{color:var(--green-dark);border-color:rgba(46,159,95,0.25);background:rgba(46,159,95,0.06)}
 .lot-btn.sell:hover{background:rgba(46,159,95,0.12)}
+.lot-btn.edit{color:var(--gold-dark);border-color:rgba(184,134,11,0.25);background:rgba(212,175,55,0.06);flex:0 0 auto;padding:7px 12px}
+.lot-btn.edit:hover{background:rgba(212,175,55,0.16);border-color:var(--gold-dark)}
 .lot-btn.delete{color:var(--red-dark);border-color:rgba(192,57,43,0.18);background:rgba(192,57,43,0.04);flex:0 0 auto;padding:7px 12px}
 .lot-btn.delete:hover{background:rgba(192,57,43,0.1)}
 
@@ -449,7 +452,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 <div id="addModal" class="modal-backdrop" onclick="if(event.target===this)closeAddModal()">
   <div class="modal">
     <div class="modal-head">
-      <div class="modal-title">บันทึกการซื้อใหม่</div>
+      <div id="addModalTitle" class="modal-title">บันทึกการซื้อใหม่</div>
       <button class="modal-close" onclick="closeAddModal()">×</button>
     </div>
     <div id="addPortField" class="field" style="display:none">
@@ -615,7 +618,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 ============================================================ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-<script src="my-portfolio.js?v=1778437938"></script>
+<script src="my-portfolio.js?v=1778438495"></script>
 
 </body>
 </html>

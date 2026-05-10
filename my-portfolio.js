@@ -964,11 +964,13 @@ function lotCardHtml(lot){
     </div>`;
   }).join('') + '</div>';
   const actions = m.status === 'closed'
-    ? `<div class="lot-actions">
+    ? `<div class="lot-actions closed">
+         <button class="lot-btn edit" onclick="openEditLotModal('${lot.id}')">แก้ไข</button>
          <button class="lot-btn delete" onclick="confirmDeleteLot('${lot.id}','${lot.ticker}')">ลบไม้นี้</button>
        </div>`
     : `<div class="lot-actions">
          <button class="lot-btn sell" onclick="openSellModal('${lot.id}')">+ ขายบางส่วน / ทั้งหมด</button>
+         <button class="lot-btn edit" onclick="openEditLotModal('${lot.id}')">แก้ไข</button>
          <button class="lot-btn delete" onclick="confirmDeleteLot('${lot.id}','${lot.ticker}')">ลบ</button>
        </div>`;
   return `<div class="lot-card ${m.status === 'closed' ? 'closed' : ''}">
@@ -1442,8 +1444,14 @@ function updateCategoryTabVisibility(){
    ADD MODAL
 ============================================================ */
 let _addAcHL = -1;
+let _addEditLotId = null;  // Phase 2.x: null = create mode; UUID = edit mode
+
 function openAddModal(){
+  _addEditLotId = null;  // create mode
+  document.getElementById('addModalTitle').textContent = 'บันทึกการซื้อใหม่';
+  document.getElementById('addConfirmBtn').textContent = 'บันทึก';
   document.getElementById('addTicker').value = '';
+  document.getElementById('addTicker').disabled = false;
   document.getElementById('addDate').value = todayISO();
   document.getElementById('addAmount').value = '';
   document.getElementById('addPreview').style.display = 'none';
@@ -1468,8 +1476,56 @@ function openAddModal(){
   document.getElementById('addModal').classList.add('active');
   setTimeout(()=> document.getElementById('addTicker').focus(), 100);
 }
+
+/* Edit mode — opens addModal pre-filled with an existing lot's data.
+   Same form, same validation, but submitAdd does UPDATE instead of INSERT. */
+function openEditLotModal(lotId){
+  const lot = S.allLots.find(l => l.id === lotId);
+  if (!lot){ toast('ไม่พบไม้นี้', 'err'); return; }
+  _addEditLotId = lotId;
+  // Pre-fill form
+  document.getElementById('addTicker').value = lot.ticker;
+  document.getElementById('addTicker').disabled = false;  // allow ticker change too
+  document.getElementById('addDate').value = lot.entry_date;
+  document.getElementById('addAmount').value = lot.amount_usd;
+  document.getElementById('addAcList').classList.remove('show');
+  // Title + button text
+  document.getElementById('addModalTitle').textContent = 'แก้ไขไม้';
+  document.getElementById('addConfirmBtn').textContent = 'บันทึกการแก้ไข';
+  document.getElementById('addConfirmBtn').disabled = false;  // enable immediately (data already valid)
+  // Hide port field (cannot move lot between portfolios in edit — preserve)
+  document.getElementById('addPortField').style.display = 'none';
+  // Reset autocomplete state
+  _addAcHL = -1;
+  _addPriceDate = null;
+  _addRange = null;
+  // Trigger preview computation with the lot's actual values
+  recalcAddPreview();
+  // After preview computes range + sets prevPrice with auto-suggested CSV close,
+  // override with the user's original entry_price
+  setTimeout(() => {
+    const priceEl = document.getElementById('prevPrice');
+    if (priceEl){
+      priceEl.value = lot.entry_price.toFixed(2);
+      onAddPriceEdit();  // recalc shares preview from this price
+    }
+  }, 50);
+  // Show warning if lot has sells (P&L will be recalculated)
+  const warnEl = document.getElementById('addPreviewWarn');
+  if (lot.sells.length > 0){
+    warnEl.innerHTML = `⚠ ไม้นี้มี <strong>${lot.sells.length} การขาย</strong>แล้ว — แก้ไขราคา/จำนวนจะกระทบ P&amp;L ของการขายด้วย`;
+    warnEl.style.display = 'block';
+  } else {
+    warnEl.style.display = 'none';
+  }
+  document.getElementById('addModal').classList.add('active');
+  setTimeout(()=> document.getElementById('addAmount').focus(), 100);
+}
+window.openEditLotModal = openEditLotModal;
+
 function closeAddModal(){
   document.getElementById('addModal').classList.remove('active');
+  _addEditLotId = null;
 }
 window.openAddModal = openAddModal;
 window.closeAddModal = closeAddModal;
@@ -1624,30 +1680,48 @@ async function submitAdd(){
     toast(`ราคาเกินช่วงที่อนุญาต ($${_addRange.min.toFixed(2)} — $${_addRange.max.toFixed(2)})`, 'err');
     return;
   }
-  // Phase 1: determine destination portfolio
-  let pid;
-  if (S.selectedPortfolioId === VIRTUAL_ALL){
-    pid = document.getElementById('addPortSelect').value;
-    if (!pid){ toast('กรุณาเลือกพอร์ตปลายทาง', 'err'); return; }
-  } else {
-    pid = S.selectedPortfolioId;
-  }
-  if (!pid){ toast('ไม่พบพอร์ตปลายทาง — โหลดหน้าใหม่', 'err'); return; }
   const shares = amt / price;
   const btn = document.getElementById('addConfirmBtn');
+  const isEdit = !!_addEditLotId;
+  const origLabel = isEdit ? 'บันทึกการแก้ไข' : 'บันทึก';
   btn.disabled = true; btn.textContent = 'กำลังบันทึก...';
-  const { error } = await sb.from('portfolio_lots').insert({
-    user_id: S.user.id,
-    portfolio_id: pid,
-    ticker: tk,
-    entry_date: p.date,
-    amount_usd: amt,
-    entry_price: price,
-    shares: shares,
-  });
-  btn.textContent = 'บันทึก'; btn.disabled = false;
-  if (error){ toast('บันทึกล้มเหลว: '+error.message, 'err'); return; }
-  toast('บันทึกแล้ว · ' + tk + ' ' + fmtShares(shares) + ' Shares', 'ok');
+
+  let error;
+  if (isEdit){
+    // EDIT MODE: update existing lot — preserve portfolio_id and category_id
+    const upd = await sb.from('portfolio_lots').update({
+      ticker: tk,
+      entry_date: p.date,
+      amount_usd: amt,
+      entry_price: price,
+      shares: shares,
+    }).eq('id', _addEditLotId);
+    error = upd.error;
+  } else {
+    // CREATE MODE
+    let pid;
+    if (S.selectedPortfolioId === VIRTUAL_ALL){
+      pid = document.getElementById('addPortSelect').value;
+      if (!pid){ toast('กรุณาเลือกพอร์ตปลายทาง', 'err'); btn.disabled = false; btn.textContent = origLabel; return; }
+    } else {
+      pid = S.selectedPortfolioId;
+    }
+    if (!pid){ toast('ไม่พบพอร์ตปลายทาง — โหลดหน้าใหม่', 'err'); btn.disabled = false; btn.textContent = origLabel; return; }
+    const ins = await sb.from('portfolio_lots').insert({
+      user_id: S.user.id,
+      portfolio_id: pid,
+      ticker: tk,
+      entry_date: p.date,
+      amount_usd: amt,
+      entry_price: price,
+      shares: shares,
+    });
+    error = ins.error;
+  }
+
+  btn.textContent = origLabel; btn.disabled = false;
+  if (error){ toast((isEdit ? 'แก้ไขล้มเหลว: ' : 'บันทึกล้มเหลว: ') + error.message, 'err'); return; }
+  toast(isEdit ? `แก้ไขแล้ว · ${tk}` : `บันทึกแล้ว · ${tk} ${fmtShares(shares)} Shares`, 'ok');
   closeAddModal();
   await fetchLots();
   renderAll();
@@ -1940,6 +2014,10 @@ function showConfirm(opts){
   document.getElementById('confirmText').innerHTML = opts.text || '';
   const ok = document.getElementById('confirmOkBtn');
   ok.textContent = opts.okLabel || 'ลบ';
+  // FIX (Joon report 11/5): reset disabled state before cloning — cloneNode copies HTML attributes
+  // including 'disabled' that was set on the previous click. Without this reset, the 2nd+ delete
+  // would clone a permanently-disabled button → click did nothing.
+  ok.disabled = false;
   // Replace handler (clone to wipe old listeners)
   const fresh = ok.cloneNode(true);
   ok.parentNode.replaceChild(fresh, ok);
