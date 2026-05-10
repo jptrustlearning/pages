@@ -33,6 +33,7 @@ const S = {
   lots: [],                  // filtered view by selectedPortfolioId — all render code reads this
   // Phase 2: categories (flat list, all portfolios — filter by portfolio_id when needed)
   categories: [],            // [{id, portfolio_id, name, color, sort_order}]
+  expandedCategoryIds: new Set(),  // which sections are expanded in ดูตามกลุ่ม tab (in-memory; resets on page reload)
   // price data
   tickers: [],       // sorted unique tickers in CSV
   sectors: {},       // ticker -> sector
@@ -674,6 +675,7 @@ async function submitCatEdit(){
       const lid = _pendingLotForNewCat;
       _pendingLotForNewCat = null;
       await setLotCategory(lid, newCat.id);
+      S.expandedCategoryIds.add(newCat.id);  // auto-expand new cat so user sees the lot
       toast('ใส่กลุ่มให้ไม้แล้ว', 'ok');
     }
     if (document.getElementById('manageCatModal').classList.contains('active')) renderManageCatList();
@@ -824,6 +826,8 @@ async function pickLotCat(catId){
   if (!lotId) return;
   const ok = await setLotCategory(lotId, catId);
   if (ok){
+    // Auto-expand destination so user sees the lot land in the right place
+    S.expandedCategoryIds.add(catId || '__uncat__');
     toast(catId ? 'ย้ายกลุ่มแล้ว' : 'นำออกจากกลุ่มแล้ว', 'ok');
     renderAll();
   }
@@ -1104,18 +1108,24 @@ function renderCatSection(cat, lots){
   const pnlCls = pnlText(totalPnl);
   const pnlSym = totalPnl >= 0 ? '+' : '−';
   const isUncat = !cat;
+  const catKey = isUncat ? '__uncat__' : cat.id;
+  const isExpanded = S.expandedCategoryIds.has(catKey);
+  const expandedClass = isExpanded ? 'expanded' : '';
 
-  const headerHtml = isUncat
-    ? `<div class="cat-section-header uncat">
-        <span class="cat-section-dot uncat"></span>
-        <span class="cat-section-name">ยังไม่ได้จัดกลุ่ม</span>
-        <span class="cat-section-count">${lots.length} ไม้</span>
-      </div>`
-    : `<div class="cat-section-header">
-        <span class="cat-section-dot" style="background:${cat.color || '#722F37'}"></span>
-        <span class="cat-section-name">${escapeHtml(cat.name)}</span>
-        <span class="cat-section-count">${lots.length} ไม้</span>
-      </div>`;
+  // Chevron SVG (rotates via CSS when expanded)
+  const chev = `<svg class="cat-section-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
+
+  const headerInner = isUncat
+    ? `<span class="cat-section-dot uncat"></span>
+       <span class="cat-section-name">ยังไม่ได้จัดกลุ่ม</span>
+       <span class="cat-section-count">${lots.length} ไม้</span>
+       ${chev}`
+    : `<span class="cat-section-dot" style="background:${cat.color || '#722F37'}"></span>
+       <span class="cat-section-name">${escapeHtml(cat.name)}</span>
+       <span class="cat-section-count">${lots.length} ไม้</span>
+       ${chev}`;
+
+  const headerHtml = `<div class="cat-section-header ${isUncat ? 'uncat' : ''}" onclick="toggleCatSection('${catKey}')">${headerInner}</div>`;
 
   const summaryHtml = lots.length === 0 ? '' : `<div class="cat-section-summary">
     <div class="cat-summary-cell"><div class="cat-summary-label">ลงทุน</div><div class="cat-summary-val">${fmtUSD(totalInvested)}</div></div>
@@ -1127,12 +1137,24 @@ function renderCatSection(cat, lots){
     ? '<div class="cat-section-empty">ไม่มีไม้ในกลุ่มนี้</div>'
     : `<div class="cat-section-lots">${lots.map(l => lotCardHtml(l)).join('')}</div>`;
 
-  return `<div class="cat-section ${isUncat ? 'uncat-section' : ''}">
+  return `<div class="cat-section ${isUncat ? 'uncat-section' : ''} ${expandedClass}" data-cat-key="${catKey}">
     ${headerHtml}
     ${summaryHtml}
     ${lotsHtml}
   </div>`;
 }
+
+/* DOM-only toggle (no full re-render — preserves expand state across data updates) */
+function toggleCatSection(catKey){
+  if (S.expandedCategoryIds.has(catKey)){
+    S.expandedCategoryIds.delete(catKey);
+  } else {
+    S.expandedCategoryIds.add(catKey);
+  }
+  const sectionEl = document.querySelector(`.cat-section[data-cat-key="${catKey}"]`);
+  if (sectionEl) sectionEl.classList.toggle('expanded');
+}
+window.toggleCatSection = toggleCatSection;
 
 /* ============================================================
    RENDER: BY TICKER
