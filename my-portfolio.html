@@ -219,22 +219,31 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .gate-text{font-size:.85rem;color:var(--text-muted);margin-bottom:18px;line-height:1.6}
 
 /* ============================================================
-   PORTFOLIO TAB BAR (Phase 1.5 — replaces chip+bottom-sheet)
+   PORTFOLIO TAB BAR (Phase 1.6 — 6M-Pro chart-tab style + wrap)
+   Container = cream-deep pill-bar; tabs flex-wrap to next row
+   when overflowing. No horizontal scroll. User sees all portfolios
+   at once.
 ============================================================ */
-.port-tabs{display:flex;gap:6px;margin-bottom:14px;padding:4px 2px 8px;overflow-x:auto;overflow-y:visible;scrollbar-width:none;-ms-overflow-style:none;position:relative;scroll-snap-type:x proximity}
-.port-tabs::-webkit-scrollbar{display:none}
-.port-tab{display:inline-flex;align-items:center;gap:7px;padding:8px 13px;background:transparent;border:1px solid var(--border-gold);border-radius:999px;font-family:var(--font-thai);font-weight:600;font-size:.8rem;color:var(--text-muted);cursor:pointer;transition:all .18s;white-space:nowrap;flex-shrink:0;scroll-snap-align:start;user-select:none;position:relative}
-.port-tab:hover{color:var(--text-heading);background:var(--cream)}
-.port-tab.active{background:var(--cream-card);color:var(--maroon);border-color:var(--border-gold-strong);box-shadow:0 2px 8px rgba(114,47,55,0.10);font-weight:700}
+.port-tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px;padding:5px;background:var(--cream-deep);border:1px solid var(--border-gold);border-radius:13px;position:relative}
+.port-tab{display:inline-flex;align-items:center;gap:7px;padding:9px 13px;background:transparent;border:none;border-radius:9px;font-family:var(--font-thai);font-weight:600;font-size:.78rem;color:var(--text-muted);cursor:pointer;transition:all .2s;white-space:nowrap;user-select:none;position:relative;line-height:1.2}
+.port-tab:hover:not(.active){color:var(--maroon);background:rgba(255,255,255,0.5)}
+.port-tab.active{background:var(--cream-card);color:var(--maroon);box-shadow:0 2px 6px rgba(114,47,55,0.12);font-weight:700}
 .port-tab-dot{width:9px;height:9px;border-radius:50%;background:var(--maroon);flex-shrink:0;box-shadow:0 0 0 2px rgba(0,0,0,0.04)}
 .port-tab-dot.all{background:linear-gradient(135deg,var(--gold) 0%,var(--maroon) 100%)}
 .port-tab-name{max-width:140px;overflow:hidden;text-overflow:ellipsis;letter-spacing:.2px}
 .port-tab-menu{background:none;border:none;color:var(--gold-dark);font-size:1rem;line-height:1;padding:0 2px 0 6px;cursor:pointer;transition:color .15s;margin-left:-2px;font-weight:700}
 .port-tab-menu:hover{color:var(--maroon)}
-.port-tab-add{display:inline-flex;align-items:center;justify-content:center;padding:8px 14px;border:1.5px dashed rgba(46,159,95,0.45);border-radius:999px;background:rgba(46,159,95,0.04);color:var(--green-dark);font-family:var(--font-thai);font-weight:700;font-size:1.05rem;line-height:1;cursor:pointer;flex-shrink:0;transition:all .15s;user-select:none;scroll-snap-align:end;min-width:38px}
-.port-tab-add:hover{background:rgba(46,159,95,0.10);border-color:rgba(46,159,95,0.6);transform:scale(1.03)}
-.port-tab-add.disabled{opacity:.35;cursor:not-allowed;border-style:solid;border-color:var(--border-gold);color:var(--text-muted);background:var(--cream-deep)}
-.port-tab-add.disabled:hover{transform:none;background:var(--cream-deep)}
+.port-tab-add{display:inline-flex;align-items:center;justify-content:center;padding:9px 14px;border:1px dashed rgba(46,159,95,0.45);border-radius:9px;background:rgba(46,159,95,0.04);color:var(--green-dark);font-family:var(--font-thai);font-weight:700;font-size:1.05rem;line-height:1;cursor:pointer;transition:all .15s;user-select:none;min-width:38px}
+.port-tab-add:hover{background:rgba(46,159,95,0.10);border-color:rgba(46,159,95,0.6)}
+.port-tab-add.disabled{opacity:.4;cursor:not-allowed;border-style:solid;border-color:var(--border-gold);color:var(--text-muted);background:rgba(255,255,255,0.4)}
+.port-tab-add.disabled:hover{background:rgba(255,255,255,0.4)}
+/* Mobile: slightly tighter padding to fit more before wrapping */
+@media (max-width: 420px){
+  .port-tabs{gap:3px;padding:4px}
+  .port-tab{padding:8px 10px;gap:6px;font-size:.74rem}
+  .port-tab-name{max-width:120px}
+  .port-tab-add{padding:8px 12px;min-width:34px}
+}
 
 /* Floating action menu — position:fixed so it escapes .port-tabs overflow-x clipping
    (CSS spec: overflow-x:auto forces overflow-y to auto/hidden too, clipping any drop-down).

@@ -371,11 +371,8 @@ function renderPortTabs(){
     items.push(`<button class="port-tab-add" onclick="openCreatePortModal()" title="สร้างพอร์ตใหม่">+</button>`);
   }
   wrap.innerHTML = items.join('');
-  // Auto-scroll active tab into view (after DOM settles)
-  setTimeout(() => {
-    const activeEl = wrap.querySelector('.port-tab.active');
-    if (activeEl) activeEl.scrollIntoView({behavior:'smooth', block:'nearest', inline:'nearest'});
-  }, 50);
+  // Note: no scrollIntoView needed — tab bar uses flex-wrap so all tabs are
+  // always visible (no horizontal overflow).
 }
 window.renderPortTabs = renderPortTabs;
 
@@ -2245,9 +2242,6 @@ async function init(){
     renderPortTabs();
     updateCategoryTabVisibility();
     renderAll();
-    // Close popup if user scrolls the tab bar horizontally (internal scroll — window scroll listener doesn't catch this)
-    const tabsEl = document.getElementById('portTabs');
-    if (tabsEl) tabsEl.addEventListener('scroll', closePortTabMenu, {passive:true});
   }, 250);
 }
 
