@@ -341,9 +341,11 @@ function renderPortTabs(){
   const wrap = document.getElementById('portTabs');
   if (!wrap) return;
   const items = [];
+  const owlSpan = `<span class="port-tab-owl"><img src="jpt-owl-logo.png" alt="" loading="lazy"></span>`;
   // ทั้งหมด tab (virtual)
   const allActive = S.selectedPortfolioId === VIRTUAL_ALL;
   items.push(`<button class="port-tab ${allActive ? 'active' : ''}" onclick="setSelectedPortfolio('${VIRTUAL_ALL}')">
+    ${owlSpan}
     <span class="port-tab-dot all"></span>
     <span class="port-tab-name">ทั้งหมด</span>
   </button>`);
@@ -351,22 +353,19 @@ function renderPortTabs(){
   S.portfolios.forEach(p => {
     const active = p.id === S.selectedPortfolioId;
     items.push(`<button class="port-tab ${active ? 'active' : ''}" onclick="setSelectedPortfolio('${p.id}')">
+      ${owlSpan}
       <span class="port-tab-dot" style="background:${p.color || '#722F37'}"></span>
       <span class="port-tab-name">${escapeHtml(p.name)}</span>
     </button>`);
   });
-  // + tab (create new) — disabled at cap
+  // Action buttons row — forced to its own line via .port-tab-actions { flex-basis:100% }
   const atCap = S.portfolios.length >= PORTFOLIO_MAX;
-  if (atCap){
-    items.push(`<button class="port-tab-add disabled" onclick="toast('มีพอร์ตครบ ${PORTFOLIO_MAX} แล้ว','err')" title="มีพอร์ตครบ ${PORTFOLIO_MAX}">+</button>`);
-  } else {
-    items.push(`<button class="port-tab-add" onclick="openCreatePortModal()" title="สร้างพอร์ตใหม่">+</button>`);
-  }
-  // ... tab (manage — rename/delete any portfolio)
-  items.push(`<button class="port-tab-manage" onclick="openManagePortsModal()" title="จัดการพอร์ต">···</button>`);
+  const addBtn = atCap
+    ? `<button class="port-tab-add disabled" onclick="toast('มีพอร์ตครบ ${PORTFOLIO_MAX} แล้ว','err')" title="มีพอร์ตครบ ${PORTFOLIO_MAX}">+</button>`
+    : `<button class="port-tab-add" onclick="openCreatePortModal()" title="สร้างพอร์ตใหม่">+</button>`;
+  const manageBtn = `<button class="port-tab-manage" onclick="openManagePortsModal()" title="จัดการพอร์ต">···</button>`;
+  items.push(`<div class="port-tab-actions">${addBtn}${manageBtn}</div>`);
   wrap.innerHTML = items.join('');
-  // Note: no scrollIntoView needed — tab bar uses flex-wrap so all tabs are
-  // always visible (no horizontal overflow).
 }
 window.renderPortTabs = renderPortTabs;
 
