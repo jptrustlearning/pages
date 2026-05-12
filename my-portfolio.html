@@ -45,6 +45,22 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .hero-value-cur{font-family:var(--font-label);font-size:.85rem;color:var(--gold-light);opacity:.8;letter-spacing:1px}
 .hero-sub{font-size:.74rem;color:rgba(255,245,225,0.7);letter-spacing:.3px}
 
+/* Big total-return % (Realized + Unrealized) — sits between value and sub */
+.hero-total-pct{font-family:var(--font-number);font-size:1.55rem;line-height:1.05;letter-spacing:-.5px;margin:6px 0 6px;display:inline-block}
+.hero-total-pct.pnl-pos{color:#5BC48E;text-shadow:0 0 16px rgba(91,196,142,0.30)}
+.hero-total-pct.pnl-neg{color:#FF8A85;text-shadow:0 0 16px rgba(255,138,133,0.30)}
+.hero-total-pct.pnl-zero{color:rgba(255,245,225,0.55)}
+.hero-total-pct::before{content:'';display:inline-block;width:0;height:0;margin-right:7px;vertical-align:middle;border-style:solid}
+.hero-total-pct.pnl-pos::before{border-width:0 6px 9px 6px;border-color:transparent transparent #5BC48E transparent}
+.hero-total-pct.pnl-neg::before{border-width:9px 6px 0 6px;border-color:#FF8A85 transparent transparent transparent}
+.hero-total-pct.pnl-zero::before{display:none}
+
+/* Eye toggle (mask amounts on/off) — absolute top-right of hero card */
+.hero-eye{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:rgba(255,245,225,0.08);border:1px solid rgba(212,175,55,0.28);color:var(--gold-light);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;padding:0;z-index:2}
+.hero-eye:hover{background:rgba(255,245,225,0.16);border-color:rgba(212,175,55,0.55);transform:scale(1.04)}
+.hero-eye:active{transform:scale(.96)}
+.hero-eye svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block}
+
 .hero-pnl-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(212,175,55,0.18)}
 .pnl-cell{}
 .pnl-cell-label{font-family:var(--font-label);font-size:.6rem;letter-spacing:2.2px;color:var(--gold-light);opacity:.75;margin-bottom:4px}
@@ -410,12 +426,16 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 
     <!-- HERO -->
     <div class="hero">
+      <button id="heroEyeBtn" class="hero-eye" onclick="toggleMaskValues()" title="ซ่อน/แสดงจำนวนเงิน" aria-label="ซ่อน/แสดงจำนวนเงิน">
+        <!-- icon set by JS based on S.maskValues -->
+      </button>
       <div class="hero-label">My Portfolio</div>
       <div class="hero-title">มูลค่าพอร์ตปัจจุบัน</div>
       <div class="hero-value-row">
         <span id="heroValue" class="hero-value">$0.00</span>
         <span class="hero-value-cur">USD</span>
       </div>
+      <div id="heroTotalPct" class="hero-total-pct pnl-zero">+0.00%</div>
       <div id="heroSub" class="hero-sub">ยังไม่มีรายการ — เริ่มบันทึกการซื้อขายของคุณ</div>
       <div class="hero-pnl-row">
         <div class="pnl-cell">
@@ -665,7 +685,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 ============================================================ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-<script src="my-portfolio.js?v=1778573535"></script>
+<script src="my-portfolio.js?v=1778575929"></script>
 
 </body>
 </html>

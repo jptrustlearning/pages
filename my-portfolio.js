@@ -42,6 +42,9 @@ const S = {
   latestDate: null,
   currentTab: 'lots',
   currentTf: 'YTD',
+  // Mask toggle: hides $ amounts (aggregated portfolio values) while keeping
+  // %, tickers and per-share prices visible. Persisted in localStorage.
+  maskValues: (() => { try { return localStorage.getItem('jpt:maskValues') === '1'; } catch(e){ return false; } })(),
 };
 
 /* ============================================================
@@ -86,13 +89,16 @@ window.toast = toast;
 /* ============================================================
    FORMATTERS
 ============================================================ */
+const MASK_STR = '••••••';   // bullet-mask used when S.maskValues is true (cleaner than ******)
 const fmtUSD = (v) => {
   if (v === null || v === undefined || isNaN(v)) return '—';
+  if (S.maskValues) return (v < 0 ? '-' : '') + '$' + MASK_STR;
   const sign = v < 0 ? '-' : '';
   return sign + '$' + Math.abs(v).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
 };
 const fmtUSDsigned = (v) => {
   if (v === null || v === undefined || isNaN(v)) return '—';
+  if (S.maskValues) return (v >= 0 ? '+' : '-') + '$' + MASK_STR;
   return (v >= 0 ? '+' : '-') + '$' + Math.abs(v).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
 };
 const fmtShares = (v) => {
@@ -893,6 +899,19 @@ function renderHero(){
   r.className = 'pnl-cell-value ' + pnlClass(t.realized);
   u.textContent = fmtUSDsigned(t.unrealized);
   u.className = 'pnl-cell-value ' + pnlClass(t.unrealized);
+  // total return % (Realized + Unrealized) / Total invested  — always visible (the headline metric)
+  const totalPnl = t.realized + t.unrealized;
+  const totalRetPct = t.totalInvested > 0 ? (totalPnl / t.totalInvested) * 100 : null;
+  const totalEl = document.getElementById('heroTotalPct');
+  if (totalEl){
+    if (totalRetPct === null){
+      totalEl.textContent = '—';
+      totalEl.className = 'hero-total-pct pnl-zero';
+    } else {
+      totalEl.textContent = (totalRetPct >= 0 ? '+' : '') + totalRetPct.toFixed(2) + '%';
+      totalEl.className = 'hero-total-pct ' + pnlClass(totalPnl);
+    }
+  }
   // sub
   const openLots = S.lots.filter(l => lotMetrics(l).status !== 'closed').length;
   const totalLots = S.lots.length;
@@ -911,7 +930,28 @@ function renderHero(){
   const unrealizedSub = document.getElementById('heroUnrealizedSub');
   if (openLots === 0) unrealizedSub.textContent = 'ไม่มีไม้ที่ถืออยู่';
   else unrealizedSub.textContent = `${openLots} ไม้ · ${t.costRemaining > 0 ? fmtPct((t.unrealized/t.costRemaining)*100) : '0%'}`;
+  // keep eye icon in sync with state (re-render-safe)
+  updateHeroEyeIcon();
 }
+
+/* === MASK TOGGLE === */
+const EYE_ON_SVG  = '<svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYE_OFF_SVG = '<svg viewBox="0 0 24 24"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg>';
+
+function updateHeroEyeIcon(){
+  const btn = document.getElementById('heroEyeBtn');
+  if (!btn) return;
+  btn.innerHTML = S.maskValues ? EYE_OFF_SVG : EYE_ON_SVG;
+  btn.title = S.maskValues ? 'แสดงจำนวนเงิน' : 'ซ่อนจำนวนเงิน';
+}
+
+function toggleMaskValues(){
+  S.maskValues = !S.maskValues;
+  try { localStorage.setItem('jpt:maskValues', S.maskValues ? '1' : '0'); } catch(e){}
+  // Re-render everything that surfaces $ amounts (hero, lots, sells, equity chart Y-axis)
+  renderAll();
+}
+window.toggleMaskValues = toggleMaskValues;
 
 /* ============================================================
    RENDER: LOTS LIST
@@ -1347,7 +1387,7 @@ function drawEquityChart(){
     const v = yMin + (yMax - yMin) * (i/4);
     const y = yAt(v);
     ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W-padR, y); ctx.stroke();
-    ctx.fillText('$' + Math.round(v).toLocaleString(), padL - 6, y);
+    ctx.fillText(S.maskValues ? '$' + MASK_STR : '$' + Math.round(v).toLocaleString(), padL - 6, y);
   }
 
   // x-axis labels (start, end)
