@@ -231,30 +231,36 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .port-tab-dot{width:9px;height:9px;border-radius:50%;background:var(--maroon);flex-shrink:0;box-shadow:0 0 0 2px rgba(0,0,0,0.04)}
 .port-tab-dot.all{background:linear-gradient(135deg,var(--gold) 0%,var(--maroon) 100%)}
 .port-tab-name{max-width:140px;overflow:hidden;text-overflow:ellipsis;letter-spacing:.2px}
-.port-tab-menu{background:none;border:none;color:var(--gold-dark);font-size:1rem;line-height:1;padding:0 2px 0 6px;cursor:pointer;transition:color .15s;margin-left:-2px;font-weight:700}
-.port-tab-menu:hover{color:var(--maroon)}
 .port-tab-add{display:inline-flex;align-items:center;justify-content:center;padding:9px 14px;border:1px dashed rgba(46,159,95,0.45);border-radius:9px;background:rgba(46,159,95,0.04);color:var(--green-dark);font-family:var(--font-thai);font-weight:700;font-size:1.05rem;line-height:1;cursor:pointer;transition:all .15s;user-select:none;min-width:38px}
 .port-tab-add:hover{background:rgba(46,159,95,0.10);border-color:rgba(46,159,95,0.6)}
 .port-tab-add.disabled{opacity:.4;cursor:not-allowed;border-style:solid;border-color:var(--border-gold);color:var(--text-muted);background:rgba(255,255,255,0.4)}
 .port-tab-add.disabled:hover{background:rgba(255,255,255,0.4)}
+/* Manage (...) tab — opens managePortsModal for rename/delete of any portfolio */
+.port-tab-manage{display:inline-flex;align-items:center;justify-content:center;padding:9px 14px;border:1px dashed rgba(212,175,55,0.5);border-radius:9px;background:rgba(212,175,55,0.06);color:var(--gold-dark);font-family:var(--font-thai);font-weight:700;font-size:1rem;line-height:1;cursor:pointer;transition:all .15s;user-select:none;min-width:38px;letter-spacing:1px}
+.port-tab-manage:hover{background:rgba(212,175,55,0.14);border-color:rgba(212,175,55,0.7);color:var(--maroon)}
 /* Mobile: slightly tighter padding to fit more before wrapping */
 @media (max-width: 420px){
   .port-tabs{gap:3px;padding:4px}
   .port-tab{padding:8px 10px;gap:6px;font-size:.74rem}
   .port-tab-name{max-width:120px}
-  .port-tab-add{padding:8px 12px;min-width:34px}
+  .port-tab-add,.port-tab-manage{padding:8px 12px;min-width:34px}
 }
 
-/* Floating action menu — position:fixed so it escapes .port-tabs overflow-x clipping
-   (CSS spec: overflow-x:auto forces overflow-y to auto/hidden too, clipping any drop-down).
-   JS sets top/left via getBoundingClientRect when shown. */
-.port-tab-menu-popup{position:fixed;background:var(--cream-card);border:1px solid var(--border-gold-strong);border-radius:9px;box-shadow:0 6px 20px rgba(45,16,24,0.18);padding:4px;display:none;flex-direction:column;gap:2px;min-width:140px;z-index:100;animation:portMenuPopup .15s ease}
-.port-tab-menu-popup.active{display:flex}
-@keyframes portMenuPopup{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
-.port-tab-menu-action{background:none;border:none;text-align:left;font-family:var(--font-thai);font-size:.8rem;font-weight:500;color:var(--text-dark);padding:9px 11px;border-radius:5px;cursor:pointer;transition:all .12s;white-space:nowrap}
-.port-tab-menu-action:hover{background:var(--cream-deep)}
-.port-tab-menu-action.danger{color:var(--red-dark)}
-.port-tab-menu-action.danger:hover{background:rgba(192,57,43,0.08)}
+/* === MANAGE PORTFOLIOS MODAL (mirrors manage-cat-* pattern) === */
+.manage-port-modal{max-width:480px}
+.manage-port-list{display:flex;flex-direction:column;gap:6px;margin-bottom:6px;max-height:55vh;overflow-y:auto}
+.manage-port-row{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--cream);border:1px solid var(--border-gold);border-radius:10px}
+.manage-port-info{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+.manage-port-dot{width:11px;height:11px;border-radius:50%;background:var(--maroon);flex-shrink:0;box-shadow:0 0 0 2px rgba(0,0,0,0.04)}
+.manage-port-name{font-family:var(--font-thai);font-weight:600;font-size:.88rem;color:var(--text-dark);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+.manage-port-count{font-family:var(--font-thai);font-size:.7rem;color:var(--text-muted);flex-shrink:0;font-weight:500}
+.manage-port-actions{display:flex;gap:5px;flex-shrink:0}
+.manage-port-btn{background:none;border:1px solid var(--border-gold);color:var(--text-heading);font-family:var(--font-thai);font-size:.7rem;font-weight:600;padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .15s;letter-spacing:.2px}
+.manage-port-btn.rename:hover{background:var(--gold-dark);color:#FFF5E1;border-color:var(--gold-dark)}
+.manage-port-btn.danger{color:var(--red-dark);border-color:rgba(192,57,43,0.3)}
+.manage-port-btn.danger:hover{background:var(--red);color:#FFF;border-color:var(--red)}
+.manage-port-btn:disabled{opacity:.4;cursor:not-allowed}
+.manage-port-btn:disabled:hover{background:none;color:var(--text-muted);border-color:var(--border-gold)}
 
 /* Add modal — destination portfolio dropdown (only visible in ทั้งหมด mode) */
 .add-port-select{font-family:var(--font-thai);font-size:.92rem;padding:10px 12px;border:1px solid var(--border-gold);border-radius:9px;background:var(--cream-card);color:var(--text-dark);width:100%;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238B6914' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
@@ -325,7 +331,8 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .manage-cat-create:hover{background:linear-gradient(135deg,rgba(46,159,95,0.15),rgba(212,175,55,0.15));border-color:rgba(46,159,95,0.6)}
 
 /* === Lot Category Popup (single body-level, position:fixed) === */
-.lot-cat-popup{position:fixed;background:var(--cream-card);border:1px solid var(--border-gold-strong);border-radius:10px;box-shadow:0 8px 24px rgba(45,16,24,0.20);padding:5px;display:none;flex-direction:column;gap:2px;min-width:200px;max-width:260px;z-index:200;animation:portMenuPopup .15s ease;max-height:60vh;overflow-y:auto}
+.lot-cat-popup{position:fixed;background:var(--cream-card);border:1px solid var(--border-gold-strong);border-radius:10px;box-shadow:0 8px 24px rgba(45,16,24,0.20);padding:5px;display:none;flex-direction:column;gap:2px;min-width:200px;max-width:260px;z-index:200;animation:popupFadeIn .15s ease;max-height:60vh;overflow-y:auto}
+@keyframes popupFadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 .lot-cat-popup.active{display:flex}
 .lot-cat-option{display:flex;align-items:center;gap:8px;background:none;border:none;text-align:left;font-family:var(--font-thai);font-size:.8rem;font-weight:500;color:var(--text-dark);padding:9px 11px;border-radius:6px;cursor:pointer;transition:all .12s}
 .lot-cat-option:hover{background:var(--cream-deep)}
@@ -603,6 +610,21 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 <!-- ============================================================
      MANAGE CATEGORIES MODAL (Phase 2)
 ============================================================ -->
+<!-- ============================================================
+     MANAGE PORTFOLIOS MODAL (Phase 1.7 — replaces in-tab ⋮ menu)
+     Lists all portfolios with rename/delete buttons. Opened from
+     the '...' tab at end of the tab bar.
+============================================================ -->
+<div id="managePortsModal" class="modal-backdrop" onclick="if(event.target===this)closeManagePortsModal()">
+  <div class="modal manage-port-modal">
+    <div class="modal-head">
+      <div class="modal-title">จัดการพอร์ต</div>
+      <button class="modal-close" onclick="closeManagePortsModal()">×</button>
+    </div>
+    <div id="managePortsList" class="manage-port-list"></div>
+  </div>
+</div>
+
 <div id="manageCatModal" class="modal-backdrop" onclick="if(event.target===this)closeManageCatModal()">
   <div class="modal manage-cat-modal">
     <div class="modal-head">
@@ -627,7 +649,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 ============================================================ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-<script src="my-portfolio.js?v=1778439940"></script>
+<script src="my-portfolio.js?v=1778553895"></script>
 
 </body>
 </html>

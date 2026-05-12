@@ -323,7 +323,6 @@ function setSelectedPortfolio(id){
   S.selectedPortfolioId = id;
   try { localStorage.setItem(lsKeyForUser(), id); } catch(e){}
   applyPortfolioFilter();
-  closePortTabMenu();
   closeLotCatPopup();
   renderPortTabs();
   updateCategoryTabVisibility();
@@ -351,69 +350,65 @@ function renderPortTabs(){
   // Each portfolio
   S.portfolios.forEach(p => {
     const active = p.id === S.selectedPortfolioId;
-    const menuHtml = active ? `
-      <button class="port-tab-menu" onclick="event.stopPropagation(); togglePortTabMenu('${p.id}', this)" title="จัดการพอร์ต">⋮</button>
-      <div class="port-tab-menu-popup" id="portMenuPopup-${p.id}">
-        <button class="port-tab-menu-action" onclick="event.stopPropagation(); closePortTabMenu(); openRenamePortModal('${p.id}')">เปลี่ยนชื่อ</button>
-        <button class="port-tab-menu-action danger" onclick="event.stopPropagation(); closePortTabMenu(); confirmDeletePortfolio('${p.id}')">ลบพอร์ต</button>
-      </div>` : '';
     items.push(`<button class="port-tab ${active ? 'active' : ''}" onclick="setSelectedPortfolio('${p.id}')">
       <span class="port-tab-dot" style="background:${p.color || '#722F37'}"></span>
       <span class="port-tab-name">${escapeHtml(p.name)}</span>
-      ${menuHtml}
     </button>`);
   });
-  // + tab (create new)
+  // + tab (create new) — disabled at cap
   const atCap = S.portfolios.length >= PORTFOLIO_MAX;
   if (atCap){
     items.push(`<button class="port-tab-add disabled" onclick="toast('มีพอร์ตครบ ${PORTFOLIO_MAX} แล้ว','err')" title="มีพอร์ตครบ ${PORTFOLIO_MAX}">+</button>`);
   } else {
     items.push(`<button class="port-tab-add" onclick="openCreatePortModal()" title="สร้างพอร์ตใหม่">+</button>`);
   }
+  // ... tab (manage — rename/delete any portfolio)
+  items.push(`<button class="port-tab-manage" onclick="openManagePortsModal()" title="จัดการพอร์ต">···</button>`);
   wrap.innerHTML = items.join('');
   // Note: no scrollIntoView needed — tab bar uses flex-wrap so all tabs are
   // always visible (no horizontal overflow).
 }
 window.renderPortTabs = renderPortTabs;
 
-function togglePortTabMenu(pid, btnEl){
-  const popup = document.getElementById('portMenuPopup-' + pid);
-  if (!popup) return;
-  // close other open ones
-  document.querySelectorAll('.port-tab-menu-popup.active').forEach(x => { if (x !== popup) x.classList.remove('active'); });
-  if (popup.classList.contains('active')){
-    popup.classList.remove('active');
+/* === MANAGE PORTFOLIOS MODAL (replaces in-tab ⋮ menu) === */
+function openManagePortsModal(){
+  renderManagePortsList();
+  document.getElementById('managePortsModal').classList.add('active');
+}
+window.openManagePortsModal = openManagePortsModal;
+
+function closeManagePortsModal(){
+  document.getElementById('managePortsModal').classList.remove('active');
+}
+window.closeManagePortsModal = closeManagePortsModal;
+
+function renderManagePortsList(){
+  const list = document.getElementById('managePortsList');
+  if (!list) return;
+  if (!S.portfolios || S.portfolios.length === 0){
+    list.innerHTML = '<div class="manage-cat-empty">ยังไม่มีพอร์ต</div>';
     return;
   }
-  // Show first so we can measure offsetWidth, then position via fixed coords
-  popup.classList.add('active');
-  if (btnEl){
-    const rect = btnEl.getBoundingClientRect();
-    const popupW = popup.offsetWidth || 150;
-    let left = rect.right - popupW;  // right-align under the ⋮ button
-    // clamp to viewport with 8px gutter
-    left = Math.max(8, Math.min(window.innerWidth - popupW - 8, left));
-    popup.style.top  = (rect.bottom + 6) + 'px';
-    popup.style.left = left + 'px';
-  }
+  const onlyOne = S.portfolios.length <= 1;
+  list.innerHTML = S.portfolios.map(p => {
+    const lotCount = S.allLots.filter(l => l.portfolio_id === p.id).length;
+    const delBtn = onlyOne
+      ? `<button class="manage-port-btn danger" disabled title="ต้องมีพอร์ตอย่างน้อย 1">ลบ</button>`
+      : `<button class="manage-port-btn danger" onclick="confirmDeletePortfolio('${p.id}')" title="ลบพอร์ต">ลบ</button>`;
+    return `<div class="manage-port-row">
+      <div class="manage-port-info">
+        <span class="manage-port-dot" style="background:${p.color || '#722F37'}"></span>
+        <span class="manage-port-name">${escapeHtml(p.name)}</span>
+        <span class="manage-port-count">${lotCount} ไม้</span>
+      </div>
+      <div class="manage-port-actions">
+        <button class="manage-port-btn rename" onclick="openRenamePortModal('${p.id}')" title="เปลี่ยนชื่อ">เปลี่ยนชื่อ</button>
+        ${delBtn}
+      </div>
+    </div>`;
+  }).join('');
 }
-window.togglePortTabMenu = togglePortTabMenu;
-
-function closePortTabMenu(){
-  document.querySelectorAll('.port-tab-menu-popup.active').forEach(x => x.classList.remove('active'));
-}
-window.closePortTabMenu = closePortTabMenu;
-
-// Outside-click closes any open tab menu
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('.port-tab-menu') && !e.target.closest('.port-tab-menu-popup')) {
-    closePortTabMenu();
-  }
-});
-
-// Close menu on viewport changes (since popup position is fixed and won't follow scroll)
-window.addEventListener('resize', closePortTabMenu);
-window.addEventListener('scroll', closePortTabMenu, {passive:true});
+window.renderManagePortsList = renderManagePortsList;
 
 /* === CREATE / RENAME MODAL === */
 let _portEditMode = 'create';
@@ -487,6 +482,7 @@ async function submitPortEdit(){
     closePortEditModal();
     toast('เปลี่ยนชื่อแล้ว', 'ok');
     renderPortTabs();
+    if (document.getElementById('managePortsModal').classList.contains('active')) renderManagePortsList();
   }
 }
 window.submitPortEdit = submitPortEdit;
@@ -520,6 +516,7 @@ function confirmDeletePortfolio(pid){
       await fetchLots();
       renderPortTabs();
       renderAll();
+      if (document.getElementById('managePortsModal').classList.contains('active')) renderManagePortsList();
     }
   });
 }
