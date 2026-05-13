@@ -677,7 +677,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .mig-sub{
     font-size:14px;line-height:1.55;
     color:#5C4438;
-    margin-bottom:18px;
+    margin-bottom:14px;
 }
 .mig-sub .mig-newurl{
     display:inline-block;
@@ -688,6 +688,49 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
     padding:3px 9px;border-radius:6px;
     margin-top:4px;font-weight:600;
     border:1px solid rgba(212,175,55,0.3);
+}
+
+/* ===== URL + action frame (unified layout) ===== */
+.mig-url-frame{
+    background:#FAF6ED;
+    border:1.5px solid rgba(212,175,55,0.35);
+    border-radius:12px;
+    padding:14px 16px 14px;
+    margin-bottom:18px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.6),0 2px 8px rgba(212,175,55,0.08);
+}
+.mig-url-text{
+    font-family:'Menlo','Monaco',monospace;
+    font-size:14.5px;font-weight:600;
+    color:#722F37;
+    letter-spacing:0.2px;
+    text-align:center;
+    word-break:break-all;
+    padding:8px 4px 12px;
+    border-bottom:1px dashed rgba(212,175,55,0.3);
+    margin-bottom:12px;
+}
+.mig-url-btn{
+    display:block;width:100%;
+    padding:13px;
+    background:linear-gradient(135deg,#D4AF37,#B8860B);
+    color:#1a0a0e;
+    text-decoration:none;
+    border:none;
+    border-radius:9px;
+    font-family:'Sarabun','Anuphan',sans-serif;
+    font-size:14.5px;font-weight:700;
+    cursor:pointer;
+    box-shadow:0 4px 14px rgba(212,175,55,0.32);
+    letter-spacing:0.3px;
+    transition:transform .15s,box-shadow .15s;
+    text-align:center;
+}
+.mig-url-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(212,175,55,0.42)}
+.mig-url-btn:active{transform:translateY(0);box-shadow:0 3px 10px rgba(212,175,55,0.28)}
+.mig-url-btn.copied{
+    background:linear-gradient(135deg,#2E9F5F,#1F7A47);
+    color:#FFFFFF;
 }
 
 /* Steps (PWA mode only) */
@@ -791,22 +834,22 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             <div class="mig-owl"><img src="jpt-owl-logo.png" alt="JP Trust" onerror="this.style.display='none'"></div>
             <div class="mig-kicker">JP Trust Learning</div>
             <div class="mig-title" id="migTitle">บ้านใหม่ของ JP Trust App</div>
-            <div class="mig-sub">
-                เพื่อความเสถียร + ปลอดภัยขึ้น เราย้ายมาที่<br>
-                <span class="mig-newurl">app.jptrustlearning.com</span>
+            <div class="mig-sub">เพื่อความเสถียร + ปลอดภัยขึ้น เราย้ายมาที่</div>
+            <!-- URL + action button — combined in single framed card -->
+            <div class="mig-url-frame">
+                <div class="mig-url-text">app.jptrustlearning.com</div>
+                <a class="mig-url-btn" href="https://app.jptrustlearning.com" id="migOpenBtn">เปิดแอพใหม่ →</a>
+                <button class="mig-url-btn" id="migCopyBtn" type="button" style="display:none" onclick="copyMigUrl(this)">📋 ก๊อปลิงก์</button>
             </div>
             <!-- PWA steps — only shown if standalone -->
             <div class="mig-steps" id="migSteps" style="display:none">
                 <div class="mig-steps-title">ทำตาม 4 ขั้นตอน</div>
-                <div class="mig-step"><div class="mig-step-num">1</div><div class="mig-step-text">กดปุ่ม <strong>"ก๊อปลิงก์"</strong> ด้านล่าง</div></div>
+                <div class="mig-step"><div class="mig-step-num">1</div><div class="mig-step-text">กดปุ่ม <strong>"ก๊อปลิงก์"</strong> ด้านบน</div></div>
                 <div class="mig-step"><div class="mig-step-num">2</div><div class="mig-step-text"><strong>ลบไอคอน</strong> JP Trust เก่าออกจากหน้าจอ</div></div>
-                <div class="mig-step"><div class="mig-step-num">3</div><div class="mig-step-text">เปิด <strong>เบราว์เซอร์</strong> (Chrome / Safari / Edge) แล้ววางลิงก์</div></div>
+                <div class="mig-step"><div class="mig-step-num">3</div><div class="mig-step-text">เปิด <strong>Chrome</strong> หรือ <strong>Safari</strong> แล้ววางลิงก์</div></div>
                 <div class="mig-step"><div class="mig-step-num">4</div><div class="mig-step-text"><strong>ติดตั้งใหม่</strong> จากหน้าที่เปิดขึ้น</div></div>
             </div>
             <div class="mig-reassure">PIN และข้อมูลทั้งหมดเหมือนเดิม ไม่ต้องสมัครใหม่</div>
-            <!-- Two button modes: copy (PWA) or open link (browser) — toggled by JS -->
-            <a class="mig-btn" href="https://app.jptrustlearning.com" id="migOpenBtn">เปิดแอพใหม่ →</a>
-            <button class="mig-btn" id="migCopyBtn" type="button" style="display:none" onclick="copyMigUrl(this)">ก๊อปลิงก์ →</button>
             <button class="mig-dismiss" onclick="dismissMigration()" type="button">ใช้แอพเก่าก่อน</button>
         </div>
     </div>
@@ -1371,12 +1414,10 @@ async function copyMigUrl(btn){
     if(ok){
         var orig=btn.textContent;
         btn.textContent='✓ ก๊อปแล้ว — เปิดเบราว์เซอร์ใหม่';
-        btn.style.background='linear-gradient(135deg,#2E9F5F,#1F7A47)';
-        btn.style.color='#FFFFFF';
+        btn.classList.add('copied');
         setTimeout(function(){
             btn.textContent=orig;
-            btn.style.background='';
-            btn.style.color='';
+            btn.classList.remove('copied');
         },3500);
     }
 }
