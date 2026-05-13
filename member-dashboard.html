@@ -651,14 +651,20 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 }
 
 .mig-owl{
-    width:62px;height:62px;
+    width:80px;height:80px;
     margin:0 auto 14px;
-    background:linear-gradient(135deg,#1a0a0e,#3d1820,#722F37);
-    border-radius:16px;
     display:flex;align-items:center;justify-content:center;
-    box-shadow:0 6px 18px rgba(114,47,55,0.3),inset 0 1px 0 rgba(212,175,55,0.25);
+    animation:migOwlFloat 2.8s ease-in-out infinite;
 }
-.mig-owl img{width:42px;height:42px;object-fit:contain;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3))}
+.mig-owl img{
+    width:80px;height:80px;
+    object-fit:contain;
+    filter:drop-shadow(0 4px 12px rgba(46,159,95,0.18)) drop-shadow(0 2px 8px rgba(212,175,55,0.35));
+}
+@keyframes migOwlFloat{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-6px)}
+}
 
 .mig-kicker{
     font-family:'Cinzel',serif;
@@ -692,25 +698,44 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 
 /* ===== URL + action frame (unified layout) ===== */
 .mig-url-frame{
-    background:#FAF6ED;
-    border:1.5px solid rgba(212,175,55,0.35);
+    background:linear-gradient(135deg,
+        #1a0a0e 0%,
+        #3d1820 25%,
+        #722F37 50%,
+        #8B6914 72%,
+        #1a0a0e 100%);
+    border:1.5px solid rgba(212,175,55,0.5);
     border-radius:12px;
     padding:14px 16px 14px;
     margin-bottom:18px;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.6),0 2px 8px rgba(212,175,55,0.08);
+    box-shadow:
+        inset 0 1px 0 rgba(212,175,55,0.25),
+        0 6px 20px rgba(26,10,14,0.25),
+        0 2px 6px rgba(114,47,55,0.18);
+    position:relative;
+    overflow:hidden;
+}
+.mig-url-frame::before{
+    content:"";
+    position:absolute;inset:0;
+    background:radial-gradient(ellipse at 25% 15%,rgba(212,175,55,0.18) 0%,transparent 55%);
+    pointer-events:none;
 }
 .mig-url-text{
+    position:relative;
     font-family:'Menlo','Monaco',monospace;
     font-size:14.5px;font-weight:600;
-    color:#722F37;
-    letter-spacing:0.2px;
+    color:#FFFFFF;
+    letter-spacing:0.4px;
     text-align:center;
     word-break:break-all;
     padding:8px 4px 12px;
-    border-bottom:1px dashed rgba(212,175,55,0.3);
+    border-bottom:1px dashed rgba(212,175,55,0.45);
     margin-bottom:12px;
+    text-shadow:0 1px 3px rgba(0,0,0,0.4),0 0 12px rgba(212,175,55,0.25);
 }
 .mig-url-btn{
+    position:relative;
     display:block;width:100%;
     padding:13px;
     background:linear-gradient(135deg,#D4AF37,#B8860B);
@@ -721,12 +746,12 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
     font-family:'Sarabun','Anuphan',sans-serif;
     font-size:14.5px;font-weight:700;
     cursor:pointer;
-    box-shadow:0 4px 14px rgba(212,175,55,0.32);
+    box-shadow:0 4px 14px rgba(212,175,55,0.32),inset 0 1px 0 rgba(255,255,255,0.3);
     letter-spacing:0.3px;
     transition:transform .15s,box-shadow .15s;
     text-align:center;
 }
-.mig-url-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(212,175,55,0.42)}
+.mig-url-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(212,175,55,0.42),inset 0 1px 0 rgba(255,255,255,0.3)}
 .mig-url-btn:active{transform:translateY(0);box-shadow:0 3px 10px rgba(212,175,55,0.28)}
 .mig-url-btn.copied{
     background:linear-gradient(135deg,#2E9F5F,#1F7A47);
@@ -839,12 +864,12 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             <div class="mig-url-frame">
                 <div class="mig-url-text">app.jptrustlearning.com</div>
                 <a class="mig-url-btn" href="https://app.jptrustlearning.com" id="migOpenBtn">เปิดแอพใหม่ →</a>
-                <button class="mig-url-btn" id="migCopyBtn" type="button" style="display:none" onclick="copyMigUrl(this)">📋 ก๊อปลิงก์</button>
+                <button class="mig-url-btn" id="migCopyBtn" type="button" style="display:none" onclick="copyMigUrl(this)">คัดลอก Link บ้านใหม่</button>
             </div>
             <!-- PWA steps — only shown if standalone -->
             <div class="mig-steps" id="migSteps" style="display:none">
                 <div class="mig-steps-title">ทำตาม 4 ขั้นตอน</div>
-                <div class="mig-step"><div class="mig-step-num">1</div><div class="mig-step-text">กดปุ่ม <strong>"ก๊อปลิงก์"</strong> ด้านบน</div></div>
+                <div class="mig-step"><div class="mig-step-num">1</div><div class="mig-step-text">กดปุ่ม <strong>"คัดลอก Link"</strong> ด้านบน</div></div>
                 <div class="mig-step"><div class="mig-step-num">2</div><div class="mig-step-text"><strong>ลบไอคอน</strong> JP Trust เก่าออกจากหน้าจอ</div></div>
                 <div class="mig-step"><div class="mig-step-num">3</div><div class="mig-step-text">เปิด <strong>Chrome</strong> หรือ <strong>Safari</strong> แล้ววางลิงก์</div></div>
                 <div class="mig-step"><div class="mig-step-num">4</div><div class="mig-step-text"><strong>ติดตั้งใหม่</strong> จากหน้าที่เปิดขึ้น</div></div>
@@ -1413,7 +1438,7 @@ async function copyMigUrl(btn){
     }catch(e){ok=false}
     if(ok){
         var orig=btn.textContent;
-        btn.textContent='✓ ก๊อปแล้ว — เปิดเบราว์เซอร์ใหม่';
+        btn.textContent='✓ คัดลอกแล้ว — เปิดเบราว์เซอร์ใหม่';
         btn.classList.add('copied');
         setTimeout(function(){
             btn.textContent=orig;
