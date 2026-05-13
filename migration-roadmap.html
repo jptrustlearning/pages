@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Migration Roadmap · JP Trust</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@200;300;400;500;600;700&family=Cinzel:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root{
+  --maroon-dark:#1a0a0e;
+  --maroon:#3d1820;
+  --burgundy:#722F37;
+  --burgundy-soft:#8B3A42;
+  --cream:#FAF6ED;
+  --cream-deep:#F2EBDC;
+  --cream-card:#FFFDF7;
+  --gold:#D4AF37;
+  --gold-dark:#B8860B;
+  --gold-deep:#8B6914;
+  --gold-soft:rgba(212,175,55,0.18);
+  --gold-border:rgba(212,175,55,0.32);
+  --text-dark:#2C1810;
+  --text-dark-muted:#5C4438;
+  --text-light:#F5E9D0;
+  --text-light-muted:rgba(245,233,208,0.62);
+  --green:#2E9F5F;
+  --shadow-card:0 4px 24px rgba(26,10,14,0.06),0 1px 2px rgba(26,10,14,0.04);
+  --shadow-card-hover:0 8px 36px rgba(26,10,14,0.10),0 2px 4px rgba(26,10,14,0.06);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+html,body{
+  font-family:'Anuphan','Sarabun',sans-serif;
+  background:var(--cream);
+  color:var(--text-dark);
+  font-size:15px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+
+body{
+  background-image:
+    radial-gradient(circle at 20% 10%,rgba(212,175,55,0.04) 0%,transparent 40%),
+    radial-gradient(circle at 80% 80%,rgba(114,47,55,0.03) 0%,transparent 40%);
+  background-attachment:fixed;
+}
+
+/* ===== HEADER ===== */
+.hero{
+  background:linear-gradient(135deg,var(--maroon-dark) 0%,var(--maroon) 60%,var(--burgundy) 100%);
+  color:var(--text-light);
+  padding:48px 32px 40px;
+  position:relative;
+  overflow:hidden;
+}
+.hero::before{
+  content:"";
+  position:absolute;
+  top:-50%;left:-20%;width:140%;height:200%;
+  background:radial-gradient(ellipse at center,rgba(212,175,55,0.12) 0%,transparent 50%);
+  pointer-events:none;
+}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1}
+.kicker{
+  font-family:'Cinzel',serif;
+  font-size:11px;
+  letter-spacing:4px;
+  color:var(--gold);
+  text-transform:uppercase;
+  font-weight:600;
+  margin-bottom:14px;
+  display:flex;align-items:center;gap:12px;
+}
+.kicker::after{
+  content:"";flex:1;height:1px;
+  background:linear-gradient(90deg,var(--gold-border),transparent);
+  max-width:200px;
+}
+.hero-title{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(36px,5vw,52px);
+  line-height:1.1;
+  margin-bottom:8px;
+  letter-spacing:-0.5px;
+}
+.hero-sub{
+  color:var(--text-light-muted);
+  font-size:15px;
+  max-width:600px;
+  margin-bottom:36px;
+}
+
+/* Overall progress */
+.overall{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:32px;
+  align-items:center;
+  padding:24px 28px;
+  background:rgba(26,10,14,0.45);
+  backdrop-filter:blur(10px);
+  border:1px solid var(--gold-border);
+  border-radius:14px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.25),inset 0 1px 0 rgba(212,175,55,0.15);
+}
+.overall-num{
+  font-family:'DM Serif Display',serif;
+  font-size:64px;
+  line-height:1;
+  color:var(--gold);
+  text-shadow:0 0 28px rgba(212,175,55,0.45);
+  font-feature-settings:"lnum";
+}
+.overall-num small{font-size:24px;color:var(--text-light-muted);margin-left:4px}
+.overall-info{display:flex;flex-direction:column;gap:10px;min-width:0}
+.overall-label{
+  font-family:'Cinzel',serif;
+  font-size:10px;
+  letter-spacing:3px;
+  color:var(--gold);
+  text-transform:uppercase;
+}
+.overall-bar{
+  width:100%;height:8px;
+  background:rgba(0,0,0,0.4);
+  border-radius:4px;
+  overflow:hidden;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,0.3);
+}
+.overall-bar-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--gold-dark),var(--gold));
+  box-shadow:0 0 10px rgba(212,175,55,0.5);
+  transition:width .6s cubic-bezier(.4,0,.2,1);
+  border-radius:4px;
+}
+.overall-meta{
+  display:flex;gap:18px;flex-wrap:wrap;
+  font-size:13px;color:var(--text-light-muted);
+}
+.overall-meta span strong{color:var(--text-light);font-weight:500}
+
+/* ===== MAIN CONTENT ===== */
+.container{
+  max-width:1100px;
+  margin:0 auto;
+  padding:48px 32px 80px;
+}
+
+/* Phase card */
+.phase{
+  background:var(--cream-card);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  margin-bottom:28px;
+  overflow:hidden;
+  transition:box-shadow .3s;
+  border:1px solid rgba(212,175,55,0.18);
+}
+.phase:hover{box-shadow:var(--shadow-card-hover)}
+.phase-header{
+  padding:28px 32px 22px;
+  border-bottom:1px solid var(--cream-deep);
+  position:relative;
+  background:linear-gradient(180deg,var(--cream-card) 0%,rgba(242,235,220,0.4) 100%);
+}
+.phase-num-wrap{
+  display:flex;align-items:baseline;gap:18px;margin-bottom:6px;
+}
+.phase-num{
+  font-family:'Cinzel',serif;
+  font-size:11px;
+  letter-spacing:3.5px;
+  color:var(--gold-deep);
+  text-transform:uppercase;
+  font-weight:600;
+}
+.phase-time{
+  font-size:12px;
+  color:var(--text-dark-muted);
+  letter-spacing:0.5px;
+}
+.phase-time::before{
+  content:"⏱";margin-right:4px;font-size:11px;opacity:0.7;
+}
+.phase-title{
+  font-family:'DM Serif Display',serif;
+  font-size:28px;
+  line-height:1.25;
+  color:var(--maroon-dark);
+  margin-bottom:8px;
+}
+.phase-goal{
+  font-size:14px;
+  color:var(--text-dark-muted);
+  line-height:1.6;
+  max-width:780px;
+}
+.phase-goal strong{color:var(--burgundy);font-weight:600}
+
+/* Progress strip */
+.phase-progress{
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:center;gap:16px;
+  padding:14px 32px;
+  background:var(--cream-deep);
+  border-bottom:1px solid rgba(212,175,55,0.15);
+}
+.phase-progress-bar{
+  height:6px;
+  background:rgba(26,10,14,0.08);
+  border-radius:3px;overflow:hidden;
+}
+.phase-progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--burgundy),var(--gold));
+  transition:width .5s cubic-bezier(.4,0,.2,1);
+  border-radius:3px;
+}
+.phase-progress-text{
+  font-family:'DM Serif Display',serif;
+  font-size:16px;
+  color:var(--maroon-dark);
+  white-space:nowrap;
+  font-feature-settings:"lnum";
+}
+.phase-progress-text small{
+  font-family:'Anuphan',sans-serif;
+  color:var(--text-dark-muted);
+  font-size:12px;font-weight:300;
+}
+
+/* Task list */
+.tasks{padding:8px 0}
+.task{
+  display:grid;
+  grid-template-columns:auto auto 1fr auto;
+  align-items:start;
+  gap:16px;
+  padding:14px 32px;
+  border-bottom:1px solid rgba(212,175,55,0.08);
+  transition:background .2s;
+  cursor:pointer;
+  position:relative;
+}
+.task:last-child{border-bottom:none}
+.task:hover{background:rgba(212,175,55,0.04)}
+.task.done{opacity:0.55}
+.task.done .task-text{text-decoration:line-through;color:var(--text-dark-muted)}
+
+/* Custom checkbox */
+.task-check{
+  width:22px;height:22px;
+  border:2px solid var(--gold-border);
+  border-radius:6px;
+  background:transparent;
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+  margin-top:1px;
+  position:relative;
+}
+.task:hover .task-check{border-color:var(--gold-dark)}
+.task.done .task-check{
+  background:linear-gradient(135deg,var(--gold),var(--gold-dark));
+  border-color:var(--gold-dark);
+}
+.task-check svg{
+  width:14px;height:14px;
+  stroke:var(--maroon-dark);
+  stroke-width:3;
+  fill:none;
+  opacity:0;
+  transition:opacity .2s;
+}
+.task.done .task-check svg{opacity:1}
+
+/* Owner badge */
+.owner-badge{
+  font-family:'Cinzel',serif;
+  font-size:10px;
+  letter-spacing:1.5px;
+  font-weight:600;
+  padding:4px 10px;
+  border-radius:4px;
+  text-transform:uppercase;
+  white-space:nowrap;
+  flex-shrink:0;
+  margin-top:1px;
+}
+.owner-joon{
+  background:rgba(114,47,55,0.12);
+  color:var(--burgundy);
+  border:1px solid rgba(114,47,55,0.25);
+}
+.owner-claude{
+  background:rgba(212,175,55,0.14);
+  color:var(--gold-deep);
+  border:1px solid rgba(212,175,55,0.35);
+}
+
+.task-text{
+  font-size:14.5px;
+  line-height:1.55;
+  color:var(--text-dark);
+  min-width:0;
+}
+.task-text code{
+  background:rgba(26,10,14,0.06);
+  padding:2px 6px;
+  border-radius:4px;
+  font-size:13px;
+  font-family:'Menlo','Monaco',monospace;
+  color:var(--burgundy);
+}
+.task-time{
+  font-size:12px;
+  color:var(--text-dark-muted);
+  white-space:nowrap;
+  font-feature-settings:"tnum";
+  margin-top:2px;
+}
+
+/* Phase 4 — special bullet list (no tasks, just items) */
+.phase-bullets{
+  padding:8px 32px 22px;
+  list-style:none;
+}
+.phase-bullets li{
+  padding:10px 0 10px 22px;
+  position:relative;
+  font-size:14px;
+  color:var(--text-dark-muted);
+  line-height:1.6;
+}
+.phase-bullets li::before{
+  content:"◆";
+  position:absolute;left:0;top:10px;
+  color:var(--gold);
+  font-size:10px;
+}
+
+/* Phase outcome footer */
+.phase-outcome{
+  padding:18px 32px;
+  background:linear-gradient(90deg,rgba(212,175,55,0.06),rgba(114,47,55,0.04));
+  border-top:1px solid rgba(212,175,55,0.15);
+  font-size:13.5px;
+  color:var(--text-dark);
+  line-height:1.5;
+}
+.phase-outcome strong{
+  font-family:'Cinzel',serif;
+  font-size:10.5px;
+  letter-spacing:2px;
+  color:var(--gold-deep);
+  text-transform:uppercase;
+  display:block;
+  margin-bottom:6px;
+  font-weight:600;
+}
+
+/* ===== FOOTER ===== */
+.footer{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:36px;padding:20px 32px;
+  background:var(--cream-card);
+  border:1px solid rgba(212,175,55,0.18);
+  border-radius:12px;
+  flex-wrap:wrap;gap:14px;
+}
+.footer-info{
+  font-size:13px;color:var(--text-dark-muted);
+}
+.footer-info strong{
+  color:var(--burgundy);font-weight:500;
+}
+.btn-reset{
+  background:transparent;
+  border:1px solid rgba(114,47,55,0.3);
+  color:var(--burgundy);
+  font-family:'Anuphan',sans-serif;
+  font-size:13px;
+  padding:8px 18px;
+  border-radius:8px;
+  cursor:pointer;
+  transition:all .2s;
+  letter-spacing:0.3px;
+}
+.btn-reset:hover{background:rgba(114,47,55,0.08);border-color:var(--burgundy)}
+
+/* Confirm modal */
+.modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(26,10,14,0.55);
+  backdrop-filter:blur(4px);
+  display:none;align-items:center;justify-content:center;
+  z-index:1000;padding:20px;
+  animation:fadeIn .2s;
+}
+.modal-overlay.show{display:flex}
+.modal{
+  background:var(--cream-card);
+  border-radius:14px;
+  padding:32px 28px 24px;
+  max-width:380px;width:100%;
+  box-shadow:0 20px 60px rgba(0,0,0,0.3);
+  border:1px solid var(--gold-border);
+}
+.modal-title{
+  font-family:'DM Serif Display',serif;
+  font-size:22px;color:var(--maroon-dark);
+  margin-bottom:10px;
+}
+.modal-body{
+  font-size:14px;color:var(--text-dark-muted);
+  margin-bottom:22px;line-height:1.6;
+}
+.modal-btns{display:flex;gap:10px;justify-content:flex-end}
+.modal-btn{
+  padding:10px 18px;border-radius:8px;
+  font-family:'Anuphan',sans-serif;font-size:14px;
+  cursor:pointer;border:none;
+  transition:all .15s;
+}
+.modal-btn-cancel{
+  background:transparent;
+  border:1px solid rgba(0,0,0,0.15);
+  color:var(--text-dark-muted);
+}
+.modal-btn-confirm{
+  background:linear-gradient(135deg,var(--burgundy),var(--maroon));
+  color:var(--text-light);
+}
+.modal-btn-confirm:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(114,47,55,0.35)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* Phase complete celebration */
+.phase.complete .phase-progress-text{color:var(--green)}
+.phase.complete .phase-num::after{
+  content:" ✦ ";color:var(--gold);font-size:14px;margin-left:6px;
+}
+
+/* Responsive */
+@media(max-width:680px){
+  .hero{padding:36px 20px 32px}
+  .hero-title{font-size:30px}
+  .overall{grid-template-columns:1fr;text-align:center;gap:16px;padding:20px}
+  .overall-num{font-size:52px}
+  .container{padding:32px 16px 60px}
+  .phase-header{padding:22px 20px 18px}
+  .phase-title{font-size:22px}
+  .phase-progress{padding:12px 20px}
+  .task{
+    grid-template-columns:auto 1fr;
+    gap:12px;padding:14px 20px;
+  }
+  .owner-badge{grid-column:1/3;grid-row:2;justify-self:start;margin-top:0}
+  .task-text{grid-column:2;font-size:14px}
+  .task-time{grid-column:1/3;grid-row:3;margin-left:34px;margin-top:0;font-size:11.5px}
+  .task-check{grid-row:1}
+  .phase-bullets,.phase-outcome{padding:14px 20px}
+  .footer{padding:16px 20px;flex-direction:column;align-items:stretch}
+  .btn-reset{width:100%}
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="kicker">JP Trust Learning · Infrastructure</div>
+    <h1 class="hero-title">Migration Roadmap</h1>
+    <p class="hero-sub">เส้นทางย้าย hosting + ปกป้องเนื้อหา ก่อนเปิด Paid Tier · ใช้ติดตามความคืบหน้าจริงทุกครั้งที่กลับมาเปิด</p>
+    
+    <div class="overall">
+      <div class="overall-num"><span id="overallPct">0</span><small>%</small></div>
+      <div class="overall-info">
+        <div class="overall-label">Overall Progress</div>
+        <div class="overall-bar"><div class="overall-bar-fill" id="overallBar" style="width:0%"></div></div>
+        <div class="overall-meta">
+          <span><strong id="doneCount">0</strong> / <span id="totalCount">25</span> tasks done</span>
+          <span><strong id="phaseDoneCount">0</strong> / 3 phases complete</span>
+          <span>Last update: <strong id="lastUpdate">—</strong></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container" id="phasesContainer">
+  <!-- Phases rendered by JS -->
+</div>
+
+<div class="footer">
+  <div class="footer-info">
+    Track ทุก task ที่ทำเสร็จด้วยการคลิก checkbox · ข้อมูลถูกเก็บใน <strong>localStorage</strong> ของเบราว์เซอร์เครื่องนี้
+  </div>
+  <button class="btn-reset" onclick="askReset()">↺ Reset progress</button>
+</div>
+
+<div class="modal-overlay" id="resetModal">
+  <div class="modal">
+    <div class="modal-title">รีเซ็ตทั้งหมด?</div>
+    <div class="modal-body">การติ๊กที่ทำไว้ทั้งหมดจะหายและกลับเป็น 0% — ยืนยันว่าต้องการเริ่มใหม่?</div>
+    <div class="modal-btns">
+      <button class="modal-btn modal-btn-cancel" onclick="closeReset()">ยกเลิก</button>
+      <button class="modal-btn modal-btn-confirm" onclick="doReset()">รีเซ็ต</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'jpt_migration_roadmap_v1';
+
+const ROADMAP = [
+  {
+    id:'p1',
+    num:'Phase 01',
+    time:'~1 ชั่วโมง',
+    title:'ย้าย host + ทำ repo <code style="font-size:0.85em">pages</code> private',
+    goal:'แอพอยู่บน <strong>app.jptrustlearning.com</strong> · repo <code>jptrustlearning/pages</code> เป็น private · ไม่ผิด GitHub Terms อีกต่อไป',
+    outcome:'After Phase 1 · แอพอยู่บน custom domain · code ปลอดภัยจาก clone ฟรี · ไม่ผิด terms',
+    tasks:[
+      {owner:'joon',text:'สมัคร <code>Cloudflare</code> account (ฟรี ใช้ email)',time:'5 นาที'},
+      {owner:'joon',text:'Cloudflare Dashboard → Pages → Create → Connect to Git → เลือก <code>jptrustlearning/pages</code>',time:'5 นาที'},
+      {owner:'joon',text:'Build settings: framework = None, build command = (ว่าง), output = <code>/</code>',time:'2 นาที'},
+      {owner:'claude',text:'เช็คว่า deploy แรกขึ้นถูกต้อง — ทุกหน้าเปิดได้, fetch CSV ได้',time:'10 นาที'},
+      {owner:'joon',text:'GoDaddy → DNS → เพิ่ม CNAME <code>app</code> → <code>&lt;project&gt;.pages.dev</code>',time:'5 นาที'},
+      {owner:'joon',text:'Cloudflare Pages → Custom domains → ใส่ <code>app.jptrustlearning.com</code>',time:'2 นาที'},
+      {owner:'joon',text:'Supabase Dashboard → Auth → URL Configuration → เพิ่ม <code>https://app.jptrustlearning.com</code> ใน Site URL + Redirect URLs',time:'5 นาที'},
+      {owner:'claude',text:'ทดสอบ login flow ครบทุก step บน domain ใหม่',time:'15 นาที'},
+      {owner:'joon',text:'GitHub → repo <code>pages</code> → Settings → Change visibility → Private',time:'1 นาที'},
+      {owner:'claude',text:'เช็คว่า Cloudflare Pages ยัง deploy ได้กับ private repo',time:'5 นาที'},
+      {owner:'joon',text:'GitHub → Pages settings → Disable GitHub Pages (อันเก่า)',time:'1 นาที'},
+      {owner:'joon',text:'Google Sites → update link → ชี้มาที่ <code>app.jptrustlearning.com</code>',time:'5 นาที'}
+    ]
+  },
+  {
+    id:'p2',
+    num:'Phase 02',
+    time:'~5 ชั่วโมง · ไม่ต้องทำวันเดียว',
+    title:'ปกป้อง CSV signal ก่อนเปิด <em>Paid</em>',
+    goal:'CSV ทั้งหมด fetch ได้ต้อง<strong>ผ่าน auth</strong> · ทำ data repos (<code>/sp500</code> <code>/gold</code> <code>/btc</code>) เป็น private',
+    outcome:'After Phase 2 · สมาชิกฟรีดู scanner ได้ตามปกติ · สมาชิก paid ดู signal premium ได้ · คน non-member ขโมย URL CSV ไม่ได้แล้ว',
+    tasks:[
+      {owner:'claude',text:'ออกแบบ + เขียน <code>Cloudflare Worker</code> proxy code',time:'2 ชม.'},
+      {owner:'joon',text:'GitHub → Settings → Developer settings → Fine-grained PAT → ให้สิทธิ์ read repo <code>/sp500</code>, <code>/gold</code>, <code>/btc</code>',time:'5 นาที'},
+      {owner:'joon',text:'Cloudflare → Workers → Settings → Environment Variables → เก็บ PAT เป็น secret',time:'2 นาที'},
+      {owner:'claude',text:'Deploy Worker + ทดสอบกับ CSV ทุกตัว',time:'30 นาที'},
+      {owner:'claude',text:'เพิ่ม column <code>subscription_tier</code>, <code>expires_at</code> ใน Supabase <code>user_settings</code>',time:'15 นาที'},
+      {owner:'claude',text:'แก้ทุก HTML file ที่ fetch CSV → เปลี่ยน URL จาก <code>raw.githubusercontent.com</code> เป็น <code>app.jptrustlearning.com/api/...</code> พร้อมใส่ JWT header',time:'1 ชม.'},
+      {owner:'claude',text:'ทดสอบทุก strategy/dashboard ว่า fetch ผ่าน Worker ได้ + tier check ทำงาน',time:'30 นาที'},
+      {owner:'joon',text:'ทำ repo <code>/sp500</code>, <code>/gold</code>, <code>/btc</code> ให้เป็น private',time:'3 นาที'},
+      {owner:'claude',text:'ทดสอบรอบสุดท้าย — ทุกอย่างยังใช้ได้, anon ดึง URL ตรงไม่ได้แล้ว',time:'20 นาที'}
+    ]
+  },
+  {
+    id:'p3',
+    num:'Phase 03',
+    time:'~3-4 ชั่วโมง · ทำตอน Course พร้อม',
+    title:'Course content + Supabase Storage',
+    goal:'PDF/video course 90 วัน ปกป้องด้วย <strong>RLS</strong> · เฉพาะคน tier ที่ถูกถึงดูได้',
+    outcome:'After Phase 3 · Course content เปิด/ปิดตาม tier · ลูกค้าจ่ายเงินถึงดูเต็มได้',
+    tasks:[
+      {owner:'claude',text:'สร้าง bucket <code>course-materials</code> ใน Supabase Storage + RLS policy (tier-based)',time:'30 นาที'},
+      {owner:'joon',text:'Upload course PDF/video เข้า bucket',time:'ตามจำนวนไฟล์'},
+      {owner:'claude',text:'เขียนหน้า course player ใน app + signed URL fetch',time:'2 ชม.'},
+      {owner:'claude',text:'ทดสอบ — free user เห็น preview, paid user ดูได้เต็ม',time:'30 นาที'}
+    ]
+  },
+  {
+    id:'p4',
+    num:'Phase 04 · Optional',
+    time:'ทำเมื่อจำเป็น',
+    title:'Polish &amp; Hardening',
+    goal:'รอจน paid stable + รู้ว่ามีคนพยายาม abuse ตรงไหน ค่อยลงทุนเพิ่ม',
+    outcome:'',
+    bullets:[
+      'Cloudflare Access ครอบทั้ง domain — login ก่อนเข้าแอพเลย ป้องกันการ scrape',
+      'Device limit — 1 บัญชี = 1 device active พร้อมกัน',
+      'Watermark ใน course PDF — ทุกหน้ามี email ลูกค้า',
+      'Rate limiting ที่ Worker — กัน abuse fetch ถี่เกินไป'
+    ],
+    tasks:[]
+  }
+];
+
+let state = loadState();
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return {done:{}, lastUpdate:null};
+}
+
+function saveState(){
+  state.lastUpdate = Date.now();
+  try{localStorage.setItem(STORAGE_KEY, JSON.stringify(state))}catch(e){}
+}
+
+function taskKey(phaseId, idx){return phaseId+':'+idx}
+
+function toggleTask(phaseId, idx){
+  const k = taskKey(phaseId, idx);
+  state.done[k] = !state.done[k];
+  saveState();
+  render();
+}
+
+function askReset(){document.getElementById('resetModal').classList.add('show')}
+function closeReset(){document.getElementById('resetModal').classList.remove('show')}
+function doReset(){
+  state = {done:{}, lastUpdate:null};
+  try{localStorage.removeItem(STORAGE_KEY)}catch(e){}
+  closeReset();
+  render();
+}
+
+function fmtDate(ts){
+  if(!ts) return '—';
+  const d = new Date(ts);
+  const now = new Date();
+  const diff = (now - d) / 1000;
+  if(diff < 60) return 'เพิ่งนี้';
+  if(diff < 3600) return Math.floor(diff/60) + ' นาทีที่แล้ว';
+  if(diff < 86400) return Math.floor(diff/3600) + ' ชม.ที่แล้ว';
+  return d.toLocaleDateString('th-TH', {day:'numeric', month:'short'}) + ' · ' + d.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'});
+}
+
+function ownerBadge(owner){
+  if(owner === 'claude') return '<span class="owner-badge owner-claude">Claude</span>';
+  return '<span class="owner-badge owner-joon">พี่จูน</span>';
+}
+
+function checkSVG(){
+  return '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+}
+
+function render(){
+  // Render phases
+  const container = document.getElementById('phasesContainer');
+  let totalTasks = 0, doneTasks = 0, phasesComplete = 0;
+  
+  container.innerHTML = ROADMAP.map(phase => {
+    const phaseTaskCount = phase.tasks.length;
+    let phaseDoneCount = 0;
+    
+    phase.tasks.forEach((t, i) => {
+      if(state.done[taskKey(phase.id, i)]) phaseDoneCount++;
+    });
+    
+    totalTasks += phaseTaskCount;
+    doneTasks += phaseDoneCount;
+    
+    const phasePct = phaseTaskCount > 0 ? Math.round((phaseDoneCount/phaseTaskCount)*100) : 0;
+    const isPhaseComplete = phaseTaskCount > 0 && phaseDoneCount === phaseTaskCount;
+    if(isPhaseComplete && phase.id !== 'p4') phasesComplete++;
+    
+    let tasksHTML = '';
+    if(phase.tasks.length > 0){
+      tasksHTML = '<div class="tasks">' + phase.tasks.map((t, i) => {
+        const isDone = !!state.done[taskKey(phase.id, i)];
+        return `
+          <div class="task ${isDone?'done':''}" onclick="toggleTask('${phase.id}', ${i})">
+            <div class="task-check">${checkSVG()}</div>
+            ${ownerBadge(t.owner)}
+            <div class="task-text">${t.text}</div>
+            <div class="task-time">${t.time}</div>
+          </div>
+        `;
+      }).join('') + '</div>';
+    }
+    
+    let bulletsHTML = '';
+    if(phase.bullets && phase.bullets.length){
+      bulletsHTML = '<ul class="phase-bullets">' + phase.bullets.map(b => `<li>${b}</li>`).join('') + '</ul>';
+    }
+    
+    const progressHTML = phaseTaskCount > 0 ? `
+      <div class="phase-progress">
+        <div class="phase-progress-bar"><div class="phase-progress-fill" style="width:${phasePct}%"></div></div>
+        <div class="phase-progress-text">${phasePct}% <small>· ${phaseDoneCount}/${phaseTaskCount}</small></div>
+      </div>
+    ` : '';
+    
+    const outcomeHTML = phase.outcome ? `
+      <div class="phase-outcome">
+        <strong>Outcome</strong>${phase.outcome}
+      </div>
+    ` : '';
+    
+    return `
+      <div class="phase ${isPhaseComplete?'complete':''}">
+        <div class="phase-header">
+          <div class="phase-num-wrap">
+            <span class="phase-num">${phase.num}</span>
+            <span class="phase-time">${phase.time}</span>
+          </div>
+          <h2 class="phase-title">${phase.title}</h2>
+          <p class="phase-goal">${phase.goal}</p>
+        </div>
+        ${progressHTML}
+        ${tasksHTML}
+        ${bulletsHTML}
+        ${outcomeHTML}
+      </div>
+    `;
+  }).join('');
+  
+  // Update overall stats
+  const overallPct = totalTasks > 0 ? Math.round((doneTasks/totalTasks)*100) : 0;
+  document.getElementById('overallPct').textContent = overallPct;
+  document.getElementById('overallBar').style.width = overallPct + '%';
+  document.getElementById('doneCount').textContent = doneTasks;
+  document.getElementById('totalCount').textContent = totalTasks;
+  document.getElementById('phaseDoneCount').textContent = phasesComplete;
+  document.getElementById('lastUpdate').textContent = fmtDate(state.lastUpdate);
+}
+
+render();
+
+// Re-render last-update timestamp every minute (so "เพิ่งนี้" stays accurate)
+setInterval(() => {
+  document.getElementById('lastUpdate').textContent = fmtDate(state.lastUpdate);
+}, 60000);
+</script>
+
+</body>
+</html>
