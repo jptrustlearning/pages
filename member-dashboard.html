@@ -591,9 +591,224 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
     font-size:10px;letter-spacing:2.4px;
     color:#B89568;text-transform:uppercase;
 }
+
+/* ===== MIGRATION POPUP (shown on old jptrustlearning.github.io domain only) ===== */
+.mig-overlay{
+    position:fixed;inset:0;
+    background:rgba(26,10,14,0.78);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+    display:none;align-items:center;justify-content:center;
+    z-index:99999;
+    padding:20px;
+    animation:migFadeIn .4s ease;
+}
+.mig-overlay.show{display:flex}
+@keyframes migFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes migCardSlide{from{opacity:0;transform:translateY(20px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+.mig-card{
+    background:#FFFFFF;
+    border-radius:18px;
+    max-width:420px;width:100%;
+    overflow:hidden;
+    box-shadow:0 24px 60px rgba(0,0,0,0.4),0 0 0 1px rgba(212,175,55,0.2);
+    animation:migCardSlide .5s cubic-bezier(.16,.84,.44,1);
+    max-height:calc(100vh - 40px);
+    overflow-y:auto;
+}
+
+/* Top gradient bar — red → pink → gold */
+.mig-bar{
+    height:6px;
+    background:linear-gradient(90deg,
+        #B71C1C 0%,
+        #C71F4A 22%,
+        #D85B6F 42%,
+        #E07B6F 58%,
+        #E5A668 78%,
+        #D4AF37 100%
+    );
+    position:relative;
+}
+.mig-bar::after{
+    content:"";
+    position:absolute;inset:0;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);
+    animation:migShimmer 2.6s ease-in-out infinite;
+}
+@keyframes migShimmer{
+    0%{transform:translateX(-100%)}
+    50%{transform:translateX(100%)}
+    100%{transform:translateX(100%)}
+}
+
+.mig-body{
+    padding:28px 26px 24px;
+    text-align:center;
+    color:#2C1810;
+    font-family:'Sarabun','Anuphan',sans-serif;
+}
+
+.mig-owl{
+    width:62px;height:62px;
+    margin:0 auto 14px;
+    background:linear-gradient(135deg,#1a0a0e,#3d1820,#722F37);
+    border-radius:16px;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 18px rgba(114,47,55,0.3),inset 0 1px 0 rgba(212,175,55,0.25);
+}
+.mig-owl img{width:42px;height:42px;object-fit:contain;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3))}
+
+.mig-kicker{
+    font-family:'Cinzel',serif;
+    font-size:10px;letter-spacing:3px;
+    color:#8B6914;text-transform:uppercase;font-weight:600;
+    margin-bottom:6px;
+}
+
+.mig-title{
+    font-family:'DM Serif Display',serif;
+    font-size:24px;line-height:1.25;
+    color:#1a0a0e;
+    margin-bottom:10px;
+}
+
+.mig-sub{
+    font-size:14px;line-height:1.55;
+    color:#5C4438;
+    margin-bottom:18px;
+}
+.mig-sub .mig-newurl{
+    display:inline-block;
+    font-family:'Menlo','Monaco',monospace;
+    font-size:13px;
+    background:rgba(212,175,55,0.12);
+    color:#8B6914;
+    padding:3px 9px;border-radius:6px;
+    margin-top:4px;font-weight:600;
+    border:1px solid rgba(212,175,55,0.3);
+}
+
+/* Steps (PWA mode only) */
+.mig-steps{
+    background:#FAF6ED;
+    border-radius:11px;
+    padding:14px 16px;
+    margin-bottom:18px;
+    text-align:left;
+}
+.mig-steps-title{
+    font-size:12px;font-weight:600;
+    color:#8B6914;
+    letter-spacing:1.5px;text-transform:uppercase;
+    margin-bottom:10px;
+    text-align:center;
+    font-family:'Cinzel',serif;
+}
+.mig-step{
+    display:flex;align-items:flex-start;gap:10px;
+    padding:5px 0;
+    font-size:13.5px;color:#2C1810;
+    line-height:1.5;
+}
+.mig-step-num{
+    flex-shrink:0;
+    width:22px;height:22px;
+    background:linear-gradient(135deg,#D4AF37,#B8860B);
+    color:#1a0a0e;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700;
+    font-family:'DM Serif Display',serif;
+    margin-top:1px;
+}
+.mig-step-text{flex:1}
+.mig-step-text strong{color:#722F37;font-weight:600}
+
+.mig-reassure{
+    font-size:12.5px;color:#5C4438;
+    background:rgba(46,159,95,0.08);
+    border:1px solid rgba(46,159,95,0.2);
+    border-radius:9px;
+    padding:9px 14px;
+    margin-bottom:18px;
+}
+.mig-reassure::before{content:"✓ ";color:#2E9F5F;font-weight:700}
+
+/* Primary CTA button */
+.mig-btn{
+    display:block;
+    width:100%;
+    padding:15px;
+    background:linear-gradient(135deg,#D4AF37,#B8860B);
+    color:#1a0a0e;
+    text-decoration:none;
+    border:none;
+    border-radius:11px;
+    font-family:'Sarabun','Anuphan',sans-serif;
+    font-size:15px;font-weight:700;
+    cursor:pointer;
+    box-shadow:0 6px 18px rgba(212,175,55,0.35);
+    letter-spacing:0.3px;
+    transition:transform .15s,box-shadow .15s;
+    text-align:center;
+}
+.mig-btn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(212,175,55,0.45)}
+.mig-btn:active{transform:translateY(0);box-shadow:0 4px 12px rgba(212,175,55,0.3)}
+
+.mig-dismiss{
+    display:block;
+    margin-top:14px;
+    background:transparent;border:none;
+    color:#7A6F62;
+    font-family:'Sarabun','Anuphan',sans-serif;
+    font-size:13px;
+    cursor:pointer;
+    width:100%;text-align:center;
+    padding:6px;
+    text-decoration:underline;
+    text-underline-offset:3px;
+    text-decoration-color:rgba(122,111,98,0.3);
+}
+.mig-dismiss:hover{color:#2C1810;text-decoration-color:#2C1810}
+
+@media (max-width:420px){
+    .mig-body{padding:24px 20px 20px}
+    .mig-title{font-size:21px}
+    .mig-sub{font-size:13.5px}
+    .mig-steps{padding:12px 14px}
+    .mig-step{font-size:13px;gap:9px}
+}
 </style>
 </head>
 <body>
+<!-- ===== Migration Popup — shown on old jptrustlearning.github.io URL only ===== -->
+<div class="mig-overlay" id="migOverlay" role="dialog" aria-modal="true" aria-labelledby="migTitle">
+    <div class="mig-card">
+        <div class="mig-bar"></div>
+        <div class="mig-body">
+            <div class="mig-owl"><img src="jpt-owl-logo.png" alt="JP Trust" onerror="this.style.display='none'"></div>
+            <div class="mig-kicker">JP Trust Learning</div>
+            <div class="mig-title" id="migTitle">บ้านใหม่ของ JP Trust App</div>
+            <div class="mig-sub">
+                เพื่อความเสถียร + ปลอดภัยขึ้น เราย้ายมาที่<br>
+                <span class="mig-newurl">app.jptrustlearning.com</span>
+            </div>
+            <!-- PWA steps — only shown if standalone -->
+            <div class="mig-steps" id="migSteps" style="display:none">
+                <div class="mig-steps-title">ทำตาม 3 ขั้นตอน</div>
+                <div class="mig-step"><div class="mig-step-num">1</div><div class="mig-step-text">กดปุ่ม <strong>"เปิดแอพใหม่"</strong> ด้านล่าง</div></div>
+                <div class="mig-step"><div class="mig-step-num">2</div><div class="mig-step-text"><strong>ลบไอคอน</strong> JP Trust เก่าออกจากหน้าจอ</div></div>
+                <div class="mig-step"><div class="mig-step-num">3</div><div class="mig-step-text"><strong>ติดตั้งใหม่</strong> จากหน้าที่เปิดขึ้นมา</div></div>
+            </div>
+            <div class="mig-reassure">PIN และข้อมูลทั้งหมดเหมือนเดิม ไม่ต้องสมัครใหม่</div>
+            <a class="mig-btn" href="https://app.jptrustlearning.com" id="migOpenBtn">เปิดแอพใหม่ →</a>
+            <button class="mig-dismiss" onclick="dismissMigration()" type="button">ใช้แอพเก่าก่อน</button>
+        </div>
+    </div>
+</div>
+
 <!-- Splash Screen -->
 <div class="splash-screen" id="splashScreen">
     <div class="splash-logo"><img src="jpt-owl-logo.png" alt="JP Trust"></div>
@@ -1103,6 +1318,33 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script>
+// ===== MIGRATION POPUP — show only on old jptrustlearning.github.io URL =====
+// Detects PWA standalone mode and shows 3-step install instructions accordingly.
+// Dismissal is session-only (sessionStorage) so it re-appears next time app opens.
+(function migrationCheck(){
+    try{
+        if(location.hostname!=='jptrustlearning.github.io')return;
+        if(sessionStorage.getItem('jpt_mig_dismissed')==='1')return;
+        var overlay=document.getElementById('migOverlay');
+        if(!overlay)return;
+        // Detect PWA standalone — show step-by-step uninstall+reinstall guide
+        var isStandalone=window.matchMedia('(display-mode:standalone)').matches||window.navigator.standalone===true;
+        if(isStandalone){
+            var steps=document.getElementById('migSteps');
+            if(steps)steps.style.display='block';
+        }
+        overlay.classList.add('show');
+        // Lock body scroll while popup open
+        document.body.style.overflow='hidden';
+    }catch(e){console.warn('[mig]',e)}
+})();
+function dismissMigration(){
+    try{sessionStorage.setItem('jpt_mig_dismissed','1')}catch(e){}
+    var overlay=document.getElementById('migOverlay');
+    if(overlay)overlay.classList.remove('show');
+    document.body.style.overflow='';
+}
+
 // Supabase client init
 var supabaseClient=(function(){
     try{return window.supabase.createClient('https://rcdukwwcbyryauhqlzmx.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZHVrd3djYnlyeWF1aHFsem14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MTY0MDAsImV4cCI6MjA4NTQ5MjQwMH0.rprPmudJYyb6dyhXb9Z9GrtQWEeIX99A2Wrj55PvS54')}catch(e){console.error('Supabase init failed');return null}

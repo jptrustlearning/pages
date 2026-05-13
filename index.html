@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="0; url=./member-dashboard.html">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>JP Trust Learning</title>
+  <link rel="icon" type="image/png" href="pwa-icons/icon-192x192.png">
+  <style>
+    html,body{margin:0;padding:0;background:#1a0a0e;color:#FAF6ED;font-family:'Sarabun',sans-serif;height:100vh;display:flex;align-items:center;justify-content:center;text-align:center}
+    .loader{display:flex;flex-direction:column;align-items:center;gap:18px}
+    .spinner{width:36px;height:36px;border:3px solid rgba(212,175,55,0.2);border-top-color:#D4AF37;border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .label{font-size:14px;letter-spacing:2px;color:rgba(245,233,208,0.6);text-transform:uppercase}
+  </style>
+</head>
+<body>
+  <div class="loader">
+    <div class="spinner"></div>
+    <div class="label">JP Trust · กำลังโหลด</div>
+  </div>
+  <script>location.replace('./member-dashboard.html');</script>
+</body>
+</html>
