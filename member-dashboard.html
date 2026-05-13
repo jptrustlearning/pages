@@ -797,13 +797,16 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             </div>
             <!-- PWA steps — only shown if standalone -->
             <div class="mig-steps" id="migSteps" style="display:none">
-                <div class="mig-steps-title">ทำตาม 3 ขั้นตอน</div>
-                <div class="mig-step"><div class="mig-step-num">1</div><div class="mig-step-text">กดปุ่ม <strong>"เปิดแอพใหม่"</strong> ด้านล่าง</div></div>
+                <div class="mig-steps-title">ทำตาม 4 ขั้นตอน</div>
+                <div class="mig-step"><div class="mig-step-num">1</div><div class="mig-step-text">กดปุ่ม <strong>"ก๊อปลิงก์"</strong> ด้านล่าง</div></div>
                 <div class="mig-step"><div class="mig-step-num">2</div><div class="mig-step-text"><strong>ลบไอคอน</strong> JP Trust เก่าออกจากหน้าจอ</div></div>
-                <div class="mig-step"><div class="mig-step-num">3</div><div class="mig-step-text"><strong>ติดตั้งใหม่</strong> จากหน้าที่เปิดขึ้นมา</div></div>
+                <div class="mig-step"><div class="mig-step-num">3</div><div class="mig-step-text">เปิด <strong>เบราว์เซอร์</strong> (Chrome / Safari / Edge) แล้ววางลิงก์</div></div>
+                <div class="mig-step"><div class="mig-step-num">4</div><div class="mig-step-text"><strong>ติดตั้งใหม่</strong> จากหน้าที่เปิดขึ้น</div></div>
             </div>
             <div class="mig-reassure">PIN และข้อมูลทั้งหมดเหมือนเดิม ไม่ต้องสมัครใหม่</div>
+            <!-- Two button modes: copy (PWA) or open link (browser) — toggled by JS -->
             <a class="mig-btn" href="https://app.jptrustlearning.com" id="migOpenBtn">เปิดแอพใหม่ →</a>
+            <button class="mig-btn" id="migCopyBtn" type="button" style="display:none" onclick="copyMigUrl(this)">ก๊อปลิงก์ →</button>
             <button class="mig-dismiss" onclick="dismissMigration()" type="button">ใช้แอพเก่าก่อน</button>
         </div>
     </div>
@@ -1319,7 +1322,8 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script>
 // ===== MIGRATION POPUP — show only on old jptrustlearning.github.io URL =====
-// Detects PWA standalone mode and shows 3-step install instructions accordingly.
+// PWA users see Copy URL flow (can't open external browser from within PWA frame).
+// Browser users see direct link button.
 // Dismissal is session-only (sessionStorage) so it re-appears next time app opens.
 (function migrationCheck(){
     try{
@@ -1327,22 +1331,54 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
         if(sessionStorage.getItem('jpt_mig_dismissed')==='1')return;
         var overlay=document.getElementById('migOverlay');
         if(!overlay)return;
-        // Detect PWA standalone — show step-by-step uninstall+reinstall guide
+        // Detect PWA standalone — swap UI to Copy URL flow + show 4-step guide
         var isStandalone=window.matchMedia('(display-mode:standalone)').matches||window.navigator.standalone===true;
         if(isStandalone){
             var steps=document.getElementById('migSteps');
+            var openBtn=document.getElementById('migOpenBtn');
+            var copyBtn=document.getElementById('migCopyBtn');
             if(steps)steps.style.display='block';
+            if(openBtn)openBtn.style.display='none';
+            if(copyBtn)copyBtn.style.display='block';
         }
         overlay.classList.add('show');
-        // Lock body scroll while popup open
         document.body.style.overflow='hidden';
     }catch(e){console.warn('[mig]',e)}
 })();
+
 function dismissMigration(){
     try{sessionStorage.setItem('jpt_mig_dismissed','1')}catch(e){}
     var overlay=document.getElementById('migOverlay');
     if(overlay)overlay.classList.remove('show');
     document.body.style.overflow='';
+}
+
+async function copyMigUrl(btn){
+    var url='https://app.jptrustlearning.com';
+    var ok=false;
+    try{
+        if(navigator.clipboard&&window.isSecureContext){
+            await navigator.clipboard.writeText(url);
+            ok=true;
+        }else{
+            var ta=document.createElement('textarea');
+            ta.value=url;ta.style.position='fixed';ta.style.opacity='0';
+            document.body.appendChild(ta);ta.select();
+            ok=document.execCommand('copy');
+            document.body.removeChild(ta);
+        }
+    }catch(e){ok=false}
+    if(ok){
+        var orig=btn.textContent;
+        btn.textContent='✓ ก๊อปแล้ว — เปิดเบราว์เซอร์ใหม่';
+        btn.style.background='linear-gradient(135deg,#2E9F5F,#1F7A47)';
+        btn.style.color='#FFFFFF';
+        setTimeout(function(){
+            btn.textContent=orig;
+            btn.style.background='';
+            btn.style.color='';
+        },3500);
+    }
 }
 
 // Supabase client init
