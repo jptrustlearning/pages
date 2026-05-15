@@ -2115,8 +2115,15 @@
         <option value="0.20">20% trail</option>
         <option value="0.25">25% trail</option>
       </select>
+      <div style="margin-top:12px;">
+        <label style="display:block; font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:1px; color:#722F37; font-weight:700; margin-bottom:6px;">GATE — เริ่ม trail หลังกำไร (%)</label>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <input type="number" id="gateThresholdInput" class="input-box" value="50" min="0" max="500" step="5" style="max-width:130px;">
+          <span style="color:var(--gold-deep); font-weight:700; font-family:'DM Serif Display',serif; font-size:1.1rem;">%</span>
+        </div>
+      </div>
       <span class="hint" style="display:block; margin-top:8px;">
-        <strong>Gate (เปิด trail):</strong> เริ่มทำงานเมื่อหุ้นทะลุ <strong>+50%</strong> จากราคาที่ซื้อ ก่อน gate ไม่ทำอะไรเลย<br>
+        <strong>Gate:</strong> trail เริ่มทำงานเมื่อหุ้นทะลุ <strong>+X%</strong> จากราคาที่ซื้อ (default = 50%) ก่อน gate ไม่ทำอะไรเลย<br>
         <strong>Trigger:</strong> ถ้า close วันใดต่ำกว่า <strong>peak × (1 − trail%)</strong> → ขายที่ <strong>open วันถัดไป</strong><br>
         <strong>หมายเหตุ:</strong> เก็บเงินขายเข้า cash pocket ของ lot รอจน maturity ค่อยรวมคืน · ถ้าทุกหุ้นในล็อต trail ออกหมด → close lot ทันที
       </span>
@@ -2209,7 +2216,7 @@ let CONFIG = {
   holdMonths: 6,               // hold each lot for 6 months
   // LAB v1: Trailing stop (stock-level, gated)
   trailStopPct: 0,             // 0 = off, e.g. 0.15 = 15% trail from peak close
-  gateThreshold: 0.50,         // peak/entry must reach this multiplier before trail activates (FIXED at +50%)
+  gateThreshold: 0.50,         // peak/entry must reach this multiplier before trail activates (user-editable, default 0.50 = +50%)
   rebalanceMonths: [0,1,2,3,4,5,6,7,8,9,10,11], // every month (first biz day)
   weightRet: 0.5,
   weightVol: 0.5,
@@ -2226,7 +2233,8 @@ const DEFAULT_ROLLING_6M = {
   perLotCapital: 600,
   topN: 10,
   startYear: 2015,
-  trailStopPct: 0  // LAB v1: trailing stop default off
+  trailStopPct: 0,        // LAB v1: trailing stop default off
+  gateThreshold: 50       // LAB v1: gate % (default 50% = trail activates when stock hits +50% from entry)
 };
 
 // Cache for saved settings (needed for dynamic year-dropdown populate)
@@ -2255,12 +2263,14 @@ function getRolling6mSettings() {
   const n = document.getElementById('topNInput');
   const y = document.getElementById('startYearSelect');
   const t = document.getElementById('trailStopSelect');
+  const g = document.getElementById('gateThresholdInput');
   return {
     weight: w ? parseInt(w.value, 10) : DEFAULT_ROLLING_6M.weight,
     perLotCapital: c ? parseFloat(c.value) || DEFAULT_ROLLING_6M.perLotCapital : DEFAULT_ROLLING_6M.perLotCapital,
     topN: n ? parseInt(n.value, 10) || DEFAULT_ROLLING_6M.topN : DEFAULT_ROLLING_6M.topN,
     startYear: y ? parseInt(y.value, 10) || DEFAULT_ROLLING_6M.startYear : DEFAULT_ROLLING_6M.startYear,
-    trailStopPct: t ? parseFloat(t.value) || 0 : DEFAULT_ROLLING_6M.trailStopPct
+    trailStopPct: t ? parseFloat(t.value) || 0 : DEFAULT_ROLLING_6M.trailStopPct,
+    gateThreshold: g ? parseFloat(g.value) || DEFAULT_ROLLING_6M.gateThreshold : DEFAULT_ROLLING_6M.gateThreshold
   };
 }
 
@@ -2271,11 +2281,13 @@ function applyRolling6mSettings(s) {
   const n = document.getElementById('topNInput');
   const y = document.getElementById('startYearSelect');
   const t = document.getElementById('trailStopSelect');
+  const g = document.getElementById('gateThresholdInput');
   if (w && s.weight != null) { w.value = s.weight; if (typeof updateWeightsUI === 'function') updateWeightsUI(); }
   if (c && s.perLotCapital != null) c.value = s.perLotCapital;
   if (n && s.topN != null) n.value = s.topN;
   if (y && s.startYear != null) y.value = s.startYear;
   if (t && s.trailStopPct != null) t.value = s.trailStopPct;
+  if (g && s.gateThreshold != null) g.value = s.gateThreshold;
 }
 
 async function loadRolling6mSettings() {
@@ -2342,6 +2354,7 @@ const el = {
   totalDeployedHint: document.getElementById('totalDeployedHint'),
   inputStartYear: document.getElementById('startYearSelect'),
   inputTrailStop: document.getElementById('trailStopSelect'),
+  inputGateThreshold: document.getElementById('gateThresholdInput'),
 
   // Opt
   optTableBody: document.getElementById('optTableBody'),
@@ -3070,6 +3083,8 @@ function runRollingBacktest() {
   CONFIG.startYear = parseInt(el.inputStartYear.value) || 2015;
   // LAB v1: snapshot trail % from UI (0 = off)
   CONFIG.trailStopPct = el.inputTrailStop ? (parseFloat(el.inputTrailStop.value) || 0) : 0;
+  // LAB v1: snapshot gate % from UI (default 50 = +50% from entry). Stored as decimal.
+  CONFIG.gateThreshold = el.inputGateThreshold ? ((parseFloat(el.inputGateThreshold.value) || 50) / 100) : 0.50;
 
   // Derived: total external capital needed (backwards-compat for legacy chart/bar functions)
   CONFIG.initialCapital = CONFIG.perLotCapital * CONFIG.holdMonths;
@@ -3722,6 +3737,7 @@ function calculateStats() {
         const lotsAutoClosed = closed.filter(cl => cl.exitMode === 'lot_trail_complete').length;
         const setText = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
         setText('lab-trail-on', CONFIG.trailStopPct > 0 ? (CONFIG.trailStopPct*100).toFixed(0) + '%' : 'OFF');
+        setText('lab-trail-gate-label', '+' + (CONFIG.gateThreshold*100).toFixed(0) + '%');
         setText('lab-trail-count', `${trailCount} / ${totalStocks}`);
         setText('lab-trail-pct', (trailPctOfStocks*100).toFixed(1) + '%');
         setText('lab-trail-gated', `${gatedStocks} / ${totalStocks}`);
@@ -4373,7 +4389,7 @@ function renderTradeLog() {
       ? ` · <span class="text-red" style="font-weight:700;">⛔ ${trailCount} trail-exit</span>`
       : '';
     const gateLabel = gateCount > 0
-      ? ` · <span style="color:#2E9F5F;font-weight:600;">✓ ${gateCount} ทะลุ gate</span>`
+      ? ` · <span style="color:#2E9F5F;font-weight:600;">✓ ${gateCount} ทะลุ gate +${(CONFIG.gateThreshold*100).toFixed(0)}%</span>`
       : '';
     const section = `<div class="trade-section">
       <div class="trade-section-label mom">MOMENTUM — ${r.stocks.length} ตัว
@@ -4393,7 +4409,8 @@ function renderTradeLog() {
         } else if (s.gateOpened) {
           extra = ' ✓';
           const peak = s.peakReturnPct != null ? '+' + (s.peakReturnPct * 100).toFixed(1) + '%' : '';
-          title = `title="ทะลุ gate +50% · peak ${peak}"`;
+          const gatePct = '+' + (CONFIG.gateThreshold * 100).toFixed(0) + '%';
+          title = `title="ทะลุ gate ${gatePct} · peak ${peak}"`;
         }
         return `<span class="stock-badge${cls}" ${title}>${s.ticker}${pctTxt}${extra}</span>`;
       }).join('')}</div>
@@ -4966,7 +4983,7 @@ window.switchStatsTab = function(tab) {
   <div style="display:grid; grid-template-columns:1fr 1fr; gap:7px 14px; font-size:0.82rem;">
     <div>หุ้นโดน trail</div><div style="text-align:right; font-weight:700; color:#722F37;" id="lab-trail-count">— / —</div>
     <div>% หุ้นโดน trail</div><div style="text-align:right; font-weight:700;" id="lab-trail-pct">—</div>
-    <div>หุ้นที่ผ่าน gate +50%</div><div style="text-align:right; font-weight:600; color:#5a3e2b;" id="lab-trail-gated">— / —</div>
+    <div>หุ้นที่ผ่าน gate <span id="lab-trail-gate-label">+50%</span></div><div style="text-align:right; font-weight:600; color:#5a3e2b;" id="lab-trail-gated">— / —</div>
     <div>กำไรเฉลี่ย (trail exit)</div><div style="text-align:right; font-weight:700; color:#1B5E20;" id="lab-trail-avg-ret">—</div>
     <div>กำไรเฉลี่ย (maturity)</div><div style="text-align:right; font-weight:700; color:#1B5E20;" id="lab-mat-avg-ret">—</div>
     <div>peak ก่อน trail trigger</div><div style="text-align:right; font-weight:600; color:#5a3e2b;" id="lab-trail-avg-peak">—</div>
