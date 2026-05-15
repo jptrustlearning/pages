@@ -2104,6 +2104,24 @@
       <span class="hint">ซื้อหุ้น <strong>อันดับ Top N</strong> จากการจัดอันดับในแต่ละล็อต · default = 10 · <strong>ล็อตต่างรอบถือซ้ำกันได้</strong></span>
     </div>
 
+    <!-- LAB v1: Trailing Stop control -->
+    <div class="control-group" style="border:1.5px dashed rgba(212,175,55,0.55); padding:14px 14px 12px; border-radius:10px; background:linear-gradient(180deg, rgba(244,228,186,0.18), rgba(255,254,248,0.6)); position:relative;">
+      <div style="position:absolute; top:-9px; left:14px; background:linear-gradient(90deg,#722F37,#D4AF37); color:#FAF6ED; padding:2px 10px; border-radius:10px; font-size:0.7rem; font-weight:700; letter-spacing:0.6px; font-family:'Cinzel',serif;">LAB · TRAILING STOP</div>
+      <label style="margin-top:4px;">TRAIL STOP — ป้องกันกำไรย้อนกลับ</label>
+      <select id="trailStopSelect" class="input-box" style="max-width:200px;">
+        <option value="0">Off — ปิดใช้งาน</option>
+        <option value="0.10">10% trail</option>
+        <option value="0.15">15% trail</option>
+        <option value="0.20">20% trail</option>
+        <option value="0.25">25% trail</option>
+      </select>
+      <span class="hint" style="display:block; margin-top:8px;">
+        <strong>Gate (เปิด trail):</strong> เริ่มทำงานเมื่อหุ้นทะลุ <strong>+50%</strong> จากราคาที่ซื้อ ก่อน gate ไม่ทำอะไรเลย<br>
+        <strong>Trigger:</strong> ถ้า close วันใดต่ำกว่า <strong>peak × (1 − trail%)</strong> → ขายที่ <strong>open วันถัดไป</strong><br>
+        <strong>หมายเหตุ:</strong> เก็บเงินขายเข้า cash pocket ของ lot รอจน maturity ค่อยรวมคืน · ถ้าทุกหุ้นในล็อต trail ออกหมด → close lot ทันที
+      </span>
+    </div>
+
     <!-- 3. Start Year -->
     <div class="control-group">
       <label>START YEAR — ปีเริ่มแบ็คเทส</label>
@@ -2189,6 +2207,9 @@ let CONFIG = {
   topN: 10,                    // default top 10 stocks per lot
   lookbackWeeks: 26,           // DEPRECATED — no longer used (replaced by calendar-based lookback: 6 calendar months back). Kept for compat.
   holdMonths: 6,               // hold each lot for 6 months
+  // LAB v1: Trailing stop (stock-level, gated)
+  trailStopPct: 0,             // 0 = off, e.g. 0.15 = 15% trail from peak close
+  gateThreshold: 0.50,         // peak/entry must reach this multiplier before trail activates (FIXED at +50%)
   rebalanceMonths: [0,1,2,3,4,5,6,7,8,9,10,11], // every month (first biz day)
   weightRet: 0.5,
   weightVol: 0.5,
@@ -2204,7 +2225,8 @@ const DEFAULT_ROLLING_6M = {
   weight: 50,
   perLotCapital: 600,
   topN: 10,
-  startYear: 2015
+  startYear: 2015,
+  trailStopPct: 0  // LAB v1: trailing stop default off
 };
 
 // Cache for saved settings (needed for dynamic year-dropdown populate)
@@ -2232,11 +2254,13 @@ function getRolling6mSettings() {
   const c = document.getElementById('perLotCapitalInput');
   const n = document.getElementById('topNInput');
   const y = document.getElementById('startYearSelect');
+  const t = document.getElementById('trailStopSelect');
   return {
     weight: w ? parseInt(w.value, 10) : DEFAULT_ROLLING_6M.weight,
     perLotCapital: c ? parseFloat(c.value) || DEFAULT_ROLLING_6M.perLotCapital : DEFAULT_ROLLING_6M.perLotCapital,
     topN: n ? parseInt(n.value, 10) || DEFAULT_ROLLING_6M.topN : DEFAULT_ROLLING_6M.topN,
-    startYear: y ? parseInt(y.value, 10) || DEFAULT_ROLLING_6M.startYear : DEFAULT_ROLLING_6M.startYear
+    startYear: y ? parseInt(y.value, 10) || DEFAULT_ROLLING_6M.startYear : DEFAULT_ROLLING_6M.startYear,
+    trailStopPct: t ? parseFloat(t.value) || 0 : DEFAULT_ROLLING_6M.trailStopPct
   };
 }
 
@@ -2246,10 +2270,12 @@ function applyRolling6mSettings(s) {
   const c = document.getElementById('perLotCapitalInput');
   const n = document.getElementById('topNInput');
   const y = document.getElementById('startYearSelect');
+  const t = document.getElementById('trailStopSelect');
   if (w && s.weight != null) { w.value = s.weight; if (typeof updateWeightsUI === 'function') updateWeightsUI(); }
   if (c && s.perLotCapital != null) c.value = s.perLotCapital;
   if (n && s.topN != null) n.value = s.topN;
   if (y && s.startYear != null) y.value = s.startYear;
+  if (t && s.trailStopPct != null) t.value = s.trailStopPct;
 }
 
 async function loadRolling6mSettings() {
@@ -2315,6 +2341,7 @@ const el = {
   inputPerLotCap: document.getElementById('perLotCapitalInput'),
   totalDeployedHint: document.getElementById('totalDeployedHint'),
   inputStartYear: document.getElementById('startYearSelect'),
+  inputTrailStop: document.getElementById('trailStopSelect'),
 
   // Opt
   optTableBody: document.getElementById('optTableBody'),
@@ -3041,6 +3068,8 @@ function runRollingBacktest() {
   CONFIG.topN = parseInt(el.inputTopN.value) || 10;
   CONFIG.perLotCapital = parseFloat(el.inputPerLotCap.value) || 600;
   CONFIG.startYear = parseInt(el.inputStartYear.value) || 2015;
+  // LAB v1: snapshot trail % from UI (0 = off)
+  CONFIG.trailStopPct = el.inputTrailStop ? (parseFloat(el.inputTrailStop.value) || 0) : 0;
 
   // Derived: total external capital needed (backwards-compat for legacy chart/bar functions)
   CONFIG.initialCapital = CONFIG.perLotCapital * CONFIG.holdMonths;
@@ -3081,16 +3110,115 @@ function runRollingBacktest() {
     const dateObj = new Date(dateStr);
     const dayData = state.marketData[dateStr];
 
-    // === 1. Mark-to-market: sum all active lots + cash ===
+    // === 1a. LAB v1: Process pending trail exits at TODAY'S OPEN ===
+    // Signal was set yesterday at close — execute the sell at this morning's open
+    if (CONFIG.trailStopPct > 0) {
+      for (const lot of state.lots) {
+        if (!lot.stockMeta) continue;
+        for (const t of Object.keys(lot.stockMeta)) {
+          const meta = lot.stockMeta[t];
+          if (meta.exited || !meta.pendingExit) continue;
+          const openPx = dayData[t] ? dayData[t].o : null;
+          if (openPx == null || !(openPx > 0)) {
+            // No open price available — defer one more day (stays pendingExit)
+            continue;
+          }
+          const proceeds = (lot.stocks[t] || 0) * openPx;
+          meta.exitPrice = openPx;
+          meta.exitDate = dateStr;
+          meta.exitReason = 'trail_stop';
+          meta.exited = true;
+          meta.pendingExit = false;
+          meta.daysHeld = (new Date(dateStr) - new Date(meta.entryDate)) / 86400000;
+          lot.cashPocket = (lot.cashPocket || 0) + proceeds;
+          delete lot.stocks[t];  // remove from active so mark-to-market and maturity skip it
+        }
+      }
+    }
+
+    // === 1. Mark-to-market: sum all active lots + cash + each lot's cashPocket ===
     let lotsVal = 0;
     for (const lot of state.lots) {
       for (const [t, shares] of Object.entries(lot.stocks)) {
         const price = dayData[t] ? dayData[t].c : (i>0 ? state.marketData[state.sortedDates[i-1]][t]?.c : 0);
         lotsVal += shares * (price || 0);
       }
+      lotsVal += (lot.cashPocket || 0);  // include any banked trail-exit proceeds
     }
     const currentEquity = cash + lotsVal;
     state.equityCurve.push({ date: dateStr, equity: currentEquity });
+
+    // === 1b. LAB v1: Update peak/gate + check trail trigger on TODAY'S CLOSE ===
+    // (After mark-to-market so equityCurve reflects today's snapshot before any new pendingExit flags)
+    if (CONFIG.trailStopPct > 0) {
+      for (const lot of state.lots) {
+        if (!lot.stockMeta) continue;
+        for (const t of Object.keys(lot.stockMeta)) {
+          const meta = lot.stockMeta[t];
+          if (meta.exited || meta.pendingExit) continue;
+          const closePx = dayData[t] ? dayData[t].c : null;
+          if (closePx == null || !(closePx > 0)) continue;
+          // Track peak close
+          if (closePx > meta.peakClose) {
+            meta.peakClose = closePx;
+            meta.peakDate = dateStr;
+          }
+          // Gate: peak must reach entry × (1 + gateThreshold) before trail activates
+          if (!meta.gateOpen && meta.peakClose >= meta.entryPrice * (1 + CONFIG.gateThreshold)) {
+            meta.gateOpen = true;
+            meta.gateDate = dateStr;
+          }
+          // Trail trigger: only after gate
+          if (meta.gateOpen && closePx < meta.peakClose * (1 - CONFIG.trailStopPct)) {
+            meta.pendingExit = true;
+            meta.signalDate = dateStr;
+            meta.signalClose = closePx;
+          }
+        }
+      }
+
+      // === 1c. LAB v1: Auto-close lots that have zero active stocks left ===
+      // If every stock in a lot has trail-exited, close the lot immediately — don't wait for maturity
+      const liveLots = [];
+      for (const lot of state.lots) {
+        const activeCount = Object.keys(lot.stocks).length;
+        if (activeCount === 0 && lot.stockMeta) {
+          // All stocks exited via trail — close lot
+          const proceeds = lot.cashPocket || 0;
+          const stockExits = Object.entries(lot.stockMeta).map(([tk, m]) => ({
+            ticker: tk, exitReason: m.exitReason || 'unknown',
+            entryPrice: m.entryPrice, exitPrice: m.exitPrice,
+            entryDate: m.entryDate, exitDate: m.exitDate,
+            peakClose: m.peakClose, peakReturnPct: m.entryPrice > 0 ? (m.peakClose - m.entryPrice) / m.entryPrice : 0,
+            stockReturnPct: m.entryPrice > 0 ? (m.exitPrice - m.entryPrice) / m.entryPrice : 0,
+            daysHeld: m.daysHeld || 0,
+            gateOpened: !!m.gateOpen
+          }));
+          const trailCount = stockExits.filter(s => s.exitReason === 'trail_stop').length;
+          cash += proceeds;
+          state.closedLots.push({
+            chainId: lot.chainId,
+            entryDate: lot.entryDate,
+            exitDate: dateStr,
+            initialCapital: lot.initialCapital,
+            exitValue: proceeds,
+            pl: proceeds - lot.initialCapital,
+            returnPct: lot.initialCapital > 0 ? (proceeds - lot.initialCapital) / lot.initialCapital : 0,
+            picks: lot.picks || [],
+            ageMonths: Math.round(((new Date(dateStr) - new Date(lot.entryDate)) / 86400000) / 30),
+            // LAB v1 trail metadata
+            exitMode: 'lot_trail_complete',  // all 10 stocks trail-exited
+            stockExits: stockExits,
+            trailExitCount: trailCount,
+            maturityExitCount: stockExits.length - trailCount,
+            cashPocketAtExit: lot.cashPocket || 0
+          });
+        } else {
+          liveLots.push(lot);
+        }
+      }
+      state.lots = liveLots;
+    }
 
     // === 2. Check if first business day of month ===
     const currentMonthKey = dateObj.getFullYear() * 12 + dateObj.getMonth();
@@ -3110,12 +3238,36 @@ function runRollingBacktest() {
         let saleProceeds = 0;
         const maturingLots = state.lots.filter(lot => (currentMonthKey - lot.entryMonthKey) >= CONFIG.holdMonths);
         for (const mLot of maturingLots) {
-          let proceeds = 0;
+          // Sum still-active stocks at today's close
+          let activeProceeds = 0;
           for (const [t, shares] of Object.entries(mLot.stocks)) {
             const price = dayData[t] ? dayData[t].c : (i>0 ? state.marketData[state.sortedDates[i-1]][t]?.c : 0);
-            proceeds += shares * (price || 0);
+            activeProceeds += shares * (price || 0);
+            // LAB v1: mark this stock as maturity-exit in stockMeta (for stats)
+            if (mLot.stockMeta && mLot.stockMeta[t] && !mLot.stockMeta[t].exited) {
+              const meta = mLot.stockMeta[t];
+              meta.exitPrice = price || 0;
+              meta.exitDate = dateStr;
+              meta.exitReason = 'maturity';
+              meta.exited = true;
+              meta.daysHeld = (new Date(dateStr) - new Date(meta.entryDate)) / 86400000;
+            }
           }
+          const proceeds = activeProceeds + (mLot.cashPocket || 0);
           saleProceeds += proceeds;
+
+          // LAB v1: build stockExits array for stats
+          const stockExits = mLot.stockMeta ? Object.entries(mLot.stockMeta).map(([tk, m]) => ({
+            ticker: tk, exitReason: m.exitReason || 'unknown',
+            entryPrice: m.entryPrice, exitPrice: m.exitPrice,
+            entryDate: m.entryDate, exitDate: m.exitDate,
+            peakClose: m.peakClose, peakReturnPct: m.entryPrice > 0 ? (m.peakClose - m.entryPrice) / m.entryPrice : 0,
+            stockReturnPct: m.entryPrice > 0 ? (m.exitPrice - m.entryPrice) / m.entryPrice : 0,
+            daysHeld: m.daysHeld || 0,
+            gateOpened: !!m.gateOpen
+          })) : [];
+          const trailCount = stockExits.filter(s => s.exitReason === 'trail_stop').length;
+
           state.closedLots.push({
             chainId: mLot.chainId,
             entryDate: mLot.entryDate,
@@ -3125,7 +3277,13 @@ function runRollingBacktest() {
             pl: proceeds - mLot.initialCapital,
             returnPct: mLot.initialCapital > 0 ? (proceeds - mLot.initialCapital) / mLot.initialCapital : 0,
             picks: mLot.picks || Object.keys(mLot.stocks),
-            ageMonths: currentMonthKey - mLot.entryMonthKey
+            ageMonths: currentMonthKey - mLot.entryMonthKey,
+            // LAB v1 trail metadata
+            exitMode: 'maturity',
+            stockExits: stockExits,
+            trailExitCount: trailCount,
+            maturityExitCount: stockExits.length - trailCount,
+            cashPocketAtExit: mLot.cashPocket || 0
           });
         }
         cash += saleProceeds;
@@ -3158,12 +3316,31 @@ function runRollingBacktest() {
         // Build the stocks-map and tally deployed BEFORE creating the lot, so we can
         // detect the "0 stocks deployable" case and skip lot creation entirely.
         const newLotStocks = {};
+        const newLotStockMeta = {};  // LAB v1: per-stock metadata for trail-stop tracking
         const alloc = newLotCapital / CONFIG.topN;
         let deployed = 0;
         for (const st of selected) {
           if (dayData[st.ticker] && dayData[st.ticker].c > 0) {
-            newLotStocks[st.ticker] = alloc / dayData[st.ticker].c;
+            const entryPx = dayData[st.ticker].c;
+            newLotStocks[st.ticker] = alloc / entryPx;
             deployed += alloc;
+            // LAB v1: init trail-tracking metadata for this stock
+            newLotStockMeta[st.ticker] = {
+              entryDate: dateStr,
+              entryPrice: entryPx,
+              peakClose: entryPx,
+              peakDate: dateStr,
+              gateOpen: false,
+              gateDate: null,
+              pendingExit: false,
+              signalDate: null,
+              signalClose: null,
+              exited: false,
+              exitPrice: null,
+              exitDate: null,
+              exitReason: null,
+              daysHeld: 0
+            };
           }
         }
 
@@ -3201,7 +3378,10 @@ function runRollingBacktest() {
           initialCapital: deployed,
           isReinvest: isReinvest,
           stocks: newLotStocks,
-          picks: selected.map(s => s.ticker)
+          picks: selected.map(s => s.ticker),
+          // LAB v1: trail-stop bookkeeping
+          stockMeta: newLotStockMeta,
+          cashPocket: 0  // accumulates proceeds from trail-stop exits before maturity
         };
         // Refund any non-deployed alloc (selected ticker missing price data) back to cash
         cash += (newLotCapital - deployed);
@@ -3274,13 +3454,14 @@ function runRollingBacktest() {
           const willMature = state.lots.find(lot => (nextMonthKey - lot.entryMonthKey) >= CONFIG.holdMonths);
           let projectedCap = CONFIG.perLotCapital;
           if (willMature) {
-            // Estimate: current lot value (MtM)
+            // Estimate: current lot value (MtM) + cashPocket from any trail exits
             let mtm = 0;
             const lastDayData = state.marketData[lastDate];
             for (const [t, shares] of Object.entries(willMature.stocks)) {
               const p = lastDayData[t] ? lastDayData[t].c : 0;
               mtm += shares * p;
             }
+            mtm += (willMature.cashPocket || 0);  // LAB v1: include banked trail proceeds
             projectedCap = mtm;
           }
 
@@ -3451,6 +3632,7 @@ function calculateStats() {
         const p = lastDayData[t] ? lastDayData[t].c : 0;
         mtm += shares * (p || 0);
       }
+      mtm += (lot.cashPocket || 0);  // LAB v1: include banked trail proceeds
       if (lot.initialCapital > 0) roundReturns.push((mtm - lot.initialCapital) / lot.initialCapital);
     });
 
@@ -3519,6 +3701,39 @@ function calculateStats() {
     document.getElementById('stat-total-return').className = 'rss-stat-val ' + (totalRet>=0?'text-green':'text-red');
     document.getElementById('stat-cagr-mirror').innerText = fmt(cagr);
     document.getElementById('stat-cagr-mirror').className = 'rss-stat-val ' + (cagr>=0?'text-green':'text-red');
+
+    // === LAB v1: Trail-stop performance stats ===
+    try {
+      const tsBox = document.getElementById('lab-trail-stats');
+      if (tsBox) {
+        const closedWithMeta = closed.filter(cl => cl.stockExits && cl.stockExits.length > 0);
+        const allStockExits = closedWithMeta.flatMap(cl => cl.stockExits);
+        const trailStocks = allStockExits.filter(s => s.exitReason === 'trail_stop');
+        const maturityStocks = allStockExits.filter(s => s.exitReason === 'maturity');
+        const trailCount = trailStocks.length;
+        const totalStocks = allStockExits.length;
+        const trailPctOfStocks = totalStocks > 0 ? trailCount / totalStocks : 0;
+        const avg = (arr, key) => arr.length > 0 ? arr.reduce((a,s) => a + (s[key]||0), 0) / arr.length : 0;
+        const avgTrailReturn = avg(trailStocks, 'stockReturnPct');
+        const avgMatReturn = avg(maturityStocks, 'stockReturnPct');
+        const avgTrailPeak = avg(trailStocks, 'peakReturnPct');
+        const avgTrailDays = avg(trailStocks, 'daysHeld');
+        const gatedStocks = allStockExits.filter(s => s.gateOpened).length;
+        const lotsAutoClosed = closed.filter(cl => cl.exitMode === 'lot_trail_complete').length;
+        const setText = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+        setText('lab-trail-on', CONFIG.trailStopPct > 0 ? (CONFIG.trailStopPct*100).toFixed(0) + '%' : 'OFF');
+        setText('lab-trail-count', `${trailCount} / ${totalStocks}`);
+        setText('lab-trail-pct', (trailPctOfStocks*100).toFixed(1) + '%');
+        setText('lab-trail-gated', `${gatedStocks} / ${totalStocks}`);
+        setText('lab-trail-avg-ret', (avgTrailReturn>=0?'+':'') + (avgTrailReturn*100).toFixed(1) + '%');
+        setText('lab-mat-avg-ret', (avgMatReturn>=0?'+':'') + (avgMatReturn*100).toFixed(1) + '%');
+        setText('lab-trail-avg-peak', (avgTrailPeak>=0?'+':'') + (avgTrailPeak*100).toFixed(1) + '%');
+        setText('lab-trail-avg-days', Math.round(avgTrailDays) + ' วัน');
+        setText('lab-trail-lots-closed', lotsAutoClosed + ' lots');
+      }
+    } catch (e) {
+      console.warn('[LAB v1] trail stats render error:', e);
+    }
 
     // === Weekly-style: populate top-card metrics ===
     const years = (days / 365.25);
@@ -3667,6 +3882,7 @@ function renderRoundsChart() {
         const p = lastDayData[t] ? lastDayData[t].c : 0;
         mtm += shares * (p || 0);
       }
+      mtm += (lot.cashPocket || 0);  // LAB v1: include banked trail proceeds
       rounds.push({
         entryDate: lot.entryDate,
         pct: ((mtm - lot.initialCapital) / lot.initialCapital) * 100,
@@ -3734,6 +3950,7 @@ function renderDistChart() {
         const p = lastDayData[t] ? lastDayData[t].c : 0;
         mtm += shares * (p || 0);
       }
+      mtm += (lot.cashPocket || 0);  // LAB v1: include banked trail proceeds
       rets.push(((mtm - lot.initialCapital) / lot.initialCapital) * 100);
     }
   });
@@ -4658,6 +4875,28 @@ window.switchStatsTab = function(tab) {
   });
 })();
 </script>
+
+
+<!-- LAB v1: Trailing Stop Performance Stats Card (visible after backtest) -->
+<div id="lab-trail-stats" style="position:fixed; bottom:18px; right:18px; max-width:340px; z-index:9000; background:linear-gradient(180deg, #FAF6ED 0%, #F4E4BA 100%); border:1.5px solid rgba(212,175,55,0.55); border-radius:12px; padding:14px 16px 12px; box-shadow:0 8px 28px rgba(26,10,14,0.18), 0 0 0 1px rgba(212,175,55,0.18) inset; font-family:'Anuphan',sans-serif; color:#1a0a0e;">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; border-bottom:1px dashed rgba(212,175,55,0.45); padding-bottom:6px;">
+    <div>
+      <div style="font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:1.2px; color:#722F37; font-weight:700;">LAB · TRAIL STOP</div>
+      <div style="font-size:0.78rem; color:#5a3e2b; margin-top:1px;">ผลทดสอบกลยุทธ์ trail</div>
+    </div>
+    <div id="lab-trail-on" style="font-family:'DM Serif Display',serif; font-size:1.4rem; color:#8B6914; font-weight:700;">OFF</div>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:7px 14px; font-size:0.82rem;">
+    <div>หุ้นโดน trail</div><div style="text-align:right; font-weight:700; color:#722F37;" id="lab-trail-count">— / —</div>
+    <div>% หุ้นโดน trail</div><div style="text-align:right; font-weight:700;" id="lab-trail-pct">—</div>
+    <div>หุ้นที่ผ่าน gate +50%</div><div style="text-align:right; font-weight:600; color:#5a3e2b;" id="lab-trail-gated">— / —</div>
+    <div>กำไรเฉลี่ย (trail exit)</div><div style="text-align:right; font-weight:700; color:#1B5E20;" id="lab-trail-avg-ret">—</div>
+    <div>กำไรเฉลี่ย (maturity)</div><div style="text-align:right; font-weight:700; color:#1B5E20;" id="lab-mat-avg-ret">—</div>
+    <div>peak ก่อน trail trigger</div><div style="text-align:right; font-weight:600; color:#5a3e2b;" id="lab-trail-avg-peak">—</div>
+    <div>วันที่ถือ (trail)</div><div style="text-align:right; font-weight:600;" id="lab-trail-avg-days">— วัน</div>
+    <div>Lot ปิดก่อน maturity</div><div style="text-align:right; font-weight:600; color:#8B6914;" id="lab-trail-lots-closed">0 lots</div>
+  </div>
+</div>
 
 </body>
 </html>
