@@ -4877,12 +4877,18 @@ window.switchStatsTab = function(tab) {
 </script>
 
 
-<!-- LAB v1: Trailing Stop Performance Stats Card (visible after backtest) -->
-<div id="lab-trail-stats" style="position:fixed; bottom:18px; right:18px; max-width:340px; z-index:9000; background:linear-gradient(180deg, #FAF6ED 0%, #F4E4BA 100%); border:1.5px solid rgba(212,175,55,0.55); border-radius:12px; padding:14px 16px 12px; box-shadow:0 8px 28px rgba(26,10,14,0.18), 0 0 0 1px rgba(212,175,55,0.18) inset; font-family:'Anuphan',sans-serif; color:#1a0a0e;">
-  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; border-bottom:1px dashed rgba(212,175,55,0.45); padding-bottom:6px;">
-    <div>
-      <div style="font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:1.2px; color:#722F37; font-weight:700;">LAB · TRAIL STOP</div>
-      <div style="font-size:0.78rem; color:#5a3e2b; margin-top:1px;">ผลทดสอบกลยุทธ์ trail</div>
+<!-- LAB v1: Trailing Stop Performance Stats Card (draggable, position remembered in localStorage) -->
+<div id="lab-trail-stats" style="position:fixed; bottom:18px; right:18px; max-width:340px; z-index:9000; background:linear-gradient(180deg, #FAF6ED 0%, #F4E4BA 100%); border:1.5px solid rgba(212,175,55,0.55); border-radius:12px; padding:14px 16px 12px; box-shadow:0 8px 28px rgba(26,10,14,0.18), 0 0 0 1px rgba(212,175,55,0.18) inset; font-family:'Anuphan',sans-serif; color:#1a0a0e; user-select:none;">
+  <div id="lab-trail-handle" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; border-bottom:1px dashed rgba(212,175,55,0.45); padding-bottom:6px; cursor:move; touch-action:none;">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" stroke-width="2.4" stroke-linecap="round" style="opacity:0.75; flex-shrink:0;" aria-hidden="true">
+        <circle cx="9" cy="6" r="0.5"/><circle cx="9" cy="12" r="0.5"/><circle cx="9" cy="18" r="0.5"/>
+        <circle cx="15" cy="6" r="0.5"/><circle cx="15" cy="12" r="0.5"/><circle cx="15" cy="18" r="0.5"/>
+      </svg>
+      <div>
+        <div style="font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:1.2px; color:#722F37; font-weight:700;">LAB · TRAIL STOP</div>
+        <div style="font-size:0.78rem; color:#5a3e2b; margin-top:1px;">ผลทดสอบกลยุทธ์ trail · <span style="font-size:0.7rem; color:#8B6914; font-style:italic;">(ลากย้ายได้)</span></div>
+      </div>
     </div>
     <div id="lab-trail-on" style="font-family:'DM Serif Display',serif; font-size:1.4rem; color:#8B6914; font-weight:700;">OFF</div>
   </div>
@@ -4897,6 +4903,109 @@ window.switchStatsTab = function(tab) {
     <div>Lot ปิดก่อน maturity</div><div style="text-align:right; font-weight:600; color:#8B6914;" id="lab-trail-lots-closed">0 lots</div>
   </div>
 </div>
+
+<script>
+// LAB v1: Drag-to-move logic for the trail-stop stats card (position persisted to localStorage)
+(function() {
+  const card = document.getElementById('lab-trail-stats');
+  const handle = document.getElementById('lab-trail-handle');
+  if (!card || !handle) return;
+
+  const STORAGE_KEY = 'jpt_lab_trail_pos_v1';
+
+  // Restore saved position
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+    if (saved && typeof saved.left === 'number' && typeof saved.top === 'number') {
+      // Clamp into viewport in case it changed since last save
+      const w = card.offsetWidth || 340;
+      const h = card.offsetHeight || 200;
+      const left = Math.max(0, Math.min(window.innerWidth - w, saved.left));
+      const top = Math.max(0, Math.min(window.innerHeight - h, saved.top));
+      card.style.left = left + 'px';
+      card.style.top = top + 'px';
+      card.style.right = 'auto';
+      card.style.bottom = 'auto';
+    }
+  } catch(e) {}
+
+  let dragging = false;
+  let startX = 0, startY = 0, startLeft = 0, startTop = 0;
+
+  function getPoint(e) {
+    if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    return { x: e.clientX, y: e.clientY };
+  }
+
+  function onDown(e) {
+    dragging = true;
+    const pt = getPoint(e);
+    startX = pt.x;
+    startY = pt.y;
+    const rect = card.getBoundingClientRect();
+    startLeft = rect.left;
+    startTop = rect.top;
+    // Switch to absolute-pixel positioning (clear bottom/right anchors)
+    card.style.left = startLeft + 'px';
+    card.style.top = startTop + 'px';
+    card.style.right = 'auto';
+    card.style.bottom = 'auto';
+    card.style.transition = 'none';
+    card.style.boxShadow = '0 12px 40px rgba(26,10,14,0.32), 0 0 0 1.5px rgba(212,175,55,0.4) inset';
+    e.preventDefault();
+  }
+
+  function onMove(e) {
+    if (!dragging) return;
+    const pt = getPoint(e);
+    const dx = pt.x - startX;
+    const dy = pt.y - startY;
+    let newLeft = startLeft + dx;
+    let newTop = startTop + dy;
+    const w = card.offsetWidth;
+    const h = card.offsetHeight;
+    newLeft = Math.max(0, Math.min(window.innerWidth - w, newLeft));
+    newTop = Math.max(0, Math.min(window.innerHeight - h, newTop));
+    card.style.left = newLeft + 'px';
+    card.style.top = newTop + 'px';
+    e.preventDefault();
+  }
+
+  function onUp() {
+    if (!dragging) return;
+    dragging = false;
+    card.style.boxShadow = '0 8px 28px rgba(26,10,14,0.18), 0 0 0 1px rgba(212,175,55,0.18) inset';
+    try {
+      const rect = card.getBoundingClientRect();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ left: rect.left, top: rect.top }));
+    } catch(e) {}
+  }
+
+  // Mouse events
+  handle.addEventListener('mousedown', onDown);
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+  // Touch events (mobile / iPad)
+  handle.addEventListener('touchstart', onDown, { passive: false });
+  document.addEventListener('touchmove', onMove, { passive: false });
+  document.addEventListener('touchend', onUp);
+  document.addEventListener('touchcancel', onUp);
+
+  // Re-clamp on window resize (so card doesn't fly off-screen)
+  window.addEventListener('resize', function() {
+    const rect = card.getBoundingClientRect();
+    const w = card.offsetWidth;
+    const h = card.offsetHeight;
+    if (rect.left + w > window.innerWidth || rect.top + h > window.innerHeight) {
+      const newLeft = Math.max(0, Math.min(window.innerWidth - w, rect.left));
+      const newTop = Math.max(0, Math.min(window.innerHeight - h, rect.top));
+      card.style.left = newLeft + 'px';
+      card.style.top = newTop + 'px';
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ left: newLeft, top: newTop })); } catch(e) {}
+    }
+  });
+})();
+</script>
 
 </body>
 </html>
