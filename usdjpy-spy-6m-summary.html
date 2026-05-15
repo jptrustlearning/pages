@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>USDJPY × SPY · 6-Month Snapshot · JP Trust Learning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Cinzel:wght@500;600;700&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --gold: #D4AF37;
+  --gold-dark: #B8860B;
+  --gold-deep: #8B6914;
+  --gold-light: #F4E4BA;
+  --maroon: #722F37;
+  --maroon-dark: #5A3D20;
+  --burgundy: #C14545;
+  --burgundy-dark: #9C2B2B;
+  --emerald: #2E9F5F;
+  --emerald-dark: #1F7D49;
+  --cream-bg: #FAF6ED;
+  --cream-card: #FFFEF8;
+  --cream-deep: #F5EDD8;
+  --text: #3D3228;
+  --text-dark: #5A3D20;
+  --text-muted: #7A6F62;
+  --border-gold: rgba(212, 175, 55, 0.40);
+  --border-gold-soft: rgba(212, 175, 55, 0.20);
+}
+
+html, body {
+  background: var(--cream-bg);
+  color: var(--text);
+  font-family: 'Anuphan', 'Sarabun', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+}
+
+/* === HERO === */
+header {
+  background: linear-gradient(135deg, #1a0a0e 0%, #3a1520 50%, #5A3D20 100%);
+  border-radius: 18px;
+  padding: 32px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 20%, rgba(212,175,55,0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.subtitle {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  letter-spacing: 4px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  color: var(--gold-light);
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+h1 .h1-amp {
+  color: var(--gold);
+  font-style: italic;
+  margin: 0 4px;
+}
+
+.tagline {
+  color: var(--gold-light);
+  font-size: 0.95rem;
+  opacity: 0.85;
+}
+
+/* === STATUS BAR === */
+.status-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+  font-size: 0.85rem;
+}
+
+.status-pill {
+  flex: 1;
+  min-width: 220px;
+  background: var(--cream-card);
+  border: 1px solid var(--border-gold);
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-pill .pill-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 1.4px;
+  color: var(--gold-deep);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.status-pill .pill-value {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-dark);
+  font-weight: 500;
+  margin-left: auto;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  flex-shrink: 0;
+}
+.status-dot.live { background: var(--emerald); box-shadow: 0 0 0 3px rgba(46,159,95,0.18); }
+.status-dot.loading { background: var(--gold); animation: pulse 1.2s infinite; }
+.status-dot.error { background: var(--burgundy); }
+
+@keyframes pulse { 50% { opacity: 0.4; } }
+
+/* === TABLE === */
+.table-wrap {
+  background: var(--cream-card);
+  border: 1.5px solid var(--border-gold);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(114,47,55,0.06);
+}
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.86rem;
+}
+
+thead {
+  background: linear-gradient(180deg, #1a0a0e 0%, #3a1520 100%);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+thead th {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 0.68rem;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  padding: 14px 10px;
+  text-align: right;
+  border-bottom: 2px solid var(--gold);
+  white-space: nowrap;
+}
+
+thead th:first-child { text-align: left; padding-left: 16px; }
+thead th:last-child { padding-right: 16px; }
+
+tbody td {
+  padding: 11px 10px;
+  text-align: right;
+  border-bottom: 1px solid var(--border-gold-soft);
+  color: var(--text);
+  white-space: nowrap;
+}
+
+tbody td:first-child {
+  text-align: left;
+  padding-left: 16px;
+  font-family: 'Anuphan', sans-serif;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+tbody td:last-child { padding-right: 16px; }
+
+tbody tr:hover { background: var(--cream-deep); }
+
+tbody tr.year-start td {
+  border-top: 2px solid var(--border-gold);
+}
+tbody tr.year-start td:first-child {
+  color: var(--gold-deep);
+  font-weight: 700;
+}
+
+.delta-pos { color: var(--emerald-dark); font-weight: 600; }
+.delta-neg { color: var(--burgundy-dark); font-weight: 600; }
+.delta-zero { color: var(--text-muted); }
+
+.cell-na { color: var(--text-muted); font-style: italic; opacity: 0.5; }
+
+/* Section divider between JPY columns and SPY columns */
+thead th.divider, tbody td.divider {
+  border-left: 2px solid var(--border-gold);
+  padding-left: 16px;
+}
+
+/* === LEGEND === */
+.legend {
+  margin-top: 24px;
+  background: var(--cream-card);
+  border: 1px solid var(--border-gold-soft);
+  border-radius: 12px;
+  padding: 18px 20px;
+  font-size: 0.88rem;
+}
+
+.legend h3 {
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  letter-spacing: 1.6px;
+  color: var(--gold-deep);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.legend ul { list-style: none; }
+.legend li {
+  margin-bottom: 6px;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.legend li strong {
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+.legend code {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--cream-deep);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  color: var(--maroon);
+}
+
+/* === LOADING === */
+#loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+
+#loading.hidden { display: none; }
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border-gold-soft);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+#error {
+  display: none;
+  background: rgba(193,69,69,0.08);
+  border: 1px solid rgba(193,69,69,0.35);
+  border-radius: 10px;
+  padding: 16px;
+  color: var(--burgundy-dark);
+  text-align: center;
+}
+
+/* === MOBILE === */
+@media (max-width: 640px) {
+  .container { padding: 16px 10px 32px; }
+  header { padding: 24px 16px; }
+  table { font-size: 0.78rem; }
+  thead th, tbody td { padding: 9px 7px; }
+  thead th:first-child, tbody td:first-child { padding-left: 12px; }
+  thead th:last-child, tbody td:last-child { padding-right: 12px; }
+  thead th.divider, tbody td.divider { padding-left: 12px; }
+  .status-pill { min-width: unset; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="subtitle">FX × Equity · 6-Month Snapshot</div>
+    <h1>USD/JPY <span class="h1-amp">×</span> SPY</h1>
+    <div class="tagline">ค่าเงินเยน vs S&amp;P 500 — เปรียบเทียบสิ้นเดือน vs 6 เดือนที่แล้ว</div>
+  </header>
+
+  <div class="status-row">
+    <div class="status-pill">
+      <span class="status-dot loading" id="status-dot"></span>
+      <span class="pill-label">Status</span>
+      <span class="pill-value" id="status-value">Loading…</span>
+    </div>
+    <div class="status-pill">
+      <span class="pill-label">Range</span>
+      <span class="pill-value" id="range-value">—</span>
+    </div>
+    <div class="status-pill">
+      <span class="pill-label">Months</span>
+      <span class="pill-value" id="count-value">—</span>
+    </div>
+  </div>
+
+  <div id="loading">
+    <div class="spinner"></div>
+    <div>กำลังโหลดข้อมูล USDJPY และ SPY…</div>
+  </div>
+
+  <div id="error"></div>
+
+  <div class="table-wrap" id="table-wrap" style="display:none;">
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>เดือน</th>
+            <th>USD/JPY</th>
+            <th>6M ก่อน</th>
+            <th>Δ6M</th>
+            <th class="divider">SPY</th>
+            <th>6M ก่อน</th>
+            <th>Δ6M</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="legend">
+    <h3>วิธีอ่านตาราง</h3>
+    <ul>
+      <li><strong>เดือน</strong> = สิ้นเดือน (วันซื้อขายสุดท้ายของเดือนนั้น)</li>
+      <li><strong>USD/JPY</strong> = ค่าเงินเยนต่อ 1 ดอลลาร์ — <code>↑ = เยนอ่อน</code>, <code>↓ = เยนแข็ง</code></li>
+      <li><strong>SPY</strong> = ราคา ETF ที่ track S&amp;P 500 (ตัวแทนตลาดหุ้นสหรัฐ)</li>
+      <li><strong>6M ก่อน</strong> = ราคาสิ้นเดือนเมื่อ 6 เดือนก่อนหน้า</li>
+      <li><strong>Δ6M</strong> = % เปลี่ยนแปลงเทียบกับ 6 เดือนก่อน — <span class="delta-pos">เขียว = บวก</span> / <span class="delta-neg">แดง = ลบ</span></li>
+      <li>แถวที่ขีดบน = เริ่มปีใหม่ (เดือนมกราคม)</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+const CSV_URLS = {
+  jpy:  'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_jpy_daily.csv',
+  bench:'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_benchmark_daily.csv'
+};
+
+// --- Simple CSV parser (no quoted strings expected in our data) ---
+function parseCsv(text) {
+  const lines = text.trim().split('\n');
+  const header = lines[0].split(',').map(s => s.trim());
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const parts = lines[i].split(',');
+    if (parts.length < header.length) continue;
+    const row = {};
+    for (let j = 0; j < header.length; j++) row[header[j]] = parts[j];
+    rows.push(row);
+  }
+  return rows;
+}
+
+// --- Filter rows by ticker, normalize to {date, close} pairs ---
+function extractClose(rows, ticker) {
+  return rows
+    .filter(r => r.Ticker === ticker)
+    .map(r => ({ date: r.Date, close: parseFloat(r.Close) }))
+    .filter(r => !isNaN(r.close))
+    .sort((a, b) => a.date.localeCompare(b.date));
+}
+
+// --- Reduce daily series → last trading day per month ---
+function monthEndSeries(daily) {
+  // daily is sorted ascending by date
+  const monthMap = new Map();   // 'YYYY-MM' → latest {date, close}
+  for (const r of daily) {
+    const ym = r.date.slice(0, 7);
+    monthMap.set(ym, r);  // overwrites — last one wins (which IS the latest because sorted asc)
+  }
+  return Array.from(monthMap.entries())
+    .map(([ym, r]) => ({ ym, date: r.date, close: r.close }))
+    .sort((a, b) => a.ym.localeCompare(b.ym));
+}
+
+// --- Compute month - 6M (string math on YYYY-MM) ---
+function monthMinus6(ym) {
+  const [yStr, mStr] = ym.split('-');
+  let y = parseInt(yStr, 10);
+  let m = parseInt(mStr, 10) - 6;
+  while (m <= 0) { m += 12; y -= 1; }
+  return `${y}-${String(m).padStart(2, '0')}`;
+}
+
+// --- Format helpers ---
+function fmtNum(v, decimals) {
+  if (v == null || isNaN(v)) return '—';
+  return v.toFixed(decimals);
+}
+function fmtPct(curr, prev) {
+  if (curr == null || prev == null || isNaN(curr) || isNaN(prev) || prev === 0) return null;
+  return ((curr - prev) / prev) * 100;
+}
+function pctCell(pct) {
+  if (pct == null) return '<span class="cell-na">—</span>';
+  const sign = pct > 0 ? '+' : '';
+  const cls = pct > 0.05 ? 'delta-pos' : (pct < -0.05 ? 'delta-neg' : 'delta-zero');
+  return `<span class="${cls}">${sign}${pct.toFixed(2)}%</span>`;
+}
+function thaiMonth(ym) {
+  const [y, m] = ym.split('-');
+  const monthNames = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  return `${monthNames[parseInt(m, 10) - 1]} ${y}`;
+}
+
+// --- Build merged month-end table with 6M comparisons ---
+function buildTableData(jpyMonthEnd, spyMonthEnd) {
+  // Index both by YYYY-MM
+  const jpyMap = new Map(jpyMonthEnd.map(r => [r.ym, r]));
+  const spyMap = new Map(spyMonthEnd.map(r => [r.ym, r]));
+
+  // Union of months — only include rows where AT LEAST one series has data
+  const allMonths = new Set([...jpyMap.keys(), ...spyMap.keys()]);
+  const sortedMonths = Array.from(allMonths).sort();
+
+  return sortedMonths.map(ym => {
+    const j = jpyMap.get(ym);
+    const s = spyMap.get(ym);
+    const ym6 = monthMinus6(ym);
+    const j6 = jpyMap.get(ym6);
+    const s6 = spyMap.get(ym6);
+
+    return {
+      ym,
+      jpyClose: j ? j.close : null,
+      jpyPrev:  j6 ? j6.close : null,
+      jpyPct:   fmtPct(j ? j.close : null, j6 ? j6.close : null),
+      spyClose: s ? s.close : null,
+      spyPrev:  s6 ? s6.close : null,
+      spyPct:   fmtPct(s ? s.close : null, s6 ? s6.close : null),
+    };
+  });
+}
+
+// --- Render to DOM ---
+function renderTable(rows) {
+  const tbody = document.getElementById('table-body');
+  // Newest first
+  const reversed = [...rows].reverse();
+  tbody.innerHTML = reversed.map(r => {
+    const isYearStart = r.ym.endsWith('-01');
+    return `
+    <tr${isYearStart ? ' class="year-start"' : ''}>
+      <td>${thaiMonth(r.ym)}</td>
+      <td>${fmtNum(r.jpyClose, 2)}</td>
+      <td>${fmtNum(r.jpyPrev, 2)}</td>
+      <td>${pctCell(r.jpyPct)}</td>
+      <td class="divider">${fmtNum(r.spyClose, 2)}</td>
+      <td>${fmtNum(r.spyPrev, 2)}</td>
+      <td>${pctCell(r.spyPct)}</td>
+    </tr>
+  `;
+  }).join('');
+}
+
+// --- Main loader ---
+async function load() {
+  const statusDot = document.getElementById('status-dot');
+  const statusValue = document.getElementById('status-value');
+  const rangeValue = document.getElementById('range-value');
+  const countValue = document.getElementById('count-value');
+  const loadingEl = document.getElementById('loading');
+  const tableWrap = document.getElementById('table-wrap');
+  const errorEl = document.getElementById('error');
+
+  try {
+    const [jpyResp, benchResp] = await Promise.all([
+      fetch(CSV_URLS.jpy),
+      fetch(CSV_URLS.bench)
+    ]);
+
+    if (!jpyResp.ok) throw new Error('USDJPY CSV ยังไม่พร้อม — รัน workflow update_jpy_prices ก่อน');
+    if (!benchResp.ok) throw new Error('Benchmark CSV โหลดไม่สำเร็จ');
+
+    const [jpyText, benchText] = await Promise.all([jpyResp.text(), benchResp.text()]);
+
+    const jpyRows = parseCsv(jpyText);
+    const benchRows = parseCsv(benchText);
+
+    const jpyDaily = extractClose(jpyRows, 'USDJPY');
+    const spyDaily = extractClose(benchRows, 'SPY');
+
+    if (jpyDaily.length === 0) {
+      throw new Error('USDJPY CSV ว่างเปล่า — รอ workflow update_jpy_prices รันรอบแรก');
+    }
+    if (spyDaily.length === 0) throw new Error('ไม่พบข้อมูล SPY ในไฟล์ benchmark');
+
+    const jpyMonthEnd = monthEndSeries(jpyDaily);
+    const spyMonthEnd = monthEndSeries(spyDaily);
+    const tableData = buildTableData(jpyMonthEnd, spyMonthEnd);
+
+    renderTable(tableData);
+
+    // Status pills
+    statusDot.className = 'status-dot live';
+    statusValue.textContent = 'Connected';
+    const firstYm = tableData[0].ym;
+    const lastYm = tableData[tableData.length - 1].ym;
+    rangeValue.textContent = `${thaiMonth(firstYm)} → ${thaiMonth(lastYm)}`;
+    countValue.textContent = `${tableData.length} เดือน`;
+
+    loadingEl.classList.add('hidden');
+    tableWrap.style.display = 'block';
+
+  } catch (err) {
+    console.error(err);
+    loadingEl.classList.add('hidden');
+    statusDot.className = 'status-dot error';
+    statusValue.textContent = 'Error';
+    errorEl.textContent = err.message || String(err);
+    errorEl.style.display = 'block';
+  }
+}
+
+load();
+</script>
+
+</body>
+</html>
