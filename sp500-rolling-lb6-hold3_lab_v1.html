@@ -3790,7 +3790,7 @@ function calculateStats() {
 
     const avgMonthSign = monthlyAvgUsd >= 0 ? '+' : '-';
     document.getElementById('rscMonthlyAvg').innerHTML = 
-      `ตกเฉลี่ย <strong>${avgMonthSign}$${Math.abs(Math.round(monthlyAvgUsd)).toLocaleString()}</strong> / เดือน &middot; จากงบรวม <strong>$${Math.round(start).toLocaleString()}</strong> (ใส่เดือนละ $${Math.round(CONFIG.perLotCapital).toLocaleString()} × 6)`;
+      `ตกเฉลี่ย <strong>${avgMonthSign}$${Math.abs(Math.round(monthlyAvgUsd)).toLocaleString()}</strong> / เดือน &middot; จากงบรวม <strong>$${Math.round(start).toLocaleString()}</strong> (ใส่เดือนละ $${Math.round(CONFIG.perLotCapital).toLocaleString()} × ${CONFIG.holdMonths})`;
 
     // === 4 top metrics ===
     const annRoi = document.getElementById('rscAnnRoi');
