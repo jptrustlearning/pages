@@ -2193,7 +2193,13 @@ let CONFIG = {
   weightRet: 0.5,
   weightVol: 0.5,
   startYear: 2001,
-  cloudCsvUrl: 'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_sp500_daily_since2001.csv',
+  // cloudCsvUrl = production CSV (2015→present). Reused so 2015+ data stays fresh
+  // via the daily SP500 update workflow — no duplication, no sync drift.
+  cloudCsvUrl: 'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_sp500_daily.csv',
+  // cloudCsvUrlHist = since2001 CSV (2001-2014 ONLY). Built once via the
+  // backfill_sp500_2001 workflow. Kept under GitHub's 100MB file-size limit
+  // by NOT duplicating 2015+ data.
+  cloudCsvUrlHist: 'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_sp500_daily_since2001.csv',
   cloudBenchUrl: 'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_benchmark_daily.csv'
 };
 
@@ -2344,6 +2350,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadDataFromCloud() {
   const fileUrl = CONFIG.cloudCsvUrl;
+  const histUrl = CONFIG.cloudCsvUrlHist;  // HIST 2001: 2001-2014 data, separate file
   const benchUrl = CONFIG.cloudBenchUrl;
   
   // Kickoff progress animation — grows from 0 toward 70% during fetch
@@ -2354,20 +2361,41 @@ async function loadDataFromCloud() {
   }, 80);
 
   try {
-    // Fetch SP500 universe + benchmark (SPY/QQQ/DIA) in parallel
-    const [responseMain, responseBench] = await Promise.all([
+    // Fetch SP500 (2015+) + historical (2001-2014) + benchmark in parallel
+    const [responseMain, responseHist, responseBench] = await Promise.all([
       fetch(fileUrl),
+      histUrl ? fetch(histUrl).catch(() => null) : Promise.resolve(null),
       benchUrl ? fetch(benchUrl).catch(() => null) : Promise.resolve(null)
     ]);
     if (!responseMain.ok) throw new Error('Network response was not ok');
     
     const csvMain = await responseMain.text();
     let csvCombined = csvMain;
+    
+    // Append historical 2001-2014 data (if available) — strip header line
+    if (responseHist && responseHist.ok) {
+      const csvHist = await responseHist.text();
+      const histLines = csvHist.trim().split('\n');
+      if (histLines.length > 1) {
+        // Skip empty/placeholder file (header-only)
+        const histDataLines = histLines.slice(1).filter(line => line.trim().length > 0);
+        if (histDataLines.length > 0) {
+          csvCombined = csvCombined.trim() + '\n' + histDataLines.join('\n');
+          console.log('[HIST 2001] Appended ' + histDataLines.length + ' historical rows (2001-2014)');
+        } else {
+          console.warn('[HIST 2001] since2001 CSV is placeholder/empty — backfill workflow needed');
+        }
+      }
+    } else {
+      console.warn('[HIST 2001] Failed to fetch since2001 CSV — running on production data only (2015+)');
+    }
+    
+    // Append benchmark (SPY/QQQ/DIA) — strip header line
     if (responseBench && responseBench.ok) {
       const csvBench = await responseBench.text();
       const benchLines = csvBench.trim().split('\n');
       if (benchLines.length > 1) {
-        csvCombined = csvMain.trim() + '\n' + benchLines.slice(1).join('\n');
+        csvCombined = csvCombined.trim() + '\n' + benchLines.slice(1).join('\n');
       }
     }
     clearInterval(fetchInterval);
