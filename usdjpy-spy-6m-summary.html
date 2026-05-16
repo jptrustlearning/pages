@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>USDJPY × SPY · 6-Month Snapshot · JP Trust Learning</title>
+<title>USDJPY × SPY × WTI × GOLD · 6-Month Snapshot · JP Trust Learning</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Cinzel:wght@500;600;700&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -249,7 +249,7 @@ tbody tr.year-start td:first-child {
 
 .cell-na { color: var(--text-muted); font-style: italic; opacity: 0.5; }
 
-/* Section divider between JPY columns and SPY columns */
+/* Section divider between asset-price block and delta-% block */
 thead th.divider, tbody td.divider {
   border-left: 2px solid var(--border-gold);
   padding-left: 16px;
@@ -343,9 +343,9 @@ thead th.divider, tbody td.divider {
 
 <div class="container">
   <header>
-    <div class="subtitle">FX × Equity · 6-Month Snapshot</div>
-    <h1>USD/JPY <span class="h1-amp">×</span> SPY</h1>
-    <div class="tagline">ยึด JPY เป็นหลัก — เทียบ growth 6 เดือน vs S&amp;P 500</div>
+    <div class="subtitle">FX × Equity × Commodities · 6-Month Snapshot</div>
+    <h1>JPY <span class="h1-amp">×</span> SPY <span class="h1-amp">×</span> WTI <span class="h1-amp">×</span> GOLD</h1>
+    <div class="tagline">เทียบ growth 6 เดือน — เยน, S&amp;P 500, น้ำมัน, ทอง</div>
   </header>
 
   <div class="status-row">
@@ -370,7 +370,7 @@ thead th.divider, tbody td.divider {
 
   <div id="loading">
     <div class="spinner"></div>
-    <div>กำลังโหลดข้อมูล USDJPY และ SPY…</div>
+    <div>กำลังโหลดข้อมูล JPY, SPY, WTI, GOLD…</div>
   </div>
 
   <div id="error"></div>
@@ -381,12 +381,14 @@ thead th.divider, tbody td.divider {
         <thead>
           <tr>
             <th>เดือน</th>
-            <th>USD/JPY</th>
-            <th>6M ก่อน</th>
-            <th>Δ6M</th>
-            <th class="divider">SPY</th>
-            <th>6M ก่อน</th>
-            <th>Δ6M</th>
+            <th>UJ</th>
+            <th>SPY</th>
+            <th>WTI</th>
+            <th>GOLD</th>
+            <th class="divider">Δ JPY</th>
+            <th>Δ SPY</th>
+            <th>Δ WTI</th>
+            <th>Δ GOLD</th>
           </tr>
         </thead>
         <tbody id="table-body"></tbody>
@@ -398,16 +400,16 @@ thead th.divider, tbody td.divider {
     <h3>วิธีอ่านตาราง</h3>
     <ul>
       <li><strong>เดือน</strong> = สิ้นเดือน (วันซื้อขายสุดท้ายของเดือนนั้น)</li>
-      <li><strong>USD/JPY</strong> = ค่า quote เยนต่อ 1 ดอลลาร์ — เลขขึ้น = เยนอ่อน, เลขลง = เยนแข็ง</li>
-      <li><strong>SPY</strong> = ราคา ETF ที่ track S&amp;P 500 (ตัวแทนตลาดหุ้นสหรัฐ)</li>
-      <li><strong>6M ก่อน</strong> = ราคาสิ้นเดือนเมื่อ 6 เดือนก่อนหน้า</li>
-      <li><strong>Δ6M (JPY column)</strong> = <em>เปลี่ยนเครื่องหมายแล้ว — ยึด JPY เป็นหลัก</em>:
-        <span class="delta-pos">+ = JPY แข็งขึ้น (เติบโต)</span>,
-        <span class="delta-neg">− = JPY อ่อนลง</span></li>
-      <li><strong>Δ6M (SPY column)</strong> = ปกติ:
-        <span class="delta-pos">+ = SPY ขึ้น</span>,
-        <span class="delta-neg">− = SPY ลง</span></li>
-      <li><span class="row-marker">●</span> <strong>แถวมาร์ก</strong> = เดือนที่ <em>JPY เติบโต ในขณะที่ SPY ติดลบ</em> (yen ชนะ SP500 ในช่วงนั้น)</li>
+      <li><strong>UJ</strong> = ค่า quote USD/JPY (เยนต่อ 1 ดอลลาร์) — เลขขึ้น = เยนอ่อน, ลง = เยนแข็ง</li>
+      <li><strong>SPY</strong> = ETF ที่ track S&amp;P 500</li>
+      <li><strong>WTI</strong> = ราคาน้ำมันดิบ WTI (CL=F futures, USD/บาร์เรล)</li>
+      <li><strong>GOLD</strong> = ราคาทองคำ futures (GC=F, USD/ออนซ์)</li>
+      <li><strong>Δ JPY</strong> = <em>เครื่องหมายกลับจาก UJ แล้ว — ยึด JPY เป็นหลัก</em>:
+        <span class="delta-pos">+ = JPY แข็งขึ้น</span> / <span class="delta-neg">− = JPY อ่อนลง</span></li>
+      <li><strong>Δ SPY / Δ WTI / Δ GOLD</strong> = ปกติ:
+        <span class="delta-pos">+ = ขึ้น</span> / <span class="delta-neg">− = ลง</span></li>
+      <li>กลุ่ม Δ ทั้ง 4 อยู่ติดกัน — เปรียบเทียบ growth ของ 4 asset ในเดือนเดียวกันได้ทันที</li>
+      <li><span class="row-marker">●</span> <strong>แถวมาร์ก</strong> = เดือนที่ <em>JPY เติบโต ในขณะที่ SPY ติดลบ</em></li>
       <li>แถวที่ขีดบน = เริ่มปีใหม่ (เดือนมกราคม)</li>
     </ul>
   </div>
@@ -415,8 +417,9 @@ thead th.divider, tbody td.divider {
 
 <script>
 const CSV_URLS = {
-  jpy:  'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_jpy_daily.csv',
-  bench:'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_benchmark_daily.csv'
+  jpy:        'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_jpy_daily.csv',
+  bench:      'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_benchmark_daily.csv',
+  commodities:'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_commodities_daily.csv'
 };
 
 // --- Simple CSV parser (no quoted strings expected in our data) ---
@@ -487,42 +490,50 @@ function thaiMonth(ym) {
 }
 
 // --- Build merged month-end table with 6M comparisons ---
-function buildTableData(jpyMonthEnd, spyMonthEnd) {
-  // Index both by YYYY-MM
-  const jpyMap = new Map(jpyMonthEnd.map(r => [r.ym, r]));
-  const spyMap = new Map(spyMonthEnd.map(r => [r.ym, r]));
+function buildTableData(jpyMonthEnd, spyMonthEnd, wtiMonthEnd, goldMonthEnd) {
+  // Index every series by YYYY-MM
+  const jpyMap  = new Map(jpyMonthEnd.map(r => [r.ym, r]));
+  const spyMap  = new Map(spyMonthEnd.map(r => [r.ym, r]));
+  const wtiMap  = new Map(wtiMonthEnd.map(r => [r.ym, r]));
+  const goldMap = new Map(goldMonthEnd.map(r => [r.ym, r]));
 
-  // Union of months — only include rows where AT LEAST one series has data
-  const allMonths = new Set([...jpyMap.keys(), ...spyMap.keys()]);
+  // Union of months — include any row where at least one series has data
+  const allMonths = new Set([
+    ...jpyMap.keys(), ...spyMap.keys(),
+    ...wtiMap.keys(), ...goldMap.keys()
+  ]);
   const sortedMonths = Array.from(allMonths).sort();
 
   return sortedMonths.map(ym => {
-    const j = jpyMap.get(ym);
-    const s = spyMap.get(ym);
     const ym6 = monthMinus6(ym);
-    const j6 = jpyMap.get(ym6);
-    const s6 = spyMap.get(ym6);
 
-    // UJ (USDJPY) raw % change — positive means USD up / JPY weak.
-    // We flip the sign so "+ = JPY strengthened" (yen-as-base perspective).
+    const j = jpyMap.get(ym),  j6 = jpyMap.get(ym6);
+    const s = spyMap.get(ym),  s6 = spyMap.get(ym6);
+    const w = wtiMap.get(ym),  w6 = wtiMap.get(ym6);
+    const g = goldMap.get(ym), g6 = goldMap.get(ym6);
+
+    // UJ raw % — positive means USD up / JPY weak. We flip the sign so
+    // "+ = JPY strengthened" (yen-as-base perspective, consistent with
+    // SPY/WTI/GOLD where + always means the asset grew).
     const ujRawPct = fmtPct(j ? j.close : null, j6 ? j6.close : null);
     const jpyPct = (ujRawPct == null) ? null : -ujRawPct;
-    const spyPct = fmtPct(s ? s.close : null, s6 ? s6.close : null);
+    const spyPct  = fmtPct(s ? s.close : null, s6 ? s6.close : null);
+    const wtiPct  = fmtPct(w ? w.close : null, w6 ? w6.close : null);
+    const goldPct = fmtPct(g ? g.close : null, g6 ? g6.close : null);
 
     // Marker: JPY strengthened (Δ > 0 in yen perspective) AND SPY fell.
-    // Use a small dead-zone (0.05%) to avoid noise on near-flat months.
+    // 0.05% dead-zone to avoid noise on near-flat months.
     const jpyOutgrew = (jpyPct != null && spyPct != null
                        && jpyPct > 0.05 && spyPct < -0.05);
 
     return {
       ym,
-      jpyClose: j ? j.close : null,
-      jpyPrev:  j6 ? j6.close : null,
-      jpyPct,                    // sign-flipped: + means JPY strengthened
-      spyClose: s ? s.close : null,
-      spyPrev:  s6 ? s6.close : null,
-      spyPct,
-      jpyOutgrew,                // true = mark row (JPY up vs SPY down)
+      jpyClose:  j ? j.close : null,
+      spyClose:  s ? s.close : null,
+      wtiClose:  w ? w.close : null,
+      goldClose: g ? g.close : null,
+      jpyPct, spyPct, wtiPct, goldPct,
+      jpyOutgrew,
     };
   });
 }
@@ -542,11 +553,13 @@ function renderTable(rows) {
     <tr${classAttr}>
       <td>${r.jpyOutgrew ? '<span class="row-marker" title="JPY แข็งขึ้น vs SPY ลง">●</span> ' : ''}${thaiMonth(r.ym)}</td>
       <td>${fmtNum(r.jpyClose, 2)}</td>
-      <td>${fmtNum(r.jpyPrev, 2)}</td>
-      <td>${pctCell(r.jpyPct)}</td>
-      <td class="divider">${fmtNum(r.spyClose, 2)}</td>
-      <td>${fmtNum(r.spyPrev, 2)}</td>
+      <td>${fmtNum(r.spyClose, 2)}</td>
+      <td>${fmtNum(r.wtiClose, 2)}</td>
+      <td>${fmtNum(r.goldClose, 2)}</td>
+      <td class="divider">${pctCell(r.jpyPct)}</td>
       <td>${pctCell(r.spyPct)}</td>
+      <td>${pctCell(r.wtiPct)}</td>
+      <td>${pctCell(r.goldPct)}</td>
     </tr>
   `;
   }).join('');
@@ -564,9 +577,10 @@ async function load() {
   const errorEl = document.getElementById('error');
 
   try {
-    const [jpyResp, benchResp] = await Promise.all([
+    const [jpyResp, benchResp, commResp] = await Promise.all([
       fetch(CSV_URLS.jpy),
-      fetch(CSV_URLS.bench)
+      fetch(CSV_URLS.bench),
+      fetch(CSV_URLS.commodities).catch(() => null)
     ]);
 
     if (!jpyResp.ok) throw new Error('USDJPY CSV ยังไม่พร้อม — รัน workflow update_jpy_prices ก่อน');
@@ -580,14 +594,30 @@ async function load() {
     const jpyDaily = extractClose(jpyRows, 'USDJPY');
     const spyDaily = extractClose(benchRows, 'SPY');
 
+    // Commodities (WTI + GOLD) — optional. If CSV missing, columns just show "—"
+    let wtiDaily = [], goldDaily = [];
+    if (commResp && commResp.ok) {
+      const commText = await commResp.text();
+      const commRows = parseCsv(commText);
+      wtiDaily  = extractClose(commRows, 'WTI');
+      goldDaily = extractClose(commRows, 'GOLD');
+      if (wtiDaily.length === 0 && goldDaily.length === 0) {
+        console.warn('[commodities] CSV loaded but no WTI/GOLD rows found — workflow may not have run yet');
+      }
+    } else {
+      console.warn('[commodities] CSV missing — WTI/GOLD columns will be empty (run update_commodities_prices workflow)');
+    }
+
     if (jpyDaily.length === 0) {
       throw new Error('USDJPY CSV ว่างเปล่า — รอ workflow update_jpy_prices รันรอบแรก');
     }
     if (spyDaily.length === 0) throw new Error('ไม่พบข้อมูล SPY ในไฟล์ benchmark');
 
-    const jpyMonthEnd = monthEndSeries(jpyDaily);
-    const spyMonthEnd = monthEndSeries(spyDaily);
-    const tableData = buildTableData(jpyMonthEnd, spyMonthEnd);
+    const jpyMonthEnd  = monthEndSeries(jpyDaily);
+    const spyMonthEnd  = monthEndSeries(spyDaily);
+    const wtiMonthEnd  = monthEndSeries(wtiDaily);
+    const goldMonthEnd = monthEndSeries(goldDaily);
+    const tableData = buildTableData(jpyMonthEnd, spyMonthEnd, wtiMonthEnd, goldMonthEnd);
 
     renderTable(tableData);
 
