@@ -281,6 +281,26 @@ tbody tr.year-start td:first-child {
 .delta-neg { color: var(--burgundy-dark); font-weight: 600; }
 .delta-zero { color: var(--text-muted); }
 
+/* Per-month rank highlight: top-1 grower = filled deep green pill,
+   top-2 grower = soft green pill. Applied only when value is positive. */
+.rank-1 {
+  background: var(--emerald-dark);
+  color: #FFF !important;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(31,125,73,0.30);
+  display: inline-block;
+}
+.rank-2 {
+  background: rgba(46, 159, 95, 0.18);
+  color: var(--emerald-dark) !important;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-weight: 700;
+  display: inline-block;
+}
+
 .cell-na { color: var(--text-muted); font-style: italic; opacity: 0.5; }
 
 /* Section divider between asset-price block and delta-% block */
@@ -443,6 +463,8 @@ thead th.divider, tbody td.divider {
       <li><strong>Δ SPY / Δ WTI / Δ GOLD</strong> = ปกติ:
         <span class="delta-pos">+ = ขึ้น</span> / <span class="delta-neg">− = ลง</span></li>
       <li>กลุ่ม Δ ทั้ง 4 อยู่ติดกัน — เปรียบเทียบ growth ของ 4 asset ในเดือนเดียวกันได้ทันที</li>
+      <li>ในแต่ละเดือน <span class="rank-1">+xx.xx%</span> = asset ที่ <em>เติบโตสูงสุด</em>,
+        <span class="rank-2">+xx.xx%</span> = อันดับ 2 (เฉพาะค่าบวก — เดือนที่ติดลบทั้ง 4 ตัวจะไม่มีไฮไลท์)</li>
       <li><span class="row-marker">●</span> <strong>แถวมาร์ก</strong> = เดือนที่ <em>JPY เติบโต ในขณะที่ SPY ติดลบ</em></li>
       <li>แถวที่ขีดบน = เริ่มปีใหม่ (เดือนมกราคม)</li>
     </ul>
@@ -511,11 +533,12 @@ function fmtPct(curr, prev) {
   if (curr == null || prev == null || isNaN(curr) || isNaN(prev) || prev === 0) return null;
   return ((curr - prev) / prev) * 100;
 }
-function pctCell(pct) {
+function pctCell(pct, rank) {
   if (pct == null) return '<span class="cell-na">—</span>';
   const sign = pct > 0 ? '+' : '';
   const cls = pct > 0.05 ? 'delta-pos' : (pct < -0.05 ? 'delta-neg' : 'delta-zero');
-  return `<span class="${cls}">${sign}${pct.toFixed(2)}%</span>`;
+  const rankCls = rank === 1 ? ' rank-1' : (rank === 2 ? ' rank-2' : '');
+  return `<span class="${cls}${rankCls}">${sign}${pct.toFixed(2)}%</span>`;
 }
 function thaiMonth(ym) {
   const [y, m] = ym.split('-');
@@ -555,6 +578,22 @@ function buildTableData(jpyMonthEnd, spyMonthEnd, wtiMonthEnd, goldMonthEnd) {
     const wtiPct  = fmtPct(w ? w.close : null, w6 ? w6.close : null);
     const goldPct = fmtPct(g ? g.close : null, g6 ? g6.close : null);
 
+    // Rank assets within this month by Δ% (descending). Only positive growers
+    // are eligible — a month where everything fell shouldn't have a "best" highlight.
+    // Top-1 → rank=1 (deep green); Top-2 → rank=2 (light green); others → null.
+    const candidates = [
+      { key: 'jpy',  val: jpyPct  },
+      { key: 'spy',  val: spyPct  },
+      { key: 'wti',  val: wtiPct  },
+      { key: 'gold', val: goldPct },
+    ]
+    .filter(c => c.val != null && c.val > 0)
+    .sort((a, b) => b.val - a.val);
+
+    const ranks = { jpy: null, spy: null, wti: null, gold: null };
+    if (candidates[0]) ranks[candidates[0].key] = 1;
+    if (candidates[1]) ranks[candidates[1].key] = 2;
+
     // Marker: JPY strengthened (Δ > 0 in yen perspective) AND SPY fell.
     // 0.05% dead-zone to avoid noise on near-flat months.
     const jpyOutgrew = (jpyPct != null && spyPct != null
@@ -567,6 +606,7 @@ function buildTableData(jpyMonthEnd, spyMonthEnd, wtiMonthEnd, goldMonthEnd) {
       wtiClose:  w ? w.close : null,
       goldClose: g ? g.close : null,
       jpyPct, spyPct, wtiPct, goldPct,
+      ranks,
       jpyOutgrew,
     };
   });
@@ -590,10 +630,10 @@ function renderTable(rows) {
       <td>${fmtNum(r.spyClose, 2)}</td>
       <td>${fmtNum(r.wtiClose, 2)}</td>
       <td>${fmtNum(r.goldClose, 2)}</td>
-      <td class="divider">${pctCell(r.jpyPct)}</td>
-      <td>${pctCell(r.spyPct)}</td>
-      <td>${pctCell(r.wtiPct)}</td>
-      <td>${pctCell(r.goldPct)}</td>
+      <td class="divider">${pctCell(r.jpyPct,  r.ranks.jpy)}</td>
+      <td>${pctCell(r.spyPct,  r.ranks.spy)}</td>
+      <td>${pctCell(r.wtiPct,  r.ranks.wti)}</td>
+      <td>${pctCell(r.goldPct, r.ranks.gold)}</td>
     </tr>
   `;
   }).join('');
