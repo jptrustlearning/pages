@@ -209,6 +209,32 @@ tbody td:last-child { padding-right: 16px; }
 
 tbody tr:hover { background: var(--cream-deep); }
 
+tbody tr.jpy-outgrew {
+  background: linear-gradient(90deg,
+    rgba(193, 69, 69, 0.10) 0%,
+    rgba(193, 69, 69, 0.04) 60%,
+    transparent 100%);
+  border-left: 3px solid var(--burgundy);
+}
+tbody tr.jpy-outgrew:hover {
+  background: linear-gradient(90deg,
+    rgba(193, 69, 69, 0.18) 0%,
+    rgba(193, 69, 69, 0.08) 60%,
+    var(--cream-deep) 100%);
+}
+tbody tr.jpy-outgrew td:first-child {
+  color: var(--burgundy-dark);
+  font-weight: 700;
+}
+
+.row-marker {
+  display: inline-block;
+  color: var(--burgundy);
+  font-size: 0.8em;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
 tbody tr.year-start td {
   border-top: 2px solid var(--border-gold);
 }
@@ -319,7 +345,7 @@ thead th.divider, tbody td.divider {
   <header>
     <div class="subtitle">FX × Equity · 6-Month Snapshot</div>
     <h1>USD/JPY <span class="h1-amp">×</span> SPY</h1>
-    <div class="tagline">ค่าเงินเยน vs S&amp;P 500 — เปรียบเทียบสิ้นเดือน vs 6 เดือนที่แล้ว</div>
+    <div class="tagline">ยึด JPY เป็นหลัก — เทียบ growth 6 เดือน vs S&amp;P 500</div>
   </header>
 
   <div class="status-row">
@@ -335,6 +361,10 @@ thead th.divider, tbody td.divider {
     <div class="status-pill">
       <span class="pill-label">Months</span>
       <span class="pill-value" id="count-value">—</span>
+    </div>
+    <div class="status-pill">
+      <span class="pill-label">JPY ชนะ SPY</span>
+      <span class="pill-value" id="jpywin-value">—</span>
     </div>
   </div>
 
@@ -368,10 +398,16 @@ thead th.divider, tbody td.divider {
     <h3>วิธีอ่านตาราง</h3>
     <ul>
       <li><strong>เดือน</strong> = สิ้นเดือน (วันซื้อขายสุดท้ายของเดือนนั้น)</li>
-      <li><strong>USD/JPY</strong> = ค่าเงินเยนต่อ 1 ดอลลาร์ — <code>↑ = เยนอ่อน</code>, <code>↓ = เยนแข็ง</code></li>
+      <li><strong>USD/JPY</strong> = ค่า quote เยนต่อ 1 ดอลลาร์ — เลขขึ้น = เยนอ่อน, เลขลง = เยนแข็ง</li>
       <li><strong>SPY</strong> = ราคา ETF ที่ track S&amp;P 500 (ตัวแทนตลาดหุ้นสหรัฐ)</li>
       <li><strong>6M ก่อน</strong> = ราคาสิ้นเดือนเมื่อ 6 เดือนก่อนหน้า</li>
-      <li><strong>Δ6M</strong> = % เปลี่ยนแปลงเทียบกับ 6 เดือนก่อน — <span class="delta-pos">เขียว = บวก</span> / <span class="delta-neg">แดง = ลบ</span></li>
+      <li><strong>Δ6M (JPY column)</strong> = <em>เปลี่ยนเครื่องหมายแล้ว — ยึด JPY เป็นหลัก</em>:
+        <span class="delta-pos">+ = JPY แข็งขึ้น (เติบโต)</span>,
+        <span class="delta-neg">− = JPY อ่อนลง</span></li>
+      <li><strong>Δ6M (SPY column)</strong> = ปกติ:
+        <span class="delta-pos">+ = SPY ขึ้น</span>,
+        <span class="delta-neg">− = SPY ลง</span></li>
+      <li><span class="row-marker">●</span> <strong>แถวมาร์ก</strong> = เดือนที่ <em>JPY เติบโต ในขณะที่ SPY ติดลบ</em> (yen ชนะ SP500 ในช่วงนั้น)</li>
       <li>แถวที่ขีดบน = เริ่มปีใหม่ (เดือนมกราคม)</li>
     </ul>
   </div>
@@ -467,14 +503,26 @@ function buildTableData(jpyMonthEnd, spyMonthEnd) {
     const j6 = jpyMap.get(ym6);
     const s6 = spyMap.get(ym6);
 
+    // UJ (USDJPY) raw % change — positive means USD up / JPY weak.
+    // We flip the sign so "+ = JPY strengthened" (yen-as-base perspective).
+    const ujRawPct = fmtPct(j ? j.close : null, j6 ? j6.close : null);
+    const jpyPct = (ujRawPct == null) ? null : -ujRawPct;
+    const spyPct = fmtPct(s ? s.close : null, s6 ? s6.close : null);
+
+    // Marker: JPY strengthened (Δ > 0 in yen perspective) AND SPY fell.
+    // Use a small dead-zone (0.05%) to avoid noise on near-flat months.
+    const jpyOutgrew = (jpyPct != null && spyPct != null
+                       && jpyPct > 0.05 && spyPct < -0.05);
+
     return {
       ym,
       jpyClose: j ? j.close : null,
       jpyPrev:  j6 ? j6.close : null,
-      jpyPct:   fmtPct(j ? j.close : null, j6 ? j6.close : null),
+      jpyPct,                    // sign-flipped: + means JPY strengthened
       spyClose: s ? s.close : null,
       spyPrev:  s6 ? s6.close : null,
-      spyPct:   fmtPct(s ? s.close : null, s6 ? s6.close : null),
+      spyPct,
+      jpyOutgrew,                // true = mark row (JPY up vs SPY down)
     };
   });
 }
@@ -486,9 +534,13 @@ function renderTable(rows) {
   const reversed = [...rows].reverse();
   tbody.innerHTML = reversed.map(r => {
     const isYearStart = r.ym.endsWith('-01');
+    const classes = [];
+    if (isYearStart) classes.push('year-start');
+    if (r.jpyOutgrew) classes.push('jpy-outgrew');
+    const classAttr = classes.length ? ` class="${classes.join(' ')}"` : '';
     return `
-    <tr${isYearStart ? ' class="year-start"' : ''}>
-      <td>${thaiMonth(r.ym)}</td>
+    <tr${classAttr}>
+      <td>${r.jpyOutgrew ? '<span class="row-marker" title="JPY แข็งขึ้น vs SPY ลง">●</span> ' : ''}${thaiMonth(r.ym)}</td>
       <td>${fmtNum(r.jpyClose, 2)}</td>
       <td>${fmtNum(r.jpyPrev, 2)}</td>
       <td>${pctCell(r.jpyPct)}</td>
@@ -506,6 +558,7 @@ async function load() {
   const statusValue = document.getElementById('status-value');
   const rangeValue = document.getElementById('range-value');
   const countValue = document.getElementById('count-value');
+  const jpyWinValue = document.getElementById('jpywin-value');
   const loadingEl = document.getElementById('loading');
   const tableWrap = document.getElementById('table-wrap');
   const errorEl = document.getElementById('error');
@@ -545,6 +598,13 @@ async function load() {
     const lastYm = tableData[tableData.length - 1].ym;
     rangeValue.textContent = `${thaiMonth(firstYm)} → ${thaiMonth(lastYm)}`;
     countValue.textContent = `${tableData.length} เดือน`;
+
+    // Count months flagged as "JPY outgrew SPY"
+    const jpyWinCount = tableData.filter(r => r.jpyOutgrew).length;
+    // Denominator: only months where BOTH Δ values are computable
+    const eligibleCount = tableData.filter(r => r.jpyPct != null && r.spyPct != null).length;
+    const pctOfEligible = eligibleCount > 0 ? (jpyWinCount / eligibleCount * 100).toFixed(0) : '—';
+    jpyWinValue.textContent = `${jpyWinCount} เดือน (${pctOfEligible}%)`;
 
     loadingEl.classList.add('hidden');
     tableWrap.style.display = 'block';
