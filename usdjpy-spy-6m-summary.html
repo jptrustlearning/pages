@@ -150,12 +150,16 @@ h1 .h1-amp {
   background: var(--cream-card);
   border: 1.5px solid var(--border-gold);
   border-radius: 14px;
-  overflow: hidden;
   box-shadow: 0 4px 16px rgba(114,47,55,0.06);
+  overflow: hidden;  /* OK now — table-scroll is its own scroll container */
 }
 
 .table-scroll {
-  overflow-x: auto;
+  /* Scroll container in BOTH directions so position:sticky has a single
+     reliable ancestor to attach to. Thead sticks to top, first col sticks
+     to left, both relative to this container. */
+  overflow: auto;
+  max-height: 78vh;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -168,9 +172,6 @@ table {
 
 thead {
   background: linear-gradient(180deg, #1a0a0e 0%, #3a1520 100%);
-  position: sticky;
-  top: 0;
-  z-index: 2;
 }
 
 thead th {
@@ -184,9 +185,22 @@ thead th {
   text-align: right;
   border-bottom: 2px solid var(--gold);
   white-space: nowrap;
+
+  /* Freeze header row at the top of the viewport when scrolling vertically */
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: linear-gradient(180deg, #1a0a0e 0%, #3a1520 100%);
 }
 
-thead th:first-child { text-align: left; padding-left: 16px; }
+thead th:first-child {
+  text-align: left;
+  padding-left: 16px;
+  /* Top-left corner cell: freeze top AND left, highest z-index */
+  left: 0;
+  z-index: 5;
+  box-shadow: 2px 0 6px -3px rgba(0,0,0,0.25);
+}
 thead th:last-child { padding-right: 16px; }
 
 tbody td {
@@ -203,9 +217,29 @@ tbody td:first-child {
   font-family: 'Anuphan', sans-serif;
   font-weight: 600;
   color: var(--text-dark);
+
+  /* Freeze first column when scrolling horizontally.
+     Solid bg required so it covers cells behind it. */
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--cream-card);
+  box-shadow: 2px 0 6px -3px rgba(0,0,0,0.12);
 }
 
 tbody td:last-child { padding-right: 16px; }
+
+/* When a row is hovered, the sticky first cell needs its bg overridden too
+   (sticky cells have their own background) */
+tbody tr:hover td:first-child { background: var(--cream-deep); }
+
+/* Marked rows: sticky first cell needs a solid tint matching the row gradient */
+tbody tr.jpy-outgrew td:first-child {
+  background: #FAEAEA;  /* solid version of the row's red tint */
+}
+tbody tr.jpy-outgrew:hover td:first-child {
+  background: #F5DCDC;
+}
 
 tbody tr:hover { background: var(--cream-deep); }
 
