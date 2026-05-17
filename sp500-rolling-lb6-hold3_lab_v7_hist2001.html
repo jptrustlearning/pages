@@ -4760,15 +4760,16 @@ function renderTradeLog() {
           peakReturnPct: se.peakReturnPct || 0,
           daysHeld: Math.round(se.daysHeld || 0),
           gateOpened: !!se.gateOpened,
-          isTrailExit: se.exitReason === 'trail_stop'
+          isTrailExit: se.exitReason === 'trail_stop',
+          isStopLoss: se.exitReason === 'stop_loss'
         }));
       } else {
         // Fallback (trail = off, no stockExits metadata)
         stockRets = log.stocks.map(t => {
           const entryPrice = state.marketData[log.date]?.[t]?.c;
           const exitPrice  = state.marketData[closed.exitDate]?.[t]?.c;
-          if (entryPrice && exitPrice) return { ticker: t, ret: (exitPrice - entryPrice) / entryPrice, entryPrice, latestPrice: exitPrice, isTrailExit: false };
-          return { ticker: t, ret: 0, isTrailExit: false };
+          if (entryPrice && exitPrice) return { ticker: t, ret: (exitPrice - entryPrice) / entryPrice, entryPrice, latestPrice: exitPrice, isTrailExit: false, isStopLoss: false };
+          return { ticker: t, ret: 0, isTrailExit: false, isStopLoss: false };
         });
       }
     } else if (active) {
@@ -4790,7 +4791,8 @@ function renderTradeLog() {
               peakReturnPct: meta.peakClose > meta.entryPrice ? (meta.peakClose - meta.entryPrice) / meta.entryPrice : 0,
               daysHeld: Math.round(meta.daysHeld || 0),
               gateOpened: !!meta.gateOpen,
-              isTrailExit: meta.exitReason === 'trail_stop'
+              isTrailExit: meta.exitReason === 'trail_stop',
+              isStopLoss: meta.exitReason === 'stop_loss'
             };
           } else {
             const latestPrice = state.marketData[latestDate]?.[ticker]?.c;
@@ -4801,7 +4803,8 @@ function renderTradeLog() {
               latestPrice,
               peakReturnPct: meta.peakClose > meta.entryPrice ? (meta.peakClose - meta.entryPrice) / meta.entryPrice : 0,
               gateOpened: !!meta.gateOpen,
-              isTrailExit: false
+              isTrailExit: false,
+              isStopLoss: false
             };
           }
         });
@@ -4810,8 +4813,8 @@ function renderTradeLog() {
         stockRets = log.stocks.map(t => {
           const entryPrice = state.marketData[log.date]?.[t]?.c;
           const latestPrice = state.marketData[latestDate]?.[t]?.c;
-          if (entryPrice && latestPrice) return { ticker: t, ret: (latestPrice - entryPrice) / entryPrice, entryPrice, latestPrice, isTrailExit: false };
-          return { ticker: t, ret: 0, isTrailExit: false };
+          if (entryPrice && latestPrice) return { ticker: t, ret: (latestPrice - entryPrice) / entryPrice, entryPrice, latestPrice, isTrailExit: false, isStopLoss: false };
+          return { ticker: t, ret: 0, isTrailExit: false, isStopLoss: false };
         });
       }
       // Mark-to-market value of active lot
@@ -4898,26 +4901,35 @@ function renderTradeLog() {
       </button>
     </div>`;
 
-    // LAB v1: count trail-stop exits for section label
+    // LAB v1+v5: count trail-stop and stop-loss exits for section label
     const trailCount = r.stockRets.filter(s => s.isTrailExit).length;
-    const gateCount = r.stockRets.filter(s => s.gateOpened && !s.isTrailExit).length;
+    const slCount = r.stockRets.filter(s => s.isStopLoss).length;
+    const gateCount = r.stockRets.filter(s => s.gateOpened && !s.isTrailExit && !s.isStopLoss).length;
     const trailLabel = trailCount > 0
       ? ` · <span class="text-red" style="font-weight:700;">⛔ ${trailCount} trail-exit</span>`
+      : '';
+    const slLabel = slCount > 0
+      ? ` · <span style="color:#9C2B2B;font-weight:700;">🛑 ${slCount} SL-exit</span>`
       : '';
     const gateLabel = gateCount > 0
       ? ` · <span style="color:#2E9F5F;font-weight:600;">✓ ${gateCount} ทะลุ gate +${(CONFIG.gateThreshold*100).toFixed(0)}%</span>`
       : '';
     const section = `<div class="trade-section">
       <div class="trade-section-label mom">MOMENTUM — ${r.stocks.length} ตัว
-        <span class="alloc-info">· $${Math.round(r.equity).toLocaleString()} รวม · $${allocPerStock.toFixed(0)}/ตัว · hold 6M${trailLabel}${gateLabel}</span>
+        <span class="alloc-info">· $${Math.round(r.equity).toLocaleString()} รวม · $${allocPerStock.toFixed(0)}/ตัว · hold 6M${trailLabel}${slLabel}${gateLabel}</span>
       </div>
       <div>${r.stockRets.map(s => {
         const cls = s.ret >= 0 ? '' : ' loss';
         const pctTxt = ` ${(s.ret*100).toFixed(1)}%`;
-        // LAB v1: trail-exit ⛔ badge + tooltip; gate ✓ for stocks that hit +50% but didn't trail
+        // LAB v1+v5: SL 🛑 → Trail ⛔ → Gate ✓ badge precedence (most-severe wins)
         let extra = '';
         let title = '';
-        if (s.isTrailExit) {
+        if (s.isStopLoss) {
+          extra = ' 🛑';
+          const exitDt = s.exitDate ? _fmtTradeDate(s.exitDate) : '';
+          const dropPct = (s.ret != null ? (s.ret * 100).toFixed(1) : '') + '%';
+          title = `title="Stop-loss exit · ${exitDt} · drop ${dropPct} · ${s.daysHeld || 0} วัน"`;
+        } else if (s.isTrailExit) {
           extra = ' ⛔';
           const peak = s.peakReturnPct != null ? '+' + (s.peakReturnPct * 100).toFixed(1) + '%' : '';
           const exitDt = s.exitDate ? _fmtTradeDate(s.exitDate) : '';
