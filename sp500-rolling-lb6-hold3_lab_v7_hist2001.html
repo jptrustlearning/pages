@@ -4638,13 +4638,26 @@ function renderTradeLog() {
     }
     return false;
   };
-  // Planned exit for an open lot: first business day of (entryMonth + 3M hold)
-  const plannedExitForOpenLot = (entryDateStr) => {
-    const e = new Date(entryDateStr + 'T00:00:00Z');
-    const eM = e.getUTCMonth(), eY = e.getUTCFullYear();
-    const exitMonthRaw = eM + CONFIG.holdMonths;
-    const xY = eY + Math.floor(exitMonthRaw / 12);
-    const xM = exitMonthRaw % 12;
+  // Planned exit for an open lot. v7: when a lot has been extended (entryMonthKey
+  // bumped forward by holdMonths each defensive month), pass the CURRENT
+  // entryMonthKey so the displayed exit reflects the actual upcoming maturity,
+  // not the original date computed from the entry date.
+  // Falls back to entry-date arithmetic if entryMonthKey is omitted (preserves
+  // behavior for code paths that haven't been updated).
+  const plannedExitForOpenLot = (entryDateStr, entryMonthKey) => {
+    let xY, xM;
+    if (typeof entryMonthKey === 'number' && !isNaN(entryMonthKey)) {
+      // Use the (possibly extended) month key directly
+      const maturityMonthKey = entryMonthKey + CONFIG.holdMonths;
+      xY = Math.floor(maturityMonthKey / 12);
+      xM = maturityMonthKey % 12;
+    } else {
+      const e = new Date(entryDateStr + 'T00:00:00Z');
+      const eM = e.getUTCMonth(), eY = e.getUTCFullYear();
+      const exitMonthRaw = eM + CONFIG.holdMonths;
+      xY = eY + Math.floor(exitMonthRaw / 12);
+      xM = exitMonthRaw % 12;
+    }
     const d = new Date(Date.UTC(xY, xM, 1));
     while(isUSMarketClosed(d)) d.setUTCDate(d.getUTCDate() + 1);
     return d.toISOString().substring(0, 10);
@@ -4776,7 +4789,9 @@ function renderTradeLog() {
       // UNREALIZED — still in 3-month holding window (LB6/H3)
       isOpen = true;
       const latestDate = state.sortedDates[state.sortedDates.length - 1];
-      exitDate = plannedExitForOpenLot(log.date);  // planned exit (first biz day of entryMonth + holdMonths, holiday-rolled)
+      // v7: pass current entryMonthKey (which is bumped by holdMonths on each
+      // extend) so the displayed exit date reflects the actual upcoming maturity.
+      exitDate = plannedExitForOpenLot(log.date, active.entryMonthKey);
       // LAB v1: prefer stockMeta so trail-exited stocks show ⛔ even while lot still active
       if (active.stockMeta) {
         stockRets = Object.entries(active.stockMeta).map(([ticker, meta]) => {
@@ -4835,7 +4850,10 @@ function renderTradeLog() {
       stocks: log.stocks,
       equity: lotCap,                  // use lot capital, not full portfolio
       isOpen, exitDate, pnl, pnlPct, stockRets,
-      isReinvest: log.isReinvest || false
+      isReinvest: log.isReinvest || false,
+      // v7: extendCount tells us how many times the lot's maturity was bumped forward.
+      // Pulled from the matched active lot (open lots only — closed lots are not extended after close).
+      extendCount: active ? (active.extendCount || 0) : 0
     };
   }).reverse();  // newest first
 
@@ -4887,8 +4905,14 @@ function renderTradeLog() {
       ? '<span style="display:inline-block;background:rgba(212,175,55,0.18);color:var(--gold-deep);border:1px solid rgba(212,175,55,0.4);padding:1px 7px;border-radius:4px;font-family:\'Cinzel\',\'Anuphan\',serif;font-size:0.58rem;font-weight:700;letter-spacing:1.2px;margin-left:6px;">REINVEST</span>'
       : '<span style="display:inline-block;background:rgba(114,47,55,0.12);color:#722F37;border:1px solid rgba(114,47,55,0.35);padding:1px 7px;border-radius:4px;font-family:\'Cinzel\',\'Anuphan\',serif;font-size:0.58rem;font-weight:700;letter-spacing:1.2px;margin-left:6px;">FRESH</span>';
 
+    // v7: extend badge — appears only when this lot has been extended at least once.
+    // Color matches the burgundy SL palette but slightly muted to differentiate.
+    const extendBadge = (r.extendCount > 0)
+      ? '<span style="display:inline-block;background:rgba(156,43,43,0.12);color:#9C2B2B;border:1px solid rgba(156,43,43,0.4);padding:1px 7px;border-radius:4px;font-family:\'Cinzel\',\'Anuphan\',serif;font-size:0.58rem;font-weight:700;letter-spacing:1.2px;margin-left:6px;" title="Lot maturity extended ' + r.extendCount + ' time(s) — SPY was out of macro top-2 at scheduled rebalance, so the same picks were held another 3 months instead of being rebalanced. Exit date shown is the updated maturity.">🔁 EXTENDED ' + r.extendCount + 'x</span>'
+      : '';
+
     let header = `<div class="trade-header"><div>
-      <div class="trade-date"><span class="trade-date-tag">Entry</span>${_fmtTradeDate(r.date)}${r.exitDate ? '<span class="trade-date-arrow">→</span><span class="trade-date-tag">Exit</span><span class="exit-date">' + _fmtTradeDate(r.exitDate) + '</span>' : ''}${r.isOpen ? ' <span class="open-badge">OPEN</span>' : ''}${reinvestBadge}</div>
+      <div class="trade-date"><span class="trade-date-tag">Entry</span>${_fmtTradeDate(r.date)}${r.exitDate ? '<span class="trade-date-arrow">→</span><span class="trade-date-tag">Exit</span><span class="exit-date">' + _fmtTradeDate(r.exitDate) + '</span>' : ''}${r.isOpen ? ' <span class="open-badge">OPEN</span>' : ''}${reinvestBadge}${extendBadge}</div>
       <div class="trade-summary">ล็อตนี้ <strong>${r.stocks.length} ตัว</strong> · ทุน <strong>$${Math.round(r.equity).toLocaleString()}</strong>`;
     if (!r.isOpen) {
       header += ` · P&L: <span class="${retCls}"><strong>$${Math.round(r.pnl).toLocaleString()}</strong> (${r.pnlPct>=0?'+':''}${r.pnlPct.toFixed(2)}%)</span>`;
@@ -4947,57 +4971,6 @@ function renderTradeLog() {
     card.innerHTML = header + section;
     container.appendChild(card);
   });
-
-  // === v7 DEBUG: banner at top of trade log showing settings + lot 2026-01-02 details ===
-  // Inserted AFTER pageRecords.forEach so it survives the early container.innerHTML clear.
-  try {
-    let dbg = '<div style="background:#fffacc;border:2px solid #c45;padding:10px;margin:10px 0;font-family:monospace;font-size:11px;line-height:1.5;color:#333;">';
-    dbg += '<strong>v7 DEBUG — Trail/SL settings:</strong><br>';
-    dbg += 'CONFIG.trailStopPct=' + (CONFIG.trailStopPct || 0) + ', stopLossPct=' + (CONFIG.stopLossPct || 0) + ', gateThreshold=' + (CONFIG.gateThreshold || 0);
-
-    // SL regime log around the APP 2026-01-02 entry (Jan-Apr 2026)
-    const slLog = state.slRegimeLog || [];
-    const window2026 = slLog.filter(r => r.date >= '2026-01-01' && r.date <= '2026-04-30');
-    dbg += '<br><br><strong>SL regime flag (Jan-Apr 2026) — when slActiveThisMonth=true, SL armed:</strong>';
-    for (const r of window2026) {
-      const ranks = r.ranking.map(x => x.key + '(' + ((x.deltaPct || 0) * 100).toFixed(1) + '%)').join(', ');
-      dbg += '<br>· ' + r.date + ' slActive=' + r.slActive + ' · top4: ' + ranks;
-    }
-
-    // APP positions
-    dbg += '<br><br><strong>APP positions:</strong>';
-    let foundAny = false;
-    for (const lot of (state.lots || [])) {
-      if (lot.stockMeta && lot.stockMeta['APP']) {
-        const m = lot.stockMeta['APP'];
-        foundAny = true;
-        if (m.exited) {
-          const drop = m.entryPrice > 0 ? ((m.exitPrice - m.entryPrice) / m.entryPrice * 100).toFixed(1) : '?';
-          const slSig = m.signalDateSL ? ' · SL-signal=' + m.signalDateSL + '@$' + (m.signalCloseSL || 0).toFixed(2) : '';
-          dbg += '<br>OPEN lot entry=' + lot.entryDate + ': APP EXITED reason=' + m.exitReason + ', exit=$' + (m.exitPrice || 0).toFixed(2) + ' on ' + m.exitDate + ', drop=' + drop + '%' + slSig;
-        } else {
-          dbg += '<br>OPEN lot entry=' + lot.entryDate + ': APP still held, entry=$' + (m.entryPrice || 0).toFixed(2);
-        }
-      }
-    }
-    for (const cl of (state.closedLots || [])) {
-      if (cl.stockExits) {
-        for (const se of cl.stockExits) {
-          if (se.ticker === 'APP') {
-            foundAny = true;
-            const drop = se.entryPrice > 0 ? ((se.exitPrice - se.entryPrice) / se.entryPrice * 100).toFixed(1) : '?';
-            dbg += '<br>CLOSED lot entry=' + cl.entryDate + ' exit=' + cl.exitDate + ': APP reason=' + se.exitReason + ', exit=$' + (se.exitPrice || 0).toFixed(2) + ' on ' + se.exitDate + ', drop=' + drop + '%';
-          }
-        }
-      }
-    }
-    if (!foundAny) dbg += '<br>(no APP positions found)';
-
-    dbg += '</div>';
-    const banner = document.createElement('div');
-    banner.innerHTML = dbg;
-    container.insertBefore(banner, container.firstChild);
-  } catch (e) {}
 }
 
 window.gotoTradeLogPage = function(p) {
