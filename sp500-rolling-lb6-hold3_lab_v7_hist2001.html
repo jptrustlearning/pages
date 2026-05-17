@@ -3815,7 +3815,10 @@ function runRollingBacktest() {
 
         {
           // === Normal path: rank stocks, top-N equal-weight ===
-          candidates = rankStocks(signalIdx, startIdx);
+          // Pass CONFIG.weightRet explicitly for consistency with runOptimization (line 3245).
+          // rankStocks falls back to CONFIG.weightRet internally when no override is passed,
+          // so this is a stylistic change — same result either way.
+          candidates = rankStocks(signalIdx, startIdx, CONFIG.weightRet);
           selected = candidates.slice(0, CONFIG.topN);
           const alloc = newLotCapital / CONFIG.topN;
           for (const st of selected) {
@@ -3974,7 +3977,7 @@ function runRollingBacktest() {
       const prevRebalFirstIdx = firstDayIdxInMonth(prevAnchor.year, prevAnchor.month);
       const startIdx = prevRebalFirstIdx >= 0 ? prevRebalFirstIdx + 1 : -1;
       if (startIdx >= 0 && startIdx < signalIdx && state.sortedDates[signalIdx] && state.sortedDates[startIdx] && state.marketData[state.sortedDates[signalIdx]] && state.marketData[state.sortedDates[startIdx]]) {
-        const candidates = rankStocks(signalIdx, startIdx);
+        const candidates = rankStocks(signalIdx, startIdx, CONFIG.weightRet);
         if (candidates && candidates.length > 0) {
           const picks = candidates.slice(0, CONFIG.topN);
           // Next lot capital: if a lot will mature next month, use its projected value; else perLotCapital (ramp-up)
