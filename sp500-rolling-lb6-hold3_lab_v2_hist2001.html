@@ -2243,7 +2243,9 @@ let CONFIG = {
 //
 // Substitution map: signal-source → ETF used for execution
 //   JPY  (USDJPY spot, sign-flipped) → FXY  (since 2007)
-//   WTI  (CL=F futures)              → USO  (since 2006)
+//   WTI  (CL=F futures)              → USL  (since 2007, 12M-spread — less
+//                                            contango decay than USO; better
+//                                            fit for the 3M hold period)
 //   GOLD (GC=F futures)              → GLD  (since 2004)
 //
 // Falls back to normal rebalance if either ETF has no price data on the rebal
@@ -2252,7 +2254,7 @@ let CONFIG = {
 const MACRO_ASSETS = [
   { key: 'JPY',  signalTicker: 'USDJPY', signFlip: true,  etfTicker: 'FXY' },
   { key: 'SPY',  signalTicker: 'SPY',    signFlip: false, etfTicker: null  },  // null = SPY = normal stock rebal path
-  { key: 'WTI',  signalTicker: 'WTI',    signFlip: false, etfTicker: 'USO' },
+  { key: 'WTI',  signalTicker: 'WTI',    signFlip: false, etfTicker: 'USL' },
   { key: 'GOLD', signalTicker: 'GOLD',   signFlip: false, etfTicker: 'GLD' },
 ];
 
