@@ -2242,14 +2242,21 @@ let CONFIG = {
 // running the normal stock rebalance.
 //
 // Cash-ETF waterfall (uses first one with price data on rebal day):
-//   1. SGOV — iShares 0-3 Month T-Bond  (since May 2020; preferred)
-//   2. BIL  — SPDR 1-3 Month T-Bill     (since 2007; pre-2020 fallback)
-//   3. Skip override → fall back to normal rebalance (pre-2007)
+//   1. SGOV  — iShares 0-3 Month T-Bond   (since May 2020; preferred)
+//   2. BIL   — SPDR 1-3 Month T-Bill      (since 2007; primary 2007-2020 fallback)
+//   3. SHY   — iShares 1-3 Year T-Bond    (since Jul 2002; pre-2007 fallback)
+//   4. $CASH — synthetic placeholder      (always; 0% return — better than
+//              normal stock rebal during dot-com risk-off pre-Jul 2002)
 //
-// Note: SGOV/BIL track NAV near \$100 with daily yield accrual via dividends,
-// so close-to-close price changes underestimate total return. The strategy
-// captures the risk-off positioning intent — actual cash yield in live
-// trading would slightly exceed the simulated return.
+// The pre-Jul 2002 issue was the root cause of v3's high MaxDD: when SPY fell
+// out of top-2 during dot-com (very common 2001-2003), there was no cash ETF
+// to substitute into, so the strategy silently fell back to normal stock
+// rebal — riding tech stocks DOWN at -70% to -80%. $CASH synthetic fixes this.
+//
+// Note: SGOV/BIL/SHY track NAV near \$100 with daily yield accrual via
+// dividends, so close-to-close price changes underestimate total return.
+// $CASH has zero return by construction (price=1 always). Both choices
+// represent the risk-off positioning intent.
 //
 const MACRO_ASSETS = [
   { key: 'JPY',  signalTicker: 'USDJPY', signFlip: true  },
@@ -2259,16 +2266,23 @@ const MACRO_ASSETS = [
 ];
 
 // Cash-equivalent ETF priority — first one with price data on the rebal day wins.
-const CASH_ETF_WATERFALL = ['SGOV', 'BIL'];
+// Extended waterfall covers different inception dates:
+//   SGOV  (May 2020+)   — preferred, modern T-bill ETF
+//   BIL   (May 2007+)   — 1-3 month T-bills, primary 2007-2020 fallback
+//   SHY   (Jul 2002+)   — 1-3 year treasuries, longer duration but stable
+//   $CASH (always)      — synthetic 0%-return placeholder for pre-Jul 2002
+//                         (better than dot-com crash exposure when override
+//                         signals risk-off but no real cash-ETF exists yet)
+const CASH_ETF_WATERFALL = ['SGOV', 'BIL', 'SHY', '$CASH'];
 
 // Tickers we never want the stock-ranker to consider — macro/benchmark/cash
 // rows injected into state.marketData for price lookup, not investable stocks.
-const MACRO_EXCLUDED_TICKERS = new Set(['USDJPY', 'WTI', 'GOLD', 'FXY', 'USL', 'USO', 'GLD', 'SGOV', 'BIL']);
+const MACRO_EXCLUDED_TICKERS = new Set(['USDJPY', 'WTI', 'GOLD', 'FXY', 'USL', 'USO', 'GLD', 'SGOV', 'BIL', 'SHY', '$CASH']);
 
 
 const BENCHMARK_TICKERS = new Set(['SPY', 'QQQ', 'DIA',
   // LAB v3: also exclude macro signal/execution tickers + cash ETFs from rankStocks
-  'USDJPY', 'WTI', 'GOLD', 'FXY', 'USL', 'USO', 'GLD', 'SGOV', 'BIL'
+  'USDJPY', 'WTI', 'GOLD', 'FXY', 'USL', 'USO', 'GLD', 'SGOV', 'BIL', 'SHY', '$CASH'
 ]);
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2683,6 +2697,15 @@ function processData(csv) {
     dateSet.add(date);
   }
   state.sortedDates = Array.from(dateSet).sort();
+
+  // LAB v3: inject synthetic $CASH ticker at price=1 on every date.
+  // Provides an always-available cash-equivalent fallback when no real
+  // T-bill ETF (SGOV/BIL/SHY) exists yet on a given date.
+  for (const d of state.sortedDates) {
+    if (state.marketData[d]) {
+      state.marketData[d]['$CASH'] = { o: 1, h: 1, l: 1, c: 1, v: 0 };
+    }
+  }
 
   // Populate Start Year Dropdown
   const years = [...new Set(state.sortedDates.map(d => d.substring(0,4)))].sort();
@@ -3614,46 +3637,18 @@ function runRollingBacktest() {
     }
   }
 
-  // =========================================================
-  // LAB v3 DIAGNOSTICS — log macro decision counts to console
-  // Remove this block once verified working.
-  // =========================================================
+  // LAB v3 summary log (one line, persistent)
   try {
     const allLots = [...state.lots, ...state.closedLots];
-    const summary = { total: allLots.length, spy_in_top2: 0, cash_override: 0, override_fallback: 0, no_decision: 0 };
-    const overrides = [];
-    const fallbacks = [];
+    const s = { total: allLots.length, spy_top2: 0, cash_etf: {}, no_decision: 0 };
     for (const lot of allLots) {
       const d = lot.macroDecision;
-      if (!d) { summary.no_decision++; continue; }
-      if (d.type === 'spy_in_top2')         summary.spy_in_top2++;
-      else if (d.type === 'cash_override')  { summary.cash_override++; overrides.push({ entry: lot.entryDate, ticker: d.ticker, ranking: d.ranking }); }
-      else if (d.type === 'override_fallback') { summary.override_fallback++; fallbacks.push({ entry: lot.entryDate, reason: d.reason, ranking: d.ranking }); }
+      if (!d) { s.no_decision++; continue; }
+      if (d.type === 'spy_in_top2') s.spy_top2++;
+      else if (d.type === 'cash_override') s.cash_etf[d.ticker] = (s.cash_etf[d.ticker] || 0) + 1;
     }
-    console.log('[v3 macro summary]', summary);
-    console.log('[v3 sample cash_overrides (first 10)]', overrides.slice(0, 10));
-    console.log('[v3 sample override_fallbacks (first 10)]', fallbacks.slice(0, 10));
-
-    // Probe one specific date to confirm macro data is reachable
-    const probeIdx = state.sortedDates.findIndex(d => d >= '2008-10-01');
-    if (probeIdx > 0) {
-      const probeDate = state.sortedDates[probeIdx];
-      const probeData = state.marketData[probeDate] || {};
-      console.log('[v3 probe 2008-10-01-ish]', {
-        date: probeDate,
-        USDJPY: probeData['USDJPY']?.c,
-        SPY: probeData['SPY']?.c,
-        WTI: probeData['WTI']?.c,
-        GOLD: probeData['GOLD']?.c,
-        BIL: probeData['BIL']?.c,
-        SGOV: probeData['SGOV']?.c,
-        FXY: probeData['FXY']?.c
-      });
-      console.log('[v3 probe macro ranking at 2008-10]', rankMacroAssets(probeIdx));
-    }
-  } catch (e) {
-    console.warn('[v3 diagnostics failed]', e);
-  }
+    console.log('[v3 lot breakdown]', s);
+  } catch (e) {}
 
   // =========================================================
   // PENDING SIGNAL — next first-business-day entry preview
