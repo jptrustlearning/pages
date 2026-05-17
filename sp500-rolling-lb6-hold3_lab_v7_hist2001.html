@@ -3919,43 +3919,6 @@ function runRollingBacktest() {
       if (d.type === 'spy_in_top2') s.spy_top2++;
     }
 
-    // === v7 DEBUG: trace 2026-01-02 lot (APP SL-exit doesn't change with threshold?) ===
-    // Will remove once root cause is confirmed.
-    (function renderDebugBanner() {
-      const target = '2026-01-02';
-      const cl = state.closedLots.find(c => c.entryDate === target);
-      const act = state.lots.find(c => c.entryDate === target);
-      let html = '<div style="background:#fffacc;border:2px solid #c45;padding:10px;margin:10px 0;font-family:monospace;font-size:11px;line-height:1.5;color:#333;">';
-      html += '<strong>v7 DEBUG — Trail/SL settings + lot 2026-01-02 (APP issue):</strong><br>';
-      html += 'CONFIG.trailStopPct=' + CONFIG.trailStopPct + ', stopLossPct=' + CONFIG.stopLossPct + ', gateThreshold=' + CONFIG.gateThreshold;
-      html += '<br><br><strong>Lot 2026-01-02:</strong> ';
-      if (cl) {
-        html += 'CLOSED at ' + cl.exitDate + ', mode=' + cl.exitMode;
-      } else if (act) {
-        html += 'OPEN, entryMonthKey=' + act.entryMonthKey + ', extendCount=' + (act.extendCount || 0);
-        if (act.stockMeta) {
-          html += '<br><strong>Per-stock meta:</strong>';
-          for (const [t, m] of Object.entries(act.stockMeta)) {
-            const exitedTxt = m.exited
-              ? ' EXITED reason=' + m.exitReason + ', exitDate=' + m.exitDate + ', exitPrice=' + (m.exitPrice || 0).toFixed(2) + ', entry=' + (m.entryPrice || 0).toFixed(2) + ', drop=' + (((m.exitPrice - m.entryPrice) / m.entryPrice) * 100).toFixed(1) + '%'
-              : ' STILL HELD';
-            const slPending = m.pendingExitSL ? ' [pendingExitSL: ' + m.signalDateSL + ' @ ' + (m.signalCloseSL || 0).toFixed(2) + ']' : '';
-            const trailPending = m.pendingExit ? ' [pendingExit: ' + m.signalDate + ' @ ' + (m.signalClose || 0).toFixed(2) + ']' : '';
-            html += '<br>· ' + t + ' entry=' + (m.entryPrice || 0).toFixed(2) + ',' + exitedTxt + slPending + trailPending;
-          }
-        }
-      } else {
-        html += 'NOT FOUND';
-      }
-      html += '</div>';
-      const tlc = document.getElementById('tradeLogContainer');
-      if (tlc) {
-        const banner = document.createElement('div');
-        banner.innerHTML = html;
-        tlc.insertBefore(banner, tlc.firstChild);
-      }
-    })();
-
     // LAB v7: extend events (defensive months when no new lot opened)
     const extLog = state.extendLog || [];
     const uniqueExtendDates = new Set(extLog.map(e => e.date)).size;
@@ -4984,6 +4947,42 @@ function renderTradeLog() {
     card.innerHTML = header + section;
     container.appendChild(card);
   });
+
+  // === v7 DEBUG: banner at top of trade log showing settings + lot 2026-01-02 details ===
+  // Inserted AFTER pageRecords.forEach so it survives the early container.innerHTML clear.
+  try {
+    const target = '2026-01-02';
+    const cl = (state.closedLots || []).find(c => c.entryDate === target);
+    const act = (state.lots || []).find(c => c.entryDate === target);
+    let dbg = '<div style="background:#fffacc;border:2px solid #c45;padding:10px;margin:10px 0;font-family:monospace;font-size:11px;line-height:1.5;color:#333;">';
+    dbg += '<strong>v7 DEBUG — Trail/SL settings + lot ' + target + ':</strong><br>';
+    dbg += 'CONFIG.trailStopPct=' + (CONFIG.trailStopPct || 0) + ', stopLossPct=' + (CONFIG.stopLossPct || 0) + ', gateThreshold=' + (CONFIG.gateThreshold || 0);
+    dbg += '<br><br><strong>Lot ' + target + ':</strong> ';
+    if (cl) {
+      dbg += 'CLOSED at ' + cl.exitDate + ', mode=' + cl.exitMode;
+    } else if (act) {
+      dbg += 'OPEN, entryMonthKey=' + act.entryMonthKey + ', extendCount=' + (act.extendCount || 0);
+      if (act.stockMeta) {
+        dbg += '<br><strong>Per-stock meta:</strong>';
+        for (const [t, m] of Object.entries(act.stockMeta)) {
+          if (m.exited) {
+            const drop = m.entryPrice > 0 ? ((m.exitPrice - m.entryPrice) / m.entryPrice * 100).toFixed(1) : '?';
+            dbg += '<br>· ' + t + ' EXITED reason=' + m.exitReason + ', entry=' + (m.entryPrice || 0).toFixed(2) + ', exit=' + (m.exitPrice || 0).toFixed(2) + ', exitDate=' + m.exitDate + ', drop=' + drop + '%';
+          } else {
+            const ph = m.pendingExitSL ? ' [pendingSL @ ' + (m.signalCloseSL || 0).toFixed(2) + ']' : '';
+            const pt = m.pendingExit ? ' [pendingTrail @ ' + (m.signalClose || 0).toFixed(2) + ']' : '';
+            dbg += '<br>· ' + t + ' still held, entry=' + (m.entryPrice || 0).toFixed(2) + ph + pt;
+          }
+        }
+      }
+    } else {
+      dbg += 'NOT FOUND';
+    }
+    dbg += '</div>';
+    const banner = document.createElement('div');
+    banner.innerHTML = dbg;
+    container.insertBefore(banner, container.firstChild);
+  } catch (e) {}
 }
 
 window.gotoTradeLogPage = function(p) {
