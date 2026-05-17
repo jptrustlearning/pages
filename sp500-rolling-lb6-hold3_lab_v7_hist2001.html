@@ -4951,33 +4951,38 @@ function renderTradeLog() {
   // === v7 DEBUG: banner at top of trade log showing settings + lot 2026-01-02 details ===
   // Inserted AFTER pageRecords.forEach so it survives the early container.innerHTML clear.
   try {
-    const target = '2026-01-02';
-    const cl = (state.closedLots || []).find(c => c.entryDate === target);
-    const act = (state.lots || []).find(c => c.entryDate === target);
     let dbg = '<div style="background:#fffacc;border:2px solid #c45;padding:10px;margin:10px 0;font-family:monospace;font-size:11px;line-height:1.5;color:#333;">';
-    dbg += '<strong>v7 DEBUG — Trail/SL settings + lot ' + target + ':</strong><br>';
+    dbg += '<strong>v7 DEBUG — Trail/SL settings:</strong><br>';
     dbg += 'CONFIG.trailStopPct=' + (CONFIG.trailStopPct || 0) + ', stopLossPct=' + (CONFIG.stopLossPct || 0) + ', gateThreshold=' + (CONFIG.gateThreshold || 0);
-    dbg += '<br><br><strong>Lot ' + target + ':</strong> ';
-    if (cl) {
-      dbg += 'CLOSED at ' + cl.exitDate + ', mode=' + cl.exitMode;
-    } else if (act) {
-      dbg += 'OPEN, entryMonthKey=' + act.entryMonthKey + ', extendCount=' + (act.extendCount || 0);
-      if (act.stockMeta) {
-        dbg += '<br><strong>Per-stock meta:</strong>';
-        for (const [t, m] of Object.entries(act.stockMeta)) {
-          if (m.exited) {
-            const drop = m.entryPrice > 0 ? ((m.exitPrice - m.entryPrice) / m.entryPrice * 100).toFixed(1) : '?';
-            dbg += '<br>· ' + t + ' EXITED reason=' + m.exitReason + ', entry=' + (m.entryPrice || 0).toFixed(2) + ', exit=' + (m.exitPrice || 0).toFixed(2) + ', exitDate=' + m.exitDate + ', drop=' + drop + '%';
-          } else {
-            const ph = m.pendingExitSL ? ' [pendingSL @ ' + (m.signalCloseSL || 0).toFixed(2) + ']' : '';
-            const pt = m.pendingExit ? ' [pendingTrail @ ' + (m.signalClose || 0).toFixed(2) + ']' : '';
-            dbg += '<br>· ' + t + ' still held, entry=' + (m.entryPrice || 0).toFixed(2) + ph + pt;
+
+    // Find EVERY APP exit across all lots — both open and closed
+    dbg += '<br><br><strong>All APP positions in any lot (open + closed):</strong>';
+    let foundAny = false;
+    for (const lot of (state.lots || [])) {
+      if (lot.stockMeta && lot.stockMeta['APP']) {
+        const m = lot.stockMeta['APP'];
+        foundAny = true;
+        if (m.exited) {
+          const drop = m.entryPrice > 0 ? ((m.exitPrice - m.entryPrice) / m.entryPrice * 100).toFixed(1) : '?';
+          dbg += '<br>OPEN lot entry=' + lot.entryDate + ': APP EXITED reason=' + m.exitReason + ', entry=' + (m.entryPrice || 0).toFixed(2) + ', exit=' + (m.exitPrice || 0).toFixed(2) + ', drop=' + drop + '%';
+        } else {
+          dbg += '<br>OPEN lot entry=' + lot.entryDate + ': APP still held, entry=' + (m.entryPrice || 0).toFixed(2);
+        }
+      }
+    }
+    for (const cl of (state.closedLots || [])) {
+      if (cl.stockExits) {
+        for (const se of cl.stockExits) {
+          if (se.ticker === 'APP') {
+            foundAny = true;
+            const drop = se.entryPrice > 0 ? ((se.exitPrice - se.entryPrice) / se.entryPrice * 100).toFixed(1) : '?';
+            dbg += '<br>CLOSED lot entry=' + cl.entryDate + ' exit=' + cl.exitDate + ': APP reason=' + se.exitReason + ', entry=' + (se.entryPrice || 0).toFixed(2) + ', exit=' + (se.exitPrice || 0).toFixed(2) + ', drop=' + drop + '%';
           }
         }
       }
-    } else {
-      dbg += 'NOT FOUND';
     }
+    if (!foundAny) dbg += '<br>(no APP positions found)';
+
     dbg += '</div>';
     const banner = document.createElement('div');
     banner.innerHTML = dbg;
