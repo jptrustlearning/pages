@@ -3891,58 +3891,6 @@ function runRollingBacktest() {
       if (d.type === 'spy_in_top2') s.spy_top2++;
     }
 
-    // === v7 DEBUG: render diagnostic banner on the page for the 2007-07-02 lot ===
-    // Removed once root cause is found.
-    (function renderV7DebugBanner() {
-      const target = '2007-07-02';
-      const closedMatch = state.closedLots.find(cl => cl.entryDate === target);
-      const activeMatch = state.lots.find(lt => lt.entryDate === target);
-      const tradeLogMatch = state.tradeLog.find(tl => tl.date === target);
-
-      // Also find any closedLot with exitDate in mid-November 2008
-      const novMidExits = state.closedLots.filter(cl =>
-        cl.exitDate && cl.exitDate >= '2008-11-08' && cl.exitDate <= '2008-11-30'
-      );
-
-      let html = '<div style="background:#fffacc;border:2px solid #c45;padding:10px;margin:10px 0;font-family:monospace;font-size:11px;line-height:1.4;color:#333;">';
-      html += '<strong>v7 DEBUG — lot 2007-07-02 trace:</strong><br>';
-      html += 'in_closedLots: ' + !!closedMatch + ' · in_activeLots: ' + !!activeMatch + ' · in_tradeLog: ' + !!tradeLogMatch + '<br>';
-      if (closedMatch) {
-        html += '<br><strong>closedLot:</strong> exitDate=' + closedMatch.exitDate
-             + ', exitMode=' + closedMatch.exitMode
-             + ', ageMonths=' + closedMatch.ageMonths
-             + ', returnPct=' + ((closedMatch.returnPct || 0) * 100).toFixed(2) + '%'
-             + ', trail=' + closedMatch.trailExitCount
-             + ', SL=' + closedMatch.stopLossExitCount
-             + ', maturity=' + closedMatch.maturityExitCount
-             + ', cashPocket=' + (closedMatch.cashPocketAtExit || 0).toFixed(0);
-      }
-      if (activeMatch) {
-        html += '<br><strong>activeLot:</strong> entryMonthKey=' + activeMatch.entryMonthKey
-             + ', extendCount=' + (activeMatch.extendCount || 0)
-             + ', stocks=' + Object.keys(activeMatch.stocks).length
-             + ', cashPocket=' + (activeMatch.cashPocket || 0).toFixed(0);
-        if (activeMatch.extendHistory) {
-          html += '<br>extendHistory: ' + JSON.stringify(activeMatch.extendHistory);
-        }
-      }
-      html += '<br><br><strong>Mid-Nov 2008 exits (all closed lots that exited 11/08-11/30):</strong> ' + novMidExits.length;
-      if (novMidExits.length > 0) {
-        for (const cl of novMidExits.slice(0, 5)) {
-          html += '<br>· entry=' + cl.entryDate + ', exit=' + cl.exitDate + ', mode=' + cl.exitMode + ', pl=$' + (cl.pl || 0).toFixed(0);
-        }
-      }
-      html += '</div>';
-
-      // Insert banner at top of trade log container
-      const tlc = document.getElementById('tradeLogContainer');
-      if (tlc) {
-        const banner = document.createElement('div');
-        banner.innerHTML = html;
-        tlc.insertBefore(banner, tlc.firstChild);
-      }
-    })();
-
     // LAB v7: extend events (defensive months when no new lot opened)
     const extLog = state.extendLog || [];
     const uniqueExtendDates = new Set(extLog.map(e => e.date)).size;
