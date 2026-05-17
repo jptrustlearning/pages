@@ -3615,6 +3615,47 @@ function runRollingBacktest() {
   }
 
   // =========================================================
+  // LAB v3 DIAGNOSTICS — log macro decision counts to console
+  // Remove this block once verified working.
+  // =========================================================
+  try {
+    const allLots = [...state.lots, ...state.closedLots];
+    const summary = { total: allLots.length, spy_in_top2: 0, cash_override: 0, override_fallback: 0, no_decision: 0 };
+    const overrides = [];
+    const fallbacks = [];
+    for (const lot of allLots) {
+      const d = lot.macroDecision;
+      if (!d) { summary.no_decision++; continue; }
+      if (d.type === 'spy_in_top2')         summary.spy_in_top2++;
+      else if (d.type === 'cash_override')  { summary.cash_override++; overrides.push({ entry: lot.entryDate, ticker: d.ticker, ranking: d.ranking }); }
+      else if (d.type === 'override_fallback') { summary.override_fallback++; fallbacks.push({ entry: lot.entryDate, reason: d.reason, ranking: d.ranking }); }
+    }
+    console.log('[v3 macro summary]', summary);
+    console.log('[v3 sample cash_overrides (first 10)]', overrides.slice(0, 10));
+    console.log('[v3 sample override_fallbacks (first 10)]', fallbacks.slice(0, 10));
+
+    // Probe one specific date to confirm macro data is reachable
+    const probeIdx = state.sortedDates.findIndex(d => d >= '2008-10-01');
+    if (probeIdx > 0) {
+      const probeDate = state.sortedDates[probeIdx];
+      const probeData = state.marketData[probeDate] || {};
+      console.log('[v3 probe 2008-10-01-ish]', {
+        date: probeDate,
+        USDJPY: probeData['USDJPY']?.c,
+        SPY: probeData['SPY']?.c,
+        WTI: probeData['WTI']?.c,
+        GOLD: probeData['GOLD']?.c,
+        BIL: probeData['BIL']?.c,
+        SGOV: probeData['SGOV']?.c,
+        FXY: probeData['FXY']?.c
+      });
+      console.log('[v3 probe macro ranking at 2008-10]', rankMacroAssets(probeIdx));
+    }
+  } catch (e) {
+    console.warn('[v3 diagnostics failed]', e);
+  }
+
+  // =========================================================
   // PENDING SIGNAL — next first-business-day entry preview
   // (Rolling enters every month, so "next rebalance" is always next month)
   // =========================================================
