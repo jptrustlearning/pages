@@ -2698,6 +2698,30 @@ function processData(csv) {
   }
   state.sortedDates = Array.from(dateSet).sort();
 
+  // LAB v3 BUGFIX: filter sortedDates to NYSE trading days only.
+  //
+  // Background: when we appended JPY (FX) and commodities CSVs, FX-only
+  // days (Jul 4, Christmas, New Year — when NYSE is closed but JPY market
+  // trades) got added to sortedDates. On those days state.marketData[date]
+  // contains ONLY {USDJPY: ...} (no SPY, no stocks, no ETFs).
+  //
+  // Effect: the mark-to-market loop reads dayData[t] for every lot's
+  // holdings, finds nothing for stock/ETF tickers, falls back to i-1
+  // which might ALSO be an FX-only day → ends up multiplying shares × 0
+  // → equity collapses visually → spurious MaxDD spikes (we saw -85.5%).
+  //
+  // Fix: drop dates that have no SPY data. SPY is our universal NYSE-day
+  // marker — if SPY didn't trade that day, neither did any stocks/ETFs,
+  // so the day shouldn't be part of the simulation timeline.
+  // Macro signal computation already uses getCloseAtOrBefore which walks
+  // back to find data — so removing these dates doesn't break the 126-
+  // trading-day lookback.
+  const beforeFilter = state.sortedDates.length;
+  state.sortedDates = state.sortedDates.filter(d => state.marketData[d] && state.marketData[d]['SPY']);
+  if (state.sortedDates.length < beforeFilter) {
+    console.log('[v3] filtered ' + (beforeFilter - state.sortedDates.length) + ' FX-only days from timeline');
+  }
+
   // LAB v3: inject synthetic $CASH ticker at price=1 on every date.
   // Provides an always-available cash-equivalent fallback when no real
   // T-bill ETF (SGOV/BIL/SHY) exists yet on a given date.
@@ -3329,10 +3353,19 @@ function runRollingBacktest() {
     }
 
     // === 1. Mark-to-market: sum all active lots + cash + each lot's cashPocket ===
+    // LAB v3: walk back up to 5 days for missing prices (ETF data gaps,
+    // delisting near maturity, etc). Previous 1-day fallback could return 0
+    // if i-1 also lacked the ticker, causing spurious MaxDD spikes.
     let lotsVal = 0;
     for (const lot of state.lots) {
       for (const [t, shares] of Object.entries(lot.stocks)) {
-        const price = dayData[t] ? dayData[t].c : (i>0 ? state.marketData[state.sortedDates[i-1]][t]?.c : 0);
+        let price = dayData[t] ? dayData[t].c : null;
+        if (price == null || !(price > 0)) {
+          for (let back = 1; back <= 5 && i - back >= 0; back++) {
+            const prev = state.marketData[state.sortedDates[i - back]];
+            if (prev && prev[t] && prev[t].c > 0) { price = prev[t].c; break; }
+          }
+        }
         lotsVal += shares * (price || 0);
       }
       lotsVal += (lot.cashPocket || 0);  // include any banked trail-exit proceeds
@@ -3431,9 +3464,16 @@ function runRollingBacktest() {
         const maturingLots = state.lots.filter(lot => (currentMonthKey - lot.entryMonthKey) >= CONFIG.holdMonths);
         for (const mLot of maturingLots) {
           // Sum still-active stocks at today's close
+          // LAB v3: walk back up to 5 days on missing prices (was 1 day — could return 0)
           let activeProceeds = 0;
           for (const [t, shares] of Object.entries(mLot.stocks)) {
-            const price = dayData[t] ? dayData[t].c : (i>0 ? state.marketData[state.sortedDates[i-1]][t]?.c : 0);
+            let price = dayData[t] ? dayData[t].c : null;
+            if (price == null || !(price > 0)) {
+              for (let back = 1; back <= 5 && i - back >= 0; back++) {
+                const prev = state.marketData[state.sortedDates[i - back]];
+                if (prev && prev[t] && prev[t].c > 0) { price = prev[t].c; break; }
+              }
+            }
             activeProceeds += shares * (price || 0);
             // LAB v1: mark this stock as maturity-exit in stockMeta (for stats)
             if (mLot.stockMeta && mLot.stockMeta[t] && !mLot.stockMeta[t].exited) {
