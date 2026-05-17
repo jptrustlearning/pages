@@ -4955,8 +4955,17 @@ function renderTradeLog() {
     dbg += '<strong>v7 DEBUG — Trail/SL settings:</strong><br>';
     dbg += 'CONFIG.trailStopPct=' + (CONFIG.trailStopPct || 0) + ', stopLossPct=' + (CONFIG.stopLossPct || 0) + ', gateThreshold=' + (CONFIG.gateThreshold || 0);
 
-    // Find EVERY APP exit across all lots — both open and closed
-    dbg += '<br><br><strong>All APP positions in any lot (open + closed):</strong>';
+    // SL regime log around the APP 2026-01-02 entry (Jan-Apr 2026)
+    const slLog = state.slRegimeLog || [];
+    const window2026 = slLog.filter(r => r.date >= '2026-01-01' && r.date <= '2026-04-30');
+    dbg += '<br><br><strong>SL regime flag (Jan-Apr 2026) — when slActiveThisMonth=true, SL armed:</strong>';
+    for (const r of window2026) {
+      const ranks = r.ranking.map(x => x.key + '(' + ((x.deltaPct || 0) * 100).toFixed(1) + '%)').join(', ');
+      dbg += '<br>· ' + r.date + ' slActive=' + r.slActive + ' · top4: ' + ranks;
+    }
+
+    // APP positions
+    dbg += '<br><br><strong>APP positions:</strong>';
     let foundAny = false;
     for (const lot of (state.lots || [])) {
       if (lot.stockMeta && lot.stockMeta['APP']) {
@@ -4964,9 +4973,10 @@ function renderTradeLog() {
         foundAny = true;
         if (m.exited) {
           const drop = m.entryPrice > 0 ? ((m.exitPrice - m.entryPrice) / m.entryPrice * 100).toFixed(1) : '?';
-          dbg += '<br>OPEN lot entry=' + lot.entryDate + ': APP EXITED reason=' + m.exitReason + ', entry=' + (m.entryPrice || 0).toFixed(2) + ', exit=' + (m.exitPrice || 0).toFixed(2) + ', drop=' + drop + '%';
+          const slSig = m.signalDateSL ? ' · SL-signal=' + m.signalDateSL + '@$' + (m.signalCloseSL || 0).toFixed(2) : '';
+          dbg += '<br>OPEN lot entry=' + lot.entryDate + ': APP EXITED reason=' + m.exitReason + ', exit=$' + (m.exitPrice || 0).toFixed(2) + ' on ' + m.exitDate + ', drop=' + drop + '%' + slSig;
         } else {
-          dbg += '<br>OPEN lot entry=' + lot.entryDate + ': APP still held, entry=' + (m.entryPrice || 0).toFixed(2);
+          dbg += '<br>OPEN lot entry=' + lot.entryDate + ': APP still held, entry=$' + (m.entryPrice || 0).toFixed(2);
         }
       }
     }
@@ -4976,7 +4986,7 @@ function renderTradeLog() {
           if (se.ticker === 'APP') {
             foundAny = true;
             const drop = se.entryPrice > 0 ? ((se.exitPrice - se.entryPrice) / se.entryPrice * 100).toFixed(1) : '?';
-            dbg += '<br>CLOSED lot entry=' + cl.entryDate + ' exit=' + cl.exitDate + ': APP reason=' + se.exitReason + ', entry=' + (se.entryPrice || 0).toFixed(2) + ', exit=' + (se.exitPrice || 0).toFixed(2) + ', drop=' + drop + '%';
+            dbg += '<br>CLOSED lot entry=' + cl.entryDate + ' exit=' + cl.exitDate + ': APP reason=' + se.exitReason + ', exit=$' + (se.exitPrice || 0).toFixed(2) + ' on ' + se.exitDate + ', drop=' + drop + '%';
           }
         }
       }
