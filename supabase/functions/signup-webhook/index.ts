@@ -131,7 +131,23 @@ async function ghNextRunningNumber(pat: string): Promise<number> {
 // ============ Supabase admin helper ============
 type GrantResult = { granted: boolean; alreadyExisted: boolean; error?: string };
 
-async function grantSupabaseUser(email: string): Promise<GrantResult> {
+// Find an existing auth user id by email (paginated). Used on renewal /
+// re-signup so we can refresh the subscription metadata of an existing user.
+// deno-lint-ignore no-explicit-any
+async function findUserIdByEmail(admin: any, email: string): Promise<string | null> {
+  for (let page = 1; page <= 10; page++) {
+    const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 200 });
+    if (error || !data) return null;
+    const u = (data.users || []).find(
+      (x: { email?: string }) => String(x.email || "").toLowerCase() === email,
+    );
+    if (u) return u.id as string;
+    if (!data.users || data.users.length < 200) break;
+  }
+  return null;
+}
+
+async function grantSupabaseUser(email: string, appMeta: Record<string, unknown>): Promise<GrantResult> {
   const supaUrl = Deno.env.get("SUPABASE_URL");
   const svcKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!supaUrl || !svcKey) {
@@ -144,6 +160,7 @@ async function grantSupabaseUser(email: string): Promise<GrantResult> {
     const { data, error } = await admin.auth.admin.createUser({
       email,
       email_confirm: true,
+      app_metadata: appMeta,
     });
     if (error) {
       // Idempotent: if user already exists, treat as success (don't fail signup)
@@ -154,6 +171,14 @@ async function grantSupabaseUser(email: string): Promise<GrantResult> {
         msg.includes("duplicate") ||
         msg.includes("exists")
       ) {
+        // Renewal / re-signup — refresh the subscription metadata (new expiry)
+        const id = await findUserIdByEmail(admin, email);
+        if (id) {
+          const { error: upErr } = await admin.auth.admin.updateUserById(id, { app_metadata: appMeta });
+          if (upErr) {
+            return { granted: true, alreadyExisted: true, error: `metadata update failed: ${upErr.message}` };
+          }
+        }
         return { granted: true, alreadyExisted: true };
       }
       return { granted: false, alreadyExisted: false, error: error.message };
@@ -479,8 +504,27 @@ serve(async (req: Request) => {
     //   }
     // ───────────────────────────────────────────────────────────────────────
 
+    // ---------- Compute subscription window ----------
+    // monthly = +30 days, yearly = +365 days from signup. Stored on the auth
+    // user's app_metadata so the client can gate access on every app open.
+    const SUB_DAYS: Record<string, number> = { monthly: 30, yearly: 365 };
+    const durationDays = plan ? SUB_DAYS[plan] : 0;
+    const startedAt = timestamp;
+    const expiresAt = durationDays
+      ? new Date(now.getTime() + durationDays * 86400000).toISOString()
+      : null;
+    const subMeta: Record<string, unknown> = {
+      plan: plan || null,
+      amount,
+      promo_applied: promoValid,
+      ref_code: refCode,
+      subscription_status: "active",
+      subscription_started_at: startedAt,
+      subscription_expires_at: expiresAt,
+    };
+
     // ---------- Auto-grant Supabase user (best-effort, never blocks signup) ----------
-    const grant = await grantSupabaseUser(email);
+    const grant = await grantSupabaseUser(email, subMeta);
     if (grant.granted) {
       console.log(`[grant] ${email} — ${grant.alreadyExisted ? "already existed" : "created"}`);
     } else {
@@ -507,6 +551,12 @@ serve(async (req: Request) => {
       promo_applied: promoValid,
       plan: plan || null,
       amount,
+      subscription: {
+        status: "active",
+        started_at: startedAt,
+        expires_at: expiresAt,
+        duration_days: durationDays,
+      },
       slip_filename: slipName,
       status: "pending",
       confirmations: {
