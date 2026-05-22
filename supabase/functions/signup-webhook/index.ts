@@ -364,6 +364,8 @@ serve(async (req: Request) => {
     username?: string;
     age?: number | string;
     promoCode?: string;
+    plan?: string;
+    amount?: number | string;
     slipBase64?: string | null;
     slipFilename?: string | null;
   };
@@ -379,6 +381,17 @@ serve(async (req: Request) => {
   const promoCode = String(body.promoCode || "").trim().toUpperCase();
   const slipBase64 = body.slipBase64 || null;
   const slipFilename = body.slipFilename || null;
+
+  // Subscription tier the member signed up for. We trust a SERVER-SIDE price
+  // table over the client-sent amount so the client can never dictate the
+  // expected price. Fall back to the client value only for legacy clients that
+  // don't send a plan yet (empty plan).
+  const planRaw = String(body.plan || "").trim().toLowerCase();
+  const plan = planRaw === "yearly" ? "yearly" : planRaw === "monthly" ? "monthly" : "";
+  const PLAN_PRICES: Record<string, number> = { monthly: 150, yearly: 1400 };
+  const amount = plan
+    ? PLAN_PRICES[plan]
+    : (typeof body.amount === "number" ? body.amount : parseInt(String(body.amount || "0"), 10) || 0);
 
   // ---------- Validation ----------
   const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -415,13 +428,13 @@ serve(async (req: Request) => {
 
     // 1. Append CSV
     const csvQ = (v: unknown) => '"' + String(v).replace(/"/g, '""') + '"';
-    const csvLine = [runStr, timestamp, email, username, ageNum, refCode, promoCode, slipName, "pending"]
+    const csvLine = [runStr, timestamp, email, username, ageNum, refCode, promoCode, slipName, "pending", plan, amount]
       .map(csvQ)
       .join(",");
     const existingCSV = await ghGetFile("member-registration.csv", GITHUB_PAT);
     const csvContent = existingCSV
       ? existingCSV.content.trimEnd() + "\n" + csvLine
-      : "id,timestamp,email,username,age,ref_code,promo_code,slip_filename,status\n" + csvLine;
+      : "id,timestamp,email,username,age,ref_code,promo_code,slip_filename,status,plan,amount\n" + csvLine;
     const csvOk = await ghPutText(
       "member-registration.csv",
       csvContent,
@@ -442,6 +455,29 @@ serve(async (req: Request) => {
       );
       if (!slipOk) throw new Error("Slip upload failed");
     }
+
+    // ───────────────────────────────────────────────────────────────────────
+    // 🔌 FUTURE HOOK — automatic slip amount / authenticity verification
+    // ───────────────────────────────────────────────────────────────────────
+    // Right now slips are reviewed MANUALLY by an admin against `amount` above
+    // (the price for the chosen `plan`). When ready to automate, plug a Thai
+    // slip-verify provider in HERE — verify BEFORE grantSupabaseUser() so a
+    // failed / short / forged slip blocks the account grant.
+    //
+    // Recommended: SlipOK or EasySlip. They re-check the slip's QR against the
+    // Bank of Thailand network and return the real amount + sender/receiver +
+    // authenticity. Do NOT use generic AI-vision OCR: it can't detect forged
+    // slips and is less exact on amounts. Keep the provider key in a Supabase
+    // secret (e.g. SLIP_VERIFY_KEY) — never client-side.
+    //
+    // Sketch (uncomment + implement verifySlip() when ready):
+    //   if (slipBase64 && !promoValid) {
+    //     const v = await verifySlip(slipBase64);              // call provider
+    //     if (!v.ok)             return errResponse(402, "ตรวจสอบสลิปไม่สำเร็จ");
+    //     if (v.amount < amount) return errResponse(402, `ยอดโอนไม่ครบ (ได้ ${v.amount}/${amount} บาท)`);
+    //     // optionally: check v.receiver === OUR_ACCOUNT and that v.ref is not reused
+    //   }
+    // ───────────────────────────────────────────────────────────────────────
 
     // ---------- Auto-grant Supabase user (best-effort, never blocks signup) ----------
     const grant = await grantSupabaseUser(email);
@@ -469,6 +505,8 @@ serve(async (req: Request) => {
       email,
       promo_code: promoCode,
       promo_applied: promoValid,
+      plan: plan || null,
+      amount,
       slip_filename: slipName,
       status: "pending",
       confirmations: {

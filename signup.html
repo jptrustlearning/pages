@@ -130,6 +130,35 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 }
 .form-group input::placeholder{color:#B8A990}
 
+/* ===== Plan selection ===== */
+.plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:480px){.plan-grid{grid-template-columns:1fr}}
+.plan-card{
+    position:relative;cursor:pointer;display:flex;flex-direction:column;
+    border:1.5px solid rgba(212,175,55,0.3);border-radius:12px;
+    padding:16px 14px 14px;background:#FFFEFA;transition:all .22s;
+}
+.plan-card:hover{border-color:var(--gold);background:rgba(212,175,55,0.05)}
+.plan-card.selected{border-color:var(--emerald);background:var(--emerald-dim);box-shadow:0 4px 16px rgba(46,159,95,0.14)}
+.plan-card input[type="radio"]{position:absolute;opacity:0;pointer-events:none}
+.plan-tier{font-family:'Cinzel','Anuphan',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold-deep);font-weight:600;margin-bottom:8px}
+.plan-card.selected .plan-tier{color:var(--emerald-dk)}
+.plan-price{font-family:'DM Serif Display',serif;font-size:30px;color:var(--maroon);line-height:1}
+.plan-card.selected .plan-price{color:var(--emerald-dk)}
+.plan-price .cur{font-size:16px;vertical-align:6px;margin-right:1px}
+.plan-per{font-size:12px;color:var(--text-muted);margin-top:5px;font-weight:500}
+.plan-save{margin-top:9px;align-self:flex-start;font-size:10.5px;font-weight:700;letter-spacing:0.3px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#1a0a0e;padding:3px 9px;border-radius:6px}
+.plan-check{position:absolute;top:12px;right:12px;width:20px;height:20px;border-radius:50%;border:1.5px solid rgba(212,175,55,0.45);background:#fff;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.plan-check svg{width:12px;height:12px;stroke:#fff;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.plan-card.selected .plan-check{border-color:var(--emerald);background:var(--emerald)}
+.plan-card.selected .plan-check svg{opacity:1}
+
+/* ===== Pay amount hint (slip section) ===== */
+.pay-amount{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;padding:12px 16px;border-radius:10px;background:linear-gradient(180deg,#FFFEF8,#F5EDD8);border:1.5px solid var(--gold-border)}
+.pay-amount .pa-label{font-size:12.5px;color:var(--text-dark-muted);font-weight:500}
+.pay-amount .pa-value{font-family:'DM Serif Display',serif;font-size:22px;color:var(--gold-deep)}
+.pay-amount .pa-value .cur{font-size:13px;vertical-align:3px;margin-right:1px}
+
 /* ===== Promo ===== */
 .promo-wrap{position:relative}
 .promo-wrap input{padding-right:90px;text-transform:uppercase;letter-spacing:1px}
@@ -327,10 +356,36 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                     <div class="field-err" id="personalError">กรุณากรอกข้อมูลให้ครบถ้วน</div>
                 </div>
 
-                <!-- 2: Promo Code -->
+                <!-- 2: Choose Plan -->
                 <div class="section">
                     <div class="section-head">
                         <div class="section-num">2</div>
+                        <h2><span class="th">เลือกแพ็กเกจสมาชิก</span></h2>
+                    </div>
+                    <div class="plan-grid">
+                        <label class="plan-card" id="planMonthlyCard">
+                            <input type="radio" name="plan" value="monthly" onchange="selectPlan('monthly',150)">
+                            <div class="plan-check"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                            <div class="plan-tier">รายเดือน</div>
+                            <div class="plan-price"><span class="cur">฿</span>150</div>
+                            <div class="plan-per">ต่อเดือน</div>
+                        </label>
+                        <label class="plan-card" id="planYearlyCard">
+                            <input type="radio" name="plan" value="yearly" onchange="selectPlan('yearly',1400)">
+                            <div class="plan-check"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                            <div class="plan-tier">รายปี</div>
+                            <div class="plan-price"><span class="cur">฿</span>1,400</div>
+                            <div class="plan-per">ต่อปี</div>
+                            <div class="plan-save">ประหยัด ฿400/ปี</div>
+                        </label>
+                    </div>
+                    <div class="field-err" id="planError">กรุณาเลือกแพ็กเกจสมาชิก</div>
+                </div>
+
+                <!-- 2: Promo Code -->
+                <div class="section">
+                    <div class="section-head">
+                        <div class="section-num">3</div>
                         <h2><span class="th">Promotion Code</span></h2>
                     </div>
                     <div class="form-group">
@@ -346,8 +401,12 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                 <!-- 3: Upload Slip -->
                 <div class="section" id="uploadSection">
                     <div class="section-head">
-                        <div class="section-num">3</div>
+                        <div class="section-num">4</div>
                         <h2><span class="th">แนบสลิปการโอนเงิน</span></h2>
+                    </div>
+                    <div class="pay-amount" id="payAmountRow" style="display:none">
+                        <span class="pa-label">ยอดที่ต้องโอน</span>
+                        <span class="pa-value"><span class="cur">฿</span><span id="payAmountValue">—</span></span>
                     </div>
                     <div class="upload-zone" id="uploadZone">
                         <div class="up-icon">
@@ -371,7 +430,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                 <!-- 4: Confirm -->
                 <div class="section">
                     <div class="section-head">
-                        <div class="section-num">4</div>
+                        <div class="section-num">5</div>
                         <h2><span class="th">ยืนยันการชำระเงิน</span></h2>
                     </div>
                     <label class="confirm-box" id="confirmSlipBox">
@@ -439,6 +498,21 @@ const SIGNUP_ENDPOINT = `${SUPABASE_URL}/functions/v1/signup-webhook`;
 const PROMO_CODE = 'JPTFREE2026';
 
 let uploadedFileBase64 = null, uploadedFileName = null, promoApplied = false;
+let selectedPlan = null, selectedAmount = null;
+
+// ============ Plan selection ============
+function selectPlan(plan, amount) {
+    selectedPlan = plan;
+    selectedAmount = amount;
+    document.getElementById('planMonthlyCard').classList.toggle('selected', plan === 'monthly');
+    document.getElementById('planYearlyCard').classList.toggle('selected', plan === 'yearly');
+    document.getElementById('planError').classList.remove('show');
+    const val = document.getElementById('payAmountValue');
+    if (val) val.textContent = amount.toLocaleString('en-US');
+    const row = document.getElementById('payAmountRow');
+    if (row) row.style.display = promoApplied ? 'none' : 'flex';
+    checkReady();
+}
 
 // ============ Promo Code ============
 function checkPromo() {
@@ -501,6 +575,8 @@ function unlockConfirms() {
     if (!cs.checked) document.getElementById('confirmSlipBox').classList.remove('checked');
     if (!cp.checked) document.getElementById('confirmPayBox').classList.remove('checked');
     document.getElementById('uploadSection').style.display = '';
+    const par = document.getElementById('payAmountRow');
+    if (par) par.style.display = selectedAmount ? 'flex' : 'none';
 }
 
 // ============ File Upload ============
@@ -550,7 +626,7 @@ function checkReady() {
     const hasFile = !!uploadedFileBase64;
     const c1 = document.getElementById('confirmSlip').checked;
     const c2 = document.getElementById('confirmPay').checked;
-    const ready = email && username && age && (hasFile || promoApplied) && c1 && c2;
+    const ready = email && username && age && selectedPlan && (hasFile || promoApplied) && c1 && c2;
     const btn = document.getElementById('submitBtn');
     btn.disabled = !ready;
     btn.className = 'submit-btn ' + (ready ? 'ready' : 'disabled');
@@ -570,6 +646,11 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
         document.getElementById('personalError').classList.add('show'); valid = false;
     } else {
         document.getElementById('personalError').classList.remove('show');
+    }
+    if (!selectedPlan) {
+        document.getElementById('planError').classList.add('show'); valid = false;
+    } else {
+        document.getElementById('planError').classList.remove('show');
     }
     if (!uploadedFileBase64 && !promoApplied) {
         document.getElementById('slipError').classList.add('show'); valid = false;
@@ -596,6 +677,8 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
             },
             body: JSON.stringify({
                 email, username, age: parseInt(age),
+                plan: selectedPlan,
+                amount: selectedAmount,
                 promoCode: promoCodeRaw,
                 slipBase64: uploadedFileBase64,
                 slipFilename: uploadedFileName
@@ -614,6 +697,8 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
         document.getElementById('successModal').classList.add('show');
         window._lastReg = {
             email, username, age,
+            plan: selectedPlan,
+            amount: selectedAmount,
             refCode: data.refCode,
             timestamp: data.timestamp || new Date().toISOString(),
             promoCode: promoCodeRaw.toUpperCase()
@@ -635,6 +720,7 @@ function goToLogin() {
 function downloadPDF() {
     const r = window._lastReg; if (!r) return;
     const regDate = new Date(r.timestamp).toLocaleString('th-TH', {year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit'});
+    const planLabel = r.plan === 'yearly' ? 'รายปี — ฿1,400 / ปี' : r.plan === 'monthly' ? 'รายเดือน — ฿150 / เดือน' : '—';
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Member Registration - ${r.refCode}</title>
 <style>@import url('https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Cinzel:wght@500;600;700&family=DM+Serif+Display&family=Sarabun:wght@400;500;600;700&display=swap');
 @page{size:A4;margin:0}*{margin:0;padding:0;box-sizing:border-box}
@@ -673,6 +759,7 @@ ${r.promoCode?`<div class="promo-badge"><span>PROMO: ${r.promoCode}</span></div>
 <table>
 <tr><td>ชื่อผู้ใช้</td><td>${r.username}</td></tr>
 <tr><td>อายุ</td><td>${r.age} ปี</td></tr>
+<tr><td>แพ็กเกจ</td><td>${planLabel}</td></tr>
 <tr><td>อีเมล</td><td>${r.email}</td></tr>
 <tr><td>Ref Code</td><td style="color:#8B6914">${r.refCode}</td></tr>
 <tr><td>วันที่สมัคร</td><td>${regDate}</td></tr>
