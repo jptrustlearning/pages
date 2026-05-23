@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jptrust-member-v5';  // bumped 2026-05-02 — tone_override support
+const CACHE_NAME = 'jptrust-member-v6';  // bumped 2026-05-23 — auth: PIN gated by live Supabase session
 const ASSETS = [
   './',
   './member-dashboard.html',
