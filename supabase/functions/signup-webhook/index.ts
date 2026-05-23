@@ -625,6 +625,7 @@ serve(async (req: Request) => {
     const durationDays = plan ? SUB_DAYS[plan] : 0;
     const startedAt = timestamp;
     const baseMeta: Record<string, unknown> = {
+      username,                   // registration name → used as the default member name in-app
       plan: plan || null,
       amount,                     // = amount_due (what they must actually pay)
       amount_due: amount,

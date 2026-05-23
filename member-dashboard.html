@@ -1477,6 +1477,9 @@ async function loadSettingsFromCloud(){
         const{data,error}=await supabaseClient.from('user_settings').select('data').eq('user_id',user.id).maybeSingle();
         if(error){console.warn('[settings] load failed:',error.message);return null}
         if(data&&data.data)Object.assign(userSettings,data.data,{email:user.email||userSettings.email});
+        // Default member name to the signup username (app_metadata.username) when the user
+        // has not set their own name yet. A name saved in user_settings always takes priority.
+        if(!userSettings.name&&user.app_metadata&&user.app_metadata.username){userSettings.name=String(user.app_metadata.username).trim();}
         return data?data.data:null;
     }catch(e){console.warn('[settings] load error:',e);return null}
 }
@@ -1768,7 +1771,7 @@ function showExpiredGate(meta,email){
   document.getElementById('jptGateLogout').onclick=async function(){try{await supabaseClient.auth.signOut();}catch(e){}try{localStorage.removeItem('jpt_pin');localStorage.removeItem('jpt_logged_in');sessionStorage.removeItem('jpt_session_active');}catch(e){}location.reload();};
 }
 
-function showApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('active');applySettings();renderTickerTape();loadSignalCards();loadSettingsFromCloud().then(d=>{if(d)applySettings()});logEvent('app_open',{screen:'home'});enforceSubscription();}
+function showApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('active');applySettings();renderTickerTape();loadSignalCards();loadSettingsFromCloud().then(function(){applySettings()});logEvent('app_open',{screen:'home'});enforceSubscription();}
 
 // ===== SIGNAL CARDS (Gold + BTC) — fetch latest row of momentum CSVs =====
 function parseCSV(text){
