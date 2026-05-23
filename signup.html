@@ -159,6 +159,11 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .pay-amount .pa-value{font-family:'DM Serif Display',serif;font-size:22px;color:var(--gold-deep)}
 .pay-amount .pa-value .cur{font-size:13px;vertical-align:3px;margin-right:1px}
 
+/* ===== Promo sub-block (inside plan section) ===== */
+.promo-sub{margin-top:18px;padding-top:18px;border-top:1px dashed rgba(212,175,55,0.35)}
+.promo-sub-label{font-family:'Cinzel','Anuphan',sans-serif;font-size:12px;font-weight:600;letter-spacing:1px;color:var(--gold-deep);text-transform:uppercase;margin-bottom:10px}
+.promo-sub-opt{font-family:'Anuphan',sans-serif;font-size:11.5px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--text-muted)}
+
 /* ===== Promo ===== */
 .promo-wrap{position:relative}
 .promo-wrap input{padding-right:90px;text-transform:uppercase;letter-spacing:1px}
@@ -380,28 +385,25 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                         </label>
                     </div>
                     <div class="field-err" id="planError">กรุณาเลือกแพ็กเกจสมาชิก</div>
-                </div>
 
-                <!-- 2: Promo Code -->
-                <div class="section">
-                    <div class="section-head">
-                        <div class="section-num">3</div>
-                        <h2><span class="th">Promotion Code</span></h2>
-                    </div>
-                    <div class="form-group">
-                        <div class="promo-wrap">
-                            <input type="text" id="promoCode" placeholder="กรอกรหัสโปรโมชัน (ถ้ามี)" value="JPTFREE2026" oninput="resetPromoApply()" autocomplete="off">
-                            <div class="promo-status" id="promoStatus"></div>
+                    <!-- Promotion code — part of the plan section -->
+                    <div class="promo-sub">
+                        <div class="promo-sub-label">Promotion Code <span class="promo-sub-opt">(ถ้ามี)</span></div>
+                        <div class="form-group">
+                            <div class="promo-wrap">
+                                <input type="text" id="promoCode" placeholder="กรอกรหัสโปรโมชัน" value="JPTFREE2026" oninput="resetPromoApply()" autocomplete="off">
+                                <div class="promo-status" id="promoStatus"></div>
+                            </div>
+                            <button type="button" class="promo-apply-btn" id="promoApplyBtn" onclick="checkPromo()">ใช้รหัสโปรโมชัน</button>
+                            <div class="promo-hint">หากมีรหัสโปรโมชันที่ใช้ได้ ไม่จำเป็นต้องแนบสลิปการโอนเงิน</div>
                         </div>
-                        <button type="button" class="promo-apply-btn" id="promoApplyBtn" onclick="checkPromo()">ใช้รหัสโปรโมชัน</button>
-                        <div class="promo-hint">หากมีรหัสโปรโมชันที่ใช้ได้ ไม่จำเป็นต้องแนบสลิปการโอนเงิน</div>
                     </div>
                 </div>
 
                 <!-- 3: Upload Slip -->
                 <div class="section" id="uploadSection">
                     <div class="section-head">
-                        <div class="section-num">4</div>
+                        <div class="section-num">3</div>
                         <h2><span class="th">แนบสลิปการโอนเงิน</span></h2>
                     </div>
                     <div class="pay-amount" id="payAmountRow" style="display:none">
@@ -430,7 +432,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                 <!-- 4: Confirm -->
                 <div class="section">
                     <div class="section-head">
-                        <div class="section-num">5</div>
+                        <div class="section-num">4</div>
                         <h2><span class="th">ยืนยันการชำระเงิน</span></h2>
                     </div>
                     <label class="confirm-box" id="confirmSlipBox">
