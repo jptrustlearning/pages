@@ -162,6 +162,22 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .pay-amount .pa-discount{font-size:11px;color:var(--emerald-dk);font-weight:600}
 .pay-amount .pa-discount s{color:var(--text-muted);font-weight:400}
 
+/* ===== Bank account (transfer destination) ===== */
+.bank-box{margin-bottom:14px;padding:14px 16px;border-radius:10px;background:linear-gradient(180deg,#FFFEF8,#F5EDD8);border:1.5px solid var(--gold-border)}
+.bank-head{font-family:'Cinzel','Anuphan',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gold-deep);font-weight:600;margin-bottom:10px}
+.bank-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.bank-meta{display:flex;flex-direction:column;gap:2px;min-width:0}
+.bank-name{font-size:13.5px;font-weight:600;color:var(--maroon)}
+.bank-holder{font-size:12px;color:var(--text-dark-muted)}
+.bank-acct-wrap{display:flex;align-items:center;gap:8px}
+.bank-acct{font-family:'DM Serif Display',serif;font-size:19px;letter-spacing:0.5px;color:var(--gold-deep);white-space:nowrap}
+.bank-copy-btn{display:inline-flex;align-items:center;gap:5px;cursor:pointer;border:1.5px solid var(--gold-border);background:rgba(212,175,55,0.08);color:var(--maroon);font-family:'Sarabun','Anuphan',sans-serif;font-size:12px;font-weight:600;padding:6px 11px;border-radius:8px;transition:all .15s ease}
+.bank-copy-btn:hover{border-color:var(--gold);background:rgba(212,175,55,0.16)}
+.bank-copy-btn:active{transform:scale(0.96)}
+.bank-copy-btn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2}
+.bank-copy-btn.copied{background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-color:var(--gold-dark);color:#1a0a0e}
+.bank-hint{font-size:11px;color:var(--text-muted);margin-top:9px;line-height:1.5}
+
 /* ===== Promo sub-block (inside plan section) ===== */
 .promo-sub{margin-top:18px;padding-top:18px;border-top:1px dashed rgba(212,175,55,0.35)}
 .promo-sub-label{font-family:'Cinzel','Anuphan',sans-serif;font-size:12px;font-weight:600;letter-spacing:1px;color:var(--gold-deep);text-transform:uppercase;margin-bottom:10px}
@@ -416,6 +432,24 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                         </div>
                         <span class="pa-value"><span class="cur">฿</span><span id="payAmountValue">—</span></span>
                     </div>
+                    <!-- Bank account to transfer to (mirrors payAmountRow visibility) -->
+                    <div class="bank-box" id="bankInfoBox" style="display:none">
+                        <div class="bank-head">โอนเงินเข้าบัญชีนี้</div>
+                        <div class="bank-row">
+                            <div class="bank-meta">
+                                <div class="bank-name">ธนาคารกรุงศรีอยุธยา</div>
+                                <div class="bank-holder">นาย วัชรพล</div>
+                            </div>
+                            <div class="bank-acct-wrap">
+                                <span class="bank-acct" id="bankAcctNo" data-acct="8049307594">804-9-30759-4</span>
+                                <button type="button" class="bank-copy-btn" id="bankCopyBtn" onclick="copyBankAcct()" aria-label="คัดลอกเลขบัญชี">
+                                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    <span class="bank-copy-label">คัดลอก</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bank-hint">คัดลอกเลขบัญชี โอนตามยอดด้านบน แล้วแนบสลิปด้านล่าง</div>
+                    </div>
                     <div class="upload-zone" id="uploadZone">
                         <div class="up-icon">
                             <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -615,15 +649,17 @@ function applyFreePromo(btn, st){
     if(btn){ btn.classList.add('applied'); btn.textContent='✓ ใช้รหัสนี้แล้ว'; }
 }
 
-// Renders the "ยอดที่ต้องโอน" row with discount line when a discount applies
+// Renders the "ยอดที่ต้องโอน" row + bank account when payment (slip) is required
 function updatePayDisplay(){
     const row = document.getElementById('payAmountRow');
     const val = document.getElementById('payAmountValue');
     const disc = document.getElementById('payDiscountLine');
+    const bank = document.getElementById('bankInfoBox');
+    const hide = () => { if(row) row.style.display='none'; if(bank) bank.style.display='none'; };
     if(!row||!val) return;
-    // Free code → no slip, hide the pay row entirely
-    if(promoApplied && promoFinalAmount === 0){ row.style.display='none'; return; }
-    if(!selectedAmount){ row.style.display='none'; return; }
+    // Free code → no slip, hide pay row + bank entirely
+    if(promoApplied && promoFinalAmount === 0){ hide(); return; }
+    if(!selectedAmount){ hide(); return; }
     const pay = (promoApplied && promoFinalAmount !== null) ? promoFinalAmount : selectedAmount;
     val.textContent = pay.toLocaleString('en-US');
     if(disc){
@@ -635,6 +671,36 @@ function updatePayDisplay(){
         }
     }
     row.style.display = 'flex';
+    if(bank) bank.style.display = 'block';
+}
+
+// Copy bank account number (plain digits) with on-button feedback + fallback
+function copyBankAcct(){
+    const el = document.getElementById('bankAcctNo');
+    if(!el) return;
+    const raw = (el.getAttribute('data-acct') || el.textContent || '').replace(/\D/g,'');
+    const btn = document.getElementById('bankCopyBtn');
+    const lbl = btn ? btn.querySelector('.bank-copy-label') : null;
+    const done = () => {
+        if(!btn) return;
+        btn.classList.add('copied');
+        if(lbl) lbl.textContent = 'คัดลอกแล้ว';
+        setTimeout(() => { btn.classList.remove('copied'); if(lbl) lbl.textContent = 'คัดลอก'; }, 1800);
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(raw).then(done).catch(() => fallbackCopy(raw, done));
+    } else {
+        fallbackCopy(raw, done);
+    }
+}
+function fallbackCopy(text, cb){
+    try{
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position='fixed'; ta.style.top='0'; ta.style.opacity='0';
+        document.body.appendChild(ta); ta.focus(); ta.select();
+        document.execCommand('copy'); document.body.removeChild(ta);
+        if(cb) cb();
+    }catch(e){}
 }
 
 // Called when user edits promo input — revert any applied state until they click OK again

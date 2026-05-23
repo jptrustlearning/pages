@@ -186,11 +186,11 @@ ON CONFLICT (code) DO UPDATE
       applies_to=EXCLUDED.applies_to, valid_from=EXCLUDED.valid_from,
       valid_until=EXCLUDED.valid_until, max_uses=EXCLUDED.max_uses, active=EXCLUDED.active;
 
--- JPTHALF5050 — 50% off, June 2026 (Asia/Bangkok), 30 seats.
--- BKK is UTC+7, so 1 Jun 00:00 BKK = 31 May 17:00 UTC; 30 Jun 23:59:59 BKK = 30 Jun 16:59:59 UTC.
+-- JPTHALF5050 — 50% off, 20 May–30 Jun 2026 (Asia/Bangkok), 30 seats.
+-- BKK is UTC+7, so 20 May 00:00 BKK = 19 May 17:00 UTC; 30 Jun 23:59:59 BKK = 30 Jun 16:59:59 UTC.
 INSERT INTO public.promo_codes (code, description, discount_type, discount_value, applies_to, valid_from, valid_until, max_uses, active)
-VALUES ('JPTHALF5050', 'มิถุนายน 2569 — ลด 50% (30 สิทธิ์แรก)', 'percent', 50, 'all',
-        '2026-05-31T17:00:00Z', '2026-06-30T16:59:59Z', 30, TRUE)
+VALUES ('JPTHALF5050', '20 พ.ค.–30 มิ.ย. 2569 — ลด 50% (30 สิทธิ์แรก)', 'percent', 50, 'all',
+        '2026-05-19T17:00:00Z', '2026-06-30T16:59:59Z', 30, TRUE)
 ON CONFLICT (code) DO UPDATE
   SET discount_type=EXCLUDED.discount_type, discount_value=EXCLUDED.discount_value,
       applies_to=EXCLUDED.applies_to, valid_from=EXCLUDED.valid_from,
