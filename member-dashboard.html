@@ -471,6 +471,18 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .settings-list{background:var(--cream-card);border:1px solid rgba(212,175,55,0.12);border-radius:var(--radius);overflow:hidden;box-shadow:0 2px 8px rgba(114,47,55,0.04)}
 .settings-item{display:flex;align-items:center;gap:14px;padding:16px;border-bottom:1px solid rgba(212,175,55,0.08);cursor:pointer;transition:background .2s}
 .settings-badge{flex-shrink:0;font-size:11px;font-weight:700;padding:5px 11px;border-radius:20px;background:rgba(31,125,73,0.12);color:#1F7D49;border:1px solid rgba(31,125,73,0.3)}
+/* Home near-expiry banner */
+.expiry-banner{display:flex;align-items:center;gap:13px;margin:14px 0 0;padding:14px 15px;border-radius:16px;cursor:pointer;background:linear-gradient(135deg,rgba(212,175,55,0.16),rgba(184,134,11,0.10));border:1.5px solid rgba(212,175,55,0.5);transition:transform .15s}
+.expiry-banner:active{transform:scale(.99)}
+.expiry-banner.expired{background:linear-gradient(135deg,rgba(234,106,94,0.16),rgba(192,57,43,0.10));border-color:rgba(234,106,94,0.5)}
+.expiry-banner-icon{width:40px;height:40px;flex-shrink:0;border-radius:11px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--gold,#D4AF37),var(--gold-dark,#B8860B));color:#1a0a0e}
+.expiry-banner.expired .expiry-banner-icon{background:linear-gradient(135deg,#E07A6E,#C0392B);color:#fff}
+.expiry-banner-icon svg{width:21px;height:21px}
+.expiry-banner-text{flex:1;min-width:0}
+.expiry-banner-title{font-size:14px;font-weight:700;color:var(--text-dark-sub,#5A3D20)}
+.expiry-banner-desc{font-size:11.5px;color:var(--text-dark-muted,#7A6F62);margin-top:2px;line-height:1.4}
+.expiry-banner-btn{flex-shrink:0;padding:9px 16px;border:none;border-radius:20px;background:linear-gradient(135deg,var(--gold,#D4AF37),var(--gold-dark,#B8860B));color:#1a0a0e;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 3px 10px rgba(212,175,55,0.3)}
+.expiry-banner.expired .expiry-banner-btn{background:linear-gradient(135deg,#E07A6E,#C0392B);color:#fff;box-shadow:0 3px 10px rgba(192,57,43,0.3)}
 .settings-badge.warn{background:rgba(212,175,55,0.15);color:var(--gold-deep,#8B6914);border-color:rgba(212,175,55,0.4)}
 .settings-badge.expired{background:rgba(234,106,94,0.12);color:#C0392B;border-color:rgba(234,106,94,0.4)}
 .settings-item:last-child{border-bottom:none}.settings-item:active{background:var(--cream-warm)}
@@ -988,6 +1000,11 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             </div>
         </div>
         <div class="home-content">
+            <div class="expiry-banner" id="expiryBanner" style="display:none" onclick="goRenew()">
+                <div class="expiry-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                <div class="expiry-banner-text"><div class="expiry-banner-title" id="expiryBannerTitle">สมาชิกของคุณใกล้หมดอายุ</div><div class="expiry-banner-desc" id="expiryBannerDesc">—</div></div>
+                <button class="expiry-banner-btn" type="button">ต่ออายุ</button>
+            </div>
             <div class="install-banner-home" id="installBanner" onclick="handleInstallClick()">
                 <div class="install-banner-icon"><span class="jpt-icon" style="width:22px;height:22px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="8" x2="12" y2="14"/><polyline points="9 12 12 15 15 12"/><line x1="9" y1="18" x2="15" y2="18"/></svg></span></div>
                 <div class="install-banner-text"><div class="install-banner-title" style="color:var(--text-dark-sub)">ติดตั้งแอป JP Trust</div><div class="install-banner-desc" style="color:var(--text-dark-muted)">เพิ่มไอคอนลงหน้าจอมือถือ</div></div>
@@ -1357,6 +1374,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             <div class="settings-item" style="cursor:default"><div class="settings-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span></div><div class="settings-info"><div class="settings-label">วันที่สมัคร</div><div class="settings-desc" id="memStarted">—</div></div></div>
             <div class="settings-item" id="memPromoItem" style="cursor:default;display:none"><div class="settings-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span></div><div class="settings-info"><div class="settings-label">โปรโมชันที่ใช้</div><div class="settings-desc" id="memPromo">—</div></div></div>
             <div class="settings-item" style="cursor:default"><div class="settings-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span></div><div class="settings-info"><div class="settings-label">สมาชิกหมดอายุ</div><div class="settings-desc" id="memExpiry">—</div></div><div class="settings-badge" id="memDaysBadge" style="display:none"></div></div>
+            <div class="settings-item" onclick="goRenew()"><div class="settings-icon" style="background:linear-gradient(135deg,#D4AF37,#B8860B);color:#1a0a0e"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></span></div><div class="settings-info"><div class="settings-label">ต่ออายุสมาชิก</div><div class="settings-desc">ขยายอายุสมาชิก — นับต่อจากวันหมดอายุเดิม</div></div><div class="settings-arrow">›</div></div>
         </div>
 
         <div class="section-header"><div class="section-title">ตั้งค่าแอป</div></div>
@@ -1701,8 +1719,30 @@ function backToEmail(){
 // Fills the "สมาชิกของคุณ" card in Settings from app_metadata (signup date,
 // promo used, expiry, days remaining). Reads the same meta enforceSubscription
 // already fetched — no extra getUser() call.
+var _renewEmail = '';
+function goRenew(){
+  var em = _renewEmail || (userSettings && userSettings.email) || '';
+  try{logEvent('renew_click');}catch(e){}
+  location.href = 'signup.html?v=1779548893' + (em ? ('&email=' + encodeURIComponent(em)) : '');
+}
+function renderHomeExpiryBanner(daysLeft, expStr){
+  var b=document.getElementById('expiryBanner'); if(!b) return;
+  var title=document.getElementById('expiryBannerTitle'), desc=document.getElementById('expiryBannerDesc');
+  // Show only when expiring within 14 days, or already past (pre-revoke grace).
+  if(daysLeft===null||daysLeft>14){b.style.display='none';return;}
+  b.className='expiry-banner'+(daysLeft<0?' expired':'');
+  if(daysLeft<0){
+    if(title)title.textContent='สมาชิกหมดอายุแล้ว';
+    if(desc)desc.textContent='หมดอายุเมื่อ '+expStr+' · ต่ออายุเพื่อใช้งานต่อ';
+  }else{
+    if(title)title.textContent=(daysLeft===0?'สมาชิกหมดอายุวันนี้':('สมาชิกเหลืออีก '+daysLeft+' วัน'));
+    if(desc)desc.textContent='หมดอายุ '+expStr+' · แตะเพื่อต่ออายุ';
+  }
+  b.style.display='flex';
+}
 function renderMembershipCard(meta){
   meta=meta||{};
+  _renewEmail=(meta && meta.email) || _renewEmail;
   function thai(iso,withTime){if(!iso)return null;var d=new Date(iso);if(isNaN(d.getTime()))return null;return d.toLocaleDateString('th-TH',withTime?{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}:{year:'numeric',month:'long',day:'numeric'});}
   var elS=document.getElementById('memStarted');
   if(elS)elS.textContent=thai(meta.subscription_started_at,true)||'\u2014';
@@ -1725,9 +1765,10 @@ function renderMembershipCard(meta){
         if(days<0){badge.textContent='\u0e2b\u0e21\u0e14\u0e2d\u0e32\u0e22\u0e38\u0e41\u0e25\u0e49\u0e27';badge.className='settings-badge expired';} // "หมดอายุแล้ว"
         else{badge.textContent='\u0e40\u0e2b\u0e25\u0e37\u0e2d '+days+' \u0e27\u0e31\u0e19';badge.className='settings-badge'+(days<=14?' warn':'');} // "เหลือ N วัน"
         badge.style.display='inline-block';
+        try{renderHomeExpiryBanner(days, expStr||'\u2014');}catch(e){}
       }
-    }
-  }
+    } else { try{renderHomeExpiryBanner(null,null);}catch(e){} }
+  } else { try{renderHomeExpiryBanner(null,null);}catch(e){} }
 }
 
 async function enforceSubscription(){
@@ -1748,7 +1789,7 @@ async function enforceSubscription(){
     }
     if(!user){forceReauth('no_session');return false;} // deleted/revoked → block
     const meta=user.app_metadata||{};
-    try{renderMembershipCard(meta);}catch(e){}
+    try{_renewEmail=user.email||_renewEmail;renderMembershipCard(meta);}catch(e){}
     const status=meta.subscription_status;
     const exp=meta.subscription_expires_at;
     let expired=false;
