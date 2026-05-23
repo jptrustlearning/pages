@@ -30,6 +30,9 @@ const MAX_SLIP_BASE64 = 7 * 1024 * 1024; // ~5MB binary → ~6.7MB base64; pad t
 const APP_URL = "https://jptrustlearning.github.io/pages/member-dashboard.html";
 const EMAIL_FROM_NAME = "JP Trust Learning";
 const EMAIL_SUBJECT = "ยินดีต้อนรับสู่ JP Trust Learning — เริ่มต้นใช้งานได้ทันที";
+// Founders notified on every new signup. Override via FOUNDER_EMAILS secret
+// (comma-separated) if it ever changes — falls back to these two otherwise.
+const FOUNDER_EMAILS_DEFAULT = "Joonstinn@gmail.com,Watcharaphon0619@gmail.com";
 
 // ============ CORS ============
 const corsHeaders = {
@@ -398,6 +401,90 @@ async function sendWelcomeEmail(email: string, username: string): Promise<EmailR
   }
 }
 
+// ============ Founder notification (internal) ============
+// Fires on every successful new signup so the founders see who joined, which
+// plan, how much is owed, and whether a slip was attached. Best-effort: never
+// blocks the signup response. reply-to = the customer so founders can reply
+// straight to them.
+interface FounderInfo {
+  username: string; email: string; age: number | null; plan: string;
+  basePrice: number; amount: number; promoCode: string; promoApplied: boolean;
+  refCode: string; slipName: string | null; expiresAt: string | null;
+}
+async function sendFounderNotification(info: FounderInfo): Promise<EmailResult> {
+  const apiKey = Deno.env.get("RESEND_API_KEY");
+  const from = Deno.env.get("RESEND_FROM") || `${EMAIL_FROM_NAME} <onboarding@resend.dev>`;
+  const recipients = (Deno.env.get("FOUNDER_EMAILS") || FOUNDER_EMAILS_DEFAULT)
+    .split(",").map((x) => x.trim()).filter(Boolean);
+  if (!apiKey) return { sent: false, error: "missing RESEND_API_KEY secret" };
+  if (recipients.length === 0) return { sent: false, error: "no founder recipients" };
+
+  const planLabel = info.plan === "yearly" ? "รายปี (Yearly)" : info.plan === "monthly" ? "รายเดือน (Monthly)" : "—";
+  const promoLine = info.promoApplied && info.promoCode ? `${info.promoCode} (ใช้งานแล้ว)` : "ไม่มี";
+  const slipLine = info.slipName ? info.slipName : "ไม่มีสลิปแนบ";
+  const fmtBaht = (n: number) => "฿" + Number(n || 0).toLocaleString("en-US");
+  const subject = `🔔 สมาชิกใหม่: ${info.username} · ${planLabel} · ${fmtBaht(info.amount)}`;
+
+  const text = [
+    "มีสมาชิกสมัครใหม่ใน JP Trust Learning",
+    "",
+    `ชื่อผู้ใช้: ${info.username}`,
+    `อีเมล: ${info.email}`,
+    `อายุ: ${info.age ?? "—"}`,
+    `แพ็กเกจ: ${planLabel}`,
+    `ราคาปกติ: ${fmtBaht(info.basePrice)}`,
+    `ยอดที่ต้องชำระ: ${fmtBaht(info.amount)}`,
+    `โปรโมชัน: ${promoLine}`,
+    `สลิป: ${slipLine}`,
+    `รหัสอ้างอิง: ${info.refCode}`,
+    `สมาชิกหมดอายุ: ${info.expiresAt ?? "—"}`,
+    "",
+    "— ระบบแจ้งเตือนอัตโนมัติ JP Trust Learning",
+  ].join("\n");
+
+  const esc = (x: string) => escapeHtml(String(x ?? ""));
+  const row = (k: string, v: string) =>
+    `<tr><td style="padding:7px 14px;color:#7A6F62;font-size:13px;white-space:nowrap;vertical-align:top">${k}</td><td style="padding:7px 14px;color:#1a0a0e;font-size:14px;font-weight:600">${v}</td></tr>`;
+  const html = `<div style="font-family:'Sarabun',Arial,sans-serif;background:#FAF6ED;padding:24px">
+    <div style="max-width:520px;margin:0 auto;background:#FFFEF8;border:1.5px solid rgba(212,175,55,0.4);border-radius:14px;overflow:hidden">
+      <div style="background:linear-gradient(135deg,#1a0a0e,#722F37);padding:18px 22px">
+        <div style="color:#D4AF37;font-size:12px;letter-spacing:2px;text-transform:uppercase">JP Trust Learning</div>
+        <div style="color:#F4E4BA;font-size:19px;font-weight:700;margin-top:3px">🔔 มีสมาชิกสมัครใหม่</div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;margin:8px 0">
+        ${row("ชื่อผู้ใช้", esc(info.username))}
+        ${row("อีเมล", esc(info.email))}
+        ${row("อายุ", info.age != null ? String(info.age) : "—")}
+        ${row("แพ็กเกจ", esc(planLabel))}
+        ${row("ราคาปกติ", fmtBaht(info.basePrice))}
+        ${row("ยอดที่ต้องชำระ", `<span style="color:#1F7D49">${fmtBaht(info.amount)}</span>`)}
+        ${row("โปรโมชัน", esc(promoLine))}
+        ${row("สลิป", esc(slipLine))}
+        ${row("รหัสอ้างอิง", esc(info.refCode))}
+        ${row("สมาชิกหมดอายุ", esc(info.expiresAt ?? "—"))}
+      </table>
+      <div style="padding:10px 22px 18px;color:#A09B92;font-size:11.5px;border-top:1px solid rgba(212,175,55,0.2)">ระบบแจ้งเตือนอัตโนมัติ — ตอบกลับอีเมลนี้เพื่อติดต่อสมาชิกได้โดยตรง</div>
+    </div>
+  </div>`;
+
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
+      body: JSON.stringify({ from, to: recipients, reply_to: info.email, subject, text, html }),
+    });
+    if (!res.ok) {
+      let detail = "";
+      try { const j = await res.json(); detail = j.message || j.error || JSON.stringify(j); }
+      catch (_) { detail = await res.text(); }
+      return { sent: false, error: `Resend ${res.status}: ${detail}` };
+    }
+    return { sent: true };
+  } catch (err) {
+    return { sent: false, error: err instanceof Error ? err.message : String(err) };
+  }
+}
+
 // ============ Promo reservation (atomic, via SECURITY DEFINER RPC) ============
 type PromoResult = {
   ok: boolean;
@@ -655,6 +742,18 @@ serve(async (req: Request) => {
       console.log(`[email] welcome sent to ${email}`);
     } else {
       console.error(`[email] FAILED for ${email}: ${mail.error}`);
+    }
+
+    // ---------- Notify founders (best-effort, never blocks signup) ----------
+    const founderMail = await sendFounderNotification({
+      username, email, age: ageNum, plan, basePrice, amount,
+      promoCode, promoApplied: promoValid, refCode,
+      slipName, expiresAt,
+    });
+    if (founderMail.sent) {
+      console.log(`[email] founder notification sent for ${email}`);
+    } else {
+      console.error(`[email] founder notification FAILED for ${email}: ${founderMail.error}`);
     }
 
     // 3. JSON log — written LAST so it captures grant + email outcomes
