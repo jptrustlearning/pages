@@ -398,6 +398,50 @@ async function sendWelcomeEmail(email: string, username: string): Promise<EmailR
   }
 }
 
+// ============ Promo reservation (atomic, via SECURITY DEFINER RPC) ============
+type PromoResult = {
+  ok: boolean;
+  reason: string;
+  discountType: string | null;
+  discountValue: number;
+  basePrice: number;
+  finalPrice: number;
+  slipRequired: boolean;
+};
+
+// Calls reserve_promo() which atomically re-validates AND consumes one quota
+// slot. Service-role only. Returns the locked-in price + whether a slip is
+// still required (free codes don't need one; discounted codes do).
+async function reservePromo(code: string, plan: string): Promise<PromoResult | null> {
+  const supaUrl = Deno.env.get("SUPABASE_URL");
+  const svcKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!supaUrl || !svcKey) return null;
+  try {
+    const admin = createClient(supaUrl, svcKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+    const { data, error } = await admin.rpc("reserve_promo", { p_code: code, p_plan: plan });
+    if (error) {
+      console.error("[promo] reserve_promo RPC error:", error.message);
+      return null;
+    }
+    const row = Array.isArray(data) ? data[0] : data;
+    if (!row) return null;
+    return {
+      ok: !!row.reserved,
+      reason: String(row.reason || ""),
+      discountType: row.discount_type ?? null,
+      discountValue: Number(row.discount_value || 0),
+      basePrice: Number(row.base_price || 0),
+      finalPrice: Number(row.final_price || 0),
+      slipRequired: !!row.slip_required,
+    };
+  } catch (err) {
+    console.error("[promo] reserve error:", err instanceof Error ? err.message : String(err));
+    return null;
+  }
+}
+
 // ============ Handler ============
 serve(async (req: Request) => {
   // CORS preflight
@@ -438,18 +482,14 @@ serve(async (req: Request) => {
   const slipBase64 = body.slipBase64 || null;
   const slipFilename = body.slipFilename || null;
 
-  // Subscription tier the member signed up for. We trust a SERVER-SIDE price
-  // table over the client-sent amount so the client can never dictate the
-  // expected price. Fall back to the client value only for legacy clients that
-  // don't send a plan yet (empty plan).
+  // Plan the member signed up for. The price ALWAYS comes from the server-side
+  // table / promo RPC — never from the client.
   const planRaw = String(body.plan || "").trim().toLowerCase();
   const plan = planRaw === "yearly" ? "yearly" : planRaw === "monthly" ? "monthly" : "";
   const PLAN_PRICES: Record<string, number> = { monthly: 150, yearly: 1400 };
-  const amount = plan
-    ? PLAN_PRICES[plan]
-    : (typeof body.amount === "number" ? body.amount : parseInt(String(body.amount || "0"), 10) || 0);
+  const basePrice = plan ? PLAN_PRICES[plan] : 0;
 
-  // ---------- Validation ----------
+  // ---------- Basic validation (before consuming any promo quota) ----------
   const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRe.test(email)) return errResponse(400, "รูปแบบอีเมลไม่ถูกต้อง");
   if (!username) return errResponse(400, "กรุณากรอกชื่อผู้ใช้");
@@ -460,14 +500,55 @@ serve(async (req: Request) => {
     return errResponse(400, "อายุไม่ถูกต้อง (10-99)");
   }
 
-  const promoValid = promoCode === PROMO_CODE;
-  if (!slipBase64 && !promoValid) {
-    return errResponse(400, "กรุณาแนบสลิปหรือกรอกรหัสโปรโมชันที่ถูกต้อง");
-  }
-
   if (slipBase64 && slipBase64.length > MAX_SLIP_BASE64) {
     return errResponse(413, "ไฟล์สลิปใหญ่เกิน 5MB");
   }
+
+  // ---------- Resolve promo + price (ATOMIC quota consume) ----------
+  // amount = what the member must actually pay. promoFree = code waives slip.
+  let amount = basePrice;
+  let promoApplied = false;
+  let promoFree = false;
+  let promoDiscountType: string | null = null;
+  let promoDiscountValue = 0;
+
+  if (promoCode) {
+    const r = await reservePromo(promoCode, plan);
+    if (r === null) {
+      // RPC unreachable/misconfigured. Don't silently let people in free —
+      // fail closed for promo, but allow the legacy beta code as a fallback so
+      // we never hard-block during infra hiccups while the only code is free.
+      if (promoCode === PROMO_CODE) {
+        promoApplied = true; promoFree = true; amount = 0; promoDiscountType = "free";
+      } else {
+        return errResponse(503, "ระบบตรวจสอบรหัสโปรโมชันไม่พร้อมใช้งานชั่วคราว กรุณาลองใหม่");
+      }
+    } else if (!r.ok) {
+      const map: Record<string, string> = {
+        invalid: "รหัสโปรโมชันไม่ถูกต้อง",
+        expired: "รหัสโปรโมชันหมดอายุแล้ว",
+        not_started: "รหัสโปรโมชันยังไม่เริ่มใช้งาน",
+        wrong_plan: "รหัสโปรโมชันใช้กับแพ็กเกจนี้ไม่ได้",
+        sold_out: "รหัสโปรโมชันถูกใช้ครบจำนวนสิทธิ์แล้ว",
+        empty: "กรุณากรอกรหัสโปรโมชัน",
+      };
+      return errResponse(409, map[r.reason] || "รหัสโปรโมชันใช้ไม่ได้");
+    } else {
+      promoApplied = true;
+      amount = r.finalPrice;
+      promoFree = !r.slipRequired; // free code → slip not required
+      promoDiscountType = r.discountType;
+      promoDiscountValue = r.discountValue;
+    }
+  }
+
+  // Slip is required unless a FREE code was applied.
+  if (!slipBase64 && !promoFree) {
+    return errResponse(400, "กรุณาแนบสลิปการโอนเงิน");
+  }
+
+  // promoValid kept for downstream references (true for any successfully applied code)
+  const promoValid = promoApplied;
 
   // ---------- Generate ref code ----------
   const now = new Date();
@@ -484,13 +565,13 @@ serve(async (req: Request) => {
 
     // 1. Append CSV
     const csvQ = (v: unknown) => '"' + String(v).replace(/"/g, '""') + '"';
-    const csvLine = [runStr, timestamp, email, username, ageNum, refCode, promoCode, slipName, "pending", plan, amount]
+    const csvLine = [runStr, timestamp, email, username, ageNum, refCode, promoCode, slipName, "pending", plan, basePrice, amount]
       .map(csvQ)
       .join(",");
     const existingCSV = await ghGetFile("member-registration.csv", GITHUB_PAT);
     const csvContent = existingCSV
       ? existingCSV.content.trimEnd() + "\n" + csvLine
-      : "id,timestamp,email,username,age,ref_code,promo_code,slip_filename,status,plan,amount\n" + csvLine;
+      : "id,timestamp,email,username,age,ref_code,promo_code,slip_filename,status,plan,base_price,amount_due\n" + csvLine;
     const csvOk = await ghPutText(
       "member-registration.csv",
       csvContent,
@@ -545,8 +626,13 @@ serve(async (req: Request) => {
     const startedAt = timestamp;
     const baseMeta: Record<string, unknown> = {
       plan: plan || null,
-      amount,
+      amount,                     // = amount_due (what they must actually pay)
+      amount_due: amount,
+      base_price: basePrice,
       promo_applied: promoValid,
+      promo_code: promoCode || null,
+      promo_discount_type: promoDiscountType,
+      promo_discount_value: promoDiscountValue,
       ref_code: refCode,
       subscription_status: "active",
       subscription_started_at: startedAt,
@@ -582,6 +668,10 @@ serve(async (req: Request) => {
       promo_applied: promoValid,
       plan: plan || null,
       amount,
+      base_price: basePrice,
+      amount_due: amount,
+      promo_discount_type: promoDiscountType,
+      promo_discount_value: promoDiscountValue,
       subscription: {
         status: "active",
         started_at: startedAt,

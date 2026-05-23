@@ -158,6 +158,9 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .pay-amount .pa-label{font-size:12.5px;color:var(--text-dark-muted);font-weight:500}
 .pay-amount .pa-value{font-family:'DM Serif Display',serif;font-size:22px;color:var(--gold-deep)}
 .pay-amount .pa-value .cur{font-size:13px;vertical-align:3px;margin-right:1px}
+.pay-amount .pa-left{display:flex;flex-direction:column;gap:3px}
+.pay-amount .pa-discount{font-size:11px;color:var(--emerald-dk);font-weight:600}
+.pay-amount .pa-discount s{color:var(--text-muted);font-weight:400}
 
 /* ===== Promo sub-block (inside plan section) ===== */
 .promo-sub{margin-top:18px;padding-top:18px;border-top:1px dashed rgba(212,175,55,0.35)}
@@ -407,7 +410,10 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                         <h2><span class="th">แนบสลิปการโอนเงิน</span></h2>
                     </div>
                     <div class="pay-amount" id="payAmountRow" style="display:none">
-                        <span class="pa-label">ยอดที่ต้องโอน</span>
+                        <div class="pa-left">
+                            <span class="pa-label">ยอดที่ต้องโอน</span>
+                            <span class="pa-discount" id="payDiscountLine" style="display:none"></span>
+                        </div>
                         <span class="pa-value"><span class="cur">฿</span><span id="payAmountValue">—</span></span>
                     </div>
                     <div class="upload-zone" id="uploadZone">
@@ -501,6 +507,7 @@ const PROMO_CODE = 'JPTFREE2026';
 
 let uploadedFileBase64 = null, uploadedFileName = null, promoApplied = false;
 let selectedPlan = null, selectedAmount = null;
+let promoFinalAmount = null, promoSlipRequired = true;
 
 // ============ Plan selection ============
 function selectPlan(plan, amount) {
@@ -509,50 +516,125 @@ function selectPlan(plan, amount) {
     document.getElementById('planMonthlyCard').classList.toggle('selected', plan === 'monthly');
     document.getElementById('planYearlyCard').classList.toggle('selected', plan === 'yearly');
     document.getElementById('planError').classList.remove('show');
-    const val = document.getElementById('payAmountValue');
-    if (val) val.textContent = amount.toLocaleString('en-US');
-    const row = document.getElementById('payAmountRow');
-    if (row) row.style.display = promoApplied ? 'none' : 'flex';
+    // If a promo is already applied, re-price it for the new plan
+    if (promoApplied) { checkPromo(); }
+    else { updatePayDisplay(); }
     checkReady();
 }
 
-// ============ Promo Code ============
-function checkPromo() {
+// ============ Promo Code (validates + prices via Supabase RPC) ============
+const REASON_TH = {
+    invalid:'รหัสไม่ถูกต้อง', expired:'หมดอายุแล้ว', not_started:'ยังไม่เริ่มใช้งาน',
+    wrong_plan:'ใช้กับแพ็กนี้ไม่ได้', sold_out:'สิทธิ์เต็มแล้ว', empty:'กรุณากรอกรหัส'
+};
+
+async function previewPromo(code, plan){
+    try{
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/preview_promo`, {
+            method:'POST',
+            headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON,'Authorization':`Bearer ${SUPABASE_ANON}`},
+            body: JSON.stringify({ p_code: code, p_plan: plan })
+        });
+        if(!res.ok) return null;
+        const data = await res.json();
+        return Array.isArray(data) ? data[0] : data;
+    }catch(e){ return null; }
+}
+
+async function checkPromo() {
     const val = document.getElementById('promoCode').value.trim().toUpperCase();
     const st = document.getElementById('promoStatus');
     const btn = document.getElementById('promoApplyBtn');
 
     if (!val) {
-        st.className = 'promo-status';
-        st.textContent = '';
-        unlockConfirms();
-        promoApplied = false;
+        st.className = 'promo-status'; st.textContent = '';
+        unlockConfirms(); promoApplied = false; promoFinalAmount = null;
         if (btn) { btn.classList.remove('applied'); btn.textContent = 'ใช้รหัสโปรโมชัน'; }
-        checkReady();
+        updatePayDisplay(); checkReady();
+        return;
+    }
+    if (!selectedPlan) {
+        st.className = 'promo-status invalid'; st.textContent = 'เลือกแพ็กก่อน';
+        document.getElementById('planError').classList.add('show');
         return;
     }
 
-    if (val === PROMO_CODE) {
-        st.className = 'promo-status valid';
-        st.textContent = 'ใช้ได้';
-        promoApplied = true;
-        const cs = document.getElementById('confirmSlip');
-        const cp = document.getElementById('confirmPay');
+    if (btn) { btn.disabled = true; btn.textContent = 'กำลังตรวจสอบ...'; }
+    const r = await previewPromo(val, selectedPlan);
+    if (btn) btn.disabled = false;
+
+    // Network/RPC down → fall back to the known free beta code so signup never hard-blocks
+    if (r === null) {
+        if (val === PROMO_CODE) { applyFreePromo(btn, st); }
+        else { st.className='promo-status invalid'; st.textContent='ลองใหม่'; if(btn){btn.classList.remove('applied');btn.textContent='ใช้รหัสโปรโมชัน';} }
+        updatePayDisplay(); checkReady(); return;
+    }
+
+    if (!r.valid) {
+        promoApplied = false; promoFinalAmount = null;
+        st.className = 'promo-status invalid';
+        st.textContent = REASON_TH[r.reason] || 'ใช้ไม่ได้';
+        unlockConfirms();
+        document.getElementById('uploadSection').style.display = '';
+        if (btn) { btn.classList.remove('applied'); btn.textContent = 'ใช้รหัสโปรโมชัน'; }
+        updatePayDisplay(); checkReady(); return;
+    }
+
+    // Valid
+    promoApplied = true;
+    promoFinalAmount = r.final_price;
+    promoSlipRequired = !!r.slip_required;
+    st.className = 'promo-status valid'; st.textContent = 'ใช้ได้';
+    if (btn) { btn.classList.add('applied'); btn.textContent = '✓ ใช้รหัสนี้แล้ว'; }
+
+    if (!r.slip_required) {
+        // Free → no slip, auto-lock confirms
+        const cs = document.getElementById('confirmSlip'), cp = document.getElementById('confirmPay');
         cs.checked = true; cp.checked = true;
         document.getElementById('confirmSlipBox').classList.add('checked','locked');
         document.getElementById('confirmPayBox').classList.add('checked','locked');
         cs.disabled = true; cp.disabled = true;
         document.getElementById('uploadSection').style.display = 'none';
-        if (btn) { btn.classList.add('applied'); btn.textContent = '✓ ใช้รหัสนี้แล้ว'; }
     } else {
-        st.className = 'promo-status invalid';
-        st.textContent = 'ไม่ถูกต้อง';
-        promoApplied = false;
+        // Discounted → slip still required, but at the reduced amount
         unlockConfirms();
         document.getElementById('uploadSection').style.display = '';
-        if (btn) { btn.classList.remove('applied'); btn.textContent = 'ใช้รหัสโปรโมชัน'; }
     }
-    checkReady();
+    updatePayDisplay(); checkReady();
+}
+
+function applyFreePromo(btn, st){
+    promoApplied = true; promoFinalAmount = 0; promoSlipRequired = false;
+    st.className='promo-status valid'; st.textContent='ใช้ได้';
+    const cs=document.getElementById('confirmSlip'), cp=document.getElementById('confirmPay');
+    cs.checked=true; cp.checked=true;
+    document.getElementById('confirmSlipBox').classList.add('checked','locked');
+    document.getElementById('confirmPayBox').classList.add('checked','locked');
+    cs.disabled=true; cp.disabled=true;
+    document.getElementById('uploadSection').style.display='none';
+    if(btn){ btn.classList.add('applied'); btn.textContent='✓ ใช้รหัสนี้แล้ว'; }
+}
+
+// Renders the "ยอดที่ต้องโอน" row with discount line when a discount applies
+function updatePayDisplay(){
+    const row = document.getElementById('payAmountRow');
+    const val = document.getElementById('payAmountValue');
+    const disc = document.getElementById('payDiscountLine');
+    if(!row||!val) return;
+    // Free code → no slip, hide the pay row entirely
+    if(promoApplied && promoFinalAmount === 0){ row.style.display='none'; return; }
+    if(!selectedAmount){ row.style.display='none'; return; }
+    const pay = (promoApplied && promoFinalAmount !== null) ? promoFinalAmount : selectedAmount;
+    val.textContent = pay.toLocaleString('en-US');
+    if(disc){
+        if(promoApplied && promoFinalAmount !== null && promoFinalAmount < selectedAmount){
+            disc.style.display = 'block';
+            disc.innerHTML = 'ราคาปกติ <s>฿'+selectedAmount.toLocaleString('en-US')+'</s> · ลด '+Math.round((1-promoFinalAmount/selectedAmount)*100)+'%';
+        } else {
+            disc.style.display = 'none';
+        }
+    }
+    row.style.display = 'flex';
 }
 
 // Called when user edits promo input — revert any applied state until they click OK again
@@ -577,8 +659,7 @@ function unlockConfirms() {
     if (!cs.checked) document.getElementById('confirmSlipBox').classList.remove('checked');
     if (!cp.checked) document.getElementById('confirmPayBox').classList.remove('checked');
     document.getElementById('uploadSection').style.display = '';
-    const par = document.getElementById('payAmountRow');
-    if (par) par.style.display = selectedAmount ? 'flex' : 'none';
+    updatePayDisplay();
 }
 
 // ============ File Upload ============
@@ -680,7 +761,7 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
             body: JSON.stringify({
                 email, username, age: parseInt(age),
                 plan: selectedPlan,
-                amount: selectedAmount,
+                amount: (promoApplied && promoFinalAmount !== null) ? promoFinalAmount : selectedAmount,
                 promoCode: promoCodeRaw,
                 slipBase64: uploadedFileBase64,
                 slipFilename: uploadedFileName
@@ -700,7 +781,7 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
         window._lastReg = {
             email, username, age,
             plan: selectedPlan,
-            amount: selectedAmount,
+            amount: (promoApplied && promoFinalAmount !== null) ? promoFinalAmount : selectedAmount,
             refCode: data.refCode,
             timestamp: data.timestamp || new Date().toISOString(),
             promoCode: promoCodeRaw.toUpperCase()
