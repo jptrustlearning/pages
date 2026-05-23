@@ -61,6 +61,11 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .login-btn{padding:16px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border:none;border-radius:var(--radius-sm);color:#1a0a0e;font-family:'Sarabun','Anuphan',sans-serif;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 4px 20px rgba(212,175,55,0.3);transition:transform .2s}.login-btn:active{transform:scale(.97)}
 .login-link{color:var(--text-light-muted);font-size:13px;text-align:center;margin-top:8px;cursor:pointer}.login-link span{color:var(--gold)}
 .login-step{display:none}.login-step.active{display:flex;flex-direction:column;gap:14px}
+.login-notfound{background:rgba(26,10,14,0.5);border:1.5px solid rgba(234,106,94,0.45);border-radius:var(--radius-sm);padding:15px 16px;text-align:left}
+.login-notfound-title{font-size:14px;font-weight:600;color:#F0A89E;margin-bottom:5px}
+.login-notfound-desc{font-size:12.5px;color:var(--text-light-muted);line-height:1.55;margin-bottom:13px}
+.login-notfound-signup{width:100%;padding:12px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border:none;border-radius:var(--radius-xs);color:#1a0a0e;font-family:'Sarabun','Anuphan',sans-serif;font-size:14px;font-weight:700;cursor:pointer}
+.login-notfound-signup:active{transform:scale(.98)}
 .otp-sent-msg{background:rgba(76,175,80,0.15);color:var(--green-light);padding:12px 16px;border-radius:var(--radius-xs);font-size:13px;text-align:center}
 .install-banner{display:none;align-items:center;gap:12px;padding:14px 16px;margin-bottom:20px;max-width:380px;width:100%;background:rgba(212,175,55,0.08);border:1px solid var(--gold-border);border-radius:var(--radius);cursor:pointer;transition:all .2s;position:relative;z-index:1}
 .install-banner:active{transform:scale(.98)}.install-banner.show{display:flex}
@@ -907,7 +912,12 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 
         <!-- Step 1: Email for OTP (ครั้งแรก / ลืม PIN) -->
         <div class="login-step" id="stepEmail">
-            <input type="email" class="login-input" id="loginEmail" placeholder="กรอกอีเมลสมาชิก" autocomplete="email">
+            <input type="email" class="login-input" id="loginEmail" placeholder="กรอกอีเมลสมาชิก" autocomplete="email" oninput="hideEmailNotFound()">
+            <div class="login-notfound" id="emailNotFound" style="display:none">
+                <div class="login-notfound-title">ไม่พบอีเมลนี้ในระบบ</div>
+                <div class="login-notfound-desc">กรุณาตรวจสอบการสะกดอีเมลอีกครั้ง — หากยังไม่เคยสมัคร สามารถสมัครสมาชิกด้วยอีเมลนี้ได้เลย</div>
+                <button class="login-notfound-signup" type="button" onclick="goSignupFromLogin()">สมัครสมาชิกด้วยอีเมลนี้ →</button>
+            </div>
             <button class="login-btn" onclick="sendOTP()">ขอรับรหัส OTP ยืนยัน</button>
             <div class="login-link" onclick="location.href='signup.html?v=1779531943'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
         </div>
@@ -1574,10 +1584,16 @@ function showForgotPIN(){
     document.getElementById('loginSubtitle').textContent='ยืนยันตัวตนด้วยอีเมล';
 }
 
+// Email not-found UX (login screen) — show inline notice instead of auto-redirecting to signup
+function showEmailNotFound(){var b=document.getElementById('emailNotFound');if(b)b.style.display='block';var i=document.getElementById('loginEmail');if(i)i.focus();}
+function hideEmailNotFound(){var b=document.getElementById('emailNotFound');if(b)b.style.display='none';}
+function goSignupFromLogin(){var e=(document.getElementById('loginEmail').value||'').trim();location.href='signup.html?v=1779531943'+(e?('&email='+encodeURIComponent(e)):'');}
+
 // Send OTP via Supabase
 async function sendOTP(){
     var e=document.getElementById('loginEmail').value.trim();
     if(!e)return;
+    hideEmailNotFound();
     var btn=document.querySelector('#stepEmail .login-btn');
     if(btn){btn.disabled=true;btn.textContent='กำลังส่ง...';}
     try{
@@ -1585,11 +1601,10 @@ async function sendOTP(){
         if(res.error){
             // New customer (email not registered) → bounce to signup page with email pre-filled
             if(res.error.message.includes('not allowed')||res.error.message.includes('Signups not allowed')||res.error.message.includes('User not found')){
-                if(btn){btn.textContent='กำลังพาไปหน้าสมัคร...';}
-                var rm=document.getElementById('jptRedirectModal');
-                if(rm)rm.classList.add('show');
-                // Spinner stays spinning until signup.html paints (browser shows current page until next loads)
-                setTimeout(function(){location.href='signup.html?v=1779531943&email='+encodeURIComponent(e);},1600);
+                // Email not in system → don't auto-redirect. Show a gentle notice so the
+                // customer can fix a typo, OR choose to sign up with this email.
+                showEmailNotFound();
+                if(btn){btn.disabled=false;btn.textContent='ขอรับรหัส OTP ยืนยัน';}
                 return;
             }
             alert('เกิดข้อผิดพลาด กรุณาลองใหม่');
