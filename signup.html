@@ -210,6 +210,58 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 }
 .promo-apply-btn.applied:hover{transform:none;box-shadow:none}
 
+/* Promo trigger (opens picker modal) */
+.promo-trigger{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:13px 16px;background:var(--cream-card);border:1.5px solid var(--gold-border);border-radius:10px;cursor:pointer;transition:all .2s;font-family:inherit;text-align:left;-webkit-tap-highlight-color:transparent}
+.promo-trigger:hover{border-color:var(--gold);background:rgba(212,175,55,0.05)}
+.promo-trigger .pt-main{display:flex;align-items:center;gap:9px;min-width:0}
+.promo-trigger .pt-ico{flex:none;color:var(--gold-deep);display:flex}
+.promo-trigger .pt-ico svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.promo-trigger .pt-text{font-size:13.5px;font-weight:600;color:var(--maroon);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.promo-trigger .pt-sub{font-size:12px;color:var(--emerald-dk);font-weight:700;white-space:nowrap}
+.promo-trigger .pt-chev{flex:none;color:var(--text-muted);display:flex}
+.promo-trigger .pt-chev svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.promo-trigger.applied{border-color:var(--emerald-dk);background:var(--emerald-dim)}
+.promo-trigger .pt-clear{display:none;width:24px;height:24px;border-radius:50%;border:none;background:rgba(114,47,55,0.12);color:var(--maroon);font-size:17px;line-height:1;cursor:pointer;flex:none;align-items:center;justify-content:center;padding:0}
+.promo-trigger.applied .pt-clear{display:inline-flex}
+.promo-trigger.applied .pt-chev{display:none}
+.promo-line-status{font-size:11.5px;font-weight:600;margin-top:7px;padding-left:2px;display:none}
+.promo-line-status.valid{display:block;color:var(--emerald-dk)}
+.promo-line-status.invalid{display:block;color:var(--red)}
+
+/* Promo picker modal */
+.promo-modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,10,14,0.78);z-index:120;align-items:flex-end;justify-content:center;padding:0}
+.promo-modal-overlay.show{display:flex}
+@media(min-width:560px){.promo-modal-overlay{align-items:center;padding:20px}}
+.promo-modal{background:var(--cream-card);border:1.5px solid var(--gold-border);border-radius:18px 18px 0 0;width:100%;max-width:460px;max-height:88vh;overflow-y:auto;box-shadow:0 -10px 60px rgba(26,10,14,0.45);animation:promoSheet .32s cubic-bezier(.16,1,.3,1);position:relative}
+@media(min-width:560px){.promo-modal{border-radius:18px;box-shadow:0 20px 60px rgba(26,10,14,0.45);animation:modalPop .32s ease-out}}
+.promo-modal::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold-sheen),var(--gold),var(--gold-dark),var(--gold),var(--gold-sheen))}
+@keyframes promoSheet{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.promo-modal-head{display:flex;align-items:center;justify-content:space-between;padding:20px 22px 14px}
+.promo-modal-head h3{font-family:'DM Serif Display',serif;font-size:20px;font-weight:400;color:var(--maroon)}
+.promo-modal-close{width:30px;height:30px;border-radius:50%;border:1px solid rgba(212,175,55,0.3);background:var(--cream-deep);color:var(--text-dark-muted);font-size:18px;line-height:1;cursor:pointer;padding:0}
+.promo-modal-close:hover{background:var(--cream-warm);color:var(--maroon)}
+.promo-modal-body{padding:0 22px 24px}
+.promo-modal-note{font-size:12px;color:var(--text-dark-muted);background:rgba(212,175,55,0.08);border:1px dashed var(--gold-border);border-radius:9px;padding:10px 12px;margin-bottom:14px;line-height:1.55}
+.promo-card{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 15px;border:1.5px solid var(--gold-border);border-radius:12px;margin-bottom:10px;background:linear-gradient(180deg,#FFFEF8,#F5EDD8);cursor:pointer;transition:all .18s}
+.promo-card:hover{border-color:var(--gold);transform:translateY(-1px);box-shadow:0 6px 16px rgba(212,175,55,0.18)}
+.promo-card.disabled{cursor:default;opacity:0.6;background:var(--cream-warm)}
+.promo-card.disabled:hover{transform:none;box-shadow:none;border-color:var(--gold-border)}
+.promo-card .pc-left{min-width:0}
+.promo-card .pc-code{font-family:'Cinzel','Anuphan',sans-serif;font-size:14px;font-weight:700;letter-spacing:0.8px;color:var(--maroon)}
+.promo-card .pc-desc{font-size:11.5px;color:var(--text-dark-muted);margin-top:3px;line-height:1.45}
+.promo-card .pc-right{text-align:right;flex:none}
+.promo-card .pc-price{font-family:'DM Serif Display',serif;font-size:18px;color:var(--gold-deep);white-space:nowrap}
+.promo-card .pc-price s{font-size:12px;color:var(--text-muted);margin-right:2px;font-family:'Sarabun',sans-serif}
+.promo-card .pc-badge{font-size:13px;font-weight:700;color:var(--emerald-dk);white-space:nowrap}
+.promo-card .pc-reason{font-size:11.5px;font-weight:600;color:var(--red);white-space:nowrap}
+.promo-card .pc-loading{font-size:11.5px;color:var(--text-muted)}
+.promo-manual{margin-top:4px;padding-top:16px;border-top:1px dashed rgba(212,175,55,0.35)}
+.promo-manual-label{font-size:12px;color:var(--text-dark-muted);margin-bottom:8px;font-weight:600}
+.promo-manual-row{display:flex;gap:8px}
+.promo-manual-row input{flex:1;text-transform:uppercase;letter-spacing:1px;min-width:0}
+.promo-manual-btn{padding:0 20px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--maroon),var(--maroon-dk));color:var(--gold-light);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.promo-manual-btn:hover{filter:brightness(1.1)}
+
 /* ===== Upload ===== */
 .upload-zone{
     border:2px dashed rgba(212,175,55,0.45);border-radius:12px;
@@ -409,12 +461,19 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                     <div class="promo-sub">
                         <div class="promo-sub-label">Promotion Code <span class="promo-sub-opt">(ถ้ามี)</span></div>
                         <div class="form-group">
-                            <div class="promo-wrap">
-                                <input type="text" id="promoCode" placeholder="กรอกรหัสโปรโมชัน" value="JPTFREE2026" oninput="resetPromoApply()" autocomplete="off">
-                                <div class="promo-status" id="promoStatus"></div>
+                            <input type="hidden" id="promoCode" value="">
+                            <div class="promo-trigger" id="promoTrigger" role="button" tabindex="0" onclick="openPromoModal()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPromoModal();}">
+                                <span class="pt-main">
+                                    <span class="pt-ico"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span>
+                                    <span class="pt-text" id="promoTriggerText">เลือกรหัสโปรโมชัน</span>
+                                    <span class="pt-sub" id="promoTriggerSub"></span>
+                                </span>
+                                <span class="pt-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+                                <button type="button" class="pt-clear" id="promoClearBtn" onclick="event.stopPropagation();clearPromo()" aria-label="ลบรหัสโปรโมชัน">&times;</button>
                             </div>
-                            <button type="button" class="promo-apply-btn" id="promoApplyBtn" onclick="checkPromo()">ใช้รหัสโปรโมชัน</button>
-                            <div class="promo-hint">หากมีรหัสโปรโมชันที่ใช้ได้ ไม่จำเป็นต้องแนบสลิปการโอนเงิน</div>
+                            <div class="promo-status" id="promoStatus" style="display:none"></div>
+                            <div class="promo-line-status" id="promoLineStatus"></div>
+                            <div class="promo-hint">กดเพื่อดูรหัสโปรโมชันที่ใช้ได้ · หากใช้รหัสฟรีไม่ต้องแนบสลิปการโอนเงิน</div>
                         </div>
                     </div>
                 </div>
@@ -500,6 +559,27 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
     <div class="footer">© 2026 <span class="brand">JP TRUST LEARNING</span> · Member Registration</div>
 </div>
 
+<!-- Promo picker modal -->
+<div class="promo-modal-overlay" id="promoModal" onclick="if(event.target===this)closePromoModal()">
+    <div class="promo-modal">
+        <div class="promo-modal-head">
+            <h3>รหัสโปรโมชันที่ใช้ได้</h3>
+            <button type="button" class="promo-modal-close" onclick="closePromoModal()" aria-label="ปิด">&times;</button>
+        </div>
+        <div class="promo-modal-body">
+            <div class="promo-modal-note" id="promoModalNote"></div>
+            <div id="promoList"></div>
+            <div class="promo-manual">
+                <div class="promo-manual-label">มีรหัสอื่น? กรอกเอง</div>
+                <div class="promo-manual-row">
+                    <input type="text" id="promoManualInput" placeholder="กรอกรหัส" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();applyPromoManual();}">
+                    <button type="button" class="promo-manual-btn" onclick="applyPromoManual()">ใช้</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Success Modal -->
 <div class="modal-overlay" id="successModal">
     <div class="modal">
@@ -551,7 +631,7 @@ function selectPlan(plan, amount) {
     document.getElementById('planYearlyCard').classList.toggle('selected', plan === 'yearly');
     document.getElementById('planError').classList.remove('show');
     // If a promo is already applied, re-price it for the new plan
-    if (promoApplied) { checkPromo(); }
+    if (promoApplied) { checkPromo().then(syncPromoTrigger); }
     else { updatePayDisplay(); }
     checkReady();
 }
@@ -573,6 +653,108 @@ async function previewPromo(code, plan){
         const data = await res.json();
         return Array.isArray(data) ? data[0] : data;
     }catch(e){ return null; }
+}
+
+// ============ Promo picker (click → modal of available codes) ============
+// Public codes shown in the picker. Price/validity is fetched live from
+// preview_promo (the DB is the source of truth). Add a future public promo by
+// appending here. Comp / free codes (e.g. JPTFREE2026) stay manual-entry only.
+const PROMO_CATALOG = [
+    { code:'JPTHALF5050', desc:'โปรเปิดตัว · ลด 50% · 30 สิทธิ์แรก · ถึง 30 มิ.ย. 2569' }
+];
+
+function openPromoModal(){
+    const ov = document.getElementById('promoModal');
+    const mi = document.getElementById('promoManualInput'); if(mi) mi.value='';
+    renderPromoList();
+    ov.classList.add('show');
+    document.addEventListener('keydown', promoEsc);
+}
+function closePromoModal(){
+    document.getElementById('promoModal').classList.remove('show');
+    document.removeEventListener('keydown', promoEsc);
+}
+function promoEsc(e){ if(e.key==='Escape') closePromoModal(); }
+
+async function renderPromoList(){
+    const list = document.getElementById('promoList');
+    const note = document.getElementById('promoModalNote');
+    note.textContent = selectedPlan
+        ? 'แตะรหัสเพื่อใช้ทันที · ราคาคำนวณตามแพ็กที่เลือก'
+        : 'เลือกแพ็กเกจสมาชิกก่อน เพื่อดูราคาหลังหักส่วนลด';
+    list.innerHTML = PROMO_CATALOG.map((p,i) =>
+        '<div class="promo-card disabled" id="pcard-'+i+'">'+
+            '<div class="pc-left"><div class="pc-code">'+p.code+'</div><div class="pc-desc">'+p.desc+'</div></div>'+
+            '<div class="pc-right"><span class="pc-loading">'+(selectedPlan?'กำลังเช็ก…':'เลือกแพ็กก่อน')+'</span></div>'+
+        '</div>').join('');
+    if(!selectedPlan) return;
+    for(let i=0;i<PROMO_CATALOG.length;i++){
+        const p = PROMO_CATALOG[i];
+        const r = await previewPromo(p.code, selectedPlan);
+        const card = document.getElementById('pcard-'+i);
+        if(!card) continue;
+        const right = card.querySelector('.pc-right');
+        if(r === null){
+            right.innerHTML = '<span class="pc-reason">ลองใหม่</span>';
+        } else if(!r.valid){
+            right.innerHTML = '<span class="pc-reason">'+(REASON_TH[r.reason]||'ใช้ไม่ได้')+'</span>';
+        } else {
+            const isFree = r.final_price === 0;
+            right.innerHTML = isFree
+                ? '<span class="pc-badge">ฟรี</span>'
+                : '<span class="pc-price"><s>฿'+Number(r.base_price).toLocaleString('en-US')+'</s>฿'+Number(r.final_price).toLocaleString('en-US')+'</span>';
+            card.classList.remove('disabled');
+            card.onclick = () => applyPromoFromCatalog(p.code);
+        }
+    }
+}
+
+async function applyPromoFromCatalog(code){
+    document.getElementById('promoCode').value = code;
+    closePromoModal();
+    await checkPromo();
+    syncPromoTrigger();
+}
+async function applyPromoManual(){
+    const v = (document.getElementById('promoManualInput').value || '').trim().toUpperCase();
+    if(!v) return;
+    if(!selectedPlan){
+        document.getElementById('planError').classList.add('show');
+        closePromoModal();
+        return;
+    }
+    document.getElementById('promoCode').value = v;
+    closePromoModal();
+    await checkPromo();
+    syncPromoTrigger();
+}
+function clearPromo(){
+    document.getElementById('promoCode').value = '';
+    resetPromoApply();
+    syncPromoTrigger();
+}
+// Reflect current promo state on the trigger button + status line
+function syncPromoTrigger(){
+    const trig = document.getElementById('promoTrigger');
+    const txt  = document.getElementById('promoTriggerText');
+    const sub  = document.getElementById('promoTriggerSub');
+    const line = document.getElementById('promoLineStatus');
+    if(!trig) return;
+    const code = (document.getElementById('promoCode').value || '').trim().toUpperCase();
+    if(promoApplied && code){
+        trig.classList.add('applied');
+        txt.textContent = code;
+        if(promoFinalAmount === 0){ sub.textContent = '· ฟรี'; }
+        else if(promoFinalAmount !== null && selectedAmount){ sub.textContent = '· ลด '+Math.round((1-promoFinalAmount/selectedAmount)*100)+'%'; }
+        else { sub.textContent = ''; }
+        line.className = 'promo-line-status valid'; line.textContent = '✓ ใช้รหัสนี้แล้ว';
+    } else {
+        trig.classList.remove('applied');
+        txt.textContent = 'เลือกรหัสโปรโมชัน'; sub.textContent = '';
+        const reason = (document.getElementById('promoStatus').textContent || '').trim();
+        if(reason){ line.className = 'promo-line-status invalid'; line.textContent = reason; }
+        else { line.className = 'promo-line-status'; line.textContent = ''; }
+    }
 }
 
 async function checkPromo() {
