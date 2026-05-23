@@ -129,7 +129,7 @@ async function ghNextRunningNumber(pat: string): Promise<number> {
 }
 
 // ============ Supabase admin helper ============
-type GrantResult = { granted: boolean; alreadyExisted: boolean; expiresAt?: string | null; error?: string };
+type GrantResult = { granted: boolean; alreadyExisted: boolean; error?: string };
 
 // Find an existing auth user id by email (paginated). Used on renewal /
 // re-signup so we can refresh the subscription metadata of an existing user.
@@ -147,42 +147,20 @@ async function findUserIdByEmail(admin: any, email: string): Promise<string | nu
   return null;
 }
 
-async function grantSupabaseUser(
-  email: string,
-  baseMeta: Record<string, unknown>,
-  durationDays: number,
-): Promise<GrantResult> {
+async function grantSupabaseUser(email: string, appMeta: Record<string, unknown>): Promise<GrantResult> {
   const supaUrl = Deno.env.get("SUPABASE_URL");
   const svcKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!supaUrl || !svcKey) {
     return { granted: false, alreadyExisted: false, error: "missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY" };
   }
-
-  // Compute an expiry that EXTENDS from a base date (so renewals don't burn
-  // remaining days). base = max(now, existing_expiry). If durationDays is 0
-  // (legacy / no plan), expiry is null.
-  const nowMs = Date.now();
-  const computeExpiry = (existingExpiryISO: string | null | undefined): string | null => {
-    if (!durationDays) return null;
-    let baseMs = nowMs;
-    if (existingExpiryISO) {
-      const t = Date.parse(existingExpiryISO);
-      if (!isNaN(t) && t > baseMs) baseMs = t; // not yet expired → extend from old expiry
-    }
-    return new Date(baseMs + durationDays * 86400000).toISOString();
-  };
-
   try {
     const admin = createClient(supaUrl, svcKey, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
-
-    // ---- New user: expiry counts from now ----
-    const freshMeta = { ...baseMeta, subscription_expires_at: computeExpiry(null) };
     const { data, error } = await admin.auth.admin.createUser({
       email,
       email_confirm: true,
-      app_metadata: freshMeta,
+      app_metadata: appMeta,
     });
     if (error) {
       // Idempotent: if user already exists, treat as success (don't fail signup)
@@ -193,28 +171,19 @@ async function grantSupabaseUser(
         msg.includes("duplicate") ||
         msg.includes("exists")
       ) {
-        // ---- Renewal / re-signup: EXTEND from the user's current expiry ----
+        // Renewal / re-signup — refresh the subscription metadata (new expiry)
         const id = await findUserIdByEmail(admin, email);
         if (id) {
-          // Read current expiry to extend from it (don't lose remaining days)
-          let currentExpiry: string | null = null;
-          try {
-            const { data: got } = await admin.auth.admin.getUserById(id);
-            const m = (got?.user?.app_metadata || {}) as Record<string, unknown>;
-            currentExpiry = (m.subscription_expires_at as string) || null;
-          } catch (_) { /* fall back to now */ }
-          const renewMeta = { ...baseMeta, subscription_expires_at: computeExpiry(currentExpiry) };
-          const { error: upErr } = await admin.auth.admin.updateUserById(id, { app_metadata: renewMeta });
+          const { error: upErr } = await admin.auth.admin.updateUserById(id, { app_metadata: appMeta });
           if (upErr) {
-            return { granted: true, alreadyExisted: true, expiresAt: renewMeta.subscription_expires_at as string | null, error: `metadata update failed: ${upErr.message}` };
+            return { granted: true, alreadyExisted: true, error: `metadata update failed: ${upErr.message}` };
           }
-          return { granted: true, alreadyExisted: true, expiresAt: renewMeta.subscription_expires_at as string | null };
         }
-        return { granted: true, alreadyExisted: true, expiresAt: null };
+        return { granted: true, alreadyExisted: true };
       }
       return { granted: false, alreadyExisted: false, error: error.message };
     }
-    return { granted: !!data?.user, alreadyExisted: false, expiresAt: freshMeta.subscription_expires_at as string | null };
+    return { granted: !!data?.user, alreadyExisted: false };
   } catch (err) {
     return {
       granted: false,
@@ -536,28 +505,28 @@ serve(async (req: Request) => {
     // ───────────────────────────────────────────────────────────────────────
 
     // ---------- Compute subscription window ----------
-    // monthly = +30 days, yearly = +365 days. On RENEWAL the expiry EXTENDS from
-    // the user's existing expiry (computed inside grantSupabaseUser via
-    // max(now, existing_expiry) + durationDays) so remaining days aren't lost.
-    // If the old sub already lapsed, it counts from now instead.
+    // monthly = +30 days, yearly = +365 days from signup. Stored on the auth
+    // user's app_metadata so the client can gate access on every app open.
     const SUB_DAYS: Record<string, number> = { monthly: 30, yearly: 365 };
     const durationDays = plan ? SUB_DAYS[plan] : 0;
     const startedAt = timestamp;
-    const baseMeta: Record<string, unknown> = {
+    const expiresAt = durationDays
+      ? new Date(now.getTime() + durationDays * 86400000).toISOString()
+      : null;
+    const subMeta: Record<string, unknown> = {
       plan: plan || null,
       amount,
       promo_applied: promoValid,
       ref_code: refCode,
       subscription_status: "active",
       subscription_started_at: startedAt,
+      subscription_expires_at: expiresAt,
     };
 
     // ---------- Auto-grant Supabase user (best-effort, never blocks signup) ----------
-    const grant = await grantSupabaseUser(email, baseMeta, durationDays);
-    // The authoritative expiry is whatever grant actually stored (extended on renewal)
-    const expiresAt = grant.expiresAt ?? null;
+    const grant = await grantSupabaseUser(email, subMeta);
     if (grant.granted) {
-      console.log(`[grant] ${email} — ${grant.alreadyExisted ? "renewed" : "created"} · expires ${expiresAt ?? "—"}`);
+      console.log(`[grant] ${email} — ${grant.alreadyExisted ? "already existed" : "created"}`);
     } else {
       console.error(`[grant] FAILED for ${email}: ${grant.error}`);
     }
