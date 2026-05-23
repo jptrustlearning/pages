@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>สมัครสมาชิก · JP Trust Learning</title>
+<link rel="icon" type="image/png" href="jpt-owl-logo.png">
+<link rel="manifest" href="manifest.json?v=1779526921">
+<meta name="theme-color" content="#1a0a0e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="JP Trust">
+<link rel="apple-touch-icon" href="pwa-icons/icon-192x192.png">
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600;700&family=DM+Serif+Display&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+    --cream:#FAF6ED;--cream-warm:#F5EFE0;--cream-card:#FFFEF8;--cream-deep:#F5EDD8;
+    --gold:#D4AF37;--gold-dark:#B8860B;--gold-deep:#8B6914;--gold-light:#F4E4BA;--gold-sheen:#E8D48B;
+    --gold-glow:rgba(212,175,55,0.15);--gold-border:rgba(212,175,55,0.4);
+    --maroon:#722F37;--maroon-dk:#5A1F26;--maroon-dark2:#1a0a0e;--maroon-mid:#2d1018;--maroon-light:#3a1520;
+    --burgundy:#C14545;--burgundy-dk:#9C2B2B;
+    --emerald:#2E9F5F;--emerald-dk:#1F7D49;--emerald-dim:rgba(46,159,95,0.12);
+    --red:#C14545;--red-dim:rgba(193,69,69,0.08);
+    --text-dark:#3D3228;--text-dark-muted:#5A3D20;--text-muted:#7A6F62;--text-light-muted:rgba(244,228,186,0.7);
+    --radius:14px;--radius-sm:10px;
+    --safe-top:env(safe-area-inset-top,0);
+    --safe-bottom:env(safe-area-inset-bottom,0);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);color:var(--text-dark);min-height:100vh;min-height:100dvh;overflow-x:hidden}
+
+/* ===== Hero ===== */
+.hero{
+    position:relative;
+    background:linear-gradient(160deg,var(--maroon-dark2),var(--maroon-mid) 40%,var(--maroon-light) 60%,var(--maroon-mid) 80%,var(--maroon-dark2));
+    padding:calc(32px + var(--safe-top)) 22px 42px;
+    overflow:hidden;
+    text-align:center;
+}
+.hero::before{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse at 30% 30%,rgba(114,47,55,0.35),transparent 50%),radial-gradient(ellipse at 70% 70%,rgba(90,30,40,0.25),transparent 50%);
+    pointer-events:none;
+}
+.hero::after{
+    content:'';position:absolute;bottom:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,transparent,var(--gold-sheen),var(--gold),var(--gold-sheen),transparent);
+}
+.hero-inner{position:relative;z-index:2;max-width:560px;margin:0 auto}
+.hero-logo{
+    width:72px;height:72px;margin:0 auto 18px;
+    background:linear-gradient(135deg,var(--gold),var(--gold-dark));
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-family:'Cinzel',serif;font-size:18px;font-weight:700;color:#fff;letter-spacing:2px;
+    box-shadow:0 0 40px var(--gold-glow),0 0 80px rgba(212,175,55,0.1);
+}
+.hero-label{
+    font-family:'Cinzel',serif;font-size:11px;letter-spacing:3.5px;
+    color:var(--gold);text-transform:uppercase;margin-bottom:10px;font-weight:600;
+}
+.hero-title{
+    font-family:'DM Serif Display',serif;
+    font-size:clamp(1.75rem,5.5vw,2.4rem);
+    line-height:1.2;color:var(--gold-light);margin-bottom:8px;
+}
+.hero-title .th{font-family:'Anuphan',sans-serif;font-weight:700;font-size:0.82em}
+.hero-sub{font-size:0.92rem;color:var(--text-light-muted);line-height:1.6;max-width:440px;margin:0 auto}
+
+/* Back link */
+.back-link{
+    position:absolute;top:calc(18px + var(--safe-top));left:18px;z-index:3;
+    display:inline-flex;align-items:center;gap:6px;
+    color:var(--gold);font-size:13px;text-decoration:none;
+    padding:8px 14px;border:1px solid var(--gold-border);border-radius:20px;
+    background:rgba(26,10,14,0.35);transition:all .2s;
+}
+.back-link:hover{background:rgba(26,10,14,0.6);border-color:var(--gold)}
+.back-link svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* ===== Page ===== */
+.page{padding:0 16px calc(40px + var(--safe-bottom))}
+.card{
+    max-width:560px;margin:-24px auto 0;position:relative;z-index:3;
+    background:var(--cream-card);
+    border:1.5px solid var(--gold-border);
+    border-radius:20px;
+    box-shadow:0 16px 48px rgba(26,10,14,0.12),0 4px 16px rgba(114,47,55,0.06);
+    overflow:hidden;
+}
+.card-glow{
+    height:3px;
+    background:linear-gradient(90deg,var(--gold-sheen),var(--gold),var(--gold-dark),var(--gold),var(--gold-sheen));
+    background-size:200% 100%;
+    animation:glowSlide 4s linear infinite;
+}
+@keyframes glowSlide{0%{background-position:0% 0%}100%{background-position:200% 0%}}
+.card-body{padding:30px 26px 24px}
+@media(max-width:480px){.card-body{padding:24px 18px 20px}}
+
+/* ===== Section ===== */
+.section{margin-bottom:26px}
+.section:last-child{margin-bottom:0}
+.section-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(212,175,55,0.25)}
+.section-num{
+    width:28px;height:28px;border-radius:8px;
+    background:linear-gradient(135deg,var(--maroon),var(--maroon-dk));
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    font-family:'DM Serif Display',serif;font-size:14px;color:var(--gold-light);
+    box-shadow:0 2px 6px rgba(114,47,55,0.25);
+}
+.section-head h2{
+    font-family:'Cinzel','Anuphan',sans-serif;font-size:13px;font-weight:600;
+    letter-spacing:1.2px;color:var(--maroon);text-transform:uppercase;
+}
+.section-head .th{font-family:'Anuphan',sans-serif;font-weight:700;letter-spacing:0;text-transform:none;font-size:14px}
+
+/* ===== Inputs ===== */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.form-row.single{grid-template-columns:1fr}
+@media(max-width:480px){.form-row{grid-template-columns:1fr}}
+.form-group label{
+    display:block;font-size:12.5px;font-weight:500;color:var(--text-dark-muted);
+    margin-bottom:6px;letter-spacing:0.2px;
+}
+.form-group label .req{color:var(--red);margin-left:2px}
+.form-group input,.form-group select{
+    width:100%;padding:12px 14px;
+    background:#FFFEFA;border:1.5px solid rgba(212,175,55,0.3);border-radius:10px;
+    color:var(--text-dark);font-family:'Sarabun','Anuphan',sans-serif;font-size:14.5px;
+    transition:all .2s;
+}
+.form-group input:focus,.form-group select:focus{
+    outline:none;border-color:var(--gold);
+    box-shadow:0 0 0 3px rgba(212,175,55,0.15);
+    background:#fff;
+}
+.form-group input::placeholder{color:#B8A990}
+
+/* ===== Plan selection ===== */
+.plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:480px){.plan-grid{grid-template-columns:1fr}}
+.plan-card{
+    position:relative;cursor:pointer;display:flex;flex-direction:column;
+    border:1.5px solid rgba(212,175,55,0.3);border-radius:12px;
+    padding:16px 14px 14px;background:#FFFEFA;transition:all .22s;
+}
+.plan-card:hover{border-color:var(--gold);background:rgba(212,175,55,0.05)}
+.plan-card.selected{border-color:var(--emerald);background:var(--emerald-dim);box-shadow:0 4px 16px rgba(46,159,95,0.14)}
+.plan-card input[type="radio"]{position:absolute;opacity:0;pointer-events:none}
+.plan-tier{font-family:'Cinzel','Anuphan',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold-deep);font-weight:600;margin-bottom:8px}
+.plan-card.selected .plan-tier{color:var(--emerald-dk)}
+.plan-price{font-family:'DM Serif Display',serif;font-size:30px;color:var(--maroon);line-height:1}
+.plan-card.selected .plan-price{color:var(--emerald-dk)}
+.plan-price .cur{font-size:16px;vertical-align:6px;margin-right:1px}
+.plan-per{font-size:12px;color:var(--text-muted);margin-top:5px;font-weight:500}
+.plan-save{margin-top:9px;align-self:flex-start;font-size:10.5px;font-weight:700;letter-spacing:0.3px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#1a0a0e;padding:3px 9px;border-radius:6px}
+.plan-check{position:absolute;top:12px;right:12px;width:20px;height:20px;border-radius:50%;border:1.5px solid rgba(212,175,55,0.45);background:#fff;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.plan-check svg{width:12px;height:12px;stroke:#fff;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.plan-card.selected .plan-check{border-color:var(--emerald);background:var(--emerald)}
+.plan-card.selected .plan-check svg{opacity:1}
+
+/* ===== Pay amount hint (slip section) ===== */
+.pay-amount{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;padding:12px 16px;border-radius:10px;background:linear-gradient(180deg,#FFFEF8,#F5EDD8);border:1.5px solid var(--gold-border)}
+.pay-amount .pa-label{font-size:12.5px;color:var(--text-dark-muted);font-weight:500}
+.pay-amount .pa-value{font-family:'DM Serif Display',serif;font-size:22px;color:var(--gold-deep)}
+.pay-amount .pa-value .cur{font-size:13px;vertical-align:3px;margin-right:1px}
+.pay-amount .pa-left{display:flex;flex-direction:column;gap:3px}
+.pay-amount .pa-discount{font-size:11px;color:var(--emerald-dk);font-weight:600}
+.pay-amount .pa-discount s{color:var(--text-muted);font-weight:400}
+
+/* ===== Bank account (transfer destination) ===== */
+.bank-box{margin-bottom:14px;padding:14px 16px;border-radius:10px;background:linear-gradient(180deg,#FFFEF8,#F5EDD8);border:1.5px solid var(--gold-border)}
+.bank-head{font-family:'Cinzel','Anuphan',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gold-deep);font-weight:600;margin-bottom:10px}
+.bank-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.bank-meta{display:flex;flex-direction:column;gap:2px;min-width:0}
+.bank-name{font-size:13.5px;font-weight:600;color:var(--maroon)}
+.bank-holder{font-size:12px;color:var(--text-dark-muted)}
+.bank-acct-wrap{display:flex;align-items:center;gap:8px}
+.bank-acct{font-family:'DM Serif Display',serif;font-size:19px;letter-spacing:0.5px;color:var(--gold-deep);white-space:nowrap}
+.bank-copy-btn{display:inline-flex;align-items:center;gap:5px;cursor:pointer;border:1.5px solid var(--gold-border);background:rgba(212,175,55,0.08);color:var(--maroon);font-family:'Sarabun','Anuphan',sans-serif;font-size:12px;font-weight:600;padding:6px 11px;border-radius:8px;transition:all .15s ease}
+.bank-copy-btn:hover{border-color:var(--gold);background:rgba(212,175,55,0.16)}
+.bank-copy-btn:active{transform:scale(0.96)}
+.bank-copy-btn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2}
+.bank-copy-btn.copied{background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-color:var(--gold-dark);color:#1a0a0e}
+.bank-hint{font-size:11px;color:var(--text-muted);margin-top:9px;line-height:1.5}
+
+/* ===== Promo sub-block (inside plan section) ===== */
+.promo-sub{margin-top:18px;padding-top:18px;border-top:1px dashed rgba(212,175,55,0.35)}
+.promo-sub-label{font-family:'Cinzel','Anuphan',sans-serif;font-size:12px;font-weight:600;letter-spacing:1px;color:var(--gold-deep);text-transform:uppercase;margin-bottom:10px}
+.promo-sub-opt{font-family:'Anuphan',sans-serif;font-size:11.5px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--text-muted)}
+
+/* ===== Promo ===== */
+.promo-wrap{position:relative}
+.promo-wrap input{padding-right:90px;text-transform:uppercase;letter-spacing:1px}
+.promo-status{
+    position:absolute;right:10px;top:50%;transform:translateY(-50%);
+    font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;
+    display:none;letter-spacing:0.3px;
+}
+.promo-status.valid{display:block;background:var(--emerald-dim);color:var(--emerald-dk)}
+.promo-status.invalid{display:block;background:var(--red-dim);color:var(--red)}
+.promo-hint{font-size:11.5px;color:var(--text-muted);margin-top:6px;line-height:1.5}
+.promo-apply-btn{
+    display:block;width:100%;margin-top:10px;padding:11px 16px;
+    background:linear-gradient(135deg,var(--gold),var(--gold-dark));
+    color:#1a0a0e;border:none;border-radius:10px;
+    font-family:inherit;font-size:14px;font-weight:600;letter-spacing:0.3px;
+    cursor:pointer;transition:all .25s;
+    box-shadow:0 4px 14px rgba(212,175,55,0.28);
+}
+.promo-apply-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(212,175,55,0.4)}
+.promo-apply-btn:active{transform:translateY(0)}
+.promo-apply-btn.applied{
+    background:linear-gradient(135deg,var(--emerald-dim),var(--emerald-dim));
+    color:var(--emerald-dk);box-shadow:none;cursor:default;
+}
+.promo-apply-btn.applied:hover{transform:none;box-shadow:none}
+
+/* Promo trigger (opens picker modal) */
+.promo-trigger{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:13px 16px;background:var(--cream-card);border:1.5px solid var(--gold-border);border-radius:10px;cursor:pointer;transition:all .2s;font-family:inherit;text-align:left;-webkit-tap-highlight-color:transparent}
+.promo-trigger:hover{border-color:var(--gold);background:rgba(212,175,55,0.05)}
+.promo-trigger .pt-main{display:flex;align-items:center;gap:9px;min-width:0}
+.promo-trigger .pt-ico{flex:none;color:var(--gold-deep);display:flex}
+.promo-trigger .pt-ico svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.promo-trigger .pt-text{font-size:13.5px;font-weight:600;color:var(--maroon);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.promo-trigger .pt-sub{font-size:12px;color:var(--emerald-dk);font-weight:700;white-space:nowrap}
+.promo-trigger .pt-chev{flex:none;color:var(--text-muted);display:flex}
+.promo-trigger .pt-chev svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.promo-trigger.applied{border-color:var(--emerald-dk);background:var(--emerald-dim)}
+.promo-trigger .pt-clear{display:none;width:24px;height:24px;border-radius:50%;border:none;background:rgba(114,47,55,0.12);color:var(--maroon);font-size:17px;line-height:1;cursor:pointer;flex:none;align-items:center;justify-content:center;padding:0}
+.promo-trigger.applied .pt-clear{display:inline-flex}
+.promo-trigger.applied .pt-chev{display:none}
+.promo-line-status{font-size:11.5px;font-weight:600;margin-top:7px;padding-left:2px;display:none}
+.promo-line-status.valid{display:block;color:var(--emerald-dk)}
+.promo-line-status.invalid{display:block;color:var(--red)}
+
+/* Promo picker modal */
+.promo-modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,10,14,0.78);z-index:120;align-items:flex-end;justify-content:center;padding:0}
+.promo-modal-overlay.show{display:flex}
+@media(min-width:560px){.promo-modal-overlay{align-items:center;padding:20px}}
+.promo-modal{background:var(--cream-card);border:1.5px solid var(--gold-border);border-radius:18px 18px 0 0;width:100%;max-width:460px;max-height:88vh;overflow-y:auto;box-shadow:0 -10px 60px rgba(26,10,14,0.45);animation:promoSheet .32s cubic-bezier(.16,1,.3,1);position:relative}
+@media(min-width:560px){.promo-modal{border-radius:18px;box-shadow:0 20px 60px rgba(26,10,14,0.45);animation:modalPop .32s ease-out}}
+.promo-modal::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold-sheen),var(--gold),var(--gold-dark),var(--gold),var(--gold-sheen))}
+@keyframes promoSheet{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.promo-modal-head{display:flex;align-items:center;justify-content:space-between;padding:20px 22px 14px}
+.promo-modal-head h3{font-family:'DM Serif Display',serif;font-size:20px;font-weight:400;color:var(--maroon)}
+.promo-modal-close{width:30px;height:30px;border-radius:50%;border:1px solid rgba(212,175,55,0.3);background:var(--cream-deep);color:var(--text-dark-muted);font-size:18px;line-height:1;cursor:pointer;padding:0}
+.promo-modal-close:hover{background:var(--cream-warm);color:var(--maroon)}
+.promo-modal-body{padding:0 22px 24px}
+.promo-modal-note{font-size:12px;color:var(--text-dark-muted);background:rgba(212,175,55,0.08);border:1px dashed var(--gold-border);border-radius:9px;padding:10px 12px;margin-bottom:14px;line-height:1.55}
+.promo-card{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 15px;border:1.5px solid var(--gold-border);border-radius:12px;margin-bottom:10px;background:linear-gradient(180deg,#FFFEF8,#F5EDD8);cursor:pointer;transition:all .18s}
+.promo-card:hover{border-color:var(--gold);transform:translateY(-1px);box-shadow:0 6px 16px rgba(212,175,55,0.18)}
+.promo-card.disabled{cursor:default;opacity:0.6;background:var(--cream-warm)}
+.promo-card.disabled:hover{transform:none;box-shadow:none;border-color:var(--gold-border)}
+.promo-card .pc-left{min-width:0}
+.promo-card .pc-code{font-family:'Cinzel','Anuphan',sans-serif;font-size:14px;font-weight:700;letter-spacing:0.8px;color:var(--maroon)}
+.promo-card .pc-desc{font-size:11.5px;color:var(--text-dark-muted);margin-top:3px;line-height:1.45}
+.promo-card .pc-right{text-align:right;flex:none}
+.promo-card .pc-price{font-family:'DM Serif Display',serif;font-size:18px;color:var(--gold-deep);white-space:nowrap}
+.promo-card .pc-price s{font-size:12px;color:var(--text-muted);margin-right:2px;font-family:'Sarabun',sans-serif}
+.promo-card .pc-badge{font-size:13px;font-weight:700;color:var(--emerald-dk);white-space:nowrap}
+.promo-card .pc-reason{font-size:11.5px;font-weight:600;color:var(--red);white-space:nowrap}
+.promo-card .pc-loading{font-size:11.5px;color:var(--text-muted)}
+.promo-manual{margin-top:4px;padding-top:16px;border-top:1px dashed rgba(212,175,55,0.35)}
+.promo-manual-label{font-size:12px;color:var(--text-dark-muted);margin-bottom:8px;font-weight:600}
+.promo-manual-row{display:flex;gap:8px}
+.promo-manual-row input{flex:1;text-transform:uppercase;letter-spacing:1px;min-width:0}
+.promo-manual-btn{padding:0 20px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--maroon),var(--maroon-dk));color:var(--gold-light);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.promo-manual-btn:hover{filter:brightness(1.1)}
+
+/* ===== Upload ===== */
+.upload-zone{
+    border:2px dashed rgba(212,175,55,0.45);border-radius:12px;
+    padding:22px 14px;text-align:center;cursor:pointer;position:relative;
+    background:rgba(212,175,55,0.04);transition:all .25s;
+}
+.upload-zone:hover{border-color:var(--gold);background:rgba(212,175,55,0.09)}
+.upload-zone.has-file{border-style:solid;border-color:var(--emerald);background:var(--emerald-dim)}
+.upload-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.upload-zone .up-icon{
+    width:36px;height:36px;margin:0 auto 8px;color:var(--gold-deep);
+}
+.upload-zone .up-icon svg{width:100%;height:100%;stroke:currentColor;fill:none;stroke-width:1.5}
+.upload-zone p{font-size:13px;color:var(--text-dark-muted);font-weight:500}
+.upload-zone .hint{font-size:11px;color:var(--text-muted);margin-top:3px;font-weight:400}
+
+.file-preview{display:none;margin-top:10px;padding:10px 12px;background:var(--emerald-dim);border:1px solid rgba(46,159,95,0.3);border-radius:10px;align-items:center;gap:10px}
+.file-preview.show{display:flex}
+.file-preview img{width:48px;height:48px;object-fit:cover;border-radius:8px;border:2px solid var(--emerald);flex-shrink:0}
+.file-preview .fp-info{flex:1;min-width:0}
+.file-preview .fp-name{font-size:12.5px;font-weight:600;word-break:break-all;color:var(--text-dark)}
+.file-preview .fp-size{font-size:10.5px;color:var(--text-muted);margin-top:2px}
+.file-preview .fp-remove{
+    width:28px;height:28px;border:none;background:rgba(193,69,69,0.15);border-radius:50%;
+    cursor:pointer;color:var(--red);font-size:16px;line-height:1;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;
+}
+.file-preview .fp-remove:hover{background:var(--red);color:#fff}
+
+/* ===== Checkboxes ===== */
+.confirm-box{
+    display:flex;align-items:flex-start;gap:11px;cursor:pointer;
+    padding:12px 14px;border:1.5px solid rgba(212,175,55,0.3);border-radius:10px;
+    background:#FFFEFA;transition:all .2s;margin-bottom:9px;
+}
+.confirm-box:hover{border-color:var(--gold)}
+.confirm-box.checked{border-color:var(--emerald);background:var(--emerald-dim)}
+.confirm-box.locked{opacity:0.8;cursor:default;border-color:var(--emerald);background:var(--emerald-dim)}
+.confirm-box input[type="checkbox"]{width:18px;height:18px;accent-color:var(--emerald);margin-top:1px;flex-shrink:0;cursor:pointer}
+.confirm-box.locked input[type="checkbox"]{cursor:default}
+.confirm-box span{font-size:13px;font-weight:500;line-height:1.5;color:var(--text-dark)}
+
+/* ===== Error ===== */
+.field-err{color:var(--red);font-size:11.5px;margin-top:6px;display:none;font-weight:500}
+.field-err.show{display:block}
+
+/* ===== Submit ===== */
+.submit-btn{
+    width:100%;padding:15px;border:none;border-radius:12px;
+    font-family:'Sarabun','Anuphan',sans-serif;font-size:15px;font-weight:700;
+    cursor:pointer;transition:all .3s;position:relative;overflow:hidden;margin-top:8px;letter-spacing:0.3px;
+}
+.submit-btn.disabled{background:#E8DFCB;color:#9E9178;cursor:not-allowed;box-shadow:none}
+.submit-btn.ready{
+    background:linear-gradient(135deg,var(--gold),var(--gold-dark));
+    color:#1a0a0e;box-shadow:0 6px 22px rgba(212,175,55,0.35);
+}
+.submit-btn.ready:hover{transform:translateY(-1px);box-shadow:0 10px 30px rgba(212,175,55,0.45)}
+.submit-btn.ready:active{transform:translateY(0)}
+.submit-btn .spinner{display:none;width:20px;height:20px;border:3px solid rgba(26,10,14,0.2);border-top-color:#1a0a0e;border-radius:50%;animation:spin .6s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.submit-btn.loading .btn-text{display:none}
+.submit-btn.loading .spinner{display:block}
+
+/* ===== Login hint (bottom of card) ===== */
+.login-hint{
+    text-align:center;margin-top:16px;padding-top:16px;
+    border-top:1px solid rgba(212,175,55,0.2);
+    font-size:13px;color:var(--text-muted);
+}
+.login-hint a{color:var(--gold-dark);font-weight:600;text-decoration:none;cursor:pointer}
+.login-hint a:hover{text-decoration:underline}
+
+.footer{margin-top:22px;text-align:center;font-size:11px;color:var(--text-muted);letter-spacing:0.3px}
+.footer .brand{font-family:'Cinzel',serif;color:var(--gold-deep);letter-spacing:2px}
+
+/* ===== Modal ===== */
+.modal-overlay{
+    display:none;position:fixed;inset:0;
+    background:rgba(26,10,14,0.78);
+    z-index:100;align-items:center;justify-content:center;padding:20px;
+}
+.modal-overlay.show{display:flex}
+.modal{
+    background:var(--cream-card);border:1.5px solid var(--gold-border);border-radius:18px;
+    padding:34px 28px 28px;max-width:420px;width:100%;text-align:center;
+    box-shadow:0 20px 60px rgba(26,10,14,0.4);
+    animation:modalPop .35s ease-out;
+    position:relative;overflow:hidden;
+}
+.modal::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,var(--gold-sheen),var(--gold),var(--gold-dark),var(--gold),var(--gold-sheen));
+}
+@keyframes modalPop{from{opacity:0;transform:scale(0.9)}to{opacity:1;transform:scale(1)}}
+.modal .success-ring{
+    width:64px;height:64px;border-radius:50%;
+    background:linear-gradient(135deg,var(--emerald),var(--gold));
+    display:flex;align-items:center;justify-content:center;margin:4px auto 16px;
+    box-shadow:0 6px 18px rgba(46,159,95,0.3);
+}
+.modal .success-ring svg{width:32px;height:32px;stroke:#fff;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.modal h3{font-family:'DM Serif Display',serif;font-size:24px;font-weight:400;color:var(--maroon);margin-bottom:6px;letter-spacing:0.3px}
+.modal .m-sub{font-size:13.5px;color:var(--text-dark-muted);line-height:1.6;margin-bottom:4px}
+.ref-badge{
+    display:inline-block;margin:14px 0 8px;
+    background:linear-gradient(180deg,#FFFEF8,#F5EDD8);
+    border:2px solid var(--gold);border-radius:10px;
+    padding:10px 22px;font-size:17px;font-weight:700;color:var(--gold-deep);letter-spacing:1.5px;
+    font-family:'DM Serif Display',serif;
+}
+.ref-label{font-size:10px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.ref-note{font-size:11.5px;color:var(--text-muted);margin-top:10px;line-height:1.5}
+.modal-actions{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+.modal button{padding:11px 22px;border:none;border-radius:10px;font-family:'Sarabun','Anuphan',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:0.2px}
+.modal .btn-primary{background:linear-gradient(135deg,var(--maroon),var(--maroon-dk));color:var(--gold-light);box-shadow:0 4px 14px rgba(114,47,55,0.25)}
+.modal .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(114,47,55,0.35)}
+.modal .btn-pdf{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#1a0a0e;box-shadow:0 4px 14px rgba(212,175,55,0.3)}
+.modal .btn-pdf:hover{transform:translateY(-1px)}
+.modal .btn-close{background:var(--cream-deep);color:var(--text-dark-muted);border:1px solid rgba(212,175,55,0.3)}
+.modal .btn-close:hover{background:var(--cream-warm);color:var(--maroon)}
+/* ===== Install app prompt (shown after successful signup) ===== */
+.install-prompt{margin-top:18px;background:linear-gradient(180deg,#FFFEF8,#F5EDD8);border:1.5px solid var(--gold-border);border-radius:14px;overflow:hidden;text-align:left}
+.install-prompt-row{display:flex;align-items:center;gap:12px;padding:13px 15px;cursor:pointer}
+.install-prompt-icon{width:42px;height:42px;flex-shrink:0;border-radius:11px;background:linear-gradient(135deg,var(--maroon),var(--maroon-dk));display:flex;align-items:center;justify-content:center;color:var(--gold)}
+.install-prompt-icon svg{width:22px;height:22px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.install-prompt-text{flex:1;min-width:0}
+.install-prompt-title{font-size:14px;font-weight:700;color:var(--maroon)}
+.install-prompt-desc{font-size:11.5px;color:var(--text-muted);margin-top:2px;line-height:1.45}
+.install-prompt-btn{flex-shrink:0;padding:9px 18px!important;background:linear-gradient(135deg,var(--gold),var(--gold-dark))!important;color:#1a0a0e!important;border:none;border-radius:20px;font-size:13px!important;font-weight:700;cursor:pointer;box-shadow:0 3px 10px rgba(212,175,55,0.3)}
+.install-steps{display:none;padding:2px 15px 14px}
+.install-steps.show{display:block}
+.install-step{display:flex;align-items:flex-start;gap:10px;margin-top:10px}
+.install-step-num{width:22px;height:22px;flex-shrink:0;border-radius:50%;background:var(--maroon);color:var(--gold-light);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.install-step-text{font-size:12.5px;color:var(--text-dark);line-height:1.5;padding-top:1px}
+.install-step-text strong{color:var(--gold-deep)}
+@media (display-mode:standalone){.install-prompt{display:none!important}}
+</style>
+</head>
+<body>
+<!-- Hero -->
+<div class="hero">
+    <a href="member-dashboard.html" class="back-link">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        กลับ
+    </a>
+    <div class="hero-inner">
+        <div class="hero-logo">JPT</div>
+        <div class="hero-label">Member Registration</div>
+        <h1 class="hero-title"><span class="th">สมัครสมาชิก</span></h1>
+    </div>
+</div>
+
+<!-- Form Card -->
+<div class="page">
+    <div class="card">
+        <div class="card-glow"></div>
+        <div class="card-body">
+            <form id="regForm" novalidate>
+
+                <!-- 1: Personal Info -->
+                <div class="section">
+                    <div class="section-head">
+                        <div class="section-num">1</div>
+                        <h2><span class="th">ข้อมูลส่วนตัว</span></h2>
+                    </div>
+                    <div class="form-row single">
+                        <div class="form-group">
+                            <label>อีเมล <span class="req">*</span></label>
+                            <input type="email" id="email" placeholder="example@email.com" autocomplete="email" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>ชื่อผู้ใช้ <span class="req">*</span></label>
+                            <input type="text" id="username" placeholder="ชื่อที่ใช้แสดงในแอป" maxlength="40" required>
+                        </div>
+                        <div class="form-group">
+                            <label>อายุ <span class="req">*</span></label>
+                            <input type="number" id="age" placeholder="เช่น 32" min="10" max="99" required>
+                        </div>
+                    </div>
+                    <div class="field-err" id="personalError">กรุณากรอกข้อมูลให้ครบถ้วน</div>
+                </div>
+
+                <!-- 2: Choose Plan -->
+                <div class="section">
+                    <div class="section-head">
+                        <div class="section-num">2</div>
+                        <h2><span class="th">เลือกแพ็กเกจสมาชิก</span></h2>
+                    </div>
+                    <div class="plan-grid">
+                        <label class="plan-card" id="planMonthlyCard">
+                            <input type="radio" name="plan" value="monthly" onchange="selectPlan('monthly',150)">
+                            <div class="plan-check"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                            <div class="plan-tier">รายเดือน</div>
+                            <div class="plan-price"><span class="cur">฿</span>150</div>
+                            <div class="plan-per">ต่อเดือน</div>
+                        </label>
+                        <label class="plan-card" id="planYearlyCard">
+                            <input type="radio" name="plan" value="yearly" onchange="selectPlan('yearly',1400)">
+                            <div class="plan-check"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                            <div class="plan-tier">รายปี</div>
+                            <div class="plan-price"><span class="cur">฿</span>1,400</div>
+                            <div class="plan-per">ต่อปี</div>
+                            <div class="plan-save">ประหยัด ฿400/ปี</div>
+                        </label>
+                    </div>
+                    <div class="field-err" id="planError">กรุณาเลือกแพ็กเกจสมาชิก</div>
+
+                    <!-- Promotion code — part of the plan section -->
+                    <div class="promo-sub">
+                        <div class="promo-sub-label">Promotion Code <span class="promo-sub-opt">(ถ้ามี)</span></div>
+                        <div class="form-group">
+                            <input type="hidden" id="promoCode" value="">
+                            <div class="promo-trigger" id="promoTrigger" role="button" tabindex="0" onclick="openPromoModal()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPromoModal();}">
+                                <span class="pt-main">
+                                    <span class="pt-ico"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span>
+                                    <span class="pt-text" id="promoTriggerText">เลือกรหัสโปรโมชัน</span>
+                                    <span class="pt-sub" id="promoTriggerSub"></span>
+                                </span>
+                                <span class="pt-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+                                <button type="button" class="pt-clear" id="promoClearBtn" onclick="event.stopPropagation();clearPromo()" aria-label="ลบรหัสโปรโมชัน">&times;</button>
+                            </div>
+                            <div class="promo-status" id="promoStatus" style="display:none"></div>
+                            <div class="promo-line-status" id="promoLineStatus"></div>
+                            <div class="promo-hint">กดเพื่อดูรหัสโปรโมชันที่ใช้ได้ · หากใช้รหัสฟรีไม่ต้องแนบสลิปการโอนเงิน</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3: Upload Slip -->
+                <div class="section" id="uploadSection">
+                    <div class="section-head">
+                        <div class="section-num">3</div>
+                        <h2><span class="th">แนบสลิปการโอนเงิน</span></h2>
+                    </div>
+                    <div class="pay-amount" id="payAmountRow" style="display:none">
+                        <div class="pa-left">
+                            <span class="pa-label">ยอดที่ต้องโอน</span>
+                            <span class="pa-discount" id="payDiscountLine" style="display:none"></span>
+                        </div>
+                        <span class="pa-value"><span class="cur">฿</span><span id="payAmountValue">—</span></span>
+                    </div>
+                    <!-- Bank account to transfer to (mirrors payAmountRow visibility) -->
+                    <div class="bank-box" id="bankInfoBox" style="display:none">
+                        <div class="bank-head">โอนเงินเข้าบัญชีนี้</div>
+                        <div class="bank-row">
+                            <div class="bank-meta">
+                                <div class="bank-name">ธนาคารกรุงศรีอยุธยา</div>
+                                <div class="bank-holder">นาย วัชรพล</div>
+                            </div>
+                            <div class="bank-acct-wrap">
+                                <span class="bank-acct" id="bankAcctNo" data-acct="8049307594">804-9-30759-4</span>
+                                <button type="button" class="bank-copy-btn" id="bankCopyBtn" onclick="copyBankAcct()" aria-label="คัดลอกเลขบัญชี">
+                                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    <span class="bank-copy-label">คัดลอก</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bank-hint">คัดลอกเลขบัญชี โอนตามยอดด้านบน แล้วแนบสลิปด้านล่าง</div>
+                    </div>
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="up-icon">
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        </div>
+                        <p>คลิกเพื่ออัปโหลดสลิป</p>
+                        <p class="hint">รองรับ JPG, PNG, PDF (ไม่เกิน 5MB)</p>
+                        <input type="file" id="slipFile" accept="image/*,.pdf" onchange="handleFile(this)">
+                    </div>
+                    <div class="file-preview" id="filePreview">
+                        <img id="previewImg" src="" alt="">
+                        <div class="fp-info">
+                            <div class="fp-name" id="fileName"></div>
+                            <div class="fp-size" id="fileSize"></div>
+                        </div>
+                        <button type="button" class="fp-remove" onclick="removeFile()" aria-label="ลบไฟล์">&times;</button>
+                    </div>
+                    <div class="field-err" id="slipError">กรุณาแนบสลิปการโอนเงิน</div>
+                </div>
+
+                <!-- 4: Confirm -->
+                <div class="section">
+                    <div class="section-head">
+                        <div class="section-num">4</div>
+                        <h2><span class="th">ยืนยันการชำระเงิน</span></h2>
+                    </div>
+                    <label class="confirm-box" id="confirmSlipBox">
+                        <input type="checkbox" id="confirmSlip" onchange="toggleCheck(this,'confirmSlipBox')">
+                        <span>ฉันได้แนบสลิปการโอนเงินแล้ว</span>
+                    </label>
+                    <label class="confirm-box" id="confirmPayBox">
+                        <input type="checkbox" id="confirmPay" onchange="toggleCheck(this,'confirmPayBox')">
+                        <span>ฉันได้ชำระเงินเรียบร้อยแล้ว</span>
+                    </label>
+                    <div class="field-err" id="confirmError">กรุณายืนยันทั้ง 2 ข้อ</div>
+                </div>
+
+                <button type="submit" class="submit-btn disabled" id="submitBtn" disabled>
+                    <span class="btn-text">ยืนยัน</span>
+                    <div class="spinner"></div>
+                </button>
+
+                <div class="login-hint">
+                    มีบัญชีอยู่แล้ว? <a href="member-dashboard.html">เข้าสู่ระบบ</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="footer">© 2026 <span class="brand">JP TRUST LEARNING</span> · Member Registration</div>
+</div>
+
+<!-- Promo picker modal -->
+<div class="promo-modal-overlay" id="promoModal" onclick="if(event.target===this)closePromoModal()">
+    <div class="promo-modal">
+        <div class="promo-modal-head">
+            <h3>รหัสโปรโมชันที่ใช้ได้</h3>
+            <button type="button" class="promo-modal-close" onclick="closePromoModal()" aria-label="ปิด">&times;</button>
+        </div>
+        <div class="promo-modal-body">
+            <div class="promo-modal-note" id="promoModalNote"></div>
+            <div id="promoList"></div>
+            <div class="promo-manual">
+                <div class="promo-manual-label">มีรหัสอื่น? กรอกเอง</div>
+                <div class="promo-manual-row">
+                    <input type="text" id="promoManualInput" placeholder="กรอกรหัส" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();applyPromoManual();}">
+                    <button type="button" class="promo-manual-btn" onclick="applyPromoManual()">ใช้</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal-overlay" id="successModal">
+    <div class="modal">
+        <div class="success-ring">
+            <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <h3>สมัครสำเร็จ</h3>
+        <p class="m-sub">ระบบได้รับข้อมูลการสมัครของคุณแล้ว<br>ทีมงาน JP Trust Learning จะตรวจสอบและยืนยันภายใน 24 ชม.</p>
+        <div class="ref-badge" id="refCode"></div>
+        <div class="ref-label">Reference Code</div>
+        <div class="ref-note">กรุณาจดรหัสอ้างอิงนี้ไว้ <br>หลังยืนยันแล้ว คุณจะสามารถเข้าสู่ระบบด้วยอีเมลที่สมัครได้ทันที</div>
+        <!-- Install app prompt — surfaced after successful signup -->
+        <div class="install-prompt" id="installPrompt">
+            <div class="install-prompt-row" onclick="signupInstall()">
+                <div class="install-prompt-icon"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="8" x2="12" y2="14"/><polyline points="9 12 12 15 15 12"/><line x1="9" y1="18" x2="15" y2="18"/></svg></div>
+                <div class="install-prompt-text">
+                    <div class="install-prompt-title">ติดตั้งแอป JP Trust</div>
+                    <div class="install-prompt-desc">เพิ่มไอคอนลงหน้าจอ เปิดใช้งานได้เร็ว เต็มจอ ไม่ต้องพิมพ์ URL</div>
+                </div>
+                <button class="install-prompt-btn" type="button" id="installPromptBtn">ติดตั้ง</button>
+            </div>
+            <div class="install-steps" id="installSteps"></div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-pdf" onclick="downloadPDF()">ดาวน์โหลดใบยืนยัน</button>
+            <button class="btn-primary" onclick="goToLogin()">
+                <svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;margin-right:6px;stroke:currentColor;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round"><polyline points="15 18 9 12 15 6"/></svg>ย้อนกลับเข้าแอพ
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============ Pre-fill email from URL (when redirected from member-dashboard login) ============
+(function(){
+    try{
+        var p=new URLSearchParams(location.search);
+        var em=p.get('email');
+        if(em){
+            var el=document.getElementById('email');
+            if(el)el.value=em.trim();
+        }
+    }catch(e){}
+})();
+
+// ============ Config ============
+const SUPABASE_URL = 'https://rcdukwwcbyryauhqlzmx.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZHVrd3djYnlyeWF1aHFsem14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MTY0MDAsImV4cCI6MjA4NTQ5MjQwMH0.rprPmudJYyb6dyhXb9Z9GrtQWEeIX99A2Wrj55PvS54';
+const SIGNUP_ENDPOINT = `${SUPABASE_URL}/functions/v1/signup-webhook`;
+const PROMO_CODE = 'JPTFREE2026';
+
+let uploadedFileBase64 = null, uploadedFileName = null, promoApplied = false;
+let selectedPlan = null, selectedAmount = null;
+let promoFinalAmount = null, promoSlipRequired = true;
+
+// ============ Plan selection ============
+function selectPlan(plan, amount) {
+    selectedPlan = plan;
+    selectedAmount = amount;
+    document.getElementById('planMonthlyCard').classList.toggle('selected', plan === 'monthly');
+    document.getElementById('planYearlyCard').classList.toggle('selected', plan === 'yearly');
+    document.getElementById('planError').classList.remove('show');
+    // If a promo is already applied, re-price it for the new plan
+    if (promoApplied) { checkPromo().then(syncPromoTrigger); }
+    else { updatePayDisplay(); }
+    checkReady();
+}
+
+// ============ Promo Code (validates + prices via Supabase RPC) ============
+const REASON_TH = {
+    invalid:'รหัสไม่ถูกต้อง', expired:'หมดอายุแล้ว', not_started:'ยังไม่เริ่มใช้งาน',
+    wrong_plan:'ใช้กับแพ็กนี้ไม่ได้', sold_out:'สิทธิ์เต็มแล้ว', empty:'กรุณากรอกรหัส'
+};
+
+async function previewPromo(code, plan){
+    try{
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/preview_promo`, {
+            method:'POST',
+            headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON,'Authorization':`Bearer ${SUPABASE_ANON}`},
+            body: JSON.stringify({ p_code: code, p_plan: plan })
+        });
+        if(!res.ok) return null;
+        const data = await res.json();
+        return Array.isArray(data) ? data[0] : data;
+    }catch(e){ return null; }
+}
+
+// ============ Promo picker (click → modal of available codes) ============
+// Public codes shown in the picker. Price/validity is fetched live from
+// preview_promo (the DB is the source of truth). Add a future public promo by
+// appending here. Comp / free codes (e.g. JPTFREE2026) stay manual-entry only.
+const PROMO_CATALOG = [
+    { code:'JPTHALF5050', desc:'โปรเปิดตัว · ลด 50% เฉพาะแพ็กรายปี · 30 สิทธิ์แรก · ถึง 30 มิ.ย. 2569' }
+];
+
+function openPromoModal(){
+    const ov = document.getElementById('promoModal');
+    const mi = document.getElementById('promoManualInput'); if(mi) mi.value='';
+    renderPromoList();
+    ov.classList.add('show');
+    document.addEventListener('keydown', promoEsc);
+}
+function closePromoModal(){
+    document.getElementById('promoModal').classList.remove('show');
+    document.removeEventListener('keydown', promoEsc);
+}
+function promoEsc(e){ if(e.key==='Escape') closePromoModal(); }
+
+async function renderPromoList(){
+    const list = document.getElementById('promoList');
+    const note = document.getElementById('promoModalNote');
+    note.textContent = selectedPlan
+        ? 'แตะรหัสเพื่อใช้ทันที · ราคาคำนวณตามแพ็กที่เลือก'
+        : 'เลือกแพ็กเกจสมาชิกก่อน เพื่อดูราคาหลังหักส่วนลด';
+    list.innerHTML = PROMO_CATALOG.map((p,i) =>
+        '<div class="promo-card disabled" id="pcard-'+i+'">'+
+            '<div class="pc-left"><div class="pc-code">'+p.code+'</div><div class="pc-desc">'+p.desc+'</div></div>'+
+            '<div class="pc-right"><span class="pc-loading">'+(selectedPlan?'กำลังเช็ก…':'เลือกแพ็กก่อน')+'</span></div>'+
+        '</div>').join('');
+    if(!selectedPlan) return;
+    for(let i=0;i<PROMO_CATALOG.length;i++){
+        const p = PROMO_CATALOG[i];
+        const r = await previewPromo(p.code, selectedPlan);
+        const card = document.getElementById('pcard-'+i);
+        if(!card) continue;
+        const right = card.querySelector('.pc-right');
+        if(r === null){
+            right.innerHTML = '<span class="pc-reason">ลองใหม่</span>';
+        } else if(!r.valid){
+            right.innerHTML = '<span class="pc-reason">'+(REASON_TH[r.reason]||'ใช้ไม่ได้')+'</span>';
+        } else {
+            const isFree = r.final_price === 0;
+            right.innerHTML = isFree
+                ? '<span class="pc-badge">ฟรี</span>'
+                : '<span class="pc-price"><s>฿'+Number(r.base_price).toLocaleString('en-US')+'</s>฿'+Number(r.final_price).toLocaleString('en-US')+'</span>';
+            card.classList.remove('disabled');
+            card.onclick = () => applyPromoFromCatalog(p.code);
+        }
+    }
+}
+
+async function applyPromoFromCatalog(code){
+    document.getElementById('promoCode').value = code;
+    closePromoModal();
+    await checkPromo();
+    syncPromoTrigger();
+}
+async function applyPromoManual(){
+    const v = (document.getElementById('promoManualInput').value || '').trim().toUpperCase();
+    if(!v) return;
+    if(!selectedPlan){
+        document.getElementById('planError').classList.add('show');
+        closePromoModal();
+        return;
+    }
+    document.getElementById('promoCode').value = v;
+    closePromoModal();
+    await checkPromo();
+    syncPromoTrigger();
+}
+function clearPromo(){
+    document.getElementById('promoCode').value = '';
+    resetPromoApply();
+    syncPromoTrigger();
+}
+// Reflect current promo state on the trigger button + status line
+function syncPromoTrigger(){
+    const trig = document.getElementById('promoTrigger');
+    const txt  = document.getElementById('promoTriggerText');
+    const sub  = document.getElementById('promoTriggerSub');
+    const line = document.getElementById('promoLineStatus');
+    if(!trig) return;
+    const code = (document.getElementById('promoCode').value || '').trim().toUpperCase();
+    if(promoApplied && code){
+        trig.classList.add('applied');
+        txt.textContent = code;
+        if(promoFinalAmount === 0){ sub.textContent = '· ฟรี'; }
+        else if(promoFinalAmount !== null && selectedAmount){ sub.textContent = '· ลด '+Math.round((1-promoFinalAmount/selectedAmount)*100)+'%'; }
+        else { sub.textContent = ''; }
+        line.className = 'promo-line-status valid'; line.textContent = '✓ ใช้รหัสนี้แล้ว';
+    } else {
+        trig.classList.remove('applied');
+        txt.textContent = 'เลือกรหัสโปรโมชัน'; sub.textContent = '';
+        const reason = (document.getElementById('promoStatus').textContent || '').trim();
+        if(reason){ line.className = 'promo-line-status invalid'; line.textContent = reason; }
+        else { line.className = 'promo-line-status'; line.textContent = ''; }
+    }
+}
+
+async function checkPromo() {
+    const val = document.getElementById('promoCode').value.trim().toUpperCase();
+    const st = document.getElementById('promoStatus');
+    const btn = document.getElementById('promoApplyBtn');
+
+    if (!val) {
+        st.className = 'promo-status'; st.textContent = '';
+        unlockConfirms(); promoApplied = false; promoFinalAmount = null;
+        if (btn) { btn.classList.remove('applied'); btn.textContent = 'ใช้รหัสโปรโมชัน'; }
+        updatePayDisplay(); checkReady();
+        return;
+    }
+    if (!selectedPlan) {
+        st.className = 'promo-status invalid'; st.textContent = 'เลือกแพ็กก่อน';
+        document.getElementById('planError').classList.add('show');
+        return;
+    }
+
+    if (btn) { btn.disabled = true; btn.textContent = 'กำลังตรวจสอบ...'; }
+    const r = await previewPromo(val, selectedPlan);
+    if (btn) btn.disabled = false;
+
+    // Network/RPC down → fall back to the known free beta code so signup never hard-blocks
+    if (r === null) {
+        if (val === PROMO_CODE) { applyFreePromo(btn, st); }
+        else { st.className='promo-status invalid'; st.textContent='ลองใหม่'; if(btn){btn.classList.remove('applied');btn.textContent='ใช้รหัสโปรโมชัน';} }
+        updatePayDisplay(); checkReady(); return;
+    }
+
+    if (!r.valid) {
+        promoApplied = false; promoFinalAmount = null;
+        st.className = 'promo-status invalid';
+        st.textContent = REASON_TH[r.reason] || 'ใช้ไม่ได้';
+        unlockConfirms();
+        document.getElementById('uploadSection').style.display = '';
+        if (btn) { btn.classList.remove('applied'); btn.textContent = 'ใช้รหัสโปรโมชัน'; }
+        updatePayDisplay(); checkReady(); return;
+    }
+
+    // Valid
+    promoApplied = true;
+    promoFinalAmount = r.final_price;
+    promoSlipRequired = !!r.slip_required;
+    st.className = 'promo-status valid'; st.textContent = 'ใช้ได้';
+    if (btn) { btn.classList.add('applied'); btn.textContent = '✓ ใช้รหัสนี้แล้ว'; }
+
+    if (!r.slip_required) {
+        // Free → no slip, auto-lock confirms
+        const cs = document.getElementById('confirmSlip'), cp = document.getElementById('confirmPay');
+        cs.checked = true; cp.checked = true;
+        document.getElementById('confirmSlipBox').classList.add('checked','locked');
+        document.getElementById('confirmPayBox').classList.add('checked','locked');
+        cs.disabled = true; cp.disabled = true;
+        document.getElementById('uploadSection').style.display = 'none';
+    } else {
+        // Discounted → slip still required, but at the reduced amount
+        unlockConfirms();
+        document.getElementById('uploadSection').style.display = '';
+    }
+    updatePayDisplay(); checkReady();
+}
+
+function applyFreePromo(btn, st){
+    promoApplied = true; promoFinalAmount = 0; promoSlipRequired = false;
+    st.className='promo-status valid'; st.textContent='ใช้ได้';
+    const cs=document.getElementById('confirmSlip'), cp=document.getElementById('confirmPay');
+    cs.checked=true; cp.checked=true;
+    document.getElementById('confirmSlipBox').classList.add('checked','locked');
+    document.getElementById('confirmPayBox').classList.add('checked','locked');
+    cs.disabled=true; cp.disabled=true;
+    document.getElementById('uploadSection').style.display='none';
+    if(btn){ btn.classList.add('applied'); btn.textContent='✓ ใช้รหัสนี้แล้ว'; }
+}
+
+// Renders the "ยอดที่ต้องโอน" row + bank account when payment (slip) is required
+function updatePayDisplay(){
+    const row = document.getElementById('payAmountRow');
+    const val = document.getElementById('payAmountValue');
+    const disc = document.getElementById('payDiscountLine');
+    const bank = document.getElementById('bankInfoBox');
+    const hide = () => { if(row) row.style.display='none'; if(bank) bank.style.display='none'; };
+    if(!row||!val) return;
+    // Free code → no slip, hide pay row + bank entirely
+    if(promoApplied && promoFinalAmount === 0){ hide(); return; }
+    if(!selectedAmount){ hide(); return; }
+    const pay = (promoApplied && promoFinalAmount !== null) ? promoFinalAmount : selectedAmount;
+    val.textContent = pay.toLocaleString('en-US');
+    if(disc){
+        if(promoApplied && promoFinalAmount !== null && promoFinalAmount < selectedAmount){
+            disc.style.display = 'block';
+            disc.innerHTML = 'ราคาปกติ <s>฿'+selectedAmount.toLocaleString('en-US')+'</s> · ลด '+Math.round((1-promoFinalAmount/selectedAmount)*100)+'%';
+        } else {
+            disc.style.display = 'none';
+        }
+    }
+    row.style.display = 'flex';
+    if(bank) bank.style.display = 'block';
+}
+
+// Copy bank account number (plain digits) with on-button feedback + fallback
+function copyBankAcct(){
+    const el = document.getElementById('bankAcctNo');
+    if(!el) return;
+    const raw = (el.getAttribute('data-acct') || el.textContent || '').replace(/\D/g,'');
+    const btn = document.getElementById('bankCopyBtn');
+    const lbl = btn ? btn.querySelector('.bank-copy-label') : null;
+    const done = () => {
+        if(!btn) return;
+        btn.classList.add('copied');
+        if(lbl) lbl.textContent = 'คัดลอกแล้ว';
+        setTimeout(() => { btn.classList.remove('copied'); if(lbl) lbl.textContent = 'คัดลอก'; }, 1800);
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(raw).then(done).catch(() => fallbackCopy(raw, done));
+    } else {
+        fallbackCopy(raw, done);
+    }
+}
+function fallbackCopy(text, cb){
+    try{
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position='fixed'; ta.style.top='0'; ta.style.opacity='0';
+        document.body.appendChild(ta); ta.focus(); ta.select();
+        document.execCommand('copy'); document.body.removeChild(ta);
+        if(cb) cb();
+    }catch(e){}
+}
+
+// Called when user edits promo input — revert any applied state until they click OK again
+function resetPromoApply() {
+    const st = document.getElementById('promoStatus');
+    const btn = document.getElementById('promoApplyBtn');
+    if (st) { st.className = 'promo-status'; st.textContent = ''; }
+    if (btn) { btn.classList.remove('applied'); btn.textContent = 'ใช้รหัสโปรโมชัน'; }
+    if (promoApplied) {
+        promoApplied = false;
+        unlockConfirms();
+        checkReady();
+    }
+}
+
+function unlockConfirms() {
+    const cs = document.getElementById('confirmSlip');
+    const cp = document.getElementById('confirmPay');
+    cs.disabled = false; cp.disabled = false;
+    document.getElementById('confirmSlipBox').classList.remove('locked');
+    document.getElementById('confirmPayBox').classList.remove('locked');
+    if (!cs.checked) document.getElementById('confirmSlipBox').classList.remove('checked');
+    if (!cp.checked) document.getElementById('confirmPayBox').classList.remove('checked');
+    document.getElementById('uploadSection').style.display = '';
+    updatePayDisplay();
+}
+
+// ============ File Upload ============
+function handleFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 5*1024*1024) { alert('ไฟล์ใหญ่เกิน 5MB'); input.value=''; return; }
+    uploadedFileName = file.name;
+    document.getElementById('fileName').textContent = file.name;
+    document.getElementById('fileSize').textContent = (file.size/1024).toFixed(1)+' KB';
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        uploadedFileBase64 = e.target.result.split(',')[1];
+        const prev = document.getElementById('previewImg');
+        prev.src = file.type.startsWith('image/') ? e.target.result : '';
+        prev.style.display = file.type.startsWith('image/') ? 'block' : 'none';
+        document.getElementById('uploadZone').classList.add('has-file');
+        document.getElementById('filePreview').classList.add('show');
+        checkReady();
+    };
+    reader.readAsDataURL(file);
+}
+function removeFile() {
+    uploadedFileBase64=null; uploadedFileName=null;
+    document.getElementById('slipFile').value='';
+    document.getElementById('uploadZone').classList.remove('has-file');
+    document.getElementById('filePreview').classList.remove('show');
+    if (!(promoApplied && !promoSlipRequired)) {
+        document.getElementById('confirmSlip').checked=false;
+        document.getElementById('confirmSlipBox').classList.remove('checked');
+    }
+    checkReady();
+}
+
+// ============ Checkboxes ============
+function toggleCheck(cb, boxId) {
+    // Confirms are auto-checked & disabled only for a FREE promo; ignore manual
+    // toggles in that locked state. For a discount promo they behave normally.
+    if (cb.disabled) { cb.checked = true; return; }
+    document.getElementById(boxId).classList.toggle('checked', cb.checked);
+    checkReady();
+}
+
+// ============ Ready Check ============
+function checkReady() {
+    const email = document.getElementById('email').value.trim();
+    const username = document.getElementById('username').value.trim();
+    const age = document.getElementById('age').value.trim();
+    const hasFile = !!uploadedFileBase64;
+    const slipWaived = promoApplied && !promoSlipRequired; // only a FREE promo skips the slip
+    const c1 = document.getElementById('confirmSlip').checked;
+    const c2 = document.getElementById('confirmPay').checked;
+    const ready = email && username && age && selectedPlan && (hasFile || slipWaived) && c1 && c2;
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = !ready;
+    btn.className = 'submit-btn ' + (ready ? 'ready' : 'disabled');
+}
+['email','username','age'].forEach(id => document.getElementById(id).addEventListener('input', checkReady));
+
+// ============ Submit (via Supabase Edge Function) ============
+document.getElementById('regForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    let valid = true;
+    const email = document.getElementById('email').value.trim();
+    const username = document.getElementById('username').value.trim();
+    const age = document.getElementById('age').value.trim();
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!username || !age || !emailRe.test(email)) {
+        document.getElementById('personalError').classList.add('show'); valid = false;
+    } else {
+        document.getElementById('personalError').classList.remove('show');
+    }
+    if (!selectedPlan) {
+        document.getElementById('planError').classList.add('show'); valid = false;
+    } else {
+        document.getElementById('planError').classList.remove('show');
+    }
+    if (!uploadedFileBase64 && !(promoApplied && !promoSlipRequired)) {
+        document.getElementById('slipError').classList.add('show'); valid = false;
+    } else {
+        document.getElementById('slipError').classList.remove('show');
+    }
+    if (!document.getElementById('confirmSlip').checked || !document.getElementById('confirmPay').checked) {
+        document.getElementById('confirmError').classList.add('show'); valid = false;
+    } else {
+        document.getElementById('confirmError').classList.remove('show');
+    }
+    if (!valid) return;
+
+    const btn = document.getElementById('submitBtn');
+    btn.classList.add('loading'); btn.disabled = true;
+    try {
+        const promoCodeRaw = document.getElementById('promoCode').value.trim();
+        const response = await fetch(SIGNUP_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${SUPABASE_ANON}`,
+                'apikey': SUPABASE_ANON
+            },
+            body: JSON.stringify({
+                email, username, age: parseInt(age),
+                plan: selectedPlan,
+                amount: (promoApplied && promoFinalAmount !== null) ? promoFinalAmount : selectedAmount,
+                promoCode: promoCodeRaw,
+                slipBase64: uploadedFileBase64,
+                slipFilename: uploadedFileName
+            })
+        });
+
+        let data;
+        try { data = await response.json(); }
+        catch { throw new Error('เซิร์ฟเวอร์ไม่ตอบกลับ'); }
+
+        if (!response.ok || !data.ok) {
+            throw new Error(data.error || `HTTP ${response.status}`);
+        }
+
+        document.getElementById('refCode').textContent = data.refCode;
+        document.getElementById('successModal').classList.add('show');
+        window._lastReg = {
+            email, username, age,
+            plan: selectedPlan,
+            amount: (promoApplied && promoFinalAmount !== null) ? promoFinalAmount : selectedAmount,
+            refCode: data.refCode,
+            timestamp: data.timestamp || new Date().toISOString(),
+            promoCode: promoCodeRaw.toUpperCase()
+        };
+
+    } catch(err) {
+        alert('เกิดข้อผิดพลาด: ' + err.message + '\nกรุณาลองใหม่ หรือติดต่อทีมงาน');
+    } finally {
+        btn.classList.remove('loading'); btn.disabled = false;
+    }
+});
+
+// ============ Login redirect ============
+function goToLogin() {
+    window.location.href = 'member-dashboard.html';
+}
+
+// ============ PDF ============
+function downloadPDF() {
+    const r = window._lastReg; if (!r) return;
+    const regDate = new Date(r.timestamp).toLocaleString('th-TH', {year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit'});
+    const planLabel = r.plan === 'yearly' ? 'รายปี — ฿1,400 / ปี' : r.plan === 'monthly' ? 'รายเดือน — ฿150 / เดือน' : '—';
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Member Registration - ${r.refCode}</title>
+<style>@import url('https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Cinzel:wght@500;600;700&family=DM+Serif+Display&family=Sarabun:wght@400;500;600;700&display=swap');
+@page{size:A4;margin:0}*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Sarabun','Anuphan',sans-serif;background:#FAF6ED;width:210mm;min-height:297mm;margin:0 auto;display:flex;align-items:center;justify-content:center;padding:20mm;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+.card{background:#FFFEF8;border:1.5px solid rgba(212,175,55,0.4);border-radius:16px;width:100%;max-width:170mm;overflow:hidden;box-shadow:0 8px 32px rgba(114,47,55,0.08)}
+.card-top{height:4px;background:linear-gradient(90deg,#E8D48B,#D4AF37,#B8860B,#D4AF37,#E8D48B)}
+.card-body{padding:32px 36px 28px}
+.logo{text-align:center;margin-bottom:18px}
+.logo-badge{display:inline-block;background:linear-gradient(135deg,#722F37,#5A1F26);color:#F4E4BA;font-family:'Cinzel',serif;font-weight:600;font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:8px 26px;border-radius:30px;box-shadow:0 3px 10px rgba(114,47,55,0.2)}
+.title{text-align:center;font-family:'DM Serif Display',serif;font-size:22px;color:#722F37;margin-bottom:4px}
+.subtitle{text-align:center;font-size:12.5px;color:#7A6F62;margin-bottom:18px}
+.divider{height:1px;background:rgba(212,175,55,0.35);margin:14px 0}
+.ref-box{text-align:center;margin:18px 0 12px}
+.ref-code{display:inline-block;background:linear-gradient(180deg,#FFFEF8,#F5EDD8);border:2px solid #D4AF37;border-radius:10px;padding:12px 34px;font-family:'DM Serif Display',serif;font-size:22px;color:#8B6914;letter-spacing:2px}
+.ref-label{font-family:'Cinzel',serif;font-size:9px;color:#7A6F62;text-transform:uppercase;letter-spacing:2.5px;margin-top:6px}
+table{width:100%;border-collapse:collapse;margin:14px 0}
+tr:nth-child(odd) td{background:#FAF6ED}
+td{padding:10px 14px;font-size:12.5px;border-bottom:1px solid rgba(212,175,55,0.15);color:#3D3228}
+td:first-child{color:#7A6F62;font-weight:500;width:40%;border-radius:6px 0 0 6px}
+td:last-child{font-weight:600;border-radius:0 6px 6px 0}
+.notice{background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.3);border-radius:10px;padding:14px 18px;margin:14px 0}
+.notice-t{font-family:'Cinzel',serif;font-size:10px;font-weight:600;color:#8B6914;text-transform:uppercase;letter-spacing:1.8px;margin-bottom:5px}
+.notice p{font-size:11.5px;color:#5A3D20;line-height:1.6}
+${r.promoCode?'.promo-badge{text-align:center;margin:12px 0}.promo-badge span{display:inline-block;background:rgba(212,175,55,0.12);border:1.5px solid #D4AF37;border-radius:8px;padding:6px 20px;font-size:12.5px;font-weight:600;color:#8B6914;letter-spacing:1px}':''}
+.footer{text-align:center;padding:14px;border-top:1px solid rgba(212,175,55,0.2);font-family:'Cinzel',serif;font-size:9px;color:#7A6F62;letter-spacing:1.5px}
+@media print{body{background:#FAF6ED!important}.no-print{display:none!important}}
+</style></head><body>
+<div style="position:fixed;top:16px;right:16px;z-index:99" class="no-print"><button onclick="window.print()" style="font-family:'Sarabun',sans-serif;padding:12px 28px;background:linear-gradient(135deg,#D4AF37,#B8860B);color:#1a0a0e;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(212,175,55,0.4)">Save as PDF</button><p style="color:#7A6F62;font-size:10px;margin-top:5px;text-align:center">เลือก "Save as PDF"</p></div>
+<div><div class="card"><div class="card-top"></div><div class="card-body">
+<div class="logo"><div class="logo-badge">✦ JP TRUST LEARNING ✦</div></div>
+<div class="title">ใบยืนยันการสมัครสมาชิก</div>
+<div class="subtitle">Member Registration Confirmation</div>
+<div class="divider"></div>
+<div class="ref-box"><div class="ref-code">${r.refCode}</div><div class="ref-label">Reference Code</div></div>
+${r.promoCode?`<div class="promo-badge"><span>PROMO: ${r.promoCode}</span></div>`:''}
+<table>
+<tr><td>ชื่อผู้ใช้</td><td>${r.username}</td></tr>
+<tr><td>อายุ</td><td>${r.age} ปี</td></tr>
+<tr><td>แพ็กเกจ</td><td>${planLabel}</td></tr>
+<tr><td>อีเมล</td><td>${r.email}</td></tr>
+<tr><td>Ref Code</td><td style="color:#8B6914">${r.refCode}</td></tr>
+<tr><td>วันที่สมัคร</td><td>${regDate}</td></tr>
+<tr><td>สถานะ</td><td style="color:#8B6914">รอตรวจสอบ</td></tr>
+</table>
+<div class="notice"><div class="notice-t">ข้อมูลสำคัญ</div><p>ทีมงาน JP Trust Learning จะตรวจสอบและยืนยันภายใน <strong>24 ชั่วโมง</strong><br>เมื่อยืนยันแล้ว คุณสามารถเข้าสู่ระบบด้วยอีเมลที่สมัคร<br>หากต้องการติดต่อ: <strong>jptrustlearning@gmail.com</strong> พร้อมแจ้ง Ref Code</p></div>
+</div><div class="footer">© 2026 JP TRUST LEARNING — Member Registration<br>เอกสารสร้างโดยระบบอัตโนมัติ · ${new Date().toLocaleDateString('th-TH')}</div></div></div></body></html>`;
+    const w = window.open('', '_blank');
+    if (w) { w.document.write(html); w.document.close(); }
+    else {
+        const blob = new Blob([html], {type:'text/html'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = `JPTrust_Member_${r.refCode}.html`; a.click();
+        URL.revokeObjectURL(url);
+    }
+}
+
+// ============ PWA install (offered after successful signup) ============
+// signup.html had no manifest/SW before — added so the browser treats this
+// origin as installable and beforeinstallprompt can fire here. start_url in
+// manifest.json points to member-dashboard.html, so installing → the app.
+if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+}
+var deferredInstallPrompt = null;
+function isStandaloneSignup(){return window.matchMedia('(display-mode:standalone)').matches||window.navigator.standalone===true;}
+window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); deferredInstallPrompt = e; });
+window.addEventListener('appinstalled', function(){ markSignupInstalled(); });
+
+function markSignupInstalled(){
+    var p=document.getElementById('installPrompt'); if(!p) return;
+    p.innerHTML='<div class="install-prompt-row" style="cursor:default"><div class="install-prompt-icon" style="background:linear-gradient(135deg,var(--emerald),var(--emerald-dk))"><svg viewBox="0 0 24 24" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></div><div class="install-prompt-text"><div class="install-prompt-title">ติดตั้งแอปแล้ว</div><div class="install-prompt-desc">เปิดแอป JP Trust จากไอคอนบนหน้าจอได้เลย</div></div></div>';
+}
+
+function signupInstall(){
+    if(deferredInstallPrompt){
+        deferredInstallPrompt.prompt();
+        deferredInstallPrompt.userChoice.then(function(r){
+            if(r && r.outcome==='accepted'){ markSignupInstalled(); }
+            deferredInstallPrompt=null;
+        });
+        return;
+    }
+    // No native prompt (iOS Safari, or event not captured yet) — show manual A2HS guide inline
+    var isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+    var steps = isIOS
+        ? [['1','กดปุ่ม <strong>Share</strong> (ไอคอนสี่เหลี่ยมมีลูกศรขึ้น) ด้านล่างของ Safari'],['2','เลื่อนลงแล้วกด <strong>"Add to Home Screen" (เพิ่มไปยังหน้าจอโฮม)</strong>'],['3','กด <strong>"Add" (เพิ่ม)</strong> มุมขวาบน — เสร็จ!']]
+        : [['1','กดเมนู <strong>⋮</strong> มุมขวาบนของ Chrome'],['2','กด <strong>"เพิ่มลงในหน้าจอหลัก"</strong> หรือ <strong>"ติดตั้งแอป"</strong>'],['3','กด <strong>"เพิ่ม" / "ติดตั้ง"</strong> — เสร็จ!']];
+    var box=document.getElementById('installSteps');
+    if(!box) return;
+    box.innerHTML = steps.map(function(s){return '<div class="install-step"><div class="install-step-num">'+s[0]+'</div><div class="install-step-text">'+s[1]+'</div></div>';}).join('');
+    box.classList.toggle('show');
+}
+
+if(isStandaloneSignup()){ var _ip=document.getElementById('installPrompt'); if(_ip) _ip.style.display='none'; }
+</script>
+</body>
+</html>
