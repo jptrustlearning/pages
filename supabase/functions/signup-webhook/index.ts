@@ -410,6 +410,7 @@ interface FounderInfo {
   username: string; email: string; age: number | null; plan: string;
   basePrice: number; amount: number; promoCode: string; promoApplied: boolean;
   refCode: string; slipName: string | null; expiresAt: string | null;
+  slipBase64: string | null;   // raw base64 (no data: prefix) — attached to the email
 }
 async function sendFounderNotification(info: FounderInfo): Promise<EmailResult> {
   const apiKey = Deno.env.get("RESEND_API_KEY");
@@ -421,7 +422,7 @@ async function sendFounderNotification(info: FounderInfo): Promise<EmailResult> 
 
   const planLabel = info.plan === "yearly" ? "รายปี (Yearly)" : info.plan === "monthly" ? "รายเดือน (Monthly)" : "—";
   const promoLine = info.promoApplied && info.promoCode ? `${info.promoCode} (ใช้งานแล้ว)` : "ไม่มี";
-  const slipLine = info.slipName ? info.slipName : "ไม่มีสลิปแนบ";
+  const slipLine = info.slipBase64 ? (info.slipName ? info.slipName + " (แนบมาในอีเมลนี้)" : "แนบมาในอีเมลนี้") : "ไม่มีสลิปแนบ";
   const fmtBaht = (n: number) => "฿" + Number(n || 0).toLocaleString("en-US");
   const subject = `🔔 สมาชิกใหม่: ${info.username} · ${planLabel} · ${fmtBaht(info.amount)}`;
 
@@ -467,11 +468,25 @@ async function sendFounderNotification(info: FounderInfo): Promise<EmailResult> 
     </div>
   </div>`;
 
+  // Attach the payment slip image when present. Resend expects { content, filename }
+  // where content is Base64 (no data: prefix) — exactly what slipBase64 already is.
+  const attachments: Array<{ content: string; filename: string }> = [];
+  if (info.slipBase64) {
+    const ext = (info.slipName || "").split(".").pop() || "jpg";
+    attachments.push({
+      content: info.slipBase64,
+      filename: `slip_${info.refCode || "member"}.${ext}`,
+    });
+  }
+
+  const payload: Record<string, unknown> = { from, to: recipients, reply_to: info.email, subject, text, html };
+  if (attachments.length > 0) payload.attachments = attachments;
+
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
-      body: JSON.stringify({ from, to: recipients, reply_to: info.email, subject, text, html }),
+      body: JSON.stringify(payload),
     });
     if (!res.ok) {
       let detail = "";
@@ -748,7 +763,7 @@ serve(async (req: Request) => {
     const founderMail = await sendFounderNotification({
       username, email, age: ageNum, plan, basePrice, amount,
       promoCode, promoApplied: promoValid, refCode,
-      slipName, expiresAt,
+      slipName, expiresAt, slipBase64,
     });
     if (founderMail.sent) {
       console.log(`[email] founder notification sent for ${email}`);
