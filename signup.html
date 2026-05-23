@@ -935,7 +935,7 @@ function removeFile() {
     document.getElementById('slipFile').value='';
     document.getElementById('uploadZone').classList.remove('has-file');
     document.getElementById('filePreview').classList.remove('show');
-    if (!promoApplied) {
+    if (!(promoApplied && !promoSlipRequired)) {
         document.getElementById('confirmSlip').checked=false;
         document.getElementById('confirmSlipBox').classList.remove('checked');
     }
@@ -944,7 +944,9 @@ function removeFile() {
 
 // ============ Checkboxes ============
 function toggleCheck(cb, boxId) {
-    if (promoApplied) { cb.checked=true; return; }
+    // Confirms are auto-checked & disabled only for a FREE promo; ignore manual
+    // toggles in that locked state. For a discount promo they behave normally.
+    if (cb.disabled) { cb.checked = true; return; }
     document.getElementById(boxId).classList.toggle('checked', cb.checked);
     checkReady();
 }
@@ -955,9 +957,10 @@ function checkReady() {
     const username = document.getElementById('username').value.trim();
     const age = document.getElementById('age').value.trim();
     const hasFile = !!uploadedFileBase64;
+    const slipWaived = promoApplied && !promoSlipRequired; // only a FREE promo skips the slip
     const c1 = document.getElementById('confirmSlip').checked;
     const c2 = document.getElementById('confirmPay').checked;
-    const ready = email && username && age && selectedPlan && (hasFile || promoApplied) && c1 && c2;
+    const ready = email && username && age && selectedPlan && (hasFile || slipWaived) && c1 && c2;
     const btn = document.getElementById('submitBtn');
     btn.disabled = !ready;
     btn.className = 'submit-btn ' + (ready ? 'ready' : 'disabled');
@@ -983,7 +986,7 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
     } else {
         document.getElementById('planError').classList.remove('show');
     }
-    if (!uploadedFileBase64 && !promoApplied) {
+    if (!uploadedFileBase64 && !(promoApplied && !promoSlipRequired)) {
         document.getElementById('slipError').classList.add('show'); valid = false;
     } else {
         document.getElementById('slipError').classList.remove('show');
