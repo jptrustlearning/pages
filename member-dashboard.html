@@ -470,6 +470,9 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .settings-group{margin-bottom:24px}.settings-group-title{font-size:12px;font-weight:600;color:var(--text-dark-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;padding-left:4px}
 .settings-list{background:var(--cream-card);border:1px solid rgba(212,175,55,0.12);border-radius:var(--radius);overflow:hidden;box-shadow:0 2px 8px rgba(114,47,55,0.04)}
 .settings-item{display:flex;align-items:center;gap:14px;padding:16px;border-bottom:1px solid rgba(212,175,55,0.08);cursor:pointer;transition:background .2s}
+.settings-badge{flex-shrink:0;font-size:11px;font-weight:700;padding:5px 11px;border-radius:20px;background:rgba(31,125,73,0.12);color:#1F7D49;border:1px solid rgba(31,125,73,0.3)}
+.settings-badge.warn{background:rgba(212,175,55,0.15);color:var(--gold-deep,#8B6914);border-color:rgba(212,175,55,0.4)}
+.settings-badge.expired{background:rgba(234,106,94,0.12);color:#C0392B;border-color:rgba(234,106,94,0.4)}
 .settings-item:last-child{border-bottom:none}.settings-item:active{background:var(--cream-warm)}
 .settings-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.settings-icon .jpt-icon svg{width:18px;height:18px;color:#FFF0D4;stroke:#FFF0D4}
 .settings-info{flex:1}.settings-label{font-size:14px;font-weight:500;color:var(--text-dark)}.settings-desc{font-size:12px;color:var(--text-dark-muted)}
@@ -907,7 +910,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             <button class="login-btn" onclick="checkPIN()">เข้าสู่ระบบ</button>
             <div class="login-link" id="pinError" style="color:#EA4335;display:none;">PIN ไม่ถูกต้อง</div>
             <div class="login-link" onclick="showForgotPIN()">ลืม PIN? <span>ยืนยันด้วย OTP</span></div>
-            <div class="login-link" onclick="location.href='signup.html?v=1779533590'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
+            <div class="login-link" onclick="location.href='signup.html?v=1779548893'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
         </div>
 
         <!-- Step 1: Email for OTP (ครั้งแรก / ลืม PIN) -->
@@ -919,7 +922,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                 <button class="login-notfound-signup" type="button" onclick="goSignupFromLogin()">สมัครสมาชิกด้วยอีเมลนี้ →</button>
             </div>
             <button class="login-btn" onclick="sendOTP()">ขอรับรหัส OTP ยืนยัน</button>
-            <div class="login-link" onclick="location.href='signup.html?v=1779533590'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
+            <div class="login-link" onclick="location.href='signup.html?v=1779548893'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
         </div>
 
         <!-- Step 2: OTP Verify -->
@@ -1349,6 +1352,13 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             <div class="settings-item"><div class="settings-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M2 20h20"/><path d="M4 17l2-12 4 5 2-6 2 6 4-5 2 12H4z"/></svg></span></div><div class="settings-info"><div class="settings-label">แผนสมาชิก</div><div class="settings-desc">Gold — Beta</div></div><div class="settings-arrow">›</div></div>
         </div>
 
+        <div class="section-header"><div class="section-title">สมาชิกของคุณ</div></div>
+        <div class="settings-list" style="margin-bottom:24px;" id="membershipCard">
+            <div class="settings-item" style="cursor:default"><div class="settings-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span></div><div class="settings-info"><div class="settings-label">วันที่สมัคร</div><div class="settings-desc" id="memStarted">—</div></div></div>
+            <div class="settings-item" id="memPromoItem" style="cursor:default;display:none"><div class="settings-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span></div><div class="settings-info"><div class="settings-label">โปรโมชันที่ใช้</div><div class="settings-desc" id="memPromo">—</div></div></div>
+            <div class="settings-item" style="cursor:default"><div class="settings-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span></div><div class="settings-info"><div class="settings-label">สมาชิกหมดอายุ</div><div class="settings-desc" id="memExpiry">—</div></div><div class="settings-badge" id="memDaysBadge" style="display:none"></div></div>
+        </div>
+
         <div class="section-header"><div class="section-title">ตั้งค่าแอป</div></div>
         <div class="settings-list" style="margin-bottom:24px;">
             <div class="settings-item"><div class="settings-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span></div><div class="settings-info"><div class="settings-label">การแจ้งเตือน</div><div class="settings-desc">Momentum, Price Alerts</div></div><div class="settings-arrow">›</div></div>
@@ -1590,7 +1600,7 @@ function showForgotPIN(){
 // Email not-found UX (login screen) — show inline notice instead of auto-redirecting to signup
 function showEmailNotFound(){var b=document.getElementById('emailNotFound');if(b)b.style.display='block';var i=document.getElementById('loginEmail');if(i)i.focus();}
 function hideEmailNotFound(){var b=document.getElementById('emailNotFound');if(b)b.style.display='none';}
-function goSignupFromLogin(){var e=(document.getElementById('loginEmail').value||'').trim();location.href='signup.html?v=1779533590'+(e?('&email='+encodeURIComponent(e)):'');}
+function goSignupFromLogin(){var e=(document.getElementById('loginEmail').value||'').trim();location.href='signup.html?v=1779548893'+(e?('&email='+encodeURIComponent(e)):'');}
 
 // Send OTP via Supabase
 async function sendOTP(){
@@ -1688,6 +1698,38 @@ function backToEmail(){
 // The "kick out" path: admin sets subscription_status='revoked' (or pushes
 // subscription_expires_at to the past) on the user in Supabase → next app open
 // they hit this gate. getUser() pulls fresh server-side metadata each time.
+// Fills the "สมาชิกของคุณ" card in Settings from app_metadata (signup date,
+// promo used, expiry, days remaining). Reads the same meta enforceSubscription
+// already fetched — no extra getUser() call.
+function renderMembershipCard(meta){
+  meta=meta||{};
+  function thai(iso,withTime){if(!iso)return null;var d=new Date(iso);if(isNaN(d.getTime()))return null;return d.toLocaleDateString('th-TH',withTime?{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}:{year:'numeric',month:'long',day:'numeric'});}
+  var elS=document.getElementById('memStarted');
+  if(elS)elS.textContent=thai(meta.subscription_started_at,true)||'\u2014';
+  // promo (only if one was applied)
+  var promoItem=document.getElementById('memPromoItem'),promoVal=document.getElementById('memPromo');
+  if(promoVal&&promoItem){
+    if(meta.promo_code&&meta.promo_applied){promoVal.textContent=meta.promo_code;promoItem.style.display='flex';}
+    else{promoItem.style.display='none';}
+  }
+  // expiry + days-left badge
+  var elE=document.getElementById('memExpiry'),badge=document.getElementById('memDaysBadge');
+  var expStr=thai(meta.subscription_expires_at,false);
+  if(elE)elE.textContent=expStr||'\u0e44\u0e21\u0e48\u0e21\u0e35\u0e01\u0e33\u0e2b\u0e19\u0e14'; // "ไม่มีกำหนด"
+  if(badge){
+    badge.style.display='none';badge.className='settings-badge';
+    if(meta.subscription_expires_at){
+      var t=Date.parse(meta.subscription_expires_at);
+      if(!isNaN(t)){
+        var days=Math.ceil((t-Date.now())/86400000);
+        if(days<0){badge.textContent='\u0e2b\u0e21\u0e14\u0e2d\u0e32\u0e22\u0e38\u0e41\u0e25\u0e49\u0e27';badge.className='settings-badge expired';} // "หมดอายุแล้ว"
+        else{badge.textContent='\u0e40\u0e2b\u0e25\u0e37\u0e2d '+days+' \u0e27\u0e31\u0e19';badge.className='settings-badge'+(days<=14?' warn':'');} // "เหลือ N วัน"
+        badge.style.display='inline-block';
+      }
+    }
+  }
+}
+
 async function enforceSubscription(){
   if(!supabaseClient) return true;
   try{
@@ -1706,6 +1748,7 @@ async function enforceSubscription(){
     }
     if(!user){forceReauth('no_session');return false;} // deleted/revoked → block
     const meta=user.app_metadata||{};
+    try{renderMembershipCard(meta);}catch(e){}
     const status=meta.subscription_status;
     const exp=meta.subscription_expires_at;
     let expired=false;
@@ -1767,7 +1810,7 @@ function showExpiredGate(meta,email){
       '</div>'+
     '</div>';
   document.body.appendChild(o);
-  document.getElementById('jptRenewBtn').onclick=function(){location.href='signup.html?v=1779533590'+(em?('&email='+encodeURIComponent(em)):'');};
+  document.getElementById('jptRenewBtn').onclick=function(){location.href='signup.html?v=1779548893'+(em?('&email='+encodeURIComponent(em)):'');};
   document.getElementById('jptGateLogout').onclick=async function(){try{await supabaseClient.auth.signOut();}catch(e){}try{localStorage.removeItem('jpt_pin');localStorage.removeItem('jpt_logged_in');sessionStorage.removeItem('jpt_session_active');}catch(e){}location.reload();};
 }
 

@@ -826,6 +826,12 @@ serve(async (req: Request) => {
       timestamp,
       granted: grant.granted,
       emailSent: mail.sent,
+      // Subscription details so the success page / PDF can show the expiry.
+      plan: plan || null,
+      startedAt,
+      expiresAt,
+      promoCode: promoValid ? (promoCode || null) : null,
+      promoApplied: promoValid,
     });
   } catch (err) {
     console.error("Signup webhook error:", err);

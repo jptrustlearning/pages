@@ -377,6 +377,13 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 }
 .ref-label{font-size:10px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
 .ref-note{font-size:11.5px;color:var(--text-muted);margin-top:10px;line-height:1.5}
+.sub-summary{margin-top:16px;background:linear-gradient(180deg,#FFFEF8,#F5EDD8);border:1.5px solid var(--gold-border);border-radius:14px;padding:14px 16px;text-align:left}
+.sub-summary-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:6px 0;border-bottom:1px solid rgba(212,175,55,0.18)}
+.sub-summary-row:last-child{border-bottom:none}
+.sub-summary-k{font-size:12px;color:var(--text-muted);flex-shrink:0}
+.sub-summary-v{font-size:13px;font-weight:700;color:var(--maroon);text-align:right}
+.sub-summary-v.exp{color:#1F7D49}
+.sub-summary-v.days{font-size:11.5px;font-weight:600;color:var(--gold-deep)}
 .modal-actions{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap}
 .modal button{padding:11px 22px;border:none;border-radius:10px;font-family:'Sarabun','Anuphan',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:0.2px}
 .modal .btn-primary{background:linear-gradient(135deg,var(--maroon),var(--maroon-dk));color:var(--gold-light);box-shadow:0 4px 14px rgba(114,47,55,0.25)}
@@ -607,10 +614,16 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
         </div>
         <h3>สมัครสำเร็จ</h3>
-        <p class="m-sub">ระบบได้รับข้อมูลการสมัครของคุณแล้ว<br>ทีมงาน JP Trust Learning จะตรวจสอบและยืนยันภายใน 24 ชม.</p>
+        <p class="m-sub">บัญชีของคุณเปิดใช้งานแล้ว เริ่มต้นใช้งานได้ทันที<br>ทีมงานจะตรวจสอบการชำระเงินภายหลัง</p>
         <div class="ref-badge" id="refCode"></div>
         <div class="ref-label">Reference Code</div>
         <div class="ref-note">กรุณาจดรหัสอ้างอิงนี้ไว้ <br>หลังยืนยันแล้ว คุณจะสามารถเข้าสู่ระบบด้วยอีเมลที่สมัครได้ทันที</div>
+        <div class="sub-summary" id="subSummary" style="display:none">
+            <div class="sub-summary-row"><span class="sub-summary-k">วันที่สมัคร</span><span class="sub-summary-v" id="ssStart">—</span></div>
+            <div class="sub-summary-row" id="ssPromoRow" style="display:none"><span class="sub-summary-k">โปรโมชัน</span><span class="sub-summary-v" id="ssPromo">—</span></div>
+            <div class="sub-summary-row"><span class="sub-summary-k">สมาชิกหมดอายุ</span><span class="sub-summary-v exp" id="ssExpiry">—</span></div>
+            <div class="sub-summary-row" id="ssDaysRow" style="display:none"><span class="sub-summary-k">ระยะเวลาสมาชิก</span><span class="sub-summary-v days" id="ssDays">—</span></div>
+        </div>
         <!-- Account-preparation hold (30s) — prevents premature "user not found" while backend creates the auth user -->
         <div class="prep-box" id="prepBox">
             <div class="prep-label" id="prepLabel">กำลังเตรียมบัญชีของคุณ • 30 วินาที</div>
@@ -1062,8 +1075,12 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
             amount: (promoApplied && promoFinalAmount !== null) ? promoFinalAmount : selectedAmount,
             refCode: data.refCode,
             timestamp: data.timestamp || new Date().toISOString(),
-            promoCode: promoCodeRaw.toUpperCase()
+            promoCode: promoCodeRaw.toUpperCase(),
+            expiresAt: data.expiresAt || null,
+            startedAt: data.startedAt || data.timestamp || null,
+            promoApplied: !!data.promoApplied
         };
+        renderSubSummary(window._lastReg);
 
     } catch(err) {
         alert('เกิดข้อผิดพลาด: ' + err.message + '\nกรุณาลองใหม่ หรือติดต่อทีมงาน');
@@ -1077,11 +1094,43 @@ function goToLogin() {
     window.location.href = 'member-dashboard.html';
 }
 
+// ============ Subscription summary in success modal ============
+function fmtThaiDate(iso, withTime){
+    if(!iso) return '—';
+    var d = new Date(iso); if(isNaN(d.getTime())) return '—';
+    var opt = withTime ? {year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}
+                       : {year:'numeric',month:'long',day:'numeric'};
+    return d.toLocaleDateString('th-TH', opt);
+}
+function renderSubSummary(r){
+    var box = document.getElementById('subSummary'); if(!box) return;
+    document.getElementById('ssStart').textContent = fmtThaiDate(r.startedAt || r.timestamp, true);
+    if(r.expiresAt){
+        document.getElementById('ssExpiry').textContent = fmtThaiDate(r.expiresAt, false);
+        // days remaining
+        var ms = new Date(r.expiresAt).getTime() - new Date(r.startedAt || r.timestamp || Date.now()).getTime();
+        var days = Math.round(ms / 86400000);
+        if(days > 0){
+            var label = r.plan === 'yearly' ? (days + ' วัน (≈ 1 ปี)') : (days + ' วัน');
+            document.getElementById('ssDays').textContent = label;
+            document.getElementById('ssDaysRow').style.display = 'flex';
+        }
+    } else {
+        document.getElementById('ssExpiry').textContent = 'ไม่มีกำหนด';
+    }
+    if(r.promoApplied && r.promoCode){
+        document.getElementById('ssPromo').textContent = r.promoCode;
+        document.getElementById('ssPromoRow').style.display = 'flex';
+    }
+    box.style.display = 'block';
+}
+
 // ============ PDF ============
 function downloadPDF() {
     const r = window._lastReg; if (!r) return;
-    const regDate = new Date(r.timestamp).toLocaleString('th-TH', {year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit'});
+    const regDate = new Date(r.startedAt || r.timestamp).toLocaleString('th-TH', {year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit'});
     const planLabel = r.plan === 'yearly' ? 'รายปี — ฿1,400 / ปี' : r.plan === 'monthly' ? 'รายเดือน — ฿150 / เดือน' : '—';
+    const expDate = r.expiresAt ? new Date(r.expiresAt).toLocaleDateString('th-TH', {year:'numeric', month:'long', day:'numeric'}) : 'ไม่มีกำหนด';
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Member Registration - ${r.refCode}</title>
 <style>@import url('https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Cinzel:wght@500;600;700&family=DM+Serif+Display&family=Sarabun:wght@400;500;600;700&display=swap');
 @page{size:A4;margin:0}*{margin:0;padding:0;box-sizing:border-box}
@@ -1124,9 +1173,10 @@ ${r.promoCode?`<div class="promo-badge"><span>PROMO: ${r.promoCode}</span></div>
 <tr><td>อีเมล</td><td>${r.email}</td></tr>
 <tr><td>Ref Code</td><td style="color:#8B6914">${r.refCode}</td></tr>
 <tr><td>วันที่สมัคร</td><td>${regDate}</td></tr>
-<tr><td>สถานะ</td><td style="color:#8B6914">รอตรวจสอบ</td></tr>
+<tr><td>สมาชิกหมดอายุ</td><td style="color:#1F7D49;font-weight:700">${expDate}</td></tr>
+<tr><td>สถานะ</td><td style="color:#1F7D49;font-weight:700">เปิดใช้งานแล้ว</td></tr>
 </table>
-<div class="notice"><div class="notice-t">ข้อมูลสำคัญ</div><p>ทีมงาน JP Trust Learning จะตรวจสอบและยืนยันภายใน <strong>24 ชั่วโมง</strong><br>เมื่อยืนยันแล้ว คุณสามารถเข้าสู่ระบบด้วยอีเมลที่สมัคร<br>หากต้องการติดต่อ: <strong>jptrustlearning@gmail.com</strong> พร้อมแจ้ง Ref Code</p></div>
+<div class="notice"><div class="notice-t">ข้อมูลสำคัญ</div><p>บัญชีของคุณ<strong>เปิดใช้งานแล้ว</strong> เข้าสู่ระบบด้วยอีเมลที่สมัครได้ทันที<br>ทีมงาน JP Trust Learning จะตรวจสอบการชำระเงินภายหลัง<br>หากต้องการติดต่อ: <strong>jptrustlearning@gmail.com</strong> พร้อมแจ้ง Ref Code</p></div>
 </div><div class="footer">© 2026 JP TRUST LEARNING — Member Registration<br>เอกสารสร้างโดยระบบอัตโนมัติ · ${new Date().toLocaleDateString('th-TH')}</div></div></div></body></html>`;
     const w = window.open('', '_blank');
     if (w) { w.document.write(html); w.document.close(); }
