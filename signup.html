@@ -641,6 +641,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 
 <script>
 // ============ Pre-fill email from URL (when redirected from member-dashboard login) ============
+// ============ + Renew mode: same flow, heading reads "ต่ออายุสมาชิก" (?renew=1) ============
 (function(){
     try{
         var p=new URLSearchParams(location.search);
@@ -648,6 +649,15 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
         if(em){
             var el=document.getElementById('email');
             if(el)el.value=em.trim();
+        }
+        // Renew mode — identical signup flow, only the heading changes so returning
+        // members don't read "สมัครสมาชิก" and get confused.
+        if(p.get('renew')==='1'){
+            var lbl=document.querySelector('.hero-label');
+            if(lbl)lbl.textContent='Renew Membership';
+            var ttl=document.querySelector('.hero-title .th');
+            if(ttl)ttl.textContent='ต่ออายุสมาชิก';
+            try{document.title='ต่ออายุสมาชิก · JP Trust Learning';}catch(e){}
         }
     }catch(e){}
 })();
