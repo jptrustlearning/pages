@@ -386,11 +386,15 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 /* ===== Account-preparation hold (30s) shown after successful signup ===== */
 .prep-box{margin-top:20px;text-align:center}
 .prep-label{font-size:13.5px;font-weight:700;color:var(--maroon);margin-bottom:9px;letter-spacing:0.2px}
-.prep-bar{height:9px;background:var(--cream-deep);border:1px solid var(--gold-border);border-radius:99px;overflow:hidden}
-.prep-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--gold-sheen),var(--gold),var(--gold-dark));border-radius:99px;transition:width 1s linear}
+.prep-bar{height:16px;background:rgba(46,159,95,0.10);border:1px solid rgba(46,159,95,0.30);border-radius:99px;box-shadow:inset 0 1px 3px rgba(31,125,73,0.12)}
+.prep-fill{position:relative;height:100%;width:0%;border-radius:99px;overflow:hidden;background:linear-gradient(180deg,#6BEBA6 0%,#33B86F 52%,#1F7D49 100%);transition:width 1s linear;animation:prepGlow 1.8s ease-in-out infinite}
+.prep-fill::before{content:'';position:absolute;left:0;right:0;top:1px;height:44%;border-radius:99px;background:linear-gradient(180deg,rgba(255,255,255,0.6),rgba(255,255,255,0));pointer-events:none}
+.prep-fill::after{content:'';position:absolute;top:0;bottom:0;left:0;width:45%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.75),transparent);animation:prepSheen 1.5s linear infinite;pointer-events:none}
+@keyframes prepSheen{0%{transform:translateX(-160%)}100%{transform:translateX(360%)}}
+@keyframes prepGlow{0%,100%{box-shadow:0 0 9px rgba(46,159,95,0.55),0 0 18px rgba(46,159,95,0.28),inset 0 1px 2px rgba(255,255,255,0.5)}50%{box-shadow:0 0 17px rgba(70,225,140,0.92),0 0 34px rgba(46,159,95,0.55),inset 0 1px 2px rgba(255,255,255,0.65)}}
 .prep-hint{font-size:11.5px;color:var(--text-muted);margin-top:9px;line-height:1.55}
 .prep-box.done .prep-label{color:var(--emerald-dk)}
-.prep-box.done .prep-fill{background:linear-gradient(90deg,var(--emerald),var(--emerald-dk))}
+.prep-box.done .prep-fill::after{animation:none;opacity:0}
 .modal .btn-enter{display:none;width:100%;margin-top:14px;background:linear-gradient(135deg,var(--maroon),var(--maroon-dk));color:var(--gold-light);box-shadow:0 4px 14px rgba(114,47,55,0.25)}
 .modal .btn-enter.show{display:block;animation:enterFade .45s ease}
 .modal .btn-enter:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(114,47,55,0.35)}
@@ -612,7 +616,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             <button class="btn-pdf" onclick="downloadPDF()">ดาวน์โหลดใบยืนยัน</button>
         </div>
         <button class="btn-enter" id="enterAppBtn" type="button" onclick="goToLogin()">
-            <svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;margin-right:6px;stroke:currentColor;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round"><polyline points="15 18 9 12 15 6"/></svg>เข้าสู่แอพ
+            เริ่มต้นใช้งาน<svg viewBox="0 0 24 24" width="15" height="15" style="vertical-align:-2px;margin-left:7px;stroke:currentColor;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
     </div>
 </div>
@@ -1133,7 +1137,7 @@ ${r.promoCode?`<div class="promo-badge"><span>PROMO: ${r.promoCode}</span></div>
 // The Edge Function needs a moment to finish creating the auth user. If the
 // customer rushes to the app and requests OTP too soon, Supabase returns
 // "user not found" and confuses them. We hold ~30s (only the download button
-// is active), then reveal the "เข้าสู่แอพ" button once it is safe to log in.
+// is active), then reveal the "เริ่มต้นใช้งาน" button once it is safe to log in.
 function startSignupPrep(){
     var total = 30, left = total;
     var fill  = document.getElementById('prepFill');
