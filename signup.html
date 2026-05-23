@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>สมัครสมาชิก · JP Trust Learning</title>
 <link rel="icon" type="image/png" href="jpt-owl-logo.png">
+<link rel="manifest" href="manifest.json?v=1779526921">
+<meta name="theme-color" content="#1a0a0e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="JP Trust">
+<link rel="apple-touch-icon" href="pwa-icons/icon-192x192.png">
 <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600;700&family=DM+Serif+Display&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -383,6 +390,22 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .modal .btn-pdf:hover{transform:translateY(-1px)}
 .modal .btn-close{background:var(--cream-deep);color:var(--text-dark-muted);border:1px solid rgba(212,175,55,0.3)}
 .modal .btn-close:hover{background:var(--cream-warm);color:var(--maroon)}
+/* ===== Install app prompt (shown after successful signup) ===== */
+.install-prompt{margin-top:18px;background:linear-gradient(180deg,#FFFEF8,#F5EDD8);border:1.5px solid var(--gold-border);border-radius:14px;overflow:hidden;text-align:left}
+.install-prompt-row{display:flex;align-items:center;gap:12px;padding:13px 15px;cursor:pointer}
+.install-prompt-icon{width:42px;height:42px;flex-shrink:0;border-radius:11px;background:linear-gradient(135deg,var(--maroon),var(--maroon-dk));display:flex;align-items:center;justify-content:center;color:var(--gold)}
+.install-prompt-icon svg{width:22px;height:22px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.install-prompt-text{flex:1;min-width:0}
+.install-prompt-title{font-size:14px;font-weight:700;color:var(--maroon)}
+.install-prompt-desc{font-size:11.5px;color:var(--text-muted);margin-top:2px;line-height:1.45}
+.install-prompt-btn{flex-shrink:0;padding:9px 18px!important;background:linear-gradient(135deg,var(--gold),var(--gold-dark))!important;color:#1a0a0e!important;border:none;border-radius:20px;font-size:13px!important;font-weight:700;cursor:pointer;box-shadow:0 3px 10px rgba(212,175,55,0.3)}
+.install-steps{display:none;padding:2px 15px 14px}
+.install-steps.show{display:block}
+.install-step{display:flex;align-items:flex-start;gap:10px;margin-top:10px}
+.install-step-num{width:22px;height:22px;flex-shrink:0;border-radius:50%;background:var(--maroon);color:var(--gold-light);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.install-step-text{font-size:12.5px;color:var(--text-dark);line-height:1.5;padding-top:1px}
+.install-step-text strong{color:var(--gold-deep)}
+@media (display-mode:standalone){.install-prompt{display:none!important}}
 </style>
 </head>
 <body>
@@ -590,6 +613,18 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
         <div class="ref-badge" id="refCode"></div>
         <div class="ref-label">Reference Code</div>
         <div class="ref-note">กรุณาจดรหัสอ้างอิงนี้ไว้ <br>หลังยืนยันแล้ว คุณจะสามารถเข้าสู่ระบบด้วยอีเมลที่สมัครได้ทันที</div>
+        <!-- Install app prompt — surfaced after successful signup -->
+        <div class="install-prompt" id="installPrompt">
+            <div class="install-prompt-row" onclick="signupInstall()">
+                <div class="install-prompt-icon"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="8" x2="12" y2="14"/><polyline points="9 12 12 15 15 12"/><line x1="9" y1="18" x2="15" y2="18"/></svg></div>
+                <div class="install-prompt-text">
+                    <div class="install-prompt-title">ติดตั้งแอป JP Trust</div>
+                    <div class="install-prompt-desc">เพิ่มไอคอนลงหน้าจอ เปิดใช้งานได้เร็ว เต็มจอ ไม่ต้องพิมพ์ URL</div>
+                </div>
+                <button class="install-prompt-btn" type="button" id="installPromptBtn">ติดตั้ง</button>
+            </div>
+            <div class="install-steps" id="installSteps"></div>
+        </div>
         <div class="modal-actions">
             <button class="btn-pdf" onclick="downloadPDF()">ดาวน์โหลดใบยืนยัน</button>
             <button class="btn-primary" onclick="goToLogin()">
@@ -1109,6 +1144,45 @@ ${r.promoCode?`<div class="promo-badge"><span>PROMO: ${r.promoCode}</span></div>
         URL.revokeObjectURL(url);
     }
 }
+
+// ============ PWA install (offered after successful signup) ============
+// signup.html had no manifest/SW before — added so the browser treats this
+// origin as installable and beforeinstallprompt can fire here. start_url in
+// manifest.json points to member-dashboard.html, so installing → the app.
+if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+}
+var deferredInstallPrompt = null;
+function isStandaloneSignup(){return window.matchMedia('(display-mode:standalone)').matches||window.navigator.standalone===true;}
+window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); deferredInstallPrompt = e; });
+window.addEventListener('appinstalled', function(){ markSignupInstalled(); });
+
+function markSignupInstalled(){
+    var p=document.getElementById('installPrompt'); if(!p) return;
+    p.innerHTML='<div class="install-prompt-row" style="cursor:default"><div class="install-prompt-icon" style="background:linear-gradient(135deg,var(--emerald),var(--emerald-dk))"><svg viewBox="0 0 24 24" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></div><div class="install-prompt-text"><div class="install-prompt-title">ติดตั้งแอปแล้ว</div><div class="install-prompt-desc">เปิดแอป JP Trust จากไอคอนบนหน้าจอได้เลย</div></div></div>';
+}
+
+function signupInstall(){
+    if(deferredInstallPrompt){
+        deferredInstallPrompt.prompt();
+        deferredInstallPrompt.userChoice.then(function(r){
+            if(r && r.outcome==='accepted'){ markSignupInstalled(); }
+            deferredInstallPrompt=null;
+        });
+        return;
+    }
+    // No native prompt (iOS Safari, or event not captured yet) — show manual A2HS guide inline
+    var isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+    var steps = isIOS
+        ? [['1','กดปุ่ม <strong>Share</strong> (ไอคอนสี่เหลี่ยมมีลูกศรขึ้น) ด้านล่างของ Safari'],['2','เลื่อนลงแล้วกด <strong>"Add to Home Screen" (เพิ่มไปยังหน้าจอโฮม)</strong>'],['3','กด <strong>"Add" (เพิ่ม)</strong> มุมขวาบน — เสร็จ!']]
+        : [['1','กดเมนู <strong>⋮</strong> มุมขวาบนของ Chrome'],['2','กด <strong>"เพิ่มลงในหน้าจอหลัก"</strong> หรือ <strong>"ติดตั้งแอป"</strong>'],['3','กด <strong>"เพิ่ม" / "ติดตั้ง"</strong> — เสร็จ!']];
+    var box=document.getElementById('installSteps');
+    if(!box) return;
+    box.innerHTML = steps.map(function(s){return '<div class="install-step"><div class="install-step-num">'+s[0]+'</div><div class="install-step-text">'+s[1]+'</div></div>';}).join('');
+    box.classList.toggle('show');
+}
+
+if(isStandaloneSignup()){ var _ip=document.getElementById('installPrompt'); if(_ip) _ip.style.display='none'; }
 </script>
 </body>
 </html>
