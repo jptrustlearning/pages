@@ -907,7 +907,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             <button class="login-btn" onclick="checkPIN()">เข้าสู่ระบบ</button>
             <div class="login-link" id="pinError" style="color:#EA4335;display:none;">PIN ไม่ถูกต้อง</div>
             <div class="login-link" onclick="showForgotPIN()">ลืม PIN? <span>ยืนยันด้วย OTP</span></div>
-            <div class="login-link" onclick="location.href='signup.html?v=1779532874'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
+            <div class="login-link" onclick="location.href='signup.html?v=1779533590'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
         </div>
 
         <!-- Step 1: Email for OTP (ครั้งแรก / ลืม PIN) -->
@@ -919,7 +919,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                 <button class="login-notfound-signup" type="button" onclick="goSignupFromLogin()">สมัครสมาชิกด้วยอีเมลนี้ →</button>
             </div>
             <button class="login-btn" onclick="sendOTP()">ขอรับรหัส OTP ยืนยัน</button>
-            <div class="login-link" onclick="location.href='signup.html?v=1779532874'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
+            <div class="login-link" onclick="location.href='signup.html?v=1779533590'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
         </div>
 
         <!-- Step 2: OTP Verify -->
@@ -1587,7 +1587,7 @@ function showForgotPIN(){
 // Email not-found UX (login screen) — show inline notice instead of auto-redirecting to signup
 function showEmailNotFound(){var b=document.getElementById('emailNotFound');if(b)b.style.display='block';var i=document.getElementById('loginEmail');if(i)i.focus();}
 function hideEmailNotFound(){var b=document.getElementById('emailNotFound');if(b)b.style.display='none';}
-function goSignupFromLogin(){var e=(document.getElementById('loginEmail').value||'').trim();location.href='signup.html?v=1779532874'+(e?('&email='+encodeURIComponent(e)):'');}
+function goSignupFromLogin(){var e=(document.getElementById('loginEmail').value||'').trim();location.href='signup.html?v=1779533590'+(e?('&email='+encodeURIComponent(e)):'');}
 
 // Send OTP via Supabase
 async function sendOTP(){
@@ -1764,7 +1764,7 @@ function showExpiredGate(meta,email){
       '</div>'+
     '</div>';
   document.body.appendChild(o);
-  document.getElementById('jptRenewBtn').onclick=function(){location.href='signup.html?v=1779532874'+(em?('&email='+encodeURIComponent(em)):'');};
+  document.getElementById('jptRenewBtn').onclick=function(){location.href='signup.html?v=1779533590'+(em?('&email='+encodeURIComponent(em)):'');};
   document.getElementById('jptGateLogout').onclick=async function(){try{await supabaseClient.auth.signOut();}catch(e){}try{localStorage.removeItem('jpt_pin');localStorage.removeItem('jpt_logged_in');sessionStorage.removeItem('jpt_session_active');}catch(e){}location.reload();};
 }
 
