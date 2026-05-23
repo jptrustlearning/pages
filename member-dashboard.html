@@ -1542,20 +1542,32 @@ function updatePinDots(inputId,dotsId){
     });
 }
 
-// Check PIN
-function checkPIN(){
+// Check PIN — correct PIN unlocks ONLY if Supabase still has a live user.
+async function checkPIN(){
     var pin=document.getElementById('pinInput').value.trim();
     if(pin.length<6)return;
-    if(pin===savedPIN){
-        isLoggedIn=true;
-        try{localStorage.setItem('jpt_logged_in','true');sessionStorage.setItem('jpt_session_active','1')}catch(e){}
-        showApp();
-    } else {
+    if(pin!==savedPIN){
         document.getElementById('pinError').style.display='block';
+        document.getElementById('pinError').textContent='PIN ไม่ถูกต้อง';
         document.getElementById('pinInput').value='';
         document.querySelectorAll('#pinDots .pin-dot').forEach(function(d){d.classList.remove('filled')});
         setTimeout(function(){document.getElementById('pinError').style.display='none'},2000);
+        return;
     }
+    // PIN matches locally — now confirm the account still exists server-side.
+    var btn=document.querySelector('#stepPin .login-btn');
+    if(btn){btn.disabled=true;btn.textContent='กำลังตรวจสอบ...';}
+    var live=await hasLiveSession();
+    if(btn){btn.disabled=false;btn.textContent='เข้าสู่ระบบ';}
+    if(live===false){
+        // Deleted / revoked → can't enter with the local PIN anymore.
+        forceReauth('account_deleted');
+        return;
+    }
+    // live===true OR live===null (offline → allow; enforceSubscription re-checks later)
+    isLoggedIn=true;
+    try{localStorage.setItem('jpt_logged_in','true');sessionStorage.setItem('jpt_session_active','1')}catch(e){}
+    showApp();
 }
 
 // Forgot PIN — go to OTP flow
@@ -1665,8 +1677,20 @@ function backToEmail(){
 async function enforceSubscription(){
   if(!supabaseClient) return true;
   try{
-    const{data:{user}}=await supabaseClient.auth.getUser();
-    if(!user) return true; // no session — login flow handles it
+    const{data:{user},error}=await supabaseClient.auth.getUser();
+    // A genuine network/infra error → fail-OPEN so valid members aren't locked
+    // out when offline. But a CLEAN "no user" answer (deleted account / revoked
+    // token) is authoritative → fail-CLOSED. getUser() hits the server, so a
+    // deleted user returns {user:null, error:null|auth-error} reliably.
+    if(error){
+      const m=String(error.message||'').toLowerCase();
+      // Auth-level errors (token invalid / user gone) are authoritative → block.
+      const authGone=m.includes('jwt')||m.includes('token')||m.includes('session')||m.includes('user')||m.includes('not found')||m.includes('unauthorized')||error.status===401||error.status===403;
+      if(authGone){forceReauth('account_deleted');return false;}
+      // Otherwise treat as transient (offline/5xx) → fail-open.
+      console.warn('[sub] transient check error:',error.message);return true;
+    }
+    if(!user){forceReauth('no_session');return false;} // deleted/revoked → block
     const meta=user.app_metadata||{};
     const status=meta.subscription_status;
     const exp=meta.subscription_expires_at;
@@ -1676,6 +1700,26 @@ async function enforceSubscription(){
     if(expired){showExpiredGate(meta,user.email);try{logEvent('subscription_blocked');}catch(e){}return false;}
     return true;
   }catch(e){console.warn('[sub] check error:',e);return true;}
+}
+
+// User no longer exists in Supabase (deleted) or token revoked → drop the local
+// PIN/session and bounce to the OTP login. A deleted email can't request an OTP
+// (shouldCreateUser:false → "User not found"), so they can't get back in.
+function forceReauth(reason){
+  try{logEvent('forced_reauth',{screen:reason||''});}catch(e){}
+  try{localStorage.removeItem('jpt_pin');localStorage.removeItem('jpt_logged_in');}catch(e){}
+  try{sessionStorage.removeItem('jpt_session_active');}catch(e){}
+  savedPIN=null; isLoggedIn=false;
+  try{document.getElementById('jptExpiredGate')&&document.getElementById('jptExpiredGate').remove();}catch(e){}
+  try{document.getElementById('mainApp').classList.remove('active');}catch(e){}
+  const splash=document.getElementById('splashScreen');
+  if(splash){splash.classList.add('hidden');splash.style.display='none';}
+  document.getElementById('loginScreen').classList.remove('hidden');
+  // Force the email/OTP step (not PIN) since the local PIN is now meaningless
+  document.querySelectorAll('.login-step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('stepEmail').classList.add('active');
+  document.getElementById('loginTitle').textContent='Member Access';
+  document.getElementById('loginSubtitle').textContent='เข้าสู่ระบบด้วยอีเมลสมาชิก';
 }
 
 function showExpiredGate(meta,email){
@@ -2337,8 +2381,41 @@ setTimeout(function(){
     if(splash){splash.classList.add('hidden');setTimeout(function(){splash.style.display='none'},600)}
 },isLoggedIn?400:2200);
 
-if(isLoggedIn)showApp();
-else initLoginScreen();
+// ===== Boot: a saved PIN is only honored if Supabase still has a live user =====
+// Prevents the "deleted user still gets in via local PIN" hole. We ask the
+// server (getUser) before trusting the local PIN. Transient/offline errors
+// fail-OPEN (valid members aren't locked out); a clean "no user" fails-CLOSED.
+async function hasLiveSession(){
+  if(!supabaseClient) return null; // can't tell → caller decides
+  try{
+    const{data:{user},error}=await supabaseClient.auth.getUser();
+    if(error){
+      const m=String(error.message||'').toLowerCase();
+      const authGone=m.includes('jwt')||m.includes('token')||m.includes('session')||m.includes('user')||m.includes('not found')||m.includes('unauthorized')||error.status===401||error.status===403;
+      if(authGone) return false; // token invalid / user gone → no live session
+      return null; // transient (offline) → unknown, don't lock out
+    }
+    return !!user;
+  }catch(e){ return null; } // network error → unknown
+}
+
+async function bootApp(){
+  // No saved PIN at all → normal first-time flow (email/OTP).
+  if(!savedPIN){ initLoginScreen(); return; }
+  // Keep the splash up while we verify server-side, so a deleted user never
+  // sees a flash of app content (isLoggedIn may be true from sessionStorage).
+  const live=await hasLiveSession();
+  if(live===false){
+    // User was deleted / token revoked → wipe local PIN, force OTP. No app access.
+    forceReauth('account_deleted');
+    return;
+  }
+  // live===true (valid) OR live===null (offline/unknown → fail-open; PIN is
+  // gated again by enforceSubscription inside showApp once back online).
+  if(isLoggedIn){ showApp(); }
+  else { initLoginScreen(); }
+}
+bootApp();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 // PIN input filters
 ['pinInput','newPinInput','confirmPinInput','loginOTP'].forEach(function(id){
