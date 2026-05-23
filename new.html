@@ -10,13 +10,11 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-    --cream:#FAF6ED;--cream-card:#FFFEF8;
     --burgundy:#722F37;--burgundy-dark:#1a0a0e;--burgundy-mid:#2d1018;--burgundy-light:#3a1520;
     --gold:#D4AF37;--gold-dark:#B8860B;--gold-deep:#8B6914;--gold-light:#F4E4BA;
     --gold-glow:rgba(212,175,55,0.15);--gold-border:rgba(212,175,55,0.2);
     --text-light:#E8E4DC;--text-light-muted:#A09B92;
-    --green-light:#4CAF50;
-    --radius-sm:12px;--radius-xs:8px;
+    --radius-sm:12px;
     --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
 }
 html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--burgundy-dark);color:var(--text-light);min-height:100vh;min-height:100dvh;overflow-x:hidden}
@@ -30,25 +28,16 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--burgundy-d
 @keyframes logoIn{0%{opacity:0;transform:translateY(14px) scale(.86)}100%{opacity:1;transform:translateY(0) scale(1)}}
 
 .entry-eyebrow{font-family:'Cinzel',serif;font-size:11px;letter-spacing:4px;color:var(--gold-deep);text-transform:uppercase;margin-bottom:10px;position:relative;z-index:1;opacity:0;animation:fadeUp .7s ease .15s forwards}
-.entry-title{font-family:'DM Serif Display',serif;font-size:27px;color:var(--gold-light);margin-bottom:8px;position:relative;z-index:1;text-align:center;opacity:0;animation:fadeUp .7s ease .25s forwards}
-.entry-subtitle{color:var(--text-light-muted);font-size:14.5px;line-height:1.6;margin-bottom:28px;position:relative;z-index:1;text-align:center;max-width:340px;opacity:0;animation:fadeUp .7s ease .35s forwards}
+.entry-title{font-family:'DM Serif Display',serif;font-size:27px;color:var(--gold-light);margin-bottom:10px;position:relative;z-index:1;text-align:center;opacity:0;animation:fadeUp .7s ease .25s forwards}
+.entry-subtitle{color:var(--text-light-muted);font-size:14.5px;line-height:1.65;margin-bottom:30px;position:relative;z-index:1;text-align:center;max-width:340px;opacity:0;animation:fadeUp .7s ease .35s forwards}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-.entry-form{width:100%;max-width:380px;display:flex;flex-direction:column;gap:14px;position:relative;z-index:1;opacity:0;animation:fadeUp .7s ease .45s forwards}
-.entry-label{font-size:13px;color:var(--gold-light);margin-bottom:-6px;font-weight:500}
-.entry-input{width:100%;padding:16px 20px;background:rgba(26,10,14,0.55);border:1.5px solid var(--gold-border);border-radius:var(--radius-sm);color:var(--gold-light);font-family:'Sarabun','Anuphan',sans-serif;font-size:16px;outline:none;transition:border-color .25s}
-.entry-input::placeholder{color:var(--text-light-muted)}
-.entry-input:focus{border-color:var(--gold)}
-.entry-input.error{border-color:#EA6A5E}
-.entry-error{color:#F08C82;font-size:12.5px;margin-top:-6px;display:none}
-.entry-error.show{display:block}
-
-.entry-btn{padding:16px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border:none;border-radius:var(--radius-sm);color:#1a0a0e;font-family:'Sarabun','Anuphan',sans-serif;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(212,175,55,0.3);transition:transform .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.entry-form{width:100%;max-width:380px;display:flex;flex-direction:column;position:relative;z-index:1;opacity:0;animation:fadeUp .7s ease .45s forwards}
+.entry-btn{padding:17px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border:none;border-radius:var(--radius-sm);color:#1a0a0e;font-family:'Sarabun','Anuphan',sans-serif;font-size:16.5px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(212,175,55,0.3);transition:transform .15s;display:flex;align-items:center;justify-content:center;gap:9px}
 .entry-btn:active{transform:scale(.97)}
-.entry-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.entry-btn svg{width:17px;height:17px;stroke:currentColor;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
 
-.entry-note{font-size:12px;color:var(--text-light-muted);text-align:center;line-height:1.65;margin-top:2px;position:relative;z-index:1}
-.entry-link{color:var(--text-light-muted);font-size:13.5px;text-align:center;margin-top:18px;cursor:pointer;position:relative;z-index:1;opacity:0;animation:fadeUp .7s ease .55s forwards}
+.entry-link{color:var(--text-light-muted);font-size:13.5px;text-align:center;margin-top:20px;cursor:pointer;position:relative;z-index:1;opacity:0;animation:fadeUp .7s ease .55s forwards}
 .entry-link span{color:var(--gold);font-weight:500}
 </style>
 </head>
@@ -62,51 +51,20 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--burgundy-d
 
     <div class="entry-eyebrow">JP Trust Learning</div>
     <div class="entry-title">สมัครสมาชิกใหม่</div>
-    <div class="entry-subtitle">เริ่มต้นเข้าถึงกลยุทธ์การลงทุนและบทวิเคราะห์ของ JP Trust<br>กรอกอีเมลของคุณเพื่อไปยังหน้าสมัครสมาชิก</div>
+    <div class="entry-subtitle">เริ่มต้นเข้าถึงกลยุทธ์การลงทุนและบทวิเคราะห์เชิงลึกของ JP Trust<br>กดปุ่มด้านล่างเพื่อเริ่มสมัครสมาชิก</div>
 
     <div class="entry-form">
-        <label class="entry-label" for="entryEmail">อีเมล</label>
-        <input type="email" class="entry-input" id="entryEmail" placeholder="example@email.com" autocomplete="email" inputmode="email" autocapitalize="off">
-        <div class="entry-error" id="entryError">กรุณากรอกอีเมลให้ถูกต้อง</div>
-        <button class="entry-btn" id="entryBtn" onclick="goToSignup()">
-            ไปสมัครสมาชิก
+        <button class="entry-btn" onclick="goSignup()">
+            สมัครสมาชิก
             <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
-        <div class="entry-note">เราจะใช้อีเมลนี้สำหรับเข้าสู่ระบบและยืนยันตัวตน</div>
     </div>
 
     <div class="entry-link" onclick="location.href='member-dashboard.html'">มีบัญชีอยู่แล้ว? <span>เข้าสู่ระบบ</span></div>
 </div>
 
 <script>
-var SIGNUP_URL = 'signup.html?v=1779526921';
-var emailEl = document.getElementById('entryEmail');
-var errEl = document.getElementById('entryError');
-
-function validEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
-
-function clearErr(){ errEl.classList.remove('show'); emailEl.classList.remove('error'); }
-emailEl.addEventListener('input', clearErr);
-emailEl.addEventListener('keydown', function(ev){ if(ev.key === 'Enter'){ ev.preventDefault(); goToSignup(); } });
-
-function goToSignup(){
-    var email = (emailEl.value || '').trim();
-    if(!validEmail(email)){
-        errEl.classList.add('show');
-        emailEl.classList.add('error');
-        emailEl.focus();
-        return;
-    }
-    location.href = SIGNUP_URL + '&email=' + encodeURIComponent(email);
-}
-
-// Pre-fill if an email was passed along (e.g. shared deep-link ?email=...)
-(function(){
-    try{
-        var em = new URLSearchParams(location.search).get('email');
-        if(em) emailEl.value = em.trim();
-    }catch(e){}
-})();
+function goSignup(){ location.href = 'signup.html?v=1779531943'; }
 </script>
 </body>
 </html>
