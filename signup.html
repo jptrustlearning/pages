@@ -688,15 +688,18 @@ function selectPlan(plan, amount) {
 // ============ Promo Code (validates + prices via Supabase RPC) ============
 const REASON_TH = {
     invalid:'รหัสไม่ถูกต้อง', expired:'หมดอายุแล้ว', not_started:'ยังไม่เริ่มใช้งาน',
-    wrong_plan:'ใช้กับแพ็กนี้ไม่ได้', sold_out:'สิทธิ์เต็มแล้ว', empty:'กรุณากรอกรหัส'
+    wrong_plan:'ใช้กับแพ็กนี้ไม่ได้', sold_out:'สิทธิ์เต็มแล้ว', empty:'กรุณากรอกรหัส',
+    members_only:'เฉพาะสมาชิกที่ยังไม่หมดอายุ'
 };
 
 async function previewPromo(code, plan){
     try{
+        var emailEl=document.getElementById('email');
+        var email=emailEl?(emailEl.value||'').trim():'';
         const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/preview_promo`, {
             method:'POST',
             headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON,'Authorization':`Bearer ${SUPABASE_ANON}`},
-            body: JSON.stringify({ p_code: code, p_plan: plan })
+            body: JSON.stringify({ p_code: code, p_plan: plan, p_email: email })
         });
         if(!res.ok) return null;
         const data = await res.json();
@@ -709,6 +712,7 @@ async function previewPromo(code, plan){
 // preview_promo (the DB is the source of truth). Add a future public promo by
 // appending here. Comp / free codes (e.g. JPTFREE2026) stay manual-entry only.
 const PROMO_CATALOG = [
+    { code:'JPTRENEW2569MAY', desc:'ต่ออายุก่อนหมด · รายเดือนลด 5% / รายปีลด 10% · เฉพาะสมาชิกที่ยังไม่หมดอายุ · ถึง 31 พ.ค. 2569' },
     { code:'JPTHALF5050', desc:'โปรเปิดตัว · ลด 50% เฉพาะแพ็กรายปี · 30 สิทธิ์แรก · ถึง 30 มิ.ย. 2569' }
 ];
 

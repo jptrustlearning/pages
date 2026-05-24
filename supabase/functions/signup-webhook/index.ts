@@ -514,7 +514,7 @@ type PromoResult = {
 // Calls reserve_promo() which atomically re-validates AND consumes one quota
 // slot. Service-role only. Returns the locked-in price + whether a slip is
 // still required (free codes don't need one; discounted codes do).
-async function reservePromo(code: string, plan: string): Promise<PromoResult | null> {
+async function reservePromo(code: string, plan: string, email: string): Promise<PromoResult | null> {
   const supaUrl = Deno.env.get("SUPABASE_URL");
   const svcKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!supaUrl || !svcKey) return null;
@@ -522,7 +522,7 @@ async function reservePromo(code: string, plan: string): Promise<PromoResult | n
     const admin = createClient(supaUrl, svcKey, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
-    const { data, error } = await admin.rpc("reserve_promo", { p_code: code, p_plan: plan });
+    const { data, error } = await admin.rpc("reserve_promo", { p_code: code, p_plan: plan, p_email: email });
     if (error) {
       console.error("[promo] reserve_promo RPC error:", error.message);
       return null;
@@ -615,7 +615,7 @@ serve(async (req: Request) => {
   let promoDiscountValue = 0;
 
   if (promoCode) {
-    const r = await reservePromo(promoCode, plan);
+    const r = await reservePromo(promoCode, plan, email);
     if (r === null) {
       // RPC unreachable/misconfigured. Don't silently let people in free —
       // fail closed for promo, but allow the legacy beta code as a fallback so
@@ -632,6 +632,7 @@ serve(async (req: Request) => {
         not_started: "รหัสโปรโมชันยังไม่เริ่มใช้งาน",
         wrong_plan: "รหัสโปรโมชันใช้กับแพ็กเกจนี้ไม่ได้",
         sold_out: "รหัสโปรโมชันถูกใช้ครบจำนวนสิทธิ์แล้ว",
+        members_only: "รหัสนี้ใช้ได้เฉพาะสมาชิกที่ยังไม่หมดอายุ (ต่ออายุก่อนหมด)",
         empty: "กรุณากรอกรหัสโปรโมชัน",
       };
       return errResponse(409, map[r.reason] || "รหัสโปรโมชันใช้ไม่ได้");
