@@ -834,9 +834,11 @@ async function checkPromo() {
     const r = await previewPromo(val, selectedPlan);
     if (btn) btn.disabled = false;
 
-    // Network/RPC down → fall back to the known free beta code so signup never hard-blocks
+    // Network/RPC down → fall back to the known free beta code so signup never
+    // hard-blocks. JPTFREE2026 is monthly-only (migration v4), so only honour the
+    // fallback for monthly; yearly+this code while RPC is down shows ลองใหม่.
     if (r === null) {
-        if (val === PROMO_CODE) { applyFreePromo(btn, st); }
+        if (val === PROMO_CODE && selectedPlan === 'monthly') { applyFreePromo(btn, st); }
         else { st.className='promo-status invalid'; st.textContent='ลองใหม่'; if(btn){btn.classList.remove('applied');btn.textContent='ใช้รหัสโปรโมชัน';} }
         updatePayDisplay(); checkReady(); return;
     }

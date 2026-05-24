@@ -619,8 +619,10 @@ serve(async (req: Request) => {
     if (r === null) {
       // RPC unreachable/misconfigured. Don't silently let people in free —
       // fail closed for promo, but allow the legacy beta code as a fallback so
-      // we never hard-block during infra hiccups while the only code is free.
-      if (promoCode === PROMO_CODE) {
+      // we never hard-block during infra hiccups. JPTFREE2026 is monthly-only
+      // (see migration v4), so the fallback must honour that too — yearly with
+      // this code while the RPC is down still gets blocked, not a free year.
+      if (promoCode === PROMO_CODE && plan === "monthly") {
         promoApplied = true; promoFree = true; amount = 0; promoDiscountType = "free";
       } else {
         return errResponse(503, "ระบบตรวจสอบรหัสโปรโมชันไม่พร้อมใช้งานชั่วคราว กรุณาลองใหม่");
