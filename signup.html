@@ -442,7 +442,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                     <div class="form-row single">
                         <div class="form-group">
                             <label>อีเมล <span class="req">*</span></label>
-                            <input type="email" id="email" placeholder="example@email.com" autocomplete="email" required>
+                            <input type="email" id="email" placeholder="example@email.com" autocomplete="email" required oninput="onEmailChanged()">
                         </div>
                     </div>
                     <div class="form-row">
@@ -673,6 +673,10 @@ const PROMO_CODE = 'JPTFREE2026';
 let uploadedFileBase64 = null, uploadedFileName = null, promoApplied = false;
 let selectedPlan = null, selectedAmount = null;
 let promoFinalAmount = null, promoSlipRequired = true;
+// The email a promo/slip was last validated against (lowercased). When the user
+// edits the email after filling things in, we reset so nothing stale carries
+// over from the old email — see onEmailChanged().
+let promoEmailSnapshot = null;
 
 // ============ Plan selection ============
 function selectPlan(plan, amount) {
@@ -789,6 +793,36 @@ function clearPromo(){
     resetPromoApply();
     syncPromoTrigger();
 }
+
+// ============ Email-change guard ============
+// Promo eligibility and the uploaded slip are tied to a specific email. If the
+// user goes back and edits the email after applying a promo / uploading a slip,
+// anything validated against the OLD email is now stale (a renew code that was
+// valid for member A is not valid for brand-new email B, etc). So when the
+// email actually changes from what a promo was validated against, wipe the
+// promo + slip + confirms and force a fresh check. Fires on input but only acts
+// when the normalised email differs from the snapshot, so normal typing doesn't
+// clear anything until a promo was actually applied against an earlier value.
+function onEmailChanged(){
+    const cur = (document.getElementById('email').value || '').trim().toLowerCase();
+    if(promoEmailSnapshot === null) return;        // nothing applied yet → nothing to stale
+    if(cur === promoEmailSnapshot) return;         // unchanged (e.g. re-focus) → leave as is
+    // Email genuinely changed after a promo was applied → reset everything tied to it.
+    promoEmailSnapshot = null;
+    if(promoApplied || document.getElementById('promoCode').value){
+        clearPromo();                              // resets promo state + trigger UI
+    }
+    removeFile();                                  // drop the slip uploaded under the old email
+    // make sure pay confirmations are unticked + unlocked again
+    try{
+        const cs=document.getElementById('confirmSlip'), cp=document.getElementById('confirmPay');
+        cs.disabled=false; cp.disabled=false; cs.checked=false; cp.checked=false;
+        document.getElementById('confirmSlipBox').classList.remove('checked','locked');
+        document.getElementById('confirmPayBox').classList.remove('checked','locked');
+        document.getElementById('uploadSection').style.display='';
+    }catch(e){}
+    updatePayDisplay(); checkReady();
+}
 // Reflect current promo state on the trigger button + status line
 function syncPromoTrigger(){
     const trig = document.getElementById('promoTrigger');
@@ -858,6 +892,10 @@ async function checkPromo() {
     promoApplied = true;
     promoFinalAmount = r.final_price;
     promoSlipRequired = !!r.slip_required;
+    // Remember which email this promo was validated against. Promo eligibility
+    // (members_only / new_only / existing_only) is per-email, so if the user
+    // later edits the email we must re-check — see onEmailChanged().
+    promoEmailSnapshot = (document.getElementById('email').value || '').trim().toLowerCase();
     st.className = 'promo-status valid'; st.textContent = 'ใช้ได้';
     if (btn) { btn.classList.add('applied'); btn.textContent = '✓ ใช้รหัสนี้แล้ว'; }
 
