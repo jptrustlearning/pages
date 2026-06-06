@@ -294,6 +294,24 @@ serve(async (req: Request) => {
     secretWarning = "REMINDER_CRON_SECRET is not set — this endpoint is currently UNPROTECTED. Set it after testing.";
   }
 
+  // ---- Test mode: send ONE sample reminder to a given address ----
+  // GET ?test=someone@x.com&stage=d14&secret=...   (stage: d14 | d7 | d1, default d14)
+  // Touches NO member data and writes NO markers — purely for previewing the
+  // real email through the real Resend pipeline. Strictly requires the cron
+  // secret (fail-closed): an open send-to-anyone endpoint would be a spam vector.
+  const testTo = (url.searchParams.get("test") || "").trim().toLowerCase();
+  if (testTo) {
+    if (!cronSecret) return jsonResponse(403, { ok: false, error: "test mode requires REMINDER_CRON_SECRET to be set" });
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(testTo)) return jsonResponse(400, { ok: false, error: "bad test email" });
+    const stageParam = (url.searchParams.get("stage") || "d14").toLowerCase();
+    const stage = (STAGES.find((s) => s.key === stageParam)?.key ?? "d14") as StageKey;
+    const sampleDays = stage === "d1" ? 1 : stage === "d7" ? 7 : 14;
+    const expiryISO = new Date(Date.now() + sampleDays * DAY_MS).toISOString();
+    const info: ReminderInfo = { email: testTo, username: "สมาชิกทดสอบ", plan: "yearly", daysLeft: sampleDays, expiryISO };
+    const result = await sendReminder(stage, info);
+    return jsonResponse(result.sent ? 200 : 500, { ok: result.sent, mode: "test", stage, to: testTo, ...(result.error ? { error: result.error } : {}) });
+  }
+
   const supaUrl = Deno.env.get("SUPABASE_URL");
   const svcKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!supaUrl || !svcKey) {
