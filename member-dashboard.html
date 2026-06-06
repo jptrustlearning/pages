@@ -1804,7 +1804,8 @@ async function enforceSubscription(){
     if(status==='revoked'||status==='expired') expired=true;
     if(exp){const t=Date.parse(exp);if(!isNaN(t)&&Date.now()>t)expired=true;}
     if(expired){showExpiredGate(meta,user.email);try{logEvent('subscription_blocked');}catch(e){}return false;}
-    try{maybeShowRenewalNotice(user.email,meta);}catch(e){}
+    try{await maybeShowRenewalNotice(user.email,meta);}catch(e){}
+    try{maybeShowExpiryReminder(user.email,meta);}catch(e){}
     return true;
   }catch(e){console.warn('[sub] check error:',e);return true;}
 }
@@ -1927,6 +1928,75 @@ async function maybeShowRenewalNotice(email,meta){
     };
     try{logEvent('renewal_notice_shown');}catch(e){}
   }catch(e){console.warn('[renew-notice]',e);}
+}
+
+// ===== Recurring expiry reminder — modal for members nearing expiry =====
+// Spec (Joon, A34): start when <=20 days remain; after "ไว้ทีหลัง" re-show every
+// 3 days, switching to daily in the last 5 days. Snooze marker is bound to the
+// expiry VALUE + BKK date of the ack ('exp|YYYY-MM-DD'), so renewing (expiry
+// change) clears it automatically — same self-heal principle as the renewal
+// notice & email cron. Already-expired members never reach here (expired gate
+// fires first in enforceSubscription). The quiet home banner (<=14d) stays.
+// Promo hint self-expires via untilMs — no redeploy needed when the code ends.
+var RENEW_PROMO_HINT = { code:'JPTBETA2026RENEW', text:'สมาชิกปัจจุบันใช้โค้ด JPTBETA2026RENEW ลด 50% แพ็กรายปี ถึง 20 มิ.ย. 2569', untilMs: Date.parse('2026-06-20T16:59:59Z') };
+function bkkDateStr(ms){ return new Date(ms + 7*3600000).toISOString().slice(0,10); }
+function maybeShowExpiryReminder(email, meta){
+  try{
+    var exp = meta && meta.subscription_expires_at;
+    if(!exp) return;
+    var t = Date.parse(exp);
+    if(isNaN(t)) return;
+    var now = Date.now();
+    var daysLeft = Math.ceil((t - now)/86400000);
+    if(daysLeft > 20 || daysLeft < 0) return;            // not in window / expired-gate territory
+    if(document.getElementById('jptRenewalNotice')) return; // just renewed — no nagging on top
+    if(document.getElementById('jptExpiryReminder')) return;
+    var interval = daysLeft <= 5 ? 1 : 3;                // daily in final 5 days, else every 3 days
+    try{
+      var ack = localStorage.getItem('jpt_expiry_remind_ack') || '';
+      var sep = ack.lastIndexOf('|');
+      if(sep > 0 && ack.slice(0,sep) === exp){
+        var ackDay = Date.parse(ack.slice(sep+1) + 'T00:00:00Z');
+        var today  = Date.parse(bkkDateStr(now) + 'T00:00:00Z');
+        if(!isNaN(ackDay) && !isNaN(today) && (today - ackDay)/86400000 < interval) return;
+      }
+    }catch(e){}
+    var expStr = new Date(t).toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+    var headline = daysLeft === 0 ? 'สมาชิกหมดอายุวันนี้' : ('สมาชิกเหลืออีก ' + daysLeft + ' วัน');
+    var promoLine = '';
+    if(RENEW_PROMO_HINT && now <= RENEW_PROMO_HINT.untilMs){
+      promoLine = '<div style="background:linear-gradient(135deg,rgba(212,175,55,0.12),rgba(184,134,11,0.08));border:1px dashed rgba(184,134,11,0.5);border-radius:10px;padding:10px 12px;margin:0 0 16px;font-size:12.5px;color:#8B6914;font-weight:600;line-height:1.55;">' + RENEW_PROMO_HINT.text + '</div>';
+    }
+    var o = document.createElement('div');
+    o.id = 'jptExpiryReminder';
+    o.style.cssText = 'position:fixed;inset:0;z-index:99970;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(26,10,14,0.78);backdrop-filter:blur(3px);font-family:Sarabun,Anuphan,sans-serif;overflow-y:auto;';
+    o.innerHTML = '' +
+      '<div style="max-width:400px;width:100%;background:#FFFEF8;border:1.5px solid rgba(212,175,55,0.4);border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5);">' +
+        '<div style="height:4px;background:linear-gradient(90deg,#B71C1C,#C71F4A,#D4AF37,#C71F4A,#B71C1C);"></div>' +
+        '<div style="padding:32px 26px 24px;text-align:center;">' +
+          '<div style="width:68px;height:68px;margin:0 auto 18px;border-radius:50%;background:linear-gradient(135deg,#722F37,#4A1520);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(114,47,55,0.35);">' +
+            '<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="#E8D48B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
+          '</div>' +
+          '<div style="font-family:Cinzel,serif;font-size:11px;letter-spacing:3px;color:#8B6914;text-transform:uppercase;font-weight:600;margin-bottom:8px;">Renewal Reminder</div>' +
+          '<h2 style="font-family:\'DM Serif Display\',serif;font-size:24px;color:#722F37;margin:0 0 10px;">' + headline + '</h2>' +
+          '<p style="font-size:13.5px;color:#5A3D20;line-height:1.65;margin:0 0 16px;">ต่ออายุตอนนี้ วันที่เหลือไม่หายไป — ระบบนับต่อจากวันหมดอายุเดิม</p>' +
+          '<div style="background:linear-gradient(180deg,#FFFEF8,#F5EDD8);border:1px solid rgba(212,175,55,0.35);border-radius:12px;padding:14px 16px;margin:0 0 14px;">' +
+            '<div style="font-size:12px;color:#7A6F62;margin-bottom:4px;">สมาชิกหมดอายุ</div>' +
+            '<div style="font-family:\'DM Serif Display\',serif;font-size:20px;color:' + (daysLeft <= 5 ? '#B71C1C' : '#8B6914') + ';font-weight:600;">' + expStr + '</div>' +
+          '</div>' +
+          promoLine +
+          '<button id="jptExpRemindRenew" style="width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#D4AF37,#B8860B);color:#1a0a0e;font-family:Sarabun,sans-serif;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 6px 22px rgba(212,175,55,0.35);">ต่ออายุสมาชิก</button>' +
+          '<button id="jptExpRemindLater" style="width:100%;margin-top:10px;padding:12px;border:1px solid rgba(114,47,55,0.25);border-radius:12px;background:transparent;color:#7A6F62;font-family:Sarabun,sans-serif;font-size:14px;font-weight:600;cursor:pointer;">ไว้ทีหลัง</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(o);
+    document.getElementById('jptExpRemindRenew').onclick = function(){ goRenew(); };
+    document.getElementById('jptExpRemindLater').onclick = function(){
+      try{localStorage.setItem('jpt_expiry_remind_ack', exp + '|' + bkkDateStr(Date.now()));}catch(e){}
+      o.remove();
+    };
+    try{logEvent('expiry_reminder_shown',{screen:'d'+daysLeft});}catch(e){}
+  }catch(e){console.warn('[expiry-remind]',e);}
 }
 
 function showApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('active');applySettings();renderTickerTape();loadSignalCards();loadSettingsFromCloud().then(function(){applySettings()});logEvent('app_open',{screen:'home'});enforceSubscription();}

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jptrust-member-v11';  // bumped 2026-06-06 — renewal notice modal for extended members
+const CACHE_NAME = 'jptrust-member-v12';  // bumped 2026-06-06 — recurring expiry-reminder modal (<=20d)
 const ASSETS = [
   './',
   './member-dashboard.html',
