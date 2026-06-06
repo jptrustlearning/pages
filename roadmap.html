@@ -2892,7 +2892,7 @@ function openPlanningDashboard(type) {
   };
   const t = TARGETS[type];
   if (!t) return;
-  const url = 'https://jptrustlearning.github.io/pages/' + t.file + '?v=' + Date.now();
+  const url = './' + t.file + '?v=' + Date.now();
   if (window.parent && window.parent !== window) {
     // Inside an iframe — ask parent to open
     window.parent.postMessage({ type: 'openIframe', title: t.title, url: url }, '*');
