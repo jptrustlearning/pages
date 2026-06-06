@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jptrust-member-v7';  // bumped 2026-06-06 — settings: last-renewal row (subscription_renewed_at)
+const CACHE_NAME = 'jptrust-member-v8';  // bumped 2026-06-06 — signup cache-bust (promo catalog cleanup)
 const ASSETS = [
   './',
   './member-dashboard.html',
