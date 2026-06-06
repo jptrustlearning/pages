@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jptrust-member-v6';  // bumped 2026-05-23 — auth: PIN gated by live Supabase session
+const CACHE_NAME = 'jptrust-member-v7';  // bumped 2026-06-06 — settings: last-renewal row (subscription_renewed_at)
 const ASSETS = [
   './',
   './member-dashboard.html',
