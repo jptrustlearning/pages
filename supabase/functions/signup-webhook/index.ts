@@ -26,6 +26,9 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const GITHUB_REPO = "jptrustlearning/payment";
 const GITHUB_API = `https://api.github.com/repos/${GITHUB_REPO}/contents`;
 const PROMO_CODE = "JPTFREE2026";
+// RPC-down fallback hard deadline for PROMO_CODE (migration v7): 15 Jun 2569
+// 23:59:59 BKK = 2026-06-15T16:59:59Z. After this the fallback never grants.
+const PROMO_FALLBACK_UNTIL_MS = Date.parse("2026-06-15T16:59:59Z");
 const MAX_SLIP_BASE64 = 7 * 1024 * 1024; // ~5MB binary → ~6.7MB base64; pad to 7MB
 const APP_URL = "https://jptrustlearning.github.io/pages/member-dashboard.html";
 const EMAIL_FROM_NAME = "JP Trust Learning";
@@ -635,10 +638,29 @@ serve(async (req: Request) => {
     if (r === null) {
       // RPC unreachable/misconfigured. Don't silently let people in free —
       // fail closed for promo, but allow the legacy beta code as a fallback so
-      // we never hard-block during infra hiccups. JPTFREE2026 is monthly-only
-      // (see migration v4), so the fallback must honour that too — yearly with
-      // this code while the RPC is down still gets blocked, not a free year.
-      if (promoCode === PROMO_CODE && plan === "monthly") {
+      // we never hard-block during infra hiccups. The fallback must honour the
+      // same rules as the table row (migrations v4 + v7): monthly-only, dead
+      // after 15 Jun 2569, and NEW USERS ONLY — an existing account renewing
+      // free during an RPC blip would violate the new-user gate.
+      const fallbackOk = promoCode === PROMO_CODE && plan === "monthly" &&
+        Date.now() <= PROMO_FALLBACK_UNTIL_MS;
+      if (fallbackOk) {
+        // New-user gate even while the RPC is down: GoTrue admin API is a
+        // separate service from PostgREST, so it is often still reachable. If
+        // we can positively see the email already exists → reject. A lookup
+        // failure falls through (same residual risk as before, now capped by
+        // the 15 Jun deadline).
+        const supaUrl = Deno.env.get("SUPABASE_URL");
+        const svcKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+        if (supaUrl && svcKey) {
+          const admin = createClient(supaUrl, svcKey, {
+            auth: { autoRefreshToken: false, persistSession: false },
+          });
+          const existingId = await findUserIdByEmail(admin, email);
+          if (existingId) {
+            return errResponse(409, "รหัสนี้ใช้ได้เฉพาะสมาชิกสมัครใหม่เท่านั้น");
+          }
+        }
         promoApplied = true; promoFree = true; amount = 0; promoDiscountType = "free";
       } else {
         return errResponse(503, "ระบบตรวจสอบรหัสโปรโมชันไม่พร้อมใช้งานชั่วคราว กรุณาลองใหม่");

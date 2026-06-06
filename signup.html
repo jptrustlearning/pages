@@ -669,6 +669,9 @@ const SUPABASE_URL = 'https://rcdukwwcbyryauhqlzmx.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZHVrd3djYnlyeWF1aHFsem14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MTY0MDAsImV4cCI6MjA4NTQ5MjQwMH0.rprPmudJYyb6dyhXb9Z9GrtQWEeIX99A2Wrj55PvS54';
 const SIGNUP_ENDPOINT = `${SUPABASE_URL}/functions/v1/signup-webhook`;
 const PROMO_CODE = 'JPTFREE2026';
+// RPC-down fallback deadline for PROMO_CODE (mirrors migration v7 + webhook):
+// 15 Jun 2569 23:59:59 BKK = 2026-06-15T16:59:59Z. UX-only — server enforces.
+const PROMO_FALLBACK_UNTIL_MS = Date.parse('2026-06-15T16:59:59Z');
 
 let uploadedFileBase64 = null, uploadedFileName = null, promoApplied = false;
 let selectedPlan = null, selectedAmount = null;
@@ -871,10 +874,11 @@ async function checkPromo() {
     if (btn) btn.disabled = false;
 
     // Network/RPC down → fall back to the known free beta code so signup never
-    // hard-blocks. JPTFREE2026 is monthly-only (migration v4), so only honour the
-    // fallback for monthly; yearly+this code while RPC is down shows ลองใหม่.
+    // hard-blocks. Mirrors migrations v4 + v7: monthly-only AND dead after
+    // 15 Jun 2569. (New-user gate can't be checked client-side — the webhook
+    // re-validates and rejects existing emails at submit.)
     if (r === null) {
-        if (val === PROMO_CODE && selectedPlan === 'monthly') { applyFreePromo(btn, st); }
+        if (val === PROMO_CODE && selectedPlan === 'monthly' && Date.now() <= PROMO_FALLBACK_UNTIL_MS) { applyFreePromo(btn, st); }
         else { st.className='promo-status invalid'; st.textContent='ลองใหม่'; if(btn){btn.classList.remove('applied');btn.textContent='ใช้รหัสโปรโมชัน';} }
         updatePayDisplay(); checkReady(); return;
     }
