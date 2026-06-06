@@ -652,6 +652,13 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             var el=document.getElementById('email');
             if(el)el.value=em.trim();
         }
+        // Renew prefill — dashboard passes the member's current username and a
+        // computed current age (stored age + years since it was recorded).
+        // Fields stay editable; params are sanity-clamped to the input rules.
+        var nm=p.get('name');
+        if(nm){ var u=document.getElementById('username'); if(u && !u.value) u.value=nm.trim().slice(0,40); }
+        var ag=parseInt(p.get('age')||'',10);
+        if(!isNaN(ag) && ag>=10 && ag<=99){ var ai=document.getElementById('age'); if(ai && !ai.value) ai.value=ag; }
         // Renew mode — identical signup flow, only the heading changes so returning
         // members don't read "สมัครสมาชิก" and get confused.
         if(p.get('renew')==='1'){

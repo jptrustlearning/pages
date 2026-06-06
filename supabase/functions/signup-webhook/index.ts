@@ -771,6 +771,7 @@ serve(async (req: Request) => {
     const startedAt = timestamp;
     const baseMeta: Record<string, unknown> = {
       username,                   // registration name → used as the default member name in-app
+      age: ageNum,                // stored so the renew form can prefill a computed current age
       plan: plan || null,
       amount,                     // = amount_due (what they must actually pay)
       amount_due: amount,

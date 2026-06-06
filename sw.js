@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jptrust-member-v15';  // bumped 2026-06-06 — bell news items (24h headline titles, renew-first ordering)
+const CACHE_NAME = 'jptrust-member-v16';  // bumped 2026-06-06 — renew-form prefill (username + computed age)
 const ASSETS = [
   './',
   './member-dashboard.html',

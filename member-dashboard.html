@@ -922,7 +922,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             <button class="login-btn" onclick="checkPIN()">เข้าสู่ระบบ</button>
             <div class="login-link" id="pinError" style="color:#EA4335;display:none;">PIN ไม่ถูกต้อง</div>
             <div class="login-link" onclick="showForgotPIN()">ลืม PIN? <span>ยืนยันด้วย OTP</span></div>
-            <div class="login-link" onclick="location.href='signup.html?v=1780726599'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
+            <div class="login-link" onclick="location.href='signup.html?v=1780733707'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
         </div>
 
         <!-- Step 1: Email for OTP (ครั้งแรก / ลืม PIN) -->
@@ -934,7 +934,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                 <button class="login-notfound-signup" type="button" onclick="goSignupFromLogin()">สมัครสมาชิกด้วยอีเมลนี้ →</button>
             </div>
             <button class="login-btn" onclick="sendOTP()">ขอรับรหัส OTP ยืนยัน</button>
-            <div class="login-link" onclick="location.href='signup.html?v=1780726599'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
+            <div class="login-link" onclick="location.href='signup.html?v=1780733707'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
         </div>
 
         <!-- Step 2: OTP Verify -->
@@ -1619,7 +1619,7 @@ function showForgotPIN(){
 // Email not-found UX (login screen) — show inline notice instead of auto-redirecting to signup
 function showEmailNotFound(){var b=document.getElementById('emailNotFound');if(b)b.style.display='block';var i=document.getElementById('loginEmail');if(i)i.focus();}
 function hideEmailNotFound(){var b=document.getElementById('emailNotFound');if(b)b.style.display='none';}
-function goSignupFromLogin(){var e=(document.getElementById('loginEmail').value||'').trim();location.href='signup.html?v=1780726599'+(e?('&email='+encodeURIComponent(e)):'');}
+function goSignupFromLogin(){var e=(document.getElementById('loginEmail').value||'').trim();location.href='signup.html?v=1780733707'+(e?('&email='+encodeURIComponent(e)):'');}
 
 // Send OTP via Supabase
 async function sendOTP(){
@@ -1721,10 +1721,27 @@ function backToEmail(){
 // promo used, expiry, days remaining). Reads the same meta enforceSubscription
 // already fetched — no extra getUser() call.
 var _renewEmail = '';
+var _renewMeta = {};
 function goRenew(){
   var em = _renewEmail || (userSettings && userSettings.email) || '';
   try{logEvent('renew_click');}catch(e){}
-  location.href = 'signup.html?v=1780726599' + (em ? ('&email=' + encodeURIComponent(em)) : '') + '&renew=1';
+  var q = 'signup.html?v=1780733707' + (em ? ('&email=' + encodeURIComponent(em)) : '') + '&renew=1';
+  // Prefill the renew form: current username + computed CURRENT age. The age
+  // anchor = when the stored age was recorded, i.e. the last signup/renew
+  // payload (renewed_at if present, else first-signup started_at); add whole
+  // years elapsed since. Members without a stored age (pre-A34 signups) just
+  // get no &age param and type it once — next renewal stores it.
+  try{
+    var m = _renewMeta || {};
+    if(m.username) q += '&name=' + encodeURIComponent(String(m.username).slice(0,40));
+    var a = parseInt(m.age, 10);
+    if(!isNaN(a)){
+      var anchor = Date.parse(m.subscription_renewed_at || m.subscription_started_at || '');
+      if(!isNaN(anchor)) a += Math.max(0, Math.floor((Date.now() - anchor) / (365.25*86400000)));
+      if(a >= 10 && a <= 99) q += '&age=' + a;
+    }
+  }catch(e){}
+  location.href = q;
 }
 function renderHomeExpiryBanner(daysLeft, expStr){
   var b=document.getElementById('expiryBanner'); if(!b) return;
@@ -1743,6 +1760,7 @@ function renderHomeExpiryBanner(daysLeft, expStr){
 }
 function renderMembershipCard(meta){
   meta=meta||{};
+  _renewMeta=meta;
   _notifState.days=null;_notifState.expStr=null;_notifState.renewedAt=meta.subscription_renewed_at||null;
   _renewEmail=(meta && meta.email) || _renewEmail;
   function thai(iso,withTime){if(!iso)return null;var d=new Date(iso);if(isNaN(d.getTime()))return null;return d.toLocaleDateString('th-TH',withTime?{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}:{year:'numeric',month:'long',day:'numeric'});}
@@ -1865,7 +1883,7 @@ function showExpiredGate(meta,email){
       '</div>'+
     '</div>';
   document.body.appendChild(o);
-  document.getElementById('jptRenewBtn').onclick=function(){location.href='signup.html?v=1780726599'+(em?('&email='+encodeURIComponent(em)):'')+'&renew=1';};
+  document.getElementById('jptRenewBtn').onclick=function(){location.href='signup.html?v=1780733707'+(em?('&email='+encodeURIComponent(em)):'')+'&renew=1';};
   document.getElementById('jptGateLogout').onclick=async function(){try{await supabaseClient.auth.signOut();}catch(e){}try{localStorage.removeItem('jpt_pin');localStorage.removeItem('jpt_logged_in');sessionStorage.removeItem('jpt_session_active');}catch(e){}location.reload();};
 }
 
