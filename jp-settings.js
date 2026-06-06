@@ -60,8 +60,16 @@
     async function getUser() {
         if (!_client) return null;
         try {
-            const { data: { user } } = await _client.auth.getUser();
-            return user || null;
+            // Resolve the user from the locally persisted session (getSession) instead
+            // of getUser(), which makes a network call to /auth/v1/user. Inside a
+            // same-origin iframe a freshly-created client's getUser() can return null
+            // even when a valid session exists (access-token expiry/refresh timing,
+            // Navigator Lock contention), producing false "not logged in" states and
+            // silently breaking load()/save(). getSession() reads from storage and is
+            // reliable here — this is the same pattern my-portfolio.js already uses.
+            // Server-side RLS still enforces auth.uid() = user_id on every query.
+            const { data: { session } } = await _client.auth.getSession();
+            return (session && session.user) || null;
         } catch (e) {
             console.warn('[JPSettings] getUser error:', e);
             return null;
