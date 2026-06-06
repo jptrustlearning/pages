@@ -1881,10 +1881,22 @@ async function maybeShowRenewalNotice(email,meta){
     var exp=meta&&meta.subscription_expires_at;
     if(!email||!exp)return;
     if(localStorage.getItem('jpt_renew_notice_ack')===exp)return;
-    if(!(window.crypto&&crypto.subtle&&window.TextEncoder))return;
-    var buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(String(email).trim().toLowerCase()));
-    var hex=Array.prototype.map.call(new Uint8Array(buf),function(b){return b.toString(16).padStart(2,'0');}).join('');
-    if(RENEWAL_NOTICE_HASHES.indexOf(hex)===-1)return;
+    // Trigger 1 — recent self-service renewal: webhook stamps
+    // subscription_renewed_at on every renewal (A32). Show within 2 days so a
+    // member who renewed sees the confirmation on next app open; after that
+    // the window closes (avoids confusing late pop-ups on new devices).
+    var recentRenew=false;
+    var rn=meta.subscription_renewed_at;
+    if(rn){var rt=Date.parse(rn);if(!isNaN(rt)&&(Date.now()-rt)<=2*86400000)recentRenew=true;}
+    // Trigger 2 — manual-extension hash list (no plaintext emails in repo).
+    var inList=false;
+    if(!recentRenew){
+      if(!(window.crypto&&crypto.subtle&&window.TextEncoder))return;
+      var buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(String(email).trim().toLowerCase()));
+      var hex=Array.prototype.map.call(new Uint8Array(buf),function(b){return b.toString(16).padStart(2,'0');}).join('');
+      inList=RENEWAL_NOTICE_HASHES.indexOf(hex)!==-1;
+    }
+    if(!recentRenew&&!inList)return;
     if(document.getElementById('jptRenewalNotice'))return;
     var d=new Date(exp);
     var expStr=isNaN(d.getTime())?'\u2014':d.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
