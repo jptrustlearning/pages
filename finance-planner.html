@@ -2180,24 +2180,18 @@ async function loadFinanceSettings() {
     const user = await window.JPSettings.getUser();
     if (!user) {
       const _d = [];
-      _d.push('SDK=' + (typeof window.supabase !== 'undefined'));
+      _d.push('href=' + String(location.href).slice(0,55));
+      try { _d.push('selfLS=[' + Object.keys(localStorage).join(',').slice(0,140) + ']'); } catch (_e0) { _d.push('selfLS=ERR(' + (_e0 && _e0.name) + ')'); }
+      try { _d.push('parentLS=[' + Object.keys(window.parent.localStorage).join(',').slice(0,140) + ']'); } catch (_e1) { _d.push('parentLS=BLOCKED(' + (_e1 && _e1.name) + ')'); }
       try {
         const _c = (window.JPSettings.client && window.JPSettings.client()) || null;
-        _d.push('client=' + !!_c);
-        if (_c) {
-          const _s = await _c.auth.getSession();
-          const _sess = _s && _s.data && _s.data.session;
-          _d.push('sess=' + !!_sess);
-          _d.push('email=' + (_sess ? _sess.user.email : 'none'));
-        }
-      } catch (_e) { _d.push('err=' + (_e && _e.message)); }
-      try {
-        const _ks = Object.keys(localStorage).filter(function(k){return k.indexOf('sb-')===0 || k.indexOf('supabase')>=0;});
-        _d.push('ls=' + (_ks.join(',') || 'none'));
-      } catch (_e2) { _d.push('ls=err'); }
+        if (_c) { const _s = await _c.auth.getSession(); _d.push('sess=' + !!(_s && _s.data && _s.data.session)); }
+      } catch (_e2) { _d.push('sessErr=' + (_e2 && _e2.message)); }
       const _b = document.getElementById('loginBanner');
       _b.style.display = 'block';
-      _b.textContent = 'DEBUG · ' + _d.join(' · ');
+      _b.style.fontSize = '12px';
+      _b.style.wordBreak = 'break-all';
+      _b.textContent = 'DEBUG2 · ' + _d.join(' · ');
     }
   } catch (e) {
     console.warn('[finance-planner] load error:', e);
