@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jptrust-member-v12';  // bumped 2026-06-06 — recurring expiry-reminder modal (<=20d)
+const CACHE_NAME = 'jptrust-member-v13';  // bumped 2026-06-06 — DB-driven promo catalog (list_public_promos)
 const ASSETS = [
   './',
   './member-dashboard.html',

@@ -721,10 +721,54 @@ async function previewPromo(code, plan){
 // Public codes shown in the picker. Price/validity is fetched live from
 // preview_promo (the DB is the source of truth). Add a future public promo by
 // appending here. Comp / free codes (e.g. JPTFREE2026) stay manual-entry only.
-const PROMO_CATALOG = [
+// Popup list is DB-driven: list_public_promos() RPC (promo_codes v9) returns
+// active+public+in-window+not-sold-out promos, so launching a promo = INSERT a
+// row with is_public=TRUE — no deploy. The static list below is a FALLBACK used
+// ONLY when the RPC errors (PostgREST down); an EMPTY RPC result is a real
+// answer (no public promos right now) and must NOT fall back, otherwise dead
+// promos would resurface. Keep the fallback mirroring the DB (A33 principle).
+const PROMO_CATALOG_FALLBACK = [
     { code:'JPTBETA2026RENEW', desc:'ต่ออายุ Beta · ลด 50% เฉพาะแพ็กรายปี · เฉพาะสมาชิกที่ยังไม่หมดอายุ · ถึง 20 มิ.ย. 2569' },
     { code:'JPTHALF5050', desc:'โปรเปิดตัว · ลด 50% เฉพาะแพ็กรายปี · 30 สิทธิ์แรก · ถึง 30 มิ.ย. 2569' }
 ];
+let _promoCatalogCache = null;
+function promoDescFromRow(p){
+    const parts = [];
+    if(p.discount_type === 'free') parts.push('ฟรี');
+    else if(p.discount_type === 'percent'){
+        if(p.applies_to === 'yearly') parts.push('ลด ' + (+p.discount_value) + '% เฉพาะแพ็กรายปี');
+        else if(p.applies_to === 'monthly') parts.push('ลด ' + (+p.discount_value) + '% เฉพาะแพ็กรายเดือน');
+        else {
+            const y = (p.discount_yearly == null ? p.discount_value : p.discount_yearly);
+            parts.push(+p.discount_value === +y ? ('ลด ' + (+p.discount_value) + '% ทุกแพ็ก')
+                : ('ลด ' + (+p.discount_value) + '% รายเดือน / ' + (+y) + '% รายปี'));
+        }
+    } else if(p.discount_type === 'fixed') parts.push('ลด ฿' + Number(p.discount_value).toLocaleString('en-US'));
+    if(p.requires_active_member) parts.push('เฉพาะสมาชิกที่ยังไม่หมดอายุ');
+    else if(p.requires_new_user) parts.push('เฉพาะสมัครใหม่');
+    else if(p.requires_existing_user) parts.push('เฉพาะลูกค้าเดิม');
+    if(p.seats_left != null) parts.push('เหลือ ' + p.seats_left + ' สิทธิ์');
+    if(p.valid_until){
+        const d = new Date(p.valid_until);
+        if(!isNaN(d.getTime())) parts.push('ถึง ' + d.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'}));
+    }
+    return parts.join(' · ');
+}
+async function loadPromoCatalog(){
+    if(_promoCatalogCache) return _promoCatalogCache;
+    try{
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/list_public_promos`, {
+            method:'POST',
+            headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON,'Authorization':`Bearer ${SUPABASE_ANON}`},
+            body:'{}'
+        });
+        if(!res.ok) return PROMO_CATALOG_FALLBACK;
+        const data = await res.json();
+        if(!Array.isArray(data)) return PROMO_CATALOG_FALLBACK;
+        _promoCatalogCache = data.map(p => ({ code: p.code, desc: promoDescFromRow(p) }));
+        return _promoCatalogCache;
+    }catch(e){ return PROMO_CATALOG_FALLBACK; }
+}
 
 function openPromoModal(){
     const ov = document.getElementById('promoModal');
@@ -745,14 +789,20 @@ async function renderPromoList(){
     note.textContent = selectedPlan
         ? 'แตะรหัสเพื่อใช้ทันที · ราคาคำนวณตามแพ็กที่เลือก'
         : 'เลือกแพ็กเกจสมาชิกก่อน เพื่อดูราคาหลังหักส่วนลด';
-    list.innerHTML = PROMO_CATALOG.map((p,i) =>
+    if(!_promoCatalogCache) list.innerHTML = '<div style="padding:14px 4px;text-align:center;font-size:13px;color:#7A6F62;">กำลังโหลดโปรโมชัน…</div>';
+    const catalog = await loadPromoCatalog();
+    if(!catalog.length){
+        list.innerHTML = '<div style="padding:14px 4px;text-align:center;font-size:13px;color:#7A6F62;">ยังไม่มีโปรโมชันสาธารณะช่วงนี้ — ถ้ามีรหัส กรอกด้านล่างได้เลย</div>';
+        return;
+    }
+    list.innerHTML = catalog.map((p,i) =>
         '<div class="promo-card disabled" id="pcard-'+i+'">'+
             '<div class="pc-left"><div class="pc-code">'+p.code+'</div><div class="pc-desc">'+p.desc+'</div></div>'+
             '<div class="pc-right"><span class="pc-loading">'+(selectedPlan?'กำลังเช็ก…':'เลือกแพ็กก่อน')+'</span></div>'+
         '</div>').join('');
     if(!selectedPlan) return;
-    for(let i=0;i<PROMO_CATALOG.length;i++){
-        const p = PROMO_CATALOG[i];
+    for(let i=0;i<catalog.length;i++){
+        const p = catalog[i];
         const r = await previewPromo(p.code, selectedPlan);
         const card = document.getElementById('pcard-'+i);
         if(!card) continue;

@@ -922,7 +922,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             <button class="login-btn" onclick="checkPIN()">เข้าสู่ระบบ</button>
             <div class="login-link" id="pinError" style="color:#EA4335;display:none;">PIN ไม่ถูกต้อง</div>
             <div class="login-link" onclick="showForgotPIN()">ลืม PIN? <span>ยืนยันด้วย OTP</span></div>
-            <div class="login-link" onclick="location.href='signup.html?v=1780721111'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
+            <div class="login-link" onclick="location.href='signup.html?v=1780726599'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
         </div>
 
         <!-- Step 1: Email for OTP (ครั้งแรก / ลืม PIN) -->
@@ -934,7 +934,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                 <button class="login-notfound-signup" type="button" onclick="goSignupFromLogin()">สมัครสมาชิกด้วยอีเมลนี้ →</button>
             </div>
             <button class="login-btn" onclick="sendOTP()">ขอรับรหัส OTP ยืนยัน</button>
-            <div class="login-link" onclick="location.href='signup.html?v=1780721111'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
+            <div class="login-link" onclick="location.href='signup.html?v=1780726599'">ยังไม่มีบัญชี? <span>สมัครสมาชิก</span></div>
         </div>
 
         <!-- Step 2: OTP Verify -->
@@ -1619,7 +1619,7 @@ function showForgotPIN(){
 // Email not-found UX (login screen) — show inline notice instead of auto-redirecting to signup
 function showEmailNotFound(){var b=document.getElementById('emailNotFound');if(b)b.style.display='block';var i=document.getElementById('loginEmail');if(i)i.focus();}
 function hideEmailNotFound(){var b=document.getElementById('emailNotFound');if(b)b.style.display='none';}
-function goSignupFromLogin(){var e=(document.getElementById('loginEmail').value||'').trim();location.href='signup.html?v=1780721111'+(e?('&email='+encodeURIComponent(e)):'');}
+function goSignupFromLogin(){var e=(document.getElementById('loginEmail').value||'').trim();location.href='signup.html?v=1780726599'+(e?('&email='+encodeURIComponent(e)):'');}
 
 // Send OTP via Supabase
 async function sendOTP(){
@@ -1724,7 +1724,7 @@ var _renewEmail = '';
 function goRenew(){
   var em = _renewEmail || (userSettings && userSettings.email) || '';
   try{logEvent('renew_click');}catch(e){}
-  location.href = 'signup.html?v=1780721111' + (em ? ('&email=' + encodeURIComponent(em)) : '') + '&renew=1';
+  location.href = 'signup.html?v=1780726599' + (em ? ('&email=' + encodeURIComponent(em)) : '') + '&renew=1';
 }
 function renderHomeExpiryBanner(daysLeft, expStr){
   var b=document.getElementById('expiryBanner'); if(!b) return;
@@ -1861,7 +1861,7 @@ function showExpiredGate(meta,email){
       '</div>'+
     '</div>';
   document.body.appendChild(o);
-  document.getElementById('jptRenewBtn').onclick=function(){location.href='signup.html?v=1780721111'+(em?('&email='+encodeURIComponent(em)):'')+'&renew=1';};
+  document.getElementById('jptRenewBtn').onclick=function(){location.href='signup.html?v=1780726599'+(em?('&email='+encodeURIComponent(em)):'')+'&renew=1';};
   document.getElementById('jptGateLogout').onclick=async function(){try{await supabaseClient.auth.signOut();}catch(e){}try{localStorage.removeItem('jpt_pin');localStorage.removeItem('jpt_logged_in');sessionStorage.removeItem('jpt_session_active');}catch(e){}location.reload();};
 }
 
@@ -1937,10 +1937,43 @@ async function maybeShowRenewalNotice(email,meta){
 // change) clears it automatically — same self-heal principle as the renewal
 // notice & email cron. Already-expired members never reach here (expired gate
 // fires first in enforceSubscription). The quiet home banner (<=14d) stays.
-// Promo hint self-expires via untilMs — no redeploy needed when the code ends.
-var RENEW_PROMO_HINT = { code:'JPTBETA2026RENEW', text:'สมาชิกปัจจุบันใช้โค้ด JPTBETA2026RENEW ลด 50% แพ็กรายปี ถึง 20 มิ.ย. 2569', untilMs: Date.parse('2026-06-20T16:59:59Z') };
+// Promo hint is DB-driven via list_public_promos() RPC (promo_codes v9):
+// launching a promo = INSERT a row with is_public=TRUE — no code change, no
+// deploy. New-user-only codes are skipped (members can't use them). On RPC
+// error/timeout the reminder still shows, just without the promo line.
+async function fetchRenewPromoHint(){
+  try{
+    if(!supabaseClient) return null;
+    var res = await supabaseClient.rpc('list_public_promos');
+    var rows = (res && res.data) || [];
+    for(var i=0;i<rows.length;i++){
+      var p = rows[i];
+      if(p.requires_new_user) continue; // active members fail the new-user gate
+      var deal = '';
+      if(p.discount_type === 'free') deal = 'ฟรี';
+      else if(p.discount_type === 'percent'){
+        if(p.applies_to === 'yearly') deal = 'ลด ' + (+p.discount_value) + '% แพ็กรายปี';
+        else if(p.applies_to === 'monthly') deal = 'ลด ' + (+p.discount_value) + '% แพ็กรายเดือน';
+        else {
+          var y = (p.discount_yearly == null ? p.discount_value : p.discount_yearly);
+          deal = (+p.discount_value === +y) ? ('ลด ' + (+p.discount_value) + '% ทุกแพ็ก')
+               : ('ลด ' + (+p.discount_value) + '% รายเดือน / ' + (+y) + '% รายปี');
+        }
+      }
+      else if(p.discount_type === 'fixed') deal = 'ลด ฿' + Number(p.discount_value).toLocaleString('en-US');
+      else continue;
+      var until = '';
+      if(p.valid_until){
+        var d = new Date(p.valid_until);
+        if(!isNaN(d.getTime())) until = ' ถึง ' + d.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+      }
+      return 'สมาชิกปัจจุบันใช้โค้ด ' + p.code + ' ' + deal + until;
+    }
+    return null;
+  }catch(e){ return null; }
+}
 function bkkDateStr(ms){ return new Date(ms + 7*3600000).toISOString().slice(0,10); }
-function maybeShowExpiryReminder(email, meta){
+async function maybeShowExpiryReminder(email, meta){
   try{
     var exp = meta && meta.subscription_expires_at;
     if(!exp) return;
@@ -1963,10 +1996,10 @@ function maybeShowExpiryReminder(email, meta){
     }catch(e){}
     var expStr = new Date(t).toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
     var headline = daysLeft === 0 ? 'สมาชิกหมดอายุวันนี้' : ('สมาชิกเหลืออีก ' + daysLeft + ' วัน');
-    var promoLine = '';
-    if(RENEW_PROMO_HINT && now <= RENEW_PROMO_HINT.untilMs){
-      promoLine = '<div style="background:linear-gradient(135deg,rgba(212,175,55,0.12),rgba(184,134,11,0.08));border:1px dashed rgba(184,134,11,0.5);border-radius:10px;padding:10px 12px;margin:0 0 16px;font-size:12.5px;color:#8B6914;font-weight:600;line-height:1.55;">' + RENEW_PROMO_HINT.text + '</div>';
-    }
+    var hintText = null;
+    try{ hintText = await Promise.race([ fetchRenewPromoHint(), new Promise(function(res){ setTimeout(function(){ res(null); }, 4000); }) ]); }catch(e){}
+    if(document.getElementById('jptExpiryReminder')) return; // re-check after await (race guard)
+    var promoLine = hintText ? '<div style="background:linear-gradient(135deg,rgba(212,175,55,0.12),rgba(184,134,11,0.08));border:1px dashed rgba(184,134,11,0.5);border-radius:10px;padding:10px 12px;margin:0 0 16px;font-size:12.5px;color:#8B6914;font-weight:600;line-height:1.55;">' + hintText + '</div>' : '';
     var o = document.createElement('div');
     o.id = 'jptExpiryReminder';
     o.style.cssText = 'position:fixed;inset:0;z-index:99970;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(26,10,14,0.78);backdrop-filter:blur(3px);font-family:Sarabun,Anuphan,sans-serif;overflow-y:auto;';
