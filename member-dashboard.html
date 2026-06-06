@@ -964,7 +964,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
     <div class="topbar">
         <div class="topbar-left"><div class="avatar">JP</div><div><div class="greeting">สวัสดี, ยินดีต้อนรับ</div><div style="display:flex;align-items:center;gap:8px"><div class="user-name" id="displayName">Joon</div><button class="refresh-btn" id="refreshBtn" onclick="refreshApp()" aria-label="Refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button></div></div></div>
         <div class="topbar-right">
-            <div class="icon-btn" onclick="openNotifications()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="notif-dot"></div></div>
+            <div class="icon-btn" onclick="openNotifications()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="notif-dot" id="notifDot" style="display:none"></div></div>
             <div class="icon-btn" onclick="navigateTo('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.38.18.82.28 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
         </div>
     </div>
@@ -1743,6 +1743,7 @@ function renderHomeExpiryBanner(daysLeft, expStr){
 }
 function renderMembershipCard(meta){
   meta=meta||{};
+  _notifState.days=null;_notifState.expStr=null;_notifState.renewedAt=meta.subscription_renewed_at||null;
   _renewEmail=(meta && meta.email) || _renewEmail;
   function thai(iso,withTime){if(!iso)return null;var d=new Date(iso);if(isNaN(d.getTime()))return null;return d.toLocaleDateString('th-TH',withTime?{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}:{year:'numeric',month:'long',day:'numeric'});}
   var elS=document.getElementById('memStarted');
@@ -1770,6 +1771,7 @@ function renderMembershipCard(meta){
       var t=Date.parse(meta.subscription_expires_at);
       if(!isNaN(t)){
         var days=Math.ceil((t-Date.now())/86400000);
+        _notifState.days=days;_notifState.expStr=expStr||'\u2014';
         if(days<0){badge.textContent='\u0e2b\u0e21\u0e14\u0e2d\u0e32\u0e22\u0e38\u0e41\u0e25\u0e49\u0e27';badge.className='settings-badge expired';} // "หมดอายุแล้ว"
         else{badge.textContent='\u0e40\u0e2b\u0e25\u0e37\u0e2d '+days+' \u0e27\u0e31\u0e19';badge.className='settings-badge'+(days<=14?' warn':'');} // "เหลือ N วัน"
         badge.style.display='inline-block';
@@ -1777,6 +1779,7 @@ function renderMembershipCard(meta){
       }
     } else { try{renderHomeExpiryBanner(null,null);}catch(e){} }
   } else { try{renderHomeExpiryBanner(null,null);}catch(e){} }
+  try{updateNotifDot();}catch(e){}
 }
 
 async function enforceSubscription(){
@@ -2635,7 +2638,83 @@ loadNewsFeed=async function(){
 
 function openEditModal(field){const m=document.getElementById('editModal'),t=document.getElementById('modalTitle'),c=document.getElementById('modalContent');if(field==='name'){t.textContent='แก้ไขชื่อที่แสดง';c.innerHTML='<input class="modal-input" id="editValue" value="'+userSettings.name+'" placeholder="ชื่อของคุณ"><button class="modal-btn" onclick="userSettings.name=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}else if(field==='risk'){t.textContent='ระดับความเสี่ยง';c.innerHTML='<div style="display:flex;flex-direction:column;gap:8px"><button class="modal-btn" style="background:'+(userSettings.risk==='low'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='low'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'low\';saveSettings();closeModal();">ต่ำ (Low)</button><button class="modal-btn" style="background:'+(userSettings.risk==='medium'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='medium'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'medium\';saveSettings();closeModal();">ปานกลาง (Medium)</button><button class="modal-btn" style="background:'+(userSettings.risk==='high'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='high'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'high\';saveSettings();closeModal();">สูง (High)</button></div>'}else if(field==='capital'){t.textContent='ทุนเริ่มต้น (บาท)';c.innerHTML='<input class="modal-input" id="editValue" type="number" value="'+userSettings.capital+'" placeholder="100000"><button class="modal-btn" onclick="userSettings.capital=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}else if(field==='broker'){t.textContent='โบรกเกอร์ของคุณ';c.innerHTML='<input class="modal-input" id="editValue" value="'+userSettings.broker+'" placeholder="เช่น XM, Exness, IC Markets"><button class="modal-btn" onclick="userSettings.broker=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}m.classList.add('show')}
 function closeModal(e){if(e&&e.target!==e.currentTarget)return;document.getElementById('editModal').classList.remove('show')}
-function openNotifications(){jptToast('ยังไม่มีการแจ้งเตือนใหม่')}
+// ===== Notification bell — in-app notification center =====
+// Items derive from membership state stashed by renderMembershipCard(). The
+// expiry item deliberately IGNORES the reminder modal's snooze: the bell is
+// the passive, always-available place to find it (like the home banner). The
+// gold dot only shows when there is something to read. Promo line is the same
+// DB-driven hint (list_public_promos) as the reminder modal, loaded lazily.
+var _notifState = { days:null, expStr:null, renewedAt:null };
+function buildNotifItems(){
+  var items = [];
+  if(_notifState.days !== null && _notifState.days >= 0 && _notifState.days <= 20) items.push('expiry');
+  if(_notifState.renewedAt){
+    var rt = Date.parse(_notifState.renewedAt);
+    if(!isNaN(rt) && (Date.now() - rt) <= 2*86400000) items.push('renewed');
+  }
+  return items;
+}
+function updateNotifDot(){
+  var dot = document.getElementById('notifDot'); if(!dot) return;
+  dot.style.display = buildNotifItems().length ? 'block' : 'none';
+}
+function openNotifications(){
+  try{logEvent('notif_open');}catch(e){}
+  if(document.getElementById('jptNotifPanel')) return;
+  var items = buildNotifItems(), s = _notifState, body = '';
+  for(var i=0;i<items.length;i++){
+    if(items[i] === 'expiry'){
+      var title = (s.days === 0 ? 'สมาชิกหมดอายุวันนี้' : ('สมาชิกเหลืออีก ' + s.days + ' วัน'));
+      body += '' +
+        '<div id="jptNotifExpItem" style="display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border:1px solid rgba(212,175,55,0.35);border-radius:14px;background:linear-gradient(180deg,#FFFEF8,#F5EDD8);cursor:pointer;margin-bottom:10px;">' +
+          '<div style="flex:0 0 auto;width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#722F37,#4A1520);display:flex;align-items:center;justify-content:center;">' +
+            '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#E8D48B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
+          '</div>' +
+          '<div style="flex:1;min-width:0;">' +
+            '<div style="font-size:14px;font-weight:700;color:#722F37;">' + title + '</div>' +
+            '<div style="font-size:12.5px;color:#5A3D20;margin-top:2px;">หมดอายุ ' + (s.expStr || '—') + ' · แตะเพื่อต่ออายุ</div>' +
+            '<div id="jptNotifPromo" style="display:none;font-size:12px;color:#8B6914;font-weight:600;margin-top:6px;line-height:1.5;"></div>' +
+          '</div>' +
+          '<div style="color:#B8860B;font-size:18px;line-height:1;align-self:center;">›</div>' +
+        '</div>';
+    } else if(items[i] === 'renewed'){
+      body += '' +
+        '<div style="display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border:1px solid rgba(212,175,55,0.35);border-radius:14px;background:linear-gradient(180deg,#FFFEF8,#F5EDD8);margin-bottom:10px;">' +
+          '<div style="flex:0 0 auto;width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#1E5E3A,#0F3D24);display:flex;align-items:center;justify-content:center;">' +
+            '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#E8D48B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>' +
+          '</div>' +
+          '<div style="flex:1;min-width:0;">' +
+            '<div style="font-size:14px;font-weight:700;color:#1E5E3A;">ต่ออายุเรียบร้อยแล้ว</div>' +
+            '<div style="font-size:12.5px;color:#5A3D20;margin-top:2px;">ใช้งานได้ถึง ' + (s.expStr || '—') + '</div>' +
+          '</div>' +
+        '</div>';
+    }
+  }
+  if(!body) body = '<div style="padding:26px 10px;text-align:center;font-size:13.5px;color:#7A6F62;">ยังไม่มีการแจ้งเตือนใหม่</div>';
+  var o = document.createElement('div');
+  o.id = 'jptNotifPanel';
+  o.style.cssText = 'position:fixed;inset:0;z-index:99950;display:flex;align-items:flex-start;justify-content:center;padding:70px 20px 24px;background:rgba(26,10,14,0.55);backdrop-filter:blur(2px);font-family:Sarabun,Anuphan,sans-serif;overflow-y:auto;';
+  o.innerHTML = '' +
+    '<div style="max-width:400px;width:100%;background:#FFFEF8;border:1.5px solid rgba(212,175,55,0.4);border-radius:18px;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,0.45);">' +
+      '<div style="height:4px;background:linear-gradient(90deg,#E8D48B,#D4AF37,#B8860B,#D4AF37,#E8D48B);"></div>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px 10px;">' +
+        '<div style="font-family:Cinzel,serif;font-size:12px;letter-spacing:2.5px;color:#8B6914;font-weight:700;text-transform:uppercase;">Notifications</div>' +
+        '<button id="jptNotifClose" style="border:none;background:transparent;color:#7A6F62;font-size:20px;cursor:pointer;line-height:1;padding:4px;">×</button>' +
+      '</div>' +
+      '<div style="padding:4px 16px 18px;">' + body + '</div>' +
+    '</div>';
+  o.addEventListener('click', function(ev){ if(ev.target === o) o.remove(); });
+  document.body.appendChild(o);
+  document.getElementById('jptNotifClose').onclick = function(){ o.remove(); };
+  var expItem = document.getElementById('jptNotifExpItem');
+  if(expItem){
+    expItem.onclick = function(){ o.remove(); goRenew(); };
+    fetchRenewPromoHint().then(function(t){
+      var el = document.getElementById('jptNotifPromo');
+      if(el && t){ el.textContent = t; el.style.display = 'block'; }
+    }).catch(function(){});
+  }
+}
 function openComingSoon(name){alert('กลยุทธ์ "'+name+'" กำลังพัฒนา — เร็วๆ นี้จะเปิดให้ใช้งาน')}
 function jptToast(msg){let t=document.getElementById('jpt-toast');if(!t){t=document.createElement('div');t.id='jpt-toast';document.body.appendChild(t)}t.textContent=msg;t.classList.add('show');clearTimeout(t._hideTimer);t._hideTimer=setTimeout(()=>t.classList.remove('show'),2800)}
 function filterStrategies(btn,key){document.querySelectorAll('.lab-chip').forEach(c=>c.classList.remove('active'));btn.classList.add('active');const list=document.getElementById('labStrategyList');if(!list)return;list.querySelectorAll('.strategy-card,.strategy-empty').forEach(el=>{const isMatch=el.classList.contains('filter-'+key);if(el.classList.contains('strategy-empty')){el.style.display=isMatch?'block':'none'}else{el.style.display=isMatch?'grid':'none'}})}
