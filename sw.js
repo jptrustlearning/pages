@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jptrust-member-v16';  // bumped 2026-06-06 — renew-form prefill (username + computed age)
+const CACHE_NAME = 'jptrust-member-v17';  // bumped 2026-06-06 — planner login-fix (getSession) cache-bust
 const ASSETS = [
   './',
   './member-dashboard.html',
