@@ -5,7 +5,7 @@
 // that deep-links to the renewal flow (signup.html?email=…&renew=1).
 //
 // Idempotency (no spam): each stage stores the EXPIRY VALUE it was sent for in
-// app_metadata (reminder_d7_for / reminder_d1_for). A run only sends a stage if
+// app_metadata (reminder_d14_for / reminder_d7_for / reminder_d1_for). A run only sends a stage if
 // its stored value differs from the user's current subscription_expires_at.
 // When a member renews, subscription_expires_at changes → the markers no longer
 // match → reminders fire again for the new cycle. This means we DON'T need to
@@ -49,8 +49,9 @@ const MAX_SENDS_PER_RUN = 300; // safety cap so a misconfig can never mass-mail
 // badge: Math.ceil((expiry - now) / 1 day). So 7 days out → 7, tomorrow → 1,
 // today → 0. minDays/maxDays are inclusive integer bounds on daysLeft.
 const STAGES = [
-  { key: "d1", minDays: 0, maxDays: 1, marker: "reminder_d1_for" },
-  { key: "d7", minDays: 2, maxDays: 7, marker: "reminder_d7_for" },
+  { key: "d1",  minDays: 0, maxDays: 1,  marker: "reminder_d1_for" },
+  { key: "d7",  minDays: 2, maxDays: 7,  marker: "reminder_d7_for" },
+  { key: "d14", minDays: 8, maxDays: 14, marker: "reminder_d14_for" },
 ] as const;
 type StageKey = (typeof STAGES)[number]["key"];
 
@@ -132,7 +133,7 @@ function stageCopy(stage: StageKey, daysLeft: number): { subject: string; headli
         `หากต้องการใช้งานต่อเนื่อง สามารถต่ออายุได้เลยจากปุ่มด้านล่างค่ะ`,
     };
   }
-  // d7
+  // d7 / d14 — generic copy; daysLeft in the text adapts on its own
   return {
     subject: `สมาชิก JP Trust Learning ของคุณใกล้หมดอายุ (เหลือ ${daysLeft} วัน)`,
     headline: `สมาชิกของคุณเหลืออีก ${daysLeft} วัน`,
