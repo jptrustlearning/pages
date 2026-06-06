@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ผู้ดูแลระบบ · JP Trust Learning</title>
+<meta name="theme-color" content="#1a0a0e">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/png" href="jpt-owl-logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@200;300;400;500;600;700&family=Cinzel:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --gold:#D4AF37;--gold-dark:#B8860B;--gold-deep:#8B6914;--gold-light:#F4E4BA;
+  --maroon:#722F37;--maroon-darkest:#1a0a0e;--maroon-mid:#2d1018;--maroon-light:#3a1520;
+  --cream:#FAF6ED;--cream-card:#FFFEF8;--cream-warm:#F5EFE0;--cream-deep:#EDE4D0;
+  --text-dark:#3D3228;--text-heading:#5A3D20;--text-muted:#7A6F62;
+  --text-light:#E8E4DC;--text-light-muted:#A09B92;
+  --emerald:#1F7D49;--emerald-bg:rgba(46,159,95,0.12);
+  --amber:#9C6F12;--amber-bg:rgba(212,175,55,0.16);
+  --red:#B23A3A;--red-bg:rgba(193,69,69,0.12);
+  --border-gold:rgba(212,175,55,0.30);
+}
+html,body{font-family:'Anuphan',sans-serif;background:var(--cream);color:var(--text-dark);min-height:100vh}
+
+/* ============ Token gate ============ */
+.gate{position:fixed;inset:0;background:linear-gradient(160deg,var(--maroon-darkest),var(--maroon-mid) 45%,var(--maroon-light) 62%,var(--maroon-mid) 82%,var(--maroon-darkest));display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;z-index:50}
+.gate::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 28%,rgba(114,47,55,0.28),transparent 50%),radial-gradient(ellipse at 70% 64%,rgba(90,30,40,0.22),transparent 50%);pointer-events:none}
+.gate-logo{width:92px;height:92px;border-radius:24px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;position:relative;z-index:1;background:linear-gradient(135deg,var(--maroon-darkest),var(--maroon));box-shadow:0 0 40px rgba(212,175,55,0.15),0 0 0 1.5px rgba(212,175,55,0.4)}
+.gate-logo img{width:64px;height:64px;object-fit:contain}
+.gate-logo .fb{display:none;font-family:'Cinzel',serif;font-size:22px;font-weight:700;letter-spacing:2px;color:var(--gold)}
+.gate-eyebrow{font-family:'Cinzel',serif;font-size:11px;letter-spacing:4px;color:var(--gold-deep);text-transform:uppercase;margin-bottom:8px;position:relative;z-index:1}
+.gate-title{font-family:'DM Serif Display',serif;font-size:26px;color:var(--gold-light);margin-bottom:6px;position:relative;z-index:1}
+.gate-sub{color:var(--text-light-muted);font-size:13.5px;margin-bottom:26px;position:relative;z-index:1;text-align:center}
+.gate-form{width:100%;max-width:340px;position:relative;z-index:1}
+.gate-input{width:100%;padding:15px 16px;border-radius:12px;border:1.5px solid rgba(212,175,55,0.3);background:rgba(255,255,255,0.06);color:var(--gold-light);font-family:'Anuphan',sans-serif;font-size:15px;letter-spacing:1px;outline:none;transition:border-color .2s}
+.gate-input::placeholder{color:rgba(160,155,146,0.7)}
+.gate-input:focus{border-color:var(--gold)}
+.gate-btn{width:100%;margin-top:14px;padding:15px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border:none;border-radius:12px;color:#1a0a0e;font-family:'Anuphan',sans-serif;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(212,175,55,0.3);transition:transform .15s}
+.gate-btn:active{transform:scale(.97)}
+.gate-err{color:#F0A8A8;font-size:13px;text-align:center;margin-top:14px;min-height:18px;position:relative;z-index:1}
+
+/* ============ App ============ */
+.app{display:none;max-width:1180px;margin:0 auto;padding:0 16px 60px}
+.topbar{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,#FFFEFB,#FAF6ED);border-bottom:2px solid;border-image:linear-gradient(90deg,transparent,var(--gold),#E8D48B,var(--gold),transparent) 1;box-shadow:0 4px 18px rgba(212,175,55,0.12);margin:0 -16px 22px;padding:14px 16px;display:flex;align-items:center;gap:12px}
+.topbar .brand{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.topbar .brand img{width:34px;height:34px;object-fit:contain}
+.topbar .brand .t{font-family:'Cinzel',serif;font-size:13px;letter-spacing:2px;color:var(--gold-deep);text-transform:uppercase;line-height:1.2}
+.topbar .brand .s{font-size:12px;color:var(--text-muted)}
+.icon-btn{flex-shrink:0;width:38px;height:38px;border-radius:10px;border:1.5px solid var(--border-gold);background:var(--cream-card);color:var(--gold-deep);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.icon-btn:active{background:var(--cream-warm)}
+.icon-btn svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+/* Stat cards */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.stat{background:linear-gradient(160deg,#FFFEF8,#F8F2E4);border:1px solid rgba(212,175,55,0.25);border-radius:16px;padding:16px 18px;box-shadow:0 4px 16px rgba(114,47,55,0.05)}
+.stat .lbl{font-family:'Cinzel',serif;font-size:10.5px;letter-spacing:2px;color:var(--gold-deep);text-transform:uppercase;margin-bottom:6px}
+.stat .num{font-family:'DM Serif Display',serif;font-size:34px;line-height:1;color:var(--text-heading)}
+.stat.warn .num{color:var(--amber)}
+.stat.danger .num{color:var(--red)}
+
+/* Controls */
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;flex:1}
+.chip{padding:8px 15px;border-radius:999px;border:1.5px solid var(--border-gold);background:var(--cream-card);color:var(--text-muted);font-size:13.5px;font-weight:500;cursor:pointer;transition:all .15s}
+.chip.active{background:linear-gradient(135deg,var(--maroon),#8B3A44);color:#FFFEF8;border-color:transparent}
+.search{padding:9px 14px;border-radius:10px;border:1.5px solid var(--border-gold);background:var(--cream-card);color:var(--text-dark);font-family:'Anuphan',sans-serif;font-size:14px;outline:none;min-width:200px}
+.search:focus{border-color:var(--gold)}
+
+.updated{font-size:12px;color:var(--text-muted);margin-bottom:10px}
+
+/* Table */
+.table-wrap{background:var(--cream-card);border:1px solid rgba(212,175,55,0.25);border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(114,47,55,0.06)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+thead th{background:linear-gradient(180deg,#F5EDD8,#EFE4CB);color:var(--text-heading);font-weight:700;text-align:left;padding:13px 14px;white-space:nowrap;cursor:pointer;user-select:none;border-bottom:1.5px solid var(--border-gold);font-size:13px}
+thead th .arr{color:var(--gold-dark);font-size:11px;margin-left:3px}
+tbody td{padding:13px 14px;border-bottom:1px solid rgba(212,175,55,0.12);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:rgba(212,175,55,0.05)}
+.cell-name{font-weight:600;color:var(--text-heading)}
+.cell-email{color:var(--text-muted);font-size:13px}
+.plan-tag{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;background:rgba(212,175,55,0.12);color:var(--gold-deep);border:1px solid rgba(212,175,55,0.2)}
+
+.badge{display:inline-block;padding:4px 11px;border-radius:999px;font-size:12.5px;font-weight:700;white-space:nowrap}
+.badge.green{background:var(--emerald-bg);color:var(--emerald)}
+.badge.amber{background:var(--amber-bg);color:var(--amber)}
+.badge.red{background:var(--red-bg);color:var(--red)}
+.badge.neutral{background:rgba(122,111,98,0.12);color:var(--text-muted)}
+
+.status-pill{font-size:12px;font-weight:600}
+.status-active{color:var(--emerald)}
+.status-revoked{color:var(--red)}
+
+.empty{padding:48px 20px;text-align:center;color:var(--text-muted);font-size:14.5px}
+.loading{padding:48px 20px;text-align:center;color:var(--gold-deep);font-size:14.5px}
+
+/* Mobile: stack rows into cards */
+@media(max-width:760px){
+  thead{display:none}
+  table,tbody,tr,td{display:block;width:100%}
+  tbody tr{padding:8px 4px;border-bottom:6px solid var(--cream)}
+  tbody td{display:flex;justify-content:space-between;gap:14px;border:none;padding:7px 14px;text-align:right}
+  tbody td::before{content:attr(data-label);font-weight:600;color:var(--text-muted);text-align:left;font-size:13px}
+  .cell-email{font-size:13px}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ Token Gate ============ -->
+<div class="gate" id="gate">
+  <div class="gate-logo">
+    <img src="jpt-owl-logo.png" alt="JP Trust" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <span class="fb">JPT</span>
+  </div>
+  <div class="gate-eyebrow">JP Trust Learning</div>
+  <div class="gate-title">ผู้ดูแลระบบ</div>
+  <div class="gate-sub">ใส่รหัสผู้ดูแลเพื่อดูรายชื่อสมาชิก</div>
+  <div class="gate-form">
+    <input class="gate-input" id="tokenInput" type="password" placeholder="Admin token" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')enterAdmin()">
+    <button class="gate-btn" onclick="enterAdmin()">เข้าสู่ระบบ</button>
+    <div class="gate-err" id="gateErr"></div>
+  </div>
+</div>
+
+<!-- ============ App ============ -->
+<div class="app" id="app">
+  <div class="topbar">
+    <div class="brand">
+      <img src="jpt-owl-logo.png" alt="" onerror="this.style.display='none'">
+      <div>
+        <div class="t">Member Admin</div>
+        <div class="s">รายชื่อสมาชิก &amp; วันหมดอายุ</div>
+      </div>
+    </div>
+    <button class="icon-btn" id="refreshBtn" title="รีเฟรช" onclick="loadMembers()">
+      <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+    </button>
+    <button class="icon-btn" title="ออกจากระบบ" onclick="logoutAdmin()">
+      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="controls">
+    <div class="chips" id="chips">
+      <div class="chip active" data-filter="all">ทั้งหมด</div>
+      <div class="chip" data-filter="d7">≤7 วัน</div>
+      <div class="chip" data-filter="d14">≤14 วัน</div>
+      <div class="chip" data-filter="expired">หมดอายุแล้ว</div>
+      <div class="chip" data-filter="revoked">ระงับแล้ว</div>
+    </div>
+    <input class="search" id="search" type="text" placeholder="ค้นหาชื่อ / อีเมล" oninput="render()">
+  </div>
+
+  <div class="updated" id="updated"></div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th data-sort="username">ชื่อ<span class="arr"></span></th>
+          <th data-sort="plan">แพ็ก<span class="arr"></span></th>
+          <th data-sort="started_at">วันสมัคร<span class="arr"></span></th>
+          <th data-sort="expires_at">วันหมดอายุ<span class="arr"></span></th>
+          <th data-sort="days_left">เหลือ<span class="arr"></span></th>
+          <th data-sort="status">สถานะ<span class="arr"></span></th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr><td colspan="6" class="loading">กำลังโหลด…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const FN_URL = 'https://rcdukwwcbyryauhqlzmx.supabase.co/functions/v1/admin-members';
+let ALL = [];
+let activeFilter = 'all';
+let sortKey = 'days_left', sortDir = 1; // 1 asc, -1 desc
+
+function getToken(){ return sessionStorage.getItem('jpt_admin_token') || ''; }
+
+function enterAdmin(){
+  const v = (document.getElementById('tokenInput').value || '').trim();
+  if(!v){ document.getElementById('gateErr').textContent = 'กรุณาใส่รหัสผู้ดูแล'; return; }
+  sessionStorage.setItem('jpt_admin_token', v);
+  document.getElementById('gateErr').textContent = '';
+  showApp();
+  loadMembers();
+}
+function logoutAdmin(){
+  sessionStorage.removeItem('jpt_admin_token');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('gate').style.display = 'flex';
+  document.getElementById('tokenInput').value = '';
+}
+function showApp(){
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+}
+
+async function loadMembers(){
+  const token = getToken();
+  if(!token){ logoutAdmin(); return; }
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '<tr><td colspan="6" class="loading">กำลังโหลด…</td></tr>';
+  try{
+    const res = await fetch(FN_URL, { headers: { 'x-admin-token': token } });
+    if(res.status === 401){
+      sessionStorage.removeItem('jpt_admin_token');
+      document.getElementById('app').style.display = 'none';
+      document.getElementById('gate').style.display = 'flex';
+      document.getElementById('gateErr').textContent = 'รหัสผู้ดูแลไม่ถูกต้อง';
+      return;
+    }
+    const data = await res.json();
+    if(!res.ok || !data.ok){
+      tbody.innerHTML = '<tr><td colspan="6" class="empty">โหลดไม่สำเร็จ: ' + escapeHtml(data.error || ('HTTP '+res.status)) + '</td></tr>';
+      return;
+    }
+    ALL = data.members || [];
+    renderStats(data.counts || {});
+    const dt = data.generated_at ? fmtDateTime(data.generated_at) : '';
+    document.getElementById('updated').textContent = dt ? ('อัปเดตล่าสุด ' + dt + ' · ' + ALL.length + ' สมาชิก') : (ALL.length + ' สมาชิก');
+    render();
+  }catch(e){
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">เชื่อมต่อไม่ได้: ' + escapeHtml(String(e && e.message || e)) + '</td></tr>';
+  }
+}
+
+function renderStats(c){
+  const el = document.getElementById('stats');
+  const card = (lbl,num,cls)=>'<div class="stat '+(cls||'')+'"><div class="lbl">'+lbl+'</div><div class="num">'+(num==null?'—':num)+'</div></div>';
+  el.innerHTML =
+    card('สมาชิกทั้งหมด', c.total) +
+    card('ใกล้หมด ≤7 วัน', c.expiring_7d, 'warn') +
+    card('ใกล้หมด ≤14 วัน', c.expiring_14d, 'warn') +
+    card('หมดอายุแล้ว', c.expired, 'danger') +
+    card('ระงับแล้ว', c.revoked, 'danger');
+}
+
+function passFilter(m){
+  if(activeFilter === 'all') return true;
+  if(activeFilter === 'revoked') return m.status === 'revoked';
+  if(m.status === 'revoked') return false;
+  const d = m.days_left;
+  if(activeFilter === 'expired') return d != null && d < 0;
+  if(activeFilter === 'd7')  return d != null && d >= 0 && d <= 7;
+  if(activeFilter === 'd14') return d != null && d >= 0 && d <= 14;
+  return true;
+}
+
+function render(){
+  const q = (document.getElementById('search').value || '').trim().toLowerCase();
+  let rows = ALL.filter(passFilter);
+  if(q) rows = rows.filter(m =>
+    (m.username||'').toLowerCase().includes(q) || (m.email||'').toLowerCase().includes(q));
+
+  rows.sort((a,b)=>{
+    let av = a[sortKey], bv = b[sortKey];
+    if(sortKey === 'days_left'){ av = av==null?Infinity:av; bv = bv==null?Infinity:bv; return (av-bv)*sortDir; }
+    if(sortKey === 'expires_at' || sortKey === 'started_at'){
+      av = av?Date.parse(av):Infinity; bv = bv?Date.parse(bv):Infinity; return (av-bv)*sortDir;
+    }
+    return String(av||'').localeCompare(String(bv||''), 'th') * sortDir;
+  });
+
+  // header arrows
+  document.querySelectorAll('thead th').forEach(th=>{
+    const a = th.querySelector('.arr');
+    a.textContent = th.dataset.sort === sortKey ? (sortDir===1?'▲':'▼') : '';
+  });
+
+  const tbody = document.getElementById('tbody');
+  if(!rows.length){ tbody.innerHTML = '<tr><td colspan="6" class="empty">ไม่พบสมาชิกตามเงื่อนไข</td></tr>'; return; }
+
+  tbody.innerHTML = rows.map(m=>{
+    const planTh = m.plan==='monthly'?'รายเดือน':(m.plan==='yearly'?'รายปี':(m.plan||'—'));
+    const planCell = m.plan ? '<span class="plan-tag">'+planTh+'</span>' : '<span class="cell-email">—</span>';
+    return '<tr>' +
+      '<td data-label="ชื่อ"><div class="cell-name">'+escapeHtml(m.username||'(ไม่มีชื่อ)')+'</div><div class="cell-email">'+escapeHtml(m.email)+'</div></td>' +
+      '<td data-label="แพ็ก">'+planCell+'</td>' +
+      '<td data-label="วันสมัคร">'+escapeHtml(fmtDate(m.started_at))+'</td>' +
+      '<td data-label="วันหมดอายุ">'+escapeHtml(fmtDate(m.expires_at))+'</td>' +
+      '<td data-label="เหลือ">'+daysBadge(m)+'</td>' +
+      '<td data-label="สถานะ">'+statusPill(m.status)+'</td>' +
+    '</tr>';
+  }).join('');
+}
+
+function daysBadge(m){
+  if(m.status === 'revoked') return '<span class="badge red">ระงับแล้ว</span>';
+  const d = m.days_left;
+  if(d == null) return '<span class="badge neutral">—</span>';
+  if(d < 0)  return '<span class="badge red">หมดอายุ '+Math.abs(d)+' วัน</span>';
+  if(d === 0) return '<span class="badge red">หมดอายุวันนี้</span>';
+  if(d <= 14) return '<span class="badge amber">เหลือ '+d+' วัน</span>';
+  return '<span class="badge green">เหลือ '+d+' วัน</span>';
+}
+function statusPill(s){
+  if(s === 'revoked') return '<span class="status-pill status-revoked">ระงับ</span>';
+  return '<span class="status-pill status-active">ใช้งาน</span>';
+}
+
+// ---- date helpers (Asia/Bangkok, พ.ศ.) ----
+function fmtDate(iso){
+  if(!iso) return '—';
+  try{ return new Intl.DateTimeFormat('th-TH',{timeZone:'Asia/Bangkok',day:'numeric',month:'short',year:'numeric'}).format(new Date(iso)); }
+  catch(e){ return String(iso).slice(0,10); }
+}
+function fmtDateTime(iso){
+  try{ return new Intl.DateTimeFormat('th-TH',{timeZone:'Asia/Bangkok',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}).format(new Date(iso)); }
+  catch(e){ return String(iso).slice(0,16).replace('T',' '); }
+}
+function escapeHtml(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ---- wire up chips + sort ----
+document.getElementById('chips').addEventListener('click', e=>{
+  const c = e.target.closest('.chip'); if(!c) return;
+  document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+  c.classList.add('active');
+  activeFilter = c.dataset.filter;
+  render();
+});
+document.querySelectorAll('thead th').forEach(th=>{
+  th.addEventListener('click', ()=>{
+    const k = th.dataset.sort;
+    if(sortKey === k){ sortDir = -sortDir; } else { sortKey = k; sortDir = 1; }
+    render();
+  });
+});
+
+// ---- boot: auto-enter if a token is already in this session ----
+if(getToken()){ showApp(); loadMembers(); }
+</script>
+</body>
+</html>
