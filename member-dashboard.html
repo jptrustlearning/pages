@@ -1809,6 +1809,7 @@ async function enforceSubscription(){
     if(expired){showExpiredGate(meta,user.email);try{logEvent('subscription_blocked');}catch(e){}return false;}
     try{await maybeShowRenewalNotice(user.email,meta);}catch(e){}
     try{maybeShowExpiryReminder(user.email,meta);}catch(e){}
+    try{refreshNotifNews();}catch(e){}
     return true;
   }catch(e){console.warn('[sub] check error:',e);return true;}
 }
@@ -2639,12 +2640,49 @@ loadNewsFeed=async function(){
 function openEditModal(field){const m=document.getElementById('editModal'),t=document.getElementById('modalTitle'),c=document.getElementById('modalContent');if(field==='name'){t.textContent='แก้ไขชื่อที่แสดง';c.innerHTML='<input class="modal-input" id="editValue" value="'+userSettings.name+'" placeholder="ชื่อของคุณ"><button class="modal-btn" onclick="userSettings.name=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}else if(field==='risk'){t.textContent='ระดับความเสี่ยง';c.innerHTML='<div style="display:flex;flex-direction:column;gap:8px"><button class="modal-btn" style="background:'+(userSettings.risk==='low'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='low'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'low\';saveSettings();closeModal();">ต่ำ (Low)</button><button class="modal-btn" style="background:'+(userSettings.risk==='medium'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='medium'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'medium\';saveSettings();closeModal();">ปานกลาง (Medium)</button><button class="modal-btn" style="background:'+(userSettings.risk==='high'?'var(--gold)':'var(--cream)')+';color:'+(userSettings.risk==='high'?'#1a0a0e':'var(--text-dark-muted)')+'" onclick="userSettings.risk=\'high\';saveSettings();closeModal();">สูง (High)</button></div>'}else if(field==='capital'){t.textContent='ทุนเริ่มต้น (บาท)';c.innerHTML='<input class="modal-input" id="editValue" type="number" value="'+userSettings.capital+'" placeholder="100000"><button class="modal-btn" onclick="userSettings.capital=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}else if(field==='broker'){t.textContent='โบรกเกอร์ของคุณ';c.innerHTML='<input class="modal-input" id="editValue" value="'+userSettings.broker+'" placeholder="เช่น XM, Exness, IC Markets"><button class="modal-btn" onclick="userSettings.broker=document.getElementById(\'editValue\').value;saveSettings();closeModal();">บันทึก</button>'}m.classList.add('show')}
 function closeModal(e){if(e&&e.target!==e.currentTarget)return;document.getElementById('editModal').classList.remove('show')}
 // ===== Notification bell — in-app notification center =====
-// Items derive from membership state stashed by renderMembershipCard(). The
-// expiry item deliberately IGNORES the reminder modal's snooze: the bell is
-// the passive, always-available place to find it (like the home banner). The
-// gold dot only shows when there is something to read. Promo line is the same
-// DB-driven hint (list_public_promos) as the reminder modal, loaded lazily.
+// Membership cards derive from state stashed by renderMembershipCard(). The
+// expiry card deliberately IGNORES the reminder modal's snooze (bell = the
+// passive always-available place, like the home banner) and ALWAYS sorts
+// first (Joon's rule). News: every batch push surfaces its headline TITLES
+// here for 24h, then they drop off — freshness is re-checked at render time
+// via _newsFresh(), so stale items vanish even without a refetch. Batch
+// timestamps are BKK-local with a fake trailing Z → must go through
+// parseBatchDate(), never new Date() directly. Promo line = same DB-driven
+// hint (list_public_promos) as the reminder modal, loaded lazily.
 var _notifState = { days:null, expStr:null, renewedAt:null };
+var _notifNews = { fetchedAt:0, items:[] };
+function _escNotif(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function _newsFresh(iso){
+  var d = parseBatchDate(iso); if(!d) return false;
+  var diff = Date.now() - d.getTime();
+  return diff > -3600000 && diff <= 24*3600000; // last 24h (1h future grace)
+}
+function getFreshNewsItems(){
+  var out = [];
+  for(var i=0;i<_notifNews.items.length;i++) if(_newsFresh(_notifNews.items[i].iso)) out.push(_notifNews.items[i]);
+  return out.slice(0,12);
+}
+async function refreshNotifNews(){
+  try{
+    if(Date.now() - _notifNews.fetchedAt < 5*60000) return; // throttle
+    _notifNews.fetchedAt = Date.now();
+    var res = await fetch(NEWS_INDEX_URL + '?t=' + Date.now(), {cache:'no-store'});
+    if(!res.ok) return;
+    var data = await res.json();
+    var batches = (data && data.batches) || [];
+    var items = [];
+    for(var i=0;i<batches.length && items.length<12;i++){
+      var b = batches[i];
+      if(!_newsFresh(b.date)) break; // index is newest-first → rest are older
+      var hs = b.headlines || [];
+      for(var j=0;j<hs.length;j++){
+        if(hs[j] && hs[j].title) items.push({ title:hs[j].title, file:b.file, idx:j, iso:b.date });
+      }
+    }
+    _notifNews.items = items;
+    updateNotifDot();
+  }catch(e){}
+}
 function buildNotifItems(){
   var items = [];
   if(_notifState.days !== null && _notifState.days >= 0 && _notifState.days <= 20) items.push('expiry');
@@ -2656,11 +2694,9 @@ function buildNotifItems(){
 }
 function updateNotifDot(){
   var dot = document.getElementById('notifDot'); if(!dot) return;
-  dot.style.display = buildNotifItems().length ? 'block' : 'none';
+  dot.style.display = (buildNotifItems().length || getFreshNewsItems().length) ? 'block' : 'none';
 }
-function openNotifications(){
-  try{logEvent('notif_open');}catch(e){}
-  if(document.getElementById('jptNotifPanel')) return;
+function buildNotifBodyHTML(){
   var items = buildNotifItems(), s = _notifState, body = '';
   for(var i=0;i<items.length;i++){
     if(items[i] === 'expiry'){
@@ -2690,7 +2726,42 @@ function openNotifications(){
         '</div>';
     }
   }
+  var news = getFreshNewsItems();
+  for(var k=0;k<news.length;k++){
+    var n = news[k];
+    body += '' +
+      '<div class="jptNotifNews" data-file="' + _escNotif(n.file) + '" data-idx="' + n.idx + '" style="display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid rgba(212,175,55,0.22);border-radius:14px;background:#FFFEF8;cursor:pointer;margin-bottom:8px;">' +
+        '<div style="flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#F5EDD8,#E8D48B);display:flex;align-items:center;justify-content:center;">' +
+          '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#8B6914" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>' +
+        '</div>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="font-size:12.5px;font-weight:600;color:#3A2A1A;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">' + _escNotif(n.title) + '</div>' +
+          '<div style="font-size:11px;color:#A09483;margin-top:3px;">ข่าวตลาด · ' + (timeAgo(n.iso) || '') + '</div>' +
+        '</div>' +
+      '</div>';
+  }
   if(!body) body = '<div style="padding:26px 10px;text-align:center;font-size:13.5px;color:#7A6F62;">ยังไม่มีการแจ้งเตือนใหม่</div>';
+  return body;
+}
+function attachNotifHandlers(o){
+  var expItem = document.getElementById('jptNotifExpItem');
+  if(expItem){
+    expItem.onclick = function(){ o.remove(); goRenew(); };
+    fetchRenewPromoHint().then(function(t){
+      var el = document.getElementById('jptNotifPromo');
+      if(el && t){ el.textContent = t; el.style.display = 'block'; }
+    }).catch(function(){});
+  }
+  var cards = o.querySelectorAll('.jptNotifNews');
+  for(var i=0;i<cards.length;i++){
+    (function(c){
+      c.onclick = function(){ o.remove(); openNewsDetail(c.getAttribute('data-file'), parseInt(c.getAttribute('data-idx'),10) || 0); };
+    })(cards[i]);
+  }
+}
+function openNotifications(){
+  try{logEvent('notif_open');}catch(e){}
+  if(document.getElementById('jptNotifPanel')) return;
   var o = document.createElement('div');
   o.id = 'jptNotifPanel';
   o.style.cssText = 'position:fixed;inset:0;z-index:99950;display:flex;align-items:flex-start;justify-content:center;padding:70px 20px 24px;background:rgba(26,10,14,0.55);backdrop-filter:blur(2px);font-family:Sarabun,Anuphan,sans-serif;overflow-y:auto;';
@@ -2701,21 +2772,22 @@ function openNotifications(){
         '<div style="font-family:Cinzel,serif;font-size:12px;letter-spacing:2.5px;color:#8B6914;font-weight:700;text-transform:uppercase;">Notifications</div>' +
         '<button id="jptNotifClose" style="border:none;background:transparent;color:#7A6F62;font-size:20px;cursor:pointer;line-height:1;padding:4px;">×</button>' +
       '</div>' +
-      '<div style="padding:4px 16px 18px;">' + body + '</div>' +
+      '<div id="jptNotifBody" style="padding:4px 16px 18px;">' + buildNotifBodyHTML() + '</div>' +
     '</div>';
   o.addEventListener('click', function(ev){ if(ev.target === o) o.remove(); });
   document.body.appendChild(o);
   document.getElementById('jptNotifClose').onclick = function(){ o.remove(); };
-  var expItem = document.getElementById('jptNotifExpItem');
-  if(expItem){
-    expItem.onclick = function(){ o.remove(); goRenew(); };
-    fetchRenewPromoHint().then(function(t){
-      var el = document.getElementById('jptNotifPromo');
-      if(el && t){ el.textContent = t; el.style.display = 'block'; }
-    }).catch(function(){});
-  }
+  attachNotifHandlers(o);
+  // refresh news lazily; if the panel is still this one when it lands, re-render
+  refreshNotifNews().then(function(){
+    var bodyEl = document.getElementById('jptNotifBody');
+    if(bodyEl && document.getElementById('jptNotifPanel') === o){
+      bodyEl.innerHTML = buildNotifBodyHTML();
+      attachNotifHandlers(o);
+    }
+  }).catch(function(){});
 }
-function openComingSoon(name){alert('กลยุทธ์ "'+name+'" กำลังพัฒนา — เร็วๆ นี้จะเปิดให้ใช้งาน')}
+
 function jptToast(msg){let t=document.getElementById('jpt-toast');if(!t){t=document.createElement('div');t.id='jpt-toast';document.body.appendChild(t)}t.textContent=msg;t.classList.add('show');clearTimeout(t._hideTimer);t._hideTimer=setTimeout(()=>t.classList.remove('show'),2800)}
 function filterStrategies(btn,key){document.querySelectorAll('.lab-chip').forEach(c=>c.classList.remove('active'));btn.classList.add('active');const list=document.getElementById('labStrategyList');if(!list)return;list.querySelectorAll('.strategy-card,.strategy-empty').forEach(el=>{const isMatch=el.classList.contains('filter-'+key);if(el.classList.contains('strategy-empty')){el.style.display=isMatch?'block':'none'}else{el.style.display=isMatch?'grid':'none'}})}
 function btcComingSoon(e){if(e){e.stopPropagation();e.preventDefault()}jptToast('🚧 Bitcoin · กำลังพัฒนา · เร็วๆ นี้')}

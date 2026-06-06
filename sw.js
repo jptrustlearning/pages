@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jptrust-member-v14';  // bumped 2026-06-06 — notification-bell center (expiry/renewed items + dynamic dot)
+const CACHE_NAME = 'jptrust-member-v15';  // bumped 2026-06-06 — bell news items (24h headline titles, renew-first ordering)
 const ASSETS = [
   './',
   './member-dashboard.html',
