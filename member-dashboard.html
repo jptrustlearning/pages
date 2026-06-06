@@ -1804,6 +1804,7 @@ async function enforceSubscription(){
     if(status==='revoked'||status==='expired') expired=true;
     if(exp){const t=Date.parse(exp);if(!isNaN(t)&&Date.now()>t)expired=true;}
     if(expired){showExpiredGate(meta,user.email);try{logEvent('subscription_blocked');}catch(e){}return false;}
+    try{maybeShowRenewalNotice(user.email,meta);}catch(e){}
     return true;
   }catch(e){console.warn('[sub] check error:',e);return true;}
 }
@@ -1861,6 +1862,58 @@ function showExpiredGate(meta,email){
   document.body.appendChild(o);
   document.getElementById('jptRenewBtn').onclick=function(){location.href='signup.html?v=1780721111'+(em?('&email='+encodeURIComponent(em)):'')+'&renew=1';};
   document.getElementById('jptGateLogout').onclick=async function(){try{await supabaseClient.auth.signOut();}catch(e){}try{localStorage.removeItem('jpt_pin');localStorage.removeItem('jpt_logged_in');sessionStorage.removeItem('jpt_session_active');}catch(e){}location.reload();};
+}
+
+// ===== One-time renewal notice for manually-extended members =====
+// Targets are stored as SHA-256 hashes of the lowercased email — NO plaintext
+// customer emails in this (public) repo. The expiry date shown comes from the
+// member's real subscription_expires_at. The "seen" marker is bound to the
+// expiry VALUE (not a boolean), so extending the same member again later
+// re-triggers the notice automatically — no code change needed.
+var RENEWAL_NOTICE_HASHES = [
+  'b500a0c2de03fec82adae130d9641ca37bbb4460d84030f41dc5d9e221a9913b',
+  '52a093063503ab0bfb9fc179e28440dd13b4654eb37639db3d7a2fd1f19ecf46',
+  '25f9fbd7d903e56a483c4681f16f0322932d01e701fbb263f72175df593781fe'
+];
+async function maybeShowRenewalNotice(email,meta){
+  try{
+    var exp=meta&&meta.subscription_expires_at;
+    if(!email||!exp)return;
+    if(localStorage.getItem('jpt_renew_notice_ack')===exp)return;
+    if(!(window.crypto&&crypto.subtle&&window.TextEncoder))return;
+    var buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(String(email).trim().toLowerCase()));
+    var hex=Array.prototype.map.call(new Uint8Array(buf),function(b){return b.toString(16).padStart(2,'0');}).join('');
+    if(RENEWAL_NOTICE_HASHES.indexOf(hex)===-1)return;
+    if(document.getElementById('jptRenewalNotice'))return;
+    var d=new Date(exp);
+    var expStr=isNaN(d.getTime())?'\u2014':d.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+    var o=document.createElement('div');
+    o.id='jptRenewalNotice';
+    o.style.cssText='position:fixed;inset:0;z-index:99980;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(26,10,14,0.78);backdrop-filter:blur(3px);font-family:Sarabun,Anuphan,sans-serif;overflow-y:auto;';
+    o.innerHTML=''+
+      '<div style="max-width:400px;width:100%;background:#FFFEF8;border:1.5px solid rgba(212,175,55,0.4);border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5);">'+
+        '<div style="height:4px;background:linear-gradient(90deg,#E8D48B,#D4AF37,#B8860B,#D4AF37,#E8D48B);"></div>'+
+        '<div style="padding:32px 26px 26px;text-align:center;">'+
+          '<div style="width:68px;height:68px;margin:0 auto 18px;border-radius:50%;background:linear-gradient(135deg,#1E5E3A,#0F3D24);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(30,94,58,0.3);">'+
+            '<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="#E8D48B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'+
+          '</div>'+
+          '<div style="font-family:Cinzel,serif;font-size:11px;letter-spacing:3px;color:#8B6914;text-transform:uppercase;font-weight:600;margin-bottom:8px;">Membership Renewed</div>'+
+          '<h2 style="font-family:\'DM Serif Display\',serif;font-size:24px;color:#722F37;margin:0 0 10px;">\u0e15\u0e48\u0e2d\u0e2d\u0e32\u0e22\u0e38\u0e2a\u0e21\u0e32\u0e0a\u0e34\u0e01\u0e40\u0e23\u0e35\u0e22\u0e1a\u0e23\u0e49\u0e2d\u0e22\u0e41\u0e25\u0e49\u0e27</h2>'+
+          '<p style="font-size:13.5px;color:#5A3D20;line-height:1.65;margin:0 0 16px;">\u0e2a\u0e21\u0e32\u0e0a\u0e34\u0e01\u0e02\u0e2d\u0e07\u0e04\u0e38\u0e13\u0e44\u0e14\u0e49\u0e23\u0e31\u0e1a\u0e01\u0e32\u0e23\u0e15\u0e48\u0e2d\u0e2d\u0e32\u0e22\u0e38\u0e43\u0e2b\u0e49\u0e40\u0e23\u0e35\u0e22\u0e1a\u0e23\u0e49\u0e2d\u0e22\u0e41\u0e25\u0e49\u0e27</p>'+
+          '<div style="background:linear-gradient(180deg,#FFFEF8,#F5EDD8);border:1px solid rgba(212,175,55,0.35);border-radius:12px;padding:14px 16px;margin:0 0 18px;">'+
+            '<div style="font-size:12px;color:#7A6F62;margin-bottom:4px;">\u0e43\u0e0a\u0e49\u0e07\u0e32\u0e19\u0e44\u0e14\u0e49\u0e16\u0e36\u0e07</div>'+
+            '<div style="font-family:\'DM Serif Display\',serif;font-size:20px;color:#1E5E3A;font-weight:600;">'+expStr+'</div>'+
+          '</div>'+
+          '<button id="jptRenewNoticeOk" style="width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#D4AF37,#B8860B);color:#1a0a0e;font-family:Sarabun,sans-serif;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 6px 22px rgba(212,175,55,0.35);">\u0e23\u0e31\u0e1a\u0e17\u0e23\u0e32\u0e1a</button>'+
+        '</div>'+
+      '</div>';
+    document.body.appendChild(o);
+    document.getElementById('jptRenewNoticeOk').onclick=function(){
+      try{localStorage.setItem('jpt_renew_notice_ack',exp);}catch(e){}
+      o.remove();
+    };
+    try{logEvent('renewal_notice_shown');}catch(e){}
+  }catch(e){console.warn('[renew-notice]',e);}
 }
 
 function showApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('active');applySettings();renderTickerTape();loadSignalCards();loadSettingsFromCloud().then(function(){applySettings()});logEvent('app_open',{screen:'home'});enforceSubscription();}

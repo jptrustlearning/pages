@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jptrust-member-v8';  // bumped 2026-06-06 — signup cache-bust (promo catalog cleanup)
+const CACHE_NAME = 'jptrust-member-v9';  // bumped 2026-06-06 — renewal notice modal for extended members
 const ASSETS = [
   './',
   './member-dashboard.html',
