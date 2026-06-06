@@ -180,8 +180,8 @@ async function grantSupabaseUser(
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    // ---- New user: expiry counts from now ----
-    const freshMeta = { ...baseMeta, subscription_expires_at: computeExpiry(null) };
+    // ---- New user: expiry counts from now; started_at = now, never renewed ----
+    const freshMeta = { ...baseMeta, subscription_renewed_at: null, subscription_expires_at: computeExpiry(null) };
     const { data, error } = await admin.auth.admin.createUser({
       email,
       email_confirm: true,
@@ -200,13 +200,29 @@ async function grantSupabaseUser(
         const id = await findUserIdByEmail(admin, email);
         if (id) {
           // Read current expiry to extend from it (don't lose remaining days)
+          // + read the original signup date so the renewal NEVER overwrites it.
           let currentExpiry: string | null = null;
+          let existingStarted: string | null = null;
           try {
             const { data: got } = await admin.auth.admin.getUserById(id);
             const m = (got?.user?.app_metadata || {}) as Record<string, unknown>;
             currentExpiry = (m.subscription_expires_at as string) || null;
+            existingStarted = (m.subscription_started_at as string) || null;
           } catch (_) { /* fall back to now */ }
-          const renewMeta = { ...baseMeta, subscription_expires_at: computeExpiry(currentExpiry) };
+          const renewMeta: Record<string, unknown> = {
+            ...baseMeta,
+            subscription_renewed_at: new Date(nowMs).toISOString(),
+            subscription_expires_at: computeExpiry(currentExpiry),
+          };
+          // subscription_started_at = first-ever signup date. On renewal keep the
+          // stored value; if we couldn't read it (or it never existed — legacy
+          // beta accounts, later backfilled from auth.users.created_at), drop the
+          // key so the merge-based metadata update leaves it untouched.
+          if (existingStarted) {
+            renewMeta.subscription_started_at = existingStarted;
+          } else {
+            delete renewMeta.subscription_started_at;
+          }
           const { error: upErr } = await admin.auth.admin.updateUserById(id, { app_metadata: renewMeta });
           if (upErr) {
             return { granted: true, alreadyExisted: true, expiresAt: renewMeta.subscription_expires_at as string | null, error: `metadata update failed: ${upErr.message}` };
@@ -743,6 +759,8 @@ serve(async (req: Request) => {
       promo_discount_value: promoDiscountValue,
       ref_code: refCode,
       subscription_status: "active",
+      // First-ever signup date. Only persisted for NEW users (createUser);
+      // on renewal grantSupabaseUser preserves the stored value instead.
       subscription_started_at: startedAt,
     };
 
