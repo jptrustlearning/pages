@@ -1,0 +1,2259 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>วางแผนการเงินส่วนบุคคล — JPTrust Learning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600;700&family=DM+Serif+Display&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./jp-settings.js?v=1780744386"></script>
+<style>
+:root {
+  --gold: #D4AF37;
+  --gold-dark: #B8860B;
+  --gold-deep: #8B6914;
+  --gold-light: #F4E4BA;
+  --gold-sheen: #E8D48B;
+  --maroon: #722F37;
+  --maroon-dk: #5A1F26;
+  --burgundy: #C14545;
+  --burgundy-dk: #9C2B2B;
+  --emerald: #2E9F5F;
+  --emerald-dk: #1F7D49;
+  --red: #C14545;
+  --amber: #D68B2C;
+  --cream: #FAF6ED;
+  --cream-card: #FFFEF8;
+  --cream-deep: #F5EDD8;
+  --text: #3D3228;
+  --text-dark: #5A3D20;
+  --text-muted: #7A6F62;
+  --border-gold: rgba(212,175,55,0.4);
+  --border-gold-strong: rgba(212,175,55,0.55);
+  /* Severity palette for insights + risk bars */
+  --sev-good: #2E9F5F;
+  --sev-ok:   #D4AF37;
+  --sev-warn: #D68B2C;
+  --sev-bad:  #C14545;
+  /* Expense breakdown palette */
+  --exp-fixed:    #8B6914;
+  --exp-variable: #D68B2C;
+  --exp-debt:     #C14545;
+  --exp-insurance:#6B4A82;
+  --exp-surplus:  #2E9F5F;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-padding-top: 0; }
+body {
+  font-family: 'Sarabun', 'Anuphan', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: clip;
+}
+
+/* ===== HERO ===== */
+.hero {
+  padding: 36px 22px 28px;
+  background: linear-gradient(180deg, #FFFEF8 0%, #FAF6ED 70%, #F5EDD8 100%);
+  border-bottom: 1.5px solid var(--border-gold);
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold-sheen), var(--gold), var(--gold-sheen), transparent);
+}
+.hero-inner { position: relative; z-index: 2; max-width: 1000px; margin: 0 auto; }
+.hero-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  margin-bottom: 10px;
+}
+.hero-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2rem, 5.5vw, 2.8rem);
+  line-height: 1.15;
+  color: var(--maroon);
+  margin-bottom: 6px;
+}
+.hero-title .th {
+  font-family: 'Anuphan', 'Sarabun', sans-serif;
+  font-weight: 700;
+  font-size: 0.88em;
+}
+.hero-sub { font-size: 0.95rem; color: var(--text-muted); max-width: 650px; }
+
+/* ===== CONTAINER ===== */
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px 18px 100px;
+}
+.section-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gold-deep);
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 4px 10px 4px;
+  margin: 30px 0 14px;
+  border-bottom: 1.5px solid rgba(212,175,55,0.3);
+}
+.section-label::before {
+  content: '◆';
+  color: var(--gold);
+  font-size: 0.7em;
+}
+
+/* ===== CARD ===== */
+.card {
+  background: linear-gradient(180deg, #FFFEF8 0%, #FAF6ED 70%, #F5EDD8 100%);
+  border: 1.5px solid var(--border-gold-strong);
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: 0 4px 14px rgba(114,47,55,0.06), inset 0 1px 0 rgba(255,255,255,0.7);
+}
+.card-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gold-deep);
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.card-desc {
+  font-size: 0.82rem; color: var(--text-muted); margin-top: -8px; margin-bottom: 14px;
+}
+
+/* ===== FORM ELEMENTS ===== */
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label {
+  font-size: 0.82rem; font-weight: 600; color: var(--text-dark);
+}
+.form-group .hint { font-size: 0.74rem; color: var(--text-muted); font-weight: 400; }
+
+input[type="number"], input[type="text"], select {
+  font-family: 'Sarabun', 'Anuphan', sans-serif;
+  font-size: 0.98rem;
+  padding: 9px 12px;
+  border: 1.5px solid var(--border-gold);
+  border-radius: 10px;
+  background: var(--cream-card);
+  color: var(--text-dark);
+  outline: none;
+  transition: all 0.2s ease;
+}
+input[type="number"]:focus, input[type="text"]:focus, select:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212,175,55,0.15);
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* Side-by-side form row */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(212,175,55,0.25);
+}
+.form-row:last-child { border-bottom: none; padding-bottom: 0; }
+.form-row:first-child { padding-top: 0; }
+.form-row .fr-labels {
+  display: flex; flex-direction: column; gap: 2px; min-width: 0;
+}
+.form-row .fr-labels label {
+  font-size: 0.92rem; font-weight: 600; color: var(--text-dark);
+}
+.form-row .fr-labels .hint {
+  font-size: 0.75rem; color: var(--text-muted); font-weight: 400;
+}
+.form-row input[type="number"], .form-row input[type="text"].num-with-commas {
+  width: 180px;
+  text-align: right;
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.1rem;
+  color: var(--maroon);
+  background: var(--cream-card);
+}
+.form-row select {
+  width: 180px;
+  font-family: 'Sarabun', 'Anuphan', sans-serif;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  background: var(--cream-card);
+  cursor: pointer;
+}
+.form-row input:focus, .form-row select:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212,175,55,0.15);
+}
+@media (max-width: 520px) {
+  .form-row { grid-template-columns: 1fr; gap: 6px; padding: 10px 0; }
+  .form-row input[type="number"], .form-row input.num-with-commas, .form-row select {
+    width: 100%;
+  }
+}
+
+/* ===== KPI GRID (summary) ===== */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+@media (max-width: 800px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+.kpi {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 55%, #F5EDD8 100%);
+  border: 1.5px solid rgba(212,175,55,0.45);
+  border-radius: 12px;
+  padding: 14px 14px 18px;
+  box-shadow: 0 4px 14px rgba(114,47,55,0.08), 0 1px 4px rgba(114,47,55,0.05), inset 0 0 0 1px rgba(255,255,255,0.6);
+  position: relative;
+  overflow: hidden;
+  min-height: 110px;
+}
+.kpi::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
+  pointer-events: none; z-index: 0;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 70' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'%3E%3Cpath d='M0,55 C20,50 40,40 70,35 C100,30 130,38 160,30 C180,25 195,32 200,28 L200,70 L0,70 Z' fill='rgba(218,195,148,0.18)'/%3E%3Cpath d='M0,60 C30,52 60,45 100,40 C140,35 170,42 200,36 L200,70 L0,70 Z' fill='rgba(232,220,192,0.28)'/%3E%3Cpath d='M0,45 C25,42 50,30 80,28 C110,26 140,35 170,22 C190,15 200,20 200,18 L200,70 L0,70 Z' fill='rgba(212,175,55,0.08)'/%3E%3Cpath d='M0,40 Q50,25 100,30 Q150,35 200,20' fill='none' stroke='rgba(184,134,11,0.14)' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
+  border-radius: 0 0 12px 12px;
+}
+.kpi > * { position: relative; z-index: 1; }
+.kpi-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--gold-deep);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.kpi-value {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.5rem;
+  color: var(--text-dark);
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+.kpi-value.positive { color: var(--emerald-dk); }
+.kpi-value.negative { color: var(--red); }
+.kpi-value.maroon { color: var(--maroon); }
+.kpi-value.amber { color: var(--amber); }
+.kpi-desc {
+  font-size: 0.72rem; color: var(--text-muted); line-height: 1.5;
+}
+
+/* ===== DONUT CHART ===== */
+.donut-wrap { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+.donut-canvas { width: 180px; height: 180px; flex-shrink: 0; position: relative; }
+.donut-legend { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 8px; }
+.legend-item {
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+  padding: 4px 0;
+}
+.legend-item .dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.legend-item .leg-name { color: var(--text-dark); }
+.legend-item .leg-val {
+  color: var(--text-muted);
+  font-family: 'DM Serif Display', serif;
+  font-size: 1rem;
+}
+.donut-empty {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  width: 100%;
+}
+
+/* ===== EMERGENCY FUND STATUS ===== */
+.emergency-wrap {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 18px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+@media (max-width: 560px) { .emergency-wrap { grid-template-columns: 1fr; gap: 10px; } }
+.emergency-numbers {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.4rem;
+  color: var(--maroon);
+}
+.emergency-numbers .ef-now { color: var(--maroon); }
+.emergency-numbers .ef-sep { color: var(--text-muted); margin: 0 6px; font-size: 0.85em; }
+.emergency-numbers .ef-goal { color: var(--gold-deep); }
+.emergency-status {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 700;
+}
+.emergency-status.ok { background: rgba(46,159,95,0.15); color: var(--emerald-dk); }
+.emergency-status.near { background: rgba(212,175,55,0.18); color: var(--gold-deep); }
+.emergency-status.low { background: rgba(193,69,69,0.15); color: var(--burgundy-dk); }
+.emergency-progress-wrap {
+  height: 14px;
+  background: rgba(114,47,55,0.08);
+  border-radius: 7px;
+  overflow: hidden;
+  border: 1px solid rgba(212,175,55,0.3);
+  margin-bottom: 12px;
+  position: relative;
+}
+.emergency-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #D4AF37, #B8860B);
+  transition: width 0.4s ease;
+  border-radius: 6px;
+}
+.emergency-progress-bar.ok { background: linear-gradient(90deg, #2E9F5F, #1F7D49); }
+.emergency-progress-bar.low { background: linear-gradient(90deg, #D68B2C, #C14545); }
+.emergency-msg {
+  font-size: 0.88rem;
+  color: var(--text);
+  line-height: 1.6;
+}
+.emergency-msg strong { color: var(--maroon); }
+
+/* ===== RISK SCORE ===== */
+.risk-main {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 22px;
+  align-items: center;
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(212,175,55,0.25);
+}
+@media (max-width: 560px) {
+  .risk-main { grid-template-columns: 1fr; gap: 10px; text-align: center; }
+}
+.risk-score-big {
+  font-family: 'DM Serif Display', serif;
+  font-size: 3.8rem;
+  line-height: 1;
+  color: var(--maroon);
+  min-width: 120px;
+  text-align: center;
+}
+.risk-score-big .rs-max {
+  font-size: 0.35em;
+  color: var(--text-muted);
+  font-family: 'Cinzel', serif;
+  letter-spacing: 1.5px;
+  display: block;
+  margin-top: 4px;
+}
+.risk-meta .risk-level-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  color: var(--gold-deep);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.risk-meta .risk-level-value {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.6rem;
+  color: var(--maroon);
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+.risk-meta .risk-level-value.good  { color: var(--emerald-dk); }
+.risk-meta .risk-level-value.ok    { color: var(--gold-deep); }
+.risk-meta .risk-level-value.warn  { color: var(--amber); }
+.risk-meta .risk-level-value.bad   { color: var(--burgundy-dk); }
+.risk-meta .risk-headline {
+  font-size: 0.88rem;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.risk-bars { display: flex; flex-direction: column; gap: 12px; }
+.risk-bar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px dashed rgba(212,175,55,0.25);
+}
+.risk-bar:last-child { border-bottom: none; }
+.risk-bar .rb-info { min-width: 0; }
+.risk-bar .rb-label {
+  font-weight: 700;
+  color: var(--maroon);
+  font-size: 0.98rem;
+  margin-bottom: 2px;
+}
+.risk-bar .rb-desc { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px; }
+.risk-bar .rb-track {
+  height: 8px;
+  background: rgba(114,47,55,0.08);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(212,175,55,0.25);
+}
+.risk-bar .rb-fill {
+  height: 100%;
+  transition: width 0.4s ease, background 0.4s ease;
+  border-radius: 3px;
+}
+.risk-bar .rb-fill.good { background: linear-gradient(90deg, #2E9F5F, #1F7D49); }
+.risk-bar .rb-fill.ok   { background: linear-gradient(90deg, #D4AF37, #B8860B); }
+.risk-bar .rb-fill.warn { background: linear-gradient(90deg, #D68B2C, #B8650B); }
+.risk-bar .rb-fill.bad  { background: linear-gradient(90deg, #D68B2C, #C14545); }
+.risk-bar .rb-value {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.25rem;
+  color: var(--maroon);
+  min-width: 78px;
+  text-align: right;
+}
+.risk-bar .rb-value.good { color: var(--emerald-dk); }
+.risk-bar .rb-value.ok   { color: var(--gold-deep); }
+.risk-bar .rb-value.warn { color: var(--amber); }
+.risk-bar .rb-value.bad  { color: var(--burgundy-dk); }
+.risk-bar .rb-value-sub {
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  letter-spacing: 1.2px;
+  color: var(--text-muted);
+  display: block;
+  margin-top: 2px;
+}
+
+/* Tier badge + note (shown under progress bar in each risk bar) */
+.risk-bar .rb-tier-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.risk-bar .rb-tier {
+  font-family: 'Cinzel', 'Anuphan', sans-serif;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.risk-bar .rb-tier.good { background: rgba(46,159,95,0.18);  color: var(--emerald-dk); }
+.risk-bar .rb-tier.ok   { background: rgba(212,175,55,0.22); color: var(--gold-deep); }
+.risk-bar .rb-tier.warn { background: rgba(214,139,44,0.2);  color: var(--amber); }
+.risk-bar .rb-tier.bad  { background: rgba(193,69,69,0.18);  color: var(--burgundy-dk); }
+.risk-bar .rb-tier-range {
+  font-family: 'DM Serif Display', serif;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+.risk-bar .rb-note {
+  margin-top: 8px;
+  font-size: 0.82rem;
+  color: var(--text);
+  line-height: 1.65;
+}
+.risk-bar .rb-note strong { color: var(--maroon); }
+
+/* ===== INSIGHTS ===== */
+.insights-list {
+  display: flex; flex-direction: column; gap: 12px;
+}
+.insight-card {
+  background: linear-gradient(180deg, #FFFEF8 0%, #FAF6ED 100%);
+  border: 1.5px solid var(--border-gold);
+  border-left-width: 4px;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: flex-start;
+}
+.insight-card.good { border-left-color: var(--sev-good); }
+.insight-card.ok   { border-left-color: var(--sev-ok); }
+.insight-card.warn { border-left-color: var(--sev-warn); }
+.insight-card.bad  { border-left-color: var(--sev-bad); }
+.insight-card .ic-icon {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cinzel', serif; font-size: 0.95rem; font-weight: 700;
+  flex-shrink: 0;
+}
+.insight-card.good .ic-icon { background: rgba(46,159,95,0.15);  color: var(--emerald-dk); }
+.insight-card.ok   .ic-icon { background: rgba(212,175,55,0.2);  color: var(--gold-deep); }
+.insight-card.warn .ic-icon { background: rgba(214,139,44,0.18); color: var(--amber); }
+.insight-card.bad  .ic-icon { background: rgba(193,69,69,0.15);  color: var(--burgundy-dk); }
+.insight-card .ic-body .ic-title {
+  font-weight: 700;
+  color: var(--maroon);
+  font-size: 0.98rem;
+  margin-bottom: 4px;
+}
+.insight-card .ic-body .ic-text {
+  font-size: 0.88rem;
+  color: var(--text);
+  line-height: 1.65;
+}
+.insight-card .ic-body .ic-text strong { color: var(--maroon); }
+
+/* ===== PORTFOLIO LINK CTA ===== */
+.link-cta {
+  background: linear-gradient(135deg, #5A1F26 0%, #722F37 50%, #8B3A44 100%);
+  border-radius: 14px;
+  padding: 22px 24px;
+  color: #FFF5E1;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 28px rgba(114,47,55,0.25);
+}
+.link-cta::before {
+  content: ''; position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 160' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'%3E%3Cpath d='M0,120 C60,100 120,80 200,80 C280,80 340,100 400,85 L400,160 L0,160 Z' fill='rgba(255,245,225,0.05)'/%3E%3Cpath d='M0,130 C80,110 160,130 240,115 C320,100 380,125 400,115 L400,160 L0,160 Z' fill='rgba(255,245,225,0.08)'/%3E%3C/svg%3E");
+  background-size: cover;
+  opacity: 0.7;
+  pointer-events: none;
+}
+.link-cta > * { position: relative; z-index: 1; }
+.link-cta-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  opacity: 0.85;
+  margin-bottom: 6px;
+  color: var(--gold-light);
+}
+.link-cta-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.4rem;
+  line-height: 1.3;
+  margin-bottom: 6px;
+}
+.link-cta-title .th {
+  font-family: 'Anuphan', sans-serif; font-weight: 700;
+}
+.link-cta-desc {
+  font-size: 0.88rem;
+  opacity: 0.9;
+  margin-bottom: 14px;
+  line-height: 1.6;
+}
+.link-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  background: linear-gradient(135deg, #D4AF37, #B8860B);
+  border: 1.5px solid #E8D48B;
+  color: #2D1510;
+  border-radius: 10px;
+  font-family: 'Cinzel', 'Anuphan', sans-serif;
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 10px rgba(212,175,55,0.3);
+}
+.link-cta-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(212,175,55,0.5);
+  background: linear-gradient(135deg, #E8C859, #C89A1A);
+}
+
+/* ===== ACTIONS ===== */
+.actions-bar {
+  display: flex; gap: 12px;
+  margin-top: 24px;
+}
+.btn-save, .btn-reset {
+  padding: 11px 20px; border-radius: 10px;
+  font-family: 'Cinzel', 'Anuphan', serif;
+  font-size: 0.78rem; font-weight: 600;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.2s ease;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: 1.5px solid;
+}
+.btn-save {
+  background: linear-gradient(135deg, #FFFEF8 0%, #F5EDD8 100%);
+  border-color: rgba(212,175,55,0.55);
+  color: var(--gold-deep);
+  box-shadow: 0 2px 8px rgba(212,175,55,0.12), inset 0 1px 0 rgba(255,255,255,0.7);
+  flex: 1;
+}
+.btn-save:hover {
+  background: linear-gradient(135deg, #D4AF37, #B8860B);
+  color: #FFF5E1; border-color: #B8860B;
+  transform: translateY(-1px); box-shadow: 0 6px 16px rgba(212,175,55,0.35);
+}
+.btn-reset {
+  background: transparent;
+  border-color: rgba(122,111,98,0.3);
+  color: var(--text-muted);
+}
+.btn-reset:hover { background: rgba(122,111,98,0.06); border-color: var(--text-muted); }
+
+/* ===== TOAST ===== */
+#jpt-toast {
+  position: fixed; bottom: 30px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: linear-gradient(135deg, #722F37 0%, #8B2252 55%, #D4AF37 100%);
+  color: #FFF5E1;
+  padding: 13px 26px;
+  border-radius: 10px;
+  font-family: 'Anuphan','Sarabun',sans-serif;
+  font-size: 0.92rem; font-weight: 500;
+  z-index: 10000;
+  box-shadow: 0 8px 32px rgba(114,47,55,0.35);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+#jpt-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.login-banner {
+  max-width: 900px; margin: 20px auto 0;
+  padding: 12px 20px;
+  background: linear-gradient(180deg, rgba(193,69,69,0.08), rgba(193,69,69,0.03));
+  border: 1.5px solid rgba(193,69,69,0.3);
+  border-radius: 10px;
+  color: var(--burgundy-dk);
+  font-size: 0.88rem; text-align: center;
+}
+
+@media (max-width: 520px) {
+  .hero-title { font-size: 1.75rem; }
+  .kpi-value { font-size: 1.3rem; }
+  .risk-score-big { font-size: 3rem; min-width: 100px; }
+  .risk-meta .risk-level-value { font-size: 1.35rem; }
+  .donut-canvas { width: 150px; height: 150px; }
+}
+
+/* ===== ABOUT MODAL ===== */
+.about-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 16, 10, 0.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+.about-modal.open { display: flex; }
+.about-inner {
+  background: linear-gradient(180deg, #FFFEF8 0%, #FAF6ED 100%);
+  border: 1.5px solid var(--border-gold-strong);
+  border-radius: 16px;
+  max-width: 640px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 32px;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.dm-close {
+  position: absolute;
+  top: 14px; right: 14px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(212,175,55,0.12);
+  color: var(--maroon);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2;
+}
+.dm-close:hover { background: rgba(212,175,55,0.25); }
+.about-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  letter-spacing: 2.2px;
+  color: var(--gold-deep);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.about-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.9rem;
+  color: var(--maroon);
+  margin-bottom: 6px;
+  line-height: 1.15;
+}
+.about-sub {
+  color: var(--text-muted);
+  margin-bottom: 22px;
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+.about-section-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gold-deep);
+  letter-spacing: 2.6px;
+  text-transform: uppercase;
+  text-align: center;
+  margin: 26px 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 1.5px solid rgba(212,175,55,0.25);
+}
+.about-section-label:first-child { margin-top: 6px; }
+
+/* Criterion block */
+.criterion {
+  background: var(--cream-card);
+  border: 1.5px solid var(--border-gold);
+  border-left: 4px solid var(--gold);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
+}
+.criterion-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed rgba(212,175,55,0.3);
+}
+.criterion-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.2rem;
+  color: var(--maroon);
+  flex: 1;
+  line-height: 1.2;
+}
+.criterion-weight {
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--gold-deep);
+  letter-spacing: 1.4px;
+  background: rgba(212,175,55,0.16);
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.criterion-what {
+  font-size: 0.86rem;
+  color: var(--text);
+  margin-bottom: 6px;
+  line-height: 1.6;
+}
+.criterion-what .clabel {
+  color: var(--gold-deep);
+  font-family: 'Cinzel', serif;
+  font-size: 0.66rem;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  margin-right: 8px;
+  font-weight: 700;
+}
+.criterion-why {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  line-height: 1.65;
+}
+.criterion-bands {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+.criterion-band {
+  display: grid;
+  grid-template-columns: 12px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(255,254,248,0.8);
+  border: 1px solid rgba(212,175,55,0.25);
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+.criterion-band .band-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+}
+.criterion-band.good .band-dot { background: var(--emerald-dk); }
+.criterion-band.ok   .band-dot { background: var(--gold); }
+.criterion-band.warn .band-dot { background: var(--amber); }
+.criterion-band.bad  .band-dot { background: var(--burgundy); }
+.criterion-band .band-label {
+  color: var(--text-dark);
+  font-weight: 600;
+}
+.criterion-band.good .band-label { color: var(--emerald-dk); }
+.criterion-band.ok   .band-label { color: var(--gold-deep); }
+.criterion-band.warn .band-label { color: var(--amber); }
+.criterion-band.bad  .band-label { color: var(--burgundy-dk); }
+.criterion-band .band-value {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.05rem;
+  color: var(--maroon);
+}
+.criterion-example {
+  padding: 9px 13px;
+  background: rgba(212,175,55,0.08);
+  border-left: 2px solid rgba(212,175,55,0.5);
+  border-radius: 6px;
+  font-size: 0.82rem;
+  color: var(--text);
+  line-height: 1.6;
+}
+.criterion-example .clabel {
+  color: var(--gold-deep);
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  margin-right: 6px;
+  font-weight: 700;
+}
+
+/* Level mapping */
+.level-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.level-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 16px;
+  border-left: 4px solid;
+  background: var(--cream-card);
+  border-top: 1px solid rgba(212,175,55,0.2);
+  border-right: 1px solid rgba(212,175,55,0.2);
+  border-bottom: 1px solid rgba(212,175,55,0.2);
+  border-radius: 0 10px 10px 0;
+}
+.level-row.good { border-left-color: var(--emerald-dk); }
+.level-row.ok   { border-left-color: var(--gold); }
+.level-row.warn { border-left-color: var(--amber); }
+.level-row.bad  { border-left-color: var(--burgundy); }
+.level-row .lv-score {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.25rem;
+  min-width: 86px;
+  line-height: 1;
+}
+.level-row.good .lv-score { color: var(--emerald-dk); }
+.level-row.ok   .lv-score { color: var(--gold-deep); }
+.level-row.warn .lv-score { color: var(--amber); }
+.level-row.bad  .lv-score { color: var(--burgundy-dk); }
+.level-row .lv-info { min-width: 0; }
+.level-row .lv-title {
+  font-weight: 700;
+  color: var(--maroon);
+  font-size: 0.95rem;
+}
+.level-row .lv-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  line-height: 1.5;
+}
+.level-row .lv-tag {
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.level-row.good .lv-tag { background: rgba(46,159,95,0.18); color: var(--emerald-dk); }
+.level-row.ok   .lv-tag { background: rgba(212,175,55,0.22); color: var(--gold-deep); }
+.level-row.warn .lv-tag { background: rgba(214,139,44,0.2);  color: var(--amber); }
+.level-row.bad  .lv-tag { background: rgba(193,69,69,0.18);  color: var(--burgundy-dk); }
+
+/* About highlight callout */
+.about-highlight {
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(212,175,55,0.04));
+  border-left: 3px solid var(--gold);
+  border-radius: 0 10px 10px 0;
+  color: var(--text);
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+.about-highlight strong { color: var(--maroon); }
+.about-highlight em { font-style: italic; color: var(--gold-deep); font-weight: 600; }
+
+/* Mobile modal */
+@media (max-width: 520px) {
+  .about-inner { padding: 24px 20px; border-radius: 12px; }
+  .about-title { font-size: 1.55rem; }
+  .criterion { padding: 14px; }
+  .criterion-header { gap: 8px; }
+  .criterion-title { font-size: 1.05rem; }
+  .criterion-weight { font-size: 0.58rem; padding: 3px 8px; }
+  .level-row { grid-template-columns: 1fr; gap: 6px; padding: 12px 14px; }
+  .level-row .lv-score { min-width: 0; font-size: 1.1rem; }
+  .level-row .lv-tag { justify-self: start; }
+}
+
+/* ===== FAB ===== */
+.fab-stack {
+  position: fixed;
+  right: 20px;
+  bottom: 24px;
+  z-index: 500;
+}
+.fab {
+  width: 54px; height: 54px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #722F37 0%, #8B2252 55%, #D4AF37 100%);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(114,47,55,0.4);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.fab:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 10px 28px rgba(114,47,55,0.5);
+}
+.fab svg { filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3)); }
+
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">JP Trust Learning · Planning Toolkit</div>
+    <h1 class="hero-title"><span class="th">วางแผนการเงินส่วนบุคคล</span></h1>
+    <p class="hero-sub">สำรวจกระแสเงินสด · ประเมินเงินสำรองฉุกเฉิน · รู้ระดับความเสี่ยงทางการเงิน</p>
+  </div>
+</div>
+
+<div id="loginBanner" class="login-banner" style="display:none;">
+  คุณยังไม่ได้ login — ใช้เครื่องคำนวณได้ แต่การตั้งค่าจะไม่ถูกบันทึก
+</div>
+
+<div class="container">
+
+  <!-- ═══ SECTION 1: INCOME ═══ -->
+  <div class="section-label">1 · รายรับต่อเดือน</div>
+
+  <div class="card">
+    <div class="card-title">กรอกรายได้ทุกช่องทาง</div>
+    <div class="card-desc">หน่วยบาท · หากช่องไหนไม่มี ใส่ 0 ได้</div>
+
+    <div class="form-row">
+      <div class="fr-labels">
+        <label>รายได้หลัก</label>
+        <div class="hint">เงินเดือน · ค่าจ้าง · รายได้จากอาชีพหลัก</div>
+      </div>
+      <input type="text" inputmode="numeric" class="num-with-commas" id="incomeMain" value="25,000">
+    </div>
+
+    <div class="form-row">
+      <div class="fr-labels">
+        <label>รายได้เสริม</label>
+        <div class="hint">งาน freelance · commission · รายได้รอง</div>
+      </div>
+      <input type="text" inputmode="numeric" class="num-with-commas" id="incomeExtra" value="5,000">
+    </div>
+
+    <div class="form-row">
+      <div class="fr-labels">
+        <label>รายได้จากการลงทุน</label>
+        <div class="hint">ปันผล · ดอกเบี้ย · ค่าเช่า</div>
+      </div>
+      <input type="text" inputmode="numeric" class="num-with-commas" id="incomeInvest" value="1,000">
+    </div>
+  </div>
+
+  <!-- ═══ SECTION 2: EXPENSES ═══ -->
+  <div class="section-label">2 · รายจ่ายต่อเดือน</div>
+
+  <div class="card">
+    <div class="card-title">แยก 4 หมวดเพื่อประเมินความเสี่ยง</div>
+    <div class="card-desc">แยกค่าใช้จ่ายจำเป็น · ผันแปร · ภาระหนี้ · ประกัน เพื่อวิเคราะห์ Fixed Expense Ratio</div>
+
+    <div class="form-row">
+      <div class="fr-labels">
+        <label>ค่าใช้จ่ายจำเป็น</label>
+        <div class="hint">ที่อยู่ · อาหาร · น้ำ-ไฟ · เดินทาง · สาธารณูปโภค</div>
+      </div>
+      <input type="text" inputmode="numeric" class="num-with-commas" id="expenseFixed" value="12,000">
+    </div>
+
+    <div class="form-row">
+      <div class="fr-labels">
+        <label>ค่าใช้จ่ายผันแปร</label>
+        <div class="hint">ช้อปปิ้ง · ท่องเที่ยว · บันเทิง · กิจกรรมสังคม</div>
+      </div>
+      <input type="text" inputmode="numeric" class="num-with-commas" id="expenseVariable" value="5,000">
+    </div>
+
+    <div class="form-row">
+      <div class="fr-labels">
+        <label>ภาระหนี้</label>
+        <div class="hint">ผ่อนบ้าน · ผ่อนรถ · บัตรเครดิต · สินเชื่อส่วนบุคคล</div>
+      </div>
+      <input type="text" inputmode="numeric" class="num-with-commas" id="expenseDebt" value="8,000">
+    </div>
+
+    <div class="form-row">
+      <div class="fr-labels">
+        <label>ค่าประกัน / สมาชิก</label>
+        <div class="hint">ประกันชีวิต · ประกันสุขภาพ · ประกันรถ · สมาชิกรายเดือน</div>
+      </div>
+      <input type="text" inputmode="numeric" class="num-with-commas" id="expenseInsurance" value="2,000">
+    </div>
+  </div>
+
+  <!-- ═══ SECTION 3: EMERGENCY FUND ═══ -->
+  <div class="section-label">3 · เงินสำรองฉุกเฉิน</div>
+
+  <div class="card">
+    <div class="card-title">เงินสำรองปัจจุบัน + เป้าหมาย</div>
+    <div class="card-desc">หลักการทั่วไป — เงินสำรองควรครอบคลุมค่าใช้จ่ายอย่างน้อย 6 เดือน</div>
+
+    <div class="form-row">
+      <div class="fr-labels">
+        <label>ยอดเงินสำรองปัจจุบัน</label>
+        <div class="hint">เงินในบัญชีออมทรัพย์ที่พร้อมใช้ทันทีเมื่อจำเป็น · หน่วยบาท</div>
+      </div>
+      <input type="text" inputmode="numeric" class="num-with-commas" id="emergencyFund" value="50,000">
+    </div>
+
+    <div class="form-row">
+      <div class="fr-labels">
+        <label>เป้าหมายเงินสำรอง</label>
+        <div class="hint">จำนวนเดือนของรายจ่ายที่ต้องการสำรองไว้</div>
+      </div>
+      <select id="emergencyTarget">
+        <option value="3">3 เดือน</option>
+        <option value="6" selected>6 เดือน</option>
+        <option value="9">9 เดือน</option>
+        <option value="12">12 เดือน</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ═══ SECTION 4: CASH FLOW SUMMARY ═══ -->
+  <div class="section-label">4 · สรุปกระแสเงินสด</div>
+
+  <div class="kpi-grid" style="margin-bottom:14px;">
+    <div class="kpi">
+      <div class="kpi-label">รายรับรวม / เดือน</div>
+      <div class="kpi-value positive" id="kpiIncome">฿0</div>
+      <div class="kpi-desc">ผลรวมรายรับทุกช่องทาง</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">รายจ่ายรวม / เดือน</div>
+      <div class="kpi-value negative" id="kpiExpense">฿0</div>
+      <div class="kpi-desc">ผลรวมรายจ่ายทั้ง 4 หมวด</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">เงินเหลือ / เดือน</div>
+      <div class="kpi-value maroon" id="kpiSurplus">฿0</div>
+      <div class="kpi-desc">รายรับ − รายจ่าย (surplus/deficit)</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">อัตราการออม</div>
+      <div class="kpi-value" id="kpiSaveRate">0%</div>
+      <div class="kpi-desc">เงินเหลือ ÷ รายรับ × 100</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">สัดส่วนรายจ่ายและเงินออม</div>
+    <div class="donut-wrap">
+      <div class="donut-canvas"><canvas id="cashDonut"></canvas></div>
+      <div class="donut-legend" id="cashLegend"></div>
+    </div>
+  </div>
+
+  <!-- ═══ SECTION 5: EMERGENCY FUND STATUS ═══ -->
+  <div class="section-label">5 · สถานะเงินสำรองฉุกเฉิน</div>
+
+  <div class="card">
+    <div class="card-title">ความพร้อมรับความเสี่ยงฉุกเฉิน</div>
+
+    <div class="emergency-wrap">
+      <div class="emergency-numbers">
+        <span class="ef-now" id="efNow">฿0</span>
+        <span class="ef-sep">/</span>
+        <span class="ef-goal" id="efGoal">฿0</span>
+      </div>
+      <div class="emergency-status ok" id="efStatus">—</div>
+    </div>
+
+    <div class="emergency-progress-wrap">
+      <div class="emergency-progress-bar" id="efBar" style="width: 0%;"></div>
+    </div>
+
+    <div class="emergency-msg" id="efMsg">—</div>
+  </div>
+
+  <!-- ═══ SECTION 6: RISK SCORE ═══ -->
+  <div class="section-label">6 · ระดับความเสี่ยงทางการเงิน</div>
+
+  <div class="card">
+    <div class="card-title">Financial Risk Score · ประเมิน 4 มิติ</div>
+
+    <div class="risk-main">
+      <div class="risk-score-big" id="riskScoreBig">
+        0<span class="rs-max">/ 100</span>
+      </div>
+      <div class="risk-meta">
+        <div class="risk-level-label">ระดับโดยรวม</div>
+        <div class="risk-level-value" id="riskLevelValue">—</div>
+        <div class="risk-headline" id="riskHeadline">กรอกข้อมูลเพื่อประเมิน</div>
+      </div>
+    </div>
+
+    <div class="risk-bars" id="riskBars"></div>
+  </div>
+
+  <!-- ═══ SECTION 7: SMART INSIGHTS ═══ -->
+  <div class="section-label">7 · คำแนะนำ</div>
+
+  <div class="insights-list" id="insightsList"></div>
+
+  <!-- ═══ SECTION 8: PORTFOLIO PLANNER CTA ═══ -->
+  <div class="section-label">8 · ก้าวต่อไป</div>
+
+  <div class="link-cta">
+    <div class="link-cta-label">Planning Toolkit</div>
+    <div class="link-cta-title"><span class="th">เมื่อมีเงินเหลือจากการออม — ลองวางแผนพอร์ตการลงทุน</span></div>
+    <div class="link-cta-desc">กำหนด Investable Pool · กระจายลงทุน 6 หมวด (เงินออม · พันธบัตร · หุ้นไทย · หุ้น US · ทองคำ · กลยุทธ์ JPTrust) · ดูว่าจะถึงเป้าหมายในกี่ปี</div>
+    <button class="link-cta-btn" onclick="openPortfolioPlanner()">
+      ไปวางแผนพอร์ตการลงทุน
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+  </div>
+
+  <!-- ═══ ACTIONS ═══ -->
+  <div class="actions-bar">
+    <button class="btn-reset" onclick="resetAllSettings()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+      คืนค่าเริ่มต้น
+    </button>
+    <button class="btn-save" onclick="saveFinanceSettings()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      บันทึกการตั้งค่า
+    </button>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- ABOUT MODAL — Financial Health Framework        -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="about-modal" id="aboutModal" onclick="if(event.target===this) closeAboutModal()">
+  <div class="about-inner">
+    <button class="dm-close" onclick="closeAboutModal()" aria-label="ปิด">✕</button>
+
+    <div class="about-label">Financial Health Framework</div>
+    <h2 class="about-title">เกณฑ์สุขภาพทางการเงิน</h2>
+    <div class="about-sub">คะแนน Risk Score คำนวณจาก <strong>4 ตัวชี้วัด</strong> ถ่วงน้ำหนักตามลำดับความสำคัญ นี่คือเกณฑ์สากลที่ใช้กันทั่วไป — เมื่อรู้ว่าตัวเลขของคุณควรอยู่ช่วงไหน จะวางแผนปรับปรุงสถานะการเงินได้ชัดเจนขึ้น</div>
+
+    <div class="about-section-label">1 · ตัวชี้วัด 4 ด้าน · ควรอยู่ในเกณฑ์ไหน</div>
+
+    <!-- CRITERION 1 · SAVING RATE -->
+    <div class="criterion">
+      <div class="criterion-header">
+        <span class="criterion-title">อัตราการออม</span>
+        <span class="criterion-weight">น้ำหนัก 30%</span>
+      </div>
+      <div class="criterion-what"><span class="clabel">คำนวณ</span>เงินเหลือ ÷ รายรับรวม × 100</div>
+      <div class="criterion-why">บอกว่าคุณสะสมสินทรัพย์ได้เร็วแค่ไหน หลักการสากลแนะนำให้ออมอย่างน้อย 20% ของรายรับ เพื่อความมั่นคงทางการเงินในระยะยาว</div>
+      <div class="criterion-bands">
+        <div class="criterion-band good">
+          <span class="band-dot"></span>
+          <span class="band-label">ดีเยี่ยม</span>
+          <span class="band-value">≥ 20%</span>
+        </div>
+        <div class="criterion-band ok">
+          <span class="band-dot"></span>
+          <span class="band-label">ดี</span>
+          <span class="band-value">15 – 19%</span>
+        </div>
+        <div class="criterion-band warn">
+          <span class="band-dot"></span>
+          <span class="band-label">เฝ้าระวัง</span>
+          <span class="band-value">10 – 14%</span>
+        </div>
+        <div class="criterion-band bad">
+          <span class="band-dot"></span>
+          <span class="band-label">ควรปรับปรุง</span>
+          <span class="band-value">&lt; 10%</span>
+        </div>
+      </div>
+      <div class="criterion-example"><span class="clabel">ตัวอย่าง</span>รายรับรวม 30,000 บาท/เดือน → ควรเหลือเงินออม <strong>≥ 6,000 บาท/เดือน</strong> จึงจะถือว่าอยู่ในเกณฑ์ดีเยี่ยม</div>
+    </div>
+
+    <!-- CRITERION 2 · DEBT RATIO -->
+    <div class="criterion">
+      <div class="criterion-header">
+        <span class="criterion-title">ภาระหนี้ต่อรายรับ</span>
+        <span class="criterion-weight">น้ำหนัก 25%</span>
+      </div>
+      <div class="criterion-what"><span class="clabel">คำนวณ</span>ยอดผ่อนหนี้รวม ÷ รายรับรวม × 100</div>
+      <div class="criterion-why">ภาระหนี้สูงทำให้การเงินเปราะบาง หากรายรับสะดุดแม้เพียงเดือนเดียว อาจจัดการไม่ไหวและต้องก่อหนี้ใหม่ จนกลายเป็นวงจร</div>
+      <div class="criterion-bands">
+        <div class="criterion-band good">
+          <span class="band-dot"></span>
+          <span class="band-label">ดีเยี่ยม</span>
+          <span class="band-value">≤ 25%</span>
+        </div>
+        <div class="criterion-band ok">
+          <span class="band-dot"></span>
+          <span class="band-label">ปลอดภัย</span>
+          <span class="band-value">25 – 35%</span>
+        </div>
+        <div class="criterion-band warn">
+          <span class="band-dot"></span>
+          <span class="band-label">เฝ้าระวัง</span>
+          <span class="band-value">35 – 45%</span>
+        </div>
+        <div class="criterion-band bad">
+          <span class="band-dot"></span>
+          <span class="band-label">เสี่ยงสูง</span>
+          <span class="band-value">&gt; 45%</span>
+        </div>
+      </div>
+      <div class="criterion-example"><span class="clabel">ตัวอย่าง</span>รายรับรวม 30,000 บาท/เดือน → ยอดผ่อนหนี้รวมไม่ควรเกิน <strong>7,500 บาท/เดือน</strong> (25%) เพื่ออยู่ในเกณฑ์ดีเยี่ยม</div>
+    </div>
+
+    <!-- CRITERION 3 · EMERGENCY FUND -->
+    <div class="criterion">
+      <div class="criterion-header">
+        <span class="criterion-title">เงินสำรองฉุกเฉิน</span>
+        <span class="criterion-weight">น้ำหนัก 25%</span>
+      </div>
+      <div class="criterion-what"><span class="clabel">คำนวณ</span>ยอดเงินสำรอง ÷ ค่าใช้จ่ายต่อเดือน = จำนวนเดือนที่ครอบคลุม</div>
+      <div class="criterion-why">ป้องกันการขายสินทรัพย์ลงทุนในจังหวะไม่ดีเมื่อเกิดเหตุฉุกเฉิน เช่น ตกงาน · เจ็บป่วย · ซ่อมบ้านหรือรถ เงินสำรองคือ "กันชน" ระหว่างชีวิตกับตลาดลงทุน</div>
+      <div class="criterion-bands">
+        <div class="criterion-band good">
+          <span class="band-dot"></span>
+          <span class="band-label">ดีเยี่ยม</span>
+          <span class="band-value">≥ 6 เดือน</span>
+        </div>
+        <div class="criterion-band ok">
+          <span class="band-dot"></span>
+          <span class="band-label">ปลอดภัย</span>
+          <span class="band-value">3 – 5.9 เดือน</span>
+        </div>
+        <div class="criterion-band warn">
+          <span class="band-dot"></span>
+          <span class="band-label">เฝ้าระวัง</span>
+          <span class="band-value">1.5 – 2.9 เดือน</span>
+        </div>
+        <div class="criterion-band bad">
+          <span class="band-dot"></span>
+          <span class="band-label">เสี่ยงสูง</span>
+          <span class="band-value">&lt; 1.5 เดือน</span>
+        </div>
+      </div>
+      <div class="criterion-example"><span class="clabel">ตัวอย่าง</span>รายจ่าย 20,000 บาท/เดือน → ควรมีเงินสำรองขั้นต่ำ <strong>120,000 บาท</strong> (ครอบคลุม 6 เดือน) จึงจะถือว่าอยู่ในเกณฑ์ดีเยี่ยม</div>
+    </div>
+
+    <!-- CRITERION 4 · FIXED EXPENSE RATIO -->
+    <div class="criterion">
+      <div class="criterion-header">
+        <span class="criterion-title">รายจ่ายคงที่ต่อรายรับ</span>
+        <span class="criterion-weight">น้ำหนัก 20%</span>
+      </div>
+      <div class="criterion-what"><span class="clabel">คำนวณ</span>(ค่าใช้จ่ายจำเป็น + ค่าประกัน) ÷ รายรับรวม × 100</div>
+      <div class="criterion-why">ค่าใช้จ่ายคงที่สูงหมายถึงความยืดหยุ่นต่ำ — ปรับตัวยากเมื่อรายรับลด ค่านี้สะท้อน "กันชนกระแสเงินสด" ที่เหลืออยู่ในยามวิกฤต</div>
+      <div class="criterion-bands">
+        <div class="criterion-band good">
+          <span class="band-dot"></span>
+          <span class="band-label">ดีเยี่ยม</span>
+          <span class="band-value">≤ 45%</span>
+        </div>
+        <div class="criterion-band ok">
+          <span class="band-dot"></span>
+          <span class="band-label">ปลอดภัย</span>
+          <span class="band-value">45 – 55%</span>
+        </div>
+        <div class="criterion-band warn">
+          <span class="band-dot"></span>
+          <span class="band-label">เฝ้าระวัง</span>
+          <span class="band-value">55 – 70%</span>
+        </div>
+        <div class="criterion-band bad">
+          <span class="band-dot"></span>
+          <span class="band-label">ควรปรับปรุง</span>
+          <span class="band-value">&gt; 70%</span>
+        </div>
+      </div>
+      <div class="criterion-example"><span class="clabel">ตัวอย่าง</span>รายรับ 30,000 บาท/เดือน → ค่าใช้จ่ายจำเป็น + ประกัน รวมกันไม่ควรเกิน <strong>13,500 บาท/เดือน</strong> (45%)</div>
+    </div>
+
+    <div class="about-section-label">2 · คะแนนรวม · 4 ระดับสุขภาพทางการเงิน</div>
+
+    <div class="level-grid">
+      <div class="level-row good">
+        <span class="lv-score">80 – 100</span>
+        <div class="lv-info">
+          <div class="lv-title">ดีเยี่ยม · แข็งแรง</div>
+          <div class="lv-desc">พื้นฐานการเงินมั่นคง · พร้อมขยายการลงทุนระยะยาวได้อย่างมั่นใจ</div>
+        </div>
+        <span class="lv-tag">ดีเยี่ยม</span>
+      </div>
+      <div class="level-row ok">
+        <span class="lv-score">65 – 79</span>
+        <div class="lv-info">
+          <div class="lv-title">ปลอดภัย · พื้นฐานดี</div>
+          <div class="lv-desc">มีพื้นฐานแข็งแรงเพียงพอ · ลงทุนระยะยาวได้ในสัดส่วนที่เหมาะสม</div>
+        </div>
+        <span class="lv-tag">ปลอดภัย</span>
+      </div>
+      <div class="level-row warn">
+        <span class="lv-score">50 – 64</span>
+        <div class="lv-info">
+          <div class="lv-title">เฝ้าระวัง · เกณฑ์กลาง</div>
+          <div class="lv-desc">ควรปรับปรุงบางจุดก่อนขยายการลงทุนเพิ่ม · เน้นเพิ่มอัตราการออมและสำรอง</div>
+        </div>
+        <span class="lv-tag">เฝ้าระวัง</span>
+      </div>
+      <div class="level-row bad">
+        <span class="lv-score">&lt; 50</span>
+        <div class="lv-info">
+          <div class="lv-title">ควรปรับปรุง · เสี่ยงสูง</div>
+          <div class="lv-desc">เน้นจัดการกระแสเงินสดและหนี้สินเป็นลำดับแรก · ชะลอการลงทุนจนกว่าจะปรับปรุงพื้นฐาน</div>
+        </div>
+        <span class="lv-tag">ควรปรับปรุง</span>
+      </div>
+    </div>
+
+    <div class="about-highlight">
+      <strong>หลักการ:</strong> เกณฑ์เหล่านี้อ้างอิงมาตรฐานสากลด้าน Personal Finance ที่ใช้กันทั่วไป
+      สำหรับบางสถานการณ์พิเศษ เช่น ผู้ใกล้เกษียณ · ผู้เพิ่งเริ่มทำงาน · ผู้มีรายได้ไม่สม่ำเสมอ อาจต้องปรับค่ามาตรฐานให้เหมาะกับบริบทของตนเอง
+      — เกณฑ์นี้จึงเป็น <em>แนวทาง ไม่ใช่กฎตายตัว</em>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- FAB (bottom-right) — opens About modal          -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="fab-stack">
+  <button class="fab" onclick="openAboutModal()" aria-label="เกณฑ์สุขภาพการเงิน">
+    <svg width="28" height="28" viewBox="0 0 64 64" fill="none" stroke="#FFF5E1" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="32" cy="26" r="20"/>
+      <circle cx="32" cy="26" r="14"/>
+      <circle cx="32" cy="26" r="8"/>
+      <circle cx="32" cy="26" r="2.5" fill="#FFF5E1"/>
+      <line x1="32" y1="46" x2="22" y2="60"/>
+      <line x1="32" y1="46" x2="42" y2="60"/>
+      <line x1="20" y1="60" x2="44" y2="60"/>
+    </svg>
+  </button>
+</div>
+
+<script>
+// ==========================================================
+// FINANCE PLANNER — JPTrust Learning
+// ==========================================================
+
+const DEFAULTS = {
+  incomeMain: 25000, incomeExtra: 5000, incomeInvest: 1000,
+  expenseFixed: 12000, expenseVariable: 5000, expenseDebt: 8000, expenseInsurance: 2000,
+  emergencyFund: 50000, emergencyTarget: 6
+};
+
+const INCOME_IDS   = ['incomeMain', 'incomeExtra', 'incomeInvest'];
+const EXPENSE_IDS  = ['expenseFixed', 'expenseVariable', 'expenseDebt', 'expenseInsurance'];
+const ALL_MONEY_IDS = INCOME_IDS.concat(EXPENSE_IDS).concat(['emergencyFund']);
+
+// ==========================================================
+// JPSettings init (must run before any load/save)
+// ==========================================================
+if (window.JPSettings && window.supabase) {
+  window.JPSettings.init({
+    url: 'https://rcdukwwcbyryauhqlzmx.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZHVrd3djYnlyeWF1aHFsem14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MTY0MDAsImV4cCI6MjA4NTQ5MjQwMH0.rprPmudJYyb6dyhXb9Z9GrtQWEeIX99A2Wrj55PvS54'
+  });
+}
+
+// ==========================================================
+// NUMBER FORMATTING
+// ==========================================================
+function parseNum(str) {
+  if (str == null) return 0;
+  const n = +String(str).replace(/,/g, '');
+  return isFinite(n) ? n : 0;
+}
+function formatNum(n) {
+  if (!isFinite(n)) return '0';
+  return Math.round(n).toLocaleString('en-US');
+}
+function numVal(el) {
+  if (!el) return 0;
+  return parseNum(el.value);
+}
+function attachCommaFormatting() {
+  document.querySelectorAll('input.num-with-commas').forEach(input => {
+    // Format initial value
+    const v = parseNum(input.value);
+    if (v > 0) input.value = formatNum(v);
+    // Restrict typing: digits only (we reformat on blur)
+    input.addEventListener('input', (e) => {
+      const raw = e.target.value.replace(/[^0-9]/g, '');
+      if (raw !== e.target.value.replace(/,/g, '')) {
+        e.target.value = raw;
+      }
+    });
+    input.addEventListener('blur', () => {
+      input.value = formatNum(parseNum(input.value));
+    });
+  });
+}
+
+function jptToast(msg) {
+  let t = document.getElementById('jpt-toast');
+  if (!t) { t = document.createElement('div'); t.id = 'jpt-toast'; document.body.appendChild(t); }
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ==========================================================
+// FORMATTERS
+// ==========================================================
+function fmt(n) {
+  if (!isFinite(n)) return '—';
+  const sign = n < 0 ? '-' : '';
+  const abs = Math.abs(n);
+  if (abs >= 1e9) return sign + '฿' + (abs/1e9).toFixed(2) + 'B';
+  if (abs >= 1e6) return sign + '฿' + (abs/1e6).toFixed(2) + 'M';
+  if (abs >= 1e3) return sign + '฿' + (abs/1e3).toFixed(abs >= 100000 ? 0 : 1) + 'K';
+  return sign + '฿' + Math.round(abs).toLocaleString('en-US');
+}
+function fmtFull(n) {
+  if (!isFinite(n)) return '—';
+  return (n < 0 ? '-' : '') + '฿' + Math.round(Math.abs(n)).toLocaleString('en-US');
+}
+function pct(n, digits) {
+  if (!isFinite(n)) return '—';
+  return n.toFixed(digits != null ? digits : 1) + '%';
+}
+
+// ==========================================================
+// GET INPUTS
+// ==========================================================
+function getInputs() {
+  const m = (id) => numVal(document.getElementById(id));
+  const incomeMain = m('incomeMain');
+  const incomeExtra = m('incomeExtra');
+  const incomeInvest = m('incomeInvest');
+  const expenseFixed = m('expenseFixed');
+  const expenseVariable = m('expenseVariable');
+  const expenseDebt = m('expenseDebt');
+  const expenseInsurance = m('expenseInsurance');
+  const emergencyFund = m('emergencyFund');
+  const emergencyTarget = parseInt(document.getElementById('emergencyTarget').value, 10) || 6;
+
+  const totalIncome = incomeMain + incomeExtra + incomeInvest;
+  const totalExpense = expenseFixed + expenseVariable + expenseDebt + expenseInsurance;
+  const surplus = totalIncome - totalExpense;
+  const saveRate = totalIncome > 0 ? (surplus / totalIncome) * 100 : 0;
+
+  const emergencyGoal = emergencyTarget * totalExpense;
+  const emergencyCoverage = totalExpense > 0 ? emergencyFund / totalExpense : 0; // in months
+  const emergencyPct = emergencyGoal > 0 ? Math.min(100, (emergencyFund / emergencyGoal) * 100) : 0;
+
+  const debtRatio = totalIncome > 0 ? (expenseDebt / totalIncome) * 100 : 0;
+  // Fixed = "mandatory" expenses: fixed + insurance (things you cannot easily cut)
+  const fixedExpenseRatio = totalIncome > 0 ? ((expenseFixed + expenseInsurance) / totalIncome) * 100 : 0;
+
+  return {
+    incomeMain, incomeExtra, incomeInvest,
+    expenseFixed, expenseVariable, expenseDebt, expenseInsurance,
+    emergencyFund, emergencyTarget,
+    totalIncome, totalExpense, surplus, saveRate,
+    emergencyGoal, emergencyCoverage, emergencyPct,
+    debtRatio, fixedExpenseRatio
+  };
+}
+
+// ==========================================================
+// KPI RENDER
+// ==========================================================
+function renderKpis(inp) {
+  document.getElementById('kpiIncome').textContent = fmtFull(inp.totalIncome);
+  document.getElementById('kpiExpense').textContent = fmtFull(inp.totalExpense);
+
+  const surplusEl = document.getElementById('kpiSurplus');
+  surplusEl.textContent = fmtFull(inp.surplus);
+  surplusEl.classList.remove('positive', 'negative', 'maroon');
+  if (inp.surplus > 0) surplusEl.classList.add('positive');
+  else if (inp.surplus < 0) surplusEl.classList.add('negative');
+  else surplusEl.classList.add('maroon');
+
+  const rateEl = document.getElementById('kpiSaveRate');
+  rateEl.textContent = inp.totalIncome > 0 ? pct(inp.saveRate, 1) : '—';
+  rateEl.classList.remove('positive', 'negative', 'amber', 'maroon');
+  if (!inp.totalIncome) { rateEl.classList.add('maroon'); }
+  else if (inp.saveRate >= 20) rateEl.classList.add('positive');
+  else if (inp.saveRate >= 10) rateEl.classList.add('amber');
+  else rateEl.classList.add('negative');
+}
+
+// ==========================================================
+// DONUT CHART
+// ==========================================================
+let cashDonutChart = null;
+
+function renderCashDonut(inp) {
+  const legend = document.getElementById('cashLegend');
+  const canvas = document.getElementById('cashDonut');
+
+  if (inp.totalIncome <= 0) {
+    legend.innerHTML = '<div class="donut-empty">กรอกรายรับเพื่อดูสัดส่วน</div>';
+    if (cashDonutChart) { cashDonutChart.destroy(); cashDonutChart = null; }
+    return;
+  }
+
+  // Breakdown based on income share: expenses (4 parts) + surplus (if positive)
+  const surplusShown = Math.max(0, inp.surplus);
+  const parts = [
+    { label: 'ค่าใช้จ่ายจำเป็น',   value: inp.expenseFixed,     color: '#8B6914' },
+    { label: 'ค่าใช้จ่ายผันแปร',    value: inp.expenseVariable,  color: '#D68B2C' },
+    { label: 'ภาระหนี้',             value: inp.expenseDebt,      color: '#C14545' },
+    { label: 'ค่าประกัน/สมาชิก',     value: inp.expenseInsurance, color: '#6B4A82' },
+    { label: 'เงินเหลือ (เพื่อออม/ลงทุน)', value: surplusShown,   color: '#2E9F5F' }
+  ].filter(p => p.value > 0);
+
+  // If deficit (surplus < 0), show warning chunk instead
+  if (inp.surplus < 0) {
+    parts.push({ label: 'ติดลบ (รายจ่ายเกิน)', value: Math.abs(inp.surplus), color: '#9C2B2B' });
+  }
+
+  // Render legend
+  legend.innerHTML = parts.map(p => {
+    const sharePct = inp.totalIncome > 0 ? (p.value / inp.totalIncome) * 100 : 0;
+    return `
+      <div class="legend-item">
+        <span class="dot" style="background:${p.color};"></span>
+        <span class="leg-name">${p.label}</span>
+        <span class="leg-val">${sharePct.toFixed(1)}%</span>
+      </div>
+    `;
+  }).join('');
+
+  // Render chart
+  const data = {
+    labels: parts.map(p => p.label),
+    datasets: [{
+      data: parts.map(p => p.value),
+      backgroundColor: parts.map(p => p.color),
+      borderColor: '#FFFEF8',
+      borderWidth: 2
+    }]
+  };
+
+  if (cashDonutChart) { cashDonutChart.destroy(); }
+  cashDonutChart = new Chart(canvas.getContext('2d'), {
+    type: 'doughnut',
+    data: data,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '62%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => ctx.label + ': ' + fmtFull(ctx.parsed)
+          }
+        }
+      }
+    }
+  });
+}
+
+// ==========================================================
+// EMERGENCY FUND STATUS
+// ==========================================================
+function renderEmergency(inp) {
+  document.getElementById('efNow').textContent  = fmtFull(inp.emergencyFund);
+  document.getElementById('efGoal').textContent = inp.emergencyGoal > 0 ? fmtFull(inp.emergencyGoal) : '—';
+
+  const bar = document.getElementById('efBar');
+  const statusEl = document.getElementById('efStatus');
+  const msgEl = document.getElementById('efMsg');
+
+  bar.style.width = inp.emergencyPct + '%';
+  bar.classList.remove('ok', 'low');
+
+  if (inp.totalExpense <= 0) {
+    statusEl.textContent = '—';
+    statusEl.className = 'emergency-status near';
+    msgEl.textContent = 'กรอกรายจ่ายเพื่อประเมินเงินสำรองที่ควรมี';
+    return;
+  }
+
+  // Coverage (months)
+  const cov = inp.emergencyCoverage;
+  const target = inp.emergencyTarget;
+
+  let status, statusCls, barCls, msg;
+  if (cov >= target) {
+    status = 'พร้อม';
+    statusCls = 'ok';
+    barCls = 'ok';
+    const excess = inp.emergencyFund - inp.emergencyGoal;
+    msg = `เงินสำรองของคุณครอบคลุมค่าใช้จ่าย <strong>${cov.toFixed(1)} เดือน</strong> ซึ่งถึงเป้าหมาย ${target} เดือนแล้ว ` +
+          (excess > 0 ? `มีเงินส่วนเกินประมาณ <strong>${fmtFull(excess)}</strong> ที่สามารถพิจารณานำไปลงทุนต่อยอดได้` : 'สามารถพิจารณาปันส่วนไปลงทุนระยะยาวเพิ่มเติมได้');
+  } else if (cov >= target * 0.5) {
+    status = 'ใกล้เป้า';
+    statusCls = 'near';
+    barCls = '';
+    const need = inp.emergencyGoal - inp.emergencyFund;
+    const monthsNeeded = inp.surplus > 0 ? need / inp.surplus : Infinity;
+    msg = `เงินสำรองของคุณครอบคลุม <strong>${cov.toFixed(1)} เดือน</strong> ยังไม่ถึงเป้าหมาย ${target} เดือน ต้องการเพิ่มอีก <strong>${fmtFull(need)}</strong>` +
+          (isFinite(monthsNeeded) ? ` (ใช้เงินเหลือเก็บต่อเนื่องประมาณ ${Math.ceil(monthsNeeded)} เดือน)` : ' — ควรเริ่มเก็บออมก่อนลงทุน');
+  } else {
+    status = 'ควรเพิ่ม';
+    statusCls = 'low';
+    barCls = 'low';
+    const need = inp.emergencyGoal - inp.emergencyFund;
+    msg = `เงินสำรองครอบคลุมเพียง <strong>${cov.toFixed(1)} เดือน</strong> ซึ่งต่ำกว่าเกณฑ์ปลอดภัย แนะนำให้เก็บเพิ่ม <strong>${fmtFull(need)}</strong> ` +
+          'ก่อนพิจารณาลงทุนระยะยาว เพื่อรองรับเหตุฉุกเฉินโดยไม่ต้องก่อหนี้';
+  }
+
+  statusEl.textContent = status;
+  statusEl.className = 'emergency-status ' + statusCls;
+  if (barCls) bar.classList.add(barCls);
+  msgEl.innerHTML = msg;
+}
+
+// ==========================================================
+// RISK SCORE CALCULATION
+// ==========================================================
+function scoreBand(value, bands) {
+  // bands = [{ max: number, score: number }] — iterate in order (first match)
+  for (const b of bands) {
+    if (value <= b.max) return b.score;
+  }
+  return bands[bands.length - 1].score;
+}
+
+function scoreBandDesc(value, bands) {
+  // For descending metrics where higher value = higher score
+  for (const b of bands) {
+    if (value >= b.min) return b.score;
+  }
+  return bands[bands.length - 1].score;
+}
+
+function severityFromScore(s) {
+  if (s >= 80) return 'good';
+  if (s >= 60) return 'ok';
+  if (s >= 40) return 'warn';
+  return 'bad';
+}
+
+// Per-metric tier label + range + actionable 1-line note based on current value
+function getMetricAdvice(id, inp) {
+  if (id === 'saveRate') {
+    if (!inp.totalIncome) return { tierLabel: '—', tierRange: '', note: 'กรอกรายรับเพื่อประเมิน' };
+    const sr = inp.saveRate;
+    if (sr >= 20) return {
+      tierLabel: 'ดีเยี่ยม', tierRange: '≥ 20%',
+      note: 'อยู่ในเกณฑ์แข็งแกร่ง — สะสมสินทรัพย์ได้เร็ว สามารถจัดสรรเงินเหลือไปลงทุนระยะยาวได้อย่างมั่นใจ'
+    };
+    if (sr >= 15) return {
+      tierLabel: 'ดี', tierRange: '15 – 19%',
+      note: `ใกล้เกณฑ์ดีเยี่ยมแล้ว — เพิ่มอัตราการออมอีก <strong>${(20 - sr).toFixed(1)}%</strong> จะถึงเป้ามาตรฐาน 20%`
+    };
+    if (sr >= 10) return {
+      tierLabel: 'เฝ้าระวัง', tierRange: '10 – 14%',
+      note: 'ต่ำกว่าเกณฑ์มาตรฐาน 20% — พิจารณาลดรายจ่ายผันแปรหรือหารายได้เสริม เพื่อดันอัตราการออมขึ้น'
+    };
+    if (sr > 0) return {
+      tierLabel: 'ควรปรับปรุง', tierRange: '< 10%',
+      note: 'อัตราการออมต่ำมาก สะสมสินทรัพย์ได้ช้า — ควรทบทวนรายจ่ายทุกหมวดเป็นลำดับแรก'
+    };
+    return {
+      tierLabel: 'ติดลบ', tierRange: 'รายจ่ายเกินรายรับ',
+      note: 'สถานะติดลบ — ต้องจัดการรายจ่ายเร่งด่วน ก่อนจะสะสมหนี้เพิ่มเติม'
+    };
+  }
+
+  if (id === 'debt') {
+    if (!inp.totalIncome) return { tierLabel: '—', tierRange: '', note: 'กรอกรายรับเพื่อประเมิน' };
+    const d = inp.debtRatio;
+    if (d === 0) return {
+      tierLabel: 'ไม่มีหนี้', tierRange: '0%',
+      note: 'ไม่มีภาระหนี้ — เยี่ยมมาก สามารถเน้นสะสมสินทรัพย์ลงทุนได้เต็มที่'
+    };
+    if (d <= 25) return {
+      tierLabel: 'ดีเยี่ยม', tierRange: '≤ 25%',
+      note: 'ภาระหนี้อยู่ในเกณฑ์ต่ำ — จัดการได้สบาย เน้นสะสมสินทรัพย์ลงทุนควบคู่ไปได้'
+    };
+    if (d <= 35) return {
+      tierLabel: 'ปลอดภัย', tierRange: '25 – 35%',
+      note: 'อยู่ในเกณฑ์ปลอดภัย — ควรชะลอการก่อหนี้ใหม่ และทยอยลดหนี้ดอกเบี้ยสูง (บัตร/สินเชื่อ) ก่อน'
+    };
+    if (d <= 45) return {
+      tierLabel: 'เฝ้าระวัง', tierRange: '35 – 45%',
+      note: 'เกินเกณฑ์แนะนำ 35% — ควรลดการก่อหนี้ใหม่และวางแผนทยอยชำระ ก่อนขยายการลงทุน'
+    };
+    return {
+      tierLabel: 'เสี่ยงสูง', tierRange: '> 45%',
+      note: 'ภาระหนี้สูงอย่างมีนัยสำคัญ — เร่งชำระหนี้ดอกเบี้ยสูงก่อน และหยุดการก่อหนี้ใหม่ทุกประเภท'
+    };
+  }
+
+  if (id === 'emergency') {
+    if (inp.totalExpense <= 0) return { tierLabel: '—', tierRange: '', note: 'กรอกรายจ่ายเพื่อประเมิน' };
+    const c = inp.emergencyCoverage;
+    if (c >= 6) return {
+      tierLabel: 'ดีเยี่ยม', tierRange: '≥ 6 เดือน',
+      note: 'ครอบคลุมความเสี่ยงฉุกเฉินได้ดี — เป็นรากฐานที่แข็งแรงสำหรับการลงทุนระยะยาว'
+    };
+    if (c >= 3) return {
+      tierLabel: 'ปลอดภัย', tierRange: '3 – 5.9 เดือน',
+      note: `อยู่ในเกณฑ์พื้นฐาน — ควรเก็บเพิ่มอีก <strong>${fmtFull(inp.emergencyGoal - inp.emergencyFund)}</strong> ให้ถึงเป้า 6 เดือน`
+    };
+    if (c >= 1.5) return {
+      tierLabel: 'เฝ้าระวัง', tierRange: '1.5 – 2.9 เดือน',
+      note: 'ต่ำกว่าเกณฑ์ขั้นต่ำ 3 เดือน — ให้ความสำคัญกับการเก็บสำรองก่อนลงทุน ลดความเสี่ยงหากเกิดเหตุฉุกเฉิน'
+    };
+    return {
+      tierLabel: 'เสี่ยงสูง', tierRange: '< 1.5 เดือน',
+      note: 'เงินสำรองไม่เพียงพอ — หากเกิดเหตุฉุกเฉินอาจต้องขายสินทรัพย์ลงทุนในจังหวะที่ไม่เหมาะสม หรือก่อหนี้ใหม่'
+    };
+  }
+
+  if (id === 'fixed') {
+    if (!inp.totalIncome) return { tierLabel: '—', tierRange: '', note: 'กรอกรายรับเพื่อประเมิน' };
+    const f = inp.fixedExpenseRatio;
+    if (f <= 45) return {
+      tierLabel: 'ดีเยี่ยม', tierRange: '≤ 45%',
+      note: 'ความยืดหยุ่นทางการเงินสูง — ปรับตัวได้ดีเมื่อรายรับผันผวน มีกันชนกระแสเงินสดเพียงพอ'
+    };
+    if (f <= 55) return {
+      tierLabel: 'ปลอดภัย', tierRange: '45 – 55%',
+      note: 'อยู่ในเกณฑ์ปลอดภัย — ความยืดหยุ่นพอใช้ สามารถรับมือกับการเปลี่ยนแปลงรายรับระดับกลางได้'
+    };
+    if (f <= 70) return {
+      tierLabel: 'เฝ้าระวัง', tierRange: '55 – 70%',
+      note: 'ความยืดหยุ่นเริ่มต่ำ — หากรายรับลดจะปรับตัวยาก พิจารณาลดรายจ่ายจำเป็นหรือเพิ่มรายรับหลัก'
+    };
+    return {
+      tierLabel: 'ควรปรับปรุง', tierRange: '> 70%',
+      note: 'รายจ่ายคงที่สูงเกินไป — การเงินเปราะบางอย่างมีนัยสำคัญ ควรทบทวนที่อยู่อาศัย/ค่าประกัน/ค่าเดินทาง'
+    };
+  }
+
+  return { tierLabel: '—', tierRange: '', note: '' };
+}
+
+function computeRiskScore(inp) {
+  // 1. Saving Rate (higher = better)
+  const saveRateScore = scoreBandDesc(inp.saveRate, [
+    { min: 25, score: 100 },
+    { min: 20, score: 88 },
+    { min: 15, score: 72 },
+    { min: 10, score: 55 },
+    { min: 5,  score: 35 },
+    { min: 0,  score: 15 },
+    { min: -Infinity, score: 0 }
+  ]);
+
+  // 2. Debt Ratio (lower = better)
+  const debtScore = scoreBand(inp.debtRatio, [
+    { max: 15, score: 100 },
+    { max: 25, score: 82 },
+    { max: 35, score: 58 },
+    { max: 45, score: 32 },
+    { max: Infinity, score: 10 }
+  ]);
+
+  // 3. Emergency Fund Coverage (months, higher = better)
+  const emergencyScore = scoreBandDesc(inp.emergencyCoverage, [
+    { min: 6,   score: 100 },
+    { min: 4.5, score: 85 },
+    { min: 3,   score: 65 },
+    { min: 1.5, score: 40 },
+    { min: 0.5, score: 20 },
+    { min: 0,   score: 5 }
+  ]);
+
+  // 4. Fixed Expense Ratio (lower = better)
+  const fixedScore = scoreBand(inp.fixedExpenseRatio, [
+    { max: 35, score: 100 },
+    { max: 45, score: 85 },
+    { max: 55, score: 65 },
+    { max: 70, score: 40 },
+    { max: Infinity, score: 15 }
+  ]);
+
+  // Weighted total
+  const total = Math.round(
+    saveRateScore * 0.30 +
+    debtScore * 0.25 +
+    emergencyScore * 0.25 +
+    fixedScore * 0.20
+  );
+
+  // Overall level
+  let level, levelCls, headline;
+  if (!inp.totalIncome) {
+    level = '—'; levelCls = '';
+    headline = 'กรอกรายรับและรายจ่ายเพื่อเริ่มประเมินสถานะการเงินของคุณ';
+  } else if (total >= 80) {
+    level = 'ดีเยี่ยม'; levelCls = 'good';
+    headline = 'สถานะการเงินของคุณอยู่ในระดับแข็งแกร่งทุกมิติ พื้นฐานมั่นคงพอที่จะขยายการลงทุนระยะยาวได้อย่างมั่นใจ ' +
+               'แนะนำใช้เครื่องมือ "วางแผนพอร์ตการลงทุน" เพื่อกระจายเงินไปยังสินทรัพย์หลากหลาย ต่อยอดความมั่งคั่งในอนาคต';
+  } else if (total >= 65) {
+    level = 'ปลอดภัย'; levelCls = 'ok';
+    headline = 'สถานะการเงินของคุณอยู่ในเกณฑ์ดี มีพื้นฐานแข็งแรงพอสำหรับการลงทุนระยะยาว ' +
+               'สามารถเริ่มวางแผนพอร์ตการลงทุนได้ในสัดส่วนที่เหมาะสมกับความเสี่ยงที่ยอมรับได้ ขณะเดียวกันยังพัฒนาตัวชี้วัดที่คะแนนต่ำสุดให้ดีขึ้น';
+  } else if (total >= 50) {
+    level = 'เฝ้าระวัง'; levelCls = 'warn';
+    headline = 'สถานะการเงินของคุณอยู่ในเกณฑ์กลาง มีบางจุดที่ควรปรับปรุงก่อนขยายการลงทุนระยะยาว ' +
+               'ดูตัวชี้วัดแต่ละตัวด้านล่างเพื่อระบุจุดที่ต้องให้ความสำคัญเป็นลำดับแรก และอ่านคำแนะนำในส่วนท้ายเพื่อวางแผนขั้นถัดไป';
+  } else {
+    level = 'ควรปรับปรุง'; levelCls = 'bad';
+    headline = 'สถานะการเงินของคุณอยู่ในเกณฑ์เสี่ยง มีความเปราะบางต่อเหตุฉุกเฉินหรือการเปลี่ยนแปลงรายรับ ' +
+               'แนะนำให้ความสำคัญกับการจัดการกระแสเงินสดและลดภาระหนี้เป็นลำดับแรก ยังไม่ควรขยายการลงทุนในช่วงนี้ จนกว่าพื้นฐานจะแข็งแรงขึ้น';
+  }
+
+  // Merge tier/note advice into each breakdown entry
+  const metrics = [
+    {
+      id: 'saveRate',
+      label: 'อัตราการออม',
+      desc: 'เงินเหลือสุทธิต่อรายรับ · หลักการทั่วไปแนะนำ ≥20%',
+      value: inp.totalIncome > 0 ? pct(inp.saveRate, 1) : '—',
+      score: saveRateScore,
+      severity: severityFromScore(saveRateScore)
+    },
+    {
+      id: 'debt',
+      label: 'ภาระหนี้ต่อรายรับ',
+      desc: 'ยอดผ่อนหนี้รวมต่อรายรับ · เกณฑ์ปลอดภัยไม่เกิน 35%',
+      value: inp.totalIncome > 0 ? pct(inp.debtRatio, 1) : '—',
+      score: debtScore,
+      severity: severityFromScore(debtScore)
+    },
+    {
+      id: 'emergency',
+      label: 'เงินสำรองฉุกเฉิน',
+      desc: 'จำนวนเดือนของค่าใช้จ่ายที่ครอบคลุม · เป้าหมายมาตรฐาน 6 เดือน',
+      value: inp.totalExpense > 0 ? inp.emergencyCoverage.toFixed(1) + ' เดือน' : '—',
+      score: emergencyScore,
+      severity: severityFromScore(emergencyScore)
+    },
+    {
+      id: 'fixed',
+      label: 'รายจ่ายคงที่ต่อรายรับ',
+      desc: 'ค่าใช้จ่ายจำเป็น + ค่าประกัน ต่อรายรับ · เกณฑ์ปลอดภัยไม่เกิน 50%',
+      value: inp.totalIncome > 0 ? pct(inp.fixedExpenseRatio, 1) : '—',
+      score: fixedScore,
+      severity: severityFromScore(fixedScore)
+    }
+  ];
+
+  metrics.forEach(m => {
+    const adv = getMetricAdvice(m.id, inp);
+    m.tierLabel = adv.tierLabel;
+    m.tierRange = adv.tierRange;
+    m.note = adv.note;
+  });
+
+  return {
+    total, level, levelCls, headline,
+    breakdown: metrics
+  };
+}
+
+function renderRisk(inp, risk) {
+  const bigEl = document.getElementById('riskScoreBig');
+  bigEl.innerHTML = risk.total + '<span class="rs-max">/ 100</span>';
+  if (inp.totalIncome > 0) {
+    bigEl.style.color = severityColor(severityFromScore(risk.total));
+  } else {
+    bigEl.style.color = '';
+  }
+
+  const levelEl = document.getElementById('riskLevelValue');
+  levelEl.textContent = risk.level;
+  levelEl.className = 'risk-level-value ' + (risk.levelCls || '');
+
+  document.getElementById('riskHeadline').textContent = risk.headline;
+
+  const barsEl = document.getElementById('riskBars');
+  barsEl.innerHTML = risk.breakdown.map(b => `
+    <div class="risk-bar">
+      <div class="rb-info">
+        <div class="rb-label">${b.label}</div>
+        <div class="rb-desc">${b.desc}</div>
+        <div class="rb-track">
+          <div class="rb-fill ${b.severity}" style="width: ${b.score}%;"></div>
+        </div>
+        ${b.tierLabel && b.tierLabel !== '—' ? `
+          <div class="rb-tier-row">
+            <span class="rb-tier ${b.severity}">${b.tierLabel}</span>
+            ${b.tierRange ? `<span class="rb-tier-range">${b.tierRange}</span>` : ''}
+          </div>
+          ${b.note ? `<div class="rb-note">${b.note}</div>` : ''}
+        ` : ''}
+      </div>
+      <div class="rb-value ${b.severity}">
+        ${b.value}
+        <span class="rb-value-sub">${b.score}/100</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function severityColor(sev) {
+  switch (sev) {
+    case 'good': return '#1F7D49';
+    case 'ok':   return '#8B6914';
+    case 'warn': return '#D68B2C';
+    case 'bad':  return '#9C2B2B';
+    default:     return '#722F37';
+  }
+}
+
+// ==========================================================
+// SMART INSIGHTS (bank-analyst Thai)
+// ==========================================================
+function generateInsights(inp, risk) {
+  const out = [];
+
+  if (!inp.totalIncome) {
+    out.push({
+      severity: 'ok', letter: 'i',
+      title: 'เริ่มต้นที่การกรอกรายรับ',
+      text: 'กรอกรายรับต่อเดือนในส่วนแรกก่อน — ระบบจะวิเคราะห์และให้คำแนะนำตามข้อมูลของคุณ'
+    });
+    return out;
+  }
+
+  // 1. Saving rate insight
+  if (inp.saveRate >= 25) {
+    out.push({
+      severity: 'good', letter: '✓',
+      title: 'อัตราการออมอยู่ในระดับดีเยี่ยม',
+      text: `คุณสามารถออมได้ <strong>${pct(inp.saveRate, 1)}</strong> ของรายรับ ซึ่งเกินเกณฑ์มาตรฐาน 20% อย่างมีนัยสำคัญ หากสถานะเงินสำรองฉุกเฉินครบแล้ว แนะนำจัดสรรส่วนเกินไปลงทุนระยะยาวเพื่อต่อยอด`
+    });
+  } else if (inp.saveRate >= 20) {
+    out.push({
+      severity: 'good', letter: '✓',
+      title: 'อัตราการออมอยู่ในเกณฑ์ดี',
+      text: `อัตราการออม <strong>${pct(inp.saveRate, 1)}</strong> ถึงเป้าหมายมาตรฐาน 20% ซึ่งเป็นระดับที่ผู้เชี่ยวชาญการเงินแนะนำ คุณอยู่บนเส้นทางที่มั่นคงสำหรับการสร้างความมั่งคั่งระยะยาว`
+    });
+  } else if (inp.saveRate >= 10) {
+    out.push({
+      severity: 'ok', letter: '!',
+      title: 'อัตราการออมอยู่ในเกณฑ์พอใช้',
+      text: `อัตราการออม <strong>${pct(inp.saveRate, 1)}</strong> ยังต่ำกว่าเกณฑ์มาตรฐาน 20% พิจารณาลดรายจ่ายผันแปร (ปัจจุบันใช้ ${fmtFull(inp.expenseVariable)}) หรือหารายได้เสริมเพื่อเพิ่มอัตราการออม`
+    });
+  } else if (inp.saveRate > 0) {
+    out.push({
+      severity: 'warn', letter: '!',
+      title: 'อัตราการออมต่ำกว่าเกณฑ์ที่ควรจะเป็น',
+      text: `อัตราการออมเพียง <strong>${pct(inp.saveRate, 1)}</strong> ทำให้สะสมเงินได้ช้ามาก ต้องใช้เวลานานกว่าจะถึงเป้าหมายทางการเงิน แนะนำทบทวนรายจ่ายแต่ละหมวดและลดค่าใช้จ่ายที่ไม่จำเป็นลง`
+    });
+  } else {
+    out.push({
+      severity: 'bad', letter: '×',
+      title: 'รายจ่ายเกินรายรับ — สถานะติดลบ',
+      text: `ปัจจุบันคุณใช้เงินเกินรายรับ <strong>${fmtFull(-inp.surplus)}</strong> ต่อเดือน สถานะนี้หากปล่อยไว้จะนำไปสู่การก่อหนี้เพิ่มขึ้นเรื่อยๆ ควรทบทวนรายจ่ายอย่างเร่งด่วน โดยเฉพาะหมวดผันแปรและหมวดหนี้`
+    });
+  }
+
+  // 2. Debt ratio insight
+  if (inp.debtRatio > 45) {
+    out.push({
+      severity: 'bad', letter: '×',
+      title: 'ภาระหนี้สูงเกินเกณฑ์อย่างมาก',
+      text: `ยอดผ่อนหนี้คิดเป็น <strong>${pct(inp.debtRatio, 1)}</strong> ของรายรับ สูงกว่าเกณฑ์ความปลอดภัย 35% อย่างมีนัยสำคัญ ควรเร่งชำระหนี้ดอกเบี้ยสูงก่อน (บัตรเครดิต/สินเชื่อส่วนบุคคล) และชะลอการก่อหนี้ใหม่ทุกประเภท ก่อนพิจารณาลงทุนเพิ่ม`
+    });
+  } else if (inp.debtRatio > 35) {
+    out.push({
+      severity: 'warn', letter: '!',
+      title: 'ภาระหนี้เริ่มสูงกว่าเกณฑ์แนะนำ',
+      text: `ยอดผ่อนหนี้ <strong>${pct(inp.debtRatio, 1)}</strong> ของรายรับ สูงกว่าเกณฑ์ปลอดภัย 35% เล็กน้อย พิจารณาลดการก่อหนี้ใหม่และวางแผนทยอยชำระก่อนขยายการลงทุน`
+    });
+  } else if (inp.debtRatio > 0 && inp.debtRatio <= 25) {
+    out.push({
+      severity: 'good', letter: '✓',
+      title: 'ภาระหนี้อยู่ในระดับที่จัดการได้',
+      text: `ยอดผ่อนหนี้ <strong>${pct(inp.debtRatio, 1)}</strong> อยู่ในเกณฑ์ปลอดภัย (ไม่เกิน 35%) หากเป็นหนี้ดอกเบี้ยต่ำ (เช่น บ้าน) สามารถคงไว้และเน้นสะสมสินทรัพย์ลงทุนขนานกันได้`
+    });
+  }
+
+  // 3. Emergency fund insight
+  if (inp.totalExpense > 0) {
+    if (inp.emergencyCoverage >= inp.emergencyTarget) {
+      out.push({
+        severity: 'good', letter: '✓',
+        title: 'เงินสำรองฉุกเฉินครบเป้าหมายแล้ว',
+        text: `เงินสำรองครอบคลุม <strong>${inp.emergencyCoverage.toFixed(1)} เดือน</strong> ของรายจ่าย ถึงเป้าหมาย ${inp.emergencyTarget} เดือนเรียบร้อย เป็นรากฐานที่มั่นคงในการเผชิญเหตุฉุกเฉินโดยไม่ต้องขายสินทรัพย์ลงทุนหรือก่อหนี้`
+      });
+    } else if (inp.emergencyCoverage >= 3) {
+      const need = inp.emergencyGoal - inp.emergencyFund;
+      out.push({
+        severity: 'ok', letter: '!',
+        title: 'เงินสำรองใกล้ถึงเป้าหมาย',
+        text: `เงินสำรองครอบคลุม <strong>${inp.emergencyCoverage.toFixed(1)} เดือน</strong> ยังขาดอีก <strong>${fmtFull(need)}</strong> เพื่อถึงเป้าหมาย ${inp.emergencyTarget} เดือน แนะนำเก็บให้ครบก่อนจัดสรรเพิ่มในการลงทุนระยะยาว`
+      });
+    } else {
+      out.push({
+        severity: 'warn', letter: '!',
+        title: 'เงินสำรองฉุกเฉินต่ำกว่าเกณฑ์ปลอดภัย',
+        text: `เงินสำรองครอบคลุมเพียง <strong>${inp.emergencyCoverage.toFixed(1)} เดือน</strong> ถือว่าต่ำกว่าเกณฑ์แนะนำขั้นต่ำ 3 เดือน ควรให้ความสำคัญกับการเก็บสำรองก่อน ลงทุนทีหลัง — เพราะหากเกิดเหตุฉุกเฉินจะทำให้ต้องขายสินทรัพย์ลงทุนในจังหวะที่ไม่เหมาะสม`
+      });
+    }
+  }
+
+  // 4. Fixed expense ratio insight
+  if (inp.fixedExpenseRatio > 55) {
+    out.push({
+      severity: 'warn', letter: '!',
+      title: 'รายจ่ายคงที่สูง — ความยืดหยุ่นทางการเงินต่ำ',
+      text: `ค่าใช้จ่ายจำเป็นและประกันรวม <strong>${pct(inp.fixedExpenseRatio, 1)}</strong> ของรายรับ สูงกว่าเกณฑ์แนะนำ 50% หมายความว่าหากรายรับลดลง จะปรับตัวยาก พิจารณาหาทางลดค่าใช้จ่ายจำเป็น (เช่น ที่อยู่อาศัย การเดินทาง) หรือเพิ่มรายรับหลัก`
+    });
+  }
+
+  // 5. Investment income relative to total income (for those who have it)
+  if (inp.incomeInvest > 0 && inp.totalIncome > 0) {
+    const investShare = (inp.incomeInvest / inp.totalIncome) * 100;
+    if (investShare >= 15) {
+      out.push({
+        severity: 'good', letter: '✓',
+        title: 'รายได้จากการลงทุนเริ่มมีสัดส่วนชัดเจน',
+        text: `รายได้จากการลงทุน <strong>${fmtFull(inp.incomeInvest)}</strong> คิดเป็น <strong>${pct(investShare, 1)}</strong> ของรายรับรวม แสดงว่าสินทรัพย์เริ่มทำงานสร้างกระแสเงินสดให้คุณ เป็นสัญญาณของความมั่งคั่งแบบยั่งยืน`
+      });
+    }
+  }
+
+  // 6. Growth opportunity — positive scenarios
+  if (inp.saveRate >= 15 && inp.emergencyCoverage >= 3 && inp.debtRatio <= 35) {
+    out.push({
+      severity: 'good', letter: '→',
+      title: 'พร้อมขยายการลงทุนระยะยาว',
+      text: `พื้นฐานการเงินของคุณแข็งแรง — อัตราการออมเหมาะสม เงินสำรองพอใช้ ภาระหนี้ควบคุมได้ แนะนำใช้เครื่องมือ "วางแผนพอร์ตการลงทุน" เพื่อกระจายเงินออมของคุณไปยังสินทรัพย์ที่หลากหลาย`
+    });
+  }
+
+  return out;
+}
+
+function renderInsights(insights) {
+  const el = document.getElementById('insightsList');
+  if (!insights.length) {
+    el.innerHTML = '<div class="donut-empty">กรอกข้อมูลเพื่อรับคำแนะนำ</div>';
+    return;
+  }
+  el.innerHTML = insights.map(ins => `
+    <div class="insight-card ${ins.severity}">
+      <div class="ic-icon">${ins.letter}</div>
+      <div class="ic-body">
+        <div class="ic-title">${ins.title}</div>
+        <div class="ic-text">${ins.text}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ==========================================================
+// OPEN PORTFOLIO PLANNER (postMessage to parent)
+// ==========================================================
+function openPortfolioPlanner() {
+  if (window.parent && window.parent !== window) {
+    window.parent.postMessage({
+      type: 'openIframe',
+      title: 'วางแผนพอร์ตการลงทุน',
+      url: './portfolio-planner.html?v=' + Date.now()
+    }, '*');
+  } else {
+    window.location.href = 'portfolio-planner.html';
+  }
+}
+
+// ==========================================================
+// MAIN RECALC
+// ==========================================================
+function recalc() {
+  const inp = getInputs();
+  renderKpis(inp);
+  renderCashDonut(inp);
+  renderEmergency(inp);
+  const risk = computeRiskScore(inp);
+  renderRisk(inp, risk);
+  const insights = generateInsights(inp, risk);
+  renderInsights(insights);
+}
+
+// ==========================================================
+// SAVE / LOAD / RESET
+// ==========================================================
+function getFinanceSettings() {
+  const m = (id) => numVal(document.getElementById(id));
+  return {
+    incomeMain: m('incomeMain'),
+    incomeExtra: m('incomeExtra'),
+    incomeInvest: m('incomeInvest'),
+    expenseFixed: m('expenseFixed'),
+    expenseVariable: m('expenseVariable'),
+    expenseDebt: m('expenseDebt'),
+    expenseInsurance: m('expenseInsurance'),
+    emergencyFund: m('emergencyFund'),
+    emergencyTarget: parseInt(document.getElementById('emergencyTarget').value, 10) || 6
+  };
+}
+
+function applyFinanceSettings(s) {
+  if (!s) return;
+  ALL_MONEY_IDS.forEach(id => {
+    if (s[id] != null) {
+      const el = document.getElementById(id);
+      if (el) el.value = formatNum(s[id]);
+    }
+  });
+  if (s.emergencyTarget != null) {
+    document.getElementById('emergencyTarget').value = String(s.emergencyTarget);
+  }
+}
+
+async function loadFinanceSettings() {
+  if (!window.JPSettings) return;
+  try {
+    const data = await window.JPSettings.load();
+    if (data && data.finance_planner) {
+      applyFinanceSettings(data.finance_planner);
+      console.log('[finance-planner] loaded settings from cloud');
+    }
+    const user = await window.JPSettings.getUser();
+    if (!user) {
+      const _d = [];
+      _d.push('href=' + String(location.href).slice(0,55));
+      try { _d.push('selfLS=[' + Object.keys(localStorage).join(',').slice(0,140) + ']'); } catch (_e0) { _d.push('selfLS=ERR(' + (_e0 && _e0.name) + ')'); }
+      try { _d.push('parentLS=[' + Object.keys(window.parent.localStorage).join(',').slice(0,140) + ']'); } catch (_e1) { _d.push('parentLS=BLOCKED(' + (_e1 && _e1.name) + ')'); }
+      try {
+        const _c = (window.JPSettings.client && window.JPSettings.client()) || null;
+        if (_c) { const _s = await _c.auth.getSession(); _d.push('sess=' + !!(_s && _s.data && _s.data.session)); }
+      } catch (_e2) { _d.push('sessErr=' + (_e2 && _e2.message)); }
+      const _b = document.getElementById('loginBanner');
+      _b.style.display = 'block';
+      _b.style.fontSize = '12px';
+      _b.style.wordBreak = 'break-all';
+      _b.textContent = 'DEBUG2 · ' + _d.join(' · ');
+    }
+  } catch (e) {
+    console.warn('[finance-planner] load error:', e);
+  }
+}
+
+async function saveFinanceSettings() {
+  if (!window.JPSettings) { jptToast('ระบบยังไม่พร้อม — กรุณาลองใหม่'); return; }
+  const user = await window.JPSettings.getUser();
+  if (!user) { jptToast('กรุณา login ก่อนบันทึกการตั้งค่า'); return; }
+  const ok = await window.JPSettings.patch({ finance_planner: getFinanceSettings() });
+  jptToast(ok ? 'บันทึกการตั้งค่าเรียบร้อย' : 'บันทึกไม่สำเร็จ — กรุณาลองใหม่');
+}
+
+function resetAllSettings() {
+  if (!confirm('คืนค่าเริ่มต้นทั้งหมด? (ค่าที่เคยบันทึกจะถูกทับเมื่อกดบันทึกครั้งถัดไป)')) return;
+  ALL_MONEY_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && DEFAULTS[id] != null) el.value = formatNum(DEFAULTS[id]);
+  });
+  document.getElementById('emergencyTarget').value = String(DEFAULTS.emergencyTarget);
+  recalc();
+  jptToast('รีเซ็ตเป็นค่าเริ่มต้นแล้ว — อย่าลืมกดบันทึก');
+}
+
+// ==========================================================
+// ABOUT MODAL
+// ==========================================================
+function openAboutModal() {
+  document.getElementById('aboutModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeAboutModal() {
+  document.getElementById('aboutModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ==========================================================
+// INIT
+// ==========================================================
+document.addEventListener('DOMContentLoaded', async () => {
+  attachCommaFormatting();
+  await loadFinanceSettings();
+  recalc();
+  // Live recalc (debounced)
+  let recalcTimer = null;
+  document.querySelectorAll('input[type="number"], input.num-with-commas, select').forEach(el => {
+    const evName = el.tagName === 'SELECT' ? 'change' : 'input';
+    el.addEventListener(evName, () => {
+      clearTimeout(recalcTimer);
+      recalcTimer = setTimeout(recalc, 200);
+    });
+  });
+  // Escape closes modal
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const m = document.getElementById('aboutModal');
+      if (m && m.classList.contains('open')) closeAboutModal();
+    }
+  });
+});
+</script>
+
+</body>
+</html>
