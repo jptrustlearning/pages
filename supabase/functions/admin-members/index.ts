@@ -49,6 +49,7 @@ interface MemberRow {
   username: string;
   plan: string;
   started_at: string | null;
+  renewed_at: string | null;
   expires_at: string | null;
   days_left: number | null;
   status: string;
@@ -104,6 +105,7 @@ serve(async (req: Request) => {
           username: (m.username as string) || "",
           plan: (m.plan as string) || "",
           started_at: (m.subscription_started_at as string) || null,
+          renewed_at: (m.subscription_renewed_at as string) || null,
           expires_at: expires,
           days_left: expires ? daysLeftFrom(expires, nowMs) : null,
           status: (m.subscription_status as string) || "",

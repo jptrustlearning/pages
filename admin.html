@@ -163,13 +163,14 @@ tbody tr:hover{background:rgba(212,175,55,0.05)}
           <th data-sort="username">ชื่อ<span class="arr"></span></th>
           <th data-sort="plan">แพ็ก<span class="arr"></span></th>
           <th data-sort="started_at">วันสมัคร<span class="arr"></span></th>
+          <th data-sort="renewed_at">ต่ออายุล่าสุด<span class="arr"></span></th>
           <th data-sort="expires_at">วันหมดอายุ<span class="arr"></span></th>
           <th data-sort="days_left">เหลือ<span class="arr"></span></th>
           <th data-sort="status">สถานะ<span class="arr"></span></th>
         </tr>
       </thead>
       <tbody id="tbody">
-        <tr><td colspan="6" class="loading">กำลังโหลด…</td></tr>
+        <tr><td colspan="7" class="loading">กำลังโหลด…</td></tr>
       </tbody>
     </table>
   </div>
@@ -206,7 +207,7 @@ async function loadMembers(){
   const token = getToken();
   if(!token){ logoutAdmin(); return; }
   const tbody = document.getElementById('tbody');
-  tbody.innerHTML = '<tr><td colspan="6" class="loading">กำลังโหลด…</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="7" class="loading">กำลังโหลด…</td></tr>';
   try{
     const res = await fetch(FN_URL, { headers: { 'x-admin-token': token } });
     if(res.status === 401){
@@ -218,7 +219,7 @@ async function loadMembers(){
     }
     const data = await res.json();
     if(!res.ok || !data.ok){
-      tbody.innerHTML = '<tr><td colspan="6" class="empty">โหลดไม่สำเร็จ: ' + escapeHtml(data.error || ('HTTP '+res.status)) + '</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" class="empty">โหลดไม่สำเร็จ: ' + escapeHtml(data.error || ('HTTP '+res.status)) + '</td></tr>';
       return;
     }
     ALL = data.members || [];
@@ -227,7 +228,7 @@ async function loadMembers(){
     document.getElementById('updated').textContent = dt ? ('อัปเดตล่าสุด ' + dt + ' · ' + ALL.length + ' สมาชิก') : (ALL.length + ' สมาชิก');
     render();
   }catch(e){
-    tbody.innerHTML = '<tr><td colspan="6" class="empty">เชื่อมต่อไม่ได้: ' + escapeHtml(String(e && e.message || e)) + '</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="empty">เชื่อมต่อไม่ได้: ' + escapeHtml(String(e && e.message || e)) + '</td></tr>';
   }
 }
 
@@ -262,7 +263,7 @@ function render(){
   rows.sort((a,b)=>{
     let av = a[sortKey], bv = b[sortKey];
     if(sortKey === 'days_left'){ av = av==null?Infinity:av; bv = bv==null?Infinity:bv; return (av-bv)*sortDir; }
-    if(sortKey === 'expires_at' || sortKey === 'started_at'){
+    if(sortKey === 'expires_at' || sortKey === 'started_at' || sortKey === 'renewed_at'){
       av = av?Date.parse(av):Infinity; bv = bv?Date.parse(bv):Infinity; return (av-bv)*sortDir;
     }
     return String(av||'').localeCompare(String(bv||''), 'th') * sortDir;
@@ -275,7 +276,7 @@ function render(){
   });
 
   const tbody = document.getElementById('tbody');
-  if(!rows.length){ tbody.innerHTML = '<tr><td colspan="6" class="empty">ไม่พบสมาชิกตามเงื่อนไข</td></tr>'; return; }
+  if(!rows.length){ tbody.innerHTML = '<tr><td colspan="7" class="empty">ไม่พบสมาชิกตามเงื่อนไข</td></tr>'; return; }
 
   tbody.innerHTML = rows.map(m=>{
     const planTh = m.plan==='monthly'?'รายเดือน':(m.plan==='yearly'?'รายปี':(m.plan||'—'));
@@ -284,6 +285,7 @@ function render(){
       '<td data-label="ชื่อ"><div class="cell-name">'+escapeHtml(m.username||'(ไม่มีชื่อ)')+'</div><div class="cell-email">'+escapeHtml(m.email)+'</div></td>' +
       '<td data-label="แพ็ก">'+planCell+'</td>' +
       '<td data-label="วันสมัคร">'+escapeHtml(fmtDate(m.started_at))+'</td>' +
+      '<td data-label="ต่ออายุล่าสุด">'+escapeHtml(fmtDate(m.renewed_at))+'</td>' +
       '<td data-label="วันหมดอายุ">'+escapeHtml(fmtDate(m.expires_at))+'</td>' +
       '<td data-label="เหลือ">'+daysBadge(m)+'</td>' +
       '<td data-label="สถานะ">'+statusPill(m.status)+'</td>' +
