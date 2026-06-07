@@ -44,6 +44,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const APP_BASE = "https://app.jptrustlearning.com";
 const EMAIL_FROM_NAME = "JP Trust Learning";
 const MAX_SENDS_PER_RUN = 300; // safety cap so a misconfig can never mass-mail
+const SEND_INTERVAL_MS = 600;  // pace Resend: it allows ~2 req/sec → 600ms ≈ 1.6/sec, safe margin
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 // Reminder stages, most-urgent first. daysLeft uses the SAME formula as the app
 // badge: Math.ceil((expiry - now) / 1 day). So 7 days out → 7, tomorrow → 1,
@@ -240,37 +242,49 @@ async function sendReminder(stage: StageKey, info: ReminderInfo): Promise<SendRe
   if (!apiKey) return { sent: false, error: "missing RESEND_API_KEY secret" };
 
   const c = stageCopy(stage, info.daysLeft);
-  try {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        from,
-        to: [info.email],
-        subject: c.subject,
-        text: buildReminderText(stage, info),
-        html: buildReminderHtml(stage, info),
-        headers: {
-          "List-Unsubscribe":
-            "<mailto:jptrustlearning@gmail.com?subject=Unsubscribe%20JP%20Trust%20Learning>",
-          "List-ID": "JP Trust Learning Membership <members.jptrustlearning.com>",
-        },
-      }),
-    });
-    if (!res.ok) {
-      let detail = "";
-      try {
-        const j = await res.json();
-        detail = j.message || j.error || JSON.stringify(j);
-      } catch (_) {
-        detail = await res.text();
+  const body = JSON.stringify({
+    from,
+    to: [info.email],
+    subject: c.subject,
+    text: buildReminderText(stage, info),
+    html: buildReminderHtml(stage, info),
+    headers: {
+      "List-Unsubscribe":
+        "<mailto:jptrustlearning@gmail.com?subject=Unsubscribe%20JP%20Trust%20Learning>",
+      "List-ID": "JP Trust Learning Membership <members.jptrustlearning.com>",
+    },
+  });
+  // Up to 3 attempts; back off on 429 (Resend hard-limits ~2 req/sec) so a
+  // transient rate hit doesn't drop a reminder. Caller also paces between sends.
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+        body,
+      });
+      if (res.status === 429 && attempt < 2) {
+        const ra = parseFloat(res.headers.get("retry-after") || "");
+        await sleep(Number.isFinite(ra) && ra > 0 ? Math.min(ra * 1000, 5000) : 1100);
+        continue;
       }
-      return { sent: false, error: `Resend ${res.status}: ${detail}` };
+      if (!res.ok) {
+        let detail = "";
+        try {
+          const j = await res.json();
+          detail = j.message || j.error || JSON.stringify(j);
+        } catch (_) {
+          detail = await res.text();
+        }
+        return { sent: false, error: `Resend ${res.status}: ${detail}` };
+      }
+      return { sent: true };
+    } catch (err) {
+      if (attempt < 2) { await sleep(800); continue; }
+      return { sent: false, error: err instanceof Error ? err.message : String(err) };
     }
-    return { sent: true };
-  } catch (err) {
-    return { sent: false, error: err instanceof Error ? err.message : String(err) };
   }
+  return { sent: false, error: "Resend: exhausted retries (429)" };
 }
 
 // ============ Main ============
@@ -328,7 +342,7 @@ serve(async (req: Request) => {
     dryRun,
     scanned: 0,
     eligible: 0,
-    sent: { d1: 0, d7: 0 } as Record<StageKey, number>,
+    sent: { d1: 0, d7: 0, d14: 0 } as Record<StageKey, number>,
     skipped_alreadySent: 0,
     skipped_revoked: 0,
     skipped_noExpiry: 0,
@@ -339,6 +353,7 @@ serve(async (req: Request) => {
   };
 
   let totalSends = 0;
+  let lastSendTs = 0;
 
   try {
     for (let page = 1; page <= 50; page++) {
@@ -400,6 +415,11 @@ serve(async (req: Request) => {
           continue;
         }
         if (limit && totalSends >= limit) continue;
+
+        // Pace consecutive Resend calls to stay under its 2 req/sec limit.
+        const since = Date.now() - lastSendTs;
+        if (lastSendTs && since < SEND_INTERVAL_MS) await sleep(SEND_INTERVAL_MS - since);
+        lastSendTs = Date.now();
 
         const r = await sendReminder(chosen.key, info);
         if (!r.sent) {
