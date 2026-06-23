@@ -1,6 +1,97 @@
 {
-  "lastUpdated": "2026-06-22T07:15:00Z",
+  "lastUpdated": "2026-06-23T07:40:00Z",
   "batches": [
+    {
+      "file": "2026-06-23-0740.md",
+      "date": "2026-06-23T07:40:00Z",
+      "date_display": "23 มิ.ย. 2026 · 07:40",
+      "summary": "หุ้นเทคใหญ่ถูกเทขายหนัก Alphabet ร่วง 6.5% รุนแรงสุดในรอบปีจากความกังวล CapEx + สมองไหล AI · เงินไหลเข้าหุ้นเล็ก Russell 2000 +21% ต้นปี · ทองฟื้นแตะ 4,200 ดอลลาร์ ก่อนข้อมูล PCE วันพฤหัสฯ",
+      "tickers": [
+        "GOOGL",
+        "AMZN",
+        "META",
+        "MSFT",
+        "NVDA",
+        "MU",
+        "IWM",
+        "GLD",
+        "SPY"
+      ],
+      "headlines": [
+        {
+          "title": "หุ้นเทคใหญ่ถูกเทขายหนัก Alphabet ร่วง 6.5% รุนแรงสุดในรอบ 1 ปี — นักลงทุนเริ่มกังวลเงินลงทุน AI มหาศาลยังไม่คุ้ม",
+          "tickers": [
+            {
+              "symbol": "GOOGL",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AMZN",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "META",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "MSFT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "MU",
+              "sentiment": "positive"
+            }
+          ],
+          "tone_override": "bearish",
+          "source": "CNBC, Bloomberg, Reuters, Yahoo Finance",
+          "published": "23 มิ.ย. 2026"
+        },
+        {
+          "title": "เงินไหลเข้าหุ้นเล็ก Russell 2000 พุ่งกว่า 21% ตั้งแต่ต้นปี ทิ้งห่าง S&P 500 — สัญญาณตลาดกระจายการลงทุนออกจากหุ้นใหญ่",
+          "tickers": [
+            {
+              "symbol": "IWM",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "MU",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SPY",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "negative"
+            }
+          ],
+          "tone_override": "bullish",
+          "source": "TheStreet, CNBC, Trading Economics",
+          "published": "23 มิ.ย. 2026"
+        },
+        {
+          "title": "ทองคำฟื้นตัวขึ้นแตะ 4,200 ดอลลาร์ รับน้ำมันร่วง-ความหวังดีลสันติภาพ แต่ยังเผชิญแรงกดดันจาก Fed สายเหยี่ยว ก่อนข้อมูลเงินเฟ้อ PCE วันพฤหัสฯ",
+          "tickers": [
+            {
+              "symbol": "GLD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "USO",
+              "sentiment": "negative"
+            }
+          ],
+          "tone_override": "mixed",
+          "source": "Trading Economics, FXEmpire, USAGold, Reuters",
+          "published": "23 มิ.ย. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-06-22-0715.md",
       "date": "2026-06-22T07:15:00Z",
