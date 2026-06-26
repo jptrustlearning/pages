@@ -3,13 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ทำไมต้อง JP Trust Learning · แพลตฟอร์มลงทุนอย่างมีระบบ</title>
-<meta name="description" content="JP Trust Learning — แพลตฟอร์มเรียนรู้และวิเคราะห์การลงทุนหุ้นสหรัฐและทองคำอย่างมีระบบ รวมเครื่องมือสแกนหุ้น ทดสอบกลยุทธ์ บันทึกพอร์ต และบทวิเคราะห์รายวันในภาษาไทย">
+<title>ทำไมต้อง JP Trust Learning · แพลตฟอร์มศึกษากลยุทธ์การลงทุน</title>
+<meta name="description" content="JP Trust Learning — แพลตฟอร์มศึกษาและวิเคราะห์กลยุทธ์การลงทุนหุ้นสหรัฐและทองคำอย่างมีระบบ รวมเครื่องมือสแกนหุ้น ทดสอบกลยุทธ์ บันทึกพอร์ต และบทวิเคราะห์รายวันในภาษาไทย">
 <meta name="theme-color" content="#1a0a0e">
-<!-- Open Graph (สำหรับ preview เวลาส่งลิงก์ในแชท) -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="ทำไมต้อง JP Trust Learning">
-<meta property="og:description" content="แพลตฟอร์มลงทุนหุ้นสหรัฐและทองคำอย่างมีระบบ — เครื่องมือวิเคราะห์ ทดสอบกลยุทธ์ บันทึกพอร์ต และบทวิเคราะห์รายวัน ในภาษาไทย">
+<meta property="og:description" content="แพลตฟอร์มศึกษากลยุทธ์การลงทุนหุ้นสหรัฐและทองคำอย่างมีระบบ — เครื่องมือวิเคราะห์ ทดสอบกลยุทธ์ บันทึกพอร์ต และบทวิเคราะห์รายวัน ในภาษาไทย">
 <meta property="og:image" content="jpt-owl-logo.png">
 <link rel="icon" type="image/png" href="pwa-icons/icon-192x192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,12 +31,12 @@ body{
   -webkit-font-smoothing:antialiased; line-height:1.7;
   overflow-x:clip;
 }
-section{padding:64px 22px;}
+section{padding:60px 22px;}
 .wrap{max-width:920px; margin:0 auto;}
 .narrow{max-width:680px; margin:0 auto;}
 
-/* ── Shared section label (Cinzel) ── */
-.kicker{font-family:'Cinzel',serif; font-size:.72rem; font-weight:600; letter-spacing:.32em; text-transform:uppercase; }
+/* ── Section label (Cinzel) ── */
+.kicker{font-family:'Cinzel',serif; font-size:.72rem; font-weight:600; letter-spacing:.32em; text-transform:uppercase;}
 .kicker.on-cream{color:var(--gold-deep);}
 .kicker.on-dark{color:var(--gold);}
 .deco{display:flex; align-items:center; justify-content:center; gap:11px; margin:0 auto 16px; max-width:210px;}
@@ -48,98 +47,81 @@ section{padding:64px 22px;}
 .deco.on-cream i{background:var(--gold-dark); box-shadow:0 0 8px rgba(212,175,55,.45);}
 .deco.on-dark i{background:var(--gold); box-shadow:0 0 10px rgba(212,175,55,.6);}
 
-.sec-title{font-family:'DM Serif Display','Anuphan',serif; font-weight:400; line-height:1.25; letter-spacing:.3px;}
+/* Bold Thai section titles (matches app design) */
+.sec-title{font-family:'Anuphan',sans-serif; font-weight:700; line-height:1.25; letter-spacing:.2px; font-size:clamp(1.7rem,4.4vw,2.4rem);}
 .sec-title.on-cream{color:var(--maroon);}
 .sec-title.on-dark{
-  background:linear-gradient(135deg,#D4AF37,#F4E4BA,#D4AF37);
+  background:linear-gradient(135deg,#D4AF37,#F4E4BA 55%,#D4AF37);
   -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;
 }
 .sec-desc{font-size:1rem; line-height:1.8; margin-top:14px;}
 .sec-desc.on-cream{color:var(--text-muted);}
 .sec-desc.on-dark{color:var(--text-light-muted);}
 
-/* ── Dark maroon section base ── */
-.dark{
-  position:relative; color:var(--text-light);
-  background:linear-gradient(160deg,#1a0a0e 0%,#2d1018 25%,#3a1520 45%,#2d1018 65%,#1a0a0e 100%);
-}
-.dark::before{
-  content:''; position:absolute; inset:0; pointer-events:none;
+/* ── Dark maroon section ── */
+.dark{position:relative; color:var(--text-light);
+  background:linear-gradient(160deg,#1a0a0e 0%,#2d1018 25%,#3a1520 45%,#2d1018 65%,#1a0a0e 100%);}
+.dark::before{content:''; position:absolute; inset:0; pointer-events:none;
   background:
     radial-gradient(ellipse at 28% 26%, rgba(114,47,55,.30) 0%, transparent 52%),
     radial-gradient(ellipse at 74% 64%, rgba(90,30,40,.22) 0%, transparent 52%),
-    radial-gradient(ellipse at 50% 50%, rgba(212,175,55,.045) 0%, transparent 62%);
-}
+    radial-gradient(ellipse at 50% 50%, rgba(212,175,55,.045) 0%, transparent 62%);}
 .dark > *{position:relative; z-index:1;}
 
-/* ── Top brand bar ── */
-.brandbar{
-  position:sticky; top:0; z-index:50;
+/* ── Brand bar ── */
+.brandbar{position:sticky; top:0; z-index:50;
   background:linear-gradient(180deg,#FFFEFB 0%,#FAF6ED 100%);
   border-bottom:2px solid transparent;
   border-image:linear-gradient(90deg,transparent,#D4AF37,#E8D48B,#D4AF37,transparent) 1;
-  box-shadow:0 4px 20px rgba(212,175,55,.13);
-  padding:11px 20px;
-}
+  box-shadow:0 4px 20px rgba(212,175,55,.13); padding:11px 20px;}
 .brandbar .inner{max-width:920px; margin:0 auto; display:flex; align-items:center; gap:11px;}
 .brandbar img{width:30px; height:30px; object-fit:contain; filter:drop-shadow(0 1px 3px rgba(139,105,20,.3));}
-.brandbar .name{
-  font-family:'Cinzel',serif; font-weight:600; font-size:1rem; letter-spacing:.16em;
+.brandbar .name{font-family:'Cinzel',serif; font-weight:600; font-size:1rem; letter-spacing:.16em;
   background:linear-gradient(135deg,#722F37,#B8860B,#722F37);
-  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;
-}
-.brandbar .cta{
-  margin-left:auto; font-size:.82rem; font-weight:600; text-decoration:none;
-  color:#722F37; border:1.4px solid rgba(114,47,55,.35); border-radius:40px;
-  padding:7px 16px; transition:all .2s; white-space:nowrap;
-}
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;}
+.brandbar .cta{margin-left:auto; font-size:.82rem; font-weight:600; text-decoration:none;
+  color:#722F37; border:1.4px solid rgba(114,47,55,.35); border-radius:40px; padding:7px 16px; transition:all .2s; white-space:nowrap;}
 .brandbar .cta:hover{background:rgba(114,47,55,.07); border-color:rgba(114,47,55,.6);}
 
 /* ── HERO ── */
 .hero{padding:54px 22px 60px; text-align:center;}
 .hero-icon{width:96px; height:96px; margin:0 auto 22px; position:relative; display:flex; align-items:center; justify-content:center;}
 .hero-icon .glow{position:absolute; inset:-8px; border-radius:50%;
-  background:radial-gradient(circle, rgba(212,175,55,.28) 0%, rgba(212,175,55,.10) 50%, transparent 76%);
-  animation:glowPulse 3s ease-in-out infinite;}
+  background:radial-gradient(circle, rgba(212,175,55,.28) 0%, rgba(212,175,55,.10) 50%, transparent 76%); animation:glowPulse 3s ease-in-out infinite;}
 @keyframes glowPulse{0%,100%{opacity:.6; transform:scale(1);} 50%{opacity:1; transform:scale(1.08);}}
 .hero-icon svg{width:100%; height:100%; position:relative; z-index:1; filter:drop-shadow(0 4px 12px rgba(0,0,0,.45));}
 .hero-icon .page{transform-origin:32px 22px; transform-box:fill-box; animation:flip 3.4s ease-in-out infinite;}
 @keyframes flip{0%,100%{transform:rotate(0);} 30%{transform:rotate(-9deg);} 60%{transform:rotate(3deg);} 80%{transform:rotate(-4deg);}}
-.hero h1{
-  font-family:'DM Serif Display','Anuphan',serif; font-weight:400;
-  font-size:clamp(2rem,5.4vw,3rem); line-height:1.22; letter-spacing:.4px; margin:8px auto 0; max-width:14ch;
+.hero h1{font-family:'Anuphan',sans-serif; font-weight:700;
+  font-size:clamp(1.9rem,5.2vw,2.9rem); line-height:1.24; letter-spacing:.3px; margin:8px auto 0; max-width:16ch;
   background:linear-gradient(135deg,#D4AF37,#F4E4BA 55%,#D4AF37);
-  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;
-}
-.hero .lead{color:var(--text-light); font-size:1.06rem; line-height:1.85; margin:20px auto 0; max-width:46ch; font-weight:300;}
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;}
+.hero .lead{color:var(--text-light); font-size:1.05rem; line-height:1.85; margin:20px auto 0; max-width:48ch; font-weight:300;}
 .hero .tags{display:flex; flex-wrap:wrap; gap:9px; justify-content:center; margin-top:26px;}
 .tag{font-size:.8rem; font-weight:500; letter-spacing:.3px; color:#C4B88A;
-  border:1px solid rgba(212,175,55,.22); background:rgba(212,175,55,.05);
-  border-radius:40px; padding:7px 15px;}
+  border:1px solid rgba(212,175,55,.22); background:rgba(212,175,55,.05); border-radius:40px; padding:7px 15px;}
 
-/* ── STATS bar (cream) ── */
+/* ── STATS ── */
 .stats{background:linear-gradient(180deg,#FFFEF8,#F8F2E4); border-top:1px solid rgba(212,175,55,.15); border-bottom:1px solid rgba(212,175,55,.15); padding:42px 22px;}
 .stats-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; max-width:880px; margin:0 auto; text-align:center;}
+.stat{position:relative; padding:6px;}
 .stat .num{font-family:'DM Serif Display',serif; font-size:clamp(1.9rem,5vw,2.7rem); line-height:1; color:var(--gold-dark);}
 .stat .lab{font-size:.8rem; color:var(--text-muted); margin-top:8px; line-height:1.45;}
-.stat{position:relative; padding:6px 6px;}
 .stat:not(:last-child)::after{content:''; position:absolute; right:-7px; top:18%; bottom:18%; width:1px; background:rgba(212,175,55,.25);}
 
-/* ── PROBLEM list (dark) ── */
+/* ── PROBLEM ── */
 .prob-list{margin:30px auto 0; max-width:620px; display:flex; flex-direction:column; gap:13px;}
 .prob{display:flex; gap:14px; align-items:flex-start; padding:16px 18px;
   background:rgba(26,10,14,.55); border:1px solid rgba(212,175,55,.12); border-left:3px solid rgba(193,69,69,.55);
   border-radius:13px; backdrop-filter:blur(4px);}
 .prob .x{flex:0 0 auto; width:22px; height:22px; margin-top:2px; color:#C14545;}
 .prob p{color:var(--text-light); font-size:.96rem; line-height:1.7;}
-.prob-close{text-align:center; margin:30px auto 0; max-width:50ch; color:var(--gold-light); font-size:1rem; line-height:1.8; font-weight:500;}
+.prob-close{text-align:center; margin:30px auto 0; max-width:52ch; color:var(--gold-light); font-size:1rem; line-height:1.8; font-weight:500;}
 
-/* ── FEATURES (cream cards) ── */
+/* ── FEATURES ── */
 .feat-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:18px; margin-top:34px;}
-.card{
-  background:linear-gradient(160deg,#FFFEF8,#F8F2E4); border:1px solid rgba(212,175,55,.22);
-  border-radius:20px; padding:26px 24px; box-shadow:0 4px 20px rgba(114,47,55,.06); transition:transform .25s, box-shadow .25s;
-}
+.card{background:linear-gradient(160deg,#FFFEF8,#F8F2E4); border:1px solid rgba(212,175,55,.22);
+  border-radius:20px; padding:26px 24px; box-shadow:0 4px 20px rgba(114,47,55,.06); transition:transform .25s, box-shadow .25s;}
 .card:hover{transform:translateY(-3px); box-shadow:0 10px 30px rgba(114,47,55,.12);}
 .card .ic{width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center;
   background:rgba(212,175,55,.10); border:1px solid rgba(212,175,55,.28); margin-bottom:16px;}
@@ -149,24 +131,62 @@ section{padding:64px 22px;}
 .card p{color:var(--text-muted); font-size:.92rem; line-height:1.72;}
 .card.wide{grid-column:1 / -1;}
 
-/* ── PILLARS / HOW (dark) ── */
+/* ── MAIN MENU (dark rows) ── */
+.menu-list{display:flex; flex-direction:column; gap:14px; margin-top:34px;}
+.menu-item{display:flex; gap:18px; align-items:center; padding:20px 22px;
+  background:rgba(26,10,14,.5); border:1px solid rgba(212,175,55,.14); border-radius:18px; backdrop-filter:blur(4px); transition:border-color .2s;}
+.menu-item:hover{border-color:rgba(212,175,55,.34);}
+.menu-ic{flex:0 0 auto; width:54px; height:54px; border-radius:14px; display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(150deg,rgba(58,21,32,.9),rgba(26,10,14,.9)); border:1px solid rgba(212,175,55,.25);}
+.menu-ic svg{width:27px; height:27px; stroke:#E8D9A8;}
+.menu-item h4{font-family:'Anuphan',sans-serif; font-weight:700; font-size:1.12rem; color:var(--gold-light); margin-bottom:4px;}
+.menu-item p{color:var(--text-light-muted); font-size:.92rem; line-height:1.6;}
+.menu-item p b{color:#C9B98A; font-weight:600;}
+
+/* ── PORTFOLIO highlight stats ── */
+.pstats{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:32px;}
+.pstat{background:linear-gradient(160deg,#FFFEF8,#F5EDD8); border:1px solid rgba(212,175,55,.22); border-radius:18px; padding:28px 16px; text-align:center; box-shadow:0 4px 16px rgba(114,47,55,.05);}
+.pstat .n{font-family:'DM Serif Display',serif; font-size:2.6rem; line-height:1; color:var(--gold-dark);}
+.pstat .l{font-size:.86rem; color:var(--text-muted); margin-top:10px; line-height:1.5;}
+
+/* ── GETTING STARTED steps (dark) ── */
+.steps{display:flex; flex-direction:column; gap:16px; margin-top:34px; max-width:680px; margin-left:auto; margin-right:auto;}
+.step{display:flex; gap:18px; align-items:flex-start; padding:22px 22px;
+  background:rgba(26,10,14,.5); border:1px solid rgba(212,175,55,.14); border-radius:18px; backdrop-filter:blur(4px);}
+.step-num{flex:0 0 auto; width:50px; height:50px; border-radius:13px; display:flex; align-items:center; justify-content:center;
+  font-family:'DM Serif Display',serif; font-size:1.5rem; color:#FFFEF8;
+  background:linear-gradient(150deg,#E5C66A,#B8860B); box-shadow:0 3px 12px rgba(184,134,11,.4);}
+.step h4{font-family:'Anuphan',sans-serif; font-weight:700; font-size:1.14rem; color:var(--gold-light); margin-bottom:5px;}
+.step p{color:var(--text-light-muted); font-size:.93rem; line-height:1.65;}
+
+/* ── QUICK TIPS (cream rows) ── */
+.tips{display:flex; flex-direction:column; gap:14px; margin-top:34px; max-width:720px; margin-left:auto; margin-right:auto;}
+.tip{display:flex; gap:16px; align-items:center; padding:18px 20px;
+  background:linear-gradient(160deg,#FFFEF8,#F8F2E4); border:1px solid rgba(212,175,55,.22); border-radius:16px; box-shadow:0 3px 14px rgba(114,47,55,.05);}
+.tip-ic{flex:0 0 auto; width:42px; height:42px; border-radius:11px; display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(145deg,#E5C66A,#B8860B); box-shadow:0 2px 8px rgba(184,134,11,.3);}
+.tip-ic svg{width:21px; height:21px; stroke:#2d1018;}
+.tip p{font-size:.95rem; color:var(--text); line-height:1.6;}
+.tip p b{color:var(--maroon); font-weight:700;}
+
+/* ── PILLARS ── */
 .pillars{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:36px;}
 .pillar{text-align:center; padding:30px 20px; background:rgba(26,10,14,.5); border:1px solid rgba(212,175,55,.13); border-radius:18px; backdrop-filter:blur(4px);}
-.pillar .step{font-family:'DM Serif Display',serif; font-size:2.2rem; line-height:1; color:var(--gold); opacity:.85;}
+.pillar .step-c{font-family:'DM Serif Display',serif; font-size:2.2rem; line-height:1; color:var(--gold); opacity:.85;}
 .pillar h4{font-family:'Anuphan',sans-serif; font-weight:600; font-size:1.15rem; color:var(--gold-light); margin:12px 0 4px;}
 .pillar .en{font-family:'Cinzel',serif; font-size:.6rem; letter-spacing:.24em; text-transform:uppercase; color:#A0875A; margin-bottom:12px;}
 .pillar p{color:var(--text-light-muted); font-size:.9rem; line-height:1.7;}
 
-/* ── QUOTE (cream) ── */
-.quote{background:#FAF6ED; text-align:center; padding:70px 22px;}
+/* ── QUOTE ── */
+.quote{background:#FAF6ED; text-align:center; padding:66px 22px;}
 .quote .mark{font-family:'DM Serif Display',serif; font-size:3.4rem; color:var(--gold); opacity:.35; line-height:.6;}
-.quote p{font-family:'DM Serif Display','Anuphan',serif; font-weight:400; font-size:clamp(1.3rem,3.6vw,1.9rem); color:var(--maroon); line-height:1.5; max-width:18ch; margin:14px auto 0;}
+.quote p{font-family:'Anuphan',sans-serif; font-weight:600; font-size:clamp(1.3rem,3.6vw,1.85rem); color:var(--maroon); line-height:1.5; max-width:20ch; margin:14px auto 0;}
 
-/* ── FINAL CTA (dark) ── */
+/* ── CTA ── */
 .cta-sec{text-align:center;}
-.cta-sec h2{font-family:'DM Serif Display','Anuphan',serif; font-weight:400; font-size:clamp(1.6rem,4.4vw,2.3rem); line-height:1.3;
+.cta-sec h2{font-family:'Anuphan',sans-serif; font-weight:700; font-size:clamp(1.6rem,4.4vw,2.3rem); line-height:1.3;
   background:linear-gradient(135deg,#D4AF37,#F4E4BA,#D4AF37); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;}
-.cta-sec p{color:var(--text-light-muted); margin:14px auto 0; max-width:42ch; font-size:1rem; line-height:1.8;}
+.cta-sec p{color:var(--text-light-muted); margin:14px auto 0; max-width:44ch; font-size:1rem; line-height:1.8;}
 .btn{display:inline-flex; align-items:center; gap:9px; margin-top:28px; text-decoration:none;
   font-weight:700; font-size:1rem; border-radius:50px; padding:15px 34px;
   background:linear-gradient(135deg,#D4AF37 0%,#B8860B 100%); color:#1a0a0e;
@@ -175,14 +195,14 @@ section{padding:64px 22px;}
 .btn svg{width:18px; height:18px;}
 .cta-note{color:#A09B92; font-size:.85rem; margin-top:18px;}
 
-/* ── FOOTER (cream-deep) ── */
+/* ── FOOTER ── */
 footer{background:#EDE4D0; padding:42px 22px 48px; text-align:center;}
 footer .flogo{display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:6px;}
 footer .flogo img{width:28px; height:28px; object-fit:contain;}
 footer .flogo span{font-family:'Cinzel',serif; font-weight:600; font-size:.95rem; letter-spacing:.16em;
   background:linear-gradient(135deg,#722F37,#B8860B); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;}
 footer .tagline{font-style:italic; font-weight:500; color:var(--gold-deep); font-size:.9rem; letter-spacing:.3px; margin-bottom:20px;}
-footer .disc{max-width:60ch; margin:0 auto 16px; font-size:.78rem; line-height:1.7; color:#8A7E6E;
+footer .disc{max-width:62ch; margin:0 auto 16px; font-size:.78rem; line-height:1.7; color:#8A7E6E;
   border-top:1px dashed rgba(212,175,55,.4); border-bottom:1px dashed rgba(212,175,55,.4); padding:16px 0;}
 footer .copy{font-size:.78rem; color:#A09585; letter-spacing:.3px;}
 
@@ -190,18 +210,18 @@ footer .copy{font-size:.78rem; color:#A09585; letter-spacing:.3px;}
 @media (prefers-reduced-motion:no-preference){
   .reveal{opacity:0; transform:translateY(16px); animation:rise .7s ease forwards;}
   @keyframes rise{to{opacity:1; transform:none;}}
-  .d1{animation-delay:.05s;} .d2{animation-delay:.13s;} .d3{animation-delay:.21s;}
-  .d4{animation-delay:.29s;} .d5{animation-delay:.37s;}
+  .d1{animation-delay:.05s;} .d2{animation-delay:.13s;} .d3{animation-delay:.21s;} .d4{animation-delay:.29s;} .d5{animation-delay:.37s;}
 }
 
 /* ── responsive ── */
 @media (max-width:760px){
-  section{padding:52px 20px;}
+  section{padding:50px 20px;}
   .stats-grid{grid-template-columns:repeat(2,1fr); gap:24px 14px;}
   .stat:nth-child(2)::after{display:none;}
   .feat-grid{grid-template-columns:1fr;}
   .card.wide{grid-column:auto;}
   .pillars{grid-template-columns:1fr; gap:14px;}
+  .pstats{grid-template-columns:1fr;}
 }
 @media (max-width:420px){
   .brandbar .cta{display:none;}
@@ -228,19 +248,15 @@ footer .copy{font-size:.78rem; color:#A09585; letter-spacing:.3px;}
       <ellipse cx="32" cy="54.5" rx="22" ry="1.6" fill="#000" opacity="0.25"/>
       <path d="M 8 16 L 32 22 L 32 50 L 8 46 Z" fill="#2d1018" stroke="#D4AF37" stroke-width="1.8"/>
       <path d="M 56 16 L 32 22 L 32 50 L 56 46 Z" fill="#2d1018" stroke="#D4AF37" stroke-width="1.8"/>
-      <g stroke="#D4AF37" stroke-width="0.95" opacity="0.6">
-        <line x1="13" y1="28" x2="28" y2="30"/><line x1="13" y1="33" x2="28" y2="35"/><line x1="13" y1="38" x2="28" y2="40"/>
-      </g>
-      <g stroke="#D4AF37" stroke-width="0.95" opacity="0.6">
-        <line x1="36" y1="30" x2="51" y2="28"/><line x1="36" y1="35" x2="51" y2="33"/><line x1="36" y1="40" x2="51" y2="38"/>
-      </g>
+      <g stroke="#D4AF37" stroke-width="0.95" opacity="0.6"><line x1="13" y1="28" x2="28" y2="30"/><line x1="13" y1="33" x2="28" y2="35"/><line x1="13" y1="38" x2="28" y2="40"/></g>
+      <g stroke="#D4AF37" stroke-width="0.95" opacity="0.6"><line x1="36" y1="30" x2="51" y2="28"/><line x1="36" y1="35" x2="51" y2="33"/><line x1="36" y1="40" x2="51" y2="38"/></g>
       <line x1="32" y1="22" x2="32" y2="50" stroke="#F4E4BA" stroke-width="1.3" opacity="0.6"/>
       <path class="page" d="M 32 22 Q 39 13 48 16 L 49 18 Q 41 17 32 22 Z" fill="#3a1520" stroke="#D4AF37" stroke-width="1.5"/>
     </svg>
   </div>
   <div class="kicker on-dark reveal d2">JP Trust Learning</div>
-  <h1 class="reveal d2">ลงทุนหุ้นสหรัฐและทองคำ<br>อย่างมีระบบ</h1>
-  <p class="lead reveal d3">แพลตฟอร์มเรียนรู้และวิเคราะห์การลงทุน รวมเครื่องมือสแกนหุ้น ทดสอบกลยุทธ์ บันทึกพอร์ต และบทวิเคราะห์รายวันไว้ในที่เดียว — เรียบเรียงเป็นภาษาไทยที่อ่านเข้าใจง่าย</p>
+  <h1 class="reveal d2">ศึกษากลยุทธ์การลงทุน<br>หุ้นสหรัฐและทองคำ อย่างมีระบบ</h1>
+  <p class="lead reveal d3">แพลตฟอร์มเรียนรู้และวิเคราะห์การลงทุน รวมเครื่องมือสแกนหุ้น ทดสอบกลยุทธ์ บันทึกพอร์ต และบทวิเคราะห์รายวันไว้ในที่เดียว — เรียบเรียงเป็นภาษาไทยที่เข้าใจง่าย เพื่อให้คุณเข้าใจตลาดและตัดสินใจด้วยตัวเองอย่างมีหลักการ</p>
   <div class="tags reveal d4">
     <span class="tag">หุ้น S&amp;P 500</span>
     <span class="tag">ทองคำ (Gold)</span>
@@ -253,7 +269,7 @@ footer .copy{font-size:.78rem; color:#A09585; letter-spacing:.3px;}
 <section class="stats">
   <div class="stats-grid">
     <div class="stat"><div class="num">~500</div><div class="lab">หุ้น S&amp;P 500<br>ที่สแกนทุกวัน</div></div>
-    <div class="stat"><div class="num">10+</div><div class="lab">ปี ข้อมูลราคา<br>ย้อนหลังจริง</div></div>
+    <div class="stat"><div class="num">25 ปี</div><div class="lab">ข้อมูลราคา<br>ย้อนหลังจริง</div></div>
     <div class="stat"><div class="num">0–100</div><div class="lab">Momentum Score<br>ทุกตัว</div></div>
     <div class="stat"><div class="num">ทุกวัน</div><div class="lab">บทวิเคราะห์<br>และข่าวลงทุน</div></div>
   </div>
@@ -264,15 +280,15 @@ footer .copy{font-size:.78rem; color:#A09585; letter-spacing:.3px;}
   <div class="wrap" style="text-align:center;">
     <div class="deco on-dark"><i></i></div>
     <div class="kicker on-dark">The Challenge</div>
-    <h2 class="sec-title on-dark" style="margin-top:10px; font-size:clamp(1.6rem,4.2vw,2.2rem);">ทำไมการลงทุนถึงยากสำหรับรายย่อย</h2>
-    <p class="sec-desc on-dark narrow">นักลงทุนรายย่อยส่วนใหญ่เจอปัญหาเดียวกัน — และมักไม่ใช่เพราะเลือกหุ้นผิด แต่เพราะขาดระบบ</p>
+    <h2 class="sec-title on-dark" style="margin-top:10px;">ทำไมการลงทุนถึงยากสำหรับรายย่อย</h2>
+    <p class="sec-desc on-dark narrow">นักลงทุนรายย่อยส่วนใหญ่เจอปัญหาเดียวกัน — และมักไม่ใช่เพราะเลือกหุ้นผิด แต่เพราะขาดระบบและความเข้าใจ</p>
     <div class="prob-list" style="text-align:left;">
       <div class="prob"><svg class="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg><p>ข้อมูลกระจัดกระจายหลายแหล่ง อ่านยาก และเป็นภาษาอังกฤษเกือบทั้งหมด</p></div>
       <div class="prob"><svg class="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg><p>ตัดสินใจซื้อ-ขายตามอารมณ์และข่าวลือ ขาดระบบที่วัดผลได้จริง</p></div>
-      <div class="prob"><svg class="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg><p>ไม่เคยรู้ว่ากลยุทธ์ที่ใช้อยู่ “เคยทำกำไรได้จริงไหม” ในอดีตที่ผ่านมา</p></div>
+      <div class="prob"><svg class="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg><p>ไม่เคยรู้ว่ากลยุทธ์ที่สนใจ “เคยให้ผลอย่างไร” ในอดีตที่ผ่านมา</p></div>
       <div class="prob"><svg class="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg><p>บันทึกพอร์ตในกระดาษหรือ Excel กระจัดกระจาย มองภาพรวมกำไร-ขาดทุนไม่ออก</p></div>
     </div>
-    <p class="prob-close">JP Trust Learning ออกแบบมาเพื่อแก้ทุกข้อนี้ — รวมเครื่องมือระดับสถาบัน ให้เข้าใจง่ายสำหรับนักลงทุนไทย</p>
+    <p class="prob-close">JP Trust Learning ออกแบบมาเพื่อช่วยให้เข้าใจทุกข้อนี้ — รวมเครื่องมือศึกษาและวิเคราะห์ระดับสถาบัน ให้เข้าใจง่ายสำหรับคนไทย</p>
   </div>
 </section>
 
@@ -281,60 +297,140 @@ footer .copy{font-size:.78rem; color:#A09585; letter-spacing:.3px;}
   <div class="wrap" style="text-align:center;">
     <div class="deco on-cream"><i></i></div>
     <div class="kicker on-cream">What's Inside</div>
-    <h2 class="sec-title on-cream" style="margin-top:10px; font-size:clamp(1.7rem,4.4vw,2.4rem);">แอปทำอะไรได้บ้าง</h2>
-    <p class="sec-desc on-cream narrow">ห้าเครื่องมือหลัก ครอบคลุมตั้งแต่การวิเคราะห์ ทดสอบ ไปจนถึงการติดตามพอร์ตจริง</p>
+    <h2 class="sec-title on-cream">แอปทำอะไรได้บ้าง</h2>
+    <p class="sec-desc on-cream narrow">ห้าเครื่องมือหลัก ครอบคลุมตั้งแต่การวิเคราะห์ ทดสอบกลยุทธ์ ไปจนถึงการติดตามพอร์ตของคุณเอง</p>
 
     <div class="feat-grid" style="text-align:left;">
-      <!-- 1 Insight Terminal -->
       <div class="card reveal d1">
         <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14a9 9 0 0 1 18 0"/><line x1="12" y1="14" x2="16.5" y2="9.5"/><circle cx="12" cy="14" r="1.4" fill="#B8860B" stroke="none"/></svg></div>
-        <h3>Insight Terminal</h3>
-        <div class="en">Analysis Dashboard</div>
+        <h3>Insight Terminal</h3><div class="en">Analysis Dashboard</div>
         <p>แดชบอร์ดวิเคราะห์ทองคำและหุ้น S&amp;P 500 แบบเรียลไทม์ พร้อม Momentum Score (คะแนนโมเมนตัม 0–100 ที่บอกความแข็งแกร่งของแนวโน้ม) แนวรับ-แนวต้าน และการอ่านภาพรวมเศรษฐกิจ (Macro) อย่างเป็นระบบ</p>
       </div>
-      <!-- 2 Backtest Lab -->
       <div class="card reveal d2">
         <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v6.5L5 19a1.5 1.5 0 0 0 1.4 2.1h11.2A1.5 1.5 0 0 0 19 19l-5-9.5V3"/><line x1="8" y1="15" x2="16" y2="15"/></svg></div>
-        <h3>Backtest Lab</h3>
-        <div class="en">Strategy Testing</div>
-        <p>ทดสอบกลยุทธ์การลงทุนเชิงระบบกับข้อมูลราคาจริงย้อนหลังกว่า 10 ปี — เห็นผลตอบแทนและความเสี่ยงที่เคยเกิดขึ้นจริง ก่อนตัดสินใจลงเงินจริงแม้แต่บาทเดียว (Backtest คือการทดสอบกลยุทธ์ย้อนหลังด้วยข้อมูลในอดีต)</p>
+        <h3>Backtest Lab</h3><div class="en">Strategy Testing</div>
+        <p>ทดสอบกลยุทธ์การลงทุนเชิงระบบกับข้อมูลราคาจริงย้อนหลังกว่า 25 ปี เพื่อเข้าใจว่ากลยุทธ์เคยให้ผลตอบแทนและความเสี่ยงอย่างไรในอดีต — เห็นภาพชัดด้วยตัวเองก่อนนำไปศึกษาต่อ (Backtest คือการทดสอบกลยุทธ์ย้อนหลังด้วยข้อมูลในอดีต)</p>
       </div>
-      <!-- 3 My Portfolio -->
       <div class="card reveal d3">
         <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M12 3v9l6.4 6.4"/></svg></div>
-        <h3>My Portfolio</h3>
-        <div class="en">Portfolio Tracker</div>
+        <h3>My Portfolio</h3><div class="en">Portfolio Tracker</div>
         <p>บันทึกและวิเคราะห์พอร์ตของคุณได้สูงสุด 5 พอร์ต คำนวณกำไร-ขาดทุนทั้งที่ขายแล้ว (Realized) และที่ยังถืออยู่ (Unrealized) แยกเป็นรายไม้อัตโนมัติ พร้อมกราฟเส้นทางการเติบโตของพอร์ต</p>
       </div>
-      <!-- 4 Planning Toolkit -->
       <div class="card reveal d4">
         <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1.2" fill="#B8860B" stroke="none"/></svg></div>
-        <h3>Planning Toolkit</h3>
-        <div class="en">Financial Planning</div>
+        <h3>Planning Toolkit</h3><div class="en">Financial Planning</div>
         <p>เครื่องมือวางแผนการเงินส่วนบุคคลและจัดสรรพอร์ตการลงทุน ช่วยให้เห็นเส้นทางจากเงินต้นวันนี้ ไปถึงเป้าหมายในอนาคตอย่างชัดเจนเป็นตัวเลข</p>
       </div>
-      <!-- 5 News & Analysis (wide) -->
       <div class="card wide reveal d5">
         <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11a2 2 0 0 1 2 2v12a2 2 0 0 0 2 2H6a2 2 0 0 1-2-2V4z"/><line x1="8" y1="8" x2="15" y2="8"/><line x1="8" y1="11.5" x2="15" y2="11.5"/><line x1="8" y1="15" x2="12" y2="15"/></svg></div>
-        <h3>News &amp; Analysis</h3>
-        <div class="en">Daily Market Brief</div>
-        <p>บทวิเคราะห์ตลาดและข่าวการลงทุนต่างประเทศ เรียบเรียงเป็นภาษาไทยที่อ่านง่าย สไตล์รายงานจากธนาคาร อัปเดตทุกวันทำการ — ช่วยให้เข้าใจว่าเกิดอะไรขึ้นในตลาด และกระทบต่อพอร์ตของเราอย่างไร</p>
+        <h3>News &amp; Analysis</h3><div class="en">Daily Market Brief</div>
+        <p>บทวิเคราะห์ตลาดและข่าวการลงทุนต่างประเทศ เรียบเรียงเป็นภาษาไทยที่อ่านง่าย สไตล์รายงานจากธนาคาร อัปเดตทุกวันทำการ — ช่วยให้เข้าใจว่าเกิดอะไรขึ้นในตลาด และมีนัยต่อนักลงทุนไทยอย่างไร</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ════ PILLARS / PHILOSOPHY ════ -->
+<!-- ════ MAIN MENU ════ -->
+<section class="dark">
+  <div class="wrap" style="text-align:center;">
+    <div class="deco on-dark"><i></i></div>
+    <div class="kicker on-dark">Main Menu</div>
+    <h2 class="sec-title on-dark">เมนูหลักในแอป</h2>
+    <p class="sec-desc on-dark narrow">โครงสร้างเรียบง่าย เข้าถึงทุกเครื่องมือได้จากแถบเมนูด้านล่าง</p>
+    <div class="menu-list" style="text-align:left;">
+      <div class="menu-item">
+        <div class="menu-ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-9"/><path d="M10 20v-6h4v6"/></svg></div>
+        <div><h4>หน้าหลัก</h4><p>ภาพรวมตลาด ราคาหุ้นและทองเรียลไทม์ บัตรสมาชิก และทางลัดเครื่องมือทั้งหมด</p></div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11a2 2 0 0 1 2 2v12a2 2 0 0 0 2 2H6a2 2 0 0 1-2-2V4z"/><line x1="8" y1="8" x2="15" y2="8"/><line x1="8" y1="12" x2="15" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg></div>
+        <div><h4>ข่าว</h4><p>ข่าวการเงินรายวันสรุปเข้าใจง่าย พร้อม<b>นัยต่อนักลงทุนไทย</b></p></div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v6.5L5 19a1.5 1.5 0 0 0 1.4 2.1h11.2A1.5 1.5 0 0 0 19 19l-5-9.5V3"/><line x1="8" y1="15" x2="16" y2="15"/></svg></div>
+        <div><h4>Lab</h4><p>Backtest กลยุทธ์ Momentum, <b>S&amp;P 500 Scanner</b>, <b>Gold Dashboard</b></p></div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5"/><path d="M4 19h16"/><polyline points="7 15 11 10 14 13 19 7"/></svg></div>
+        <div><h4>Roadmap</h4><p>แผนการเรียนรู้ 90 วัน พร้อมเครื่องมือวางแผนพอร์ตเป็นขั้นตอน</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ MY PORTFOLIO highlight ════ -->
+<section class="stats" style="background:#FAF6ED; border:none;">
+  <div class="wrap" style="text-align:center;">
+    <div class="deco on-cream"><i></i></div>
+    <div class="kicker on-cream">My Portfolio</div>
+    <h2 class="sec-title on-cream">บันทึกพอร์ตการลงทุน</h2>
+    <p class="sec-desc on-cream narrow">เก็บทุกการซื้อ-ขายไว้ที่เดียว ให้แอปคำนวณและสรุปภาพรวมให้อัตโนมัติ</p>
+    <div class="pstats">
+      <div class="pstat"><div class="n">5</div><div class="l">พอร์ตต่อบัญชี<br>ตั้งชื่อได้เอง</div></div>
+      <div class="pstat"><div class="n">&infin;</div><div class="l">บันทึกไม้ซื้อ<br>คิดกำไร/ขาดทุนอัตโนมัติ</div></div>
+      <div class="pstat"><div class="n">3</div><div class="l">มุมมอง: รายไม้<br>ต่อหุ้น · ตามกลุ่ม</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ GETTING STARTED ════ -->
+<section class="dark">
+  <div class="wrap" style="text-align:center;">
+    <div class="deco on-dark"><i></i></div>
+    <div class="kicker on-dark">Getting Started</div>
+    <h2 class="sec-title on-dark">เริ่มต้นใน 3 ขั้นตอน</h2>
+    <p class="sec-desc on-dark narrow">ตั้งแต่เปิดแอปครั้งแรก จนพร้อมใช้งานทุกฟีเจอร์</p>
+    <div class="steps" style="text-align:left;">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div><h4>เพิ่มแอปลงหน้าจอ</h4><p>เปิด app.jptrustlearning.com แล้วเลือก “เพิ่มลงในหน้าจอหลัก” ใช้งานได้เหมือนแอปจริง</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div><h4>เข้าสู่ระบบด้วยอีเมล</h4><p>กรอกอีเมลที่สมัครไว้ รับรหัส OTP 6 หลักทางอีเมล แล้วนำมายืนยันตัวตน</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div><h4>ตั้งรหัส PIN</h4><p>ตั้ง PIN 6 หลักไว้เปิดแอป ทุกครั้งที่เปิดใหม่ใส่ PIN เพื่อความปลอดภัย</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ QUICK TIPS ════ -->
+<section class="stats" style="background:#FAF6ED; border:none;">
+  <div class="wrap" style="text-align:center;">
+    <div class="deco on-cream"><i></i></div>
+    <div class="kicker on-cream">Quick Tips</div>
+    <h2 class="sec-title on-cream">เคล็ดลับการใช้งาน</h2>
+    <div class="tips" style="text-align:left;">
+      <div class="tip">
+        <div class="tip-ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><polyline points="20 4 20 10 14 10"/></svg></div>
+        <p><b>ราคาค้าง?</b> สลับไปเมนูอื่นแล้วกลับมาหน้าหลัก ราคาจะรีเฟรชใหม่</p>
+      </div>
+      <div class="tip">
+        <div class="tip-ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8 8 0 0 1-11.5 7.2L4 20l1.3-4.5A8 8 0 1 1 21 11.5z"/></svg></div>
+        <p><b>ข่าวไม่ขึ้น?</b> ปิดแอปแล้วเปิดใหม่ ข่าวจะถูกดึงมาแบบสดๆ</p>
+      </div>
+      <div class="tip">
+        <div class="tip-ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+        <p><b>ใกล้หมดอายุ?</b> ระบบแจ้งเตือนล่วงหน้า กดต่ออายุได้ ต่อจากวันหมดอายุเดิม</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ PILLARS ════ -->
 <section class="dark">
   <div class="wrap" style="text-align:center;">
     <div class="deco on-dark"><i></i></div>
     <div class="kicker on-dark">Our Philosophy</div>
-    <h2 class="sec-title on-dark" style="margin-top:10px; font-size:clamp(1.6rem,4.2vw,2.2rem);">สามเสาหลักของการลงทุนที่ยั่งยืน</h2>
+    <h2 class="sec-title on-dark">สามเสาหลักของการลงทุนที่ยั่งยืน</h2>
     <p class="sec-desc on-dark narrow">ทุกเครื่องมือในแอปถูกออกแบบรอบแนวคิดเดียวกัน</p>
     <div class="pillars" style="text-align:center;">
-      <div class="pillar"><div class="step">01</div><h4>ความรู้</h4><div class="en">Knowledge</div><p>เรียนรู้กลยุทธ์และหลักการลงทุนอย่างเป็นระบบ ไม่ใช่การเดาหรือทำตามกระแส</p></div>
-      <div class="pillar"><div class="step">02</div><h4>ข้อมูล</h4><div class="en">Data</div><p>ตัดสินใจบนข้อมูลจริงและตัวเลขที่วัดผลได้ ไม่ใช่บนอารมณ์หรือข่าวลือ</p></div>
-      <div class="pillar"><div class="step">03</div><h4>วินัย</h4><div class="en">Discipline</div><p>ลงมือตามแผนอย่างมีวินัย ทำซ้ำได้ และทบทวนผลได้อย่างต่อเนื่อง</p></div>
+      <div class="pillar"><div class="step-c">01</div><h4>ความรู้</h4><div class="en">Knowledge</div><p>เรียนรู้กลยุทธ์และหลักการลงทุนอย่างเป็นระบบ ไม่ใช่การเดาหรือทำตามกระแส</p></div>
+      <div class="pillar"><div class="step-c">02</div><h4>ข้อมูล</h4><div class="en">Data</div><p>ทำความเข้าใจตลาดบนข้อมูลจริงและตัวเลขที่วัดผลได้ ไม่ใช่บนอารมณ์หรือข่าวลือ</p></div>
+      <div class="pillar"><div class="step-c">03</div><h4>วินัย</h4><div class="en">Discipline</div><p>มีกรอบและวินัยในการตัดสินใจ ทบทวนผลได้อย่างต่อเนื่องด้วยตัวเอง</p></div>
     </div>
   </div>
 </section>
@@ -345,12 +441,12 @@ footer .copy{font-size:.78rem; color:#A09585; letter-spacing:.3px;}
   <p>ความรู้ · ข้อมูล · วินัย<br>สามองค์ประกอบที่ทำให้การลงทุนยั่งยืน</p>
 </section>
 
-<!-- ════ FINAL CTA ════ -->
+<!-- ════ CTA ════ -->
 <section class="dark cta-sec">
   <div class="narrow">
     <div class="kicker on-dark">Get Started</div>
-    <h2 style="margin-top:12px;">พร้อมเริ่มลงทุนอย่างมีระบบแล้วหรือยัง</h2>
-    <p>เข้าถึงทุกเครื่องมือวิเคราะห์ ห้องทดสอบกลยุทธ์ และบทวิเคราะห์รายวันได้ทันที เมื่อเป็นสมาชิก JP Trust Learning</p>
+    <h2 style="margin-top:12px;">พร้อมเริ่มศึกษากลยุทธ์การลงทุนอย่างมีระบบแล้วหรือยัง</h2>
+    <p>เข้าถึงทุกเครื่องมือศึกษาและวิเคราะห์ ห้องทดสอบกลยุทธ์ และบทวิเคราะห์รายวันได้ทันที เมื่อเป็นสมาชิก JP Trust Learning</p>
     <a class="btn" href="./signup.html">สมัครสมาชิก
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>
     </a>
@@ -365,7 +461,7 @@ footer .copy{font-size:.78rem; color:#A09585; letter-spacing:.3px;}
     <span>JP Trust Learning</span>
   </div>
   <div class="tagline">ความรู้ · ข้อมูล · วินัย</div>
-  <p class="disc">เนื้อหาและเครื่องมือทั้งหมดจัดทำขึ้นเพื่อการศึกษาและให้ข้อมูลเท่านั้น ไม่ถือเป็นคำแนะนำในการซื้อขายหลักทรัพย์หรือการลงทุน การลงทุนมีความเสี่ยง ผู้ลงทุนควรศึกษาข้อมูลและพิจารณาอย่างรอบคอบก่อนตัดสินใจ</p>
+  <p class="disc">เนื้อหาและเครื่องมือทั้งหมดจัดทำขึ้นเพื่อการศึกษาและให้ข้อมูลเท่านั้น ไม่ใช่คำแนะนำหรือการชักชวนให้ซื้อขายหลักทรัพย์หรือลงทุน การลงทุนมีความเสี่ยง ผู้ลงทุนควรศึกษาข้อมูลและพิจารณาด้วยตนเองอย่างรอบคอบก่อนตัดสินใจ</p>
   <div class="copy">© 2026 JP Trust Learning · All rights reserved</div>
 </footer>
 
