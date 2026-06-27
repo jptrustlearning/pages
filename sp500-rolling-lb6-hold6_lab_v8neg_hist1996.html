@@ -2386,24 +2386,18 @@ function rankMacroAssets(rebalIdx) {
 }
 
 /**
- * LAB v8neg: true when the RAW 6M change of ALL FOUR macro assets is negative
- * (SPY, USDJPY, WTI, GOLD all in the red — broad risk-off, "ติดลบทุกตลาด").
- * Uses raw price change per signalTicker (NO signFlip). Returns false if any
- * asset lacks ~126d history (can't confirm all-negative).
+ * LAB v8neg: true when ALL FOUR macro SIGNALS are negative, using the SAME
+ * signed convention as rankMacroAssets (signFlip applied for JPY):
+ *   SPY / WTI / GOLD signal < 0  ⟺  price fell over 6M
+ *   JPY signal < 0               ⟺  USDJPY rose = yen WEAK
+ *   (yen STRONG = JPY signal POSITIVE — it competes as a risk-off "grower")
+ * So this fires only when every macro asset is a negative signal at once.
+ * Returns false unless all four have ~126d history (can't confirm otherwise).
  */
 function allFourNegativeAtIdx(rebalIdx) {
-  const sixMonthsBackIdx = rebalIdx - 126;
-  if (sixMonthsBackIdx < 0) return false;
-  let counted = 0;
-  for (const asset of MACRO_ASSETS) {
-    const curr = getCloseAtOrBefore(asset.signalTicker, rebalIdx);
-    const prev = getCloseAtOrBefore(asset.signalTicker, sixMonthsBackIdx);
-    if (curr == null || prev == null || prev === 0) return false;
-    const rawPct = ((curr - prev) / prev) * 100;
-    if (rawPct >= 0) return false;
-    counted++;
-  }
-  return counted === 4;
+  const ranked = rankMacroAssets(rebalIdx);
+  if (ranked.length < MACRO_ASSETS.length) return false;  // need all four with history
+  return ranked.every(r => r.deltaPct < 0);
 }
 
 /**
