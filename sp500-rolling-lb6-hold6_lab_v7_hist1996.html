@@ -4860,9 +4860,12 @@ function renderTradeLog() {
       equity: lotCap,                  // use lot capital, not full portfolio
       isOpen, exitDate, pnl, pnlPct, stockRets,
       isReinvest: log.isReinvest || false,
-      // v7: extendCount tells us how many times the lot's maturity was bumped forward.
-      // Pulled from the matched active lot (open lots only — closed lots are not extended after close).
-      extendCount: active ? (active.extendCount || 0) : 0
+      // v7: extendCount = how many times the lot's maturity was bumped forward.
+      // Closed lots RETAIN extendCount, so read it from the closed record for
+      // historical rows; fall back to the active (open) lot for in-flight rows.
+      // (Bug fix: previously read only from `active`, so closed/old extended
+      //  rounds always showed 0 and the 🔁 EXTENDED badge never appeared.)
+      extendCount: closed ? (closed.extendCount || 0) : (active ? (active.extendCount || 0) : 0)
     };
   }).reverse();  // newest first
 
