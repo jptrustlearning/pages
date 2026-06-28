@@ -1,34 +1,34 @@
-# temprender — JPTrust App Ad Renders (WIP)
+# temprender — JPTrust App Ad Renders
 
-โฟลเดอร์ชั่วคราวสำหรับงานทำภาพโฆษณาแอป JPTrust (กราฟิกแนวตั้งสำหรับ IG/FB)
-self-contained — ฝังฟอนต์ + สกรีนช็อตไว้ในตัว แก้/เรนเดอร์ใหม่ได้เรื่อย ๆ
+ชุดกราฟิกโฆษณาแอป JPTrust (แนวตั้ง 1080×1350 @2x → 2160×2700) ดีไซน์ดำ-ทองพรีเมียม
+self-contained — ฝังฟอนต์ + สกรีนช็อต + โลโก้ไว้ในตัว แก้/เรนเดอร์ใหม่ได้โดยไม่ต้องต่อเน็ต
 
-## ไฟล์
-- `build_ad.py` — สคริปต์ประกอบ HTML + เรนเดอร์เป็น PNG (1080×1350 @2x → 2160×2700)
-- `ad1.html` — Part 1 (VS S&P 500) self-contained (ฟอนต์+รูป base64 ในตัว) เปิดในเบราว์เซอร์ได้เลย
-- `ad1.png` — ผลลัพธ์ภาพล่าสุด
-- `screen_vs.jpg` — สกรีนช็อต VS S&P 500 (ครอปแถบ android nav ดำออกแล้ว)
-- `fonts/` — woff2 เฉพาะที่ใช้: Anuphan (latin+thai 300–700), Cinzel (400/600), DM Serif Display (400)
+## ไฟล์หลัก
+- `build_all.py` — **master builder** สร้างทั้ง 4 ภาพจากเทมเพลตเดียว (แก้คำที่ `CONFIGS`)
+- `ad1.png` / `ad2.png` / `ad3.png` / `ad4.png` — ผลลัพธ์ (และ `.html` self-contained คู่กัน)
+- `owl.png` — โลโก้นกฮูก (ครอปจาก ad reference)
+- `screen_vs.jpg` `screen_roadmap.jpg` `screen_lab.jpg` `screen_news.jpg` — สกรีนช็อต (ครอป nav ออกแล้ว)
+- `fonts/` — woff2: Anuphan (latin+thai 300–700), Cinzel (400/600), DM Serif Display (400)
+
+## 4 ภาพในชุด
+| ภาพ | มุมขาย | สกรีน |
+|-----|--------|-------|
+| ad1 | VS S&P 500 — กลยุทธ์พิสูจน์แล้ว | screen_vs |
+| ad2 | Roadmap 90 วัน — มีแผนทีละก้าว | screen_roadmap |
+| ad3 | Strategy Lab — 5 กลยุทธ์มือโปร | screen_lab |
+| ad4 | Daily News — อ่านตลาดทุกเช้า | screen_news |
 
 ## เรนเดอร์ใหม่
-```bash
-# ครั้งแรกต่อเครื่อง (chromium ของ playwright ลงใหม่ทุก session)
-pip install playwright pillow --break-system-packages
-python3 -m playwright install chromium
+    pip install playwright pillow --break-system-packages
+    python3 -m playwright install chromium   # ครั้งแรกต่อเครื่อง
+    python3 build_all.py                       # สร้างทั้ง 4
+    python3 build_all.py --no-render           # เขียน HTML อย่างเดียว (พรีวิวเร็ว)
 
-# เรนเดอร์
-python3 build_ad.py            # เขียน ad1.html + ad1.png
-python3 build_ad.py --no-render  # เขียน HTML อย่างเดียว (เร็ว, ไว้พรีวิว)
-```
-ไม่ต้องต่อเน็ตหรือ npm install — ฟอนต์อยู่ใน `fonts/` แล้ว
+## แก้เนื้อหา / ดีไซน์
+- คำโปรย/ฟีเจอร์: แก้ที่ dict `CONFIGS` ใน build_all.py (eyebrow, headline, sub, badge, feats, disc)
+- เทมเพลต/สี/ขนาด: แก้ที่ตัวแปร `CSS`
+- ไอคอน: เพิ่ม/แก้ที่ dict `ICON` (inline SVG เส้นทอง)
+- เลย์เอาต์: ซ้าย = โลโก้+headline+sub+4 feature การ์ดไอคอน · ขวา = มือถือเอียง · ล่าง = CTA bar
+- สเปกแบรนด์: JPTRUST-THEME-GUIDE.md (มารูน #1a0a0e/#3a1520, ทอง #D4AF37)
 
-## แก้คำโปรย / ดีไซน์
-แก้ตรง block HTML ใน `build_ad.py` (headline `<h1>`, `.sub`, bullets, `.badge`, `.cta`)
-สเปกแบรนด์อ้างอิง: `JPTRUST-THEME-GUIDE.md` (มารูน #1a0a0e/#3a1520, ครีม #FAF6ED, ทอง #D4AF37)
-
-## TODO
-- [ ] Part 2 — Roadmap 90 วัน + Planning Toolkit
-- [ ] Part 3 — Lab / 5 กลยุทธ์
-- [ ] Part 4 — News / Insight รายวัน
-
-> หมายเหตุ: โฟลเดอร์นี้เป็น asset โฆษณา ไม่เกี่ยวกับ build ของ PWA — ไม่ถูก deploy
+หมายเหตุ: โฟลเดอร์นี้เป็น asset โฆษณา ไม่เกี่ยวกับ build PWA — ไม่ถูก deploy
