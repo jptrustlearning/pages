@@ -177,7 +177,7 @@ CONFIGS={
  },
  "ad3":{
    "screen":"screen_lab.jpg","badge":"★ อัปเดตทุกเดือน","eyebrow":"STRATEGY LAB",
-   "headline":"5 กลยุทธ์ลงทุน<br>ระดับมือโปร",
+   "headline":"ทดสอบกลยุทธ์ลงทุน<br>ระดับมือโปร",
    "sub":"Dashboard ใช้งานจริง ไม่ต้องนั่งคำนวณเอง ไม่ต้องจ้างที่ปรึกษาแพง — การวิเคราะห์ระดับสถาบันที่คุณเข้าถึงได้",
    "disc":DISC_GEN,
    "feats":[("flask","5 กลยุทธ์ลงทุน",'<span class="en">Weekly · 6M · Rolling</span> + <span class="en">Gold</span>'),
