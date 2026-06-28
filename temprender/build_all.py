@@ -36,6 +36,7 @@ ICON={
  "news":svg('<path d="M4 5h13v14H6a2 2 0 0 1-2-2z"/><path d="M17 8h3v9a2 2 0 0 1-2 2h-1"/><line x1="7" y1="9" x2="14" y2="9"/><line x1="7" y1="13" x2="14" y2="13"/><line x1="7" y1="17" x2="11" y2="17"/>'),
  "tone":svg('<polyline points="3 9 7 5 11 9"/><line x1="7" y1="5" x2="7" y2="13"/><polyline points="13 15 17 19 21 15"/><line x1="17" y1="11" x2="17" y2="19"/>'),
  "tag":svg('<path d="M3.5 12.5l8-8a2 2 0 0 1 1.4-.6H19a1.5 1.5 0 0 1 1.5 1.5v6.1a2 2 0 0 1-.6 1.4l-8 8a2 2 0 0 1-2.8 0l-5.6-5.6a2 2 0 0 1 0-2.8z"/><circle cx="16" cy="8" r="1.4"/>'),
+ "pulse":svg('<polyline points="3 12 7 12 9.5 5 14.5 19 17 12 21 12"/>'),
  "globe":f'<svg viewBox="0 0 24 24" fill="none" stroke="{G}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.2"/><line x1="2.8" y1="12" x2="21.2" y2="12"/><path d="M12 2.8c2.6 2.5 4 5.8 4 9.2s-1.4 6.7-4 9.2c-2.6-2.5-4-5.8-4-9.2s1.4-6.7 4-9.2z"/></svg>',
 }
 
@@ -194,6 +195,16 @@ CONFIGS={
             ("tone",'โทน <span class="en">Bull / Bear</span>',"รู้ทันทีว่าข่าวบวกหรือลบ"),
             ("globe",'คัดจาก <span class="en">Wall Street</span>',"สรุปเป็นไทย ในภาษาที่เข้าใจ"),
             ("tag","บอกผลต่อพอร์ต","แท็กหุ้นที่เกี่ยวข้องในแต่ละข่าว")],
+ },
+ "ad5":{
+   "screen":"screen_home.jpg","badge":"★ ครบในที่เดียว","eyebrow":"ALL-IN-ONE PLATFORM",
+   "headline":"ทุกเครื่องมือลงทุน<br>ครบในแอปเดียว",
+   "sub":"JP Trust Learning เปลี่ยน<b>งานวิจัย</b>ให้เป็นระบบใช้งานจริง — กลยุทธ์ · ข้อมูล · แผน ครบ จบ ในที่เดียว",
+   "disc":DISC_GEN,
+   "feats":[("flask","กลยุทธ์ + Dashboard","Momentum หลายแบบ + ทองคำ"),
+            ("pulse","ราคาตลาด Live",'หุ้น · ทองคำ · คริปโต เรียลไทม์'),
+            ("pie","วางแผน + จัดพอร์ต",'การเงินส่วนตัว · <span class="en">Asset Allocation</span>'),
+            ("map","Roadmap + ข่าว","แผน 90 วัน + ข่าวกรองรายวัน")],
  },
 }
 

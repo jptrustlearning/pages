@@ -13,10 +13,11 @@ self-contained — ฝังฟอนต์ + สกรีนช็อต + โ�
 ## 4 ภาพในชุด
 | ภาพ | มุมขาย | สกรีน |
 |-----|--------|-------|
+| ad5 | ภาพปก — ทุกเครื่องมือครบในแอปเดียว | screen_home |
 | ad1 | VS S&P 500 — กลยุทธ์พิสูจน์แล้ว | screen_vs |
 | ad2 | Roadmap 90 วัน — มีแผนทีละก้าว | screen_roadmap |
-| ad3 | Strategy Lab — 5 กลยุทธ์มือโปร | screen_lab |
-| ad4 | Daily News — อ่านตลาดทุกเช้า | screen_news |
+| ad3 | Strategy Lab — ทดสอบกลยุทธ์มือโปร | screen_lab |
+| ad4 | Daily News — อ่านตลาดเช้า-บ่าย-เย็น | screen_news |
 
 ## เรนเดอร์ใหม่
     pip install playwright pillow --break-system-packages
