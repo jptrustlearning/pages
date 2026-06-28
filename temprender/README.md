@@ -18,6 +18,7 @@ self-contained — ฝังฟอนต์ + สกรีนช็อต + โ�
 | ad2 | Roadmap 90 วัน — มีแผนทีละก้าว | screen_roadmap |
 | ad3 | Strategy Lab — ทดสอบกลยุทธ์มือโปร | screen_lab |
 | ad4 | Daily News — อ่านตลาดเช้า-บ่าย-เย็น | screen_news |
+| ad5_cream | ปก เวอร์ชันพื้นครีมเหลือบทอง (theme=cream) | screen_home |
 
 ## เรนเดอร์ใหม่
     pip install playwright pillow --break-system-packages

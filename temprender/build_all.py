@@ -114,6 +114,39 @@ h1{{font-weight:600;font-size:52px;line-height:1.08;letter-spacing:.2px;margin-b
 .disc{{position:absolute;left:50px;bottom:14px;font-weight:300;font-size:13px;color:#6f6256}}
 """
 
+# Cream / iridescent-gold variant — reuse layout, override colours.
+# Feature tiles, phone bezel, badge and CTA bar stay dark for contrast on cream.
+CSS_CREAM = CSS + """
+body{
+  background:
+    radial-gradient(ellipse 55% 42% at 16% 16%, rgba(212,175,55,.20) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 86% 84%, rgba(184,134,11,.18) 0%, transparent 55%),
+    radial-gradient(ellipse 65% 55% at 82% 10%, rgba(255,252,242,.6) 0%, transparent 52%),
+    linear-gradient(118deg, transparent 32%, rgba(212,175,55,.08) 46%, rgba(255,243,210,.24) 50%, rgba(212,175,55,.08) 54%, transparent 68%),
+    linear-gradient(155deg,#FFFDF6 0%,#FAF6ED 28%,#F3E8CF 54%,#FBF7EE 78%,#F5EEDB 100%);}
+.streak{opacity:.5;background-image:
+    radial-gradient(1.3px 1.3px at 18% 26%, rgba(184,134,11,.40), transparent),
+    radial-gradient(1.2px 1.2px at 74% 16%, rgba(212,175,55,.40), transparent),
+    radial-gradient(1.2px 1.2px at 60% 42%, rgba(184,134,11,.32), transparent),
+    radial-gradient(1.2px 1.2px at 33% 72%, rgba(212,175,55,.30), transparent),
+    radial-gradient(1.1px 1.1px at 90% 66%, rgba(184,134,11,.32), transparent);}
+.frame{border-color:rgba(184,134,11,.28)}
+.wm .a{color:#5A3D20}
+.wm .b{color:#8B6914}
+.eyebrow{color:#B8860B}
+.eyebrow::before{background:linear-gradient(90deg,#B8860B,transparent)}
+h1{background-image:linear-gradient(120deg,#B8860B 0%,#8B6914 42%,#722F37 100%);
+   -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+   filter:drop-shadow(0 2px 10px rgba(184,134,11,.18))}
+.sub{color:#7A6F62}
+.sub b{color:#5A3D20}
+.divider{background:linear-gradient(90deg,#B8860B,rgba(184,134,11,0))}
+.ftxt .t{color:#3D3228}
+.ftxt .d{color:#8A7B68}
+.ftxt .d .en,.ftxt .t .en{color:#8B6914}
+.disc{color:#9A8B72}
+"""
+
 def feats_html(feats):
     rows=[]
     for ic,t,d in feats:
@@ -123,7 +156,8 @@ def feats_html(feats):
 
 def page(cfg):
     screen=b64(HERE/cfg["screen"])
-    return f"""<!DOCTYPE html><html lang="th"><head><meta charset="utf-8"><style>{CSS}</style></head><body>
+    css = CSS_CREAM if cfg.get("theme")=="cream" else CSS
+    return f"""<!DOCTYPE html><html lang="th"><head><meta charset="utf-8"><style>{css}</style></head><body>
 <div class="streak"></div><div class="frame"></div>
 <div class="wrap">
   <div class="main">
@@ -197,6 +231,17 @@ CONFIGS={
             ("tag","บอกผลต่อพอร์ต","แท็กหุ้นที่เกี่ยวข้องในแต่ละข่าว")],
  },
  "ad5":{
+   "screen":"screen_home.jpg","badge":"★ ครบในที่เดียว","eyebrow":"ALL-IN-ONE PLATFORM",
+   "headline":"ทุกเครื่องมือลงทุน<br>ครบในแอปเดียว",
+   "sub":"JP Trust Learning เปลี่ยน<b>งานวิจัย</b>ให้เป็นระบบใช้งานจริง — กลยุทธ์ · ข้อมูล · แผน ครบ จบ ในที่เดียว",
+   "disc":DISC_GEN,
+   "feats":[("flask","กลยุทธ์ + Dashboard","Momentum หลายแบบ + ทองคำ"),
+            ("pulse","ราคาตลาด Live",'หุ้น · ทองคำ · คริปโต เรียลไทม์'),
+            ("pie","วางแผน + จัดพอร์ต",'การเงินส่วนตัว · <span class="en">Asset Allocation</span>'),
+            ("map","Roadmap + ข่าว","แผน 90 วัน + ข่าวกรองรายวัน")],
+ },
+ "ad5_cream":{
+   "theme":"cream",
    "screen":"screen_home.jpg","badge":"★ ครบในที่เดียว","eyebrow":"ALL-IN-ONE PLATFORM",
    "headline":"ทุกเครื่องมือลงทุน<br>ครบในแอปเดียว",
    "sub":"JP Trust Learning เปลี่ยน<b>งานวิจัย</b>ให้เป็นระบบใช้งานจริง — กลยุทธ์ · ข้อมูล · แผน ครบ จบ ในที่เดียว",
