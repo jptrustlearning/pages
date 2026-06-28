@@ -58,22 +58,22 @@ body{{font-family:'Anuphan',sans-serif;position:relative;overflow:hidden;
 .eyebrow{{font-family:'Cinzel',serif;font-size:18px;letter-spacing:5px;color:#D4AF37;
   display:flex;align-items:center;gap:12px;margin-bottom:16px}}
 .eyebrow::before{{content:"";width:36px;height:1.5px;background:linear-gradient(90deg,#D4AF37,transparent)}}
-h1{{font-weight:600;font-size:58px;line-height:1.08;letter-spacing:.2px;margin-bottom:22px;
+h1{{font-weight:600;font-size:52px;line-height:1.08;letter-spacing:.2px;margin-bottom:18px;
   background:linear-gradient(120deg,#F4E4BA 0%,#D4AF37 45%,#B8860B 100%);
   -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
   filter:drop-shadow(0 2px 14px rgba(212,175,55,.18))}}
 .block{{margin:auto 0;display:flex;flex-direction:column}}
-.sub{{font-weight:400;font-size:22px;line-height:1.5;color:#B6A491;max-width:500px}}
+.sub{{font-weight:400;font-size:21px;line-height:1.5;color:#B6A491;max-width:480px}}
+.divider{{width:120px;height:2px;background:linear-gradient(90deg,#D4AF37,rgba(212,175,55,0));margin:22px 0 26px}}
 .sub b{{color:#E2D3B6;font-weight:600}}
-.divider{{width:132px;height:2px;background:linear-gradient(90deg,#D4AF37,rgba(212,175,55,0));margin:28px 0 30px}}
-.feats{{display:flex;flex-direction:column;gap:22px}}
-.frow{{display:flex;align-items:center;gap:18px}}
-.ftile{{flex:0 0 60px;width:60px;height:60px;border-radius:15px;display:flex;align-items:center;justify-content:center;
+.feats{{display:flex;flex-direction:column;gap:26px}}
+.frow{{display:flex;align-items:center;gap:20px}}
+.ftile{{flex:0 0 72px;width:72px;height:72px;border-radius:18px;display:flex;align-items:center;justify-content:center;
   background:linear-gradient(150deg,#2c1512,#160a0c);border:1px solid rgba(212,175,55,.34);
   box-shadow:inset 0 1px 8px rgba(212,175,55,.08),0 4px 14px rgba(0,0,0,.4)}}
-.ftile svg{{width:30px;height:30px}}
-.ftxt .t{{font-weight:600;font-size:25px;color:#F0E6D2;line-height:1.2}}
-.ftxt .d{{font-weight:400;font-size:17px;color:#9C8B78;line-height:1.32;margin-top:2px}}
+.ftile svg{{width:36px;height:36px}}
+.ftxt .t{{font-weight:600;font-size:40px;color:#F0E6D2;line-height:1.16}}
+.ftxt .d{{font-weight:400;font-size:23px;color:#9C8B78;line-height:1.3;margin-top:3px}}
 .ftxt .d .en{{color:#C2B188;font-weight:500}}
 
 /* RIGHT — tilted phone */
@@ -123,9 +123,9 @@ h1{{font-weight:600;font-size:58px;line-height:1.08;letter-spacing:.2px;margin-b
       <div class="divider"></div>
 
       <div class="feats">
-        <div class="frow"><div class="ftile">{ic_bars}</div><div class="ftxt"><div class="t">เทียบกับ S&amp;P 500 รายปี</div><div class="d">เห็นผลตอบแทนปีต่อปี ชนะดัชนีชัดเจน</div></div></div>
-        <div class="frow"><div class="ftile">{ic_hist}</div><div class="ftxt"><div class="t"><span class="en">Backtest</span> ย้อนหลัง 10+ ปี</div><div class="d">ทดสอบกลยุทธ์กับข้อมูลจริง</div></div></div>
-        <div class="frow"><div class="ftile">{ic_line}</div><div class="ftxt"><div class="t">วิเคราะห์เชิงลึกครบ</div><div class="d"><span class="en">Equity Curve · Drawdown</span> · สถิติ</div></div></div>
+        <div class="frow"><div class="ftile">{ic_bars}</div><div class="ftxt"><div class="t">เทียบ S&amp;P 500 รายปี</div><div class="d">เห็นผลตอบแทนปีต่อปี ชนะดัชนีชัดเจน</div></div></div>
+        <div class="frow"><div class="ftile">{ic_hist}</div><div class="ftxt"><div class="t"><span class="en">Backtest</span> 10+ ปี</div><div class="d">ทดสอบกลยุทธ์กับข้อมูลจริงย้อนหลัง</div></div></div>
+        <div class="frow"><div class="ftile">{ic_line}</div><div class="ftxt"><div class="t">วิเคราะห์เชิงลึก</div><div class="d"><span class="en">Equity · Drawdown</span> · สถิติ</div></div></div>
         <div class="frow"><div class="ftile">{ic_shield}</div><div class="ftxt"><div class="t">โปร่งใส ตรวจสอบได้</div><div class="d">เปิดดูทุกตัวเลข ไม่ขายฝัน</div></div></div>
       </div>
       </div>
