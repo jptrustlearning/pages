@@ -180,7 +180,7 @@ CONFIGS={
    "headline":"ทดสอบกลยุทธ์ลงทุน<br>ระดับมือโปร",
    "sub":"Dashboard ใช้งานจริง ไม่ต้องนั่งคำนวณเอง ไม่ต้องจ้างที่ปรึกษาแพง — การวิเคราะห์ระดับสถาบันที่คุณเข้าถึงได้",
    "disc":DISC_GEN,
-   "feats":[("flask","5 กลยุทธ์ลงทุน",'<span class="en">Weekly · 6M · Rolling</span> + <span class="en">Gold</span>'),
+   "feats":[("flask","หลากหลายกลยุทธ์",'<span class="en">Weekly · 6M · Rolling</span> + <span class="en">Gold</span>'),
             ("refresh","อัปเดตทุกเดือน","Dashboard พร้อมใช้ ไม่ต้องคำนวณเอง"),
             ("log","วิเคราะห์ครบทุกมุม",'<span class="en">Trade Log · Yearly · Heatmap</span>'),
             ("scan",'<span class="en">Scanner</span> คัดหุ้น','ตามสัญญาณ <span class="en">Momentum</span> อัตโนมัติ')],
