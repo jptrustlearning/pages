@@ -251,6 +251,16 @@ CONFIGS={
             ("pie","วางแผน + จัดพอร์ต",'การเงินส่วนตัว · <span class="en">Asset Allocation</span>'),
             ("map","Roadmap + ข่าว","แผน 90 วัน + ข่าวกรองรายวัน")],
  },
+ "ad6":{
+   "screen":"screen_gold.jpg","badge":"★ วัดแรงซื้อ-ขาย","eyebrow":"GOLD SENTIMENT LAB",
+   "headline":"จับโมเมนตัมทองคำ<br>Bull หรือ Bear",
+   "sub":"<b>Gold Sentiment Lab</b> วัดแรงซื้อ-แรงขายในตลาดทองคำแบบเรียลไทม์ — รู้ว่าตลาดเอนไป Bull หรือ Bear ด้วยค่า Net Bias",
+   "disc":DISC_GEN,
+   "feats":[("pulse","ราคาทองคำ Live",'<span class="en">XAU/USD</span> อัปเดตเรียลไทม์'),
+            ("tone",'<span class="en">Net Bias</span> ทองคำ',"ชี้ชัด Bull / Bear เป็นตัวเลข"),
+            ("target","สัญญาณ Sentiment","จับจุดแรงซื้อ-ขายอิ่มตัว"),
+            ("refresh","อัปเดตทุกวัน","ข้อมูล Sentiment สดใหม่ทุกวัน")],
+ },
 }
 
 def main():
