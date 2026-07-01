@@ -1,6 +1,101 @@
 {
-  "lastUpdated": "2026-06-30T08:00:00Z",
+  "lastUpdated": "2026-07-01T08:30:00Z",
   "batches": [
+    {
+      "file": "2026-07-01-0830.md",
+      "date": "2026-07-01T08:30:00Z",
+      "date_display": "1 ก.ค. 2026 · 08:30",
+      "summary": "ตลาดสหรัฐฯ ปิดไตรมาส 2 ดีสุดนับจากปี 2020 หุ้นเทคฯ นำ, Nike งบเกินคาดแต่มาจากกำไรพิเศษ, น้ำมันอ่อนเปิดทางทองฟื้น",
+      "tickers": [
+        "SPY",
+        "QQQ",
+        "DIA",
+        "IWM",
+        "NKE",
+        "USO",
+        "XLE",
+        "GLD",
+        "PTT",
+        "PTTEP",
+        "AOT"
+      ],
+      "headlines": [
+        {
+          "title": "ตลาดหุ้นสหรัฐฯ ปิดไตรมาส 2 แข็งแกร่งที่สุดนับจากปี 2020 — หุ้นเทคฯ นำการฟื้นตัว",
+          "tickers": [
+            {
+              "symbol": "SPY",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DIA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "IWM",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "CNBC, TheStreet, Bloomberg",
+          "published": "1 ก.ค. 2026"
+        },
+        {
+          "title": "Nike ประกาศงบไตรมาส 4 เกินคาด — แต่กำไรพิเศษจากภาษีบดบังความจริงของแผนพลิกฟื้น",
+          "tickers": [
+            {
+              "symbol": "NKE",
+              "sentiment": "neutral"
+            }
+          ],
+          "tone_override": "neutral",
+          "source": "TheStreet, Reuters, Yahoo Finance",
+          "published": "1 ก.ค. 2026"
+        },
+        {
+          "title": "ราคาน้ำมันอ่อนตัวจากความหวังสันติภาพอิหร่าน — เปิดทางทองคำฟื้นในครึ่งปีหลัง",
+          "tickers": [
+            {
+              "symbol": "USO",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "XLE",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "GLD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "PTTEP",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "Reuters, Al Jazeera, Bloomberg",
+          "published": "1 ก.ค. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-06-30-0800.md",
       "date": "2026-06-30T08:00:00Z",
