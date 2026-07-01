@@ -105,6 +105,11 @@ const fmtShares = (v) => {
   if (v === null || v === undefined || isNaN(v)) return '—';
   return v.toLocaleString('en-US', {minimumFractionDigits:4, maximumFractionDigits:4});
 };
+// Masked-display variant: hides the share COUNT when mask is ON, so that
+// (shares × visible per-share price) can't be reverse-calculated back into $ amounts.
+// Use ONLY on passive display surfaces (lot cards, ticker view, sell history).
+// Keep raw fmtShares for inputs / live previews / sell-modal max (must stay usable).
+const fmtSharesM = (v) => S.maskValues ? MASK_STR : fmtShares(v);
 const fmtPct = (v) => {
   if (v === null || v === undefined || isNaN(v)) return '—';
   return (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
@@ -988,7 +993,7 @@ function lotCardHtml(lot){
     return `<div class="sell-row">
       <div class="sell-row-left">
         <span class="sell-row-tag">SOLD</span>
-        <span>${s.exit_date} · ${fmtShares(s.shares_sold)} Shares @ $${s.exit_price.toFixed(2)}</span>
+        <span>${s.exit_date} · ${fmtSharesM(s.shares_sold)} Shares @ $${s.exit_price.toFixed(2)}</span>
       </div>
       <div style="display:flex;align-items:center;gap:6px">
         <span class="sell-row-pnl ${cls}">${fmtUSDsigned(sellPnl)}</span>
@@ -1016,7 +1021,7 @@ function lotCardHtml(lot){
         </div>
         <div class="lot-meta">
           ${sector ? sector + ' · ' : ''}ซื้อ ${lot.entry_date} @ $${lot.entry_price.toFixed(2)}<br>
-          ${fmtShares(lot.shares)} Shares · ลงทุน ${fmtUSD(lot.amount_usd)}
+          ${fmtSharesM(lot.shares)} Shares · ลงทุน ${fmtUSD(lot.amount_usd)}
         </div>
       </div>
       <div class="lot-pnl">
@@ -1028,7 +1033,7 @@ function lotCardHtml(lot){
     <div class="lot-detail-row">
       <div>
         <div class="lot-detail-label">ถืออยู่</div>
-        <div class="lot-detail-val">${fmtShares(m.effRemaining)} Shares</div>
+        <div class="lot-detail-val">${fmtSharesM(m.effRemaining)} Shares</div>
       </div>
       <div>
         <div class="lot-detail-label">ราคาตอนนี้</div>
@@ -1242,7 +1247,7 @@ function renderByTicker(){
         </div>
       </div>
       <div class="ticker-card-stats">
-        <div><div class="lot-detail-label">ถืออยู่</div><div class="lot-detail-val">${fmtShares(a.remainingShares)} Shares</div></div>
+        <div><div class="lot-detail-label">ถืออยู่</div><div class="lot-detail-val">${fmtSharesM(a.remainingShares)} Shares</div></div>
         <div><div class="lot-detail-label">ต้นทุนเฉลี่ย</div><div class="lot-detail-val">${a.remainingShares > 0 ? '$'+avgCost.toFixed(2) : '—'}</div></div>
         <div><div class="lot-detail-label">มูลค่าตอนนี้</div><div class="lot-detail-val">${fmtUSD(a.marketValue)}</div></div>
         <div><div class="lot-detail-label">Realized</div><div class="lot-detail-val ${pnlText(a.realized)}">${fmtUSDsigned(a.realized)}</div></div>
@@ -2184,7 +2189,7 @@ function renderSells(){
       <div class="lot-detail-row">
         <div>
           <div class="lot-detail-label">จำนวนที่ขาย</div>
-          <div class="lot-detail-val">${fmtShares(s.shares_sold)} Shares</div>
+          <div class="lot-detail-val">${fmtSharesM(s.shares_sold)} Shares</div>
         </div>
         <div>
           <div class="lot-detail-label">ราคาขาย</div>
