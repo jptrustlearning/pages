@@ -3444,8 +3444,17 @@ function calculateStats() {
       if (cl.initialCapital > 0) roundReturns.push(cl.returnPct);
     });
     // Add unrealized open lots (mark-to-market)
-    const lastDayData = state.equityCurve.length > 0 ? state.marketData[state.equityCurve[state.equityCurve.length - 1].date] : {};
+    // === Option A (Joon, Jul 2026): exclude "day-0" lots from stats ===
+    // A lot entered ON the last data day has MTM == initialCapital (return exactly 0%)
+    // because zero market days have elapsed. Counting it in the denominator made Win Rate
+    // show a phantom "losing" lot (e.g. 18/19 = 94.7% with no actual loss, PF = 999).
+    // Day-0 lots carry no information -> excluded from Win Rate / Best / Worst / Profit
+    // Factor / round count. The Round Returns & Distribution charts still display them
+    // (dimmed open-lot style) -- that divergence is intentional.
+    const lastCurveDate = state.equityCurve.length > 0 ? state.equityCurve[state.equityCurve.length - 1].date : null;
+    const lastDayData = lastCurveDate ? (state.marketData[lastCurveDate] || {}) : {};
     (state.lots || []).forEach(lot => {
+      if (lot.entryDate === lastCurveDate) return; // day-0 lot -- no elapsed market days, skip stats
       let mtm = 0;
       for (const [t, shares] of Object.entries(lot.stocks)) {
         const p = lastDayData[t] ? lastDayData[t].c : 0;
@@ -3636,9 +3645,10 @@ let charts = {};
 // === PHASE 6: ROUND RETURNS CHART (bar chart of per-LOT P&L%) ===
 // Per-lot return = (exitValue - initialCapital) / initialCapital for closed lots,
 // or (MTM - initialCapital) / initialCapital for still-open lots.
-// MUST match the Win Rate / Best / Worst / Profit Factor KPI computation above
-// (lines 3411-3425). DO NOT use tradeLog equity diffs — that's monthly portfolio
-// return, not per-lot return.
+// Matches the Win Rate / Best / Worst / Profit Factor KPI computation above,
+// EXCEPT: charts intentionally still display day-0 open lots (entered on the last
+// data day, 0.00% MTM) which the KPIs exclude — see Option A note in calculateStats().
+// DO NOT use tradeLog equity diffs — that's monthly portfolio return, not per-lot return.
 function renderRoundsChart() {
   const canvas = document.getElementById('roundsChart');
   if (!canvas) return;
@@ -3713,7 +3723,8 @@ function renderRoundsChart() {
 
 // === PHASE 6: DISTRIBUTION CHART (histogram of per-LOT returns) ===
 // Same data source as renderRoundsChart — closed lots' returnPct + open lots' MTM.
-// Consistent with Win Rate / Best / Worst / Profit Factor KPIs.
+// Like renderRoundsChart, this still includes day-0 open lots that the Win Rate /
+// Best / Worst / Profit Factor KPIs exclude (Option A) — intentional, display-only.
 function renderDistChart() {
   const canvas = document.getElementById('distChart');
   if (!canvas) return;

@@ -3025,10 +3025,18 @@ function calculateStats() {
       if (prev > 0) roundReturns.push((curr - prev) / prev);
     }
     // If there's an open final round, compare to latest equity (unrealized)
+    // === Option A (Joon, Jul 2026): exclude "day-0" open round ===
+    // If the final rebalance happened ON the last data day, zero market days have
+    // elapsed -> return is exactly 0% and carries no information. Counting it made
+    // Win Rate show a phantom non-winning round with no actual loss. Skip it.
     if (logs.length > 0 && state.equityCurve.length > 0) {
-      const openEntry = logs[logs.length - 1].equity;
-      const latestEq = state.equityCurve[state.equityCurve.length - 1].equity;
-      if (openEntry > 0) roundReturns.push((latestEq - openEntry) / openEntry);
+      const lastLog = logs[logs.length - 1];
+      const lastCurvePoint = state.equityCurve[state.equityCurve.length - 1];
+      if (lastLog.date !== lastCurvePoint.date) {
+        const openEntry = lastLog.equity;
+        const latestEq = lastCurvePoint.equity;
+        if (openEntry > 0) roundReturns.push((latestEq - openEntry) / openEntry);
+      }
     }
 
     const roundWins = roundReturns.filter(r => r > 0).length;
