@@ -354,7 +354,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
       <span id="ocrText">กำลังอ่านสลิป…</span>
       <div class="ocr-bar"><div class="ocr-bar-fill" id="ocrBar"></div></div>
     </div>
-    <button class="btn-secondary" style="width:100%" onclick="PR.addPendingManual()">+ เพิ่มรายการรอด้วยตนเอง (ไม่ใช้สลิป)</button>
+    <button class="btn-secondary" style="width:100%" onclick="PR.openManualAdd()">+ เพิ่มรายการด้วยตนเอง (ไม่ใช้สลิป)</button>
     <div class="section-label">รายการรอบันทึก (Pending)</div>
     <div class="lots-list" id="pendingList"></div>
   </div>
@@ -527,6 +527,21 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
     <div id="gmRows"></div>
     <button class="btn-secondary" style="width:100%;margin-bottom:12px" onclick="PR.gmAddRow()">+ กลุ่มใหม่</button>
     <button class="btn-primary" style="width:100%" onclick="PR.gmSubmit()">บันทึก</button>
+  </div>
+</div>
+
+<!-- MODAL: manual add — choose buy/sell -->
+<div class="modal-backdrop" id="mdlMa">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">เพิ่มรายการด้วยตนเอง</div><button class="modal-close" onclick="PR.closeModal('mdlMa')">×</button></div>
+    <div id="maStep1">
+      <button class="ga-opt" onclick="PR.maChoose('buy')" style="padding:16px 14px"><span style="font-size:1.2rem">🟢</span><span><b>บันทึกการซื้อ</b><br><span style="font-size:.72rem;color:var(--text-muted);font-weight:500">เปิดฟอร์มซื้อ — ใส่เงินลงทุน ระบบดึงราคาปิดให้</span></span></button>
+      <button class="ga-opt" onclick="PR.maChoose('sell')" style="padding:16px 14px"><span style="font-size:1.2rem">🔴</span><span><b>บันทึกการขาย</b><br><span style="font-size:.72rem;color:var(--text-muted);font-weight:500">เลือกหุ้นที่ถืออยู่ → เลือกไม้ที่จะตัดขาย</span></span></button>
+    </div>
+    <div id="maStep2" class="hidden">
+      <div class="field-hint" style="margin-bottom:12px">เลือกหุ้นที่จะขาย (แสดงเฉพาะที่ถืออยู่จริงในพอร์ต)</div>
+      <div class="port-pick" id="maTickers"></div>
+    </div>
   </div>
 </div>
 
@@ -1430,10 +1445,30 @@ function renderPending(){
       +'</div></div>';
   }).join('');
 }
-function addPendingManual(){
+function openManualAdd(){
   if(!requireDrive()) return;
-  D.pending.unshift({id:uid(),ticker:'',price:null,shares:null,amount:null,date:todayStr(),side:'buy',slip:null,note:'กรอกเอง',createdAt:Date.now()});
-  saveData(); renderPending(); toast('เพิ่มรายการรอแล้ว — กด ✓ เพื่อกรอกรายละเอียด');
+  $('maStep1').classList.remove('hidden');
+  $('maStep2').classList.add('hidden');
+  openModal('mdlMa');
+}
+function maChoose(side){
+  if(side==='buy'){ closeModal('mdlMa'); openAddModal(null, null); return; }
+  // sell: list only tickers actually held (rem > 0) across all portfolios
+  const held={};
+  D.lots.forEach(l=>{ const r=remShares(l); if(r>1e-9) held[l.ticker]=(held[l.ticker]||0)+r; });
+  const tks=Object.keys(held).sort();
+  if(!tks.length){
+    closeModal('mdlMa');
+    showAlert('ยังไม่มีหุ้นที่ถืออยู่','พอร์ตยังไม่มีไม้ที่เปิดอยู่เลย — บันทึกการซื้อก่อน จึงจะบันทึกการขายได้');
+    return;
+  }
+  $('maTickers').innerHTML=tks.map(tk=>'<button type="button" class="port-chip" onclick="PR.maSellTicker(\''+tk+'\')" style="padding:10px 16px"><span class="lot-ticker" style="font-size:.95rem">'+esc(tk)+'</span>&nbsp;<span style="font-size:.68rem;color:var(--text-muted)">'+fmtSh(held[tk])+' Sh</span></button>').join('');
+  $('maStep1').classList.add('hidden');
+  $('maStep2').classList.remove('hidden');
+}
+function maSellTicker(tk){
+  closeModal('mdlMa');
+  sellPickForTicker(tk, null);
 }
 function confirmPending(id){
   const pd=D.pending.find(p=>p.id===id); if(!pd) return;
@@ -1442,20 +1477,26 @@ function confirmPending(id){
 }
 let spPendingId=null;
 function openSellPick(pendingId){
-  if(!requireDrive()) return;
   const pd=D.pending.find(p=>p.id===pendingId); if(!pd) return;
   const tk=(pd.ticker||'').toUpperCase();
-  if(!tk){ showAlert('สลิปขายไม่มี Ticker','AI อ่านชื่อหุ้นจากสลิปไม่ได้ — ไปที่แท็บ พอร์ต แล้วกดขายจากการ์ดไม้โดยตรง หรือทิ้งรายการนี้'); return; }
+  if(!tk){ showAlert('สลิปขายไม่มี Ticker','AI อ่านชื่อหุ้นจากสลิปไม่ได้ — กด "+ เพิ่มรายการด้วยตนเอง" แล้วเลือกบันทึกการขายแทน หรือทิ้งรายการนี้'); return; }
+  sellPickForTicker(tk, pendingId);
+}
+function sellPickForTicker(tk, pendingId){
+  if(!requireDrive()) return;
+  const pd = pendingId? D.pending.find(p=>p.id===pendingId) : null;
   const holds=D.lots.filter(l=>l.ticker===tk && remShares(l)>1e-9)
     .sort((a,b)=>(a.date||'').localeCompare(b.date||''));
   if(!holds.length){
     showAlert('ไม่พบ '+tk+' ในพอร์ต',
-      'สลิปนี้เป็นการ<b>ขาย '+esc(tk)+'</b> แต่ไม่มีไม้ '+esc(tk)+' ที่ถืออยู่ในพอร์ตใดเลย<br>บันทึกการซื้อไม้นั้นก่อน จึงจะบันทึกการขายได้'); 
+      'ไม่มีไม้ '+esc(tk)+' ที่ถืออยู่ในพอร์ตใดเลย<br>บันทึกการซื้อไม้นั้นก่อน จึงจะบันทึกการขายได้');
     return;
   }
-  spPendingId=pendingId;
+  if(holds.length===1){ openSellModal(holds[0].id, pendingId||null); return; } // ไม้เดียว ข้ามหน้าเลือกไปเลย
+  spPendingId=pendingId||null;
   $('spTitle').textContent='เลือกไม้ที่จะตัดขาย · '+tk;
-  $('spSub').innerHTML='สลิปขาย: '+(pd.shares!=null? fmtSh(pd.shares)+' Shares':'')+(pd.price!=null?' @ $'+Number(pd.price).toFixed(2):'')+(pd.date?' · '+esc(pd.date):'')+'<br>พบ '+holds.length+' ไม้ที่ถือ '+tk+' อยู่ — แตะไม้ที่ต้องการตัดขาย';
+  $('spSub').innerHTML=(pd? 'สลิปขาย: '+(pd.shares!=null? fmtSh(pd.shares)+' Shares':'')+(pd.price!=null?' @ $'+Number(pd.price).toFixed(2):'')+(pd.date?' · '+esc(pd.date):'')+'<br>':'')
+    +'พบ '+holds.length+' ไม้ที่ถือ '+tk+' อยู่ — แตะไม้ที่ต้องการตัดขาย';
   $('spRows').innerHTML=holds.map(l=>{
     const p=portById(l.portfolioId)||{name:'?',color:'#B9AE9C'};
     const rem=remShares(l), pi=priceInfo(l);
@@ -1855,7 +1896,7 @@ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded'
 
 return {switchTab,gotoSettings,toggleMask,selectPort,openPortModal,submitPort,deletePortfolio,
   openAddModal,pickFormPort,submitLot,deleteLot,onBuyInput,recalcBuy,openSellModal,submitSell,pickSellLot,setSellMode,sellAllQuick,recalcSell,onSellDateInput,closeModal,viewSlip,
-  onSlipFile,addPendingManual,confirmPending,deletePending,
+  onSlipFile,openManualAdd,maChoose,maSellTicker,confirmPending,deletePending,
   setTf,refreshPrices,
   selectRbPort,rbUseCurrent,renderRebalance,openTargetsModal,addTgtRow,updateTgtSum,submitTargets,
   setView,toggleDense,toggleGroup,openGa,gaAssign,gaCreateAssign,openGm,gmAddRow,gmDelRow,gmSubmit,deleteSell,openPm,pmDelete,
