@@ -316,7 +316,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
     </div>
 
     <div class="action-row">
-      <button class="btn-primary" onclick="PR.openAddModal()">+ บันทึกการซื้อใหม่</button>
+      <button class="btn-primary" onclick="PR.openManualAdd()">+ บันทึกการซื้อ / ขาย</button>
       <button class="btn-secondary" style="flex:0 0 auto" onclick="PR.refreshPrices(true)" id="refreshBtn">⟳ ราคา</button>
     </div>
 
@@ -539,8 +539,8 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
       <button class="ga-opt" onclick="PR.maChoose('sell')" style="padding:16px 14px"><span style="font-size:1.2rem">🔴</span><span><b>บันทึกการขาย</b><br><span style="font-size:.72rem;color:var(--text-muted);font-weight:500">เลือกหุ้นที่ถืออยู่ → เลือกไม้ที่จะตัดขาย</span></span></button>
     </div>
     <div id="maStep2" class="hidden">
-      <div class="field-hint" style="margin-bottom:12px">เลือกหุ้นที่จะขาย (แสดงเฉพาะที่ถืออยู่จริงในพอร์ต)</div>
-      <div class="port-pick" id="maTickers"></div>
+      <div class="field-hint" style="margin-bottom:12px">เลือกไม้ที่จะตัดขาย — แสดงทุกไม้ที่ถืออยู่ พร้อมพอร์ตที่สังกัด</div>
+      <div id="maLots"></div>
     </div>
   </div>
 </div>
@@ -1451,24 +1451,35 @@ function openManualAdd(){
   $('maStep2').classList.add('hidden');
   openModal('mdlMa');
 }
+function sellLotRowHtml(l, onclickJs){
+  const p=portById(l.portfolioId)||{name:'?',color:'#B9AE9C'};
+  const rem=remShares(l), pi=priceInfo(l);
+  return '<button class="ga-opt" onclick="'+onclickJs+'" style="display:block">'
+    +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
+    +'<span class="lot-ticker" style="font-size:1.05rem">'+esc(l.ticker)+'</span>'
+    +'<span class="port-chip" style="padding:3px 10px;font-size:.66rem;pointer-events:none"><span class="pc-dot" style="background:'+p.color+'"></span>'+esc(p.name)+'</span>'
+    +(l.groupId&&grpOf(l)?'<span class="grp-chip has" style="pointer-events:none">'+esc(grpOf(l).name)+'</span>':'')
+    +'</div>'
+    +'<div style="font-size:.72rem;color:var(--text-muted);font-weight:500">ซื้อ '+esc(l.date)+' @ $'+l.price.toFixed(2)+' · ถืออยู่ '+fmtSh(rem)+' Shares · มูลค่า '+fmtUSD(rem*pi.price)+'</div>'
+    +'</button>';
+}
 function maChoose(side){
   if(side==='buy'){ closeModal('mdlMa'); openAddModal(null, null); return; }
-  // sell: list only tickers actually held (rem > 0) across all portfolios
-  const held={};
-  D.lots.forEach(l=>{ const r=remShares(l); if(r>1e-9) held[l.ticker]=(held[l.ticker]||0)+r; });
-  const tks=Object.keys(held).sort();
-  if(!tks.length){
+  // sell: list EVERY open lot (ไม้) across all portfolios with port tags
+  const holds=D.lots.filter(l=>remShares(l)>1e-9)
+    .sort((a,b)=> a.ticker===b.ticker ? (a.date||'').localeCompare(b.date||'') : a.ticker.localeCompare(b.ticker));
+  if(!holds.length){
     closeModal('mdlMa');
     showAlert('ยังไม่มีหุ้นที่ถืออยู่','พอร์ตยังไม่มีไม้ที่เปิดอยู่เลย — บันทึกการซื้อก่อน จึงจะบันทึกการขายได้');
     return;
   }
-  $('maTickers').innerHTML=tks.map(tk=>'<button type="button" class="port-chip" onclick="PR.maSellTicker(\''+tk+'\')" style="padding:10px 16px"><span class="lot-ticker" style="font-size:.95rem">'+esc(tk)+'</span>&nbsp;<span style="font-size:.68rem;color:var(--text-muted)">'+fmtSh(held[tk])+' Sh</span></button>').join('');
+  $('maLots').innerHTML=holds.map(l=>sellLotRowHtml(l, "PR.maSellLot('"+l.id+"')")).join('');
   $('maStep1').classList.add('hidden');
   $('maStep2').classList.remove('hidden');
 }
-function maSellTicker(tk){
+function maSellLot(lotId){
   closeModal('mdlMa');
-  sellPickForTicker(tk, null);
+  openSellModal(lotId, null);
 }
 function confirmPending(id){
   const pd=D.pending.find(p=>p.id===id); if(!pd) return;
@@ -1497,18 +1508,7 @@ function sellPickForTicker(tk, pendingId){
   $('spTitle').textContent='เลือกไม้ที่จะตัดขาย · '+tk;
   $('spSub').innerHTML=(pd? 'สลิปขาย: '+(pd.shares!=null? fmtSh(pd.shares)+' Shares':'')+(pd.price!=null?' @ $'+Number(pd.price).toFixed(2):'')+(pd.date?' · '+esc(pd.date):'')+'<br>':'')
     +'พบ '+holds.length+' ไม้ที่ถือ '+tk+' อยู่ — แตะไม้ที่ต้องการตัดขาย';
-  $('spRows').innerHTML=holds.map(l=>{
-    const p=portById(l.portfolioId)||{name:'?',color:'#B9AE9C'};
-    const rem=remShares(l), pi=priceInfo(l);
-    return '<button class="ga-opt" onclick="PR.pickSellLot(\''+l.id+'\')" style="display:block">'
-      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
-      +'<span class="lot-ticker" style="font-size:1.05rem">'+esc(l.ticker)+'</span>'
-      +'<span class="port-chip" style="padding:3px 10px;font-size:.66rem;pointer-events:none"><span class="pc-dot" style="background:'+p.color+'"></span>'+esc(p.name)+'</span>'
-      +(l.groupId&&grpOf(l)?'<span class="grp-chip has" style="pointer-events:none">'+esc(grpOf(l).name)+'</span>':'')
-      +'</div>'
-      +'<div style="font-size:.72rem;color:var(--text-muted);font-weight:500">ซื้อ '+esc(l.date)+' @ $'+l.price.toFixed(2)+' · ถืออยู่ '+fmtSh(rem)+' Shares · มูลค่า '+fmtUSD(rem*pi.price)+'</div>'
-      +'</button>';
-  }).join('');
+  $('spRows').innerHTML=holds.map(l=>sellLotRowHtml(l, "PR.pickSellLot('"+l.id+"')")).join('');
   openModal('mdlSp');
 }
 function pickSellLot(lotId){
@@ -1896,7 +1896,7 @@ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded'
 
 return {switchTab,gotoSettings,toggleMask,selectPort,openPortModal,submitPort,deletePortfolio,
   openAddModal,pickFormPort,submitLot,deleteLot,onBuyInput,recalcBuy,openSellModal,submitSell,pickSellLot,setSellMode,sellAllQuick,recalcSell,onSellDateInput,closeModal,viewSlip,
-  onSlipFile,openManualAdd,maChoose,maSellTicker,confirmPending,deletePending,
+  onSlipFile,openManualAdd,maChoose,maSellLot,confirmPending,deletePending,
   setTf,refreshPrices,
   selectRbPort,rbUseCurrent,renderRebalance,openTargetsModal,addTgtRow,updateTgtSum,submitTargets,
   setView,toggleDense,toggleGroup,openGa,gaAssign,gaCreateAssign,openGm,gmAddRow,gmDelRow,gmSubmit,deleteSell,openPm,pmDelete,
