@@ -530,6 +530,15 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
   </div>
 </div>
 
+<!-- MODAL: pick lot to sell from (sell slip flow) -->
+<div class="modal-backdrop" id="mdlSp">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title" id="spTitle">เลือกไม้ที่จะตัดขาย</div><button class="modal-close" onclick="PR.closeModal('mdlSp')">×</button></div>
+    <div class="field-hint" id="spSub" style="margin-bottom:12px"></div>
+    <div id="spRows"></div>
+  </div>
+</div>
+
 <!-- MODAL: slip preview -->
 <div class="modal-backdrop" id="mdlSlip">
   <div class="modal" style="text-align:center">
@@ -832,7 +841,7 @@ function sellHistoryHtml(l){
   }).join('')+'</div>';
 }
 function viewSlip(id,kind){
-  const arr = kind==='lot'? D.lots : D.pending;
+  const arr = kind==='lot'? D.lots : (kind==='sell'? D.sells : D.pending);
   const it=arr.find(x=>x.id===id);
   if(it&&it.slip){ $('slipFull').src=it.slip; openModal('mdlSlip'); }
 }
@@ -1007,7 +1016,7 @@ function renderSells(){
     const days=l? Math.max(0, Math.round((Date.parse(s.date)-Date.parse(l.date))/86400000)) : null;
     return '<div class="lot-card">'
       +'<div class="lot-head"><div style="flex:1;min-width:0">'
-      +'<div class="lot-ticker-row"><span class="lot-ticker">'+esc(tk)+'</span><span class="lot-badge closed">SOLD</span></div>'
+      +'<div class="lot-ticker-row"><span class="lot-ticker">'+esc(tk)+'</span><span class="lot-badge closed">SOLD</span>'+(s.slip?'<img class="slip-thumb" style="width:34px;height:34px" src="'+s.slip+'" onclick="event.stopPropagation();PR.viewSlip(\''+s.id+'\',\'sell\')" alt="สลิป">':'')+'</div>'
       +'<div class="lot-meta">ขาย '+esc(s.date)+' · '+fmtSh(s.shares)+' Shares @ $'+s.price.toFixed(2)+(l?'<br>ต้นทุน $'+l.price.toFixed(2)+'/หุ้น · ได้รับ '+fmtUSD(s.shares*s.price)+(days!=null?' · ถือ '+days+' วัน':''):'')+'</div></div>'
       +'<div class="lot-pnl"><div class="lot-pnl-val '+pnlClass(pnl)+'">'+fmtUSDsigned(pnl)+'</div><div class="lot-pnl-pct '+pnlClass(pnl)+'">'+fmtPct(pct,true)+'</div></div>'
       +'</div>'
@@ -1120,21 +1129,26 @@ function deleteLot(id){
 }
 
 /* ---------- SELL ---------- */
-let sellMode='usd', sellFetchTimer=null, sellRange=null;
-function openSellModal(lotId){
+let sellMode='usd', sellFetchTimer=null, sellRange=null, sellPendingId=null;
+function openSellModal(lotId, fromPendingId){
   if(!requireDrive()) return;
   sellLotId=lotId; const l=D.lots.find(x=>x.id===lotId); if(!l) return;
+  sellPendingId=fromPendingId||null;
+  const pd = sellPendingId? D.pending.find(p=>p.id===sellPendingId) : null;
   const rem=remShares(l);
-  sellMode='usd';
+  sellMode = (pd && pd.shares>0)? 'shares' : 'usd';
   document.querySelectorAll('#sModeSeg .seg-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===sellMode));
-  $('mdlSellTitle').textContent='ขาย '+l.ticker;
-  $('sInfo').innerHTML='<div class="preview-row"><span>ถืออยู่</span><span class="preview-num">'+fmtSh(rem)+' Shares</span></div><div class="preview-row"><span>ต้นทุนเฉลี่ย</span><span class="preview-num">$'+l.price.toFixed(2)+'/หุ้น</span></div>';
-  $('sDate').value=todayStr();
-  $('sAmount').value='';
+  $('mdlSellTitle').textContent='ขาย '+l.ticker+(pd?' (จากสลิป)':'');
+  $('sInfo').innerHTML='<div class="preview-row"><span>ถืออยู่</span><span class="preview-num">'+fmtSh(rem)+' Shares</span></div><div class="preview-row"><span>ต้นทุนเฉลี่ย</span><span class="preview-num">$'+l.price.toFixed(2)+'/หุ้น</span></div>'
+    +(pd?'<div class="field-hint" style="margin-top:6px">ข้อมูลจากสลิป: '+(pd.shares!=null?fmtSh(pd.shares)+' Shares ':'')+(pd.price!=null?'@ $'+Number(pd.price).toFixed(2):'')+' — ตรวจ/แก้ก่อนบันทึก</div>':'');
+  $('sDate').value = (pd && pd.date && pd.date>=l.date && pd.date<=todayStr())? pd.date : todayStr();
+  $('sAmount').value = pd? (pd.shares>0? pd.shares : (pd.amount>0? pd.amount : '')) : '';
   const pi=priceInfo(l);
-  $('sPrevPrice').value=pi.price.toFixed(2);
-  sellRange = pi.stale? null : priceRangeAt(l.ticker, closeIdxOn(l.ticker, pi.date));
-  $('sPriceHint').textContent = pi.stale? 'ไม่พบราคาตลาด — กรอกราคาขายจริงเอง' : 'ราคาปิดล่าสุด ('+pi.date+')'+(sellRange?' · ช่วงที่อนุญาต $'+sellRange.min.toFixed(2)+' — $'+sellRange.max.toFixed(2):'')+' — แก้เป็นราคา fill จริงได้';
+  const initPrice = (pd && pd.price>0)? pd.price : pi.price;
+  $('sPrevPrice').value=initPrice.toFixed(2);
+  sellRange = pi.stale? null : priceRangeAt(l.ticker, closeIdxOn(l.ticker, (pd&&pd.date)? pd.date : pi.date));
+  $('sPriceHint').textContent = pd? 'ราคาจากสลิป'+(sellRange?' · ช่วงที่อนุญาต $'+sellRange.min.toFixed(2)+' — $'+sellRange.max.toFixed(2):'')+' — แก้ได้'
+    : (pi.stale? 'ไม่พบราคาตลาด — กรอกราคาขายจริงเอง' : 'ราคาปิดล่าสุด ('+pi.date+')'+(sellRange?' · ช่วงที่อนุญาต $'+sellRange.min.toFixed(2)+' — $'+sellRange.max.toFixed(2):'')+' — แก้เป็นราคา fill จริงได้');
   $('sErr').classList.add('hidden');
   updateSellMax(); recalcSell();
   openModal('mdlSell');
@@ -1209,8 +1223,14 @@ function submitSell(){
     err.textContent='ราคาขายอยู่นอกช่วงซื้อขายจริงของวันนั้น ($'+sellRange.min.toFixed(2)+' — $'+sellRange.max.toFixed(2)+')';
     err.classList.remove('hidden'); return;
   }
-  D.sells.push({id:uid(),lotId:l.id,shares,price,date,createdAt:Date.now()});
-  saveData(); closeModal('mdlSell'); renderAll();
+  const sell={id:uid(),lotId:l.id,shares,price,date,createdAt:Date.now()};
+  if(sellPendingId){
+    const pd=D.pending.find(p=>p.id===sellPendingId);
+    if(pd){ if(pd.slip) sell.slip=pd.slip; D.pending=D.pending.filter(p=>p.id!==sellPendingId); }
+    sellPendingId=null;
+  }
+  D.sells.push(sell);
+  saveData(); closeModal('mdlSell'); renderAll(); renderPending();
   toast('บันทึกการขายแล้ว · Realized '+fmtUSDsigned((price-l.price)*shares));
 }
 
@@ -1220,8 +1240,18 @@ function showConfirm(title,msg,okLabel,cb){
   $('cfTitle').textContent=title;
   $('cfMsg').innerHTML=msg;
   const b=$('cfOkBtn'); b.textContent=okLabel||'ยืนยัน';
+  b.previousElementSibling.style.display=''; // ปุ่มยกเลิก
   cfCb=cb;
   b.onclick=()=>{ closeModal('mdlCf'); const f=cfCb; cfCb=null; if(f) f(); };
+  openModal('mdlCf');
+}
+function showAlert(title,msg,okLabel){
+  $('cfTitle').textContent=title;
+  $('cfMsg').innerHTML=msg;
+  const b=$('cfOkBtn'); b.textContent=okLabel||'เข้าใจแล้ว';
+  b.previousElementSibling.style.display='none';
+  cfCb=null;
+  b.onclick=()=>{ closeModal('mdlCf'); };
   openModal('mdlCf');
 }
 function openModal(id){ $(id).classList.add('active'); }
@@ -1405,7 +1435,46 @@ function addPendingManual(){
   D.pending.unshift({id:uid(),ticker:'',price:null,shares:null,amount:null,date:todayStr(),side:'buy',slip:null,note:'กรอกเอง',createdAt:Date.now()});
   saveData(); renderPending(); toast('เพิ่มรายการรอแล้ว — กด ✓ เพื่อกรอกรายละเอียด');
 }
-function confirmPending(id){ openAddModal(null, id); }
+function confirmPending(id){
+  const pd=D.pending.find(p=>p.id===id); if(!pd) return;
+  if(pd.side==='sell'){ openSellPick(id); return; }
+  openAddModal(null, id);
+}
+let spPendingId=null;
+function openSellPick(pendingId){
+  if(!requireDrive()) return;
+  const pd=D.pending.find(p=>p.id===pendingId); if(!pd) return;
+  const tk=(pd.ticker||'').toUpperCase();
+  if(!tk){ showAlert('สลิปขายไม่มี Ticker','AI อ่านชื่อหุ้นจากสลิปไม่ได้ — ไปที่แท็บ พอร์ต แล้วกดขายจากการ์ดไม้โดยตรง หรือทิ้งรายการนี้'); return; }
+  const holds=D.lots.filter(l=>l.ticker===tk && remShares(l)>1e-9)
+    .sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  if(!holds.length){
+    showAlert('ไม่พบ '+tk+' ในพอร์ต',
+      'สลิปนี้เป็นการ<b>ขาย '+esc(tk)+'</b> แต่ไม่มีไม้ '+esc(tk)+' ที่ถืออยู่ในพอร์ตใดเลย<br>บันทึกการซื้อไม้นั้นก่อน จึงจะบันทึกการขายได้'); 
+    return;
+  }
+  spPendingId=pendingId;
+  $('spTitle').textContent='เลือกไม้ที่จะตัดขาย · '+tk;
+  $('spSub').innerHTML='สลิปขาย: '+(pd.shares!=null? fmtSh(pd.shares)+' Shares':'')+(pd.price!=null?' @ $'+Number(pd.price).toFixed(2):'')+(pd.date?' · '+esc(pd.date):'')+'<br>พบ '+holds.length+' ไม้ที่ถือ '+tk+' อยู่ — แตะไม้ที่ต้องการตัดขาย';
+  $('spRows').innerHTML=holds.map(l=>{
+    const p=portById(l.portfolioId)||{name:'?',color:'#B9AE9C'};
+    const rem=remShares(l), pi=priceInfo(l);
+    return '<button class="ga-opt" onclick="PR.pickSellLot(\''+l.id+'\')" style="display:block">'
+      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
+      +'<span class="lot-ticker" style="font-size:1.05rem">'+esc(l.ticker)+'</span>'
+      +'<span class="port-chip" style="padding:3px 10px;font-size:.66rem;pointer-events:none"><span class="pc-dot" style="background:'+p.color+'"></span>'+esc(p.name)+'</span>'
+      +(l.groupId&&grpOf(l)?'<span class="grp-chip has" style="pointer-events:none">'+esc(grpOf(l).name)+'</span>':'')
+      +'</div>'
+      +'<div style="font-size:.72rem;color:var(--text-muted);font-weight:500">ซื้อ '+esc(l.date)+' @ $'+l.price.toFixed(2)+' · ถืออยู่ '+fmtSh(rem)+' Shares · มูลค่า '+fmtUSD(rem*pi.price)+'</div>'
+      +'</button>';
+  }).join('');
+  openModal('mdlSp');
+}
+function pickSellLot(lotId){
+  closeModal('mdlSp');
+  openSellModal(lotId, spPendingId);
+  spPendingId=null;
+}
 function deletePending(id){ D.pending=D.pending.filter(p=>p.id!==id); saveData(); renderPending(); }
 
 function compressImage(file, maxW, q){
@@ -1785,7 +1854,7 @@ function init(){
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
 
 return {switchTab,gotoSettings,toggleMask,selectPort,openPortModal,submitPort,deletePortfolio,
-  openAddModal,pickFormPort,submitLot,deleteLot,onBuyInput,recalcBuy,openSellModal,submitSell,setSellMode,sellAllQuick,recalcSell,onSellDateInput,closeModal,viewSlip,
+  openAddModal,pickFormPort,submitLot,deleteLot,onBuyInput,recalcBuy,openSellModal,submitSell,pickSellLot,setSellMode,sellAllQuick,recalcSell,onSellDateInput,closeModal,viewSlip,
   onSlipFile,addPendingManual,confirmPending,deletePending,
   setTf,refreshPrices,
   selectRbPort,rbUseCurrent,renderRebalance,openTargetsModal,addTgtRow,updateTgtSum,submitTargets,
