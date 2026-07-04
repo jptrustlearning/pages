@@ -889,7 +889,7 @@ function renderLots(){
     return '<div class="lot-card '+(status==='closed'?'closed':'')+'">'
       +'<div class="lot-head"><div style="flex:1;min-width:0">'
       +'<div class="lot-ticker-row"><span class="lot-ticker">'+esc(l.ticker)+'</span>'+badge+grpChip(l)+(pi.stale&&rem>0?'<span class="lot-badge stale" title="ยังไม่มีราคาจากตลาด ใช้ราคาซื้อแทน">ราคาไม่อัพเดต</span>':'')+'</div>'
-      +'<div class="lot-meta">'+(pname?esc(pname)+' · ':'')+'ซื้อ '+esc(l.date)+' @ $'+l.price.toFixed(2)+'<br>'+fmtSh(l.shares)+' Shares · ลงทุน '+fmtUSD(lotAmount(l))+'</div>'
+      +'<div class="lot-meta">'+(pname?esc(pname)+' · ':'')+'ซื้อ '+esc(l.date)+' @ $'+l.price.toFixed(2)+'<br>'+fmtSh(l.shares)+' Shares · ลงทุน '+fmtUSD(lotAmount(l))+(rem>0&&st.curVal>0?' · <b style="color:var(--gold-dark)">'+(pv/st.curVal*100).toFixed(1)+'% ของพอร์ต</b>':'')+'</div>'
       +'</div>'+slip
       +(rem>0?'<div class="lot-pnl"><div class="lot-pnl-val '+pnlClass(pnl)+'">'+fmtUSDsigned(pnl)+'</div><div class="lot-pnl-pct '+pnlClass(pnl)+'">'+fmtPct(pnlPct,true)+'</div></div>':'')
       +'</div>'
@@ -999,6 +999,7 @@ function renderGroups(){
   }
   const p=portById(sel); if(!p) return;
   const lots=D.lots.filter(l=>l.portfolioId===p.id);
+  const portOpenTotal=lots.reduce((a,l)=>a+lotCurVal(l),0);
   let h='<div class="port-bar" style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px"><div style="font-size:.86rem;font-weight:600;color:var(--text-heading)">กลุ่มในพอร์ต <span style="color:var(--maroon);font-weight:700">'+esc(p.name)+'</span></div><button class="btn-secondary" style="flex:0 0 auto;padding:8px 14px;font-size:.76rem" onclick="PR.openGm()">⚙ จัดการกลุ่ม</button></div>';
   const buckets=(p.groups||[]).map(g=>({key:g.id,name:g.name,color:grpColor(p,g.id),lots:lots.filter(l=>l.groupId===g.id)}));
   buckets.push({key:'__none__',name:'ยังไม่ได้จัดกลุ่ม',color:'#B9AE9C',lots:lots.filter(l=>!l.groupId||!(p.groups||[]).some(g=>g.id===l.groupId))});
@@ -1006,11 +1007,11 @@ function renderGroups(){
   buckets.forEach(b=>{
     if(!b.lots.length && b.key==='__none__' && (p.groups||[]).length) return;
     any=true;
-    let invested=0, value=0;
+    let invested=0, value=0, openVal=0;
     b.lots.forEach(l=>{
       invested+=lotAmount(l);
       const rem=remShares(l), pi=priceInfo(l);
-      value+=rem*pi.price;
+      value+=rem*pi.price; openVal+=rem*pi.price;
       lotSells(l.id).forEach(s=>{ value+=s.shares*s.price; });
     });
     const pnl=value-invested, pct=invested>0?pnl/invested*100:0;
@@ -1019,7 +1020,7 @@ function renderGroups(){
       +'<div class="g-head" onclick="PR.toggleGroup(\''+b.key+'\')">'
       +'<span class="g-dot" style="background:'+b.color+'"></span>'
       +'<span class="g-name">'+esc(b.name)+'</span>'
-      +'<span class="g-count">'+b.lots.length+' ไม้</span><span class="g-chev">▾</span></div>'
+      +'<span class="g-count">'+b.lots.length+' ไม้'+(portOpenTotal>0&&openVal>0?' · '+(openVal/portOpenTotal*100).toFixed(1)+'%':'')+'</span><span class="g-chev">▾</span></div>'
       +'<div class="g-stats">'
       +'<div><div class="g-stat-label">ลงทุน</div><div class="g-stat-val">'+fmtUSD(invested)+'</div></div>'
       +'<div><div class="g-stat-label">มูลค่ารวม</div><div class="g-stat-val">'+fmtUSD(value)+'</div></div>'
@@ -1027,7 +1028,8 @@ function renderGroups(){
       +'</div>'
       +'<div class="g-body">'+(b.lots.length? b.lots.map(l=>{
           const rem=remShares(l), pi=priceInfo(l), v=rem*pi.price, lp=v-rem*l.price;
-          return '<div class="g-lot-row"><span class="g-lot-tk">'+esc(l.ticker)+'</span><span>'+fmtSh(rem)+' Shares</span><span>'+fmtUSD(v)+'</span><span class="'+pnlClass(lp)+'" style="font-family:var(--font-number)">'+fmtUSDsigned(lp)+'</span></div>';
+          const w=portOpenTotal>0&&v>0? ' <span style="color:var(--gold-dark);font-weight:700">('+(v/portOpenTotal*100).toFixed(1)+'%)</span>':'';
+          return '<div class="g-lot-row"><span class="g-lot-tk">'+esc(l.ticker)+'</span><span>'+fmtSh(rem)+' Shares</span><span>'+fmtUSD(v)+w+'</span><span class="'+pnlClass(lp)+'" style="font-family:var(--font-number)">'+fmtUSDsigned(lp)+'</span></div>';
         }).join(''):'<div class="field-hint">ไม่มีไม้ในกลุ่มนี้ — กด "+ จัดกลุ่ม" ที่การ์ดไม้ในมุมมอง "ดูเป็นไม้"</div>')
       +'</div></div>';
   });
@@ -1053,6 +1055,7 @@ function renderByTicker(){
     lotSells(l.id).forEach(s=>{ t.realized+=(s.price-l.price)*s.shares; });
   });
   let agg=Object.values(map);
+  const grand=agg.reduce((a,t)=>a+t.rem*t.price,0);
   if(sortMode==='ticker') agg.sort((a,b)=>a.ticker.localeCompare(b.ticker));
   else if(sortMode==='pnl') agg.sort((a,b)=>((b.costOpen>0?(b.rem*b.price-b.costOpen)/b.costOpen:-1e9))-((a.costOpen>0?(a.rem*a.price-a.costOpen)/a.costOpen:-1e9)));
   else agg.sort((a,b)=>(b.rem*b.price)-(a.rem*a.price)); // weight/recent = มูลค่ามาก่อน
@@ -1062,7 +1065,7 @@ function renderByTicker(){
     return '<div class="lot-card">'
       +'<div class="lot-head"><div style="flex:1;min-width:0">'
       +'<div class="lot-ticker-row"><span class="lot-ticker" style="font-size:1.4rem">'+esc(t.ticker)+'</span>'+(t.stale?'<span class="lot-badge stale">ราคาไม่อัพเดต</span>':'')+'</div>'
-      +'<div class="lot-meta">'+t.n+' ไม้ · ราคาตอนนี้ $'+t.price.toFixed(2)+'</div></div>'
+      +'<div class="lot-meta">'+t.n+' ไม้ · ราคาตอนนี้ $'+t.price.toFixed(2)+(t.rem>0&&grand>0?' · <b style="color:var(--gold-dark)">'+(t.rem*t.price/grand*100).toFixed(1)+'% ของพอร์ต</b>':'')+'</div></div>'
       +(t.rem>0?'<div class="lot-pnl"><div class="lot-pnl-val '+pnlClass(unreal)+'">'+fmtUSDsigned(unreal)+'</div><div class="lot-pnl-pct '+pnlClass(unreal)+'">'+fmtPct(pct,true)+'</div></div>':'')
       +'</div>'
       +'<div class="lot-detail-row">'
