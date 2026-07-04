@@ -381,39 +381,6 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
       <div class="field-hint" id="driveLastSync" style="margin-top:8px"></div>
     </div>
 
-    <div class="set-card">
-      <div class="set-title">📈 แหล่งราคาหุ้น (Yahoo Finance)</div>
-      <div class="set-desc">แอปดึงราคาปิดย้อนหลังตั้งแต่วันซื้อ + อัพเดตรายวันผ่านตัวกลางของ JP Trust Learning · พิมพ์ ticker อะไรก็ได้ทั่วโลก (AAPL, NVDA, PTT.BK, 7203.T ฯลฯ)</div>
-      <div class="set-status off" id="workerStatus"><span>●</span> ยังไม่ได้ตั้งค่า</div>
-      <div class="field">
-        <label class="field-label">Price Service URL</label>
-        <input class="field-input" id="workerUrlInput" placeholder="https://port-price.xxx.workers.dev">
-      </div>
-      <div class="set-row">
-        <button class="btn-secondary" style="flex:0 1 auto;padding:10px 16px;font-size:.8rem" onclick="PR.saveWorkerUrl()">บันทึก &amp; ทดสอบ</button>
-      </div>
-    </div>
-
-    <div class="set-card">
-      <div class="set-title">🔐 Google Client ID</div>
-      <div class="set-desc">ค่าตั้งต้นถูกฝังไว้ในแอปแล้ว — ช่องนี้ใช้เฉพาะตอนทดสอบ/เปลี่ยนค่า</div>
-      <div class="field">
-        <label class="field-label">OAuth Client ID</label>
-        <input class="field-input" id="clientIdInput" placeholder="xxxx.apps.googleusercontent.com">
-      </div>
-      <div class="set-row"><button class="btn-secondary" style="flex:0 1 auto;padding:10px 16px;font-size:.8rem" onclick="PR.saveClientId()">บันทึก</button></div>
-    </div>
-
-    <div class="set-card">
-      <div class="set-title">🗂️ ข้อมูลของฉัน</div>
-      <div class="set-desc">ส่งออกไฟล์สำรอง หรือกู้คืนจากไฟล์ที่เคยส่งออก</div>
-      <div class="set-row">
-        <button class="btn-secondary" style="flex:0 1 auto;padding:10px 16px;font-size:.8rem" onclick="PR.exportData()">⬇ ส่งออก JSON</button>
-        <button class="btn-secondary" style="flex:0 1 auto;padding:10px 16px;font-size:.8rem" onclick="document.getElementById('importInput').click()">⬆ นำเข้า JSON</button>
-        <input type="file" id="importInput" accept="application/json" style="display:none" onchange="PR.importData(this)">
-        <button class="btn-danger-ghost" onclick="PR.wipeAll()">ล้างข้อมูลทั้งหมด</button>
-      </div>
-    </div>
     <div style="text-align:center;font-size:.68rem;color:var(--text-muted);padding:6px 10px 0;line-height:1.7">Port Recorder เป็นเครื่องมือบันทึกข้อมูลส่วนบุคคล ไม่ใช่คำแนะนำการลงทุน<br>© JP Trust Learning</div>
   </div>
 
@@ -1723,59 +1690,7 @@ function renderSettings(){
   $('driveDisconnectBtn').style.display = on?'':'none';
   $('driveSyncBtn').disabled=!on;
   $('driveLastSync').textContent = DRIVE.lastSync? ('ซิงก์ล่าสุด: '+new Date(DRIVE.lastSync).toLocaleString('th-TH')):'';
-  $('workerUrlInput').value=CFG.workerUrl||DEFAULT_WORKER_URL||'';
-  $('clientIdInput').value=CFG.clientId||DEFAULT_CLIENT_ID||'';
-  const ws=$('workerStatus');
-  if(workerUrl()){ ws.className='set-status on'; ws.innerHTML='<span>●</span> ตั้งค่าแล้ว'; }
-  else{ ws.className='set-status off'; ws.innerHTML='<span>●</span> ยังไม่ได้ตั้งค่า — ราคาจะใช้ราคาซื้อแทนชั่วคราว'; }
 }
-async function saveWorkerUrl(){
-  const v=$('workerUrlInput').value.trim().replace(/\/+$/,'');
-  CFG.workerUrl=v; try{ localStorage.setItem(LS_CFG, JSON.stringify(CFG)); }catch(e){}
-  if(!v){ renderSettings(); toast('ล้างค่าแล้ว'); return; }
-  toast('กำลังทดสอบ…');
-  try{
-    const j=await fetchHist('AAPL', '2026-06-20');
-    renderSettings(); toast('เชื่อมต่อสำเร็จ ✓ ('+j.dates.length+' แท่งราคา)');
-    refreshPrices(false);
-  }catch(e){ renderSettings(); toast('ทดสอบไม่ผ่าน: '+e.message); }
-}
-function saveClientId(){
-  CFG.clientId=$('clientIdInput').value.trim();
-  try{ localStorage.setItem(LS_CFG, JSON.stringify(CFG)); }catch(e){}
-  tokenClient=null; toast('บันทึกแล้ว');
-}
-function exportData(){
-  const blob=new Blob([JSON.stringify({data:D,prices:PRICES,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download='port-recorder-backup-'+todayStr()+'.json'; a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href),3000);
-}
-function importData(input){
-  const f=input.files&&input.files[0]; input.value=''; if(!f) return;
-  const rd=new FileReader();
-  rd.onload=()=>{
-    try{
-      const j=JSON.parse(rd.result);
-      if(!j.data||!Array.isArray(j.data.portfolios)) throw new Error('รูปแบบไฟล์ไม่ถูกต้อง');
-      showConfirm('นำเข้าไฟล์สำรอง?','ข้อมูลปัจจุบันทั้งหมดจะถูกแทนที่ด้วยข้อมูลจากไฟล์','นำเข้า',()=>{
-        D=j.data; if(j.prices) PRICES=j.prices;
-        D.portfolios.forEach(p=>{ if(!p.targets) p.targets={}; if(p.tolerance==null) p.tolerance=2; if(!Array.isArray(p.groups)) p.groups=[]; });
-        sel=ALL; rbSel=null; saveData(); renderAll(); renderPending(); toast('นำเข้าแล้ว ✓');
-      });
-    }catch(e){ toast('นำเข้าไม่สำเร็จ: '+e.message); }
-  };
-  rd.readAsText(f);
-}
-function wipeAll(){
-  showConfirm('ล้างข้อมูลทั้งหมด?','ข้อมูลในเครื่องนี้จะหายทั้งหมดและย้อนกลับไม่ได้<br>(ไฟล์ใน Google Drive ไม่ถูกลบ)','ล้างทั้งหมด',()=>{ doWipe(); });
-}
-function doWipe(){
-  [LS_DATA,LS_PRICES].forEach(k=>{ try{localStorage.removeItem(k);}catch(e){} });
-  D=freshData(); PRICES={}; sel=ALL; rbSel=null;
-  saveData(); renderAll(); renderPending(); toast('ล้างข้อมูลแล้ว');
-}
-
 /* ============================================================
    INIT
 ============================================================ */
@@ -1801,7 +1716,7 @@ return {switchTab,gotoSettings,toggleMask,selectPort,openPortModal,submitPort,de
   setTf,refreshPrices,
   selectRbPort,setRbMode,renderRebalance,openTargetsModal,addTgtRow,updateTgtSum,submitTargets,
   setView,toggleGroup,openGa,gaAssign,gaCreateAssign,openGm,gmAddRow,gmDelRow,gmSubmit,deleteSell,openPm,pmDelete,
-  driveConnect,driveSyncNow,driveDisconnect,saveWorkerUrl,saveClientId,exportData,importData,wipeAll};
+  driveConnect,driveSyncNow,driveDisconnect};
 })();
 
 </script>
