@@ -218,6 +218,8 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .tab-btn{flex:1;background:none;border:none;font-family:var(--font-thai);font-size:.76rem;font-weight:600;padding:9px 6px;border-radius:8px;color:var(--text-muted);cursor:pointer;transition:all .15s;white-space:nowrap}
 .tab-btn.active{background:var(--cream-card);color:var(--maroon);box-shadow:0 1px 3px rgba(114,47,55,0.08)}
 /* group chip on lot */
+.sort-sel{background:var(--cream-card);border:1px solid var(--border-gold);color:var(--gold-dark);font-family:var(--font-thai);font-size:.72rem;font-weight:700;padding:6px 10px;border-radius:100px;cursor:pointer;-webkit-appearance:none;appearance:none;max-width:60%}
+.sort-sel:focus{outline:none;border-color:var(--gold-dark)}
 .dense-btn{background:var(--cream-card);border:1px solid var(--border-gold);color:var(--gold-dark);font-family:var(--font-thai);font-size:.72rem;font-weight:700;padding:6px 13px;border-radius:100px;cursor:pointer;transition:all .15s}
 .dense-btn:hover{border-color:var(--gold-dark);background:rgba(212,175,55,0.08)}
 #lotsList.compact .lot-detail-row,#lotsList.compact .lot-actions,#lotsList.compact .sell-history,#lotsList.compact .slip-thumb{display:none}
@@ -342,7 +344,15 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
       <button class="tab-btn" data-view="group" onclick="PR.setView('group')">ดูตามกลุ่ม</button>
       <button class="tab-btn" data-view="sells" onclick="PR.setView('sells')">รายการขายแล้ว</button>
     </div>
-    <div style="display:flex;justify-content:flex-end;margin:-4px 0 10px" id="denseWrap"><button class="dense-btn" id="denseBtn" onclick="PR.toggleDense()">⊟ ย่อทั้งหมด</button></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin:-4px 0 10px" id="denseWrap">
+      <select class="sort-sel" id="sortSel" onchange="PR.setSort(this.value)">
+        <option value="recent">เรียง: ล่าสุด</option>
+        <option value="ticker">เรียง: ชื่อหุ้น A→Z</option>
+        <option value="weight">เรียง: สัดส่วน มาก→น้อย</option>
+        <option value="pnl">เรียง: กำไร มาก→น้อย</option>
+      </select>
+      <button class="dense-btn" id="denseBtn" onclick="PR.toggleDense()">⊟ ย่อทั้งหมด</button>
+    </div>
     <div class="lots-list" id="lotsList"></div>
   </div>
 
@@ -626,6 +636,8 @@ let editLotId = null, sellLotId = null, editPortId = null, tgtPortId = null;
 let viewMode = 'lots';
 let dense = false;
 try{ dense = localStorage.getItem('pr:dense')==='1'; }catch(e){}
+let sortMode = 'recent';
+try{ sortMode = localStorage.getItem('pr:sort')||'recent'; }catch(e){}
 let gaLotId = null;
 let openGroups = {};
 let tokenClient = null;
@@ -817,6 +829,7 @@ function renderView(){
 }
 function applyDense(){
   const w=$('denseWrap'), l=$('lotsList'), b=$('denseBtn');
+  const s=$('sortSel'); if(s && s.value!==sortMode) s.value=sortMode;
   const usable = viewMode==='lots'||viewMode==='ticker';
   if(w) w.style.display = usable? '':'none';
   if(l) l.classList.toggle('compact', dense && usable);
@@ -826,6 +839,25 @@ function toggleDense(){
   dense=!dense;
   try{ localStorage.setItem('pr:dense', dense?'1':'0'); }catch(e){}
   applyDense();
+}
+function setSort(v){
+  sortMode=v;
+  try{ localStorage.setItem('pr:sort', v); }catch(e){}
+  renderView();
+}
+function lotCurVal(l){ const rem=remShares(l); return rem>1e-9? rem*priceInfo(l).price : 0; }
+function lotUnreal(l){ const rem=remShares(l); return rem>1e-9? rem*(priceInfo(l).price-l.price) : null; }
+function sortLots(arr){
+  const a=arr.slice();
+  if(sortMode==='ticker') a.sort((x,y)=> x.ticker===y.ticker ? (y.date||'').localeCompare(x.date||'') : x.ticker.localeCompare(y.ticker));
+  else if(sortMode==='weight') a.sort((x,y)=> lotCurVal(y)-lotCurVal(x));
+  else if(sortMode==='pnl') a.sort((x,y)=>{
+    const px=lotUnreal(x), py=lotUnreal(y);
+    if(px==null&&py==null) return (y.date||'').localeCompare(x.date||'');
+    if(px==null) return 1; if(py==null) return -1;
+    return py-px;
+  });
+  return a; // 'recent' = ตาม visibleLots เดิม (วันที่ใหม่ก่อน)
 }
 function renderHero(){
   const st=portStats(sel);
@@ -844,6 +876,7 @@ function renderHero(){
 }
 function renderLots(){
   const st=portStats(sel); const wrap=$('lotsList');
+  st.lots=sortLots(st.lots);
   if(!st.lots.length){ wrap.innerHTML='<div class="empty"><div class="empty-icon">🦉</div><div class="empty-text">ยังไม่มีรายการในพอร์ตนี้</div><div class="empty-sub">กด "+ บันทึกการซื้อใหม่" หรืออัพสลิปในแท็บ บันทึก</div></div>'; return; }
   wrap.innerHTML=st.lots.map(l=>{
     const rem=remShares(l), sold=soldShares(l);
@@ -1019,7 +1052,11 @@ function renderByTicker(){
     if(!pi.stale){ t.price=pi.price; t.stale=false; } else if(t.stale){ t.price=pi.price; }
     lotSells(l.id).forEach(s=>{ t.realized+=(s.price-l.price)*s.shares; });
   });
-  wrap.innerHTML=Object.values(map).sort((a,b)=>(b.rem*b.price)-(a.rem*a.price)).map(t=>{
+  let agg=Object.values(map);
+  if(sortMode==='ticker') agg.sort((a,b)=>a.ticker.localeCompare(b.ticker));
+  else if(sortMode==='pnl') agg.sort((a,b)=>((b.rem*b.price-b.costOpen))-((a.rem*a.price-a.costOpen)));
+  else agg.sort((a,b)=>(b.rem*b.price)-(a.rem*a.price)); // weight/recent = มูลค่ามาก่อน
+  wrap.innerHTML=agg.map(t=>{
     const curVal=t.rem*t.price, unreal=curVal-t.costOpen, avg=t.rem>0? t.costOpen/t.rem : 0;
     const pct=t.costOpen>0? unreal/t.costOpen*100:0;
     return '<div class="lot-card">'
@@ -2075,7 +2112,7 @@ return {switchTab,gotoSettings,toggleMask,selectPort,openPortModal,submitPort,de
   msToggle,msAuto,msSetMode,msRecalc,onMsDate,msSellAllSel,msSubmit,
   setTf,refreshPrices,
   selectRbPort,rbUseCurrent,renderRebalance,openTargetsModal,addTgtRow,updateTgtSum,submitTargets,
-  setView,toggleDense,toggleGroup,openGa,gaAssign,gaCreateAssign,openGm,gmAddRow,gmDelRow,gmSubmit,deleteSell,openPm,pmDelete,
+  setView,toggleDense,setSort,toggleGroup,openGa,gaAssign,gaCreateAssign,openGm,gmAddRow,gmDelRow,gmSubmit,deleteSell,openPm,pmDelete,
   driveConnect,driveSyncNow,driveDisconnect,drivePillTap};
 })();
 
