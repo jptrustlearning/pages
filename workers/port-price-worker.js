@@ -140,7 +140,10 @@ async function ocr(request, env, ctx, CORS) {
     + '- THAI BUDDHIST ERA years: 4-digit >= 2500 -> subtract 543 (2569 -> 2026). TWO-DIGIT Thai years are BE too: "1 ก.ค. 69" means BE 2569 -> 2026-07-01 (NOT 1969/2069). Convert: 2-digit yy -> 2500+yy -> minus 543.\n'
     + '- Thai months: ม.ค.=01 ก.พ.=02 มี.ค.=03 เม.ย.=04 พ.ค.=05 มิ.ย.=06 ก.ค.=07 ส.ค.=08 ก.ย.=09 ต.ค.=10 พ.ย.=11 ธ.ค.=12. Thai numeric dates are day/month/year.\n'
     + '- Today is ' + today + '; dates must not be in the future.\n'
-    + '- List screens: one element per order row (same ticker on different rows/times = separate trades). Skip pending/cancelled orders; include only executed/filled ones.\n'
+    + '- List screens: one element per order row (same ticker on different rows/times = separate trades). Include only executed/filled orders — status "จับคู่แล้ว"/"กำลังคืนเงิน"/Filled counts as executed; skip pending/cancelled.\n'
+    + '- SKIP rows that are NOT stock trades: dividends (ปันผล/รับเงินเข้า), withholding tax (ภาษีหัก ณ ที่จ่าย), fees (ค่าธรรมเนียม...), deposits/withdrawals, interest. Only ซื้อ/ขาย orders become trades.\n'
+    + '- SELL rows in lists: the big headline number is the SHARE COUNT ("0.3650863 หุ้น"), not money. price = ราคาที่ได้จริง; amount = price x shares.\n'
+    + '- SELL detail pages: use "มูลค่าหุ้น" (gross) as amount, NOT "ยอดที่จะได้รับคืน" (net proceeds after fees).\n'
     + '- confidence "low" only if blurry or a key field is ambiguous.';
 
   let ar;
