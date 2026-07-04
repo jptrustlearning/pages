@@ -67,7 +67,7 @@ async function hist(url, ctx, CORS) {
   }
   if (!yr.ok) return json({ error: 'yahoo ' + yr.status }, yr.status === 404 ? 404 : 502, CORS);
 
-  let dates = [], closes = [];
+  let dates = [], closes = [], highs = [], lows = [];
   try {
     const j = await yr.json();
     const r = j.chart && j.chart.result && j.chart.result[0];
@@ -75,7 +75,9 @@ async function hist(url, ctx, CORS) {
     const ts = r.timestamp || [];
     const q = r.indicators || {};
     const adj = q.adjclose && q.adjclose[0] && q.adjclose[0].adjclose;
-    const raw = q.quote && q.quote[0] && q.quote[0].close;
+    const quote = (q.quote && q.quote[0]) || {};
+    const raw = quote.close;
+    const hiA = quote.high || [], loA = quote.low || [];
     const src = adj || raw || [];
     const tz = (r.meta && r.meta.exchangeTimezoneName) || 'UTC';
     const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -84,13 +86,17 @@ async function hist(url, ctx, CORS) {
       if (c == null || !isFinite(c)) continue;
       dates.push(fmt.format(new Date(ts[i] * 1000)));
       closes.push(Math.round(c * 10000) / 10000);
+      const h = (hiA[i] != null && isFinite(hiA[i])) ? hiA[i] : c;
+      const l = (loA[i] != null && isFinite(loA[i])) ? loA[i] : c;
+      highs.push(Math.round(h * 10000) / 10000);
+      lows.push(Math.round(l * 10000) / 10000);
     }
   } catch (e) {
     return json({ error: 'parse: ' + e.message }, 502, CORS);
   }
   if (!dates.length) return json({ error: 'no data for ' + symbol }, 404, CORS);
 
-  const body = JSON.stringify({ symbol, dates, closes });
+  const body = JSON.stringify({ symbol, dates, closes, highs, lows });
   const res = new Response(body, {
     headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=3600', ...CORS, 'X-Cache': 'MISS' },
   });
