@@ -231,6 +231,11 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 
   <!-- ============ TAB: PORTFOLIO ============ -->
   <div class="tab-page active" id="page-port">
+    <div class="set-card" id="driveGate" style="display:none;border:1.5px solid rgba(212,175,55,0.55);background:linear-gradient(135deg,#FFF8E7,#FFFEF8)">
+      <div class="set-title">⚠️ เชื่อม Google Drive ก่อนเริ่มบันทึก</div>
+      <div class="set-desc">แอปเก็บข้อมูลพอร์ต ราคา และสลิปไว้ใน <b>Google Drive ของคุณเอง</b> — ล้างแคชหรือเปลี่ยนเครื่องข้อมูลก็ไม่หาย · แอปเห็นเฉพาะไฟล์ที่แอปสร้าง ไม่เห็นไฟล์อื่นใน Drive</div>
+      <button class="btn-primary" style="width:100%" onclick="PR.driveConnect()">เชื่อมต่อ Google Drive เพื่อเริ่มใช้งาน</button>
+    </div>
     <div class="port-bar">
       <div class="port-chips" id="portChips"></div>
     </div>
@@ -306,7 +311,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
   <div class="tab-page" id="page-set">
     <div class="set-card">
       <div class="set-title">☁️ Google Drive (ส่วนตัว)</div>
-      <div class="set-desc">เก็บข้อมูลพอร์ต + รูปสลิปไว้ใน Google Drive ของคุณเอง แอปเห็นเฉพาะไฟล์ที่แอปสร้าง (สิทธิ์ drive.file) ไม่มีใครเข้าถึงข้อมูลคุณได้นอกจากตัวคุณ · ถ้าไม่เชื่อม ข้อมูลจะเก็บในเครื่องนี้เท่านั้น</div>
+      <div class="set-desc">ที่เก็บหลักของข้อมูลพอร์ต ราคา และสลิป คือ Google Drive ของคุณเอง — <b>ต้องเชื่อมก่อนเริ่มบันทึก</b> เพื่อไม่ให้ข้อมูลหายเมื่อล้างแคชหรือเปลี่ยนเครื่อง · แอปเห็นเฉพาะไฟล์ที่แอปสร้าง (สิทธิ์ drive.file) ไม่มีใครเข้าถึงข้อมูลคุณได้นอกจากตัวคุณ</div>
       <div class="set-status off" id="driveStatus"><span>●</span> ยังไม่เชื่อมต่อ</div>
       <div class="set-row">
         <button class="btn-primary" style="flex:0 1 auto;padding:10px 18px;font-size:.82rem" id="driveConnectBtn" onclick="PR.driveConnect()">เชื่อมต่อ Google Drive</button>
@@ -493,7 +498,19 @@ function persistLocal(){
 }
 function saveData(){
   persistLocal();
-  if(DRIVE.connected){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>drivePush().catch(e=>console.warn('drive push',e)), 2500); }
+  if(DRIVE.connected){
+    clearTimeout(saveTimer);
+    saveTimer=setTimeout(()=>{ saveTimer=null;
+      drivePush().catch(e=>{ console.warn('drive push',e); toast('⚠ ยังซิงก์ขึ้น Drive ไม่สำเร็จ — จะลองใหม่อัตโนมัติ');
+        setTimeout(()=>drivePush().catch(()=>{}), 8000); });
+    }, 1000);
+  }
+}
+function requireDrive(){
+  if(DRIVE.connected) return true;
+  toast('เชื่อม Google Drive ก่อนบันทึก — ข้อมูลจะได้ไม่หายเมื่อล้างแคช');
+  driveConnect();
+  return false;
 }
 function workerUrl(){ return (CFG.workerUrl||DEFAULT_WORKER_URL||'').replace(/\/+$/,''); }
 function clientId(){ return CFG.clientId||DEFAULT_CLIENT_ID||''; }
@@ -645,6 +662,7 @@ function viewSlip(id,kind){
 /* ---------- ADD / EDIT LOT ---------- */
 let pendingToConvert=null;
 function openAddModal(lotId, fromPending){
+  if(!requireDrive()) return;
   editLotId=lotId||null; pendingToConvert=fromPending||null;
   $('mdlLotTitle').textContent = lotId?'แก้ไขรายการ':(fromPending?'ตรวจสอบก่อนบันทึกเข้าพอร์ต':'บันทึกการซื้อใหม่');
   let src = lotId? D.lots.find(l=>l.id===lotId) : (fromPending? D.pending.find(p=>p.id===fromPending):null);
@@ -696,6 +714,7 @@ function deleteLot(id){
 
 /* ---------- SELL ---------- */
 function openSellModal(lotId){
+  if(!requireDrive()) return;
   sellLotId=lotId; const l=D.lots.find(x=>x.id===lotId); if(!l) return;
   const rem=remShares(l);
   $('mdlSellTitle').textContent='ขาย '+l.ticker;
@@ -878,6 +897,7 @@ function renderPending(){
   }).join('');
 }
 function addPendingManual(){
+  if(!requireDrive()) return;
   D.pending.unshift({id:uid(),ticker:'',price:null,shares:null,date:todayStr(),side:'buy',slip:null,note:'กรอกเอง',createdAt:Date.now()});
   saveData(); renderPending(); toast('เพิ่มรายการรอแล้ว — กด ✓ เพื่อกรอกรายละเอียด');
 }
@@ -911,6 +931,7 @@ function loadTesseract(){
 async function onSlipFile(input){
   const file=input.files&&input.files[0]; input.value='';
   if(!file) return;
+  if(!requireDrive()) return;
   const st=$('ocrStatus'), bar=$('ocrBar'), txt=$('ocrText');
   st.classList.add('show'); bar.style.width='5%'; txt.textContent='กำลังเตรียมรูป…';
   try{
@@ -1065,6 +1086,7 @@ function renderRebalance(){
 
 /* ---------- TARGETS EDITOR ---------- */
 function openTargetsModal(){
+  if(!requireDrive()) return;
   const p=portById(rbSel); if(!p){ toast('เลือกพอร์ตก่อน'); return; }
   tgtPortId=p.id;
   $('tgtPortName').textContent='พอร์ต: '+p.name+' — กำหนด % ที่อยากให้แต่ละหุ้นเป็น (รวมไม่เกิน 100)';
@@ -1210,6 +1232,7 @@ function renderDrivePill(){
   const on=!!DRIVE.connected;
   $('drivePill').classList.toggle('on',on);
   $('drivePillText').textContent = on?'Drive เชื่อมแล้ว':'ยังไม่เชื่อม Drive';
+  const g=$('driveGate'); if(g) g.style.display = on?'none':'';
 }
 
 /* ============================================================
@@ -1218,7 +1241,7 @@ function renderDrivePill(){
 function renderSettings(){
   const on=!!DRIVE.connected;
   const ds=$('driveStatus'); ds.className='set-status '+(on?'on':'off');
-  ds.innerHTML='<span>●</span> '+(on?'เชื่อมต่อแล้ว — โฟลเดอร์ "'+DRIVE_FOLDER+'" ใน Drive ของคุณ':'ยังไม่เชื่อมต่อ (ข้อมูลอยู่ในเครื่องนี้เท่านั้น)');
+  ds.innerHTML='<span>●</span> '+(on?'เชื่อมต่อแล้ว — โฟลเดอร์ "'+DRIVE_FOLDER+'" ใน Drive ของคุณ':'ยังไม่เชื่อมต่อ — ต้องเชื่อมก่อนเริ่มบันทึกข้อมูล');
   $('driveConnectBtn').style.display = on?'none':'';
   $('driveDisconnectBtn').style.display = on?'':'none';
   $('driveSyncBtn').disabled=!on;
@@ -1280,6 +1303,11 @@ function init(){
   loadLocal();
   renderEye(); renderDrivePill(); renderAll(); renderSettings();
   window.addEventListener('resize', ()=>drawEquity());
+  document.addEventListener('visibilitychange', ()=>{
+    if(document.visibilityState==='hidden' && DRIVE.connected && saveTimer){
+      clearTimeout(saveTimer); saveTimer=null; drivePush().catch(()=>{});
+    }
+  });
   if(DRIVE.connected){
     drivePull().then(ch=>{ if(ch){ renderAll(); renderPending(); } }).catch(e=>console.warn('pull',e));
   }
