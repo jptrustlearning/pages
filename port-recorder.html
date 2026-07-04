@@ -464,7 +464,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
         <button type="button" class="seg-btn active" data-mode="usd" onclick="PR.setSellMode('usd')">จำนวนเงิน (USD)</button>
         <button type="button" class="seg-btn" data-mode="shares" onclick="PR.setSellMode('shares')">จำนวนหุ้น</button>
       </div>
-      <input class="field-input num" id="sAmount" type="number" inputmode="decimal" step="any" placeholder="0.00" oninput="PR.recalcSell()">
+      <input class="field-input num" id="sAmount" type="number" inputmode="decimal" step="any" placeholder="0.00" oninput="PR.onSAmountInput()">
       <div class="field-hint" id="sMaxHint"></div>
     </div>
     <div class="preview-box" style="margin-bottom:14px">
@@ -574,7 +574,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
         <button type="button" class="seg-btn active" data-mode="usd" onclick="PR.msSetMode('usd')">จำนวนเงิน (USD)</button>
         <button type="button" class="seg-btn" data-mode="shares" onclick="PR.msSetMode('shares')">จำนวนหุ้น</button>
       </div>
-      <input class="field-input num" id="msAmount" type="number" inputmode="decimal" step="any" placeholder="0.00" oninput="PR.msRecalc()">
+      <input class="field-input num" id="msAmount" type="number" inputmode="decimal" step="any" placeholder="0.00" oninput="PR.onMsAmountInput()">
       <div class="field-hint" id="msCapHint"></div>
     </div>
     <div class="preview-box" style="margin-bottom:12px">
@@ -621,6 +621,7 @@ const DATA_FILENAME = 'portfolio-data.json';
 const PORT_COLORS   = ['#722F37','#B8860B','#2E9F5F','#8B2252','#5A3D20','#1F6F8B','#C0392B','#6B4E9B','#3C7A57','#A8642A'];
 const PORT_MAX      = 10;
 const ALL           = '__all__';
+const DUST_SHARES   = 5e-5; // เศษหุ้นต่ำกว่านี้ = ถือว่าไม้ปิดแล้ว (ตาม my-portfolio)
 const LS_DATA='pr:data', LS_PRICES='pr:prices', LS_CFG='pr:cfg', LS_MASK='pr:mask', LS_DRIVE='pr:drive';
 
 /* ---------- STATE ---------- */
@@ -791,7 +792,7 @@ function pmDelete(pid){
 function lotAmount(l){ return l.amount!=null? l.amount : l.shares*l.price; }
 function lotSells(lotId){ return D.sells.filter(s=>s.lotId===lotId); }
 function soldShares(lot){ return lotSells(lot.id).reduce((a,s)=>a+s.shares,0); }
-function remShares(lot){ return Math.max(0, lot.shares - soldShares(lot)); }
+function remShares(lot){ const r=lot.shares - soldShares(lot); return r < DUST_SHARES ? 0 : r; }
 function lastClose(tk){ const p=PRICES[tk]; return (p&&p.closes.length)? p.closes[p.closes.length-1] : null; }
 function priceInfo(lot){
   const c=lastClose(lot.ticker);
@@ -1213,10 +1214,11 @@ function deleteLot(id){
 }
 
 /* ---------- SELL ---------- */
-let sellMode='usd', sellFetchTimer=null, sellRange=null, sellPendingId=null;
+let sellMode='usd', sellFetchTimer=null, sellRange=null, sellPendingId=null, sellAllArmed=false;
 function openSellModal(lotId, fromPendingId){
   if(!requireDrive()) return;
   sellLotId=lotId; const l=D.lots.find(x=>x.id===lotId); if(!l) return;
+  sellAllArmed=false;
   sellPendingId=fromPendingId||null;
   const pd = sellPendingId? D.pending.find(p=>p.id===sellPendingId) : null;
   const rem=remShares(l);
@@ -1237,7 +1239,9 @@ function openSellModal(lotId, fromPendingId){
   updateSellMax(); recalcSell();
   openModal('mdlSell');
 }
+function onSAmountInput(){ sellAllArmed=false; recalcSell(); }
 function setSellMode(m){
+  sellAllArmed=false;
   sellMode=m;
   document.querySelectorAll('#sModeSeg .seg-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===m));
   $('sAmount').value='';
@@ -1255,13 +1259,17 @@ function sellAllQuick(){
   const l=D.lots.find(x=>x.id===sellLotId); if(!l) return;
   const rem=remShares(l);
   $('sAmount').value = sellMode==='usd' ? (rem*sellPrice()).toFixed(2) : rem;
+  sellAllArmed=true; // ใช้จำนวนคงเหลือเป๊ะ ไม่เพี้ยนจากการปัดทศนิยม
   recalcSell();
 }
 function sellSharesDerived(){
   const l=D.lots.find(x=>x.id===sellLotId); if(!l) return 0;
-  const amt=parseFloat($('sAmount').value)||0, price=sellPrice(), rem=remShares(l);
+  const rem=remShares(l);
+  if(sellAllArmed) return rem; // กดขายทั้งหมด = คงเหลือเป๊ะ
+  const amt=parseFloat($('sAmount').value)||0, price=sellPrice();
   let sh = sellMode==='usd' ? (price>0? amt/price:0) : amt;
-  if(sh>rem && sh<=rem*1.0001) sh=rem; // snap rounding to "all"
+  // dust snap: พิมพ์ค่าใกล้คงเหลือระดับความละเอียดหน้าจอ = ตั้งใจขายหมด
+  if(Math.abs(sh-rem) <= Math.max(DUST_SHARES, rem*0.001)) sh=rem;
   return sh;
 }
 function onSellDateInput(){
@@ -1563,14 +1571,14 @@ function sellFlowForTicker(tk, pendingId){
 }
 
 /* ---------- MULTI-LOT SEQUENTIAL SELL ---------- */
-let msTicker=null, msPendingId=null, msOrder=[], msMode='usd', msRange=null, msFetchTimer=null;
+let msTicker=null, msPendingId=null, msOrder=[], msMode='usd', msRange=null, msFetchTimer=null, msAllArmed=false;
 function msLots(){
   return D.lots.filter(l=>l.ticker===msTicker && remShares(l)>1e-9)
     .sort((a,b)=>(a.date||'').localeCompare(b.date||''));
 }
 function msPriceVal(){ return parseFloat($('msPrice').value)||0; }
 function openMultiSell(tk, pendingId){
-  msTicker=tk; msPendingId=pendingId||null; msOrder=[]; msMode='usd'; msRange=null;
+  msTicker=tk; msPendingId=pendingId||null; msOrder=[]; msMode='usd'; msRange=null; msAllArmed=false;
   const pd = msPendingId? D.pending.find(p=>p.id===msPendingId) : null;
   const lots=msLots();
   const cap=lots.reduce((a,l)=>a+remShares(l),0);
@@ -1609,13 +1617,16 @@ function onMsDate(){
     msRecalc();
   }, 550);
 }
+function onMsAmountInput(){ msAllArmed=false; msRecalc(); }
 function msSetMode(m){
+  msAllArmed=false;
   msMode=m;
   document.querySelectorAll('#msModeSeg .seg-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===m));
   $('msAmount').value='';
   msRecalc();
 }
 function msToggle(lotId){
+  msAllArmed=false;
   const i=msOrder.indexOf(lotId);
   if(i>=0) msOrder.splice(i,1); else msOrder.push(lotId);
   msRender(); msRecalc();
@@ -1628,6 +1639,7 @@ function msSellAllSel(){
   const cap=msSelCap();
   if(cap<=0){ toast('แตะเลือกไม้ก่อน'); return; }
   $('msAmount').value = msMode==='shares'? cap : (cap*msPriceVal()).toFixed(2);
+  msAllArmed=true; // ตัดเต็มทุกไม้ที่เลือก ไม่เหลือเศษ
   msRecalc();
 }
 function msSelCap(){
@@ -1637,17 +1649,21 @@ function msSelCap(){
 function msAlloc(){
   const price=msPriceVal();
   const total=parseFloat($('msAmount').value)||0;
-  let remain = msMode==='shares'? total : (price>0? total/price : 0);
   const cuts={};
+  if(msAllArmed){ // ขายไม้ที่เลือกทั้งหมด = คงเหลือเป๊ะทุกไม้
+    msOrder.forEach(id=>{ const l=D.lots.find(x=>x.id===id); cuts[id]=l? remShares(l):0; });
+    return {cuts, leftover:0, price, total};
+  }
+  let remain = msMode==='shares'? total : (price>0? total/price : 0);
   msOrder.forEach(id=>{
     const l=D.lots.find(x=>x.id===id); if(!l){ cuts[id]=0; return; }
     const r=remShares(l);
     let take=Math.min(r, remain);
-    if(take>r*0.9999) take=r; // snap รอบทศนิยม = ขายหมดไม้
+    if(r-take <= Math.max(DUST_SHARES, r*0.001)) take=r; // dust snap = ขายหมดไม้ ไม่เหลือเศษ
     if(take<1e-9) take=0;
     cuts[id]=take; remain-=take;
   });
-  return {cuts, leftover:Math.max(0,remain), price, total};
+  return {cuts, leftover: remain>DUST_SHARES? remain:0, price, total};
 }
 function msRender(){
   const lots=msLots();
@@ -2110,9 +2126,9 @@ function init(){
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
 
 return {switchTab,gotoSettings,toggleMask,selectPort,openPortModal,submitPort,deletePortfolio,
-  openAddModal,pickFormPort,submitLot,deleteLot,onBuyInput,recalcBuy,openSellModal,submitSell,setSellMode,sellAllQuick,recalcSell,onSellDateInput,closeModal,viewSlip,
+  openAddModal,pickFormPort,submitLot,deleteLot,onBuyInput,recalcBuy,openSellModal,submitSell,onSAmountInput,setSellMode,sellAllQuick,recalcSell,onSellDateInput,closeModal,viewSlip,
   onSlipFile,openManualAdd,maChoose,maSellTicker,confirmPending,deletePending,
-  msToggle,msAuto,msSetMode,msRecalc,onMsDate,msSellAllSel,msSubmit,
+  msToggle,msAuto,msSetMode,msRecalc,onMsAmountInput,onMsDate,msSellAllSel,msSubmit,
   setTf,refreshPrices,
   selectRbPort,rbUseCurrent,renderRebalance,openTargetsModal,addTgtRow,updateTgtSum,submitTargets,
   setView,toggleDense,setSort,toggleGroup,openGa,gaAssign,gaCreateAssign,openGm,gmAddRow,gmDelRow,gmSubmit,deleteSell,openPm,pmDelete,
