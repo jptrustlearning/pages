@@ -126,23 +126,22 @@ async function ocr(request, env, ctx, CORS) {
   if (image.length > 2400000) return json({ error: 'image too large' }, 413, CORS);
 
   const today = new Date().toISOString().slice(0, 10);
-  const prompt = 'You are reading a stock brokerage trade slip / order confirmation (from Thai or international broker apps such as Dime, InnovestX, Streaming, Webull, IBKR, Schwab, etc.). Extract the trade details carefully.\n'
-    + 'Respond with ONLY a JSON object, no markdown fences, no other text:\n'
-    + '{"side":"buy"|"sell","ticker":"SYMBOL or empty string","price":number or null,"shares":number or null,"amount":number or null,"date":"YYYY-MM-DD" or null,"confidence":"high"|"low"}\n'
-    + 'Rules:\n'
-    + '- side: ซื้อ/Buy/Bought = "buy"; ขาย/Sell/Sold = "sell".\n'
-    + '- ticker: the stock symbol only (e.g. AAPL, NVDA, PTT.BK). If shown as "AAPL:NASDAQ" or with company name, return just the symbol, uppercase. Empty string if truly unclear.\n'
-    + '- price: the EXECUTED/FILLED average price per share (ราคาเฉลี่ย/ราคาที่จับคู่/Filled/Avg price). If both a limit/order price and a filled price appear, use the filled price. Do NOT use the current market price shown elsewhere on screen.\n'
-    + '- shares: quantity of shares actually filled (จำนวนหุ้น). May be fractional.\n'
-    + '- amount: total trade value = price x shares (มูลค่า/ยอดรวม). EXCLUDE commission/fees/VAT (ค่าคอมมิชชั่น/ค่าธรรมเนียม). If only amount-with-fees is shown, prefer price x shares.\n'
-    + '- Cross-check: if price, shares and amount are all visible, they must be consistent (price x shares ~= amount within 1%). If not, trust price and shares.\n'
-    + '- date: the trade/execution date as YYYY-MM-DD.\n'
-    + '- IMPORTANT Thai Buddhist Era: Thai slips often use พ.ศ. years (e.g. 2569, 04/07/2569, 4 ก.ค. 2569). If the year is 2500 or greater, subtract 543 to convert to CE (2569 -> 2026).\n'
-    + '- Thai month abbreviations: ม.ค.=01 ก.พ.=02 มี.ค.=03 เม.ย.=04 พ.ค.=05 มิ.ย.=06 ก.ค.=07 ส.ค.=08 ก.ย.=09 ต.ค.=10 พ.ย.=11 ธ.ค.=12.\n'
-    + '- Thai numeric dates are day/month/year (04/07/2569 = 4 July 2026), NOT month/day.\n'
-    + '- Today is ' + today + '; the final date must not be in the future. If no date is visible, use null.\n'
-    + '- If the image contains multiple orders, use the most recent FILLED/executed one.\n'
-    + '- confidence "low" only if the image is blurry or key fields are ambiguous.';
+  const prompt = 'You are reading a screenshot from a stock brokerage app (Thai brokers like Dime!, InnovestX, Streaming, or international apps). It may show ONE order detail page, or a LIST of multiple orders.\n'
+    + 'Extract every distinct EXECUTED trade visible. Respond with ONLY this JSON, no markdown fences, no other text:\n'
+    + '{"trades":[{"side":"buy"|"sell","ticker":"SYMBOL","price":number or null,"shares":number or null,"amount":number or null,"date":"YYYY-MM-DD" or null,"confidence":"high"|"low"}]}\n'
+    + 'Rules per trade:\n'
+    + '- side: ซื้อ/Buy = "buy"; ขาย/Sell = "sell".\n'
+    + '- ticker: symbol only, uppercase (AAPL, PTT.BK). Strip exchange tags like ":NASDAQ" and company names.\n'
+    + '- price: the FILLED price per share. Thai labels: "ราคาที่ได้จริง", "ราคาเฉลี่ย", "ราคาที่จับคู่". NOT the limit price, NOT current market price.\n'
+    + '- shares: filled quantity ("จำนวนหุ้น"), may be fractional like 0.2138450.\n'
+    + '- amount: value of shares EXCLUDING commission/fees/VAT. Thai label "มูลค่าหุ้น". The big headline amount (e.g. "25.00 USD") often INCLUDES fees — prefer "มูลค่าหุ้น" or compute price x shares. Numbers may contain thousands commas (2,088.00 = 2088).\n'
+    + '- Cross-check: price x shares should ~= amount within 1%; if inconsistent, trust price and shares.\n'
+    + '- date: execution/fill date ("วันที่คำสั่งสำเร็จ" preferred over order-sent date) as YYYY-MM-DD.\n'
+    + '- THAI BUDDHIST ERA years: 4-digit >= 2500 -> subtract 543 (2569 -> 2026). TWO-DIGIT Thai years are BE too: "1 ก.ค. 69" means BE 2569 -> 2026-07-01 (NOT 1969/2069). Convert: 2-digit yy -> 2500+yy -> minus 543.\n'
+    + '- Thai months: ม.ค.=01 ก.พ.=02 มี.ค.=03 เม.ย.=04 พ.ค.=05 มิ.ย.=06 ก.ค.=07 ส.ค.=08 ก.ย.=09 ต.ค.=10 พ.ย.=11 ธ.ค.=12. Thai numeric dates are day/month/year.\n'
+    + '- Today is ' + today + '; dates must not be in the future.\n'
+    + '- List screens: one element per order row (same ticker on different rows/times = separate trades). Skip pending/cancelled orders; include only executed/filled ones.\n'
+    + '- confidence "low" only if blurry or a key field is ambiguous.';
 
   let ar;
   try {
@@ -155,7 +154,7 @@ async function ocr(request, env, ctx, CORS) {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 400,
+        max_tokens: 1200,
         messages: [{
           role: 'user',
           content: [

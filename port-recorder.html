@@ -1409,25 +1409,32 @@ async function onSlipFile(input){
     try{ p=await r.json(); }catch(e){}
     if(!r.ok) throw new Error((p&&p.error)||('HTTP '+r.status));
     bar.style.width='100%';
-    // normalize
-    const side = p.side==='sell'?'sell':'buy';
-    let ticker=(p.ticker||'').toString().trim().toUpperCase();
-    if(!/^[A-Z0-9.\-^=]{1,12}$/.test(ticker)) ticker='';
-    let price=Number(p.price), shares=Number(p.shares), amount=Number(p.amount);
-    if(!(price>0)) price=null;
-    if(!(shares>0)) shares=null;
-    if(!(amount>0)) amount=null;
-    if(amount==null && price&&shares) amount=Math.round(price*shares*100)/100;
-    if(shares==null && price&&amount) shares=amount/price;
-    let date=(p.date||'').toString().slice(0,10);
-    if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||date>todayStr()) date=todayStr();
-    const note = p.confidence==='low' ? 'AI อ่านแล้วแต่ภาพไม่ชัด — โปรดตรวจให้ดี' : 'AI อ่านจากสลิป — โปรดตรวจสอบ';
+    const raw = Array.isArray(p&&p.trades)? p.trades : [p];
     const thumb=await compressImage(file, 700);
-    D.pending.unshift({id:uid(),side,ticker,price,shares,amount,date,slip:thumb,note,createdAt:Date.now()});
+    let added=0;
+    raw.forEach(t=>{
+      if(!t) return;
+      const side = t.side==='sell'?'sell':'buy';
+      let ticker=(t.ticker||'').toString().trim().toUpperCase();
+      if(!/^[A-Z0-9.\-^=]{1,12}$/.test(ticker)) ticker='';
+      let price=Number(t.price), shares=Number(t.shares), amount=Number(t.amount);
+      if(!(price>0)) price=null;
+      if(!(shares>0)) shares=null;
+      if(!(amount>0)) amount=null;
+      if(amount==null && price&&shares) amount=Math.round(price*shares*100)/100;
+      if(shares==null && price&&amount) shares=amount/price;
+      if(!ticker && price==null && shares==null && amount==null) return;
+      let date=(t.date||'').toString().slice(0,10);
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||date>todayStr()) date=todayStr();
+      const note = t.confidence==='low' ? 'AI อ่านแล้วแต่ภาพไม่ชัด — โปรดตรวจให้ดี' : 'AI อ่านจากสลิป — โปรดตรวจสอบ';
+      D.pending.unshift({id:uid(),side,ticker,price,shares,amount,date,slip:thumb,note,createdAt:Date.now()+added});
+      added++;
+    });
+    if(!added) throw new Error('ไม่พบรายการซื้อขายในภาพ');
     saveData(); renderPending();
-    txt.textContent='อ่านสลิปเสร็จ ✓ ตรวจรายการด้านล่างก่อนบันทึก';
-    setTimeout(()=>st.classList.remove('show'),1800);
-    toast('ขึ้นเป็นรายการรอแล้ว — ตรวจก่อนเข้าพอร์ต');
+    txt.textContent='อ่านสลิปเสร็จ ✓ พบ '+added+' รายการ — ตรวจด้านล่างก่อนบันทึก';
+    setTimeout(()=>st.classList.remove('show'),2200);
+    toast(added>1? 'อ่านได้ '+added+' รายการ — ตรวจทีละใบก่อนเข้าพอร์ต' : 'ขึ้นเป็นรายการรอแล้ว — ตรวจก่อนเข้าพอร์ต');
   }catch(e){
     if(anim) clearInterval(anim);
     console.warn(e);
