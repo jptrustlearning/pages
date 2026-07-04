@@ -1397,7 +1397,7 @@ async function onSlipFile(input){
   st.classList.add('show'); bar.style.width='8%'; txt.textContent='กำลังเตรียมรูป…';
   let anim=null;
   try{
-    const dataUrl=await compressImage(file, 1200, 0.82);
+    const dataUrl=await compressImage(file, 1600, 0.85);
     txt.textContent='AI กำลังอ่านสลิป…'; bar.style.width='25%';
     let w=25; anim=setInterval(()=>{ w=Math.min(88,w+4); bar.style.width=w+'%'; }, 350);
     const r=await fetch(workerUrl()+'/ocr',{

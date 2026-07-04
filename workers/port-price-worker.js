@@ -126,17 +126,23 @@ async function ocr(request, env, ctx, CORS) {
   if (image.length > 2400000) return json({ error: 'image too large' }, 413, CORS);
 
   const today = new Date().toISOString().slice(0, 10);
-  const prompt = 'Read this brokerage trade confirmation slip and extract the trade details.\n'
+  const prompt = 'You are reading a stock brokerage trade slip / order confirmation (from Thai or international broker apps such as Dime, InnovestX, Streaming, Webull, IBKR, Schwab, etc.). Extract the trade details carefully.\n'
     + 'Respond with ONLY a JSON object, no markdown fences, no other text:\n'
     + '{"side":"buy"|"sell","ticker":"SYMBOL or empty string","price":number or null,"shares":number or null,"amount":number or null,"date":"YYYY-MM-DD" or null,"confidence":"high"|"low"}\n'
     + 'Rules:\n'
-    + '- ticker: the stock symbol (e.g. AAPL, NVDA, PTT.BK). Uppercase. Empty string if unclear.\n'
-    + '- price: executed/filled price per share.\n'
-    + '- shares: quantity of shares.\n'
-    + '- amount: total value of the trade if shown.\n'
-    + '- date: the trade/fill date. Today is ' + today + '; the date must not be in the future.\n'
-    + '- The slip may be in Thai or English.\n'
-    + '- confidence "low" if the image is blurry or fields are ambiguous.';
+    + '- side: ซื้อ/Buy/Bought = "buy"; ขาย/Sell/Sold = "sell".\n'
+    + '- ticker: the stock symbol only (e.g. AAPL, NVDA, PTT.BK). If shown as "AAPL:NASDAQ" or with company name, return just the symbol, uppercase. Empty string if truly unclear.\n'
+    + '- price: the EXECUTED/FILLED average price per share (ราคาเฉลี่ย/ราคาที่จับคู่/Filled/Avg price). If both a limit/order price and a filled price appear, use the filled price. Do NOT use the current market price shown elsewhere on screen.\n'
+    + '- shares: quantity of shares actually filled (จำนวนหุ้น). May be fractional.\n'
+    + '- amount: total trade value = price x shares (มูลค่า/ยอดรวม). EXCLUDE commission/fees/VAT (ค่าคอมมิชชั่น/ค่าธรรมเนียม). If only amount-with-fees is shown, prefer price x shares.\n'
+    + '- Cross-check: if price, shares and amount are all visible, they must be consistent (price x shares ~= amount within 1%). If not, trust price and shares.\n'
+    + '- date: the trade/execution date as YYYY-MM-DD.\n'
+    + '- IMPORTANT Thai Buddhist Era: Thai slips often use พ.ศ. years (e.g. 2569, 04/07/2569, 4 ก.ค. 2569). If the year is 2500 or greater, subtract 543 to convert to CE (2569 -> 2026).\n'
+    + '- Thai month abbreviations: ม.ค.=01 ก.พ.=02 มี.ค.=03 เม.ย.=04 พ.ค.=05 มิ.ย.=06 ก.ค.=07 ส.ค.=08 ก.ย.=09 ต.ค.=10 พ.ย.=11 ธ.ค.=12.\n'
+    + '- Thai numeric dates are day/month/year (04/07/2569 = 4 July 2026), NOT month/day.\n'
+    + '- Today is ' + today + '; the final date must not be in the future. If no date is visible, use null.\n'
+    + '- If the image contains multiple orders, use the most recent FILLED/executed one.\n'
+    + '- confidence "low" only if the image is blurry or key fields are ambiguous.';
 
   let ar;
   try {
@@ -148,8 +154,8 @@ async function ocr(request, env, ctx, CORS) {
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5',
-        max_tokens: 300,
+        model: 'claude-sonnet-4-6',
+        max_tokens: 400,
         messages: [{
           role: 'user',
           content: [
