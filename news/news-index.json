@@ -1,6 +1,103 @@
 {
-  "lastUpdated": "2026-07-03T07:50:00Z",
+  "lastUpdated": "2026-07-04T08:20:00Z",
   "batches": [
+    {
+      "file": "2026-07-04-0820.md",
+      "date": "2026-07-04T08:20:00Z",
+      "date_display": "4 ก.ค. 2026 · 08:20",
+      "summary": "ตลาดโลกฟื้นวันศุกร์ (สหรัฐฯ ปิดวันชาติ) เอเชียเด้งนำโดย Kospi +5.8% · ทองปิดบวกรายสัปดาห์ครั้งแรกในรอบ 5 สัปดาห์ · จับตาข้อมูลเศรษฐกิจสัปดาห์หน้าเมื่อตลาดสหรัฐฯ กลับมาเทรด 6 ก.ค.",
+      "tickers": [
+        "DIA",
+        "SPY",
+        "NVDA",
+        "MU",
+        "LRCX",
+        "EWY",
+        "GLD",
+        "SLV",
+        "USO",
+        "UUP",
+        "QQQ",
+        "SMH"
+      ],
+      "headlines": [
+        {
+          "title": "ตลาดโลกฟื้นวันศุกร์ ตลาดหุ้นสหรัฐฯ ปิดวันชาติ — เอเชียเด้งแรงนำโดยเกาหลี Kospi กลับขึ้น 5.8% หลังดิ่งเกือบ 8% วันก่อน",
+          "tickers": [
+            {
+              "symbol": "DIA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "EWY",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "MU",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "LRCX",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "SPY",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "Associated Press, Euronews, Fortune, CNBC",
+          "published": "4 ก.ค. 2026"
+        },
+        {
+          "title": "ทองคำปิดบวกรายสัปดาห์ครั้งแรกในรอบ 5 สัปดาห์ — jobs อ่อนลดโอกาส Fed ขึ้นดอกเบี้ย ดอลลาร์อ่อนสุดตั้งแต่เดือน เม.ย.",
+          "tickers": [
+            {
+              "symbol": "GLD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SLV",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "USO",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "UUP",
+              "sentiment": "negative"
+            }
+          ],
+          "tone_override": "bullish",
+          "source": "CNBC, Reuters, Trading Economics",
+          "published": "4 ก.ค. 2026"
+        },
+        {
+          "title": "จับตาสัปดาห์หน้า — ตลาดสหรัฐฯ กลับมาเทรด 6 ก.ค. พร้อมชุดข้อมูล ISM, ADP และบันทึกประชุม Fed ประเมินทิศทางดอกเบี้ย",
+          "tickers": [
+            {
+              "symbol": "SPY",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "SMH",
+              "sentiment": "neutral"
+            }
+          ],
+          "tone_override": "neutral",
+          "source": "CNBC, Reuters, LiteFinance",
+          "published": "4 ก.ค. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-07-03-0750.md",
       "date": "2026-07-03T07:50:00Z",
