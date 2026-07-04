@@ -203,11 +203,11 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* === BOTTOM NAV === */
-.bottom-nav{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:2px;background:rgba(45,16,24,0.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(212,175,55,0.25);border-radius:100px;padding:6px;z-index:500;box-shadow:0 8px 26px rgba(20,10,15,0.4)}
-.bn-btn{display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;color:rgba(244,228,186,0.55);font-family:var(--font-thai);font-size:.6rem;font-weight:600;padding:8px 15px;border-radius:100px;cursor:pointer;transition:all .18s;white-space:nowrap}
-.bn-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.bn-btn.active{background:linear-gradient(135deg,rgba(212,175,55,0.22),rgba(139,34,82,0.35));color:var(--gold-light)}
-@media(max-width:380px){.bn-btn{padding:8px 11px}}
+.bottom-nav{position:fixed;left:14px;right:14px;bottom:14px;max-width:600px;margin:0 auto;display:flex;justify-content:space-around;gap:2px;background:rgba(12,10,12,0.97);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(212,175,55,0.22);border-radius:100px;padding:8px 6px;z-index:500;box-shadow:0 8px 26px rgba(0,0,0,0.5)}
+.bn-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:rgba(244,228,186,0.5);font-family:var(--font-thai);font-size:.66rem;font-weight:600;padding:9px 6px;border-radius:100px;cursor:pointer;transition:all .18s;white-space:nowrap}
+.bn-btn svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.bn-btn.active{background:linear-gradient(135deg,rgba(212,175,55,0.25),rgba(139,34,82,0.3));color:var(--gold-light)}
+@media(max-width:380px){.bn-btn{padding:9px 4px;font-size:.62rem}}
 .tab-page{display:none}
 .tab-page.active{display:block;animation:pageFade .2s ease}
 @keyframes pageFade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
