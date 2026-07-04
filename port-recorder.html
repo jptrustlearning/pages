@@ -216,6 +216,12 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .tab-btn{flex:1;background:none;border:none;font-family:var(--font-thai);font-size:.76rem;font-weight:600;padding:9px 6px;border-radius:8px;color:var(--text-muted);cursor:pointer;transition:all .15s;white-space:nowrap}
 .tab-btn.active{background:var(--cream-card);color:var(--maroon);box-shadow:0 1px 3px rgba(114,47,55,0.08)}
 /* group chip on lot */
+.dense-btn{background:var(--cream-card);border:1px solid var(--border-gold);color:var(--gold-dark);font-family:var(--font-thai);font-size:.72rem;font-weight:700;padding:6px 13px;border-radius:100px;cursor:pointer;transition:all .15s}
+.dense-btn:hover{border-color:var(--gold-dark);background:rgba(212,175,55,0.08)}
+#lotsList.compact .lot-detail-row,#lotsList.compact .lot-actions,#lotsList.compact .sell-history,#lotsList.compact .slip-thumb{display:none}
+#lotsList.compact .lot-card{padding:11px 14px}
+#lotsList.compact .lot-head{margin-bottom:0}
+#lotsList.compact .lot-meta br{display:none}
 .grp-chip{font-family:var(--font-thai);font-size:.64rem;font-weight:700;padding:3px 9px;border-radius:100px;border:1px dashed var(--border-gold-strong);background:none;color:var(--gold-dark);cursor:pointer;transition:all .15s}
 .grp-chip.has{border-style:solid;background:rgba(212,175,55,0.1)}
 .grp-chip:hover{background:rgba(212,175,55,0.16)}
@@ -330,6 +336,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
       <button class="tab-btn" data-view="group" onclick="PR.setView('group')">ดูตามกลุ่ม</button>
       <button class="tab-btn" data-view="sells" onclick="PR.setView('sells')">รายการขายแล้ว</button>
     </div>
+    <div style="display:flex;justify-content:flex-end;margin:-4px 0 10px" id="denseWrap"><button class="dense-btn" id="denseBtn" onclick="PR.toggleDense()">⊟ ย่อทั้งหมด</button></div>
     <div class="lots-list" id="lotsList"></div>
   </div>
 
@@ -562,6 +569,8 @@ let mask = false;
 let curTf = 'All';
 let editLotId = null, sellLotId = null, editPortId = null, tgtPortId = null;
 let viewMode = 'lots';
+let dense = false;
+try{ dense = localStorage.getItem('pr:dense')==='1'; }catch(e){}
 let gaLotId = null;
 let openGroups = {};
 let tokenClient = null;
@@ -735,10 +744,23 @@ function setView(v){
   renderView();
 }
 function renderView(){
+  applyDense();
   if(viewMode==='ticker') renderByTicker();
   else if(viewMode==='group') renderGroups();
   else if(viewMode==='sells') renderSells();
   else renderLots();
+}
+function applyDense(){
+  const w=$('denseWrap'), l=$('lotsList'), b=$('denseBtn');
+  const usable = viewMode==='lots'||viewMode==='ticker';
+  if(w) w.style.display = usable? '':'none';
+  if(l) l.classList.toggle('compact', dense && usable);
+  if(b) b.textContent = dense? '⊞ ดูแบบเต็ม' : '⊟ ย่อทั้งหมด';
+}
+function toggleDense(){
+  dense=!dense;
+  try{ localStorage.setItem('pr:dense', dense?'1':'0'); }catch(e){}
+  applyDense();
 }
 function renderHero(){
   const st=portStats(sel);
@@ -1735,7 +1757,7 @@ return {switchTab,gotoSettings,toggleMask,selectPort,openPortModal,submitPort,de
   onSlipFile,addPendingManual,confirmPending,deletePending,
   setTf,refreshPrices,
   selectRbPort,rbUseCurrent,renderRebalance,openTargetsModal,addTgtRow,updateTgtSum,submitTargets,
-  setView,toggleGroup,openGa,gaAssign,gaCreateAssign,openGm,gmAddRow,gmDelRow,gmSubmit,deleteSell,openPm,pmDelete,
+  setView,toggleDense,toggleGroup,openGa,gaAssign,gaCreateAssign,openGm,gmAddRow,gmDelRow,gmSubmit,deleteSell,openPm,pmDelete,
   driveConnect,driveSyncNow,driveDisconnect};
 })();
 
