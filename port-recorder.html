@@ -25,6 +25,8 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .drive-pill .dp-dot{width:7px;height:7px;border-radius:50%;background:#B9AE9C}
 .drive-pill.on{border-color:rgba(46,159,95,0.35);color:var(--green-dark)}
 .drive-pill.on .dp-dot{background:var(--green);box-shadow:0 0 6px rgba(46,159,95,0.6)}
+.drive-pill.warn{border-color:rgba(184,134,11,0.5);color:#8A6D1A;background:#FFF8E7}
+.drive-pill.warn .dp-dot{background:var(--gold);box-shadow:0 0 6px rgba(212,175,55,0.7)}
 
 /* === PORTFOLIO CHIPS === */
 .port-bar{background:var(--cream-card);border:1px solid var(--border-gold);border-radius:14px;padding:12px;margin-bottom:14px}
@@ -286,7 +288,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
         <div class="topbar-sub">สมุดบันทึกพอร์ตส่วนตัว</div>
       </div>
     </div>
-    <button class="drive-pill" id="drivePill" onclick="PR.gotoSettings()"><span class="dp-dot"></span><span id="drivePillText">ยังไม่เชื่อม Drive</span></button>
+    <button class="drive-pill" id="drivePill" onclick="PR.drivePillTap()"><span class="dp-dot"></span><span id="drivePillText">ยังไม่เชื่อม Drive</span></button>
   </div>
 
   <!-- ============ TAB: PORTFOLIO ============ -->
@@ -575,6 +577,7 @@ let gaLotId = null;
 let openGroups = {};
 let tokenClient = null;
 let saveTimer = null;
+let needAuth = false, syncToastShown = false;
 
 /* ---------- UTILS ---------- */
 const $ = id => document.getElementById(id);
@@ -609,10 +612,19 @@ function persistLocal(){
 function saveData(){
   persistLocal();
   if(DRIVE.connected){
+    DRIVE.dirty=true; persistDrive();
     clearTimeout(saveTimer);
     saveTimer=setTimeout(()=>{ saveTimer=null;
-      drivePush().catch(e=>{ console.warn('drive push',e); toast('⚠ ยังซิงก์ขึ้น Drive ไม่สำเร็จ — จะลองใหม่อัตโนมัติ');
-        setTimeout(()=>drivePush().catch(()=>{}), 8000); });
+      drivePush(false).catch(e=>{
+        console.warn('drive push',e);
+        if(String(e.message).indexOf('need-interactive')>=0){
+          needAuth=true; renderDrivePill();
+          if(!syncToastShown){ syncToastShown=true; toast('เซสชัน Google หมดเวลา — ข้อมูลเก็บในเครื่องแล้ว แตะป้าย Drive ด้านบนเพื่อซิงก์'); }
+        }else{
+          toast('⚠ ซิงก์ขึ้น Drive ไม่สำเร็จ — จะลองใหม่อัตโนมัติ');
+          setTimeout(()=>drivePush(false).catch(()=>{}), 8000);
+        }
+      });
     }, 1000);
   }
 }
@@ -1621,6 +1633,7 @@ function persistDrive(){ try{ localStorage.setItem(LS_DRIVE, JSON.stringify(DRIV
 function ensureToken(interactive){
   return new Promise((res,rej)=>{
     const t=driveToken(); if(t) return res(t);
+    if(!interactive){ rej(new Error('need-interactive')); return; } // ห้าม popup เองเด็ดขาด
     const cid=clientId();
     if(!cid){ rej(new Error('no-client-id')); return; }
     if(!window.google || !google.accounts || !google.accounts.oauth2){ rej(new Error('gis-not-loaded')); return; }
@@ -1630,54 +1643,55 @@ function ensureToken(interactive){
     tokenClient.callback=(resp)=>{
       if(resp.error){ rej(new Error(resp.error)); return; }
       DRIVE.token=resp.access_token; DRIVE.tokenExp=Date.now()+(resp.expires_in||3600)*1000;
-      persistDrive(); res(DRIVE.token);
+      needAuth=false; persistDrive(); renderDrivePill(); res(DRIVE.token);
     };
-    tokenClient.requestAccessToken({prompt: interactive?'consent':''});
+    tokenClient.requestAccessToken({prompt:''}); // มี session อยู่แล้ว = ผ่านเงียบๆ, ไม่มีค่อยขึ้นให้เลือกบัญชี
   });
 }
-async function gapi(path, opts){
-  const tok=await ensureToken(false).catch(async e=>{ return await ensureToken(true); });
+async function gapi(path, opts, interactive){
+  const tok=await ensureToken(!!interactive);
   const r=await fetch(path, Object.assign({},opts,{headers:Object.assign({Authorization:'Bearer '+tok},(opts&&opts.headers)||{})}));
   if(!r.ok){ const tx=await r.text(); throw new Error('drive '+r.status+' '+tx.slice(0,120)); }
   return r;
 }
-async function driveEnsureFolder(){
+async function driveEnsureFolder(interactive){
   if(DRIVE.folderId) return DRIVE.folderId;
   const q=encodeURIComponent("name='"+DRIVE_FOLDER+"' and mimeType='application/vnd.google-apps.folder' and trashed=false");
-  let r=await gapi('https://www.googleapis.com/drive/v3/files?q='+q+'&fields=files(id)');
+  let r=await gapi('https://www.googleapis.com/drive/v3/files?q='+q+'&fields=files(id)', null, interactive);
   let j=await r.json();
   if(j.files&&j.files.length){ DRIVE.folderId=j.files[0].id; persistDrive(); return DRIVE.folderId; }
-  r=await gapi('https://www.googleapis.com/drive/v3/files',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:DRIVE_FOLDER,mimeType:'application/vnd.google-apps.folder'})});
+  r=await gapi('https://www.googleapis.com/drive/v3/files',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:DRIVE_FOLDER,mimeType:'application/vnd.google-apps.folder'})}, interactive);
   j=await r.json(); DRIVE.folderId=j.id; persistDrive(); return DRIVE.folderId;
 }
-async function driveFindDataFile(){
+async function driveFindDataFile(interactive){
   if(DRIVE.dataFileId) return DRIVE.dataFileId;
-  const fid=await driveEnsureFolder();
+  const fid=await driveEnsureFolder(interactive);
   const q=encodeURIComponent("name='"+DATA_FILENAME+"' and '"+fid+"' in parents and trashed=false");
-  const r=await gapi('https://www.googleapis.com/drive/v3/files?q='+q+'&fields=files(id,modifiedTime)');
+  const r=await gapi('https://www.googleapis.com/drive/v3/files?q='+q+'&fields=files(id,modifiedTime)', null, interactive);
   const j=await r.json();
   if(j.files&&j.files.length){ DRIVE.dataFileId=j.files[0].id; persistDrive(); return DRIVE.dataFileId; }
   return null;
 }
-async function drivePush(){
+async function drivePush(interactive){
   const payload=JSON.stringify({data:D, prices:PRICES, savedAt:new Date().toISOString()});
-  let fileId=await driveFindDataFile();
+  let fileId=await driveFindDataFile(interactive);
   if(fileId){
-    await gapi('https://www.googleapis.com/upload/drive/v3/files/'+fileId+'?uploadType=media',{method:'PATCH',headers:{'Content-Type':'application/json'},body:payload});
+    await gapi('https://www.googleapis.com/upload/drive/v3/files/'+fileId+'?uploadType=media',{method:'PATCH',headers:{'Content-Type':'application/json'},body:payload}, interactive);
   }else{
-    const fid=await driveEnsureFolder();
+    const fid=await driveEnsureFolder(interactive);
     const meta={name:DATA_FILENAME,parents:[fid],mimeType:'application/json'};
     const boundary='prb'+Date.now();
     const body='--'+boundary+'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n'+JSON.stringify(meta)
       +'\r\n--'+boundary+'\r\nContent-Type: application/json\r\n\r\n'+payload+'\r\n--'+boundary+'--';
-    const r=await gapi('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+boundary},body});
+    const r=await gapi('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+boundary},body}, interactive);
     const j=await r.json(); DRIVE.dataFileId=j.id;
   }
-  DRIVE.lastSync=Date.now(); persistDrive(); renderDrivePill(); renderSettings();
+  DRIVE.lastSync=Date.now(); DRIVE.dirty=false; needAuth=false;
+  persistDrive(); renderDrivePill(); renderSettings();
 }
-async function drivePull(){
-  const fileId=await driveFindDataFile(); if(!fileId) return false;
-  const r=await gapi('https://www.googleapis.com/drive/v3/files/'+fileId+'?alt=media');
+async function drivePull(interactive){
+  const fileId=await driveFindDataFile(interactive); if(!fileId) return false;
+  const r=await gapi('https://www.googleapis.com/drive/v3/files/'+fileId+'?alt=media', null, interactive);
   const j=await r.json();
   if(j&&j.data&&Array.isArray(j.data.portfolios)){
     D=j.data; if(j.prices) PRICES=j.prices;
@@ -1686,16 +1700,16 @@ async function drivePull(){
   return false;
 }
 async function driveConnect(){
-  if(!clientId()){ toast('ยังไม่ได้ตั้งค่า Google Client ID (ช่องด้านล่าง)'); return; }
+  if(!clientId()){ toast('ระบบยังไม่พร้อม — ติดต่อ JP Trust Learning'); return; }
   try{
     await ensureToken(true);
     const hasLocal = D.lots.length||D.pending.length||D.sells.length;
-    const existing = await driveFindDataFile();
+    const existing = await driveFindDataFile(true);
     if(existing && !hasLocal){
-      const ok=await drivePull();
+      const ok=await drivePull(true);
       if(ok) toast('ดึงข้อมูลเดิมจาก Drive แล้ว ✓');
     }else{
-      await drivePush();
+      await drivePush(true);
     }
     DRIVE.connected=true; persistDrive();
     renderDrivePill(); renderSettings(); renderAll();
@@ -1706,7 +1720,19 @@ async function driveConnect(){
   }
 }
 async function driveSyncNow(){
-  try{ await drivePush(); toast('ซิงก์แล้ว ✓'); }catch(e){ toast('ซิงก์ไม่สำเร็จ: '+e.message); }
+  try{
+    if(DRIVE.dirty){ await drivePush(true); }
+    else{
+      const ok=await drivePull(true);
+      if(ok){ renderAll(); renderPending(); }
+      DRIVE.lastSync=Date.now(); needAuth=false; persistDrive(); renderDrivePill(); renderSettings();
+    }
+    toast('ซิงก์แล้ว ✓');
+  }catch(e){ toast('ซิงก์ไม่สำเร็จ: '+(String(e.message).indexOf('need-interactive')>=0?'ยกเลิกการยืนยันตัวตน':e.message)); }
+}
+function drivePillTap(){
+  if(DRIVE.connected) driveSyncNow();
+  else gotoSettings();
 }
 function driveDisconnect(){
   showConfirm('ยกเลิกการเชื่อมต่อ Drive?','ไฟล์ใน Drive จะยังอยู่ · ข้อมูลในเครื่องนี้ยังอยู่<br>แต่จะบันทึกรายการใหม่ไม่ได้จนกว่าจะเชื่อมอีกครั้ง','ยกเลิกการเชื่อมต่อ',()=>{
@@ -1716,8 +1742,10 @@ function driveDisconnect(){
 }
 function renderDrivePill(){
   const on=!!DRIVE.connected;
-  $('drivePill').classList.toggle('on',on);
-  $('drivePillText').textContent = on?'Drive เชื่อมแล้ว':'ยังไม่เชื่อม Drive';
+  const pill=$('drivePill');
+  pill.classList.toggle('on', on && !needAuth);
+  pill.classList.toggle('warn', on && needAuth);
+  $('drivePillText').textContent = !on?'ยังไม่เชื่อม Drive':(needAuth?'แตะเพื่อซิงก์ Drive':'Drive เชื่อมแล้ว');
   const g=$('driveGate'); if(g) g.style.display = on?'none':'';
 }
 
@@ -1746,7 +1774,11 @@ function init(){
     }
   });
   if(DRIVE.connected){
-    drivePull().then(ch=>{ if(ch){ renderAll(); renderPending(); } }).catch(e=>console.warn('pull',e));
+    if(driveToken()){
+      drivePull(false).then(ch=>{ if(ch){ renderAll(); renderPending(); } }).catch(e=>console.warn('pull',e));
+    }else{
+      needAuth=true; renderDrivePill(); // เงียบๆ ไม่มี popup — ใช้ข้อมูล cache ในเครื่องไปก่อน
+    }
   }
   refreshPrices(false);
 }
@@ -1758,7 +1790,7 @@ return {switchTab,gotoSettings,toggleMask,selectPort,openPortModal,submitPort,de
   setTf,refreshPrices,
   selectRbPort,rbUseCurrent,renderRebalance,openTargetsModal,addTgtRow,updateTgtSum,submitTargets,
   setView,toggleDense,toggleGroup,openGa,gaAssign,gaCreateAssign,openGm,gmAddRow,gmDelRow,gmSubmit,deleteSell,openPm,pmDelete,
-  driveConnect,driveSyncNow,driveDisconnect};
+  driveConnect,driveSyncNow,driveDisconnect,drivePillTap};
 })();
 
 </script>
