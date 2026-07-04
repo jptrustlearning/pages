@@ -353,9 +353,21 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
   <!-- ============ TAB: REBALANCE ============ -->
   <div class="tab-page" id="page-rb">
     <div class="port-bar"><div class="port-chips" id="rbPortChips"></div></div>
-    <div class="seg-control" id="rbModeSeg">
-      <button class="seg-btn active" data-mode="trade" onclick="PR.setRbMode('trade')">ขาย + ซื้อภายในพอร์ต</button>
-      <button class="seg-btn" data-mode="contrib" onclick="PR.setRbMode('contrib')">เติมเงินอย่างเดียว</button>
+    <div class="set-card" style="margin-bottom:14px">
+      <div class="set-title" style="font-size:.86rem;margin-bottom:10px">🎯 เป้าหมายมูลค่าพอร์ตหลังปรับ</div>
+      <div class="field" style="margin-bottom:10px">
+        <label class="field-label">เงินจากพอร์ตปัจจุบัน (USD)</label>
+        <div style="display:flex;gap:8px">
+          <input class="field-input num" id="rbBase" type="number" inputmode="decimal" step="any" oninput="PR.renderRebalance()">
+          <button class="btn-secondary" style="flex:0 0 auto;padding:8px 13px;font-size:.72rem" onclick="PR.rbUseCurrent()">⟳ ใช้ค่าปัจจุบัน</button>
+        </div>
+        <div class="field-hint" id="rbBaseHint">ลดตัวเลขลงต่ำกว่ามูลค่าปัจจุบัน = ถอนกำไร/เงินออกจากพอร์ต</div>
+      </div>
+      <div class="field" style="margin-bottom:10px">
+        <label class="field-label">+ เงินใหม่ที่จะเติม (USD)</label>
+        <input class="field-input num" id="rbNew" type="number" inputmode="decimal" step="any" placeholder="0.00" oninput="PR.renderRebalance()">
+      </div>
+      <div class="preview-row" style="border-top:1px dashed var(--border-gold);padding-top:10px;margin-top:4px"><span style="font-weight:700;font-size:.84rem">เป้าหมายมูลค่าพอร์ตรวม</span><span class="preview-num" id="rbTargetTotal" style="font-size:1.15rem">$0.00</span></div>
     </div>
     <div class="tol-row">
       <span style="font-size:.78rem;color:var(--text-muted)">เกณฑ์เพี้ยนที่ยอมรับได้ (Tolerance) ±</span>
@@ -546,7 +558,6 @@ let CFG = {};          // {workerUrl, clientId}
 let DRIVE = {};        // {connected, token, tokenExp, folderId, dataFileId, lastSync}
 let sel = ALL;         // selected portfolio id (dashboard)
 let rbSel = null;      // selected portfolio id (rebalance)
-let rbMode = 'trade';
 let mask = false;
 let curTf = 'All';
 let editLotId = null, sellLotId = null, editPortId = null, tgtPortId = null;
@@ -1432,9 +1443,17 @@ function renderRbChips(){
   if(!rbSel || !portById(rbSel)) rbSel=D.portfolios[0].id;
   $('rbPortChips').innerHTML=D.portfolios.map(p=>'<button class="port-chip'+(p.id===rbSel?' active':'')+'" onclick="PR.selectRbPort(\''+p.id+'\')"><span class="pc-dot" style="background:'+p.color+'"></span>'+esc(p.name)+'</button>').join('');
   const p=portById(rbSel); $('rbTol').value=p.tolerance!=null?p.tolerance:2;
+  rbSeedInputs();
 }
+function rbTotalNow(){ return holdingsOf(rbSel).reduce((a,h)=>a+h.value,0); }
+function rbSeedInputs(){
+  const total=rbTotalNow();
+  $('rbBase').value=total>0? total.toFixed(2):'';
+  $('rbNew').value='';
+  $('rbBaseHint').textContent='มูลค่าพอร์ตปัจจุบัน '+fmtUSD(total)+' — ลดตัวเลขลง = ถอนกำไร/เงินออกจากพอร์ต';
+}
+function rbUseCurrent(){ rbSeedInputs(); renderRebalance(); }
 function selectRbPort(id){ rbSel=id; renderRbChips(); renderRebalance(); }
-function setRbMode(m){ rbMode=m; document.querySelectorAll('#rbModeSeg .seg-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===m)); renderRebalance(); }
 function holdingsOf(pid){
   const map={};
   D.lots.filter(l=>l.portfolioId===pid).forEach(l=>{
@@ -1464,6 +1483,11 @@ function renderRebalance(){
     return;
   }
   const total=holds.reduce((a,h)=>a+h.value,0);
+  let base=parseFloat($('rbBase').value); if(!(base>=0)) base=total;
+  const add=Math.max(0, parseFloat($('rbNew').value)||0);
+  const targetTotal=Math.max(0, base+add);
+  $('rbTargetTotal').textContent=fmtUSD(targetTotal);
+  const cashDelta=targetTotal-total; // + = เติมสุทธิ, - = ถอนออกสุทธิ
   // union of tickers (held ∪ targeted)
   const tset=new Set(holds.map(h=>h.ticker)); tgtTks.forEach(t=>tset.add(t));
   const rows=[...tset].map(tk=>{
@@ -1472,24 +1496,12 @@ function renderRebalance(){
     const tgt=targets[tk]||0;
     return {tk, value, tgt, stale:h?h.stale:false};
   });
-  let html='', sumBuy=0, sumSell=0, maxDrift=0, topup=0;
-  if(rbMode==='trade'){
-    rows.forEach(r=>{
-      r.cur = total>0? r.value/total*100 : 0;
-      r.delta = r.tgt/100*total - r.value;
-      r.drift = r.cur - r.tgt;
-    });
-  }else{
-    // contribute-only: find newTotal so no holding exceeds target
-    let newTotal=total;
-    rows.forEach(r=>{ if(r.tgt>0) newTotal=Math.max(newTotal, r.value/(r.tgt/100)); });
-    topup=newTotal-total;
-    rows.forEach(r=>{
-      r.cur = total>0? r.value/total*100 : 0;
-      r.delta = Math.max(0, r.tgt/100*newTotal - r.value);
-      r.drift = r.cur - r.tgt;
-    });
-  }
+  let html='', sumBuy=0, sumSell=0, maxDrift=0;
+  rows.forEach(r=>{
+    r.cur = total>0? r.value/total*100 : 0;
+    r.delta = r.tgt/100*targetTotal - r.value;
+    r.drift = r.cur - r.tgt;
+  });
   rows.sort((a,b)=>Math.abs(b.drift)-Math.abs(a.drift));
   rows.forEach(r=>{
     maxDrift=Math.max(maxDrift,Math.abs(r.drift));
@@ -1507,20 +1519,21 @@ function renderRebalance(){
   });
   const sumTgt=tgtTks.reduce((a,t)=>a+targets[t],0);
   let sm='<div class="rb-summary"><div class="rb-summary-title">REBALANCE · '+esc(p.name).toUpperCase()+'</div>';
-  if(rbMode==='trade'){
-    sm+='<div class="rb-summary-main">'+(maxDrift<=tol?'พอร์ตอยู่ในเกณฑ์เป้าหมายแล้ว ✓':'พอร์ตเพี้ยนจากเป้าสูงสุด '+maxDrift.toFixed(1)+'% — ปรับตามการ์ดด้านล่างเพื่อกลับเข้าเป้า')+'</div>'
-      +'<div class="rb-summary-nums">'
-      +'<div class="rb-sn-cell">มูลค่าพอร์ต<span class="rb-sn-val">'+fmtUSD(total)+'</span></div>'
-      +'<div class="rb-sn-cell">ต้องซื้อรวม<span class="rb-sn-val" style="color:#4DE89A">'+fmtUSD(sumBuy)+'</span></div>'
-      +'<div class="rb-sn-cell">ต้องขายรวม<span class="rb-sn-val" style="color:#FF6B6B">'+fmtUSD(sumSell)+'</span></div>'
-      +'</div>';
+  let headline;
+  if(Math.abs(cashDelta)>=0.01){
+    headline = cashDelta>0
+      ? 'เติมเงินสุทธิ '+fmtUSD(cashDelta)+' แล้วซื้อ/ขายตามการ์ดด้านล่างให้เข้าเป้า'
+      : 'ถอนเงินออกสุทธิ '+fmtUSD(-cashDelta)+' — ขาย/ซื้อตามการ์ดด้านล่าง ส่วนต่างคือเงินสดที่ได้กลับมา';
   }else{
-    sm+='<div class="rb-summary-main">'+(topup<0.01?'ไม่ต้องเติมเงิน — พอร์ตไม่มีตัวไหนเกินเป้า ✓':'โหมดเติมเงินอย่างเดียว (ไม่ขาย) ต้องเติมเงินรวม '+fmtUSD(topup)+' แล้วซื้อตามการ์ดด้านล่าง')+'</div>'
-      +'<div class="rb-summary-nums">'
-      +'<div class="rb-sn-cell">มูลค่าพอร์ต<span class="rb-sn-val">'+fmtUSD(total)+'</span></div>'
-      +'<div class="rb-sn-cell">เงินที่ต้องเติม<span class="rb-sn-val" style="color:#4DE89A">'+fmtUSD(topup)+'</span></div>'
-      +'</div>';
+    headline = maxDrift<=tol? 'พอร์ตอยู่ในเกณฑ์เป้าหมายแล้ว ✓' : 'พอร์ตเพี้ยนจากเป้าสูงสุด '+maxDrift.toFixed(1)+'% — ปรับตามการ์ดด้านล่างเพื่อกลับเข้าเป้า';
   }
+  sm+='<div class="rb-summary-main">'+headline+'</div>'
+    +'<div class="rb-summary-nums">'
+    +'<div class="rb-sn-cell">มูลค่าตอนนี้<span class="rb-sn-val">'+fmtUSD(total)+'</span></div>'
+    +'<div class="rb-sn-cell">เป้าหลังปรับ<span class="rb-sn-val" style="color:#F4E4BA">'+fmtUSD(targetTotal)+'</span></div>'
+    +'<div class="rb-sn-cell">ต้องซื้อรวม<span class="rb-sn-val" style="color:#4DE89A">'+fmtUSD(sumBuy)+'</span></div>'
+    +'<div class="rb-sn-cell">ต้องขายรวม<span class="rb-sn-val" style="color:#FF6B6B">'+fmtUSD(sumSell)+'</span></div>'
+    +'</div>';
   if(Math.abs(sumTgt-100)>0.01) sm+='<div style="font-size:.68rem;margin-top:8px;color:var(--gold-light);opacity:.85">⚠ เป้ารวม '+sumTgt.toFixed(1)+'% (ส่วนที่เหลือ '+(100-sumTgt).toFixed(1)+'% = ถือเป็นเงินสด/ไม่ระบุ)</div>';
   sm+='</div>';
   $('rbSummary').innerHTML=sm;
@@ -1714,7 +1727,7 @@ return {switchTab,gotoSettings,toggleMask,selectPort,openPortModal,submitPort,de
   openAddModal,pickFormPort,submitLot,deleteLot,onBuyInput,recalcBuy,openSellModal,submitSell,setSellMode,sellAllQuick,recalcSell,onSellDateInput,closeModal,viewSlip,
   onSlipFile,addPendingManual,confirmPending,deletePending,
   setTf,refreshPrices,
-  selectRbPort,setRbMode,renderRebalance,openTargetsModal,addTgtRow,updateTgtSum,submitTargets,
+  selectRbPort,rbUseCurrent,renderRebalance,openTargetsModal,addTgtRow,updateTgtSum,submitTargets,
   setView,toggleGroup,openGa,gaAssign,gaCreateAssign,openGm,gmAddRow,gmDelRow,gmSubmit,deleteSell,openPm,pmDelete,
   driveConnect,driveSyncNow,driveDisconnect};
 })();
