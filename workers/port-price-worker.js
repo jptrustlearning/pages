@@ -128,7 +128,7 @@ async function ocr(request, env, ctx, CORS) {
   const today = new Date().toISOString().slice(0, 10);
   const prompt = 'You are reading a screenshot from a stock brokerage app or statement (brokers used in Thailand like Dime!, Webull Thailand, InnovestX, Streaming, or international apps). It may show ONE order detail page, a LIST of multiple orders, or an account statement / TRADE RECORDS table.\n'
     + 'Extract every distinct EXECUTED trade visible. Respond with ONLY this JSON, no markdown fences, no other text:\n'
-    + '{"trades":[{"side":"buy"|"sell","ticker":"SYMBOL","price":number or null,"shares":number or null,"amount":number or null,"date":"YYYY-MM-DD" or null,"confidence":"high"|"low"}]}\n'
+    + '{"trades":[{"side":"buy"|"sell","ticker":"SYMBOL","price":number or null,"shares":number or null,"amount":number or null,"date":"YYYY-MM-DD" or null,"date_text":"the date EXACTLY as printed on screen, e.g. 01/07/2026 or 1 ก.ค. 69 or Jul 1, 2026","confidence":"high"|"low"}]}\n'
     + 'Rules per trade:\n'
     + '- side: ซื้อ/Buy = "buy"; ขาย/Sell = "sell".\n'
     + '- ticker: symbol only, uppercase (AAPL, PTT.BK). Strip exchange tags like ":NASDAQ" and company names.\n'
@@ -186,11 +186,70 @@ async function ocr(request, env, ctx, CORS) {
     return json({ error: 'parse model output failed' }, 502, CORS);
   }
 
+  // Deterministic date fix: parse date_text ourselves (Thai-market brokers = day/month/year)
+  try {
+    if (out && Array.isArray(out.trades)) {
+      out.trades.forEach(function (t) {
+        const fixed = normDate(t && t.date_text, t && t.date);
+        if (fixed) t.date = fixed;
+      });
+    }
+  } catch (e) {}
+
   ctx.waitUntil(cache.put(capKey, new Response(JSON.stringify({ n: count + 1 }), {
     headers: { 'Cache-Control': 'max-age=86400' },
   })));
 
   return json(out, 200, CORS);
+}
+
+/* แปลงข้อความวันที่ดิบ -> YYYY-MM-DD (เลขล้วน = วัน/เดือน/ปี เสมอ, รองรับ พ.ศ. และเดือนไทย/อังกฤษ) */
+function normDate(txt, fallbackIso) {
+  const iso = function (y, mo, d) {
+    if (!(y > 1990 && mo >= 1 && mo <= 12 && d >= 1 && d <= 31)) return null;
+    return y + '-' + String(mo).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+  };
+  const fixYear = function (y) {
+    if (y >= 2500) return y - 543;            // พ.ศ. 4 หลัก
+    if (y < 100) return y >= 60 ? y + 2500 - 543 : y + 2000; // 2 หลัก: 69 = พ.ศ.2569, 26 = ค.ศ.2026
+    return y;
+  };
+  if (!txt) return fallbackIso || null;
+  txt = String(txt).trim();
+
+  let m = txt.match(/(\d{4})-(\d{2})-(\d{2})/); // ISO อยู่แล้ว
+  if (m) return iso(+m[1], +m[2], +m[3]);
+
+  // เดือนไทยย่อ/เต็ม
+  const TH = { 'ม.ค': 1, 'มกราคม': 1, 'ก.พ': 2, 'กุมภาพันธ์': 2, 'มี.ค': 3, 'มีนาคม': 3, 'เม.ย': 4, 'เมษายน': 4,
+    'พ.ค': 5, 'พฤษภาคม': 5, 'มิ.ย': 6, 'มิถุนายน': 6, 'ก.ค': 7, 'กรกฎาคม': 7, 'ส.ค': 8, 'สิงหาคม': 8,
+    'ก.ย': 9, 'กันยายน': 9, 'ต.ค': 10, 'ตุลาคม': 10, 'พ.ย': 11, 'พฤศจิกายน': 11, 'ธ.ค': 12, 'ธันวาคม': 12 };
+  for (const k in TH) {
+    if (txt.indexOf(k) >= 0) {
+      const dm = txt.match(/(\d{1,2})/);
+      const nums = txt.match(/\d{1,4}/g) || [];
+      const ym = nums.length ? nums[nums.length - 1] : null;
+      if (dm && ym) return iso(fixYear(+ym), TH[k], +dm[1]);
+    }
+  }
+
+  // เดือนอังกฤษเป็นคำ: "Jul 1, 2026" หรือ "1 Jul 2026"
+  const EN = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
+  const low = txt.toLowerCase();
+  m = low.match(/([a-z]{3,9})\.?\s+(\d{1,2}),?\s+(\d{2,4})/);
+  if (m && EN[m[1].slice(0, 3)]) return iso(fixYear(+m[3]), EN[m[1].slice(0, 3)], +m[2]);
+  m = low.match(/(\d{1,2})\s+([a-z]{3,9})\.?,?\s+(\d{2,4})/);
+  if (m && EN[m[2].slice(0, 3)]) return iso(fixYear(+m[3]), EN[m[2].slice(0, 3)], +m[1]);
+
+  // ตัวเลขล้วน: วัน/เดือน/ปี เสมอ (โบรกที่ใช้ในไทย)
+  m = txt.match(/(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/);
+  if (m) {
+    let d = +m[1], mo = +m[2];
+    const y = fixYear(+m[3]);
+    if (mo > 12 && d <= 12) { const t = d; d = mo; mo = t; } // เขียนสลับชัดเจนค่อยสลับกลับ
+    return iso(y, mo, d) || fallbackIso || null;
+  }
+  return fallbackIso || null;
 }
 
 function json(obj, status, cors) {
