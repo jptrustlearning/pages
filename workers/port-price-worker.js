@@ -126,7 +126,7 @@ async function ocr(request, env, ctx, CORS) {
   if (image.length > 2400000) return json({ error: 'image too large' }, 413, CORS);
 
   const today = new Date().toISOString().slice(0, 10);
-  const prompt = 'You are reading a screenshot from a stock brokerage app (Thai brokers like Dime!, InnovestX, Streaming, or international apps). It may show ONE order detail page, or a LIST of multiple orders.\n'
+  const prompt = 'You are reading a screenshot from a stock brokerage app or statement (brokers used in Thailand like Dime!, Webull Thailand, InnovestX, Streaming, or international apps). It may show ONE order detail page, a LIST of multiple orders, or an account statement / TRADE RECORDS table.\n'
     + 'Extract every distinct EXECUTED trade visible. Respond with ONLY this JSON, no markdown fences, no other text:\n'
     + '{"trades":[{"side":"buy"|"sell","ticker":"SYMBOL","price":number or null,"shares":number or null,"amount":number or null,"date":"YYYY-MM-DD" or null,"confidence":"high"|"low"}]}\n'
     + 'Rules per trade:\n'
@@ -138,7 +138,9 @@ async function ocr(request, env, ctx, CORS) {
     + '- Cross-check: price x shares should ~= amount within 1%; if inconsistent, trust price and shares.\n'
     + '- date: execution/fill date ("วันที่คำสั่งสำเร็จ" preferred over order-sent date) as YYYY-MM-DD.\n'
     + '- THAI BUDDHIST ERA years: 4-digit >= 2500 -> subtract 543 (2569 -> 2026). TWO-DIGIT Thai years are BE too: "1 ก.ค. 69" means BE 2569 -> 2026-07-01 (NOT 1969/2069). Convert: 2-digit yy -> 2500+yy -> minus 543.\n'
-    + '- Thai months: ม.ค.=01 ก.พ.=02 มี.ค.=03 เม.ย.=04 พ.ค.=05 มิ.ย.=06 ก.ค.=07 ส.ค.=08 ก.ย.=09 ต.ค.=10 พ.ย.=11 ธ.ค.=12. Thai numeric dates are day/month/year.\n'
+    + '- Thai months: ม.ค.=01 ก.พ.=02 มี.ค.=03 เม.ย.=04 พ.ค.=05 มิ.ย.=06 ก.ค.=07 ส.ค.=08 ก.ย.=09 ต.ค.=10 พ.ย.=11 ธ.ค.=12.\n'
+    + '- NUMERIC DATE ORDER — IMPORTANT: brokers used in Thailand (Dime!, Webull Thailand, InnovestX, Streaming) write numeric dates as DAY/MONTH/YEAR. "01/07/2026" = 1 July 2026, NOT January 7 — even when the app UI is English and shows a US timezone like EDT/EST next to the time (Webull Thailand does this). Interpret month-first ONLY when the month is written as a word in US order (e.g. "Jul 1, 2026").\n'
+    + '- Account statements / TRADE RECORDS tables: one trade per table row. Use the Trade Date column (day/month/year), Buy/Sell column for side, Quantity for shares, Traded Price for price, Gross Amount for amount (fallback: price x quantity). Skip non-stock rows (dividends, fees, deposits).\n'
     + '- Today is ' + today + '; dates must not be in the future.\n'
     + '- List screens: one element per order row (same ticker on different rows/times = separate trades). Include only executed/filled orders — status "จับคู่แล้ว"/"กำลังคืนเงิน"/Filled counts as executed; skip pending/cancelled.\n'
     + '- SKIP rows that are NOT stock trades: dividends (ปันผล/รับเงินเข้า), withholding tax (ภาษีหัก ณ ที่จ่าย), fees (ค่าธรรมเนียม...), deposits/withdrawals, interest. Only ซื้อ/ขาย orders become trades.\n'
