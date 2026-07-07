@@ -1,6 +1,97 @@
 {
-  "lastUpdated": "2026-07-06T00:25:00Z",
+  "lastUpdated": "2026-07-07T08:15:00Z",
   "batches": [
+    {
+      "file": "2026-07-07-0815.md",
+      "date": "2026-07-07T08:15:00Z",
+      "date_display": "7 ก.ค. 2026 · 08:15",
+      "summary": "Dow ปิดเหนือ 53,000 ครั้งแรก หุ้นชิปฟื้นแรง · SK Hynix เปิดขาย ADR 28,000 ล้านดอลลาร์ · SpaceX เข้า Nasdaq-100 คืนนี้",
+      "tickers": [
+        "SPY",
+        "QQQ",
+        "AMD",
+        "AVGO",
+        "AAPL",
+        "DELL",
+        "MU",
+        "NVDA",
+        "SKHY",
+        "SPCX"
+      ],
+      "headlines": [
+        {
+          "title": "ตลาดสหรัฐฯ กลับมาเทรดวันแรกหลังหยุดยาว — Dow ปิดเหนือ 53,000 จุดครั้งแรกในประวัติศาสตร์ หุ้นชิปฟื้นแรงนำโดย AMD บวก 6.6%",
+          "tickers": [
+            {
+              "symbol": "SPY",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AMD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AVGO",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AAPL",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DELL",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "MU",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "CNBC, TheStreet, Yahoo Finance, Reuters",
+          "published": "7 ก.ค. 2026"
+        },
+        {
+          "title": "SK Hynix เปิดขายหุ้น ADR มูลค่า 28,000 ล้านดอลลาร์บน Nasdaq — หนึ่งในการระดมทุนใหญ่ที่สุดในประวัติศาสตร์ เริ่มเทรดวันศุกร์นี้ในชื่อ SKHY",
+          "tickers": [
+            {
+              "symbol": "SKHY",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "MU",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "neutral"
+            }
+          ],
+          "tone_override": "neutral",
+          "source": "Reuters, Bloomberg, Korea Herald, Yahoo Finance",
+          "published": "7 ก.ค. 2026"
+        },
+        {
+          "title": "SpaceX เข้าดัชนี Nasdaq-100 อย่างเป็นทางการคืนนี้ — แรงซื้ออัตโนมัติจากกองทุนดัชนีกว่า 4,300 ล้านดอลลาร์ ปะทะแรงขายจากหุ้นล็อกอัพที่ทยอยปลดล็อก",
+          "tickers": [
+            {
+              "symbol": "SPCX",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "neutral"
+            }
+          ],
+          "tone_override": "mixed",
+          "source": "CNBC, Benzinga, Yahoo Finance",
+          "published": "7 ก.ค. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-07-06-0725.md",
       "date": "2026-07-06T00:25:00Z",
