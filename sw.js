@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jptrust-member-v20';  // bumped 2026-07-08 — auto-reload clients on activate (self-heal stale caches)
+const CACHE_NAME = 'jptrust-member-v20';  // bumped 2026-07-08 — auto-reload stale clients on upgrade (unstick without manual cache clear)
 const ASSETS = [
   './',
   './member-dashboard.html',
@@ -19,15 +19,20 @@ self.addEventListener('install', event => {
 // Activate — clean old caches
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
-    // purge old version caches
     const keys = await caches.keys();
-    await Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)));
+    const oldCaches = keys.filter(k => k !== CACHE_NAME);
+    await Promise.all(oldCaches.map(k => caches.delete(k)));
     await self.clients.claim();
-    // Auto-reload any open pages so they refetch fresh HTML (via cache:reload).
-    // This self-heals users stuck on a stale cached app shell — no manual clear.
-    const wins = await self.clients.matchAll({ type: 'window' });
-    for (const c of wins) {
-      try { c.navigate(c.url); } catch (e) {}
+    // Auto-reload open pages ONLY when upgrading from an older cache version, so
+    // users on a stale app shell get fresh HTML (via cache:reload) without a manual
+    // cache clear. This does NOT touch localStorage/sessionStorage, so the Supabase
+    // login (jpt_logged_in / jpt_pin) and the unlocked-session flag (jpt_session_active)
+    // survive the reload — no re-login and no PIN re-prompt. Skipped on first install.
+    if (oldCaches.length > 0) {
+      const clients = await self.clients.matchAll({ type: 'window' });
+      for (const client of clients) {
+        try { client.navigate(client.url); } catch (e) {}
+      }
     }
   })());
 });
