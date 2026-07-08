@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jptrust-member-v19';  // bumped 2026-07-08 — force-fresh HTML (customers were stuck on stale cached pages)
+const CACHE_NAME = 'jptrust-member-v20';  // bumped 2026-07-08 — auto-reload clients on activate (self-heal stale caches)
 const ASSETS = [
   './',
   './member-dashboard.html',
@@ -18,12 +18,18 @@ self.addEventListener('install', event => {
 
 // Activate — clean old caches
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    )
-  );
-  self.clients.claim();
+  event.waitUntil((async () => {
+    // purge old version caches
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)));
+    await self.clients.claim();
+    // Auto-reload any open pages so they refetch fresh HTML (via cache:reload).
+    // This self-heals users stuck on a stale cached app shell — no manual clear.
+    const wins = await self.clients.matchAll({ type: 'window' });
+    for (const c of wins) {
+      try { c.navigate(c.url); } catch (e) {}
+    }
+  })());
 });
 
 // Fetch — network first, fallback to cache
