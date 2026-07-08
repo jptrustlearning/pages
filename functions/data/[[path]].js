@@ -7,7 +7,7 @@ export async function onRequestGet(context) {
   const key = Array.isArray(params.path) ? params.path.join('/') : (params.path || '');
 
   // allow only flat .csv keys; block path traversal
-  if (!key || key.includes('..') || key.includes('/') || !key.endsWith('.csv')) {
+  if (!key || key.includes('..') || !key.endsWith('.csv')) {  // allow subpaths (e.g. profiles/); block only traversal
     return new Response('Not found', { status: 404 });
   }
 
