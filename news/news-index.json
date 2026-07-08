@@ -1,6 +1,94 @@
 {
-  "lastUpdated": "2026-07-08T07:20:00Z",
+  "lastUpdated": "2026-07-08T17:45:00Z",
   "batches": [
+    {
+      "file": "2026-07-08-1745.md",
+      "date": "2026-07-08T17:45:00Z",
+      "date_display": "8 ก.ค. 2026 · 17:45",
+      "summary": "Trump ประกาศข้อตกลง Iran \"จบแล้ว\" กลางเวที NATO Summit หลังสหรัฐฯ ถล่ม 80+ เป้า · น้ำมันเด้ง 6% แตะ 78 ดอลลาร์ · ทองคำร่วงใกล้ 4,100 ตามกลไกสงครามพลังงาน · หุ้นโลกเทขาย Dow futures ลบ 700 จุด บาทอ่อนใกล้ 33.4",
+      "tickers": [
+        "USO",
+        "XLE",
+        "PTTEP",
+        "PTT",
+        "BCP",
+        "GLD",
+        "UUP",
+        "TLT",
+        "SPY",
+        "QQQ",
+        "AOT",
+        "KBANK"
+      ],
+      "headlines": [
+        {
+          "title": "Trump ประกาศข้อตกลง Iran \"จบแล้ว\" กลางเวที NATO Summit — น้ำมันเด้ง 6% แตะ 78 ดอลลาร์ หลังสหรัฐฯ ถล่ม Iran กว่า 80 เป้า",
+          "tickers": [
+            {
+              "symbol": "USO",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "XLE",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTTEP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTT",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "CNN, CNBC, Bloomberg, Reuters, AP",
+          "published": "8 ก.ค. 2026"
+        },
+        {
+          "title": "ทองคำร่วงใกล้ 4,100 ดอลลาร์สวนข่าวสงคราม — ยืนยันกลไก \"สงครามพลังงาน = ทองลง\" อีกครั้ง",
+          "tickers": [
+            {
+              "symbol": "GLD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "UUP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "TLT",
+              "sentiment": "negative"
+            }
+          ],
+          "tone_override": "bearish",
+          "source": "Trading Economics, CNBC, Bloomberg, Reuters",
+          "published": "8 ก.ค. 2026"
+        },
+        {
+          "title": "หุ้นทั่วโลกเทขาย Dow futures ลบ 700 จุด — บาทอ่อนใกล้ 33.4 แรงกดดันสองชั้นต่อ SET",
+          "tickers": [
+            {
+              "symbol": "SPY",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "KBANK",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "CNBC, Euronews, AP, Trading Economics",
+          "published": "8 ก.ค. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-07-08-0720.md",
       "date": "2026-07-08T07:20:00Z",
