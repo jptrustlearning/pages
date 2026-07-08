@@ -2360,11 +2360,69 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
+// --- Resilient loader (v22 POC): watchdog + 429/5xx backoff + cache-reload on retry ---
+async function jptResilientFetch(url, opts) {
+  opts = opts || {};
+  const label = opts.label || 'data';
+  const timeoutMs = opts.timeoutMs || 25000;
+  const maxRetries = (opts.maxRetries != null) ? opts.maxRetries : 3;
+  let lastErr;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const fopts = { signal: controller.signal };
+      // retries force a fresh copy: bypasses poisoned/partial cache + stale CDN edge
+      if (attempt > 0) fopts.cache = 'reload';
+      const res = await fetch(url, fopts);
+      clearTimeout(timer);
+      if (res.status === 429 || res.status >= 500) {
+        const ra = parseInt(res.headers.get('retry-after') || '0', 10);
+        const wait = ra > 0 ? ra * 1000 : Math.min(1000 * Math.pow(2, attempt), 8000) + Math.random() * 500;
+        if (attempt < maxRetries) { await new Promise(r => setTimeout(r, wait)); continue; }
+        throw new Error(label + ' HTTP ' + res.status);
+      }
+      if (!res.ok) throw new Error(label + ' HTTP ' + res.status);
+      return await res.text();
+    } catch (e) {
+      clearTimeout(timer);
+      lastErr = e;
+      if (attempt < maxRetries) {
+        const wait = Math.min(1000 * Math.pow(2, attempt), 8000) + Math.random() * 500;
+        await new Promise(r => setTimeout(r, wait));
+        continue;
+      }
+    }
+  }
+  throw lastErr || new Error(label + ' failed');
+}
+
+function showLoaderError(err) {
+  const stage = document.querySelector('#loading .owl-loader-stage');
+  const textEl = document.querySelector('#loading .owl-loader-text');
+  if (!textEl) return;
+  if (!err) {
+    if (stage) stage.style.display = '';
+    textEl.innerHTML = '<span class="loader-dots-left">...</span> Initializing <span class="loader-dots-right">...</span>';
+    return;
+  }
+  if (stage) stage.style.display = 'none';
+  textEl.innerHTML =
+    '<div style="color:#B23A3A;font-weight:700;margin-bottom:6px;">โหลดข้อมูลไม่สำเร็จ</div>' +
+    '<div style="font-size:0.82rem;opacity:0.7;margin-bottom:14px;max-width:280px;">เครือข่ายอาจติดขัดชั่วคราว (rate limit / สัญญาณหลุด) — ระบบลองซ้ำแล้วแต่ยังไม่ผ่าน</div>' +
+    '<button type="button" onclick="loadDataFromCloud()" style="padding:9px 22px;border:none;border-radius:22px;background:linear-gradient(135deg,#D4AF37,#B8860B);color:#1A0A0E;font-weight:700;letter-spacing:.5px;cursor:pointer;">ลองใหม่อีกครั้ง</button>';
+}
+
 async function loadDataFromCloud() {
   const fileUrl = CONFIG.cloudCsvUrl;
   const benchUrl = CONFIG.cloudBenchUrl;
-  
-  // Kickoff progress animation — grows from 0 toward 70% during fetch
+
+  // reset loader to a clean state (also covers "retry" re-entry)
+  showLoaderError(null);
+  el.manualUpload.style.display = 'none';
+  el.loading.classList.remove('hidden');
+  el.dash.classList.add('hidden');
+
   let fetchPct = 0;
   const fetchInterval = setInterval(() => {
     fetchPct = Math.min(fetchPct + 2 + Math.random() * 3, 70);
@@ -2372,17 +2430,18 @@ async function loadDataFromCloud() {
   }, 80);
 
   try {
-    // Fetch SP500 universe + benchmark (SPY/QQQ/DIA) in parallel
-    const [responseMain, responseBench] = await Promise.all([
-      fetch(fileUrl),
-      benchUrl ? fetch(benchUrl).catch(() => null) : Promise.resolve(null)
+    // main = required (hard retry); benchmark = optional (best-effort)
+    const [csvMain, csvBench] = await Promise.all([
+      jptResilientFetch(fileUrl, { label: 'SP500', timeoutMs: 30000, maxRetries: 3 }),
+      benchUrl ? jptResilientFetch(benchUrl, { label: 'Benchmark', timeoutMs: 15000, maxRetries: 2 }).catch(() => null) : Promise.resolve(null)
     ]);
-    if (!responseMain.ok) throw new Error('Network response was not ok');
-    
-    const csvMain = await responseMain.text();
+
+    // integrity guard: catch truncated / error-page bodies before parsing
+    const mainLines = csvMain.trim().split('\n');
+    if (mainLines.length < 1000) throw new Error('SP500 data truncated (' + mainLines.length + ' lines)');
+
     let csvCombined = csvMain;
-    if (responseBench && responseBench.ok) {
-      const csvBench = await responseBench.text();
+    if (csvBench) {
       const benchLines = csvBench.trim().split('\n');
       if (benchLines.length > 1) {
         csvCombined = csvMain.trim() + '\n' + benchLines.slice(1).join('\n');
@@ -2392,11 +2451,10 @@ async function loadDataFromCloud() {
     if (typeof updateOwlProgress === 'function') updateOwlProgress(80);
     processData(csvCombined);
     if (typeof updateOwlProgress === 'function') updateOwlProgress(95);
-    
-    // Update UI Status
+
     el.status.className = 'status-indicator success';
-    el.status.innerHTML = '<span>●</span> Connected';
-    
+    el.status.innerHTML = '<span>\u25CF</span> Connected';
+
     setTimeout(() => {
       if (typeof updateOwlProgress === 'function') updateOwlProgress(100);
       setTimeout(() => {
@@ -2409,11 +2467,11 @@ async function loadDataFromCloud() {
   } catch (error) {
     clearInterval(fetchInterval);
     console.error('Failed to load cloud data:', error);
-    
-    // Show Error & Fallback to Manual
     el.status.className = 'status-indicator error';
-    el.status.innerHTML = '<span>●</span> Upload CSV';
+    el.status.innerHTML = '<span>\u25CF</span> Upload CSV';
     el.manualUpload.style.display = 'block';
+    // KEY FIX: never leave the owl frozen — show real error + retry button
+    showLoaderError(error);
   }
 }
 
