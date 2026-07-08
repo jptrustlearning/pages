@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jptrust-member-v18';  // bumped 2026-07-08 — R2 data migration (sub-pages now serve CSVs from /data/)
+const CACHE_NAME = 'jptrust-member-v19';  // bumped 2026-07-08 — force-fresh HTML (customers were stuck on stale cached pages)
 const ASSETS = [
   './',
   './member-dashboard.html',
@@ -40,8 +40,13 @@ self.addEventListener('fetch', event => {
     event.respondWith(fetch(event.request, {cache: 'no-store'}));
     return;
   }
+  // HTML / navigations: always fetch fresh from network (bypass the browser
+  // HTTP cache) so a new deploy reaches users immediately — no stale app shell.
+  let pathname = '/';
+  try { pathname = new URL(url).pathname; } catch (e) {}
+  const isHTML = event.request.mode === 'navigate' || pathname.endsWith('.html') || pathname === '/';
   event.respondWith(
-    fetch(event.request)
+    fetch(event.request, isHTML ? {cache: 'reload'} : undefined)
       .then(response => {
         const clone = response.clone();
         caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
