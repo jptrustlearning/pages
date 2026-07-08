@@ -1,0 +1,11 @@
+# Always revalidate the app shell so users never get stuck on a stale cached
+# page after a deploy (fixes customers holding an old HTML that still pointed
+# at raw.githubusercontent). HTML is tiny — 304s keep this cheap.
+/*.html
+  Cache-Control: no-cache
+/
+  Cache-Control: no-cache
+/sw.js
+  Cache-Control: no-cache
+/manifest.json
+  Cache-Control: no-cache
