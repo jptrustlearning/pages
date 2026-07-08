@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jptrust-member-v17';  // bumped 2026-06-06 — planner login-fix (getSession) cache-bust
+const CACHE_NAME = 'jptrust-member-v18';  // bumped 2026-07-08 — R2 data migration (sub-pages now serve CSVs from /data/)
 const ASSETS = [
   './',
   './member-dashboard.html',
