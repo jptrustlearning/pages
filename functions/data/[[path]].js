@@ -1,4 +1,4 @@
-// functions/data/[[path]].js
+// functions/data/[[path]].js  (v2 — redeploy to pick up MARKET_DATA binding)
 // Serves market-data CSVs from the R2 bucket (binding: MARKET_DATA) at
 // app.jptrustlearning.com/data/<filename>, replacing raw.githubusercontent.com
 // (which rate-limits per-IP -> 429). Responses are cached at the Cloudflare edge.
