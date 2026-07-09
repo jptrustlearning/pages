@@ -1,6 +1,135 @@
 {
-  "lastUpdated": "2026-07-08T17:45:00Z",
+  "lastUpdated": "2026-07-09T09:30:00Z",
   "batches": [
+    {
+      "file": "2026-07-09-0930.md",
+      "date": "2026-07-09T09:30:00Z",
+      "date_display": "9 ก.ค. 2026 · 09:30",
+      "summary": "ตลาดสหรัฐฯ ปิดแยกทาง Dow ลบ 577 จุดแต่ Nasdaq บวกจากชิปเด้ง (Broadcom–Apple) · รายงาน Fed แตก 9-9 หนุนดอกเบี้ยสูงนาน น้ำมันปิดพุ่ง · ทองร่วงแตะ 4,030 ดอลลาร์ ยืนยันกลไกสงครามพลังงาน",
+      "tickers": [
+        "SPY",
+        "QQQ",
+        "AVGO",
+        "AAPL",
+        "MSFT",
+        "GOOGL",
+        "AMZN",
+        "JPM",
+        "V",
+        "TLT",
+        "UUP",
+        "USO",
+        "XLE",
+        "GLD",
+        "PTTEP",
+        "PTT",
+        "AOT"
+      ],
+      "headlines": [
+        {
+          "title": "ตลาดสหรัฐฯ ปิดแยกทาง — Dow ร่วงกว่า 570 จุด แต่ Nasdaq พลิกกลับมาบวกได้จากหุ้นชิปเด้ง นำโดยดีล Broadcom–Apple",
+          "tickers": [
+            {
+              "symbol": "SPY",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AVGO",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AAPL",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "MSFT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "GOOGL",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AMZN",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "JPM",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "V",
+              "sentiment": "negative"
+            }
+          ],
+          "source": "CNBC, Yahoo Finance, Washington Post",
+          "published": "9 ก.ค. 2026"
+        },
+        {
+          "title": "รายงานการประชุม Fed แตกเป็น 9 ต่อ 9 — ฝ่าย hawks เปิดหน้าหนุนขึ้นดอกเบี้ย ขณะน้ำมันปิดพุ่งเติมเชื้อเงินเฟ้อ",
+          "tickers": [
+            {
+              "symbol": "TLT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "UUP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "USO",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "XLE",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SPY",
+              "sentiment": "negative"
+            }
+          ],
+          "source": "CNBC, Trading Economics, Reuters",
+          "published": "9 ก.ค. 2026"
+        },
+        {
+          "title": "ทองคำร่วงแตะ 4,030 ดอลลาร์ ต่ำสุดตั้งแต่ 2 ก.ค. — โอกาส Fed ขึ้นดอกเบี้ย ก.ย. ขยับเป็น 66% ยืนยันกลไกสงครามพลังงาน",
+          "tickers": [
+            {
+              "symbol": "GLD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "USO",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "UUP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTTEP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "negative"
+            }
+          ],
+          "tone_override": "bearish",
+          "source": "Trading Economics, CNBC, Bloomberg",
+          "published": "9 ก.ค. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-07-08-1745.md",
       "date": "2026-07-08T17:45:00Z",
