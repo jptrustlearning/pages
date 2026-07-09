@@ -198,15 +198,18 @@ YYYY-MM-DD-HHMM-backup-[reason].md
 
 ### URLs สำหรับ Frontend
 
-Frontend PWA อ่านข้อมูลจาก GitHub Raw:
+Frontend PWA (member-dashboard + news-detail) อ่านข้อมูลจาก **Cloudflare Pages (same-origin)** — เลี่ยง raw.githubusercontent 429 บน CGNAT ไทย (แก้ 9 ก.ค. 2026, commit 98899f2):
 
 ```
 Index:
-https://raw.githubusercontent.com/jptrustlearning/pages/main/news/news-index.json
+https://app.jptrustlearning.com/news/news-index.json
 
 Batch File:
-https://raw.githubusercontent.com/jptrustlearning/pages/main/news/2026-04-21-2240.md
+https://app.jptrustlearning.com/news/2026-04-21-2240.md
 ```
+
+> ⚠️ ห้ามชี้ frontend กลับไปที่ raw.githubusercontent (จะโดน 429 อีก). raw ใช้ได้เฉพาะ **verify ว่า push ขึ้น GitHub แล้ว** เท่านั้น:
+> `https://raw.githubusercontent.com/jptrustlearning/pages/main/news/news-index.json`
 
 ---
 
@@ -922,8 +925,9 @@ for b in data['batches'][:5]:
 | Repo | https://github.com/jptrustlearning/pages |
 | Main App | https://jptrustlearning.github.io/pages/member-dashboard.html |
 | News Detail | https://jptrustlearning.github.io/pages/news-detail.html |
-| News Index Raw | https://raw.githubusercontent.com/jptrustlearning/pages/main/news/news-index.json |
-| Batch Example | https://raw.githubusercontent.com/jptrustlearning/pages/main/news/2026-04-21-2240.md |
+| News Index (live, frontend) | https://app.jptrustlearning.com/news/news-index.json |
+| Batch Example (live, frontend) | https://app.jptrustlearning.com/news/2026-04-21-2240.md |
+| News Index Raw (verify push only) | https://raw.githubusercontent.com/jptrustlearning/pages/main/news/news-index.json |
 
 ---
 
