@@ -3872,6 +3872,10 @@ function computeAlphaMetrics(closedResults) {
   const portAnnual = portMean * periodsPerYear;
   const mktAnnual = mktMean * periodsPerYear;
 
+  // Geometric annualized return (CAGR) of portfolio round-returns — used as Sharpe/Sortino numerator
+  const portGrowth = alignedPort.reduce((a,b)=>a*(1+b),1);
+  const portCagr = portGrowth > 0 ? Math.pow(portGrowth, periodsPerYear/n) - 1 : portAnnual;
+
   // Jensen's Alpha (annualized)
   const alpha = portAnnual - (RISK_FREE_ANNUAL + beta * (mktAnnual - RISK_FREE_ANNUAL));
 
@@ -3882,7 +3886,7 @@ function computeAlphaMetrics(closedResults) {
   const mktVolAnn = mktStd * Math.sqrt(periodsPerYear);
 
   // Sharpe Ratio (annualized)
-  const sharpe = portVolAnn > 0 ? (portAnnual - RISK_FREE_ANNUAL) / portVolAnn : 0;
+  const sharpe = portVolAnn > 0 ? (portCagr - RISK_FREE_ANNUAL) / portVolAnn : 0;
 
   // Tracking Error & Information Ratio
   const excessRets = alignedPort.map((p,i) => p - alignedMkt[i]);
@@ -3895,7 +3899,7 @@ function computeAlphaMetrics(closedResults) {
   const downsideRets = alignedPort.filter(r => r < rfPerPeriod);
   const downsideVar = downsideRets.length > 0 ? downsideRets.reduce((s,r) => s + Math.pow(r - rfPerPeriod, 2), 0) / downsideRets.length : 0;
   const downsideDev = Math.sqrt(downsideVar) * Math.sqrt(periodsPerYear);
-  const sortino = downsideDev > 0 ? (portAnnual - RISK_FREE_ANNUAL) / downsideDev : 0;
+  const sortino = downsideDev > 0 ? (portCagr - RISK_FREE_ANNUAL) / downsideDev : 0;
 
   // Display
   document.getElementById('stat-beta').innerText = beta.toFixed(2);

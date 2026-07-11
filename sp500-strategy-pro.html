@@ -2683,7 +2683,7 @@ function simulateStrategy(wRet, nStocks) {
   const varM = monthlyRets.length > 0 ? monthlyRets.reduce((a,b) => a + Math.pow(b-avgM, 2), 0) / monthlyRets.length : 0;
   const stdM = Math.sqrt(varM);
   const volAnn = stdM * Math.sqrt(12);  // annualized vol
-  const sharpe = volAnn === 0 ? 0 : (avgM * 12) / volAnn;
+  const sharpe = volAnn === 0 ? 0 : cagr / volAnn;
 
   const wins = monthlyRets.filter(r => r > 0).length;
   const winRate = monthlyRets.length > 0 ? wins / monthlyRets.length : 0;
@@ -3072,7 +3072,7 @@ function calculateStats() {
     const avgM = mr.reduce((a,b)=>a+b,0)/mr.length;
     const stdM = Math.sqrt(mr.reduce((a,b)=>a+Math.pow(b-avgM,2),0)/mr.length);
     const vol = stdM * Math.sqrt(12);
-    const sharpe = (avgM * 12) / vol;
+    const sharpe = cagr / vol;
 
     // === ROUND-BASED win rate + best/worst (Joon request) ===
     // 6M strategy holds for 6 months per round — it makes sense to measure success
