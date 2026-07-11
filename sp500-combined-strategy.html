@@ -3786,7 +3786,7 @@ function computeAlphaMetrics(closedResults) {
     return;
   }
 
-  const RISK_FREE_ANNUAL = 0.045; // ~4.5% US T-bill
+  const RISK_FREE_ANNUAL = 0; // Rf=0 house standard (align with 6M/Rolling momentum engines) — also zeroes Rf in Sortino & Jensen's alpha in this panel
 
   // For alpha: need to compare portfolio return vs market return over the SAME holding period
   // Each round: portfolio bought at entryDate, sold at exitDate
