@@ -23,8 +23,9 @@ export default {
 
     const url = new URL(request.url);
     if (url.pathname === '/hist' && request.method === 'GET') return hist(url, ctx, CORS);
+    if (url.pathname === '/search' && request.method === 'GET') return search(url, ctx, CORS);
     if (url.pathname === '/ocr' && request.method === 'POST') return ocr(request, env, ctx, CORS);
-    return json({ ok: true, service: 'port-price', endpoints: ['/hist?symbol=AAPL&from=YYYY-MM-DD', 'POST /ocr'] }, 200, CORS);
+    return json({ ok: true, service: 'port-price', endpoints: ['/hist?symbol=AAPL&from=YYYY-MM-DD', '/search?q=apple', 'POST /ocr'] }, 200, CORS);
   },
 };
 
@@ -99,6 +100,62 @@ async function hist(url, ctx, CORS) {
   const body = JSON.stringify({ symbol, dates, closes, highs, lows });
   const res = new Response(body, {
     headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=3600', ...CORS, 'X-Cache': 'MISS' },
+  });
+  ctx.waitUntil(cache.put(cacheKey, res.clone()));
+  return res;
+}
+
+/* ---------------- /search : Yahoo ticker lookup (name + exchange) ---------------- */
+async function search(url, ctx, CORS) {
+  const q = (url.searchParams.get('q') || '').trim();
+  if (q.length < 1) return json({ quotes: [] }, 200, CORS);
+  if (q.length > 40) return json({ error: 'query too long' }, 400, CORS);
+
+  const cacheKey = new Request(`https://cache.port-price/search/${encodeURIComponent(q.toLowerCase())}`);
+  const cache = caches.default;
+  const hit = await cache.match(cacheKey);
+  if (hit) {
+    const res = new Response(hit.body, hit);
+    Object.entries(CORS).forEach(([k, v]) => res.headers.set(k, v));
+    res.headers.set('X-Cache', 'HIT');
+    return res;
+  }
+
+  const yUrl = `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(q)}&quotesCount=10&newsCount=0&listsCount=0&enableFuzzyQuery=false`;
+  let yr;
+  try {
+    yr = await fetch(yUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
+        'Accept': 'application/json',
+      },
+      cf: { cacheTtl: 0 },
+    });
+  } catch (e) {
+    return json({ error: 'upstream fetch failed' }, 502, CORS);
+  }
+  if (!yr.ok) return json({ error: 'yahoo ' + yr.status }, 502, CORS);
+
+  const OK_TYPES = ['EQUITY', 'ETF', 'INDEX', 'CRYPTOCURRENCY', 'CURRENCY', 'FUTURE', 'MUTUALFUND'];
+  let quotes = [];
+  try {
+    const j = await yr.json();
+    quotes = (j.quotes || [])
+      .filter((x) => x.symbol && OK_TYPES.includes(x.quoteType))
+      .map((x) => ({
+        symbol: x.symbol,
+        name: x.shortname || x.longname || x.symbol,
+        exchange: x.exchDisp || x.exchange || '',
+        type: x.quoteType,
+      }))
+      .slice(0, 8);
+  } catch (e) {
+    return json({ error: 'parse: ' + e.message }, 502, CORS);
+  }
+
+  const body = JSON.stringify({ quotes });
+  const res = new Response(body, {
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400', ...CORS, 'X-Cache': 'MISS' },
   });
   ctx.waitUntil(cache.put(cacheKey, res.clone()));
   return res;
