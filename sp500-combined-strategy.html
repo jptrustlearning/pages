@@ -3576,6 +3576,7 @@ function updateKPIs() {
     const yearsSpan = Math.max(daySpan / 365.25, 0.5);
     annualizedRoi = roiOnDeployed / yearsSpan;
   }
+  state.annualizedRoi = annualizedRoi;  // non-compounded annualized return (summary card) — reused as Weekly Sharpe/Sortino numerator
 
   document.getElementById('kpi-deployed').innerText = '$' + capitalDeployed.toLocaleString();
   const momSlots = CONFIG.momHoldWeeks;
@@ -3872,9 +3873,10 @@ function computeAlphaMetrics(closedResults) {
   const portAnnual = portMean * periodsPerYear;
   const mktAnnual = mktMean * periodsPerYear;
 
-  // Geometric annualized return (CAGR) of portfolio round-returns — used as Sharpe/Sortino numerator
-  const portGrowth = alignedPort.reduce((a,b)=>a*(1+b),1);
-  const portCagr = portGrowth > 0 ? Math.pow(portGrowth, periodsPerYear/n) - 1 : portAnnual;
+  // Sharpe/Sortino numerator = non-compounded annualized return from the summary card
+  // (Weekly deploys staggered lots on a fixed capital base — round returns do NOT compound sequentially,
+  //  so a geometric CAGR would be wrong here. state.annualizedRoi is % → convert to decimal.)
+  const annRet = (typeof state.annualizedRoi === 'number') ? state.annualizedRoi / 100 : portAnnual;
 
   // Jensen's Alpha (annualized)
   const alpha = portAnnual - (RISK_FREE_ANNUAL + beta * (mktAnnual - RISK_FREE_ANNUAL));
@@ -3886,7 +3888,7 @@ function computeAlphaMetrics(closedResults) {
   const mktVolAnn = mktStd * Math.sqrt(periodsPerYear);
 
   // Sharpe Ratio (annualized)
-  const sharpe = portVolAnn > 0 ? (portCagr - RISK_FREE_ANNUAL) / portVolAnn : 0;
+  const sharpe = portVolAnn > 0 ? (annRet - RISK_FREE_ANNUAL) / portVolAnn : 0;
 
   // Tracking Error & Information Ratio
   const excessRets = alignedPort.map((p,i) => p - alignedMkt[i]);
@@ -3899,7 +3901,7 @@ function computeAlphaMetrics(closedResults) {
   const downsideRets = alignedPort.filter(r => r < rfPerPeriod);
   const downsideVar = downsideRets.length > 0 ? downsideRets.reduce((s,r) => s + Math.pow(r - rfPerPeriod, 2), 0) / downsideRets.length : 0;
   const downsideDev = Math.sqrt(downsideVar) * Math.sqrt(periodsPerYear);
-  const sortino = downsideDev > 0 ? (portCagr - RISK_FREE_ANNUAL) / downsideDev : 0;
+  const sortino = downsideDev > 0 ? (annRet - RISK_FREE_ANNUAL) / downsideDev : 0;
 
   // Display
   document.getElementById('stat-beta').innerText = beta.toFixed(2);
