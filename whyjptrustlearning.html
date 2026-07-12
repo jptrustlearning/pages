@@ -74,14 +74,23 @@ section{padding:60px 22px;}
   border-bottom:2px solid transparent;
   border-image:linear-gradient(90deg,transparent,#D4AF37,#E8D48B,#D4AF37,transparent) 1;
   box-shadow:0 4px 20px rgba(212,175,55,.13); padding:11px 20px;}
-.brandbar .inner{max-width:920px; margin:0 auto; display:flex; align-items:center; gap:11px;}
-.brandbar img{width:30px; height:30px; object-fit:contain; filter:drop-shadow(0 1px 3px rgba(139,105,20,.3));}
-.brandbar .name{font-family:'Cinzel',serif; font-weight:600; font-size:1rem; letter-spacing:.16em;
-  background:linear-gradient(135deg,#722F37,#B8860B,#722F37);
+.brandbar .inner{max-width:1180px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:11px;}
+/* ── โลโก้ = ลิงก์กลับ jptrustlearning.com (โครงเดียวกับ nav หน้า home) ── */
+.brandbar .brand{display:flex; align-items:center; gap:10px; text-decoration:none;}
+.brandbar .brand-owl{width:clamp(30px,5vw,38px); height:auto; flex-shrink:0;}
+.brandbar .brand-text{display:flex; flex-direction:column; line-height:1.05;}
+.brandbar .brand-name{font-family:'Cinzel',serif; font-weight:600; font-size:clamp(14px,2.2vw,17px); letter-spacing:1px;
+  background:linear-gradient(135deg,#722F37,#D4AF37);
   -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;}
-.brandbar .cta{margin-left:auto; font-size:.82rem; font-weight:600; text-decoration:none;
-  color:#722F37; border:1.4px solid rgba(114,47,55,.35); border-radius:40px; padding:7px 16px; transition:all .2s; white-space:nowrap;}
-.brandbar .cta:hover{background:rgba(114,47,55,.07); border-color:rgba(114,47,55,.6);}
+.brandbar .brand-sub{font-size:clamp(9px,1.3vw,11px); color:#8B6914; letter-spacing:2px; font-weight:500;}
+.brandbar .brand:hover .brand-owl{transform:translateY(-1px); transition:transform .2s;}
+.brandbar .cta{display:inline-flex; align-items:center; gap:7px; margin-left:auto; text-decoration:none;
+  background:linear-gradient(135deg,#722F37 0%,#8B3A44 100%); color:#FFFEF8; border:none;
+  padding:clamp(8px,1.4vw,10px) clamp(14px,2.5vw,22px); border-radius:50px;
+  font-size:clamp(12px,1.8vw,14px); font-weight:600; white-space:nowrap;
+  box-shadow:0 4px 16px rgba(114,47,55,.28); transition:transform .2s, box-shadow .2s;}
+.brandbar .cta:hover{transform:translateY(-1px); box-shadow:0 8px 22px rgba(114,47,55,.36); background:linear-gradient(135deg,#722F37 0%,#8B3A44 100%);}
+.brandbar .cta svg{width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round;}
 
 /* ── HERO ── */
 .hero{padding:54px 22px 60px; text-align:center;}
@@ -224,7 +233,6 @@ footer .copy{font-size:.78rem; color:#A09585; letter-spacing:.3px;}
   .pstats{grid-template-columns:1fr;}
 }
 @media (max-width:420px){
-  .brandbar .cta{display:none;}
   .stat:not(:last-child)::after{display:none;}
 }
 </style>
@@ -234,9 +242,25 @@ footer .copy{font-size:.78rem; color:#A09585; letter-spacing:.3px;}
 <!-- ════ BRAND BAR ════ -->
 <header class="brandbar">
   <div class="inner">
-    <img src="jpt-owl-logo.png" alt="JP Trust Learning" onerror="this.style.display='none'">
-    <span class="name">JP Trust Learning</span>
-    <a class="cta" href="./signup.html">สมัครสมาชิก</a>
+    <a class="brand" href="https://jptrustlearning.com" aria-label="กลับหน้าแรก JP Trust Learning">
+      <svg class="brand-owl" viewBox="0 0 64 64" aria-hidden="true">
+        <g fill="none" stroke="#D4AF37" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 12 L22 22 M50 12 L42 22"/>
+          <path d="M32 18 C16 18 13 30 13 40 C13 52 22 58 32 58 C42 58 51 52 51 40 C51 30 48 18 32 18 Z"/>
+          <circle cx="24" cy="33" r="7"/><circle cx="40" cy="33" r="7"/>
+          <circle cx="24" cy="33" r="2" fill="#D4AF37"/><circle cx="40" cy="33" r="2" fill="#D4AF37"/>
+          <path d="M30 39 L32 43 L34 39 Z" fill="#D4AF37"/>
+        </g>
+      </svg>
+      <span class="brand-text">
+        <span class="brand-name">JP Trust Learning</span>
+        <span class="brand-sub">PUBLIC LIBRARY</span>
+      </span>
+    </a>
+    <a class="cta" href="./signup.html">
+      สมัครสมาชิก
+      <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
   </div>
 </header>
 
