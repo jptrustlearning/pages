@@ -277,6 +277,51 @@ strong{font-weight:600;color:var(--maroon-3);}
 .neg{color:var(--down);}
 .tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 
+/* ── Reveal on scroll ─────────────────────────────────── */
+.rv{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease;}
+.rv.in{opacity:1;transform:none;}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none;}}
+
+/* ── Showcase (แนะนำแพลตฟอร์ม) ────────────────────────── */
+.showcase{padding:clamp(54px,8vw,90px) 0;}
+.showcase-inner{
+  display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,56px);align-items:center;
+}
+.showcase h3{font-size:clamp(24px,3.4vw,34px);font-weight:600;line-height:1.35;margin-bottom:14px;}
+.showcase p{font-size:17px;margin-bottom:18px;}
+.showcase ul{list-style:none;}
+.showcase li{
+  position:relative;padding:9px 0 9px 22px;font-size:16.5px;line-height:1.7;
+  border-top:1px solid rgba(184,134,11,.18);
+}
+.showcase li::before{
+  content:"";position:absolute;left:0;top:20px;width:7px;height:7px;border-radius:50%;
+  background:var(--gold);
+}
+.band.showcase li{border-top-color:rgba(212,175,55,.22);}
+.shot{
+  border-radius:20px;overflow:hidden;
+  border:1px solid rgba(212,175,55,.35);
+  box-shadow:0 30px 70px -34px rgba(0,0,0,.55);
+}
+.shot img{display:block;width:100%;height:auto;}
+.light-shot{box-shadow:0 26px 60px -34px rgba(90,60,20,.45);border-color:rgba(184,134,11,.3);}
+.sc-cta{
+  display:inline-flex;flex-direction:column;gap:3px;margin-top:22px;
+  text-decoration:none;border:1px solid rgba(212,175,55,.45);
+  border-radius:14px;padding:14px 22px;
+}
+.sc-cta .sub{font-family:var(--font-label);font-size:10px;letter-spacing:.26em;color:var(--gold-deep);}
+.band .sc-cta .sub{color:var(--gold);}
+.sc-cta .url{font-family:var(--font-label);font-weight:700;font-size:19px;letter-spacing:.02em;color:var(--maroon-3);}
+.band .sc-cta .url{color:var(--gold-pale);}
+.sc-cta:hover{border-color:var(--gold);}
+@media(max-width:820px){
+  .showcase-inner{grid-template-columns:1fr;}
+  .showcase .shot{order:-1;}
+  .showcase.flip .shot{order:-1;}
+}
+
 /* ── ภาพประกอบในเนื้อหา ───────────────────────────────── */
 .fig{
   margin:28px 0 6px;border-radius:18px;overflow:hidden;
@@ -515,6 +560,30 @@ footer{
         <div class="tl-t">แรงขายกลับมา — เกาหลีติด Circuit Breaker</div>
         <div class="tl-b">โบรกเกอร์เกาหลี KIS ปรับประมาณการกำไรไตรมาส 2 ของ SK Hynix ลงมาต่ำกว่าตลาดคาด 8% ชี้ว่าการส่งมอบ HBM4 ช้ากว่าที่คิด ส่งผลให้หุ้นร่วง 15.4% ดัชนี KOSPI ดิ่ง 8.95% จนต้องหยุดการซื้อขาย และหุ้น memory ฝั่งสหรัฐฯ ร่วงตาม 4–6% ท่ามกลางความตึงเครียดสหรัฐฯ–อิหร่านที่ดันน้ำมันขึ้นแตะ 74 ดอลลาร์</div>
       </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ SHOWCASE · ข่าวรายวัน ═════════════════════════════ -->
+<section class="band showcase">
+  <div class="wrap">
+    <div class="showcase-inner">
+      <div>
+        <div class="eyebrow">Daily Dispatches</div>
+        <h3>ข่าวแบบนี้ เราย่อยให้ทุกเช้า–บ่าย–เย็น</h3>
+        <p>งบ Micron, การเข้าตลาดของ SK Hynix, โน้ตหั่นประมาณการจากโบรกฯ เกาหลี — ข่าวกระจัดกระจายทั่ว Wall Street เราคัด สรุปเป็นไทย แล้วบอกต่อว่ามันกระทบพอร์ตอย่างไร</p>
+        <ul>
+          <li>คัดจาก Wall Street สรุปเป็นไทยในภาษาที่เข้าใจ</li>
+          <li>ติดโทน Bull / Bear ให้รู้ทันทีว่าข่าวบวกหรือลบ</li>
+          <li>แท็กหุ้นที่เกี่ยวข้องในแต่ละข่าว พร้อมวิเคราะห์โอกาสและความเสี่ยง</li>
+        </ul>
+        <a class="sc-cta" href="https://jptrustlearning.com" target="_blank" rel="noopener">
+          <span class="sub">Subscribe at</span>
+          <span class="url">jptrustlearning.com</span>
+        </a>
+      </div>
+      <div class="shot"><img src="article-img/ad-news.jpg" alt="ฟีเจอร์ข่าวรายวันในแอป JP Trust Learning" loading="lazy"></div>
     </div>
   </div>
 </section>
@@ -831,6 +900,31 @@ footer{
       <div class="cal-i">
         <div class="cal-d"><b>27</b><span>2027</span></div>
         <div class="cal-x"><b>กำลังการผลิตใหม่เริ่มเข้าตลาด</b><span>โรงงานใหม่ของทุกค่ายทยอยเดินเครื่องปลายปี 2027–2028 — จุดที่วัฏจักรรอบนี้จะถูกทดสอบจริง</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ SHOWCASE · เครื่องมือครบในแอปเดียว ═══════════════ -->
+<section class="showcase flip">
+  <div class="wrap">
+    <div class="showcase-inner">
+      <div class="shot light-shot"><img src="article-img/ad-allinone.jpg" alt="เครื่องมือทั้งหมดในแอป JP Trust Learning" loading="lazy"></div>
+      <div>
+        <div class="eyebrow">All-in-one Platform</div>
+        <h3>ระบบที่ว่า อยู่ครบในแอปเดียว</h3>
+        <p>เปลี่ยนงานวิจัยให้เป็นเครื่องมือใช้งานจริง — ตั้งแต่สแกนหาตัวแรง ไปจนถึงวางแผนพอร์ตและตามข่าว</p>
+        <ul>
+          <li>กลยุทธ์ Momentum หลายแบบ + Dashboard ทองคำ</li>
+          <li>ราคาตลาด Live — หุ้น ทองคำ คริปโต เรียลไทม์</li>
+          <li>วางแผน + จัดพอร์ต การเงินส่วนตัว · Asset Allocation</li>
+          <li>Roadmap 90 วัน + ข่าวกรองรายวัน</li>
+        </ul>
+        <a class="sc-cta" href="https://jptrustlearning.com" target="_blank" rel="noopener">
+          <span class="sub">Subscribe at</span>
+          <span class="url">jptrustlearning.com</span>
+        </a>
       </div>
     </div>
   </div>
@@ -1162,6 +1256,48 @@ footer{
   }, {threshold: 0.25});
 
   bars.forEach(function(b){ io.observe(b); });
+})();
+
+/* ═══ Reveal on scroll ═══════════════════════════════ */
+(function(){
+  var wraps = document.querySelectorAll('section > .wrap, header .statstrip, header .hero-fig');
+  var groups = ['.grid2','.grid3','.tl','.cal','.bb','.showcase-inner'];
+  var targets = [];
+
+  document.querySelectorAll('section > .wrap > *').forEach(function(el){
+    var isGroup = groups.some(function(g){ return el.matches(g); });
+    if (isGroup){
+      Array.prototype.forEach.call(el.children, function(c){ targets.push(c); });
+    } else {
+      targets.push(el);
+    }
+  });
+  document.querySelectorAll('.tl-item, .cal-i, .statstrip .stat, header .hero-fig').forEach(function(el){
+    if (targets.indexOf(el) === -1) targets.push(el);
+  });
+  // showcase: เผยทีละคอลัมน์
+  document.querySelectorAll('.showcase-inner > *').forEach(function(el){
+    if (targets.indexOf(el) === -1) targets.push(el);
+  });
+
+  targets.forEach(function(el){ el.classList.add('rv'); });
+
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (e.isIntersecting){
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  }, {threshold:0.12, rootMargin:'0px 0px -6% 0px'});
+
+  targets.forEach(function(el){
+    var sibs = Array.prototype.filter.call(el.parentElement.children, function(c){
+      return c.classList.contains('rv');
+    });
+    el.style.transitionDelay = (Math.min(sibs.indexOf(el), 5) * 60) + 'ms';
+    io.observe(el);
+  });
 })();
 </script>
 </body>
