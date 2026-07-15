@@ -242,7 +242,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .g-count{font-size:.74rem;color:var(--gold-dark);font-weight:600;white-space:nowrap}
 .g-chev{transition:transform .18s;color:var(--text-muted);font-size:.8rem}
 .g-card.open .g-chev{transform:rotate(180deg)}
-.g-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 10px;margin-top:11px;padding-top:11px;border-top:1px dashed var(--border-gold);font-size:.72rem}
+.g-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:6px 10px;margin-top:11px;padding-top:11px;border-top:1px dashed var(--border-gold);font-size:.72rem}
 .g-stat-label{font-family:var(--font-label);font-size:.55rem;letter-spacing:1.4px;color:var(--gold-dark);margin-bottom:3px;text-transform:uppercase}
 .g-stat-val{font-family:var(--font-number);font-size:.98rem;color:var(--text-heading)}
 .g-body{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed var(--border-gold);flex-direction:column;gap:6px}
@@ -1046,7 +1046,8 @@ function renderGroups(){
       value+=rem*pi.price; openVal+=rem*pi.price;
       lotSells(l.id).forEach(s=>{ value+=s.shares*s.price; });
     });
-    const pnl=value-invested, pct=invested>0?pnl/invested*100:0;
+    const netBase=peakDeployedLots(b.lots)||invested;   // เงินต้นสุทธิของกลุ่ม (recycle ในกลุ่มตัวเอง; fallback ซื้อรวม)
+    const pnl=value-invested, pct=netBase>0?pnl/netBase*100:0;
     const opened=!!openGroups[b.key];
     h+='<div class="g-card'+(opened?' open':'')+'">'
       +'<div class="g-head" onclick="PR.toggleGroup(\''+b.key+'\')">'
@@ -1054,7 +1055,8 @@ function renderGroups(){
       +'<span class="g-name">'+esc(b.name)+'</span>'
       +'<span class="g-count">'+b.lots.length+' ไม้'+(portOpenTotal>0&&openVal>0?' · '+(openVal/portOpenTotal*100).toFixed(1)+'%':'')+'</span><span class="g-chev">▾</span></div>'
       +'<div class="g-stats">'
-      +'<div><div class="g-stat-label">ลงทุน</div><div class="g-stat-val">'+fmtUSD(invested)+'</div></div>'
+      +'<div><div class="g-stat-label">เงินต้นสุทธิ</div><div class="g-stat-val">'+fmtUSD(netBase)+'</div></div>'
+      +'<div><div class="g-stat-label">ซื้อรวม</div><div class="g-stat-val">'+fmtUSD(invested)+'</div></div>'
       +'<div><div class="g-stat-label">มูลค่ารวม</div><div class="g-stat-val">'+fmtUSD(value)+'</div></div>'
       +'<div><div class="g-stat-label">P&L</div><div class="g-stat-val '+pnlClass(pnl)+'">'+fmtUSDsigned(pnl)+' ('+fmtPct(pct,true)+')</div></div>'
       +'</div>'
