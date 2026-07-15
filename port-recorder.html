@@ -2255,7 +2255,13 @@ function init(){
   });
   if(DRIVE.connected){
     if(driveToken()){
-      drivePull(false).then(ch=>{ if(ch){ renderAll(); renderPending(); } }).catch(e=>console.warn('pull',e));
+      if(DRIVE.dirty){
+        // มีการแก้ในเครื่องที่ยังไม่ได้ push (เช่น เปลี่ยนชื่อพอร์ตแล้วปิดแอปก่อนซิงก์) → push ก่อน ห้าม pull ทับ
+        drivePush(false).catch(e=>{ console.warn('init push',e);
+          if(String(e&&e.message).indexOf('need-interactive')>=0){ needAuth=true; renderDrivePill(); } });
+      }else{
+        drivePull(false).then(ch=>{ if(ch){ renderAll(); renderPending(); } }).catch(e=>console.warn('pull',e));
+      }
     }else{
       needAuth=true; renderDrivePill(); // เงียบๆ ไม่มี popup — ใช้ข้อมูล cache ในเครื่องไปก่อน
     }
