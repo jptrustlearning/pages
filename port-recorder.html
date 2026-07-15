@@ -2173,17 +2173,17 @@ async function drivePush(interactive){
   const payload=JSON.stringify({data:D, prices:PRICES, savedAt:new Date().toISOString()});
   let fileId=await driveFindDataFile(interactive);
   if(fileId){
-    const r=await gapi('https://www.googleapis.com/upload/drive/v3/files/'+fileId+'?uploadType=media&fields=id,modifiedTime',{method:'PATCH',headers:{'Content-Type':'application/json'},body:payload}, interactive);
-    const j=await r.json(); if(j&&j.modifiedTime) DRIVE.baseModified=j.modifiedTime;
+    await gapi('https://www.googleapis.com/upload/drive/v3/files/'+fileId+'?uploadType=media',{method:'PATCH',headers:{'Content-Type':'application/json'},body:payload}, interactive);
   }else{
     const fid=await driveEnsureFolder(interactive);
     const meta={name:DATA_FILENAME,parents:[fid],mimeType:'application/json'};
     const boundary='prb'+Date.now();
     const body='--'+boundary+'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n'+JSON.stringify(meta)
       +'\r\n--'+boundary+'\r\nContent-Type: application/json\r\n\r\n'+payload+'\r\n--'+boundary+'--';
-    const r=await gapi('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,modifiedTime',{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+boundary},body}, interactive);
-    const j=await r.json(); DRIVE.dataFileId=j.id; if(j.modifiedTime) DRIVE.baseModified=j.modifiedTime;
+    const r=await gapi('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+boundary},body}, interactive);
+    const j=await r.json(); DRIVE.dataFileId=j.id;
   }
+  try{ const mt=await driveFileMeta(interactive); if(mt.modified) DRIVE.baseModified=mt.modified; }catch(e){}   // base จาก files.list = แหล่งเดียวกับตอนเช็ค conflict → ไม่หลอกว่าชน
   DRIVE.lastSync=Date.now(); DRIVE.dirty=false; DRIVE.pendingConflict=false; needAuth=false;
   persistDrive(); renderDrivePill(); renderSettings();
 }
