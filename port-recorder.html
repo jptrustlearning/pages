@@ -280,6 +280,19 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .preview-row:last-child{margin-bottom:0}
 .preview-num{font-family:var(--font-number);font-size:1rem;color:var(--text-heading)}
 .hidden{display:none!important}
+
+/* ===== PORTFOLIO STATS CARD (ครีม-แชมเปญ-ชมพู) ===== */
+.stats-card{background:linear-gradient(135deg,#FFF9F0 0%,#FBEEDD 44%,#F6DBCF 100%);border:1px solid var(--border-gold-strong);border-radius:18px;padding:15px 15px 13px;margin-bottom:16px;box-shadow:0 4px 16px rgba(212,175,55,0.10)}
+.stats-head{display:flex;align-items:baseline;gap:8px;margin-bottom:11px;flex-wrap:wrap}
+.stats-title{font-family:var(--font-label);font-size:.72rem;letter-spacing:2px;color:var(--maroon);font-weight:700;text-transform:uppercase}
+.stats-sub{font-family:var(--font-thai);font-size:.68rem;color:var(--text-muted)}
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.stat-cell{background:rgba(255,255,255,0.58);border:1px solid rgba(212,175,55,0.22);border-radius:12px;padding:10px 12px}
+.stat-label{font-family:var(--font-label);font-size:.58rem;letter-spacing:1.2px;color:var(--text-heading);font-weight:700;text-transform:uppercase}
+.stat-value{font-family:var(--font-number);font-size:1.4rem;color:var(--text-dark);margin:2px 0;line-height:1.05}
+.stat-value.pos{color:var(--green)}.stat-value.neg{color:var(--red)}
+.stat-note{font-family:var(--font-thai);font-size:.63rem;color:var(--text-muted);line-height:1.25}
+.stats-foot{font-family:var(--font-thai);font-size:.62rem;color:var(--text-muted);margin-top:9px;text-align:center;opacity:.9}
 </style>
 </head>
 <body>
@@ -319,6 +332,17 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
         <div><div class="pnl-cell-label">REALIZED P&amp;L</div><div class="pnl-cell-value" id="heroRealized">$0.00</div><div class="pnl-cell-pct" id="heroRealizedSub">ยังไม่มีการขาย</div></div>
         <div><div class="pnl-cell-label">UNREALIZED P&amp;L</div><div class="pnl-cell-value" id="heroUnreal">$0.00</div><div class="pnl-cell-pct" id="heroUnrealSub">—</div></div>
       </div>
+    </div>
+
+    <div class="stats-card">
+      <div class="stats-head"><span class="stats-title">Portfolio Stats</span><span class="stats-sub">สถิติผลตอบแทน–ความเสี่ยงของพอร์ต</span></div>
+      <div class="stats-grid">
+        <div class="stat-cell"><div class="stat-label">Annualized Return</div><div class="stat-value" id="stCagr">—</div><div class="stat-note">ผลตอบแทนต่อปี (CAGR)</div></div>
+        <div class="stat-cell"><div class="stat-label">Sharpe Ratio</div><div class="stat-value" id="stSharpe">—</div><div class="stat-note">ผลตอบแทน ÷ ความเสี่ยง</div></div>
+        <div class="stat-cell"><div class="stat-label">Max Drawdown</div><div class="stat-value neg" id="stMdd">—</div><div class="stat-note">เคยลดจากจุดสูงสุดมากที่สุด</div></div>
+        <div class="stat-cell"><div class="stat-label">Strategy Vol</div><div class="stat-value" id="stVol">—</div><div class="stat-note">ความผันผวนต่อปี</div></div>
+      </div>
+      <div class="stats-foot" id="stFoot"></div>
     </div>
 
     <div class="action-row">
@@ -846,7 +870,21 @@ function portStats(pid){
 }
 
 /* ---------- RENDER: DASHBOARD ---------- */
-function renderAll(){ renderChips(); renderHero(); renderView(); renderEqTf(); drawEquity(); }
+function renderAll(){ renderChips(); renderHero(); renderStats(); renderView(); renderEqTf(); drawEquity(); }
+function renderStats(){
+  const m=portMetrics(sel);
+  const set=(id,txt,cls)=>{ const el=$(id); if(el){ el.textContent=txt; el.className='stat-value'+(cls?(' '+cls):''); } };
+  const foot=$('stFoot');
+  if(!m){ set('stCagr','—'); set('stSharpe','—'); set('stMdd','—','neg'); set('stVol','—');
+    if(foot) foot.textContent='บันทึกการซื้อ + โหลดราคา เพื่อดูสถิติพอร์ต'; return; }
+  const pct1=(x,sign)=>((sign&&x>=0?'+':'')+(x*100).toFixed(1)+'%');
+  set('stCagr', pct1(m.cagr,true), m.cagr>=0?'pos':'neg');
+  set('stSharpe', m.nMonths>=2 ? m.sharpe.toFixed(2) : '—', (m.nMonths>=2&&m.sharpe>=1)?'pos':'');
+  set('stMdd', (m.maxDD*100).toFixed(1)+'%', 'neg');
+  set('stVol', m.nMonths>=2 ? (m.volAnn*100).toFixed(1)+'%' : '—');
+  const mo=Math.max(1,Math.round(m.days/30.44));
+  if(foot) foot.textContent='Time-Weighted · ตัดผลเงินเติมทุน · ข้อมูล '+mo+' เดือน'+(m.nMonths<2?' — สั้นเกินวัดความผันผวน':'');
+}
 function setView(v){
   viewMode=v;
   document.querySelectorAll('#viewTabs .tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.view===v));
@@ -1497,6 +1535,43 @@ function buildCurve(pid){
     val.push(totVal); inv.push(totInv);             // gold=มูลค่า ; dashed=เงินต้นสุทธิ (ปลายเส้น=netBase ตรงกับ hero)
   });
   return {dates,val,inv};
+}
+/* ---------- PORTFOLIO RISK/RETURN STATS (นิยามตรงกับ Lab: sp500-strategy-pro) ----------
+   พอร์ตมีเติมทุน (ไม้ staggered) → คิด return จากเส้น value ตรงๆ ไม่ได้ (เงินเติม=กำไรปลอม)
+   แก้: สร้าง Time-Weighted index ตัดผล cash flow ออกก่อน แล้วคิด CAGR/DD/Vol/Sharpe บน index นั้น
+   cash flow รายวัน = ก้าวขึ้นของเส้นเงินต้นสุทธิ inv[] ; TWR: r = val_t/(val_{t-1}+CF_t) − 1        */
+function portMetrics(pid){
+  const c=buildCurve(pid); if(!c || c.dates.length<2) return null;
+  const {dates,val,inv}=c;
+  const idx=[1];
+  for(let i=1;i<val.length;i++){
+    const cf=(inv[i]||0)-(inv[i-1]||0);              // เงินเติมใหม่วันนั้น
+    const base=val[i-1]+cf;
+    const r = base>1e-9 ? val[i]/base-1 : 0;
+    idx.push(idx[i-1]*(1+r));
+  }
+  const d0=new Date(dates[0]+'T00:00:00'), dN=new Date(dates[dates.length-1]+'T00:00:00');
+  let days=(dN-d0)/86400000; if(!isFinite(days)||days<1) days=1;   // กัน Invalid Date
+  const start=idx[0], end=idx[idx.length-1];
+  const cagr = days>0 ? Math.pow(end/start, 365.25/days)-1 : 0;
+  let peak=idx[0], maxDD=0;
+  for(const v of idx){ if(v>peak) peak=v; const dd=v/peak-1; if(dd<maxDD) maxDD=dd; }
+  const monthly=monthlyReturns(dates, idx);
+  let volAnn=0, sharpe=0;
+  if(monthly.length>=2){
+    const avg=monthly.reduce((a,b)=>a+b,0)/monthly.length;
+    const varM=monthly.reduce((a,b)=>a+(b-avg)*(b-avg),0)/monthly.length;   // population (ตรงกับ Lab)
+    volAnn=Math.sqrt(varM)*Math.sqrt(12);
+    sharpe= volAnn>1e-9 ? cagr/volAnn : 0;                                   // Sharpe = CAGR ÷ Vol (rf=0)
+  }
+  return {cagr, maxDD, volAnn, sharpe, days, nMonths:monthly.length};
+}
+function monthlyReturns(dates, idx){
+  const byMonth={};
+  for(let i=0;i<dates.length;i++){ byMonth[dates[i].slice(0,7)]=idx[i]; }    // ค่า index ล่าสุดของแต่ละเดือน
+  const keys=Object.keys(byMonth).sort(); const out=[];
+  for(let i=1;i<keys.length;i++){ const p=byMonth[keys[i-1]]; if(p>1e-9) out.push(byMonth[keys[i]]/p-1); }
+  return out;
 }
 function tfStart(tf){
   const n=new Date();
