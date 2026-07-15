@@ -333,8 +333,8 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
       </div>
       <div class="eq-canvas-wrap"><canvas id="eqCanvas"></canvas><div class="eq-empty hidden" id="eqEmpty">บันทึกการซื้อครั้งแรกเพื่อเริ่มเส้นพอร์ต</div></div>
       <div class="eq-legend">
-        <div class="eq-leg-item"><span class="eq-leg-dot" style="background:#D4AF37"></span>มูลค่าพอร์ต (open + cash)</div>
-        <div class="eq-leg-item"><span class="eq-leg-dot" style="background:#722F37"></span>เงินลงทุนสะสม</div>
+        <div class="eq-leg-item"><span class="eq-leg-dot" style="background:#D4AF37"></span>มูลค่าพอร์ต (ถือ + เงินสด)</div>
+        <div class="eq-leg-item"><span class="eq-leg-dot" style="background:#722F37"></span>เงินต้นสุทธิ</div>
       </div>
     </div>
 
@@ -1470,17 +1470,29 @@ function buildCurve(pid){
   set.add(todayStr());
   const dates=[...set].sort();
   if(dates.length<2) dates.push(todayStr());
+  // จัดไม้ตามพอร์ต — คิด wallet แยกรายพอร์ต (เงินคนละพอร์ตไม่ recycle ข้ามกัน) แล้วรวม
+  const groups={};
+  lots.forEach(l=>{ (groups[l.portfolioId]=groups[l.portfolioId]||[]).push(l); });
+  const peak={};                        // high-water mark เงินต้นสุทธิ ต่อพอร์ต (ขึ้นอย่างเดียว)
   const val=[], inv=[];
   dates.forEach(d=>{
-    let v=0, cash=0, invested=0;
-    lots.forEach(l=>{
-      if(l.date>d) return;
-      invested+=lotAmount(l);
-      let rem=l.shares;
-      lotSells(l.id).forEach(s=>{ if(s.date<=d){ rem-=s.shares; cash+=s.shares*s.price; } });
-      if(rem>1e-9) v+=rem*closeOn(l.ticker,d,l.price);
-    });
-    val.push(v+cash); inv.push(invested);
+    let totVal=0, totInv=0;
+    for(const gid in groups){
+      let v=0, cash=0, invested=0;
+      groups[gid].forEach(l=>{
+        if(l.date>d) return;
+        invested+=lotAmount(l);
+        let rem=l.shares;
+        lotSells(l.id).forEach(s=>{ if(s.date<=d){ rem-=s.shares; cash+=s.shares*s.price; } });
+        if(rem>1e-9) v+=rem*closeOn(l.ticker,d,l.price);
+      });
+      const running=invested-cash;                 // เงินตัวเองที่จมในพอร์ตนี้ ณ วันนั้น
+      if(!(gid in peak)) peak[gid]=0;
+      if(running>peak[gid]) peak[gid]=running;      // เงินต้นสุทธิ = จุดจมสูงสุดถึงวันนี้
+      totVal += v + (peak[gid]-running);            // มูลค่าถือ + เงินสดที่ยังไม่ reinvest (≥0)
+      totInv += peak[gid];
+    }
+    val.push(totVal); inv.push(totInv);             // gold=มูลค่า ; dashed=เงินต้นสุทธิ (ปลายเส้น=netBase ตรงกับ hero)
   });
   return {dates,val,inv};
 }
