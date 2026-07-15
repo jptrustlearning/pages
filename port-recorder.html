@@ -337,10 +337,10 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
     <div class="stats-card">
       <div class="stats-head"><span class="stats-title">Portfolio Stats</span><span class="stats-sub">สถิติผลตอบแทน–ความเสี่ยงของพอร์ต</span></div>
       <div class="stats-grid">
-        <div class="stat-cell"><div class="stat-label">Annualized Return</div><div class="stat-value" id="stCagr">—</div><div class="stat-note">ผลตอบแทนต่อปี (CAGR)</div></div>
+        <div class="stat-cell"><div class="stat-label" id="stCagrLabel">Annualized Return</div><div class="stat-value" id="stCagr">—</div><div class="stat-note" id="stCagrNote">ผลตอบแทนต่อปี (CAGR)</div></div>
         <div class="stat-cell"><div class="stat-label">Sharpe Ratio</div><div class="stat-value" id="stSharpe">—</div><div class="stat-note">ผลตอบแทน ÷ ความเสี่ยง</div></div>
         <div class="stat-cell"><div class="stat-label">Max Drawdown</div><div class="stat-value neg" id="stMdd">—</div><div class="stat-note">เคยลดจากจุดสูงสุดมากที่สุด</div></div>
-        <div class="stat-cell"><div class="stat-label">Strategy Vol</div><div class="stat-value" id="stVol">—</div><div class="stat-note">ความผันผวนต่อปี</div></div>
+        <div class="stat-cell"><div class="stat-label" id="stVolLabel">Strategy Vol</div><div class="stat-value" id="stVol">—</div><div class="stat-note" id="stVolNote">ความผันผวนต่อปี</div></div>
       </div>
       <div class="stats-foot" id="stFoot"></div>
     </div>
@@ -873,17 +873,34 @@ function portStats(pid){
 function renderAll(){ renderChips(); renderHero(); renderStats(); renderView(); renderEqTf(); drawEquity(); }
 function renderStats(){
   const m=portMetrics(sel);
-  const set=(id,txt,cls)=>{ const el=$(id); if(el){ el.textContent=txt; el.className='stat-value'+(cls?(' '+cls):''); } };
+  const setV=(id,txt,cls)=>{ const el=$(id); if(el){ el.textContent=txt; el.className='stat-value'+(cls?(' '+cls):''); } };
+  const setT=(id,txt)=>{ const el=$(id); if(el) el.textContent=txt; };
   const foot=$('stFoot');
-  if(!m){ set('stCagr','—'); set('stSharpe','—'); set('stMdd','—','neg'); set('stVol','—');
+  if(!m){ setV('stCagr','—'); setV('stSharpe','—'); setV('stMdd','—','neg'); setV('stVol','—');
     if(foot) foot.textContent='บันทึกการซื้อ + โหลดราคา เพื่อดูสถิติพอร์ต'; return; }
   const pct1=(x,sign)=>((sign&&x>=0?'+':'')+(x*100).toFixed(1)+'%');
-  set('stCagr', pct1(m.cagr,true), m.cagr>=0?'pos':'neg');
-  set('stSharpe', m.nMonths>=2 ? m.sharpe.toFixed(2) : '—', (m.nMonths>=2&&m.sharpe>=1)?'pos':'');
-  set('stMdd', (m.maxDD*100).toFixed(1)+'%', 'neg');
-  set('stVol', m.nMonths>=2 ? (m.volAnn*100).toFixed(1)+'%' : '—');
   const mo=Math.max(1,Math.round(m.days/30.44));
-  if(foot) foot.textContent='Time-Weighted · ตัดผลเงินเติมทุน · ข้อมูล '+mo+' เดือน'+(m.nMonths<2?' — สั้นเกินวัดความผันผวน':'');
+  const enoughVol=m.nMonths>=2;
+  setV('stMdd', (m.maxDD*100).toFixed(1)+'%', 'neg');   // MaxDD = ค่าจริงที่เกิดขึ้น ไม่เกี่ยว annualize
+  if(m.days>=365){
+    // ครบปีแล้ว → annualized
+    setT('stCagrLabel','Annualized Return'); setT('stCagrNote','ผลตอบแทนต่อปี (CAGR)');
+    setV('stCagr', pct1(m.cagr,true), m.cagr>=0?'pos':'neg');
+    setT('stVolLabel','Strategy Vol'); setT('stVolNote','ความผันผวนต่อปี');
+    setV('stVol', enoughVol?(m.volAnn*100).toFixed(1)+'%':'—');
+    const sh = enoughVol && m.volAnn>1e-9 ? m.cagr/m.volAnn : 0;
+    setV('stSharpe', enoughVol? sh.toFixed(2):'—', (enoughVol&&sh>=1)?'pos':'');
+    if(foot) foot.textContent='Time-Weighted · ตัดผลเงินเติมทุน · ข้อมูล '+(m.days/365.25).toFixed(1)+' ปี';
+  } else {
+    // ยังไม่ครบปี → ค่าจริงตามช่วง (ไม่ annualize)
+    setT('stCagrLabel','Total Return'); setT('stCagrNote','ผลตอบแทนรวม '+mo+' เดือน (ยังไม่ครบปี)');
+    setV('stCagr', pct1(m.totalRet,true), m.totalRet>=0?'pos':'neg');
+    setT('stVolLabel','Volatility'); setT('stVolNote','ความผันผวน '+mo+' เดือน (ตามช่วงจริง)');
+    setV('stVol', enoughVol?(m.volPeriod*100).toFixed(1)+'%':'—');
+    const sh = enoughVol && m.volPeriod>1e-9 ? m.totalRet/m.volPeriod : 0;
+    setV('stSharpe', enoughVol? sh.toFixed(2):'—', (enoughVol&&sh>=1)?'pos':'');
+    if(foot) foot.textContent='Time-Weighted · ตัดผลเงินเติมทุน · ข้อมูล '+mo+' เดือน · ยังไม่ครบปีจึงยังไม่ annualize';
+  }
 }
 function setView(v){
   viewMode=v;
@@ -1556,15 +1573,17 @@ function portMetrics(pid){
   const cagr = days>0 ? Math.pow(end/start, 365.25/days)-1 : 0;
   let peak=idx[0], maxDD=0;
   for(const v of idx){ if(v>peak) peak=v; const dd=v/peak-1; if(dd<maxDD) maxDD=dd; }
+  const totalRet = start>1e-9 ? end/start-1 : 0;                           // ผลตอบแทนรวมช่วงจริง (TWR สะสม ไม่ annualize)
   const monthly=monthlyReturns(dates, idx);
-  let volAnn=0, sharpe=0;
+  let volAnn=0, volPeriod=0;
   if(monthly.length>=2){
     const avg=monthly.reduce((a,b)=>a+b,0)/monthly.length;
     const varM=monthly.reduce((a,b)=>a+(b-avg)*(b-avg),0)/monthly.length;   // population (ตรงกับ Lab)
-    volAnn=Math.sqrt(varM)*Math.sqrt(12);
-    sharpe= volAnn>1e-9 ? cagr/volAnn : 0;                                   // Sharpe = CAGR ÷ Vol (rf=0)
+    const sd=Math.sqrt(varM);
+    volAnn=sd*Math.sqrt(12);                                                // annualized (×√12) — ใช้เมื่อครบปี
+    volPeriod=sd*Math.sqrt(monthly.length);                                 // ช่วงจริง (×√เดือน) — ใช้เมื่อยังไม่ครบปี
   }
-  return {cagr, maxDD, volAnn, sharpe, days, nMonths:monthly.length};
+  return {cagr, totalRet, maxDD, volAnn, volPeriod, days, nMonths:monthly.length};
 }
 function monthlyReturns(dates, idx){
   const byMonth={};
