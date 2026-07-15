@@ -800,6 +800,36 @@ function priceInfo(lot){
   return {price:lot.price, date:lot.date, stale:true}; // fallback: buy price
 }
 function visibleLots(pid){ return D.lots.filter(l=> pid===ALL ? true : l.portfolioId===pid).slice().sort((a,b)=> (b.date||'').localeCompare(a.date||'')); }
+/* ---------- NET CAPITAL (peak deployed) = ตัวหารของ %กำไรรวม ----------
+   ตัวหาร = จุดที่เงินตัวเองจมในตลาดพร้อมกันสูงสุดตลอดเส้นเวลา
+          = max ของ (Σต้นทุนซื้อสะสม − Σเงินขายคืนสะสม)
+   เงินขายไม้เก่า → recycle เป็นทุนซื้อไม้ใหม่ (ไม่นับซ้ำ). peak ≥ ก้อนซื้อแรกเสมอ → ไม่มีทาง ≤0
+   คิดแยกรายพอร์ต แล้วรวมตอนดู "ทั้งหมด" (เงินคนละพอร์ตไม่ recycle ข้ามกัน)            */
+function peakDeployedLots(lots){
+  const lotIds=new Set(lots.map(l=>l.id));
+  const ev=[];
+  lots.forEach(l=> ev.push({d:l.date||'', s:l.createdAt||0, k:0, c:lotAmount(l)}));                                   // k=0 ซื้อ
+  D.sells.forEach(x=>{ if(lotIds.has(x.lotId)) ev.push({d:x.date||'', s:x.createdAt||0, k:1, c:x.shares*x.price}); }); // k=1 ขาย
+  ev.sort((a,b)=> a.d!==b.d ? (a.d<b.d?-1:1) : (a.k!==b.k ? b.k-a.k : a.s-b.s));   // วันเก่า→ใหม่; วันเดียวกันขายก่อนซื้อ; แล้ว createdAt
+  let run=0, peak=0;
+  ev.forEach(e=>{ run += e.k? -e.c : e.c; if(run>peak) peak=run; });
+  return peak;
+}
+function grossLots(lots){ return lots.reduce((a,l)=>a+lotAmount(l),0); }
+function netBaseFor(pid){
+  if(pid!==ALL){
+    const lots=D.lots.filter(l=>l.portfolioId===pid);
+    const p=peakDeployedLots(lots); return p>0? p : grossLots(lots);   // guard: ห้ามหารด้วย ≤0
+  }
+  let sum=0; const known=new Set();
+  D.portfolios.forEach(pf=>{ known.add(pf.id);
+    const lots=D.lots.filter(l=>l.portfolioId===pf.id); if(!lots.length) return;
+    const p=peakDeployedLots(lots); sum += p>0? p : grossLots(lots);
+  });
+  const orphan=D.lots.filter(l=>!known.has(l.portfolioId));           // กันไม้ portfolioId กำพร้า
+  if(orphan.length){ const p=peakDeployedLots(orphan); sum += p>0? p : grossLots(orphan); }
+  return sum;
+}
 function portStats(pid){
   const lots=visibleLots(pid);
   let invested=0, curVal=0, unreal=0, openCount=0, costOpen=0;
@@ -811,7 +841,8 @@ function portStats(pid){
   let realized=0;
   const lotIds=new Set(lots.map(l=>l.id));
   D.sells.forEach(s=>{ if(lotIds.has(s.lotId)){ const lot=D.lots.find(l=>l.id===s.lotId); if(lot) realized+=(s.price-lot.price)*s.shares; } });
-  return {lots, invested, curVal, unreal, realized, openCount, costOpen};
+  const netBase=netBaseFor(pid);
+  return {lots, invested, curVal, unreal, realized, openCount, costOpen, netBase};
 }
 
 /* ---------- RENDER: DASHBOARD ---------- */
@@ -864,11 +895,11 @@ function renderHero(){
   const st=portStats(sel);
   $('heroValue').textContent=fmtUSD(st.curVal);
   const totPnl=st.unreal+st.realized;
-  const base=st.invested;
+  const base=st.netBase;   // เดิม st.invested (ซื้อรวม) → เปลี่ยนเป็นเงินต้นสุทธิ (peak deployed)
   const pct= base>0 ? totPnl/base*100 : 0;
   const el=$('heroPct'); el.className='hero-total-pct '+pnlClass(totPnl); el.textContent=fmtPct(pct,true);
   $('heroSub').textContent = st.openCount>0
-    ? st.openCount+' ไม้ที่ถืออยู่ · จากทั้งหมด '+st.lots.length+' ไม้ · ลงทุนไปแล้ว '+fmtUSD(st.invested)
+    ? st.openCount+' ไม้ที่ถืออยู่ · จากทั้งหมด '+st.lots.length+' ไม้ · ลงทุนไปแล้ว '+fmtUSD(st.invested)+' · เงินต้นสุทธิ '+fmtUSD(st.netBase)
     : (st.lots.length>0 ? 'ปิดครบทุกไม้แล้ว · '+st.lots.length+' ไม้' : 'ยังไม่มีรายการ — เริ่มบันทึกไม้แรกได้เลย');
   const r=$('heroRealized'); r.textContent=fmtUSDsigned(st.realized); r.className='pnl-cell-value '+pnlClass(st.realized);
   $('heroRealizedSub').textContent = D.sells.length? D.sells.length+' รายการขาย':'ยังไม่มีการขาย';
