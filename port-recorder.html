@@ -896,34 +896,36 @@ function submitOwner(){
   toast(nm? 'บันทึกชื่อเจ้าของแล้ว ✓' : 'ล้างชื่อเจ้าของแล้ว');
 }
 function renderStats(){
-  const m=portMetrics(sel);
+  const st=portStats(sel);                    // เลขการ์ด hero (เงินจริง): netBase, unreal, realized
+  const m=portMetrics(sel);                   // TWR: volAnn, volPeriod, maxDD, days, nMonths
   const setV=(id,txt,cls)=>{ const el=$(id); if(el){ el.textContent=txt; el.className='stat-value'+(cls?(' '+cls):''); } };
   const setT=(id,txt)=>{ const el=$(id); if(el) el.textContent=txt; };
   const foot=$('stFoot');
-  if(!m){ setV('stCagr','—'); setV('stSharpe','—'); setV('stMdd','—','neg'); setV('stVol','—');
+  if(!st || !st.lots.length){ setV('stCagr','—'); setV('stSharpe','—'); setV('stMdd','—','neg'); setV('stVol','—');
     if(foot) foot.textContent='บันทึกการซื้อ + โหลดราคา เพื่อดูสถิติพอร์ต'; return; }
   const pct1=(x,sign)=>((sign&&x>=0?'+':'')+(x*100).toFixed(1)+'%');
-  const mo=Math.max(1,Math.round(m.days/30.44));
-  const enoughVol=m.nMonths>=2;
-  setV('stMdd', (m.maxDD*100).toFixed(1)+'%', 'neg');   // MaxDD = ค่าจริงที่เกิดขึ้น ไม่เกี่ยว annualize
-  if(m.days>=365){
-    // ครบปีแล้ว → annualized
+  const ret = st.netBase>0 ? (st.unreal+st.realized)/st.netBase : 0;   // = % การ์ด hero เป๊ะ (เงินจริง)
+  const days = m? m.days : 0;
+  const enoughVol = !!(m && m.nMonths>=2);
+  const mo = Math.max(1, Math.round((days||1)/30.44));
+  setV('stMdd', m? (m.maxDD*100).toFixed(1)+'%' : '—', 'neg');          // MaxDD = TWR (ค่าจริงที่เกิด)
+  if(days>=365){
+    const cagr = Math.pow(1+ret, 365.25/days)-1;                       // annualize เลขเงินจริงตัวเดียวกับ hero
     setT('stCagrLabel','Annualized Return'); setT('stCagrNote','ผลตอบแทนต่อปี (CAGR)');
-    setV('stCagr', pct1(m.cagr,true), m.cagr>=0?'pos':'neg');
+    setV('stCagr', pct1(cagr,true), cagr>=0?'pos':'neg');
     setT('stVolLabel','Strategy Vol'); setT('stVolNote','ความผันผวนต่อปี');
     setV('stVol', enoughVol?(m.volAnn*100).toFixed(1)+'%':'—');
-    const sh = enoughVol && m.volAnn>1e-9 ? m.cagr/m.volAnn : 0;
+    const sh = (enoughVol && m.volAnn>1e-9) ? cagr/m.volAnn : 0;        // Sharpe = ผลตอบแทน÷ความเสี่ยงที่โชว์
     setV('stSharpe', enoughVol? sh.toFixed(2):'—', (enoughVol&&sh>=1)?'pos':'');
-    if(foot) foot.textContent='Time-Weighted · ตัดผลเงินเติมทุน · ข้อมูล '+(m.days/365.25).toFixed(1)+' ปี';
+    if(foot) foot.textContent='ผลตอบแทน = เงินจริง (=การ์ดบน) annualized · ความเสี่ยง Time-Weighted · ข้อมูล '+(days/365.25).toFixed(1)+' ปี';
   } else {
-    // ยังไม่ครบปี → ค่าจริงตามช่วง (ไม่ annualize)
     setT('stCagrLabel','Total Return'); setT('stCagrNote','ผลตอบแทนรวม '+mo+' เดือน (ยังไม่ครบปี)');
-    setV('stCagr', pct1(m.totalRet,true), m.totalRet>=0?'pos':'neg');
+    setV('stCagr', pct1(ret,true), ret>=0?'pos':'neg');
     setT('stVolLabel','Volatility'); setT('stVolNote','ความผันผวน '+mo+' เดือน (ตามช่วงจริง)');
     setV('stVol', enoughVol?(m.volPeriod*100).toFixed(1)+'%':'—');
-    const sh = enoughVol && m.volPeriod>1e-9 ? m.totalRet/m.volPeriod : 0;
+    const sh = (enoughVol && m.volPeriod>1e-9) ? ret/m.volPeriod : 0;   // Sharpe = ผลตอบแทน÷ความเสี่ยงที่โชว์
     setV('stSharpe', enoughVol? sh.toFixed(2):'—', (enoughVol&&sh>=1)?'pos':'');
-    if(foot) foot.textContent='Time-Weighted · ตัดผลเงินเติมทุน · ข้อมูล '+mo+' เดือน · ยังไม่ครบปีจึงยังไม่ annualize';
+    if(foot) foot.textContent='ผลตอบแทน = เงินจริง (=การ์ดบน) · ความเสี่ยง Time-Weighted · ข้อมูล '+mo+' เดือน';
   }
 }
 function setView(v){
