@@ -1869,7 +1869,7 @@
         <button class="tab-btn" onclick="openChartTab(event, 'chart-rounds')">ROUND RETURNS</button>
         <button class="tab-btn" onclick="openChartTab(event, 'chart-dist')">DISTRIBUTION</button>
         <button class="tab-btn" onclick="openChartTab(event, 'chart-dd')">DRAWDOWN</button>
-        <button class="tab-btn" onclick="openChartTab(event, 'chart-runup')">RUN-UP</button>
+        <button class="tab-btn" onclick="openChartTab(event, 'chart-mfe')">MFE</button>
         <button class="tab-btn" onclick="openChartTab(event, 'chart-vs')">VS S&P500</button>
       </div>
       
@@ -1885,12 +1885,12 @@
       <div id="chart-dd" class="tab-content" style="height: 400px;">
         <canvas id="ddChart"></canvas>
       </div>
-      <div id="chart-runup" class="tab-content" style="height: 400px;">
+      <div id="chart-mfe" class="tab-content" style="height: 400px;">
         <div style="font-size:0.72rem; color:var(--text-muted); line-height:1.55; padding:2px 4px 6px;">
-          กลับด้านกับกราฟ Drawdown — วัดจาก<strong>ก้นของรอบ drawdown ล่าสุด</strong>ขึ้นมาถึงปัจจุบัน
-          และ<strong>รีเซ็ตเป็น 0 ทุกครั้งที่พอร์ตทำจุดสูงสุดใหม่</strong>
+          <strong>MFE (Maximum Favorable Excursion)</strong> — แต่ละรอบลงทุนเคยขึ้นไปสูงสุดกี่ % ระหว่างที่ถือ
+          (เส้นเขียว) เทียบกับที่ปิดจริงตอนครบกำหนด (แท่งทอง) · ช่องว่างระหว่างสองอันคือ<strong>ระยะจากยอดลงมาถึงจุดปิด</strong>
         </div>
-        <div style="height: calc(100% - 36px);"><canvas id="runupChart"></canvas></div>
+        <div style="height: calc(100% - 36px);"><canvas id="mfeChart"></canvas></div>
       </div>
       <div id="chart-vs" class="tab-content" style="height: 400px;">
         <canvas id="vsChart"></canvas>
@@ -2028,9 +2028,14 @@
             <div class="stat-sub">Peak to Valley</div>
           </div>
           <div class="stat-box">
-            <div class="stat-label">Max Run-up</div>
-            <div class="stat-val text-green" id="stat-runup">0.0%</div>
-            <div class="stat-sub">Valley to Peak</div>
+            <div class="stat-label">Avg MFE</div>
+            <div class="stat-val text-green" id="stat-mfe">0.0%</div>
+            <div class="stat-sub">จุดสูงสุดเฉลี่ยต่อรอบ</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Avg Give-back</div>
+            <div class="stat-val text-red" id="stat-giveback">0.0%</div>
+            <div class="stat-sub">ระยะจากยอดถึงจุดปิด</div>
           </div>
           <div class="stat-box">
             <div class="stat-label">Win Rate</div>
@@ -3567,6 +3572,7 @@ function runRollingBacktest() {
     // if i-1 also lacked the ticker, causing spurious MaxDD spikes.
     let lotsVal = 0;
     for (const lot of state.lots) {
+      let thisLotVal = 0;   // MFE: value of THIS lot alone, for peak tracking
       for (const [t, shares] of Object.entries(lot.stocks)) {
         let price = dayData[t] ? dayData[t].c : null;
         if (price == null || !(price > 0)) {
@@ -3575,9 +3581,15 @@ function runRollingBacktest() {
             if (prev && prev[t] && prev[t].c > 0) { price = prev[t].c; break; }
           }
         }
-        lotsVal += shares * (price || 0);
+        thisLotVal += shares * (price || 0);
       }
-      lotsVal += (lot.cashPocket || 0);  // include any banked trail-exit proceeds
+      thisLotVal += (lot.cashPocket || 0);  // include any banked trail-exit proceeds
+      lotsVal += thisLotVal;
+      // MFE bookkeeping: highest value this lot has reached while held
+      if (lot.peakValue == null || thisLotVal > lot.peakValue) {
+        lot.peakValue = thisLotVal;
+        lot.peakDate  = dateStr;
+      }
     }
     const currentEquity = cash + lotsVal;
     state.equityCurve.push({ date: dateStr, equity: currentEquity });
@@ -3667,6 +3679,11 @@ function runRollingBacktest() {
             exitValue: proceeds,
             pl: proceeds - lot.initialCapital,
             returnPct: lot.initialCapital > 0 ? (proceeds - lot.initialCapital) / lot.initialCapital : 0,
+            peakValue: Math.max(lot.peakValue != null ? lot.peakValue : lot.initialCapital, proceeds),
+            peakDate: lot.peakDate || lot.entryDate,
+            mfePct: lot.initialCapital > 0
+              ? (Math.max(lot.peakValue != null ? lot.peakValue : lot.initialCapital, proceeds) - lot.initialCapital) / lot.initialCapital
+              : 0,
             picks: lot.picks || [],
             ageMonths: Math.round(((new Date(dateStr) - new Date(lot.entryDate)) / 86400000) / 30),
             // LAB v1+v5 exit metadata
@@ -3789,6 +3806,11 @@ function runRollingBacktest() {
             exitValue: proceeds,
             pl: proceeds - mLot.initialCapital,
             returnPct: mLot.initialCapital > 0 ? (proceeds - mLot.initialCapital) / mLot.initialCapital : 0,
+            peakValue: Math.max(mLot.peakValue != null ? mLot.peakValue : mLot.initialCapital, proceeds),
+            peakDate: mLot.peakDate || mLot.entryDate,
+            mfePct: mLot.initialCapital > 0
+              ? (Math.max(mLot.peakValue != null ? mLot.peakValue : mLot.initialCapital, proceeds) - mLot.initialCapital) / mLot.initialCapital
+              : 0,
             picks: mLot.picks || Object.keys(mLot.stocks),
             ageMonths: currentMonthKey - mLot.entryMonthKey,
             // LAB v1+v5 exit metadata
@@ -3898,6 +3920,8 @@ function runRollingBacktest() {
           entryIdx: i,
           entryMonthKey: currentMonthKey,
           initialCapital: deployed,
+          peakValue: deployed,        // MFE: peak MTM value reached while held
+          peakDate: dateStr,
           isReinvest: isReinvest,
           stocks: newLotStocks,
           picks: selected.map(s => s.ticker),
@@ -4204,22 +4228,21 @@ function calculateStats() {
       if(dd < maxDD) maxDD = dd;
     });
 
-    // Mirror of maxDD: biggest climb off the bottom of a drawdown episode.
-    // Anchor = lowest equity since the last all-time high; resets at each new high.
-    let ruPeak = -Infinity, ruTrough = Infinity, maxRunup = 0;
-    state.equityCurve.forEach(e => {
-      if (e.equity < ruTrough) ruTrough = e.equity;
-      const ru = (e.equity - ruTrough) / ruTrough;
-      if (ru > maxRunup) maxRunup = ru;
-      if (e.equity > ruPeak) { ruPeak = e.equity; ruTrough = e.equity; }
-    });
+    // MFE: how high each closed round ever got vs where it actually closed.
+    const _mfeLots = (state.closedLots || []).filter(cl => cl.initialCapital > 0 && cl.mfePct != null);
+    const avgMfe = _mfeLots.length
+      ? _mfeLots.reduce((s, cl) => s + cl.mfePct, 0) / _mfeLots.length : 0;
+    const avgGiveback = _mfeLots.length
+      ? _mfeLots.reduce((s, cl) => s + (cl.mfePct - (cl.returnPct || 0)), 0) / _mfeLots.length : 0;
 
     const fmt = (n, p=1) => (n*100).toFixed(p)+'%';
     document.getElementById('stat-sharpe').innerText = sharpe.toFixed(2);
     document.getElementById('stat-vol').innerText = fmt(vol);
     document.getElementById('stat-dd').innerText = fmt(maxDD);
-    const _ruEl = document.getElementById('stat-runup');
-    if (_ruEl) _ruEl.innerText = '+' + fmt(maxRunup);
+    const _mfeEl = document.getElementById('stat-mfe');
+    if (_mfeEl) _mfeEl.innerText = '+' + fmt(avgMfe);
+    const _gbEl = document.getElementById('stat-giveback');
+    if (_gbEl) _gbEl.innerText = '-' + fmt(avgGiveback);
     document.getElementById('stat-win').innerText = fmt(winRate);
     document.getElementById('stat-best').innerText = fmt(best);
     document.getElementById('stat-worst').innerText = fmt(worst);
@@ -4629,7 +4652,7 @@ function renderAll() {
   renderRoundsChart();   // Phase 6
   renderDistChart();     // Phase 6
   renderDDChart();
-  renderRunupChart();
+  renderMfeChart();
   renderBarChart();
   renderVsChart(); 
   renderHeatmap();
@@ -5137,83 +5160,133 @@ function renderDDChart() {
   });
 }
 
-function renderRunupChart() {
-  const cv = document.getElementById('runupChart');
+function renderMfeChart() {
+  const cv = document.getElementById('mfeChart');
   if (!cv) return;
   const ctx = cv.getContext('2d');
-  if (charts.runup) charts.runup.destroy();
+  if (charts.mfe) charts.mfe.destroy();
 
-  // Mirror of the drawdown calc: anchor on the trough of the current episode,
-  // reset the anchor whenever a new all-time high is printed.
-  let peak = -Infinity, trough = Infinity;
-  const rus = state.equityCurve.map(e => {
-    if (e.equity < trough) trough = e.equity;
-    const ru = ((e.equity - trough) / trough) * 100;
-    // Reset AFTER measuring, so the bar that breaks out to a new high still
-    // reports the full trough-to-breakout climb instead of snapping to 0.
-    if (e.equity > peak) { peak = e.equity; trough = e.equity; }
-    return ru;
+  // One entry per investment round. Closed rounds use the realized exit value;
+  // still-open rounds are marked to the last available close.
+  const rows = [];
+  (state.closedLots || []).forEach(cl => {
+    if (!(cl.initialCapital > 0)) return;
+    rows.push({
+      entryDate: cl.entryDate,
+      exitDate: cl.exitDate,
+      peakDate: cl.peakDate,
+      mfe: (cl.mfePct || 0) * 100,
+      realized: (cl.returnPct || 0) * 100,
+      isOpen: false
+    });
   });
 
-  // Gradient runs the opposite way to the DD chart: strongest at the top.
-  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-  gradient.addColorStop(0, 'rgba(46,159,95, 0.75)');    // Top - deep green
-  gradient.addColorStop(0.55, 'rgba(120,190,120, 0.35)');
-  gradient.addColorStop(1, 'rgba(212,175,55, 0.08)');   // Bottom - faint gold
+  const lastDate = state.sortedDates && state.sortedDates.length
+    ? state.sortedDates[state.sortedDates.length - 1] : null;
+  const lastDayData = lastDate ? (state.marketData[lastDate] || {}) : {};
+  (state.lots || []).forEach(lot => {
+    if (!(lot.initialCapital > 0)) return;
+    let mtm = 0;
+    for (const [t, shares] of Object.entries(lot.stocks)) {
+      const p = lastDayData[t] ? lastDayData[t].c : 0;
+      mtm += shares * (p || 0);
+    }
+    mtm += (lot.cashPocket || 0);
+    const pk = Math.max(lot.peakValue != null ? lot.peakValue : lot.initialCapital, mtm);
+    rows.push({
+      entryDate: lot.entryDate,
+      exitDate: null,
+      peakDate: lot.peakDate,
+      mfe: ((pk - lot.initialCapital) / lot.initialCapital) * 100,
+      realized: ((mtm - lot.initialCapital) / lot.initialCapital) * 100,
+      isOpen: true
+    });
+  });
 
-  charts.runup = new Chart(ctx, {
-    type: 'line',
+  rows.sort((a, b) => (a.entryDate || '').localeCompare(b.entryDate || ''));
+
+  charts.mfe = new Chart(ctx, {
     data: {
-      labels: state.equityCurve.map(e => e.date),
-      datasets: [{
-        label: 'Run-up',
-        data: rus,
-        borderColor: '#2E9F5F',
-        backgroundColor: gradient,
-        borderWidth: 2,
-        pointRadius: 0,
-        pointHoverRadius: 6,
-        pointBackgroundColor: '#2E9F5F',
-        pointBorderColor: '#fff',
-        fill: true,
-        tension: 0.2
-      }]
+      labels: rows.map(r => r.entryDate),
+      datasets: [
+        {
+          type: 'line',
+          label: 'MFE (จุดสูงสุดระหว่างถือ)',
+          data: rows.map(r => r.mfe),
+          borderColor: '#2E9F5F',
+          backgroundColor: 'rgba(46,159,95,0.10)',
+          borderWidth: 1.6,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          pointBackgroundColor: '#2E9F5F',
+          fill: true,
+          tension: 0.15,
+          order: 0
+        },
+        {
+          type: 'bar',
+          label: 'ปิดจริง',
+          data: rows.map(r => r.realized),
+          backgroundColor: rows.map(r =>
+            r.isOpen ? 'rgba(212,175,55,0.35)'
+                     : (r.realized >= 0 ? 'rgba(212,175,55,0.85)' : 'rgba(193,69,69,0.8)')),
+          borderWidth: 0,
+          order: 1
+        }
+      ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { display: false },
+        legend: {
+          display: true,
+          position: 'top',
+          labels: { color: '#8B7D5E', boxWidth: 12, font: { size: 10 } }
+        },
         tooltip: {
-            enabled: true,
-            backgroundColor: 'rgba(30, 41, 59, 0.9)',
-            titleColor: '#fff',
-            bodyColor: '#7BD3A0',
-            borderColor: 'rgba(46,159,95, 0.3)',
-            borderWidth: 1,
-            displayColors: false,
-            callbacks: {
-                label: function(context) {
-                    return `Run-up: +${context.parsed.y.toFixed(2)}%`;
-                }
+          enabled: true,
+          backgroundColor: 'rgba(30, 41, 59, 0.92)',
+          titleColor: '#fff',
+          bodyColor: '#E8DFC8',
+          borderColor: 'rgba(212,175,55, 0.3)',
+          borderWidth: 1,
+          displayColors: false,
+          callbacks: {
+            title: function(items) {
+              const r = rows[items[0].dataIndex];
+              return 'เข้า ' + r.entryDate + (r.isOpen ? ' · ยังถืออยู่' : ' · ออก ' + r.exitDate);
+            },
+            afterBody: function(items) {
+              const r = rows[items[0].dataIndex];
+              const gb = r.mfe - r.realized;
+              const out = [];
+              if (r.peakDate) out.push('จุดสูงสุด ' + r.peakDate);
+              out.push('จากยอดถึงจุดปิด ' + gb.toFixed(1) + ' จุด%');
+              return out;
+            },
+            label: function(context) {
+              return context.dataset.label + ': ' +
+                     (context.parsed.y >= 0 ? '+' : '') + context.parsed.y.toFixed(1) + '%';
             }
+          }
         }
       },
       scales: {
         x: {
-            display: true,
-            grid: { display: false, color: 'rgba(212,175,55,0.2)' },
-            ticks: { color: '#8B7D5E', maxTicksLimit: 8 }
+          display: true,
+          grid: { display: false },
+          ticks: { color: '#8B7D5E', maxTicksLimit: 8, autoSkip: true }
         },
         y: {
-            display: true,
-            position: 'right',
-            grid: { color: 'rgba(51, 65, 85, 0.5)', borderDash: [4, 4] },
-            ticks: {
-                color: '#C4B88A',
-                callback: function(value) { return '+' + value + '%'; }
-            }
+          display: true,
+          position: 'right',
+          grid: { color: 'rgba(51, 65, 85, 0.5)', borderDash: [4, 4] },
+          ticks: {
+            color: '#C4B88A',
+            callback: function(value) { return (value >= 0 ? '+' : '') + value + '%'; }
+          }
         }
       }
     }
