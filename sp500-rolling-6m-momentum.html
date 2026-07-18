@@ -7,6 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./jp-settings.js?v=1761234567"></script>
+<script src="./jp-drawdown.js?v=1786530000"></script>
 <!-- Modern Fonts: Outfit (Headings) + Inter (Body/Numbers) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2016,6 +2017,8 @@
             <div class="stat-val" id="stat-count">0</div>
           </div>
         </div>
+        <!-- สถิติฝั่งขาลง — เติมโดย jp-drawdown.js หลัง backtest เสร็จ -->
+        <div id="jpDrawdownPanel"></div>
       </div>
       
       <!-- Tab 4: Trade Log -->
@@ -3487,6 +3490,14 @@ function calculateStats() {
     document.getElementById('stat-worst').innerText = fmt(worst);
     document.getElementById('stat-avg').innerText = fmt(avgM, 2);
     document.getElementById('stat-count').innerText = roundReturns.length;
+
+    // === สถิติฝั่งขาลง (jp-drawdown.js) ===
+    // Max Drawdown บอกแค่จุดเดียว ชุดนี้บอกว่าปกติจมลึกแค่ไหนและบ่อยแค่ไหน
+    try {
+      if (window.JPDrawdown) {
+        window.JPDrawdown.render('jpDrawdownPanel', state.equityCurve, state.universeDaily);
+      }
+    } catch (e) { console.warn('[jp-drawdown]', e); }
 
     // === Mirror to top-level KPI + stat IDs ===
     document.getElementById('kpi-strat-vol').innerText = fmt(vol);
