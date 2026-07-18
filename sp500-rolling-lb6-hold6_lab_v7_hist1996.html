@@ -2664,6 +2664,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Load user's saved settings from cloud first (if logged in)
   await loadRollingLB6H3Settings();
 
+  // === ?start=2015 — run on the same data window as the un-filtered strategies ===
+  // Keeps the long-history default intact; only the query-string variant is trimmed.
+  try {
+    if (new URLSearchParams(location.search).get('start') === '2015') {
+      CONFIG.startYear = 2015;
+      CONFIG.cloudCsvUrlHist = null;       // 2001-2014 block
+      CONFIG.cloudCsvUrlHist1996 = null;   // 1996-2000 block (lab v7 only)
+      CONFIG.cloudCsvUrlDelisted = null;   // delisted survivorship block (lab v7 only)
+      if (el.inputStartYear) {
+        if (!el.inputStartYear.querySelector('option[value="2015"]')) {
+          const o = document.createElement('option');
+          o.value = '2015'; o.textContent = '2015';
+          el.inputStartYear.appendChild(o);
+        }
+        el.inputStartYear.value = '2015';
+      }
+      document.querySelectorAll('.subtitle-lab, h1, .about-sub').forEach(n => {
+        n.innerHTML = n.innerHTML.replace(/HIST 1996[^<]*/g, '2015+').replace(/HIST 2001/g, '2015+');
+      });
+    }
+  } catch (e) { console.warn('[start param]', e); }
+
   if (CONFIG.cloudCsvUrl && CONFIG.cloudCsvUrl !== 'REPLACE_WITH_YOUR_RAW_CSV_URL') {
       loadDataFromCloud();
   } else {
