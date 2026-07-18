@@ -2379,10 +2379,11 @@ function parseMasterMap(text) {
   const lines = text.trim().split('\n');
   const head  = lines[0].split(',').map(s => s.trim());
   const iT  = head.indexOf('ticker');
-  const iTh = head.indexOf('theme');
-  const iT2 = head.indexOf('theme_2');
+  const _col = window.__JPT_MAP_COL || 'theme';
+  const iTh = head.indexOf(_col);
+  const iT2 = head.indexOf(_col + '_2');
   const iE  = head.indexOf('etf');
-  if (iT < 0 || iTh < 0) throw new Error('master_map.csv: ticker/theme column missing');
+  if (iT < 0 || iTh < 0) throw new Error('master_map.csv: ticker/' + _col + ' column missing');
   let n = 0;
   for (let i = 1; i < lines.length; i++) {
     const c  = lines[i].split(',');
@@ -2432,7 +2433,12 @@ const THEME_ABBR = {
   'Pharma & Managed Care':'PHRM', 'REITs':'REIT', 'Semi Equip & Memory':'SEMQ',
   'Semiconductors':'SEMI', 'Software':'SFTW', 'Staples':'STPL',
   'Transport & Logistics':'TRAN', 'Travel & Airlines':'TRVL',
-  'Utilities & Power':'UTIL', 'Other':'OTH'
+  'Utilities & Power':'UTIL',
+  // GICS sectors — used when ?map=sector swaps the grouping column
+  'Information Technology':'TECH', 'Financials':'FIN', 'Health Care':'HLTH',
+  'Consumer Discretionary':'CDIS', 'Consumer Staples':'CSTP', 'Communication Services':'COMM',
+  'Real Estate':'RE', 'Utilities':'UTIL',
+  'Other':'OTH'
 };
 function themeTag(t) { return '<span class="sec-tag">' + (THEME_ABBR[themeOf(t)] || 'OTH') + '</span>'; }
 
@@ -2796,6 +2802,23 @@ const el = {
 document.addEventListener('DOMContentLoaded', async () => {
   // Load user's saved settings from cloud first (if logged in)
   await loadRollingLB6H3Settings();
+
+  // === ?map=sector — quota by GICS sector (11) instead of the 28-theme map ===
+  // Same master_map.csv, different column. Nothing else about the engine moves.
+  try {
+    if (new URLSearchParams(location.search).get('map') === 'sector') {
+      window.__JPT_MAP_COL = 'sector';
+      document.querySelectorAll('.subtitle-lab, .about-sub, .hint, label').forEach(n => {
+        n.innerHTML = n.innerHTML
+          .replace(/28 Theme/g, '11 Sector')
+          .replace(/Theme-Capped/g, 'Sector-Capped')
+          .replace(/v10theme/g, 'v10sector')
+          .replace(/Theme/g, 'Sector')
+          .replace(/theme/g, 'sector')
+          .replace(/ธีม/g, 'อุตสาหกรรม');
+      });
+    }
+  } catch (e) { console.warn('[map param]', e); }
 
   // === ?macro=off — same engine with the macro regime rule switched off ===
   // Powers the un-filtered (top-row) tile. Nothing else changes: same universe,
