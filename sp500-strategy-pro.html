@@ -2104,7 +2104,7 @@
       <label>PORTFOLIO SIZE — จำนวนหุ้นต่อรอบ</label>
       <div class="top-n-wrapper" style="display:flex; align-items:center; gap:10px;">
         <span style="color:var(--text-muted); font-weight:600;">TOP</span>
-        <input type="number" id="topNInput" class="input-box" value="15" min="1" max="50" style="max-width:120px;">
+        <input type="number" id="topNInput" class="input-box" value="10" min="1" max="50" style="max-width:120px;">
         <span style="color:var(--text-muted); font-weight:600;">STOCKS</span>
       </div>
       <span class="hint">ซื้อหุ้น <strong>อันดับ Top N</strong> จากการจัดอันดับ · น้อยตัว (5-10) = เสี่ยงกระจุก แต่กำไรตัวเดียววิ่งจะหนัก · เยอะตัว (20-30) = กระจายความเสี่ยงแต่ผลตอบแทนเจือจาง</span>
@@ -2192,7 +2192,7 @@
 // --- CONFIGURATION ---
 let CONFIG = {
   initialCapital: 15000,
-  topN: 15,
+  topN: 10,
   lookbackWeeks: 26,           // DEPRECATED — no longer used (replaced by calendar-based lookback from prev rebal month). Kept for compat.
   rebalanceMonths: [1, 7], // Feb(1), Aug(7)
   weightRet: 0.5,
@@ -2208,7 +2208,7 @@ const BENCHMARK_TICKERS = new Set(['SPY', 'QQQ', 'DIA']);
 const DEFAULT_SP500_PRO = {
   weight: 50,          // Return % (Volume = 100 - weight)
   initialCapital: 15000,
-  topN: 15,
+  topN: 10,
   startYear: 2015
 };
 

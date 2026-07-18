@@ -2104,7 +2104,7 @@
       <label>PORTFOLIO SIZE — จำนวนหุ้นต่อรอบ</label>
       <div class="top-n-wrapper" style="display:flex; align-items:center; gap:10px;">
         <span style="color:var(--text-muted); font-weight:600;">TOP</span>
-        <input type="number" id="topNInput" class="input-box" value="15" min="1" max="50" style="max-width:120px;">
+        <input type="number" id="topNInput" class="input-box" value="10" min="1" max="50" style="max-width:120px;">
         <span style="color:var(--text-muted); font-weight:600;">STOCKS</span>
       </div>
       <span class="hint">ซื้อหุ้น <strong>อันดับ Top N</strong> จากการจัดอันดับ · น้อยตัว (5-10) = เสี่ยงกระจุก แต่กำไรตัวเดียววิ่งจะหนัก · เยอะตัว (20-30) = กระจายความเสี่ยงแต่ผลตอบแทนเจือจาง</span>
@@ -2115,12 +2115,12 @@
       <div style="position:absolute; top:-9px; left:14px; background:linear-gradient(90deg,#9C2B2B,#C14545); color:#FAF6ED; padding:2px 10px; border-radius:10px; font-size:0.7rem; font-weight:700; letter-spacing:0.6px; font-family:'Cinzel',serif;">DEFENSIVE · STOP LOSS</div>
       <label style="margin-top:4px;">STOP LOSS — ตัดขาดทุนรายตัว</label>
       <select id="stopLossSelect" class="input-box" style="max-width:200px;">
-        <option value="0">Off — ปิดใช้งาน</option>
+        <option value="0" selected>Off — ปิดใช้งาน (default)</option>
         <option value="0.10">10% — ตัดเมื่อขาดทุน 10%</option>
         <option value="0.15">15%</option>
         <option value="0.20">20%</option>
         <option value="0.25">25%</option>
-        <option value="0.30" selected>30% — ค่าเริ่มต้น</option>
+        <option value="0.30">30%</option>
         <option value="0.40">40%</option>
       </select>
       <span class="hint" style="display:block; margin-top:8px;">
@@ -2228,24 +2228,24 @@
 // --- CONFIGURATION ---
 let CONFIG = {
   initialCapital: 15000,
-  topN: 15,
+  topN: 10,
   lookbackWeeks: 26,           // DEPRECATED — no longer used (replaced by calendar-based lookback from prev rebal month). Kept for compat.
   rebalanceMonths: [1, 7], // Feb(1), Aug(7)
   weightRet: 0.5,
   weightVol: 0.5,
   startYear: 2001,
   // cloudCsvUrl = production CSV (2015→present). Reused so 2015+ data stays fresh.
-  cloudCsvUrl: 'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_sp500_daily.csv',
+  cloudCsvUrl: 'https://app.jptrustlearning.com/data/input_sp500_daily.csv',
   // cloudCsvUrlHist = since2001 CSV (2001-2014 ONLY). Built via backfill_sp500_2001 workflow.
-  cloudCsvUrlHist: 'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_sp500_daily_since2001.csv',
-  cloudBenchUrl: 'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_benchmark_daily.csv',
+  cloudCsvUrlHist: 'https://app.jptrustlearning.com/data/input_sp500_daily_since2001.csv',
+  cloudBenchUrl: 'https://app.jptrustlearning.com/data/input_benchmark_daily.csv',
   // Defensive UAT: macro signal data — USDJPY + WTI + GOLD daily CSV
-  cloudJpyUrl: 'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_jpy_daily.csv',
-  cloudCommodUrl: 'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_commodities_daily.csv',
+  cloudJpyUrl: 'https://app.jptrustlearning.com/data/input_jpy_daily.csv',
+  cloudCommodUrl: 'https://app.jptrustlearning.com/data/input_commodities_daily.csv',
   // SL + Trail defaults — applied only during defensive regime (SPY out of macro top-2)
   trailStopPct: 0,      // 0 = off, e.g. 0.10 = 10% trail from peak close
   gateThreshold: 0.50,  // trail gate: arms when stock reaches +50% from entry
-  stopLossPct: 0.30     // 0 = off, default 0.30 = SL fires at -30% from entry
+  stopLossPct: 0        // SL default OFF (kept toggleable in UI)
 };
 
 const BENCHMARK_TICKERS = new Set(['SPY', 'QQQ', 'DIA']);
@@ -2254,10 +2254,10 @@ const BENCHMARK_TICKERS = new Set(['SPY', 'QQQ', 'DIA']);
 const DEFAULT_SP500_PRO = {
   weight: 50,          // Return % (Volume = 100 - weight)
   initialCapital: 15000,
-  topN: 15,
+  topN: 10,
   startYear: 2001,
   // Defensive UAT
-  stopLossPct: 0.30,   // 30% default
+  stopLossPct: 0,      // default OFF
   trailStopPct: 0,     // off by default
   gateThreshold: 50    // %
 };
