@@ -2806,6 +2806,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       // the regime rule is the only consumer of these two, so skip the download
       CONFIG.cloudJpyUrl = null;    // input_jpy_daily.csv    ~0.4 MB
       CONFIG.cloudCommUrl = null;   // input_commodities_daily.csv ~2.1 MB
+      // SL only ever fires inside the defensive regime (see the slActiveThisMonth
+      // gate), so with the filter off the control cannot do anything. Force it
+      // off and hide the whole group rather than leave a dead dropdown.
+      CONFIG.stopLossPct = 0;
+      const _sl = document.getElementById('stopLossSelect');
+      if (_sl) {
+        _sl.value = '0';
+        const _grp = _sl.closest('.control-group');
+        if (_grp) _grp.style.display = 'none';
+      }
       document.querySelectorAll('.subtitle-lab, .about-sub').forEach(n => {
         n.innerHTML = n.innerHTML
           .replace(/Macro Extend/g, 'No Macro Filter')
