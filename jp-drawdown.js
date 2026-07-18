@@ -15,6 +15,12 @@
 
   var TRADING_DAYS = 252;
 
+  /* ระยะห่างเป็น "วันปฏิทิน" ไม่ใช่จำนวนแท่งราคา — คนอ่านคิดเป็นวันจริง ไม่ใช่วันทำการ */
+  function calDays(a, b) {
+    if (!a || !b) return 0;
+    return Math.max(0, Math.round((new Date(b) - new Date(a)) / 86400000));
+  }
+
   function val(p) {
     if (p == null) return null;
     if (typeof p === 'number') return p;
@@ -46,11 +52,14 @@
           if (dds[j].dd < dds[t].dd) t = j;
           j++;
         }
+        var endDate = (j < n) ? dds[j].date : dds[n - 1].date;
         eps.push({
           start: dds[i].date,
           trough: dds[t].date,
+          end: endDate,
           depth: -dds[t].dd,
-          days: j - i,
+          bars: j - i,                       // จำนวนวันทำการ
+          days: calDays(dds[i].date, endDate),  // จำนวนวันปฏิทิน
           recovered: j < n
         });
         i = j;
@@ -93,6 +102,16 @@
     var cagr = (first > 0 && years > 0) ? (Math.pow(last / first, 1 / years) - 1) * 100 : NaN;
     var calmar = (maxDD < 0 && isFinite(cagr)) ? cagr / Math.abs(maxDD) : NaN;
 
+    /* จุดสูงสุดล่าสุด = วันสุดท้ายที่ drawdown เท่ากับ 0 */
+    var peakIdx = 0;
+    for (i = dds.length - 1; i >= 0; i--) {
+      if (dds[i].dd >= -1e-9) { peakIdx = i; break; }
+    }
+    var peakDate = dds[peakIdx].date;
+    var lastDate = dds[dds.length - 1].date;
+    var underDays = calDays(peakDate, lastDate);
+    var underBars = dds.length - 1 - peakIdx;
+
     var eps = findEpisodes(dds, 5);
     var deep10 = eps.filter(function (e) { return e.depth >= 10; }).length;
     var deep20 = eps.filter(function (e) { return e.depth >= 20; }).length;
@@ -105,6 +124,8 @@
       nEp: eps.length, deep10: deep10, deep20: deep20,
       avgEp: avgEp, longest: longest,
       currentDD: vals[vals.length - 1],
+      peakDate: peakDate, lastDate: lastDate,
+      underDays: underDays, underBars: underBars,
       top: eps.slice().sort(function (x, y) { return y.depth - x.depth; }).slice(0, 3),
       days: curve.length
     };
@@ -197,9 +218,13 @@
       vs(m.sortino, bm && bm.sortino, 2), 'text-green');
     html += box('Calmar Ratio', num(m.calmar), 'ผลตอบแทนต่อปี ÷ Max Drawdown — ยิ่งสูงยิ่งดี',
       vs(m.calmar, bm && bm.calmar, 2), 'text-green');
+    var atPeak = m.currentDD >= -0.05;
     html += box('สถานะตอนนี้', pct(m.currentDD),
-      m.currentDD < -0.05 ? 'ยังต่ำกว่ายอดเดิมอยู่' : 'อยู่ที่ยอดสูงสุด', '',
-      m.currentDD < -0.05 ? 'text-red' : 'text-green');
+      atPeak ? 'อยู่ที่ยอดสูงสุดพอดี'
+             : 'ต่ำกว่ายอดเดิม · จมมาแล้ว <strong>' + m.underDays.toLocaleString() + ' วัน</strong>',
+      atPeak ? 'ข้อมูลถึง ' + thDate(m.lastDate)
+             : 'ยอดสูงสุดเมื่อ ' + thDate(m.peakDate) + ' · ข้อมูลถึง ' + thDate(m.lastDate),
+      atPeak ? 'text-green' : 'text-red');
     html += '</div>';
 
     html += '<div class="jpdd-grid stats-grid" style="margin-top:10px">';
@@ -211,8 +236,9 @@
       bm ? 'SPY ' + bm.deep20 : '');
     html += box('ความลึกเฉลี่ยต่อรอบ', pct(m.avgEp), 'เฉลี่ยของก้นแต่ละรอบที่ลึกเกิน 5%',
       bm ? 'SPY ' + pct(bm.avgEp) : '', 'text-red');
-    html += box('จมนานที่สุด', m.longest.toLocaleString() + ' วัน', 'รอบที่ใช้เวลากลับสู่ยอดเดิมนานสุด',
-      bm ? 'SPY ' + bm.longest + ' วัน' : '');
+    html += box('จมนานที่สุด', m.longest.toLocaleString() + ' วัน',
+      'รอบที่ใช้เวลากลับสู่ยอดเดิมนานสุด (วันปฏิทิน)',
+      bm ? 'SPY ' + bm.longest.toLocaleString() + ' วัน' : '');
     html += '</div>';
 
     if (m.top.length) {
@@ -233,7 +259,8 @@
       '<strong>วิธีอ่าน</strong> — สองกลยุทธ์อาจมี Max Drawdown เท่ากัน แต่ตัวที่ <strong>Average Drawdown</strong> ' +
       'และ <strong>Ulcer Index</strong> ต่ำกว่า คือตัวที่โผล่พ้นน้ำเร็วกว่าและถือได้สบายใจกว่า ' +
       'ส่วน <strong>Sortino</strong> ต่างจาก Sharpe ตรงที่ไม่นับความผันผวนขาขึ้นเป็นความเสี่ยง ' +
-      '· Sortino คิดแบบรายปีที่เกณฑ์ 0% · ตัวเลขทั้งหมดมาจากการทดสอบย้อนหลัง ไม่ใช่การรับประกันผลในอนาคต' +
+      '· Sortino คิดแบบรายปีที่เกณฑ์ 0% · จำนวนวันทั้งหมดนับเป็นวันปฏิทิน ' +
+      '· ตัวเลขทั้งหมดมาจากการทดสอบย้อนหลัง ไม่ใช่การรับประกันผลในอนาคต' +
       '</div></div>';
 
     el.innerHTML = html;
