@@ -2668,6 +2668,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Keeps the long-history default intact; only the query-string variant is trimmed.
   try {
     if (new URLSearchParams(location.search).get('start') === '2015') {
+      window.__JPT_FORCE_START = 2015;
       CONFIG.startYear = 2015;
       CONFIG.cloudCsvUrlHist = null;       // 2001-2014 block
       CONFIG.cloudCsvUrlHist1996 = null;   // 1996-2000 block (lab v7 only)
@@ -2914,7 +2915,8 @@ function processData(csv) {
   // Populate Start Year Dropdown
   const years = [...new Set(state.sortedDates.map(d => d.substring(0,4)))].sort();
   // Filter only years >= 2001 (historical test mode)
-  const displayYears = years.filter(y => parseInt(y) >= 1996);
+  const _forced = window.__JPT_FORCE_START || 0;
+  const displayYears = years.filter(y => parseInt(y) >= (_forced || 1996));
   
   el.inputStartYear.innerHTML = '';
   displayYears.forEach(y => {
@@ -2925,9 +2927,9 @@ function processData(csv) {
   });
 
   // Respect saved setting first, else default 2015, else first year
-  const preferredYear = (_savedRollingLB6H3Cache && _savedRollingLB6H3Cache.startYear) || 1996;
+  const preferredYear = _forced || (_savedRollingLB6H3Cache && _savedRollingLB6H3Cache.startYear) || 1996;
   const matchYear = displayYears.find(y => parseInt(y) === preferredYear)
-                 || displayYears.find(y => parseInt(y) === 1996)
+                 || displayYears.find(y => parseInt(y) === (_forced || 1996))
                  || displayYears[0];
   if (matchYear) el.inputStartYear.value = matchYear;
 }
