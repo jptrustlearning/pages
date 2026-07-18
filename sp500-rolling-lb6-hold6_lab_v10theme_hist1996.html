@@ -2668,6 +2668,17 @@ function jptToast(msg) {
   t._hideTimer = setTimeout(() => t.classList.remove('show'), 2500);
 }
 
+// The one engine file serves 8 tiles. Saved settings live under one key, so a
+// Save on the semi tile would otherwise write perLotCapital 3600 into the rolling
+// tiles' slot (6 x 3600 = 21,600). Give each cadence its own key.
+function _jptSettingsKey() {
+  try {
+    return new URLSearchParams(location.search).get('cadence') === 'semi'
+      ? 'rolling_lb6h6_v10theme_hist1996_semi'
+      : 'rolling_lb6h6_v10theme_hist1996';
+  } catch (e) { return 'rolling_lb6h6_v10theme_hist1996'; }
+}
+
 function getRollingLB6H3Settings() {
   const w = document.getElementById('weightSlider');
   const c = document.getElementById('perLotCapitalInput');
@@ -2724,10 +2735,11 @@ async function loadRollingLB6H3Settings() {
   if (!window.JPSettings) return;
   try {
     const data = await window.JPSettings.load();
-    if (data && data.rolling_lb6h6_v10theme_hist1996) {
-      _savedRollingLB6H3Cache = data.rolling_lb6h6_v10theme_hist1996;
-      applyRollingLB6H3Settings(data.rolling_lb6h6_v10theme_hist1996);
-      console.log('[rolling-lb6h3] loaded saved settings from cloud');
+    const k = _jptSettingsKey();
+    if (data && data[k]) {
+      _savedRollingLB6H3Cache = data[k];
+      applyRollingLB6H3Settings(data[k]);
+      console.log('[rolling-lb6h3] loaded saved settings from cloud (' + k + ')');
     }
   } catch (e) {
     console.warn('[rolling-lb6h3] load settings error:', e);
@@ -2738,13 +2750,17 @@ async function saveRollingLB6H3Settings() {
   if (!window.JPSettings) { jptToast('ระบบยังไม่พร้อม — กรุณาลองใหม่'); return; }
   const user = await window.JPSettings.getUser();
   if (!user) { jptToast('กรุณา login ก่อนบันทึกการตั้งค่า'); return; }
-  const ok = await window.JPSettings.patch({ rolling_lb6h6_v10theme_hist1996: getRollingLB6H3Settings() });
+  const _payload = {};
+  _payload[_jptSettingsKey()] = getRollingLB6H3Settings();
+  const ok = await window.JPSettings.patch(_payload);
   jptToast(ok ? 'บันทึกการตั้งค่าเรียบร้อย' : 'บันทึกไม่สำเร็จ — กรุณาลองใหม่');
 }
 
 function resetRollingLB6H3Settings() {
   if (!confirm('คืนค่าเริ่มต้นทั้งหมด? (ค่าที่เคยบันทึกจะถูกทับ เมื่อกดบันทึกครั้งถัดไป)')) return;
-  applyRollingLB6H3Settings(DEFAULT_ROLLING_LB6H3);
+  const _d = Object.assign({}, DEFAULT_ROLLING_LB6H3);
+  if (window.__JPT_CADENCE === 'semi') _d.perLotCapital = 3600;
+  applyRollingLB6H3Settings(_d);
   jptToast('รีเซ็ตเป็นค่าเริ่มต้นแล้ว — อย่าลืมกดบันทึก');
 }
 
