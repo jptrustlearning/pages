@@ -1869,6 +1869,7 @@
         <button class="tab-btn" onclick="openChartTab(event, 'chart-rounds')">ROUND RETURNS</button>
         <button class="tab-btn" onclick="openChartTab(event, 'chart-dist')">DISTRIBUTION</button>
         <button class="tab-btn" onclick="openChartTab(event, 'chart-dd')">DRAWDOWN</button>
+        <button class="tab-btn" onclick="openChartTab(event, 'chart-runup')">RUN-UP</button>
         <button class="tab-btn" onclick="openChartTab(event, 'chart-vs')">VS S&P500</button>
       </div>
       
@@ -1883,6 +1884,13 @@
       </div>
       <div id="chart-dd" class="tab-content" style="height: 400px;">
         <canvas id="ddChart"></canvas>
+      </div>
+      <div id="chart-runup" class="tab-content" style="height: 400px;">
+        <div style="font-size:0.72rem; color:var(--text-muted); line-height:1.55; padding:2px 4px 6px;">
+          กลับด้านกับกราฟ Drawdown — วัดจาก<strong>ก้นของรอบ drawdown ล่าสุด</strong>ขึ้นมาถึงปัจจุบัน
+          และ<strong>รีเซ็ตเป็น 0 ทุกครั้งที่พอร์ตทำจุดสูงสุดใหม่</strong>
+        </div>
+        <div style="height: calc(100% - 36px);"><canvas id="runupChart"></canvas></div>
       </div>
       <div id="chart-vs" class="tab-content" style="height: 400px;">
         <canvas id="vsChart"></canvas>
@@ -2018,6 +2026,11 @@
             <div class="stat-label">Max Drawdown</div>
             <div class="stat-val text-red" id="stat-dd">0.0%</div>
             <div class="stat-sub">Peak to Valley</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Max Run-up</div>
+            <div class="stat-val text-green" id="stat-runup">0.0%</div>
+            <div class="stat-sub">Valley to Peak</div>
           </div>
           <div class="stat-box">
             <div class="stat-label">Win Rate</div>
@@ -4191,10 +4204,22 @@ function calculateStats() {
       if(dd < maxDD) maxDD = dd;
     });
 
+    // Mirror of maxDD: biggest climb off the bottom of a drawdown episode.
+    // Anchor = lowest equity since the last all-time high; resets at each new high.
+    let ruPeak = -Infinity, ruTrough = Infinity, maxRunup = 0;
+    state.equityCurve.forEach(e => {
+      if (e.equity < ruTrough) ruTrough = e.equity;
+      const ru = (e.equity - ruTrough) / ruTrough;
+      if (ru > maxRunup) maxRunup = ru;
+      if (e.equity > ruPeak) { ruPeak = e.equity; ruTrough = e.equity; }
+    });
+
     const fmt = (n, p=1) => (n*100).toFixed(p)+'%';
     document.getElementById('stat-sharpe').innerText = sharpe.toFixed(2);
     document.getElementById('stat-vol').innerText = fmt(vol);
     document.getElementById('stat-dd').innerText = fmt(maxDD);
+    const _ruEl = document.getElementById('stat-runup');
+    if (_ruEl) _ruEl.innerText = '+' + fmt(maxRunup);
     document.getElementById('stat-win').innerText = fmt(winRate);
     document.getElementById('stat-best').innerText = fmt(best);
     document.getElementById('stat-worst').innerText = fmt(worst);
@@ -4604,6 +4629,7 @@ function renderAll() {
   renderRoundsChart();   // Phase 6
   renderDistChart();     // Phase 6
   renderDDChart();
+  renderRunupChart();
   renderBarChart();
   renderVsChart(); 
   renderHeatmap();
@@ -5106,6 +5132,89 @@ function renderDDChart() {
                 callback: function(value) { return value + '%'; }
             } 
         } 
+      }
+    }
+  });
+}
+
+function renderRunupChart() {
+  const cv = document.getElementById('runupChart');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  if (charts.runup) charts.runup.destroy();
+
+  // Mirror of the drawdown calc: anchor on the trough of the current episode,
+  // reset the anchor whenever a new all-time high is printed.
+  let peak = -Infinity, trough = Infinity;
+  const rus = state.equityCurve.map(e => {
+    if (e.equity < trough) trough = e.equity;
+    const ru = ((e.equity - trough) / trough) * 100;
+    // Reset AFTER measuring, so the bar that breaks out to a new high still
+    // reports the full trough-to-breakout climb instead of snapping to 0.
+    if (e.equity > peak) { peak = e.equity; trough = e.equity; }
+    return ru;
+  });
+
+  // Gradient runs the opposite way to the DD chart: strongest at the top.
+  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+  gradient.addColorStop(0, 'rgba(46,159,95, 0.75)');    // Top - deep green
+  gradient.addColorStop(0.55, 'rgba(120,190,120, 0.35)');
+  gradient.addColorStop(1, 'rgba(212,175,55, 0.08)');   // Bottom - faint gold
+
+  charts.runup = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: state.equityCurve.map(e => e.date),
+      datasets: [{
+        label: 'Run-up',
+        data: rus,
+        borderColor: '#2E9F5F',
+        backgroundColor: gradient,
+        borderWidth: 2,
+        pointRadius: 0,
+        pointHoverRadius: 6,
+        pointBackgroundColor: '#2E9F5F',
+        pointBorderColor: '#fff',
+        fill: true,
+        tension: 0.2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+            enabled: true,
+            backgroundColor: 'rgba(30, 41, 59, 0.9)',
+            titleColor: '#fff',
+            bodyColor: '#7BD3A0',
+            borderColor: 'rgba(46,159,95, 0.3)',
+            borderWidth: 1,
+            displayColors: false,
+            callbacks: {
+                label: function(context) {
+                    return `Run-up: +${context.parsed.y.toFixed(2)}%`;
+                }
+            }
+        }
+      },
+      scales: {
+        x: {
+            display: true,
+            grid: { display: false, color: 'rgba(212,175,55,0.2)' },
+            ticks: { color: '#8B7D5E', maxTicksLimit: 8 }
+        },
+        y: {
+            display: true,
+            position: 'right',
+            grid: { color: 'rgba(51, 65, 85, 0.5)', borderDash: [4, 4] },
+            ticks: {
+                color: '#C4B88A',
+                callback: function(value) { return '+' + value + '%'; }
+            }
+        }
       }
     }
   });
