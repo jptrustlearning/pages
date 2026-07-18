@@ -2132,14 +2132,14 @@
     <div class="control-group">
       <label>PORTFOLIO SIZE — จำนวน Theme × หุ้นต่อ Theme</label>
       <div class="top-n-wrapper" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-        <input type="number" id="themeCountInput" class="input-box" value="4" min="1" max="28" style="max-width:82px;" oninput="syncTopNDisplay()">
+        <input type="number" id="themeCountInput" class="input-box" value="10" min="1" max="28" style="max-width:82px;" oninput="syncTopNDisplay()">
         <span style="color:var(--text-muted); font-weight:600;">THEMES ×</span>
-        <input type="number" id="perThemeInput" class="input-box" value="3" min="1" max="10" style="max-width:82px;" oninput="syncTopNDisplay()">
+        <input type="number" id="perThemeInput" class="input-box" value="1" min="1" max="10" style="max-width:82px;" oninput="syncTopNDisplay()">
         <span style="color:var(--text-muted); font-weight:600;">STOCKS =</span>
-        <input type="number" id="topNInput" class="input-box" value="12" readonly tabindex="-1" style="max-width:82px; opacity:0.7; pointer-events:none;">
+        <input type="number" id="topNInput" class="input-box" value="10" readonly tabindex="-1" style="max-width:82px; opacity:0.7; pointer-events:none;">
         <span style="color:var(--text-muted); font-weight:600;">TOTAL</span>
       </div>
-      <span class="hint">ไล่อันดับ momentum จากบนลงล่างเหมือนเดิม แต่จำกัด <strong>ไม่เกิน (หุ้นต่อ Theme) ตัวใน Theme เดียวกัน</strong> และ <strong>ใช้ได้ไม่เกิน (จำนวน Theme) Theme ต่อล็อต</strong> · default 4 × 3 = 12 ตัว · Theme มาจาก <strong>master_map.csv</strong> (28 Theme · 657 ticker) · <strong>ล็อตต่างรอบถือซ้ำกันได้</strong></span>
+      <span class="hint">ไล่อันดับ momentum จากบนลงล่างเหมือนเดิม แต่จำกัด <strong>ไม่เกิน (หุ้นต่อ Theme) ตัวใน Theme เดียวกัน</strong> และ <strong>ใช้ได้ไม่เกิน (จำนวน Theme) Theme ต่อล็อต</strong> · default 10 × 1 = 10 ตัว (กระจาย 10 กลุ่ม กลุ่มละ 1 ตัว) · Theme มาจาก <strong>master_map.csv</strong> (28 Theme · 657 ticker) · <strong>ล็อตต่างรอบถือซ้ำกันได้</strong></span>
     </div>
 
     <!-- LAB v5: Stop Loss control -->
@@ -2272,8 +2272,11 @@
 let CONFIG = {
   perLotCapital: 600,          // default per-lot USD (user editable)
   topN: 12,                    // v10theme: DERIVED = themeCount x perTheme (do not set by hand)
-  themeCount: 4,               // v10theme: how many themes per lot
-  perTheme: 3,                 // v10theme: how many stocks inside each theme
+  themeCount: 10,              // v10theme: how many themes per lot
+  perTheme: 1,                 // v10theme: how many stocks inside each theme
+                               // 10x1 replaced 4x3 as the default: on real 2015+ data it beat
+                               // 4x3 and 5x2 on CAGR, MaxDD, AvgDD, Ulcer and Sortino in every
+                               // window tested, on both the theme and the sector map.
   lookbackWeeks: 26,           // DEPRECATED — no longer used (replaced by calendar-based lookback: 6 calendar months back). Kept for compat.
   holdMonths: 6,               // hold each lot for 6 months
   lookbackMonths: 6,           // lookback window for ranking (6M momentum signal)
@@ -2640,8 +2643,8 @@ const DEFAULT_ROLLING_LB6H3 = {
   weight: 50,
   perLotCapital: 600,
   topN: 12,
-  themeCount: 4,
-  perTheme: 3,
+  themeCount: 10,
+  perTheme: 1,
   startYear: 1996,
   trailStopPct: 0,        // LAB v1: trailing stop default off
   gateThreshold: 50,      // LAB v1: gate % (default 50% = trail activates when stock hits +50% from entry)
