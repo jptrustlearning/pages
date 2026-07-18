@@ -201,6 +201,54 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .dash-card-value{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text-dark);margin-top:8px}
 
 /* ============ LAB REDESIGN — My Strategies + Library + Create CTA ============ */
+
+/* ---- Shelf cards (ported 1:1 from public library หมวดหมู่ความรู้ · prefixed .lsc-* to avoid clashing with .sc-* strategy cards) ---- */
+.lab-shelf-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(8px,2.8vw,14px);margin-bottom:6px}
+.lab-shelf-card{
+  --card-bg:linear-gradient(160deg,#BCA595 0%,#C7B2A2 28%,#D2BFB0 48%,#C7B2A2 70%,#BCA595 100%);
+  --card-edge:rgba(120,80,52,0.42);
+  --card-glow:radial-gradient(ellipse at center,rgba(255,255,255,0.5),rgba(255,248,228,0.18) 55%,transparent 72%);
+  --card-icon-edge:rgba(60,32,18,0.4);
+  --card-title:#2A1410;
+  --card-desc:rgba(48,28,18,0.78);
+  --card-foot:linear-gradient(180deg,#4A2A18,#2C1810);
+  --card-line:rgba(212,175,55,0.3);
+  --card-count:#F4E4BA;
+  --card-arrow-edge:rgba(212,175,55,0.6);
+  --card-arrow:#D4AF37;
+  --card-arrow-hbg:#D4AF37;
+  --card-arrow-hfg:#1a0a0e;
+  position:relative;display:flex;flex-direction:column;overflow:hidden;cursor:pointer;
+  border-radius:clamp(12px,3.8vw,18px);background:var(--card-bg);
+  border:1px solid var(--card-edge);
+  box-shadow:0 9px 20px rgba(90,60,45,0.18),0 0 0 2px #7A5236,0 0 0 3px rgba(212,175,55,0.45);
+  transition:transform .25s ease,box-shadow .25s ease;
+  isolation:isolate;text-decoration:none;
+}
+.lab-shelf-card:nth-child(odd){
+  --card-bg:linear-gradient(150deg,#F2E0AD 0%,#E9D699 38%,#E0C88C 68%,#D9BE7C 100%);
+  --card-edge:rgba(140,100,30,0.4);
+  --card-glow:radial-gradient(ellipse at center,rgba(255,255,255,0.55),rgba(255,250,230,0.2) 55%,transparent 72%);
+  --card-icon-edge:rgba(60,38,10,0.38);
+  --card-title:#2A1B08;
+  --card-desc:rgba(58,38,14,0.78);
+}
+.lab-shelf-card:active{transform:scale(.985)}
+.lab-shelf-card::before{content:"";position:absolute;top:-34px;left:50%;transform:translateX(-50%);width:74%;height:96px;border-radius:50%;pointer-events:none;z-index:0;background:var(--card-glow)}
+.lsc-top{position:relative;z-index:1;display:flex;flex-direction:column;gap:clamp(6px,2vw,9px);align-items:flex-start;padding:clamp(10px,3.2vw,15px) clamp(10px,3.2vw,15px) clamp(8px,2.6vw,12px)}
+.lsc-icon{flex-shrink:0;width:clamp(32px,9.6vw,44px);height:clamp(32px,9.6vw,44px);border-radius:50%;overflow:hidden;border:1.5px solid var(--card-icon-edge);box-shadow:0 3px 12px rgba(0,0,0,0.35),inset 0 0 12px rgba(212,175,55,0.18)}
+.lsc-icon img{width:100%;height:100%;object-fit:cover;display:block}
+.lsc-text{min-width:0}
+.lsc-title{display:block;font-weight:700;line-height:1.25;font-size:clamp(13px,4vw,17px);color:var(--card-title);letter-spacing:.2px;font-family:'Anuphan',sans-serif}
+.lsc-sub{display:block;font-weight:700;line-height:1.25;font-size:clamp(13px,4vw,17px);color:var(--card-title);letter-spacing:.2px;font-family:'Anuphan',sans-serif}
+.lsc-desc{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-top:3px;font-size:clamp(10.5px,3.05vw,13px);line-height:1.45;color:var(--card-desc);font-weight:400}
+.lsc-shelf{position:relative;z-index:1;line-height:0;margin-top:auto;border-top:2px solid rgba(93,52,24,0.9);box-shadow:inset 0 3px 10px rgba(0,0,0,0.45)}
+.lsc-shelf img{width:100%;height:auto;display:block;aspect-ratio:362/262;object-fit:cover}
+.lsc-foot{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:clamp(7px,2.4vw,11px) clamp(9px,3vw,14px);background:var(--card-foot);border-top:1px solid var(--card-line);box-shadow:inset 0 3px 8px rgba(0,0,0,0.28)}
+.lsc-count{font-size:clamp(10.5px,3.05vw,13px);color:var(--card-count);font-weight:500}
+.lsc-arrow{flex-shrink:0;width:clamp(23px,6.8vw,30px);height:clamp(23px,6.8vw,30px);border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--card-arrow-edge);color:var(--card-arrow);transition:background .22s,transform .22s,color .22s}
+.lsc-arrow svg{width:clamp(11px,3.2vw,14px);height:clamp(11px,3.2vw,14px);fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.lab-shelf-card:active .lsc-arrow{background:var(--card-arrow-hbg);color:var(--card-arrow-hfg)}
 .lab-section-head{display:flex;justify-content:space-between;align-items:center;margin:24px 4px 14px}
 .lab-section-title{font-size:18px;font-weight:700;color:var(--text-dark);font-family:'Anuphan',sans-serif}
 .lab-see-all{font-size:13px;color:var(--text-dark-muted);display:inline-flex;align-items:center;gap:3px;cursor:pointer;background:none;border:none;font-family:inherit;padding:4px 0}
@@ -1222,7 +1270,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
     <div class="screen" id="screen-gold"><div class="placeholder-hero"><div class="balance-card"><div class="balance-label">Gold Price</div><div class="balance-row"><div class="balance-amount">2,485</div><div class="balance-currency">USD</div></div><div class="balance-change up">▲ +1.2%</div></div></div></div>
     <div class="screen" id="screen-bitcoin"><div class="placeholder-hero"><div class="balance-card"><div class="balance-label">Bitcoin Price</div><div class="balance-row"><div class="balance-amount">107,250</div><div class="balance-currency">USD</div></div><div class="balance-change up">▲ +2.8%</div></div></div></div>
     <div class="screen" id="screen-lab">
-        <div class="placeholder-hero"><div class="balance-card"><div class="balance-label">Lab</div><div class="balance-row"><div class="balance-amount">5</div><div class="balance-currency">กลยุทธ์</div></div><div class="balance-change up">Momentum + Gold Studies</div></div><img class="lab-flask" src="lab-flask.png?v=1783496563" alt="" aria-hidden="true"></div>
+        <div class="placeholder-hero"><div class="balance-card"><div class="balance-label">Lab</div><div class="balance-row"><div class="balance-amount">10</div><div class="balance-currency">กลยุทธ์</div></div><div class="balance-change up">Momentum + Gold Studies</div></div><img class="lab-flask" src="lab-flask.png?v=1783496563" alt="" aria-hidden="true"></div>
         <div class="screen-content">
             <!-- ===== My Strategies ===== -->
             <div class="lab-section-head fade-up fade-up-1">
@@ -1234,7 +1282,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             <div class="lab-chips fade-up fade-up-1">
               <button class="lab-chip active" onclick="filterStrategies(this,'momentum')" type="button">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>
-                <div class="chip-meta"><div class="chip-title">Momentum</div><div class="chip-sub">3 Strategies</div></div>
+                <div class="chip-meta"><div class="chip-title">Momentum</div><div class="chip-sub">2 Collections</div></div>
               </button>
               <button class="lab-chip" onclick="filterStrategies(this,'gold')" type="button">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="6" width="4" height="15"/><rect x="17" y="9" width="4" height="12"/></svg>
@@ -1248,40 +1296,39 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 
             <!-- Strategy list (filterable) -->
             <div class="strategy-list fade-up fade-up-2" id="labStrategyList">
-              <!-- Momentum (default visible) -->
-              <a class="strategy-card filter-momentum" onclick="openIframe('SP500 Weekly Momentum','./sp500-combined-strategy.html?v=1783496563')">
-                <div class="sc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
-                <div class="sc-meta">
-                  <div class="sc-title">Weekly Momentum<span class="star">★</span></div>
-                  <div class="sc-sub">Combined Strategy</div>
-                  <span class="sc-tag tag-momentum">Momentum</span>
-                  <div class="sc-status active"><span class="dot"></span>Active</div>
-                </div>
-                <div class="sc-spark"><svg viewBox="0 0 72 32" preserveAspectRatio="none"><polyline points="2,26 11,22 20,18 28,21 38,14 48,11 58,7 70,4" fill="none" stroke="#722F37" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-                <div class="sc-arrow">›</div>
-              </a>
-              <a class="strategy-card filter-momentum" onclick="openIframe('SP500 Strategy Pro — 6M Momentum','./sp500-strategy-pro.html?v=1783496563')">
-                <div class="sc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg></div>
-                <div class="sc-meta">
-                  <div class="sc-title">6M Momentum</div>
-                  <div class="sc-sub">Strategy Pro V22 Backtest</div>
-                  <span class="sc-tag tag-momentum">Momentum</span>
-                  <div class="sc-status active"><span class="dot"></span>Active</div>
-                </div>
-                <div class="sc-spark"><svg viewBox="0 0 72 32" preserveAspectRatio="none"><polyline points="2,22 12,24 22,18 30,20 40,12 50,15 60,9 70,8" fill="none" stroke="#722F37" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-                <div class="sc-arrow">›</div>
-              </a>
-              <a class="strategy-card filter-momentum" onclick="openIframe('SP500 Rolling 6M Momentum','./sp500-rolling-6m-momentum.html?v=1783496563')">
-                <div class="sc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-15-6.7L3 8"/><polyline points="3 3 3 8 8 8"/><path d="M3 12a9 9 0 0 0 15 6.7L21 16"/><polyline points="21 21 21 16 16 16"/></svg></div>
-                <div class="sc-meta">
-                  <div class="sc-title">Rolling 6M Momentum</div>
-                  <div class="sc-sub">Top Ranks Momentum ใหม่ทุกเดือน</div>
-                  <span class="sc-tag tag-momentum">Momentum</span>
-                  <div class="sc-status active"><span class="dot"></span>Active</div>
-                </div>
-                <div class="sc-spark"><svg viewBox="0 0 72 32" preserveAspectRatio="none"><polyline points="2,18 12,21 22,15 30,17 40,13 50,16 60,10 70,12" fill="none" stroke="#722F37" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-                <div class="sc-arrow">›</div>
-              </a>
+              <!-- Momentum (default visible) — shelf cards, style ported from public library -->
+              <div class="lab-shelf-grid filter-momentum">
+                <a class="lab-shelf-card" onclick="openIframe('กลยุทธ์ Momentum · กระทิงแถวหน้า','./lab-momentum-frontbull.html?v=1784500000','lab')">
+                  <div class="lsc-top">
+                    <span class="lsc-icon"><img src="lib/icon-momentum.jpg?v=1784500000" alt="" width="240" height="240"></span>
+                    <span class="lsc-text">
+                      <span class="lsc-title">กลยุทธ์ Momentum</span>
+                      <span class="lsc-sub">กระทิงแถวหน้า</span>
+                      <span class="lsc-desc">ผลทดสอบกลยุทธ์โมเมนตัมย้อนหลังกว่า 30 ปี พร้อม trade log เต็ม</span>
+                    </span>
+                  </div>
+                  <div class="lsc-shelf"><img src="lib/shelf-momentum.jpg?v=1784500000" alt="" width="724" height="524" loading="lazy" decoding="async"></div>
+                  <div class="lsc-foot">
+                    <span class="lsc-count">4 กลยุทธ์</span>
+                    <span class="lsc-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+                  </div>
+                </a>
+                <a class="lab-shelf-card" onclick="openIframe('กลยุทธ์ Momentum · ผู้ชนะสิบทิศ','./lab-momentum-tenwinds.html?v=1784500000','lab')">
+                  <div class="lsc-top">
+                    <span class="lsc-icon"><img src="lib/icon-analysis.jpg?v=1784500000" alt="" width="240" height="240"></span>
+                    <span class="lsc-text">
+                      <span class="lsc-title">กลยุทธ์ Momentum</span>
+                      <span class="lsc-sub">ผู้ชนะสิบทิศ</span>
+                      <span class="lsc-desc">เจาะลึกตลาด เศรษฐกิจ และจิตวิทยาราคา เป็นรายเหตุการณ์</span>
+                    </span>
+                  </div>
+                  <div class="lsc-shelf"><img src="lib/shelf-analysis.jpg?v=1784500000" alt="" width="724" height="524" loading="lazy" decoding="async"></div>
+                  <div class="lsc-foot">
+                    <span class="lsc-count">4 กลยุทธ์</span>
+                    <span class="lsc-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+                  </div>
+                </a>
+              </div>
               <!-- Gold (hidden by default) -->
               <a class="strategy-card filter-gold" style="display:none" onclick="openIframe('SMC Patient Hunter — Gold Strategy','./smc-patient-hunter-report.html')">
                 <div class="sc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/><path d="M8 16l2-2 2 2 3-3"/></svg></div>
@@ -2807,7 +2854,7 @@ function openNotifications(){
 }
 
 function jptToast(msg){let t=document.getElementById('jpt-toast');if(!t){t=document.createElement('div');t.id='jpt-toast';document.body.appendChild(t)}t.textContent=msg;t.classList.add('show');clearTimeout(t._hideTimer);t._hideTimer=setTimeout(()=>t.classList.remove('show'),2800)}
-function filterStrategies(btn,key){document.querySelectorAll('.lab-chip').forEach(c=>c.classList.remove('active'));btn.classList.add('active');const list=document.getElementById('labStrategyList');if(!list)return;list.querySelectorAll('.strategy-card,.strategy-empty').forEach(el=>{const isMatch=el.classList.contains('filter-'+key);if(el.classList.contains('strategy-empty')){el.style.display=isMatch?'block':'none'}else{el.style.display=isMatch?'grid':'none'}})}
+function filterStrategies(btn,key){document.querySelectorAll('.lab-chip').forEach(c=>c.classList.remove('active'));btn.classList.add('active');const list=document.getElementById('labStrategyList');if(!list)return;list.querySelectorAll('.strategy-card,.strategy-empty,.lab-shelf-grid').forEach(el=>{const isMatch=el.classList.contains('filter-'+key);if(el.classList.contains('strategy-empty')){el.style.display=isMatch?'block':'none'}else{el.style.display=isMatch?'grid':'none'}})}
 function btcComingSoon(e){if(e){e.stopPropagation();e.preventDefault()}jptToast('🚧 Bitcoin · กำลังพัฒนา · เร็วๆ นี้')}
 let lastScreen='home';
 function openIframe(title,url,navScreen){const tEl=document.getElementById('iframeTitle'),tb=document.getElementById('iframeTopbar'),ld=document.getElementById('iframeLoading'),ct=document.getElementById('iframeContainer'),ifr=document.getElementById('iframeContent');const cur=document.querySelector('.screen.active');if(cur)lastScreen=cur.id.replace('screen-','');if(tEl)tEl.textContent=title;/* Hide topbar only for pages that already own their header (sp500-combined-strategy); show for everything else including news-detail */if(tb){const hideTopbar=/sp500-combined-strategy|sp500-strategy-pro|sp500-rolling-6m-momentum|gold-momentum-app|roadmap\.html|portfolio-planner|finance-planner|my-portfolio|user-guide/.test(url);tb.style.display=hideTopbar?'none':'flex'}ld.style.display='flex';ct.style.display='none';ifr.src='about:blank';document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-iframe').classList.add('active');/* Sync bottom nav highlight — auto-detect tab from URL when navScreen not explicitly passed */if(!navScreen){if(/sp500-(strategy-pro|combined-strategy|rolling-6m-momentum)|smc-patient-hunter|gold-swing-h1-sensitivity/.test(url))navScreen='lab';else if(/gold-momentum-app|Free_scannerSP500|my-portfolio|user-guide/.test(url))navScreen='more';else if(/portfolio-planner|finance-planner/.test(url))navScreen='roadmap';else if(/news-detail/.test(url))navScreen='news'}document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));if(navScreen){const b=document.querySelector('.nav-item[data-screen="'+navScreen+'"]');if(b)b.classList.add('active')}setTimeout(()=>{ifr.src=url;ifr.onload=function(){ld.style.display='none';ct.style.display='block'}},100);window.scrollTo({top:0});/* Strip cache-bust ?v= for cleaner analytics URLs */const cleanUrl=url.replace(/\?v=\d+/,'');logEvent('page_view',{screen:'iframe',url:cleanUrl})}
