@@ -2126,7 +2126,7 @@
         <span style="color:var(--gold-deep); font-weight:700; font-family:'DM Serif Display',serif; font-size:1.1rem;">$</span>
         <input type="number" id="perLotCapitalInput" class="input-box" value="600" step="100" min="50">
       </div>
-      <span class="hint">เงินที่ใส่ <strong>ต่อรอบ</strong> (ต่อเดือน) · default $600 · รวมสูงสุดช่วง ramp-up = เงินต่อรอบ × 6 = <span id="totalDeployedHint" style="color:var(--gold-deep);font-weight:700">$3,600</span> (6 ล็อตซ้อน · ถือ 6 เดือนต่อล็อต)</span>
+      <span class="hint">เงินที่ใส่ <strong>ต่อรอบ</strong> (ต่อเดือน) · default $600 · รวมสูงสุดช่วง ramp-up = เงินต่อรอบ × 6 = <span id="totalDeployedHint" class="total-deployed-hint" style="color:var(--gold-deep);font-weight:700">$3,600</span> (6 ล็อตซ้อน · ถือ 6 เดือนต่อล็อต)</span>
     </div>
 
     <div class="control-group">
@@ -2281,7 +2281,9 @@ let CONFIG = {
   trailStopPct: 0,             // 0 = off, e.g. 0.15 = 15% trail from peak close
   stopLossPct: 0,              // LAB v7: SL default OFF (kept toggleable in UI). v5/v6 defaulted to 0.20.
   gateThreshold: 0.50,         // peak/entry must reach this multiplier before trail activates (user-editable, default 0.50 = +50%)
-  rebalanceMonths: [0,1,2,3,4,5,6,7,8,9,10,11], // every month (first biz day)
+  rebalanceMonths: [0,1,2,3,4,5,6,7,8,9,10,11], // months allowed to open a lot (first biz day)
+  lotCount: 6,                 // staggered lots at steady state = holdMonths for the rolling cadence.
+                               // ?cadence=semi sets rebalanceMonths=[1,7] + lotCount=1 (single lot, Feb/Aug).
   weightRet: 0.5,
   weightVol: 0.5,
   startYear: 1996,
@@ -2820,6 +2822,51 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   } catch (e) { console.warn('[map param]', e); }
 
+  // === ?cadence=semi — one lot, entered twice a year (Feb + Aug) ===
+  // The engine is rolling by default: 6 staggered lots, a new one every month.
+  // 'semi' narrows the entry calendar to two months and shrinks the chain to a
+  // single lot, so the whole budget rides one basket for 6 months at a time.
+  // holdMonths stays 6, so a lot entered in Feb matures exactly on the Aug
+  // rebalance day and is replaced the same day — the chain never overlaps.
+  // Capital is raised from $600/lot to the full $3,600 so this tile sits on the
+  // same budget as the rolling tiles in the same quad.
+  try {
+    if (new URLSearchParams(location.search).get('cadence') === 'semi') {
+      window.__JPT_CADENCE = 'semi';
+      CONFIG.rebalanceMonths = [1, 7];   // Feb + Aug, 0-indexed
+      CONFIG.lotCount = 1;
+      CONFIG.perLotCapital = 3600;
+      if (el.inputPerLotCap) {
+        el.inputPerLotCap.value = 3600;
+        el.inputPerLotCap.step = 100;
+        const _lbl = el.inputPerLotCap.closest('.control-group');
+        if (_lbl) {
+          const _l = _lbl.querySelector('label');
+          if (_l) _l.textContent = 'INITIAL CAPITAL — เงินลงทุนตั้งต้น';
+          // Rebuild the hint but KEEP the live #totalDeployedHint node — el.* was
+          // cached before DOMContentLoaded, so replacing it wholesale would orphan
+          // the reference and the running-total would stop updating.
+          const _h = _lbl.querySelector('.hint');
+          if (_h) {
+            const _span = _h.querySelector('.total-deployed-hint');
+            _h.innerHTML = 'เงินลงทุน<strong>ทั้งก้อน</strong> ใส่ครั้งเดียวตอนเริ่ม · default $3,600 · ลงทีเดียวเต็มจำนวน = ';
+            if (_span) { _span.textContent = '$3,600'; _h.appendChild(_span); }
+            _h.appendChild(document.createTextNode(' (1 ล็อต · ถือ 6 เดือน · เข้าใหม่ ก.พ. และ ส.ค.)'));
+          }
+        }
+      }
+      document.querySelectorAll('.subtitle-lab, .about-sub, .hint, h1, label').forEach(n => {
+        n.innerHTML = n.innerHTML
+          .replace(/Rolling 6M/g, 'Semi-Annual 6M')
+          .replace(/Rolling-6M/g, 'Semi-Annual')
+          .replace(/ROLLING/g, 'SEMI-ANNUAL')
+          .replace(/แบ่ง 6 ไม้/g, 'ลงทีเดียว')
+          .replace(/6 ล็อตซ้อน/g, '1 ล็อต')
+          .replace(/ทุกเดือน/g, 'ปีละ 2 ครั้ง (ก.พ. · ส.ค.)');
+      });
+    }
+  } catch (e) { console.warn('[cadence param]', e); }
+
   // === ?macro=off — same engine with the macro regime rule switched off ===
   // Powers the un-filtered (top-row) tile. Nothing else changes: same universe,
   // same ranking, same theme caps, same lot schedule.
@@ -2983,7 +3030,7 @@ el.inputPerLotCap.addEventListener('change', runBacktest);
 el.inputPerLotCap.addEventListener('input', () => {
   if (el.totalDeployedHint) {
     const perLot = parseFloat(el.inputPerLotCap.value) || 0;
-    el.totalDeployedHint.textContent = '$' + (perLot * CONFIG.holdMonths).toLocaleString();
+    el.totalDeployedHint.textContent = '$' + (perLot * Math.max(1, CONFIG.lotCount || CONFIG.holdMonths)).toLocaleString();
   }
 });
 el.inputStartYear.addEventListener('change', runBacktest);
@@ -3429,7 +3476,11 @@ function simulateStrategy(wRet, nStocks) {
   let startIndex = state.sortedDates.findIndex(d => d.startsWith(startYear.toString()));
   if (startIndex === -1) startIndex = 0;
 
-  let cash = perLot * CONFIG.holdMonths;
+  const LOT_COUNT = Math.max(1, CONFIG.lotCount || CONFIG.holdMonths);
+  const ENTRY_MONTHS = (CONFIG.rebalanceMonths && CONFIG.rebalanceMonths.length)
+    ? CONFIG.rebalanceMonths : [0,1,2,3,4,5,6,7,8,9,10,11];
+
+  let cash = perLot * LOT_COUNT;
   let lots = [];   // {entryMonthKey, stocks:{t:shares}}
   let curve = [];
 
@@ -3452,9 +3503,10 @@ function simulateStrategy(wRet, nStocks) {
 
     const currentMonthKey = dateObj.getFullYear() * 12 + dateObj.getMonth();
     const isFirstWeek = dateObj.getDate() <= 7;
+    const isEntryMonth = ENTRY_MONTHS.indexOf(dateObj.getMonth()) !== -1;
     const notAlreadyRebalanced = currentMonthKey !== lastRebalancedMonth;
 
-    if (isFirstWeek && notAlreadyRebalanced) {
+    if (isFirstWeek && isEntryMonth && notAlreadyRebalanced) {
       // Calendar-based lookback: CONFIG.lookbackMonths (default 6) months back — independent of hold period.
       // Window = [2nd biz day of (currentMonth - lookbackMonths)] → [day before this rebal day]
       const signalIdx = i - 1;
@@ -3660,15 +3712,21 @@ function runRollingBacktest() {
   // LAB v1: snapshot gate % from UI (default 50 = +50% from entry). Stored as decimal.
   CONFIG.gateThreshold = el.inputGateThreshold ? ((parseFloat(el.inputGateThreshold.value) || 50) / 100) : 0.50;
 
-  // Derived: total external capital needed (backwards-compat for legacy chart/bar functions)
-  CONFIG.initialCapital = CONFIG.perLotCapital * CONFIG.holdMonths;
+  // Number of lots the chain runs at steady state. Rolling = 6 (one per month of
+  // the hold period); ?cadence=semi = 1 (the whole budget rides a single basket).
+  const LOT_COUNT = Math.max(1, CONFIG.lotCount || CONFIG.holdMonths);
+  const ENTRY_MONTHS = (CONFIG.rebalanceMonths && CONFIG.rebalanceMonths.length)
+    ? CONFIG.rebalanceMonths : [0,1,2,3,4,5,6,7,8,9,10,11];
 
-  // Update hint (total deployed = perLot × holdMonths)
+  // Derived: total external capital needed (backwards-compat for legacy chart/bar functions)
+  CONFIG.initialCapital = CONFIG.perLotCapital * LOT_COUNT;
+
+  // Update hint (total deployed = perLot × lotCount)
   if (el.totalDeployedHint) {
-    el.totalDeployedHint.textContent = '$' + (CONFIG.perLotCapital * CONFIG.holdMonths).toLocaleString();
+    el.totalDeployedHint.textContent = '$' + (CONFIG.perLotCapital * LOT_COUNT).toLocaleString();
   }
 
-  const totalReserve = CONFIG.perLotCapital * CONFIG.holdMonths;  // total external capital needed
+  const totalReserve = CONFIG.perLotCapital * LOT_COUNT;  // total external capital needed
   let cash = totalReserve;  // parked cash reserve at t=0
   state.lots = [];
   state.closedLots = [];
@@ -3903,12 +3961,16 @@ function runRollingBacktest() {
       state.lots = liveLots;
     }
 
-    // === 2. Check if first business day of month ===
+    // === 2. Check if first business day of an entry month ===
+    // ENTRY_MONTHS is every month for the rolling cadence and [Feb, Aug] for
+    // ?cadence=semi. Everything downstream (maturity, defensive extend, new lot)
+    // lives inside this gate, so a non-entry month is a pure hold month.
     const currentMonthKey = dateObj.getFullYear() * 12 + dateObj.getMonth();
     const isFirstWeek = dateObj.getDate() <= 7;
+    const isEntryMonth = ENTRY_MONTHS.indexOf(dateObj.getMonth()) !== -1;
     const notAlreadyRebalanced = currentMonthKey !== lastRebalancedMonth;
 
-    if (isFirstWeek && notAlreadyRebalanced) {
+    if (isFirstWeek && isEntryMonth && notAlreadyRebalanced) {
       // Calendar-based lookback: CONFIG.lookbackMonths (default 6) months back — independent of hold period.
       // Window = [2nd biz day of (currentMonth - lookbackMonths)] → [day before this rebal day]
       const signalIdx = i - 1;
@@ -4112,7 +4174,7 @@ function runRollingBacktest() {
         // %P&L row reflect true return on capital at risk, not a diluted figure that
         // includes the unused alloc (which is refunded to cash below).
         const newLot = {
-          chainId: monthsElapsedAtEntry % CONFIG.holdMonths,  // 0..5 (6 lots staggered, hold 6M)
+          chainId: monthsElapsedAtEntry % LOT_COUNT,  // rolling: 0..5 · semi: always 0 (single lot)
           entryDate: dateStr,
           entryIdx: i,
           entryMonthKey: currentMonthKey,
@@ -4143,7 +4205,7 @@ function runRollingBacktest() {
         });
 
         // === 8. Track external capital timeline ===
-        const externalDeployed = Math.min((monthsElapsedAtEntry + 1), CONFIG.holdMonths) * CONFIG.perLotCapital;
+        const externalDeployed = Math.min((monthsElapsedAtEntry + 1), LOT_COUNT) * CONFIG.perLotCapital;
         state.externalCapitalTimeline.push({ date: dateStr, cumulativeDeployed: externalDeployed });
 
         lastRebalancedMonth = currentMonthKey;
@@ -4195,16 +4257,24 @@ function runRollingBacktest() {
       const lastMonth = lastDateObj.getMonth();
       const lastYear  = lastDateObj.getFullYear();
 
-      // Next rebalance = next month's first business day (rolling is monthly, so always next month)
+      // Next rebalance = the first business day of the next month that is on the
+      // entry calendar. For the rolling cadence that is simply next month; for
+      // ?cadence=semi it walks forward to the next Feb or Aug.
       let nextRebalMonth, nextRebalYear;
-      if (lastDateObj.getDate() <= 7 && currentMonthKeyOfLast(lastDateObj) !== lastRebalancedMonth) {
-        // Still in first week of this month and not yet rebalanced — next entry is THIS month
+      if (lastDateObj.getDate() <= 7 && ENTRY_MONTHS.indexOf(lastMonth) !== -1
+          && currentMonthKeyOfLast(lastDateObj) !== lastRebalancedMonth) {
+        // Still in first week of an entry month and not yet rebalanced — it is THIS month
         nextRebalMonth = lastMonth;
         nextRebalYear = lastYear;
       } else {
-        // First week passed or already rebalanced this month — next entry is NEXT month
-        nextRebalMonth = (lastMonth + 1) % 12;
-        nextRebalYear = lastMonth === 11 ? lastYear + 1 : lastYear;
+        // Walk forward to the next month on the entry calendar (max 12 steps)
+        nextRebalMonth = lastMonth;
+        nextRebalYear = lastYear;
+        for (let step = 0; step < 12; step++) {
+          nextRebalMonth = (nextRebalMonth + 1) % 12;
+          if (nextRebalMonth === 0) nextRebalYear += 1;
+          if (ENTRY_MONTHS.indexOf(nextRebalMonth) !== -1) break;
+        }
       }
 
       const monthsThNames = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
@@ -4546,7 +4616,10 @@ function calculateStats() {
 
     const avgMonthSign = monthlyAvgUsd >= 0 ? '+' : '-';
     document.getElementById('rscMonthlyAvg').innerHTML = 
-      `ตกเฉลี่ย <strong>${avgMonthSign}$${Math.abs(Math.round(monthlyAvgUsd)).toLocaleString()}</strong> / เดือน &middot; จากงบรวม <strong>$${Math.round(start).toLocaleString()}</strong> (ใส่เดือนละ $${Math.round(CONFIG.perLotCapital).toLocaleString()} × ${CONFIG.holdMonths})`;
+      `ตกเฉลี่ย <strong>${avgMonthSign}$${Math.abs(Math.round(monthlyAvgUsd)).toLocaleString()}</strong> / เดือน &middot; จากงบรวม <strong>$${Math.round(start).toLocaleString()}</strong> ` +
+      (window.__JPT_CADENCE === 'semi'
+        ? '(ใส่ครั้งเดียวตอนเริ่ม · เข้าใหม่ ก.พ. และ ส.ค.)'
+        : `(ใส่เดือนละ $${Math.round(CONFIG.perLotCapital).toLocaleString()} × ${CONFIG.holdMonths})`);
 
     // === 4 top metrics ===
     const annRoi = document.getElementById('rscAnnRoi');
@@ -5757,6 +5830,9 @@ window.switchStatsTab = function(tab) {
           'จำนวนหุ้นต่อล็อต': CONFIG.topN + ' ตัว (' + CONFIG.themeCount + ' Theme × ' + CONFIG.perTheme + ' ตัว)',
           'น้ำหนัก Return / Volume': Math.round((CONFIG.weightRet||0)*100) + '% / ' + Math.round((CONFIG.weightVol||0)*100) + '%',
           'ระยะถือครอง': CONFIG.holdMonths + ' เดือน',
+          'จังหวะเข้าซื้อ': (window.__JPT_CADENCE === 'semi'
+            ? 'ปีละ 2 ครั้ง (ก.พ. · ส.ค.) · 1 ล็อต'
+            : 'ทุกเดือน · ' + Math.max(1, CONFIG.lotCount || CONFIG.holdMonths) + ' ล็อตซ้อน'),
           'Lookback': 'ย้อน 6 เดือนปฏิทิน (ตามล็อตที่ครบกำหนด)',
           'ปีเริ่มต้น': CONFIG.startYear
         }
