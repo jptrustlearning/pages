@@ -2797,6 +2797,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Load user's saved settings from cloud first (if logged in)
   await loadRollingLB6H3Settings();
 
+  // === ?macro=off — same engine with the macro regime rule switched off ===
+  // Powers the un-filtered (top-row) tile. Nothing else changes: same universe,
+  // same ranking, same theme caps, same lot schedule.
+  try {
+    if (new URLSearchParams(location.search).get('macro') === 'off') {
+      window.__JPT_NO_MACRO = true;
+      document.querySelectorAll('.subtitle-lab, .about-sub').forEach(n => {
+        n.innerHTML = n.innerHTML
+          .replace(/Macro Extend/g, 'No Macro Filter')
+          .replace(/ · มี defensive extend ตอนตลาดอันตราย/g, ' · ไม่กรองภาวะตลาด');
+      });
+    }
+  } catch (e) { console.warn('[macro param]', e); }
+
   // === ?start=2015 — run on the same data window as the un-filtered strategies ===
   // Keeps the long-history default intact; only the query-string variant is trimmed.
   try {
@@ -3663,7 +3677,7 @@ function runRollingBacktest() {
     const thisMonthKey = dateObj.getFullYear() * 12 + dateObj.getMonth();
     const isFirstBizDayOfMonth = (dateObj.getDate() <= 7) && (thisMonthKey !== slRegimeMonthKey);
     if (isFirstBizDayOfMonth) {
-      const spyTop2 = isSPYInMacroTop2AtIdx(i - 1);
+      const spyTop2 = window.__JPT_NO_MACRO ? null : isSPYInMacroTop2AtIdx(i - 1);
       // null = insufficient history → treat as benign (SL off)
       slActiveThisMonth = (spyTop2 === false);
       slRegimeMonthKey = thisMonthKey;
