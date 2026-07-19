@@ -1,6 +1,199 @@
 {
-  "lastUpdated": "2026-07-18T09:45:00Z",
+  "lastUpdated": "2026-07-19T08:30:00Z",
   "batches": [
+    {
+      "file": "2026-07-19-0830.md",
+      "date": "2026-07-19T08:30:00Z",
+      "date_display": "19 ก.ค. 2026 · 08:30",
+      "summary": "Meta เจรจาปล่อยเช่าพลังประมวลผลให้ Anthropic สูงสุด 10,000 ล้านดอลลาร์ · สงครามอิหร่านคืนที่เจ็ด น้ำมันขึ้น 14% ในสัปดาห์เดียว ทองลง 3% · Buffett เผยเป็นคนสั่งซื้อ Alphabet 31,000 ล้านดอลลาร์เอง · SET แตะสูงสุดรอบเกือบ 3 ปีครึ่ง บาทอ่อนสุดรอบ 14 เดือนครึ่ง",
+      "tickers": [
+        "META",
+        "NVDA",
+        "GOOGL",
+        "BRK.B",
+        "USO",
+        "XLE",
+        "GLD",
+        "PTT",
+        "PTTEP",
+        "TOP",
+        "BCP",
+        "KBANK",
+        "SCB",
+        "BBL",
+        "AOT",
+        "DELTA",
+        "SPY"
+      ],
+      "headlines": [
+        {
+          "title": "Meta เจรจาปล่อยเช่าพลังประมวลผลให้ Anthropic มูลค่าสูงสุด 10,000 ล้านดอลลาร์ — สัญญาณแรกที่เงินลงทุน AI เริ่มแปลงเป็นรายได้โดยตรง",
+          "tickers": [
+            {
+              "symbol": "META",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "CRWV",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "NBIS",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "MSFT",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "AMZN",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "GOOGL",
+              "sentiment": "neutral"
+            }
+          ],
+          "tone_override": "bullish",
+          "source": "New York Times, CNBC, Reuters, Bloomberg",
+          "published": "19 ก.ค. 2026"
+        },
+        {
+          "title": "สงครามอิหร่านเข้าสู่คืนที่เจ็ด — สหรัฐฯ ถล่มสะพานและระบบไฟฟ้า อิหร่านตอบโต้ใส่โครงสร้างพื้นฐานพลเรือนในอ่าวเปอร์เซีย เรือผ่านฮอร์มุซเหลือวันละ 8 ลำ",
+          "tickers": [
+            {
+              "symbol": "USO",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "XLE",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTTEP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "TOP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "BCP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "GLD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "TU",
+              "sentiment": "negative"
+            }
+          ],
+          "source": "Associated Press, NPR, Reuters, Trading Economics",
+          "published": "19 ก.ค. 2026"
+        },
+        {
+          "title": "Buffett เผยเป็นคนสั่งซื้อ Alphabet 31,000 ล้านดอลลาร์ด้วยตัวเอง — และให้เหตุผลที่กลับด้านกับสิ่งที่ตลาดกำลังกลัว",
+          "tickers": [
+            {
+              "symbol": "GOOGL",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "BRK.B",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "IBM",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "TSLA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "INTC",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "MSFT",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "SPY",
+              "sentiment": "neutral"
+            }
+          ],
+          "tone_override": "bullish",
+          "source": "CNBC, Fortune, Yahoo Finance",
+          "published": "19 ก.ค. 2026"
+        },
+        {
+          "title": "SET แตะจุดสูงสุดในรอบเกือบ 3 ปีครึ่งสวนทางตลาดสหรัฐฯ — แต่เงินบาทอ่อนค่าสุดในรอบ 14 เดือนครึ่ง สองสัญญาณที่ต้องอ่านคู่กัน",
+          "tickers": [
+            {
+              "symbol": "KBANK",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SCB",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "BBL",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTTEP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "CPALL",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "SPY",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "KCE",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "ศูนย์วิจัยกสิกรไทย, CNBC, Reuters",
+          "published": "19 ก.ค. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-07-18-0945.md",
       "date": "2026-07-18T09:45:00Z",
