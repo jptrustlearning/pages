@@ -1,6 +1,212 @@
 {
-  "lastUpdated": "2026-07-20T08:15:00Z",
+  "lastUpdated": "2026-07-21T13:10:00Z",
   "batches": [
+    {
+      "file": "2026-07-21-1310.md",
+      "date": "2026-07-21T13:10:00Z",
+      "date_display": "21 ก.ค. 2026 · 13:10",
+      "summary": "Apple ร่วง 2.1% ฉุด Dow ลง 307 จุด จากต้นทุนชิปหน่วยความจำ · Brent แตะ 90 ดอลลาร์ก่อนย่อ เรือบรรทุกน้ำมันระเบิดกลางฮอร์มุซ · ทองคำนิ่งแถว 4,000 ดอลลาร์ ตลาดเดิมพัน Fed ขึ้นดอกเบี้ย · Intel ปลดพนักงานก่อนสัปดาห์งบ AI",
+      "tickers": [
+        "AAPL",
+        "MU",
+        "GOOGL",
+        "MSFT",
+        "AMZN",
+        "INTC",
+        "TSLA",
+        "USO",
+        "XLE",
+        "GLD",
+        "TLT",
+        "UUP",
+        "PTT",
+        "PTTEP",
+        "BCP",
+        "TOP",
+        "AOT",
+        "CPALL",
+        "TU",
+        "DELTA",
+        "KCE",
+        "HANA",
+        "COM7"
+      ],
+      "headlines": [
+        {
+          "title": "Apple ร่วง 2.1% ฉุด Dow ลง 307 จุด — ราคาชิปหน่วยความจำที่ถูกดันขึ้นจากศึก AI กำลังย้อนกลับมากัดมาร์จิ้นผู้ผลิตฮาร์ดแวร์",
+          "tickers": [
+            {
+              "symbol": "AAPL",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "MU",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "GOOGL",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "MSFT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AMZN",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "KCE",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "HANA",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "COM7",
+              "sentiment": "negative"
+            }
+          ],
+          "source": "CNBC, Kiplinger, Yahoo Finance, Bank of America",
+          "published": "21 ก.ค. 2026"
+        },
+        {
+          "title": "Brent แตะ 90 ดอลลาร์ก่อนย่อลง — เรือบรรทุกน้ำมันสองลำระเบิดกลางฮอร์มุซ ขณะที่อิหร่านเปิดช่องเจรจาผ่านคนกลาง",
+          "tickers": [
+            {
+              "symbol": "USO",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "XLE",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTTEP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "BCP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "TOP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "TU",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "CPALL",
+              "sentiment": "negative"
+            }
+          ],
+          "source": "Reuters, Bloomberg, Trading Economics, CNBC",
+          "published": "21 ก.ค. 2026"
+        },
+        {
+          "title": "ทองคำยืนแถว 4,000 ดอลลาร์ทั้งที่สงครามเข้าคืนที่เก้า — ตลาดกำลังเดิมพันว่า Fed จะขึ้นดอกเบี้ย ไม่ใช่ลด",
+          "tickers": [
+            {
+              "symbol": "GLD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "SLV",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "GDX",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "TLT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "UUP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "CPALL",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "negative"
+            }
+          ],
+          "source": "Yahoo Finance, Trading Economics, สมาคมค้าทองคำ, Federal Reserve",
+          "published": "21 ก.ค. 2026"
+        },
+        {
+          "title": "Intel ปลดพนักงานรอบใหม่ในกลุ่มดาต้าเซ็นเตอร์ ก่อนรายงานงบวันพฤหัสบดี — สัปดาห์นี้คือบททดสอบจริงว่าเงินลงทุน AI สร้างผลตอบแทนได้แล้วหรือยัง",
+          "tickers": [
+            {
+              "symbol": "INTC",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "GOOGL",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "TSLA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "MU",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "IBM",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "SMH",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "AMD",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "SPY",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "neutral"
+            }
+          ],
+          "tone_override": "neutral",
+          "source": "CNBC, FactSet, Yahoo Finance, TechTimes",
+          "published": "21 ก.ค. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-07-20-0815.md",
       "date": "2026-07-20T08:15:00Z",
