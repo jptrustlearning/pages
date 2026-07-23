@@ -1969,6 +1969,25 @@
         </table>
       </div>
 
+      <div style="font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:1.4px; color:#722F37; margin:18px 0 6px;">HORSE RACE รายปี — 8 ปีล่าสุด</div>
+      <div style="font-family:'Anuphan',sans-serif; font-size:0.78rem; color:#7A6F62; margin:0 0 8px; line-height:1.55;">Mean IC ของแต่ละ factor แยกรายปีปฏิทิน — ช่องเขียว = ผู้ชนะของปีนั้น · ปีล่าสุดมีรอบน้อยกว่าปกติเพราะรอบท้ายๆ ยังไม่มี forward ครบ 6 เดือน · ใช้ดูว่า factor ไหนกำลัง "มาแรง" ช่วงหลังจริงหรือแค่ noise ปีเดียว</div>
+      <div class="heatmap-wrapper">
+        <table class="simple-table" id="fhHorseYearlyTable">
+          <thead>
+            <tr>
+              <th style="text-align:left;">ปี</th>
+              <th style="color:#B8860B;">LB6</th>
+              <th style="color:#722F37;">6-1 Skip</th>
+              <th style="color:#1F7D49;">52W High</th>
+              <th style="color:#C71F4A;">FIP</th>
+              <th style="color:#5A3D20;">Vol-Adj</th>
+              <th>รอบ</th>
+            </tr>
+          </thead>
+          <tbody id="fhHorseYearlyBody"></tbody>
+        </table>
+      </div>
+
       <div style="font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:1.4px; color:#722F37; margin:18px 0 6px;">SUB-PERIOD BREAKDOWN</div>
       <div class="heatmap-wrapper">
         <table class="simple-table" id="fhPeriodTable">
@@ -5068,6 +5087,36 @@ function _fhRenderHorseRace() {
       '<td>' + (all ? (all.hit * 100).toFixed(0) + '%' : '—') + '</td></tr>';
   });
   document.getElementById('fhHorseBody').innerHTML = rows.join('');
+
+  // ---------- Yearly breakdown (last 8 calendar years) ----------
+  const yBody = document.getElementById('fhHorseYearlyBody');
+  if (yBody) {
+    const keys = ['icMom6', 'icSkip', 'icHi52', 'icFip', 'icVadj'];
+    const byYear = {};
+    pts.forEach(p => {
+      const y = +p.date.substring(0, 4);
+      (byYear[y] = byYear[y] || []).push(p);
+    });
+    const years = Object.keys(byYear).map(Number).sort((a, b) => a - b).slice(-8);
+    const yRows = [];
+    years.forEach(y => {
+      const seg = byYear[y];
+      const means = keys.map(k => {
+        const v = seg.filter(p => p[k] != null).map(p => p[k]);
+        return v.length >= 3 ? v.reduce((a, b) => a + b, 0) / v.length : null;
+      });
+      let best = -Infinity, bi = -1;
+      means.forEach((m, i) => { if (m != null && m > best) { best = m; bi = i; } });
+      const cells = means.map((m, i) => {
+        if (m == null) return '<td style="color:#7A6F62;">—</td>';
+        const win = i === bi;
+        const neg = m < 0;
+        return '<td style="' + (win ? 'font-weight:700; color:#1F7D49; background:rgba(46,159,95,0.10);' : (neg ? 'color:#9C2B2B;' : '')) + '">' + (m >= 0 ? '+' : '') + m.toFixed(3) + '</td>';
+      });
+      yRows.push('<tr><td style="text-align:left; font-family:\'Anuphan\',sans-serif; font-weight:700;">' + (y + 543) + '</td>' + cells.join('') + '<td style="color:#7A6F62;">' + seg.length + '</td></tr>');
+    });
+    yBody.innerHTML = yRows.join('');
+  }
 }
 
 function _fhPeriodStats(monthly, ics, y0, y1) {
