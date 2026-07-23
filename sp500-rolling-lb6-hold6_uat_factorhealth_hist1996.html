@@ -1940,6 +1940,33 @@
       <div style="font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:1.4px; color:#722F37; margin:18px 0 6px;">RANK IC — ทุกรอบ REBALANCE (FORWARD 6M)</div>
       <div style="height:320px; position:relative;"><canvas id="fhIcChart"></canvas></div>
 
+      <div style="font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:1.4px; color:#722F37; margin:18px 0 6px;">FACTOR HORSE RACE — LB6 vs 6-1 SKIP vs 52W HIGH</div>
+      <div style="background:linear-gradient(180deg,#FFFEF8 0%,#F5EDD8 100%); border:1.5px dashed rgba(212,175,55,0.5); border-radius:12px; padding:12px 14px; font-family:'Anuphan',sans-serif; font-size:0.82rem; color:#3D3228; line-height:1.6; margin-bottom:10px;">
+        แข่ง 3 factor แบบ "เพียวๆ" (ไม่รวมน้ำหนัก volume) บนวัน rebalance เดียวกัน + forward 6 เดือนเดียวกันทุกจุด:
+        <strong style="color:#B8860B;">LB6</strong> = ผลตอบแทน 6 เดือนถึงเมื่อวาน (ตัวที่ใช้อยู่) ·
+        <strong style="color:#722F37;">6-1 Skip</strong> = ผลตอบแทน 6 เดือนแต่<u>ข้ามเดือนล่าสุด</u> (ตัดผล short-term reversal ตามงานวิชาการ) ·
+        <strong style="color:#1F7D49;">52W High</strong> = ราคาปัจจุบันใกล้จุดสูงสุด 52 สัปดาห์แค่ไหน (ยิ่งใกล้ยอด = อันดับยิ่งดี) ·
+        เส้นในกราฟ = ค่าเฉลี่ยเคลื่อนที่ 12 รอบของ IC — เส้นไหนอยู่สูงกว่า = factor นั้นทำนายเก่งกว่าในช่วงนั้น
+      </div>
+      <div id="fh-hr-loading" style="font-family:'Anuphan',sans-serif; font-size:0.82rem; color:#8B6914; padding:6px 2px;">⏳ กำลังคำนวณ horse race (~2-3 วินาที)...</div>
+      <div style="height:320px; position:relative;"><canvas id="fhHorseChart"></canvas></div>
+      <div class="heatmap-wrapper" style="margin-top:10px;">
+        <table class="simple-table" id="fhHorseTable">
+          <thead>
+            <tr>
+              <th style="text-align:left;">Factor</th>
+              <th>Mean IC ทั้งหมด</th>
+              <th>2539–2548 ⚠️</th>
+              <th>2549–2558</th>
+              <th>2559–2569</th>
+              <th>5 ปีล่าสุด</th>
+              <th>Hit Rate</th>
+            </tr>
+          </thead>
+          <tbody id="fhHorseBody"></tbody>
+        </table>
+      </div>
+
       <div style="font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:1.4px; color:#722F37; margin:18px 0 6px;">SUB-PERIOD BREAKDOWN</div>
       <div class="heatmap-wrapper">
         <table class="simple-table" id="fhPeriodTable">
@@ -3963,6 +3990,7 @@ function runRollingBacktest() {
           state.icSnapshots.push({
             date: dateStr,
             signalIdx: signalIdx,
+            startIdx: startIdx,                      // UAT horse race: lookback anchor for pure-factor recompute
             tickers: candidates.map(c => c.ticker)   // ranked order: index 0 = best composite score
           });
           const alloc = newLotCapital / CONFIG.topN;
@@ -4824,6 +4852,175 @@ function _fhSpearmanIC(snap) {
   return { date: snap.date, ic: cov / Math.sqrt(vx * vy), n: n };
 }
 
+// ---------- UAT · FACTOR HORSE RACE (LB6 pure vs 6-1 skip vs 52W high) ----------
+function _fhRankCorrVals(vals, fwds) {
+  // vals/fwds: aligned arrays. Higher val = better signal, higher fwd = better outcome.
+  const n = vals.length;
+  if (n < 30) return null;
+  const rankOf = arr => {
+    const order = arr.map((_, i) => i).sort((a, b) => arr[b] - arr[a]);  // desc: 0 = highest
+    const r = new Array(n);
+    order.forEach((origI, rk) => { r[origI] = rk; });
+    return r;
+  };
+  const rx = rankOf(vals), ry = rankOf(fwds);
+  let sx = 0, sy = 0;
+  for (let i = 0; i < n; i++) { sx += rx[i]; sy += ry[i]; }
+  const mx = sx / n, my = sy / n;
+  let cov = 0, vx = 0, vy = 0;
+  for (let i = 0; i < n; i++) {
+    const dx = rx[i] - mx, dy = ry[i] - my;
+    cov += dx * dy; vx += dx * dx; vy += dy * dy;
+  }
+  if (vx === 0 || vy === 0) return null;
+  return cov / Math.sqrt(vx * vy);
+}
+
+function _fhComputeHorseRace() {
+  // Returns [{date, icMom6, icSkip, icHi52}] on the SAME rebalance dates + forward windows.
+  const out = [];
+  const SD = state.sortedDates, MD = state.marketData;
+  for (const snap of (state.icSnapshots || [])) {
+    const sIdx = snap.signalIdx, stIdx = snap.startIdx;
+    const sDate = SD[sIdx];
+    if (!sDate || stIdx == null || stIdx < 0 || stIdx >= sIdx) continue;
+    // forward window: same rule as _fhSpearmanIC (binary search, 6 calendar months, min 60 trading days)
+    const sd = new Date(sDate);
+    const td = new Date(sd.getFullYear(), sd.getMonth() + 6, sd.getDate());
+    const targetStr = td.getFullYear() + '-' + String(td.getMonth() + 1).padStart(2, '0') + '-' + String(td.getDate()).padStart(2, '0');
+    let lo = sIdx + 1, hi = SD.length - 1, fIdx = -1;
+    while (lo <= hi) { const mid = (lo + hi) >> 1; if (SD[mid] <= targetStr) { fIdx = mid; lo = mid + 1; } else { hi = mid - 1; } }
+    if (fIdx === -1 || (fIdx - sIdx) < 60) continue;
+    const sRow = MD[sDate], stRow = MD[SD[stIdx]], fRow = MD[SD[fIdx]];
+    // 6-1 skip: end price ~21 trading days before signal (skip most-recent month)
+    const skIdx = sIdx - 21;
+    const skRow = skIdx > stIdx ? MD[SD[skIdx]] : null;
+    // 52W high: rolling max close over up to 252 trading days ending at signal (need >=120 days)
+    const w0 = Math.max(0, sIdx - 251);
+    const hasHi = (sIdx - w0) >= 120;
+    const hiMax = {};
+    if (hasHi) {
+      for (let k = w0; k <= sIdx; k++) {
+        const row = MD[SD[k]];
+        if (!row) continue;
+        for (const t of snap.tickers) {
+          const c = row[t] ? row[t].c : null;
+          if (c > 0 && (hiMax[t] == null || c > hiMax[t])) hiMax[t] = c;
+        }
+      }
+    }
+    const vM6 = [], vSk = [], vHi = [], fM6 = [], fSk = [], fHi = [];
+    for (const t of snap.tickers) {
+      const p0 = sRow[t] ? sRow[t].c : null;
+      const pS = stRow[t] ? stRow[t].c : null;
+      if (!(p0 > 0) || !(pS > 0)) continue;
+      let p1 = fRow[t] ? fRow[t].c : null;
+      if (p1 == null) {
+        for (let b = 1; b <= 5 && fIdx - b > sIdx; b++) {
+          const r = MD[SD[fIdx - b]];
+          if (r && r[t] && r[t].c > 0) { p1 = r[t].c; break; }
+        }
+      }
+      if (!(p1 > 0)) continue;
+      const fwd = (p1 - p0) / p0;
+      vM6.push((p0 - pS) / pS); fM6.push(fwd);
+      if (skRow && skRow[t] && skRow[t].c > 0) { vSk.push((skRow[t].c - pS) / pS); fSk.push(fwd); }
+      if (hasHi && hiMax[t] > 0) { vHi.push(p0 / hiMax[t]); fHi.push(fwd); }
+    }
+    out.push({
+      date: snap.date,
+      icMom6: _fhRankCorrVals(vM6, fM6),
+      icSkip: _fhRankCorrVals(vSk, fSk),
+      icHi52: hasHi ? _fhRankCorrVals(vHi, fHi) : null
+    });
+  }
+  return out;
+}
+
+function _fhHorseStats(pts, key, y0, y1) {
+  const seg = pts.filter(p => {
+    if (p[key] == null) return false;
+    if (y0 == null) return true;
+    const y = +p.date.substring(0, 4);
+    return y >= y0 && y <= y1;
+  }).map(p => p[key]);
+  if (!seg.length) return null;
+  return { mean: seg.reduce((a, b) => a + b, 0) / seg.length, hit: seg.filter(v => v > 0).length / seg.length, n: seg.length };
+}
+
+function _fhRenderHorseRace() {
+  const loadEl = document.getElementById('fh-hr-loading');
+  const token = (state.icSnapshots || []).length + '|' + ((state.icSnapshots[0] || {}).date || '') + '|' + ((state.icSnapshots[state.icSnapshots.length - 1] || {}).date || '') + '|' + CONFIG.startYear;
+  let pts;
+  if (state._fhHorseCache && state._fhHorseCache.token === token) {
+    pts = state._fhHorseCache.pts;
+  } else {
+    pts = _fhComputeHorseRace();
+    state._fhHorseCache = { token, pts };
+  }
+  if (loadEl) loadEl.style.display = 'none';
+  if (!pts || pts.length < 12) return;
+
+  const rollN = 12;
+  const roll = key => pts.map((p, i) => {
+    let s = 0, c = 0;
+    for (let k = Math.max(0, i - rollN + 1); k <= i; k++) {
+      if (pts[k][key] != null) { s += pts[k][key]; c++; }
+    }
+    return (i >= rollN - 1 && c >= Math.floor(rollN * 0.7)) ? s / c : null;
+  });
+  const lbls = pts.map(p => p.date.substring(0, 7));
+
+  if (charts.fhHorse) charts.fhHorse.destroy();
+  charts.fhHorse = new Chart(document.getElementById('fhHorseChart').getContext('2d'), {
+    type: 'line',
+    data: { labels: lbls, datasets: [
+      { label: 'LB6 (ที่ใช้อยู่)', data: roll('icMom6'), borderColor: '#B8860B', pointRadius: 0, borderWidth: 2.5, tension: 0.2, spanGaps: true },
+      { label: '6-1 Skip', data: roll('icSkip'), borderColor: '#722F37', pointRadius: 0, borderWidth: 2, tension: 0.2, spanGaps: true },
+      { label: '52W High', data: roll('icHi52'), borderColor: '#1F7D49', pointRadius: 0, borderWidth: 2, tension: 0.2, spanGaps: true }
+    ]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: true, labels: { font: { family: 'Anuphan' } } },
+        tooltip: { callbacks: { label: c => ' ' + c.dataset.label + ': ' + (c.parsed.y == null ? '—' : c.parsed.y.toFixed(3)) } } },
+      scales: {
+        x: { ticks: { maxTicksLimit: 14, font: { family: 'Anuphan', size: 10 } }, grid: { display: false } },
+        y: { title: { display: true, text: 'Rolling 12-round Mean IC', font: { family: 'Anuphan' } },
+             grid: { color: ctx => ctx.tick.value === 0 ? 'rgba(114,47,55,0.55)' : 'rgba(212,175,55,0.15)' } }
+      }
+    }
+  });
+
+  // Table — winner per column bolded
+  const lastY = +pts[pts.length - 1].date.substring(0, 4);
+  const factors = [
+    ['LB6 (ที่ใช้อยู่)', 'icMom6', '#B8860B'],
+    ['6-1 Skip', 'icSkip', '#722F37'],
+    ['52W High', 'icHi52', '#1F7D49']
+  ];
+  const cols = [[null, null], [1996, 2005], [2006, 2015], [2016, lastY], [lastY - 4, lastY]];
+  const cells = factors.map(([, key]) => cols.map(([a, b]) => _fhHorseStats(pts, key, a, b)));
+  const winner = cols.map((_, ci) => {
+    let best = -1, bi = -1;
+    cells.forEach((row, ri) => { if (row[ci] && row[ci].mean > best) { best = row[ci].mean; bi = ri; } });
+    return bi;
+  });
+  const fmt = v => (v >= 0 ? '+' : '') + v.toFixed(3);
+  const rows = factors.map(([name, key, color], ri) => {
+    const all = cells[ri][0];
+    const td = (ci) => {
+      const st = cells[ri][ci];
+      if (!st) return '<td style="color:#7A6F62;">—</td>';
+      const win = winner[ci] === ri;
+      return '<td style="' + (win ? 'font-weight:700; color:#1F7D49; background:rgba(46,159,95,0.08);' : '') + '">' + fmt(st.mean) + '</td>';
+    };
+    return '<tr><td style="text-align:left; font-family:\'Anuphan\',sans-serif; font-weight:700; color:' + color + ';">' + name + '</td>' +
+      td(0) + td(1) + td(2) + td(3) + td(4) +
+      '<td>' + (all ? (all.hit * 100).toFixed(0) + '%' : '—') + '</td></tr>';
+  });
+  document.getElementById('fhHorseBody').innerHTML = rows.join('');
+}
+
 function _fhPeriodStats(monthly, ics, y0, y1) {
   // monthly = [{ym,date,eq,spy}], period inclusive years [y0..y1]
   const seg = monthly.filter(m => { const y = +m.ym.substring(0,4); return y >= y0 && y <= y1; });
@@ -4968,6 +5165,11 @@ function renderFactorHealth() {
       '<td>' + (st.icMean == null ? '—' : ((st.icMean >= 0 ? '+' : '') + st.icMean.toFixed(3)) + ' <span style="color:#7A6F62; font-size:0.72em;">(' + st.nIC + ' รอบ)</span>') + '</td></tr>');
   });
   document.getElementById('fhPeriodBody').innerHTML = rows.join('');
+
+  // Horse race is heavy (52W scan) — defer so the rest of the page paints first
+  const hrLoad = document.getElementById('fh-hr-loading');
+  if (hrLoad) hrLoad.style.display = '';
+  setTimeout(_fhRenderHorseRace, 60);
 }
 
 function renderAll() {
