@@ -1940,15 +1940,17 @@
       <div style="font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:1.4px; color:#722F37; margin:18px 0 6px;">RANK IC — ทุกรอบ REBALANCE (FORWARD 6M)</div>
       <div style="height:320px; position:relative;"><canvas id="fhIcChart"></canvas></div>
 
-      <div style="font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:1.4px; color:#722F37; margin:18px 0 6px;">FACTOR HORSE RACE — LB6 vs 6-1 SKIP vs 52W HIGH</div>
+      <div style="font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:1.4px; color:#722F37; margin:18px 0 6px;">FACTOR HORSE RACE — 5 FACTORS</div>
       <div style="background:linear-gradient(180deg,#FFFEF8 0%,#F5EDD8 100%); border:1.5px dashed rgba(212,175,55,0.5); border-radius:12px; padding:12px 14px; font-family:'Anuphan',sans-serif; font-size:0.82rem; color:#3D3228; line-height:1.6; margin-bottom:10px;">
-        แข่ง 3 factor แบบ "เพียวๆ" (ไม่รวมน้ำหนัก volume) บนวัน rebalance เดียวกัน + forward 6 เดือนเดียวกันทุกจุด:
+        แข่ง 5 factor บนวัน rebalance เดียวกัน + forward 6 เดือนเดียวกันทุกจุด:
         <strong style="color:#B8860B;">LB6</strong> = ผลตอบแทน 6 เดือนถึงเมื่อวาน (ตัวที่ใช้อยู่) ·
         <strong style="color:#722F37;">6-1 Skip</strong> = ผลตอบแทน 6 เดือนแต่<u>ข้ามเดือนล่าสุด</u> (ตัดผล short-term reversal ตามงานวิชาการ) ·
         <strong style="color:#1F7D49;">52W High</strong> = ราคาปัจจุบันใกล้จุดสูงสุด 52 สัปดาห์แค่ไหน (ยิ่งใกล้ยอด = อันดับยิ่งดี) ·
+        <strong style="color:#C71F4A;">FIP</strong> (frog-in-the-pan) = โมเมนตัมแบบ "ขึ้นเนียน" — ผสมอันดับผลตอบแทน 6 เดือน 50% + อันดับสัดส่วนวันที่บวก 50% (หุ้นเดินขึ้นบันไดชนะหุ้นกระโดดจากข่าวก้อนเดียว) ·
+        <strong style="color:#5A3D20;">Vol-Adj</strong> = ผลตอบแทน 6 เดือน ÷ ความผันผวนรายวัน (หุ้นขึ้น 40% นิ่งๆ ชนะหุ้นขึ้น 50% แบบเหวี่ยง) ·
         เส้นในกราฟ = ค่าเฉลี่ยเคลื่อนที่ 12 รอบของ IC — เส้นไหนอยู่สูงกว่า = factor นั้นทำนายเก่งกว่าในช่วงนั้น
       </div>
-      <div id="fh-hr-loading" style="font-family:'Anuphan',sans-serif; font-size:0.82rem; color:#8B6914; padding:6px 2px;">⏳ กำลังคำนวณ horse race (~2-3 วินาที)...</div>
+      <div id="fh-hr-loading" style="font-family:'Anuphan',sans-serif; font-size:0.82rem; color:#8B6914; padding:6px 2px;">⏳ กำลังคำนวณ horse race 5 factors (~4-6 วินาที)...</div>
       <div style="height:320px; position:relative;"><canvas id="fhHorseChart"></canvas></div>
       <div class="heatmap-wrapper" style="margin-top:10px;">
         <table class="simple-table" id="fhHorseTable">
@@ -4877,7 +4879,7 @@ function _fhRankCorrVals(vals, fwds) {
 }
 
 function _fhComputeHorseRace() {
-  // Returns [{date, icMom6, icSkip, icHi52}] on the SAME rebalance dates + forward windows.
+  // Returns [{date, icMom6, icSkip, icHi52, icFip, icVadj}] on the SAME rebalance dates + forward windows.
   const out = [];
   const SD = state.sortedDates, MD = state.marketData;
   for (const snap of (state.icSnapshots || [])) {
@@ -4909,7 +4911,26 @@ function _fhComputeHorseRace() {
         }
       }
     }
-    const vM6 = [], vSk = [], vHi = [], fM6 = [], fSk = [], fHi = [];
+    // Daily-return stats over lookback (one pass): %pos days (FIP) + daily vol (Vol-Adj)
+    const dstat = {};
+    for (let k = stIdx; k <= sIdx; k++) {
+      const row = MD[SD[k]];
+      if (!row) continue;
+      for (const t of snap.tickers) {
+        const cell = row[t];
+        if (!cell || !(cell.c > 0)) continue;
+        let st = dstat[t];
+        if (!st) { st = dstat[t] = { n: 0, pos: 0, sum: 0, sum2: 0, prev: 0 }; }
+        if (st.prev > 0) {
+          const r = cell.c / st.prev - 1;
+          st.n++; if (r > 0) st.pos++;
+          st.sum += r; st.sum2 += r * r;
+        }
+        st.prev = cell.c;
+      }
+    }
+    const vM6 = [], vSk = [], vHi = [], vVa = [], fM6 = [], fSk = [], fHi = [], fVa = [];
+    const fipMom = [], fipSm = [], fFip = [];
     for (const t of snap.tickers) {
       const p0 = sRow[t] ? sRow[t].c : null;
       const pS = stRow[t] ? stRow[t].c : null;
@@ -4923,15 +4944,39 @@ function _fhComputeHorseRace() {
       }
       if (!(p1 > 0)) continue;
       const fwd = (p1 - p0) / p0;
-      vM6.push((p0 - pS) / pS); fM6.push(fwd);
+      const mom = (p0 - pS) / pS;
+      vM6.push(mom); fM6.push(fwd);
       if (skRow && skRow[t] && skRow[t].c > 0) { vSk.push((skRow[t].c - pS) / pS); fSk.push(fwd); }
       if (hasHi && hiMax[t] > 0) { vHi.push(p0 / hiMax[t]); fHi.push(fwd); }
+      const st = dstat[t];
+      if (st && st.n >= 40) {
+        // FIP smoothness = share of positive days in lookback
+        fipMom.push(mom); fipSm.push(st.pos / st.n); fFip.push(fwd);
+        // Vol-Adj = lookback return / daily volatility
+        const m = st.sum / st.n;
+        const v = Math.sqrt(Math.max(0, st.sum2 / st.n - m * m));
+        if (v > 0) { vVa.push(mom / v); fVa.push(fwd); }
+      }
+    }
+    // FIP = rank blend: 50% momentum rank + 50% smoothness rank (higher value = better = lower combined rank)
+    let vFip = [];
+    if (fipMom.length >= 30) {
+      const rk = arr => {
+        const o = arr.map((_, i) => i).sort((a, b) => arr[b] - arr[a]);
+        const r = new Array(arr.length);
+        o.forEach((oi, x) => { r[oi] = x; });
+        return r;
+      };
+      const rm = rk(fipMom), rs = rk(fipSm);
+      vFip = fipMom.map((_, i) => -(rm[i] + rs[i]));
     }
     out.push({
       date: snap.date,
       icMom6: _fhRankCorrVals(vM6, fM6),
       icSkip: _fhRankCorrVals(vSk, fSk),
-      icHi52: hasHi ? _fhRankCorrVals(vHi, fHi) : null
+      icHi52: hasHi ? _fhRankCorrVals(vHi, fHi) : null,
+      icFip: vFip.length ? _fhRankCorrVals(vFip, fFip) : null,
+      icVadj: _fhRankCorrVals(vVa, fVa)
     });
   }
   return out;
@@ -4977,7 +5022,9 @@ function _fhRenderHorseRace() {
     data: { labels: lbls, datasets: [
       { label: 'LB6 (ที่ใช้อยู่)', data: roll('icMom6'), borderColor: '#B8860B', pointRadius: 0, borderWidth: 2.5, tension: 0.2, spanGaps: true },
       { label: '6-1 Skip', data: roll('icSkip'), borderColor: '#722F37', pointRadius: 0, borderWidth: 2, tension: 0.2, spanGaps: true },
-      { label: '52W High', data: roll('icHi52'), borderColor: '#1F7D49', pointRadius: 0, borderWidth: 2, tension: 0.2, spanGaps: true }
+      { label: '52W High', data: roll('icHi52'), borderColor: '#1F7D49', pointRadius: 0, borderWidth: 2, tension: 0.2, spanGaps: true },
+      { label: 'FIP', data: roll('icFip'), borderColor: '#C71F4A', pointRadius: 0, borderWidth: 2, tension: 0.2, spanGaps: true },
+      { label: 'Vol-Adj', data: roll('icVadj'), borderColor: '#5A3D20', pointRadius: 0, borderWidth: 2, tension: 0.2, spanGaps: true }
     ]},
     options: {
       responsive: true, maintainAspectRatio: false,
@@ -4996,7 +5043,9 @@ function _fhRenderHorseRace() {
   const factors = [
     ['LB6 (ที่ใช้อยู่)', 'icMom6', '#B8860B'],
     ['6-1 Skip', 'icSkip', '#722F37'],
-    ['52W High', 'icHi52', '#1F7D49']
+    ['52W High', 'icHi52', '#1F7D49'],
+    ['FIP', 'icFip', '#C71F4A'],
+    ['Vol-Adj', 'icVadj', '#5A3D20']
   ];
   const cols = [[null, null], [1996, 2005], [2006, 2015], [2016, lastY], [lastY - 4, lastY]];
   const cells = factors.map(([, key]) => cols.map(([a, b]) => _fhHorseStats(pts, key, a, b)));
