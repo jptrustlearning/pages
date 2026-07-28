@@ -771,6 +771,61 @@
   }
   .panel-body .hint strong { color:var(--gold-deep); font-weight:700; }
 
+  /* --- LAB · GROUP FILTER (Theme / Sector tick-boxes) --------------------- */
+  .gf-head { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+  .gf-btn {
+    font-family:'Sarabun','Anuphan',sans-serif; font-size:0.72rem; font-weight:700;
+    color:var(--gold-deep); background:var(--cream-warm);
+    border:1px solid var(--border); border-radius:999px;
+    padding:6px 14px; cursor:pointer; transition:all 0.18s ease;
+  }
+  .gf-btn:hover { border-color:var(--accent); background:var(--gold-light); transform:translateY(-1px); }
+  .gf-btn:active { transform:translateY(0); }
+  .gf-count {
+    margin-left:auto; font-family:'DM Serif Display',serif; font-size:1rem;
+    color:var(--burgundy); white-space:nowrap;
+  }
+  .gf-count .gf-warn {
+    display:block; font-family:'Sarabun','Anuphan',sans-serif; font-size:0.68rem;
+    font-weight:700; color:var(--red); line-height:1.3; margin-top:2px;
+  }
+  .gf-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(158px,1fr)); gap:8px; }
+  .panel-body .control-group label.gf-chip {
+    display:flex; align-items:center; gap:9px; margin-bottom:0;
+    padding:9px 11px; border-radius:10px; cursor:pointer;
+    border:1px solid var(--border); background:var(--cream-warm);
+    font-family:'Sarabun','Anuphan',sans-serif; font-size:0.78rem; font-weight:600;
+    color:var(--text-muted); letter-spacing:0; text-transform:none;
+    transition:all 0.18s ease; -webkit-user-select:none; user-select:none;
+  }
+  .panel-body .control-group label.gf-chip:hover { border-color:var(--accent); }
+  .panel-body .control-group label.gf-chip.on {
+    background:var(--cream-card); border-color:rgba(212,175,55,0.55);
+    color:var(--text-dark); box-shadow:0 2px 8px rgba(114,47,55,0.06);
+  }
+  .gf-chip input { position:absolute; opacity:0; width:0; height:0; }
+  .gf-box {
+    flex:0 0 18px; width:18px; height:18px; border-radius:5px;
+    border:1.5px solid rgba(212,175,55,0.6); background:#fff;
+    display:flex; align-items:center; justify-content:center; transition:all 0.18s ease;
+  }
+  .gf-chip.on .gf-box { background:linear-gradient(135deg,#D4AF37,#B8860B); border-color:#B8860B; }
+  .gf-chip.on .gf-box::after {
+    content:''; width:5px; height:9px; border:solid #FFFEF8;
+    border-width:0 2px 2px 0; transform:rotate(45deg) translate(-1px,-1px);
+  }
+  .gf-name { flex:1; line-height:1.25; }
+  .gf-chip:not(.on) .gf-name { text-decoration:line-through; opacity:0.55; }
+  .gf-n { font-family:'DM Serif Display',serif; font-size:0.8rem; color:var(--gold-deep); opacity:0.7; }
+  @media (max-width:480px) {
+    .gf-grid { grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:7px; }
+    .panel-body .control-group label.gf-chip { font-size:0.74rem; padding:8px 9px; }
+    /* On a phone the warning line has no room beside the buttons — give the
+       counter its own row instead of letting it wrap into three. */
+    .gf-count { flex-basis:100%; margin-left:0; text-align:left; }
+    .gf-count .gf-warn { margin-top:3px; }
+  }
+
   /* --- ABOUT MODAL --- */
   .about-modal {
     position:fixed; inset:0; z-index:210; display:none;
@@ -2145,6 +2200,20 @@
       <span class="hint">ไล่อันดับ momentum จากบนลงล่างเหมือนเดิม แต่จำกัด <strong>ไม่เกิน (หุ้นต่อ Theme) ตัวใน Theme เดียวกัน</strong> และ <strong>ใช้ได้ไม่เกิน (จำนวน Theme) Theme ต่อล็อต</strong> · default 10 × 1 = 10 ตัว (กระจาย 10 กลุ่ม กลุ่มละ 1 ตัว) · Theme มาจาก <strong>master_map.csv</strong> (28 Theme · 657 ticker) · <strong>ล็อตต่างรอบถือซ้ำกันได้</strong></span>
     </div>
 
+    <!-- LAB · GROUP FILTER — tick which Themes/Sectors may enter the portfolio.
+         The list is built at runtime from master_map.csv, so it shows 28 Themes on the
+         theme tiles and 11 Sectors when ?map=sector swaps the grouping column. -->
+    <div class="control-group" id="groupFilterGroup">
+      <label>THEME FILTER — เลือก Theme ที่ให้เข้าพอร์ต</label>
+      <div class="gf-head">
+        <button type="button" class="gf-btn" onclick="gfSetAll(true)">เลือกทั้งหมด</button>
+        <button type="button" class="gf-btn" onclick="gfSetAll(false)">ล้างทั้งหมด</button>
+        <span class="gf-count" id="gfCount">—</span>
+      </div>
+      <div class="gf-grid" id="groupFilterList"></div>
+      <span class="hint">ติ๊กเฉพาะ <strong>Theme</strong> ที่ต้องการให้เข้าพอร์ต · กลุ่มที่ไม่ติ๊กจะถูก<strong>ข้ามทั้งหมด</strong>ตอนไล่อันดับ momentum — หุ้นในกลุ่มนั้นจะไม่ถูกเลือกเลย · ค่าเริ่มต้นคือ <strong>เปิดครบทุกกลุ่ม</strong> · ตัวเลขหลังชื่อ = จำนวนหุ้นในกลุ่มนั้น</span>
+    </div>
+
     <!-- LAB v5: Stop Loss control -->
     <div class="control-group" style="border:1.5px dashed rgba(193,69,69,0.55); padding:14px 14px 12px; border-radius:10px; background:linear-gradient(180deg, rgba(193,69,69,0.08), rgba(255,254,248,0.6)); position:relative;">
       <div style="position:absolute; top:-9px; left:14px; background:linear-gradient(90deg,#9C2B2B,#C14545); color:#FAF6ED; padding:2px 10px; border-radius:10px; font-size:0.7rem; font-weight:700; letter-spacing:0.6px; font-family:'Cinzel',serif;">LAB v5 · STOP LOSS</div>
@@ -2222,7 +2291,7 @@
     </div>
     <div class="footer-row">
       <button class="btn-cancel" onclick="closeSettingsPanel()">ยกเลิก</button>
-      <button class="btn-run-backtest" onclick="runBacktest(); closeSettingsPanel();">
+      <button class="btn-run-backtest" onclick="if (gfGuard()) { runBacktest(); closeSettingsPanel(); }">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         RUN BACKTEST
       </button>
@@ -2461,6 +2530,134 @@ function syncTopNDisplay() {
   o.value = nt * pt;
 }
 
+// ═══ LAB · GROUP FILTER — user-selectable Theme / Sector whitelist ═══════════
+// EXCLUDED_GROUPS holds the group names the member has UNTICKED. Empty set = the
+// engine behaves exactly as before (every group eligible), so every existing tile
+// is unchanged until somebody actually unticks something.
+// The filter is applied inside selectThemeCapped(), which is the single choke point
+// for all three selection call sites (live rebalance, next-signal preview, and the
+// sensitivity sweep via selectThemeCappedN).
+let EXCLUDED_GROUPS = new Set();
+let ALL_GROUPS = [];
+
+// Which word this tile uses for the grouping axis. ?map=sector flips it.
+function _grpWord() { return (window.__JPT_MAP_COL === 'sector') ? 'Sector' : 'Theme'; }
+function _grpWordTh() { return (window.__JPT_MAP_COL === 'sector') ? 'อุตสาหกรรม' : 'ธีม'; }
+// Saved-settings field name. Theme tiles and sector tiles share one settings blob,
+// so they must not overwrite each other's exclusion list.
+function _gfField() { return (window.__JPT_MAP_COL === 'sector') ? 'excludedSectors' : 'excludedThemes'; }
+
+// Thai labels for the 11 GICS sectors. Themes (28) keep their English names.
+const GROUP_TH = {
+  'Information Technology': 'เทคโนโลยี',
+  'Financials': 'การเงิน',
+  'Health Care': 'สุขภาพ',
+  'Consumer Discretionary': 'สินค้าฟุ่มเฟือย',
+  'Consumer Staples': 'สินค้าจำเป็น',
+  'Communication Services': 'สื่อสาร',
+  'Industrials': 'อุตสาหกรรม',
+  'Energy': 'พลังงาน',
+  'Materials': 'วัตถุดิบ',
+  'Real Estate': 'อสังหาฯ',
+  'Utilities': 'สาธารณูปโภค'
+};
+
+function _gfEsc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// Built AFTER loadThemeMap() so the list always matches the column actually loaded.
+function buildGroupFilterUI() {
+  const wrap = document.getElementById('groupFilterList');
+  if (!wrap) return;
+  const counts = {};
+  for (const tk in THEME_MAP) { const g = THEME_MAP[tk]; counts[g] = (counts[g] || 0) + 1; }
+  ALL_GROUPS = Object.keys(counts).sort(function(a, b) {
+    return counts[b] - counts[a] || a.localeCompare(b);
+  });
+  if (!ALL_GROUPS.length) { wrap.innerHTML = '<span class="hint" style="border:0;padding:0;margin:0;">โหลดตารางกลุ่มไม่สำเร็จ</span>'; return; }
+
+  // Drop stale exclusions that belong to the other map column (e.g. a saved theme
+  // name loaded on a sector tile) so the count never lies.
+  const valid = new Set(ALL_GROUPS);
+  EXCLUDED_GROUPS.forEach(function(g) { if (!valid.has(g)) EXCLUDED_GROUPS.delete(g); });
+
+  wrap.innerHTML = ALL_GROUPS.map(function(g) {
+    const on = !EXCLUDED_GROUPS.has(g);
+    // Thai names exist for the 11 GICS sectors only. On the 28-theme map every
+    // chip stays English so the list does not read half-translated.
+    const label = (window.__JPT_MAP_COL === 'sector' && GROUP_TH[g]) ? GROUP_TH[g] : g;
+    return '<label class="gf-chip' + (on ? ' on' : '') + '" data-g="' + _gfEsc(g) + '" title="' + _gfEsc(g) + '">' +
+             '<input type="checkbox"' + (on ? ' checked' : '') + '>' +
+             '<span class="gf-box"></span>' +
+             '<span class="gf-name">' + _gfEsc(label) + '</span>' +
+             '<span class="gf-n">' + counts[g] + '</span>' +
+           '</label>';
+  }).join('');
+
+  wrap.querySelectorAll('.gf-chip input').forEach(function(cb) {
+    cb.addEventListener('change', function() {
+      const chip = this.closest('.gf-chip');
+      const g = chip.getAttribute('data-g');
+      if (this.checked) { EXCLUDED_GROUPS.delete(g); chip.classList.add('on'); }
+      else { EXCLUDED_GROUPS.add(g); chip.classList.remove('on'); }
+      updateGroupFilterCount();
+    });
+  });
+
+  // With ?map=sector there are only 11 groups, so a quota of 28 is meaningless.
+  const tc = document.getElementById('themeCountInput');
+  if (tc) tc.max = ALL_GROUPS.length;
+
+  updateGroupFilterCount();
+}
+
+function gfSelectedCount() { return ALL_GROUPS.length - EXCLUDED_GROUPS.size; }
+
+function updateGroupFilterCount() {
+  const out = document.getElementById('gfCount');
+  if (!out) return;
+  const sel = gfSelectedCount();
+  const tcEl = document.getElementById('themeCountInput');
+  const want = tcEl ? (parseInt(tcEl.value, 10) || 1) : 1;
+  let html = sel + ' / ' + ALL_GROUPS.length;
+  let warn = '';
+  if (sel === 0) {
+    warn = 'ต้องเลือกอย่างน้อย 1 ' + _grpWord();
+  } else if (sel < want) {
+    warn = 'เลือกไว้น้อยกว่าโควต้า (' + want + ') — พอร์ตจะได้แค่ ' + sel + ' กลุ่ม';
+  }
+  out.innerHTML = html + (warn ? '<span class="gf-warn">' + warn + '</span>' : '');
+  out.classList.toggle('warn', sel === 0);
+}
+
+function gfSetAll(on) {
+  if (on) EXCLUDED_GROUPS.clear();
+  else ALL_GROUPS.forEach(function(g) { EXCLUDED_GROUPS.add(g); });
+  const wrap = document.getElementById('groupFilterList');
+  if (wrap) {
+    wrap.querySelectorAll('.gf-chip').forEach(function(chip) {
+      const cb = chip.querySelector('input');
+      if (cb) cb.checked = on;
+      chip.classList.toggle('on', on);
+    });
+  }
+  updateGroupFilterCount();
+}
+
+// Called at the top of runBacktest(). An empty whitelist would silently produce an
+// all-cash equity curve, which reads as a broken page rather than a settings mistake.
+function gfGuard() {
+  if (ALL_GROUPS.length && gfSelectedCount() === 0) {
+    if (typeof jptToast === 'function') {
+      jptToast('ยังไม่ได้เลือก ' + _grpWordTh() + ' เลย — ติ๊กอย่างน้อย 1 กลุ่มก่อน');
+    }
+    return false;
+  }
+  return true;
+}
+
 // v10theme selection: walk the momentum-ranked list top-down and accept a stock only if
 //   (a) its THEME currently holds < perTheme picks, AND
 //   (b) the theme is already in the chosen set OR fewer than nThemes themes are chosen.
@@ -2476,6 +2673,9 @@ function selectThemeCapped(candidates, nThemes, perTheme) {
   for (const st of candidates) {
     if (picks.length >= cap) break;
     const th = themeOf(st.ticker);
+    // LAB group filter: an unticked Theme/Sector is skipped outright, so nothing
+    // inside it can ever be picked no matter how high it ranks on momentum.
+    if (EXCLUDED_GROUPS.size && EXCLUDED_GROUPS.has(th)) continue;
     const c  = count[th] || 0;
     if (c >= pt) continue;
     if (c === 0 && Object.keys(count).length >= nt) continue;
@@ -2692,7 +2892,7 @@ function getRollingLB6H3Settings() {
   const y = document.getElementById('startYearSelect');
   const t = document.getElementById('trailStopSelect');
   const g = document.getElementById('gateThresholdInput');
-  return {
+  const _out = {
     weight: w ? parseInt(w.value, 10) : DEFAULT_ROLLING_LB6H3.weight,
     perLotCapital: c ? parseFloat(c.value) || DEFAULT_ROLLING_LB6H3.perLotCapital : DEFAULT_ROLLING_LB6H3.perLotCapital,
     topN: n ? parseInt(n.value, 10) || DEFAULT_ROLLING_LB6H3.topN : DEFAULT_ROLLING_LB6H3.topN,
@@ -2712,6 +2912,10 @@ function getRollingLB6H3Settings() {
     })(),
     gateThreshold: g ? parseFloat(g.value) || DEFAULT_ROLLING_LB6H3.gateThreshold : DEFAULT_ROLLING_LB6H3.gateThreshold
   };
+  // LAB group filter — keyed by map column so the theme tiles and the sector tiles
+  // keep separate lists inside the one shared settings blob.
+  _out[_gfField()] = Array.from(EXCLUDED_GROUPS);
+  return _out;
 }
 
 function applyRollingLB6H3Settings(s) {
@@ -2735,6 +2939,13 @@ function applyRollingLB6H3Settings(s) {
   if (g && s.gateThreshold != null) g.value = s.gateThreshold;
   const slEl = document.getElementById('stopLossSelect');
   if (slEl && s.stopLossPct != null) slEl.value = s.stopLossPct;
+  // LAB group filter. This runs BEFORE loadThemeMap(), so only the Set is restored
+  // here — buildGroupFilterUI() renders the ticks from it afterwards.
+  const _gf = s[_gfField()];
+  if (Array.isArray(_gf)) {
+    EXCLUDED_GROUPS = new Set(_gf);
+    if (document.getElementById('groupFilterList') && ALL_GROUPS.length) buildGroupFilterUI();
+  }
 }
 
 async function loadRollingLB6H3Settings() {
@@ -2766,6 +2977,7 @@ function resetRollingLB6H3Settings() {
   if (!confirm('คืนค่าเริ่มต้นทั้งหมด? (ค่าที่เคยบันทึกจะถูกทับ เมื่อกดบันทึกครั้งถัดไป)')) return;
   const _d = Object.assign({}, DEFAULT_ROLLING_LB6H3);
   if (window.__JPT_CADENCE === 'semi') _d.perLotCapital = 3600;
+  _d[_gfField()] = [];   // LAB: reset ticks every group back on
   applyRollingLB6H3Settings(_d);
   jptToast('รีเซ็ตเป็นค่าเริ่มต้นแล้ว — อย่าลืมกดบันทึก');
 }
@@ -2832,9 +3044,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     if (new URLSearchParams(location.search).get('map') === 'sector') {
       window.__JPT_MAP_COL = 'sector';
-      document.querySelectorAll('.subtitle-lab, .about-sub, .hint, label').forEach(n => {
+      // .top-n-wrapper span covers the bare 'THEMES x ... STOCKS = ... TOTAL' row,
+      // which is neither a label nor a .hint and was reading 'THEMES' on a page
+      // whose own heading already said Sector.
+      document.querySelectorAll('.subtitle-lab, .about-sub, .hint, label, .top-n-wrapper span').forEach(n => {
         n.innerHTML = n.innerHTML
           .replace(/28 Theme/g, '11 Sector')
+          .replace(/THEMES/g, 'SECTORS')
+          .replace(/THEME/g, 'SECTOR')
           .replace(/Theme-Capped/g, 'Sector-Capped')
           .replace(/v10theme/g, 'v10sector')
           .replace(/Theme/g, 'Sector')
@@ -2942,6 +3159,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // v10theme: the theme map MUST be in memory before any selection runs
   await loadThemeMap();
+
+  // LAB group filter: the tick-list can only be drawn once we know which groups
+  // exist, which depends on whether ?map=sector swapped the column.
+  try { buildGroupFilterUI(); } catch (e) { console.warn('[group filter]', e); }
+  const _tcSync = document.getElementById('themeCountInput');
+  if (_tcSync) _tcSync.addEventListener('input', updateGroupFilterCount);
 
   if (CONFIG.cloudCsvUrl && CONFIG.cloudCsvUrl !== 'REPLACE_WITH_YOUR_RAW_CSV_URL') {
       loadDataFromCloud();
@@ -3704,7 +3927,11 @@ function renderOptimizationTable() {
   });
 }
 
-function runBacktest() { return runRollingBacktest(); }  // alias so existing callers work
+function runBacktest() {
+  // LAB group filter: refuse to run on an empty whitelist rather than render a flat line.
+  if (typeof gfGuard === 'function' && !gfGuard()) return;
+  return runRollingBacktest();
+}  // alias so existing callers work
 
 function runRollingBacktest() {
   // =============================================================
@@ -5711,7 +5938,7 @@ function updateMarketAnalyzer() {
     const startYr = document.getElementById('startYearSelect') ? document.getElementById('startYearSelect').value : CONFIG.startYear;
     const topN = CONFIG.topN;
     const wRet = parseInt(document.getElementById('weightSlider').value);
-    rscNarrative.innerHTML = `ด้วยการตั้งค่า <strong>${CONFIG.themeCount} Theme × ${CONFIG.perTheme} ตัว = Top ${topN} หุ้น</strong> · น้ำหนัก Return ${wRet}% / Volume ${100-wRet}% · ` +
+    rscNarrative.innerHTML = `ด้วยการตั้งค่า <strong>${CONFIG.themeCount} ${_grpWord()} × ${CONFIG.perTheme} ตัว = Top ${topN} หุ้น</strong> · น้ำหนัก Return ${wRet}% / Volume ${100-wRet}% · ` +
       `ตั้งแต่ปี ${startYr} ทำกำไรรวม <strong class="${pnl>=0?'text-green':'text-red'}">${pnl>=0?'+':''}$${Math.abs(Math.round(pnl)).toLocaleString()}</strong> ` +
       `คิดเป็น <strong>${stratCagr>=0?'+':''}${(stratCagr*100).toFixed(1)}% ต่อปี</strong> ตลอด ${yrs} ปี · ` +
       `Max Drawdown <strong class="text-red">${(state.equityCurve.length > 0 ? '' : '')}</strong>`;
@@ -5857,7 +6084,10 @@ window.switchStatsTab = function(tab) {
         summary: txt('rscPeriod'),
         config: {
           'ทุนต่อล็อต': '$' + (CONFIG.perLotCapital || 0).toLocaleString(),
-          'จำนวนหุ้นต่อล็อต': CONFIG.topN + ' ตัว (' + CONFIG.themeCount + ' Theme × ' + CONFIG.perTheme + ' ตัว)',
+          'จำนวนหุ้นต่อล็อต': CONFIG.topN + ' ตัว (' + CONFIG.themeCount + ' ' + _grpWord() + ' × ' + CONFIG.perTheme + ' ตัว)',
+          'กลุ่มที่เลือกใช้': (ALL_GROUPS.length && EXCLUDED_GROUPS.size)
+            ? (gfSelectedCount() + '/' + ALL_GROUPS.length + ' กลุ่ม · ตัดออก ' + Array.from(EXCLUDED_GROUPS).join(', '))
+            : 'ครบทุกกลุ่ม',
           'น้ำหนัก Return / Volume': Math.round((CONFIG.weightRet||0)*100) + '% / ' + Math.round((CONFIG.weightVol||0)*100) + '%',
           'ระยะถือครอง': CONFIG.holdMonths + ' เดือน',
           'จังหวะเข้าซื้อ': (window.__JPT_CADENCE === 'semi'
