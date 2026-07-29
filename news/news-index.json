@@ -1,6 +1,214 @@
 {
-  "lastUpdated": "2026-07-28T07:15:00Z",
+  "lastUpdated": "2026-07-29T07:55:00Z",
   "batches": [
+    {
+      "file": "2026-07-29-0755.md",
+      "date": "2026-07-29T07:55:00Z",
+      "date_display": "29 ก.ค. 2026 · 07:55",
+      "summary": "อิหร่านยิงขีปนาวุธใส่ฐานทัพสหรัฐฯ สกัดได้ทั้งหมด น้ำมันเด้ง 5% หลังร่วง 16% ใน 3 วัน · คืนนี้เฟดตัดสินดอกเบี้ย ตลาดให้โอกาสขึ้นดอกเบี้ยกว่า 30% · หุ้นชิปถูกเทขายวันที่ 4 SOX ลบกว่า 5% แต่ Dow บวก 537 จุด · Apple แตะ 5 ล้านล้านดอลลาร์ครั้งแรก Microsoft-Meta ประกาศงบคืนนี้ · SET หยุด 2 วัน กลับมาเปิดพฤหัสฯ ย่อยข่าว 3 วันรวด",
+      "tickers": [
+        "USO",
+        "XLE",
+        "GLD",
+        "TLT",
+        "SPY",
+        "QQQ",
+        "SMH",
+        "MU",
+        "AMD",
+        "NVDA",
+        "AAPL",
+        "MSFT",
+        "META",
+        "GOOGL",
+        "KO",
+        "PTT",
+        "PTTEP",
+        "TOP",
+        "AOT",
+        "DELTA",
+        "KCE"
+      ],
+      "headlines": [
+        {
+          "title": "อิหร่านยิงขีปนาวุธถล่มฐานทัพสหรัฐฯ สหรัฐฯ สกัดได้ทั้งหมด — น้ำมันเด้งกลับ 5% ทันที หลังเพิ่งร่วง 16% ใน 3 วันทำการ แรงที่สุดนับจากเมษายน 2020",
+          "tickers": [
+            {
+              "symbol": "USO",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "XLE",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTTEP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "TOP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "GLD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "SPY",
+              "sentiment": "neutral"
+            }
+          ],
+          "tone_override": "mixed",
+          "source": "CENTCOM, Associated Press, Reuters, Bloomberg, CNN, PBS NewsHour, Rigzone, Trading Economics",
+          "published": "29 ก.ค. 2026"
+        },
+        {
+          "title": "คืนนี้เฟดตัดสินดอกเบี้ย — ตลาดให้โอกาส \"ขึ้น\" ดอกเบี้ยกว่า 30% ซึ่งสูงผิดปกติมากสำหรับวันประชุม และเป็นบททดสอบจริงครั้งแรกของ Kevin Warsh",
+          "tickers": [
+            {
+              "symbol": "TLT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "GLD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "SPY",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "XLE",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "CBS News, Fortune, Morningstar, Bond Buyer, The Conference Board, Reuters",
+          "published": "29 ก.ค. 2026"
+        },
+        {
+          "title": "หุ้นชิปถูกเทขายเป็นวันที่ 4 ติด ดัชนีเซมิคอนดักเตอร์ฟิลาเดลเฟียร่วงกว่า 5% — แต่ Dow บวก 537 จุด และ S&P 500 แบบถ่วงน้ำหนักเท่ากันทำจุดสูงสุดใหม่",
+          "tickers": [
+            {
+              "symbol": "SMH",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "MU",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AMD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "KCE",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "KO",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DIA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "RSP",
+              "sentiment": "positive"
+            }
+          ],
+          "tone_override": "mixed",
+          "source": "CNBC, Bloomberg, Yahoo Finance, TheStreet, TradingKey",
+          "published": "29 ก.ค. 2026"
+        },
+        {
+          "title": "Apple แตะมูลค่า 5 ล้านล้านดอลลาร์เป็นครั้งแรกในประวัติศาสตร์ ขณะที่คืนนี้ Microsoft และ Meta ประกาศงบ — ฤดูกาลนี้ตลาดไม่ได้ให้คะแนน \"การเติบโต\" แต่ให้คะแนน \"ใบเรียกเก็บเงิน\"",
+          "tickers": [
+            {
+              "symbol": "AAPL",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "MSFT",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "META",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "AMZN",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "GOOGL",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "negative"
+            }
+          ],
+          "source": "CNBC, GeekWire, S&P Global, Yahoo Finance, TradingKey",
+          "published": "29 ก.ค. 2026"
+        },
+        {
+          "title": "ตลาดหุ้นไทยหยุด 2 วันติด กลับมาเปิดวันพฤหัสฯ พร้อมย่อยข่าว 3 วันรวดในวันเดียว — คู่มืออ่านเกมสำหรับนักลงทุนไทย",
+          "tickers": [
+            {
+              "symbol": "PTT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTTEP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "KCE",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "KBANK",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "BBL",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "InfoQuest, Kaohoon, Bangkokbiznews, Thairath, SET",
+          "published": "29 ก.ค. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-07-28-0715.md",
       "date": "2026-07-28T07:15:00Z",
