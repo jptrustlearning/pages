@@ -1,6 +1,252 @@
 {
-  "lastUpdated": "2026-07-30T08:05:00Z",
+  "lastUpdated": "2026-07-31T09:25:00Z",
   "batches": [
+    {
+      "file": "2026-07-31-0925.md",
+      "date": "2026-07-31T09:25:00Z",
+      "date_display": "31 ก.ค. 2026 · 09:25",
+      "summary": "Microsoft บวก 16% เพิ่มมูลค่า 450,000 ล้านดอลลาร์ในวันเดียว สถิติใหม่ของตลาดหุ้นโลก · Amazon รายได้ทะลุ 200,000 ล้านดอลลาร์ AWS โต 37% · Apple ร่วง 6.6% เพราะผลิตไม่ทันและหน่วยความจำแพง · KOSPI บวก 15% ทำสถิติสูงสุด · GDP สหรัฐฯ โต 1.5% พันธบัตร 30 ปีแตะ 5.244%",
+      "tickers": [
+        "MSFT",
+        "AMZN",
+        "AAPL",
+        "META",
+        "NVDA",
+        "MU",
+        "SMH",
+        "QQQ",
+        "SPY",
+        "DIA",
+        "TLT",
+        "GLD",
+        "UUP",
+        "USO",
+        "XLE",
+        "PTT",
+        "PTTEP",
+        "TOP",
+        "BCP",
+        "AOT",
+        "CPALL",
+        "DELTA",
+        "KCE",
+        "HANA",
+        "KBANK",
+        "BBL"
+      ],
+      "headlines": [
+        {
+          "title": "Microsoft บวก 16% เพิ่มมูลค่าบริษัท 450,000 ล้านดอลลาร์ในวันเดียว — สถิติใหม่ของตลาดหุ้นโลก Nasdaq ปิดบวก 2.8% ตัดวงจรร่วง 6 วันติด",
+          "tickers": [
+            {
+              "symbol": "MSFT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SMH",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SPY",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "META",
+              "sentiment": "negative"
+            }
+          ],
+          "source": "CNBC, Reuters, Bloomberg, Fortune, Washington Post, Yahoo Finance",
+          "published": "31 ก.ค. 2026"
+        },
+        {
+          "title": "Amazon รายได้ไตรมาสเดียวทะลุ 200,000 ล้านดอลลาร์เป็นครั้งแรก AWS โต 37% เร็วที่สุดในรอบ 18 ไตรมาส แต่เพิ่มงบลงทุนปีนี้เป็น 220,000 ล้านดอลลาร์เพราะหน่วยความจำแพงขึ้น",
+          "tickers": [
+            {
+              "symbol": "AMZN",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "MU",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SMH",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "CNBC, Business Wire, Quartz, Yahoo Finance, Bloomberg",
+          "published": "31 ก.ค. 2026"
+        },
+        {
+          "title": "Apple ทำรายได้ไตรมาสมิถุนายนสูงเป็นประวัติการณ์ แต่หุ้นร่วง 6.6% หลังเตือนว่าไตรมาสหน้าผลิตของไม่ทัน และต้นทุนหน่วยความจำจะแพงขึ้นอีก",
+          "tickers": [
+            {
+              "symbol": "AAPL",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "MU",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "KCE",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "neutral"
+            }
+          ],
+          "tone_override": "bearish",
+          "source": "CNBC, Reuters, Yahoo Finance, TheStreet, Investing.com",
+          "published": "31 ก.ค. 2026"
+        },
+        {
+          "title": "ตลาดหุ้นเกาหลีบวกกว่า 15% ในวันเดียว ทำสถิติสูงสุดในประวัติศาสตร์ Samsung บวก 24% SK Hynix บวก 28% — พลิกกลับจากที่เพิ่งถูกหยุดซื้อขาย 2 วันติด",
+          "tickers": [
+            {
+              "symbol": "SMH",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "MU",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "KCE",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "HANA",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "Asia Business Daily, KED Global, Investing.com, CNBC, Bloomberg",
+          "published": "31 ก.ค. 2026"
+        },
+        {
+          "title": "เงินเฟ้อสหรัฐฯ ชะลอลงตามที่หวัง แต่เศรษฐกิจโตแค่ 1.5% ต่ำกว่าคาด — พันธบัตร 30 ปีขึ้นแตะ 5.244% สูงสุดตั้งแต่ปี 2007",
+          "tickers": [
+            {
+              "symbol": "TLT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "UUP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "GLD",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "SPY",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "KBANK",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "CNBC, Trading Economics, BullionVault, Invezz, Reuters",
+          "published": "31 ก.ค. 2026"
+        },
+        {
+          "title": "ซาอุดีอาระเบียเสนอตั้งกองกำลังทางเรือร่วม 40 ประเทศคุ้มกันเส้นทางเดินเรือ — น้ำมันย่อลง 2% แม้สหรัฐฯ เพิ่งโจมตีอิหร่านระลอกใหญ่",
+          "tickers": [
+            {
+              "symbol": "USO",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "XLE",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "PTT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "PTTEP",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "TOP",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "CPALL",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "CNBC, Bloomberg, Trading Economics, Reuters",
+          "published": "31 ก.ค. 2026"
+        },
+        {
+          "title": "คู่มืออ่านเกม SET วันศุกร์: กลุ่มอิเล็กทรอนิกส์ได้แรงหนุนจากตลาดภูมิภาค แต่บาทที่ 33.65 กับน้ำมัน 89 ดอลลาร์ยังเป็นแรงถ่วง",
+          "tickers": [
+            {
+              "symbol": "DELTA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "KCE",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "HANA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTT",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "KBANK",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "Trading Economics, SET, Thanachart Securities, Bloomberg",
+          "published": "31 ก.ค. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-07-30-0805.md",
       "date": "2026-07-30T08:05:00Z",
