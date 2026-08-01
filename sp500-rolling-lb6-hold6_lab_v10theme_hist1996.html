@@ -6160,6 +6160,13 @@ window.switchStatsTab = function(tab) {
         if (n.type === 'checkbox' || n.type === 'radio') cfg[n.id] = { c: !!n.checked };
         else cfg[n.id] = { v: n.value };
       });
+      /* theme/sector filter chips have no ids — their state is the engine's
+         EXCLUDED_GROUPS set. Persist it under a reserved key.               */
+      try {
+        if (typeof EXCLUDED_GROUPS !== 'undefined'){
+          cfg.__gf = { x: Array.from(EXCLUDED_GROUPS) };
+        }
+      } catch(e){}
       parent.postMessage({ type:'jpt-ctlcfg-save', id: ctlId, cfg: cfg }, '*');
     }
 
@@ -6224,7 +6231,20 @@ window.switchStatsTab = function(tab) {
   function applyMapToInputs(map){
     _applying = true;
     try {
+      if (map.__gf && map.__gf.x && typeof EXCLUDED_GROUPS !== 'undefined'){
+        try {
+          EXCLUDED_GROUPS.clear();
+          map.__gf.x.forEach(function(g){ EXCLUDED_GROUPS.add(g); });
+          /* if the chip list is already rendered, rebuild it so the UI matches
+             (buildGroupFilterUI also drops names not valid for this map column) */
+          if (typeof buildGroupFilterUI === 'function' &&
+              typeof ALL_GROUPS !== 'undefined' && ALL_GROUPS.length){
+            buildGroupFilterUI();
+          }
+        } catch(e){}
+      }
       Object.keys(map).forEach(function(id){
+        if (id === '__gf') return;
         var n = document.getElementById(id);
         if (!n) return;
         var e = map[id];
