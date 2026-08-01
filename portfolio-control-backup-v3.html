@@ -53,8 +53,8 @@
   @media (min-width:900px){ .sgrid{ grid-template-columns:repeat(4,1fr); } }
 
   .strat{
-    position:relative; aspect-ratio:1/1; min-height:172px; min-width:0;
-    display:flex; flex-direction:column; padding:12px;
+    position:relative; aspect-ratio:1/1; min-height:172px;
+    display:flex; flex-direction:column; padding:14px;
     border-radius:22px; cursor:pointer;
     background:linear-gradient(150deg,#401a26 0%,#2c1119 55%,#210c12 100%);
     border:1px solid rgba(212,175,55,.22);
@@ -72,9 +72,9 @@
   .strat.off .name, .strat.off .cfgline{ opacity:.45; }
   .strat .top{ display:flex; align-items:flex-start; gap:8px; }
   .strat .name{ flex:1; min-width:0; }
-  .strat .name .th{ font-size:.86rem; font-weight:700; line-height:1.25; }
-  .strat .name .en{ font-family:'Cinzel',serif; font-size:.52rem; letter-spacing:.16em; color:var(--gold); margin-top:3px; overflow-wrap:anywhere; }
-  .cfgline{ margin-top:auto; padding-top:5px; font-size:.63rem; color:rgba(244,228,186,.75);
+  .strat .name .th{ font-size:.9rem; font-weight:700; line-height:1.3; }
+  .strat .name .en{ font-family:'Cinzel',serif; font-size:.52rem; letter-spacing:.16em; color:var(--gold); margin-top:3px; }
+  .cfgline{ margin-top:auto; padding-top:8px; font-size:.66rem; color:rgba(244,228,186,.75);
             display:flex; align-items:center; gap:5px; }
   .cfgline .gear{ font-size:.8rem; }
   .cfgline.custom{ color:var(--gold2); }
@@ -83,28 +83,18 @@
   .dot.done{ background:#4caf7d; } .dot.err{ background:#e05555; }
   @keyframes pulse{ 50%{ opacity:.35; } }
 
-  .sw{ display:inline-flex; flex:none; border-radius:11px; overflow:hidden; cursor:pointer;
-       border:1px solid rgba(212,175,55,.30);
-       box-shadow: inset 2px 2px 6px rgba(0,0,0,.5), inset -1px -1px 3px rgba(255,246,220,.05); }
-  .sw input{ display:none; }
-  .sw span{ font-family:'Cinzel',serif; font-size:.6rem; font-weight:700; letter-spacing:.14em;
-            padding:5px 11px; color:rgba(250,246,237,.28); background:rgba(0,0,0,.32);
-            transition:all .15s; user-select:none; }
-  /* OFF active (unchecked): red side raised */
-  .sw input:not(:checked) ~ .off{
-    background:linear-gradient(150deg,#7a2c2c,#5a1e1e); color:#f2b0a8;
-    box-shadow: 0 1px 4px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.18); }
-  /* ON active (checked): gold side raised */
-  .sw input:checked ~ .on{
-    background:linear-gradient(150deg,var(--gold2),var(--gold) 45%,#a8862a); color:var(--m1);
-    text-shadow:0 1px 0 rgba(255,255,255,.35);
-    box-shadow: 0 1px 5px rgba(212,175,55,.35), inset 0 1px 0 rgba(255,255,255,.45); }
+  .sw{ position:relative; width:38px; height:22px; flex:none; cursor:pointer; }
+  .sw input{ opacity:0; width:0; height:0; }
+  .sw i{ position:absolute; inset:0; background:rgba(255,255,255,.15); border-radius:22px; transition:.2s; }
+  .sw i:before{ content:""; position:absolute; width:16px; height:16px; left:3px; top:3px; background:var(--cream); border-radius:50%; transition:.2s; }
+  .sw input:checked + i{ background:var(--gold); }
+  .sw input:checked + i:before{ transform:translateX(16px); background:var(--m1); }
 
-  .wgtrow{ margin-top:6px; }
-  .wgtrow label{ display:block; font-size:.62rem; color:rgba(250,246,237,.6); margin-bottom:3px; }
+  .wgtrow{ margin-top:10px; }
+  .wgtrow label{ display:block; font-size:.64rem; color:rgba(250,246,237,.6); margin-bottom:4px; }
   .wgtrow input{
     width:100%; background:rgba(0,0,0,.42); border:1px solid var(--line); border-radius:12px;
-    color:var(--gold2); font-family:'DM Serif Display',serif; font-size:1.05rem; padding:6px 10px;
+    color:var(--gold2); font-family:'DM Serif Display',serif; font-size:1.15rem; padding:8px 10px;
     text-align:center; outline:none;
     box-shadow: inset 2px 3px 6px rgba(0,0,0,.5), inset -1px -1px 3px rgba(255,246,220,.04);
   }
@@ -309,8 +299,8 @@ let lastRun = null;      // { ids:[...] } strategies included in last completed 
           <div class="name"><div class="th">${s.th}</div><div class="en">${s.en}</div></div>
           <span class="dot idle" id="dot-${s.id}"></span>
         </div>
-        <div style="margin-top:6px;">
-          <label class="sw"><input type="checkbox" onchange="toggleStrat('${s.id}',this.checked)"><span class="on">ON</span><span class="off">OFF</span></label>
+        <div style="margin-top:8px;">
+          <label class="sw"><input type="checkbox" onchange="toggleStrat('${s.id}',this.checked)"><i></i></label>
         </div>
         <div class="mini" id="mini-${s.id}"></div>
         <div class="cfgline" id="cfg-${s.id}"><span class="gear">⚙</span> ค่าโรงงาน · แตะเพื่อตั้งค่า</div>
