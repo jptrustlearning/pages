@@ -6215,17 +6215,27 @@ window.switchStatsTab = function(tab) {
     } else setTimeout(setupCfgUI, 60);
   }
 
-  /* apply a captured map to the live inputs (used by both modes) */
+  /* apply a captured map to the live inputs (used by both modes).
+     CRITICAL: engines sync derived CONFIG values (e.g. weightRet from the
+     ranking slider) through input/change listeners — setting .value silently
+     leaves CONFIG at factory. So every write must fire both events, with a
+     reentrancy guard because 'change' listeners call runBacktest.          */
+  var _applying = false;
   function applyMapToInputs(map){
-    Object.keys(map).forEach(function(id){
-      var n = document.getElementById(id);
-      if (!n) return;
-      var e = map[id];
-      try {
-        if (e && typeof e.c === 'boolean'){ n.checked = e.c; }
-        else if (e && typeof e.v !== 'undefined'){ n.value = e.v; }
-      } catch(err){}
-    });
+    _applying = true;
+    try {
+      Object.keys(map).forEach(function(id){
+        var n = document.getElementById(id);
+        if (!n) return;
+        var e = map[id];
+        try {
+          if (e && typeof e.c === 'boolean'){ n.checked = e.c; }
+          else if (e && typeof e.v !== 'undefined'){ n.value = e.v; }
+          n.dispatchEvent(new Event('input',  { bubbles: true }));
+          n.dispatchEvent(new Event('change', { bubbles: true }));
+        } catch(err){}
+      });
+    } finally { _applying = false; }
   }
 
   /* ============================= RUN MODE ============================ */
@@ -6280,6 +6290,7 @@ window.switchStatsTab = function(tab) {
     return;
   }
   window.runBacktest = function(){
+    if (_applying) return;   /* synthetic change-events during apply must not run */
     applyCtl();
     var runErr = null, r;
     try { r = _orig.apply(this, arguments); }
