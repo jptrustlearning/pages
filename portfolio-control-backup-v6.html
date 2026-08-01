@@ -216,7 +216,7 @@
         <button class="btn2" style="width:100%; padding:11px;" onclick="equalizeWeights()">แบ่งสัดส่วนเท่ากันทุกตัวที่เปิด</button>
       </div>
     </div>
-    <div class="note">เปลี่ยนปีเริ่ม = ต้องกดรันใหม่ (กลยุทธ์เริ่มลงเงินจริงปีนั้น) · เงินรวมเป็นตัวตั้งต้นตัวเดียว — ทุกกลยุทธ์คิดจากสัดส่วน % ของเงินก้อนนี้ · rebalance กลับเข้าสัดส่วนเป้าหมายทุกต้นเดือน · ยังไม่รวมค่าธรรมเนียม ภาษี และอัตราแลกเปลี่ยน</div>
+    <div class="note">เงินรวมเป็นตัวตั้งต้นตัวเดียว — ทุกกลยุทธ์คิดจากสัดส่วน % ของเงินก้อนนี้ · rebalance กลับเข้าสัดส่วนเป้าหมายทุกต้นเดือน · ยังไม่รวมค่าธรรมเนียม ภาษี และอัตราแลกเปลี่ยน</div>
   </div>
 
   <!-- ===== STRATEGY GRID (built by JS) ===== -->
@@ -351,14 +351,7 @@ let lastRun = null;      // { ids:[...] } strategies included in last completed 
     const o = document.createElement('option'); o.value = y; o.textContent = y; ySel.appendChild(o);
   }
   ySel.value = 2015;
-  ySel.addEventListener('change', () => {
-    if (lastRun){
-      lastRun = null;
-      document.getElementById('results').style.display = 'none';
-      document.getElementById('progress').style.display = 'none';
-      STRATS.forEach(s => setDot(s.id, S[s.id].on ? 'idle' : 'idle'));
-    }
-  });
+  ySel.addEventListener('change', () => { if (lastRun) computeAndRender(); });
   document.getElementById('gCapital').addEventListener('change', () => { if (lastRun) computeAndRender(); });
   updateSum();
 })();
@@ -443,11 +436,10 @@ function updateSum(){
 let RUNNING = false;
 let seq = 0;
 
-function chosenYear(){ return parseInt(document.getElementById('gStartYear').value) || 2015; }
 function cacheKeyOf(s){
   const p = new URLSearchParams();
   Object.entries(s.base).forEach(([k, v]) => p.set(k, v));
-  return s.url + '?' + p.toString() + '|sy:' + chosenYear() + '|cfg:' + (S[s.id].cfg || 'factory');
+  return s.url + '?' + p.toString() + '|cfg:' + (S[s.id].cfg || 'factory');
 }
 
 function runOne(s){
@@ -458,7 +450,6 @@ function runOne(s){
     const ctlid = 'r' + (++seq);
     const p = new URLSearchParams();
     Object.entries(s.base).forEach(([k, v]) => p.set(k, v));
-    p.set('sy', chosenYear());          // engine ACTUALLY starts this year (ramp-up included)
     p.set('ctl', '1'); p.set('ctlid', ctlid);
 
     const iframe = document.createElement('iframe');
@@ -595,21 +586,23 @@ function computeAndRender(){
   const requested = STRATS.filter(s => S[s.id].on && S[s.id].weight > 0);
   const excluded = requested.filter(s => !ids.includes(s.id));
 
+  const startYear = parseInt(document.getElementById('gStartYear').value) || 2015;
   const capital   = parseFloat(document.getElementById('gCapital').value) || 100000;
+  const startStr  = startYear + '-01-01';
 
-  // date intersection (curves already begin at the chosen start year — real start, ramp-up included)
+  // date intersection
   const maps = {};
   let common = null;
   for (const id of ids){
     const m = new Map();
-    for (const [d, v] of S[id].curve){ if (v > 0) m.set(d, v); }
+    for (const [d, v] of S[id].curve){ if (d >= startStr && v > 0) m.set(d, v); }
     maps[id] = m;
     const ds = new Set(m.keys());
     common = common === null ? ds : new Set([...common].filter(d => ds.has(d)));
   }
   const dates = [...common].sort();
   if (dates.length < 40){
-    alert('ช่วงข้อมูลสั้นเกินไป — ลองเลือกปีเริ่มที่เก่ากว่านี้');
+    alert('ช่วงข้อมูลร่วมสั้นเกินไป — ลองเลือกปีเริ่มที่เก่ากว่านี้');
     return;
   }
 
@@ -709,7 +702,7 @@ function renderResults(dates, port, st, per, wavgVol, capital, excluded, nReques
     : '';
   document.getElementById('rangeNote').innerHTML = exclTxt +
     'ช่วงทดสอบ ' + dates[0] + ' → ' + dates[dates.length - 1] +
-    ' (' + st.years.toFixed(1) + ' ปี) · ทุกกลยุทธ์เริ่มลงเงินจริงปีที่เลือก (รวมช่วง ramp-up เหมือนหน้ากลยุทธ์เดี่ยว) · rebalance เข้าสัดส่วนเป้าหมายทุกต้นเดือน' +
+    ' (' + st.years.toFixed(1) + ' ปี) · rebalance เข้าสัดส่วนเป้าหมายทุกต้นเดือน' +
     (divBen > 0.001 ? ' · การกระจายช่วยลดความผันผวนลง ' + fmtP0(divBen) + ' เทียบกับค่าเฉลี่ยถ่วงน้ำหนักของแต่ละกลยุทธ์' : '') +
     ' · แต่ละกลยุทธ์คำนวณจาก engine หน้าจริงของตัวเอง · กลยุทธ์ที่ไม่ได้แตะตั้งค่า = ค่าโรงงาน (ไม่อ่านค่าที่เคย Save ส่วนตัว เพื่อให้ผลเทียบกันได้ทุกคน) · วันสุดท้ายของช่วงทดสอบ = รุ่นข้อมูลที่ใช้ ถ้ารันคนละวันข้อมูลอาจอัพเดตแล้ว';
 
