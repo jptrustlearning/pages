@@ -583,8 +583,6 @@ function computeAndRender(){
   if (!lastRun) return;
   const ids = lastRun.ids.filter(id => S[id].curve);
   if (!ids.length) return;
-  const requested = STRATS.filter(s => S[s.id].on && S[s.id].weight > 0);
-  const excluded = requested.filter(s => !ids.includes(s.id));
 
   const startYear = parseInt(document.getElementById('gStartYear').value) || 2015;
   const capital   = parseFloat(document.getElementById('gCapital').value) || 100000;
@@ -643,7 +641,7 @@ function computeAndRender(){
   // weighted-average standalone vol → diversification benefit
   const wavgVol = per.reduce((a, p) => a + p.w * p.s.vol, 0);
 
-  renderResults(dates, port, stats, per, wavgVol, capital, excluded, requested.length);
+  renderResults(dates, port, stats, per, wavgVol, capital);
 }
 
 function curveStats(dates, vals){
@@ -671,7 +669,7 @@ const fmtB = v => v.toLocaleString('th-TH', { maximumFractionDigits:0 });
 const fmtP = v => (v >= 0 ? '+' : '') + (v * 100).toFixed(1) + '%';
 const fmtP0 = v => (v * 100).toFixed(1) + '%';
 
-function renderResults(dates, port, st, per, wavgVol, capital, excluded, nRequested){
+function renderResults(dates, port, st, per, wavgVol, capital){
   document.getElementById('results').style.display = 'block';
 
   document.getElementById('statGrid').innerHTML = `
@@ -695,16 +693,11 @@ function renderResults(dates, port, st, per, wavgVol, capital, excluded, nReques
       <td class="neg">${fmtP0(st.mdd)}</td><td style="color:var(--gold2);">${fmtP0(st.vol)}</td></tr>`;
 
   const divBen = wavgVol - st.vol;
-  const exclTxt = (excluded && excluded.length)
-    ? '<span style="color:#f0a0a0;">⚠ คำนวณจาก ' + per.length + '/' + nRequested +
-      ' กลยุทธ์ — ไม่รวม: ' + excluded.map(s => s.th).join(', ') +
-      ' (รันไม่สำเร็จ · สัดส่วนถูกปรับใหม่ให้ครบ 100%)</span> · '
-    : '';
-  document.getElementById('rangeNote').innerHTML = exclTxt +
+  document.getElementById('rangeNote').innerHTML =
     'ช่วงทดสอบ ' + dates[0] + ' → ' + dates[dates.length - 1] +
     ' (' + st.years.toFixed(1) + ' ปี) · rebalance เข้าสัดส่วนเป้าหมายทุกต้นเดือน' +
     (divBen > 0.001 ? ' · การกระจายช่วยลดความผันผวนลง ' + fmtP0(divBen) + ' เทียบกับค่าเฉลี่ยถ่วงน้ำหนักของแต่ละกลยุทธ์' : '') +
-    ' · แต่ละกลยุทธ์คำนวณจาก engine หน้าจริงของตัวเอง · กลยุทธ์ที่ไม่ได้แตะตั้งค่า = ค่าโรงงาน (ไม่อ่านค่าที่เคย Save ส่วนตัว เพื่อให้ผลเทียบกันได้ทุกคน) · วันสุดท้ายของช่วงทดสอบ = รุ่นข้อมูลที่ใช้ ถ้ารันคนละวันข้อมูลอาจอัพเดตแล้ว';
+    ' · แต่ละกลยุทธ์คำนวณจาก engine หน้าจริงของตัวเอง · กลยุทธ์ที่ไม่ได้แตะตั้งค่า = ค่าโรงงาน (ไม่อ่านค่าที่เคย Save ส่วนตัว เพื่อให้ผลเทียบกันได้ทุกคน)';
 
   // mini stats on the cards
   per.forEach(p => {
