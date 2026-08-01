@@ -5752,5 +5752,83 @@ window.switchStatsTab = function(tab) {
 
 <!-- LAB v7: drag IIFE removed (card is now a tab) -->
 
+
+<script>
+/* === JPT PORTFOLIO CONTROL HOOK (?ctl=1) ===================================
+   When embedded by portfolio-control.html this page:
+   1) overrides the exposed settings from URL params (topn / tc / pt / sy,
+      stop-loss + trail forced 0 unless sl/ts passed) right before every run,
+   2) posts the daily equity curve to the parent after runBacktest completes.
+   Normal standalone use (?ctl absent) is completely unaffected.            */
+(function(){
+  var q = new URLSearchParams(location.search);
+  if (q.get('ctl') !== '1') return;
+  var ctlId = q.get('ctlid') || '';
+  var posted = false;
+
+  function applyCtl(){
+    try{
+      var v;
+      var _el = (typeof el !== 'undefined') ? el : null;
+      v = q.get('topn'); if (v !== null && _el && _el.inputTopN)       _el.inputTopN.value = v;
+      v = q.get('tc');   if (v !== null && _el && _el.inputThemeCount) _el.inputThemeCount.value = v;
+      v = q.get('pt');   if (v !== null && _el && _el.inputPerTheme)   _el.inputPerTheme.value = v;
+      if (_el && _el.inputStopLoss)  _el.inputStopLoss.value  = (q.get('sl') !== null ? q.get('sl') : 0);
+      if (_el && _el.inputTrailStop) _el.inputTrailStop.value = (q.get('ts') !== null ? q.get('ts') : 0);
+      v = q.get('sy');
+      if (v !== null && _el && _el.inputStartYear){
+        var has = false, opts = _el.inputStartYear.options || [];
+        for (var i = 0; i < opts.length; i++){ if (opts[i].value === v){ has = true; break; } }
+        if (has) _el.inputStartYear.value = v;
+      }
+    }catch(e){ /* never block the run */ }
+  }
+
+  function postCurve(runErr){
+    if (posted) return;
+    try{
+      var src = (typeof state !== 'undefined' && state.equityCurve) || [];
+      var c = new Array(src.length);
+      for (var i = 0; i < src.length; i++) c[i] = [src[i].date, src[i].equity];
+      if (c.length > 10){
+        posted = true;
+        parent.postMessage({ type:'jpt-ctl-result', id: ctlId, n: c.length,
+                             warn: runErr ? String(runErr) : null, curve: c }, '*');
+      } else if (runErr){
+        posted = true;
+        parent.postMessage({ type:'jpt-ctl-error', id: ctlId, msg: String(runErr) }, '*');
+      }
+    }catch(e){
+      posted = true;
+      parent.postMessage({ type:'jpt-ctl-error', id: ctlId, msg: String(e) }, '*');
+    }
+  }
+
+  var _orig = window.runBacktest;
+  if (typeof _orig !== 'function'){
+    parent.postMessage({ type:'jpt-ctl-error', id: ctlId, msg: 'runBacktest not found' }, '*');
+    return;
+  }
+  window.runBacktest = function(){
+    applyCtl();
+    var runErr = null, r;
+    try { r = _orig.apply(this, arguments); }
+    catch(e){ runErr = e; }
+    postCurve(runErr);
+    return r;
+  };
+
+  /* data-load failure (CSV fetch etc.) should not leave the parent waiting forever */
+  window.addEventListener('error', function(ev){
+    setTimeout(function(){
+      if (!posted && !(typeof state !== 'undefined' && state.equityCurve && state.equityCurve.length)){
+        parent.postMessage({ type:'jpt-ctl-error', id: ctlId,
+                             msg: String((ev && ev.message) || 'page error') }, '*');
+        posted = true;
+      }
+    }, 500);
+  });
+})();
+</script>
 </body>
 </html>
