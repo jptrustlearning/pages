@@ -352,20 +352,46 @@ function runOne(s){
     const iframe = document.createElement('iframe');
     iframe.style.cssText = 'width:1280px;height:900px;border:0;';
     let settled = false;
+    const t0 = Date.now();
+    let lastHb = 0, lastRows = 0;
     const cleanup = () => {
       window.removeEventListener('message', onMsg);
-      clearTimeout(timer);
+      clearInterval(watch);
       try { iframe.remove(); } catch(e){}
     };
-    const timer = setTimeout(() => {
+    const fail = (msg) => {
       if (settled) return; settled = true; cleanup();
-      setDot(s.id, 'err'); setProg(s.id, 'หมดเวลา (โหลดข้อมูลไม่สำเร็จ)');
+      setDot(s.id, 'err'); setProg(s.id, msg);
       resolve(false);
-    }, 240000); // 4 min: first strategy carries the big CSV download
+    };
+    /* watchdog: no heartbeat at all within 45s = page failed to boot ·
+       heartbeats but data never arrives = give the download up to 8 min ·
+       data arrived but no result within 3 more min = computation stuck   */
+    const watch = setInterval(() => {
+      if (settled) return;
+      const el = Date.now() - t0;
+      const sec = Math.round(el / 1000);
+      if (!lastHb && el > 45000)               return fail('หน้า engine ไม่ตอบสนอง — ลองใหม่');
+      if (lastHb && Date.now() - lastHb > 30000) return fail('ขาดสัญญาณจาก engine — ลองใหม่');
+      if (lastRows === 0 && el > 480000)       return fail('โหลดข้อมูลไม่สำเร็จใน 8 นาที (เน็ตช้าหรือไฟล์ใหญ่) — ลองใหม่');
+      if (lastRows > 0 && lastHb && Date.now() - hbDataAt > 180000) return fail('คำนวณค้างเกิน 3 นาที — ลองใหม่');
+      if (lastHb) setProg(s.id, (lastRows > 0 ? 'ข้อมูลมาแล้ว กำลังคำนวณ… ' : 'กำลังโหลดข้อมูล… ') + sec + ' วิ');
+    }, 2000);
+    let hbDataAt = 0, errHb = 0;
 
     function onMsg(ev){
       const d = ev.data;
       if (!d || d.id !== ctlid || settled) return;
+      if (d.type === 'jpt-ctl-hb'){
+        lastHb = Date.now();
+        if (d.rows > 0 && lastRows === 0) hbDataAt = Date.now();
+        lastRows = d.rows || 0;
+        if (d.err && lastRows === 0){
+          errHb++;
+          if (errHb >= 2) fail('โหลดข้อมูลไม่สำเร็จ (engine รายงาน error) — ลองใหม่');
+        } else { errHb = 0; }
+        return;
+      }
       if (d.type === 'jpt-ctl-result' && Array.isArray(d.curve) && d.curve.length > 10){
         settled = true; cleanup();
         CACHE[key] = d.curve; S[s.id].curve = d.curve; S[s.id].cacheKey = key;
@@ -378,7 +404,7 @@ function runOne(s){
       }
     }
     window.addEventListener('message', onMsg);
-    setDot(s.id, 'load'); setProg(s.id, 'กำลังโหลด + คำนวณ…');
+    setDot(s.id, 'load'); setProg(s.id, 'กำลังเปิด engine…');
     iframe.src = s.url + '?' + p.toString();
     document.getElementById('iframeHost').appendChild(iframe);
   });
@@ -405,12 +431,33 @@ async function runAll(){
   }
 
   RUNNING = false; updateSum();
+  const failed = active.filter(s => !S[s.id].curve);
+  if (failed.length){
+    const btn = document.createElement('button');
+    btn.className = 'btn2'; btn.style.marginTop = '10px';
+    btn.textContent = 'ลองรันตัวที่พลาดอีกครั้ง (' + failed.length + ' ตัว)';
+    btn.onclick = () => { btn.remove(); retryFailed(failed); };
+    document.getElementById('progress').appendChild(btn);
+  }
   if (okCount === 0){
-    setProgNote('ทุกกลยุทธ์รันไม่สำเร็จ — ลองใหม่อีกครั้ง หรือเช็คอินเทอร์เน็ต');
+    setProgNote('ทุกกลยุทธ์รันไม่สำเร็จ — เช็คอินเทอร์เน็ตแล้วลองใหม่');
     return;
+  }
+  if (failed.length){
+    setProgNote('บางกลยุทธ์รันไม่สำเร็จ — ผลด้านล่างคิดจากตัวที่สำเร็จ โดยปรับสัดส่วนใหม่ให้ครบ 100% อัตโนมัติ');
   }
   lastRun = { ids: active.filter(s => S[s.id].curve).map(s => s.id) };
   computeAndRender();
+}
+
+async function retryFailed(list){
+  if (RUNNING) return;
+  RUNNING = true; updateSum();
+  let ok = 0;
+  for (const s of list){ if (await runOne(s)) ok++; }
+  RUNNING = false; updateSum();
+  const active = STRATS.filter(s => S[s.id].on && S[s.id].weight > 0 && S[s.id].curve);
+  if (active.length){ lastRun = { ids: active.map(s => s.id) }; computeAndRender(); }
 }
 
 function setDot(id, cls){

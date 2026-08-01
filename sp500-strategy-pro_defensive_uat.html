@@ -4949,6 +4949,14 @@ window.switchStatsTab = function(tab) {
     return r;
   };
 
+  /* heartbeat: tell the parent whether we're still downloading or computing */
+  var _hb = setInterval(function(){
+    if (posted){ clearInterval(_hb); return; }
+    var rows = (typeof state !== 'undefined' && state.sortedDates) ? state.sortedDates.length : 0;
+    var loadErr = !!document.querySelector('.status-indicator.error');
+    try { parent.postMessage({ type:'jpt-ctl-hb', id: ctlId, rows: rows, err: loadErr }, '*'); } catch(e){}
+  }, 4000);
+
   /* data-load failure (CSV fetch etc.) should not leave the parent waiting forever */
   window.addEventListener('error', function(ev){
     setTimeout(function(){
