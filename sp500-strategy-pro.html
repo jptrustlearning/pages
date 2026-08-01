@@ -4521,27 +4521,142 @@ window.switchStatsTab = function(tab) {
 
 
 <script>
-/* === JPT PORTFOLIO CONTROL HOOK (?ctl=1) ===================================
-   When embedded by portfolio-control.html this page:
-   1) overrides the exposed settings from URL params (topn / tc / pt / sy,
-      stop-loss + trail forced 0 unless sl/ts passed) right before every run,
-   2) posts the daily equity curve to the parent after runBacktest completes.
-   Normal standalone use (?ctl absent) is completely unaffected.            */
+/* === JPT PORTFOLIO CONTROL HOOK v2 (?ctl=1 run · ?ctlcfg=1 config) ========
+   Embedded by portfolio-control.html only. Normal use is unaffected.       */
 (function(){
   var q = new URLSearchParams(location.search);
-  if (q.get('ctl') !== '1') return;
+  var RUN = q.get('ctl') === '1';
+  var CFG = q.get('ctlcfg') === '1';
+  if (!RUN && !CFG) return;
   var ctlId = q.get('ctlid') || '';
+
+  /* Determinism: never read the member's saved cloud settings in ctl modes.
+     Factory defaults + the captured map are the only inputs.               */
+  try {
+    if (window.JPSettings && window.JPSettings.load){
+      window.JPSettings.load = function(){ return Promise.resolve(null); };
+    }
+  } catch(e){}
+
+  /* ------------------------------------------------------------------ */
+  /* shared: parse #jptcfg= map                                          */
+  function readCfgMap(){
+    try {
+      var h = location.hash || '';
+      var m = h.match(/[#&]jptcfg=([^&]+)/);
+      if (!m) return null;
+      var obj = JSON.parse(decodeURIComponent(m[1]));
+      return (obj && typeof obj === 'object') ? obj : null;
+    } catch(e){ return null; }
+  }
+
+  /* =========================== CONFIG MODE =========================== */
+  if (CFG){
+    /* skip every heavy download — the panel doesn't need price data */
+    try {
+      if (typeof CONFIG !== 'undefined'){
+        Object.keys(CONFIG).forEach(function(k){
+          if (/^cloud.*Url/i.test(k)) CONFIG[k] = null;
+        });
+      }
+    } catch(e){}
+
+    function el2(id){ return document.getElementById(id); }
+
+    function captureAndPost(){
+      var panel = el2('settingsPanel');
+      if (!panel) return;
+      var cfg = {};
+      panel.querySelectorAll('input[id], select[id], textarea[id]').forEach(function(n){
+        if (n.id === 'startYearSelect') return;           /* global year is the authority */
+        if (n.type === 'checkbox' || n.type === 'radio') cfg[n.id] = { c: !!n.checked };
+        else cfg[n.id] = { v: n.value };
+      });
+      parent.postMessage({ type:'jpt-ctlcfg-save', id: ctlId, cfg: cfg }, '*');
+    }
+
+    function setupCfgUI(){
+      var panel = el2('settingsPanel');
+      if (!panel) return setTimeout(setupCfgUI, 120);
+
+      /* hide the loading owl + backdrop, pin the panel fullscreen */
+      var st = document.createElement('style');
+      st.textContent =
+        '#loading{display:none !important;}' +
+        '#panelBackdrop{display:none !important;}' +
+        '.settings-panel{position:fixed !important;top:0 !important;right:0 !important;' +
+        'left:0 !important;bottom:0 !important;width:100% !important;max-width:100% !important;' +
+        'height:100% !important;z-index:2147483000 !important;transform:none !important;' +
+        'transition:none !important;overflow-y:auto !important;}' +
+        '.btn-save-settings{display:none !important;}';
+      document.head.appendChild(st);
+      panel.classList.add('open');
+      document.body.style.visibility = 'visible';
+
+      /* start-year is controlled by the portfolio page — show it disabled */
+      var sy = el2('startYearSelect');
+      if (sy){
+        if (!sy.options.length){
+          var now = new Date().getFullYear();
+          for (var y = 2015; y <= now; y++){
+            var o = document.createElement('option'); o.value = y; o.textContent = y;
+            sy.appendChild(o);
+          }
+        }
+        sy.disabled = true;
+        sy.title = 'ตั้งจากหน้าพอร์ตรวม';
+      }
+
+      /* the run button becomes the apply button */
+      document.querySelectorAll('.btn-run-backtest').forEach(function(b){
+        b.onclick = function(ev){ if (ev) ev.preventDefault(); captureAndPost(); return false; };
+        b.textContent = 'ใช้ค่านี้กับพอร์ตรวม';
+      });
+      /* ✕ and ยกเลิก close the modal on the parent side */
+      window.closeSettingsPanel = function(){
+        parent.postMessage({ type:'jpt-ctlcfg-cancel', id: ctlId }, '*');
+      };
+      /* if a previous config exists, restore it into the panel */
+      var prev = readCfgMap();
+      if (prev) applyMapToInputs(prev);
+
+      parent.postMessage({ type:'jpt-ctlcfg-ready', id: ctlId }, '*');
+    }
+    if (document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', function(){ setTimeout(setupCfgUI, 60); });
+    } else setTimeout(setupCfgUI, 60);
+  }
+
+  /* apply a captured map to the live inputs (used by both modes) */
+  function applyMapToInputs(map){
+    Object.keys(map).forEach(function(id){
+      var n = document.getElementById(id);
+      if (!n) return;
+      var e = map[id];
+      try {
+        if (e && typeof e.c === 'boolean'){ n.checked = e.c; }
+        else if (e && typeof e.v !== 'undefined'){ n.value = e.v; }
+      } catch(err){}
+    });
+  }
+
+  /* ============================= RUN MODE ============================ */
+  if (!RUN) return;
   var posted = false;
+  var cfgMap = readCfgMap();
 
   function applyCtl(){
     try{
       var v;
       var _el = (typeof el !== 'undefined') ? el : null;
+      if (cfgMap) applyMapToInputs(cfgMap);
       v = q.get('topn'); if (v !== null && _el && _el.inputTopN)       _el.inputTopN.value = v;
       v = q.get('tc');   if (v !== null && _el && _el.inputThemeCount) _el.inputThemeCount.value = v;
       v = q.get('pt');   if (v !== null && _el && _el.inputPerTheme)   _el.inputPerTheme.value = v;
-      if (_el && _el.inputStopLoss)  _el.inputStopLoss.value  = (q.get('sl') !== null ? q.get('sl') : 0);
-      if (_el && _el.inputTrailStop) _el.inputTrailStop.value = (q.get('ts') !== null ? q.get('ts') : 0);
+      if (!cfgMap){                    /* no explicit config → deterministic zero stops */
+        if (_el && _el.inputStopLoss)  _el.inputStopLoss.value  = (q.get('sl') !== null ? q.get('sl') : 0);
+        if (_el && _el.inputTrailStop) _el.inputTrailStop.value = (q.get('ts') !== null ? q.get('ts') : 0);
+      }
       v = q.get('sy');
       if (v !== null && _el && _el.inputStartYear){
         var has = false, opts = _el.inputStartYear.options || [];
