@@ -1757,10 +1757,14 @@ function buildVsSeries(pid){
   });
   const shown = (vsGran==='m' && rows.length>VS_MAX_M) ? rows.slice(-VS_MAX_M) : rows;
   const bEnd=closeOn(BENCH, dates[dates.length-1], null);
+  // ตัวเลขสรุปหัวการ์ด = ผลตอบแทน "เงินจริง" ตัวเดียวกับ hero + Portfolio Stats
+  // (แท่งรายงวดยังเป็น Time-Weighted เพราะต้องเทียบกับ SPY รายช่วงให้ตรง)
+  const stM=portStats(pid);
+  const totPort = (stM && stM.netBase>0) ? (stM.unreal+stM.realized)/stM.netBase : (idx[idx.length-1]/idx[0]-1);
   return {
     rows: shown,
     trimmed: rows.length-shown.length,
-    totPort: idx[idx.length-1]/idx[0]-1,
+    totPort: totPort,
     totBench: (bStart>0 && bEnd>0) ? bEnd/bStart-1 : null,
     from: dates[0], to: dates[dates.length-1]
   };
@@ -1782,11 +1786,11 @@ function renderVsSummary(s){
   const diff = (s.totBench==null)? null : s.totPort-s.totBench;
   const span = 'ตั้งแต่ '+s.from;
   box.innerHTML =
-    '<div class="vs-cell"><div class="vs-cell-lbl">พอร์ตของคุณ</div><div class="vs-cell-val '+cls(s.totPort)+'">'+sgn(s.totPort)+'</div><div class="vs-cell-note">'+span+'</div></div>'
+    '<div class="vs-cell"><div class="vs-cell-lbl">พอร์ตของคุณ</div><div class="vs-cell-val '+cls(s.totPort)+'">'+sgn(s.totPort)+'</div><div class="vs-cell-note">เงินจริง · '+span+'</div></div>'
    +'<div class="vs-cell"><div class="vs-cell-lbl">S&amp;P 500</div><div class="vs-cell-val '+(s.totBench==null?'zero':cls(s.totBench))+'">'+(s.totBench==null?'—':sgn(s.totBench))+'</div><div class="vs-cell-note">ช่วงเวลาเดียวกัน</div></div>'
    +'<div class="vs-cell lead"><div class="vs-cell-lbl">ชนะ / แพ้ ตลาด</div><div class="vs-cell-val '+(diff==null?'zero':cls(diff))+'">'+(diff==null?'—':sgn(diff))+'</div><div class="vs-cell-note">'+(diff==null?'—':(diff>=0?'ชนะ S&P 500':'แพ้ S&P 500'))+'</div></div>';
   if(foot){
-    let t='ผลตอบแทนในกราฟนี้คิดแบบ Time-Weighted (ตัดผลของการเติม/ถอนเงินออก) จึงอาจไม่เท่า % บนการ์ดบนสุด แต่เป็นวิธีเดียวที่เทียบกับ S&P 500 ได้ตรง';
+    let t='% ช่องบน = ผลตอบแทนเงินจริง (ตัวเดียวกับการ์ด Portfolio Stats) · แท่งรายงวดคิดแบบ Time-Weighted เพื่อเทียบกับ S&P 500 แต่ละช่วงให้ตรง — แท่งแต่ละงวดต้องคูณกัน ไม่ใช่บวก · S&P 500 รวมปันผลแล้ว';
     if(s.trimmed>0) t+=' · แสดง '+VS_MAX_M+' เดือนล่าสุด';
     foot.textContent=t;
   }
