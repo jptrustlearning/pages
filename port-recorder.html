@@ -82,6 +82,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .eq-tf-btn.active{background:var(--maroon);color:#FFF5E1}
 .eq-canvas-wrap{position:relative;height:200px;width:100%}
 .eq-empty{display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);font-size:.78rem;text-align:center;padding:20px}
+.eq-mode-row{display:flex;margin:0 0 10px}
 .eq-legend{display:flex;gap:14px;justify-content:center;margin-top:6px;flex-wrap:wrap}
 .eq-leg-item{display:flex;align-items:center;gap:6px;font-size:.7rem;color:var(--text-muted)}
 .eq-leg-dot{width:10px;height:2px;border-radius:1px}
@@ -365,14 +366,12 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 
     <div class="eq-card">
       <div class="eq-head">
-        <div class="eq-title">Equity Curve</div>
+        <div class="eq-title" id="eqTitle">Equity Curve</div>
         <div class="eq-tf" id="eqTf"></div>
       </div>
+      <div class="eq-mode-row"><div class="eq-tf" id="eqMode"></div></div>
       <div class="eq-canvas-wrap"><canvas id="eqCanvas"></canvas><div class="eq-empty hidden" id="eqEmpty">บันทึกการซื้อครั้งแรกเพื่อเริ่มเส้นพอร์ต</div></div>
-      <div class="eq-legend">
-        <div class="eq-leg-item"><span class="eq-leg-dot" style="background:#D4AF37"></span>มูลค่าพอร์ต (ถือ + เงินสด)</div>
-        <div class="eq-leg-item"><span class="eq-leg-dot" style="background:#722F37"></span>เงินต้นสุทธิ</div>
-      </div>
+      <div class="eq-legend" id="eqLegend"></div>
     </div>
 
     <div class="eq-card">
@@ -694,6 +693,8 @@ let sel = ALL;         // selected portfolio id (dashboard)
 let rbSel = null;      // selected portfolio id (rebalance)
 let mask = false;
 let curTf = 'All';
+let eqMode = 'value';  // 'value' = มูลค่าพอร์ต, 'dd' = Drawdown (ระยะห่างจากจุดสูงสุด)
+try{ eqMode = localStorage.getItem('pr:eqmode')||'value'; }catch(e){}
 let vsGran = 'y';      // 'y' = รายปี, 'm' = รายเดือน (12 เดือนล่าสุด)
 try{ vsGran = localStorage.getItem('pr:vsgran')||'y'; }catch(e){}
 let editLotId = null, sellLotId = null, editPortId = null, tgtPortId = null;
@@ -909,7 +910,7 @@ function portStats(pid){
 }
 
 /* ---------- RENDER: DASHBOARD ---------- */
-function renderAll(){ renderOwner(); renderChips(); renderHero(); renderStats(); renderView(); renderEqTf(); drawEquity(); renderVsGran(); drawVsChart(); }
+function renderAll(){ renderOwner(); renderChips(); renderHero(); renderStats(); renderView(); renderEqTf(); renderEqMode(); drawEquity(); renderVsGran(); drawVsChart(); }
 function renderOwner(){
   const sub=$('ownerSub'), nmEl=$('ownerName'); if(!sub||!nmEl) return;
   const nm=(D&&D.owner)||'';
@@ -1552,6 +1553,21 @@ function renderEqTf(){
   $('eqTf').innerHTML=TFS.map(t=>'<button class="eq-tf-btn'+(t===curTf?' active':'')+'" onclick="PR.setTf(\''+t+'\')">'+t+'</button>').join('');
 }
 function setTf(t){ curTf=t; renderEqTf(); drawEquity(); }
+function renderEqMode(){
+  const bar=$('eqMode'); if(!bar) return;
+  const opt=[['value','มูลค่าพอร์ต'],['dd','Drawdown']];
+  bar.innerHTML=opt.map(o=>'<button class="eq-tf-btn'+(o[0]===eqMode?' active':'')+'" onclick="PR.setEqMode(\''+o[0]+'\')">'+o[1]+'</button>').join('');
+  const ttl=$('eqTitle'); if(ttl) ttl.textContent = eqMode==='dd' ? 'Drawdown' : 'Equity Curve';
+  const lg=$('eqLegend');
+  if(lg) lg.innerHTML = eqMode==='dd'
+    ? '<div class="eq-leg-item"><span class="eq-leg-dot" style="background:#C0392B"></span>ระยะห่างจากจุดสูงสุดที่เคยทำได้ (Time-Weighted)</div>'
+    : '<div class="eq-leg-item"><span class="eq-leg-dot" style="background:#D4AF37"></span>มูลค่าพอร์ต (ถือ + เงินสด)</div>'
+     +'<div class="eq-leg-item"><span class="eq-leg-dot" style="background:#722F37"></span>เงินต้นสุทธิ</div>';
+}
+function setEqMode(m){
+  eqMode=m; try{ localStorage.setItem('pr:eqmode', m); }catch(e){}
+  renderEqMode(); drawEquity();
+}
 function closeIdxOn(tk, date){
   const p=PRICES[tk];
   if(!p||!p.dates.length) return -1;
@@ -1660,6 +1676,7 @@ function tfStart(tf){
   return n.toISOString().slice(0,10);
 }
 function drawEquity(){
+  if(eqMode==='dd') return drawDrawdown();
   const cv=$('eqCanvas'), empty=$('eqEmpty'), wrap=cv.parentElement;
   const curve=buildCurve(sel);
   if(!curve){ cv.style.display='none'; empty.classList.remove('hidden'); return; }
@@ -1698,6 +1715,68 @@ function drawEquity(){
   ctx.lineTo(X(val.length-1),H-padB); ctx.lineTo(X(0),H-padB); ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
   ctx.beginPath(); val.forEach((v,i)=>{ const x=X(i),y=Y(v); i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
   ctx.strokeStyle='#C9A227'; ctx.lineWidth=2; ctx.stroke();
+}
+
+/* ---------- DRAWDOWN (underwater) ----------
+   คิดบน index Time-Weighted ตัวเดียวกับ portMetrics → เลขต่ำสุดของช่วง All
+   ตรงกับการ์ด Max Drawdown ใน Portfolio Stats เป๊ะ
+   dd คิดบนเส้นเต็มก่อน แล้วค่อยตัดตามช่วงเวลา (ไม่งั้นเปิดช่วง 1M แล้วจะเริ่มที่ 0 ทั้งที่จมอยู่) */
+function drawDrawdown(){
+  const cv=$('eqCanvas'), empty=$('eqEmpty'), wrap=cv.parentElement;
+  const t=twrIndex(sel);
+  if(!t || t.dates.length<2){
+    cv.style.display='none';
+    if(empty){ empty.classList.remove('hidden'); empty.textContent='บันทึกการซื้อครั้งแรกเพื่อดู Drawdown'; }
+    return;
+  }
+  cv.style.display='block'; if(empty) empty.classList.add('hidden');
+  const {dates,idx}=t;
+  let pk=idx[0]; const ddAll=idx.map(v=>{ if(v>pk) pk=v; return pk>1e-12 ? v/pk-1 : 0; });
+  const start=tfStart(curTf);
+  let i0=dates.findIndex(d=>d>=start); if(i0<0) i0=0; if(i0>0) i0--;
+  const ds=dates.slice(i0), dd=ddAll.slice(i0);
+  const dpr=window.devicePixelRatio||1, W=wrap.clientWidth, H=wrap.clientHeight;
+  cv.width=W*dpr; cv.height=H*dpr; cv.style.width=W+'px'; cv.style.height=H+'px';
+  const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W,H);
+  const padL=46,padR=10,padT=12,padB=24;
+  let mn=Math.min(...dd); if(!isFinite(mn)) mn=0;
+  if(mn>-0.01) mn=-0.01;
+  mn*=1.12;
+  const X=i=> padL + (ds.length<=1?0:(i/(ds.length-1))*(W-padL-padR));
+  const Y=v=> padT + (v/mn)*(H-padT-padB);          // 0 ที่บน, mn ที่ล่าง
+  ctx.font='10px Anuphan'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  for(let g=0;g<=4;g++){
+    const v=mn*g/4, y=Y(v);
+    ctx.strokeStyle= g===0? 'rgba(114,47,55,0.4)' : 'rgba(212,175,55,0.15)';
+    ctx.lineWidth= g===0? 1.2 : 1;
+    ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(W-padR,y); ctx.stroke();
+    ctx.fillStyle='#7A6F62'; ctx.fillText((v*100).toFixed(1)+'%', 2, y+3);
+  }
+  ctx.fillStyle='#7A6F62';
+  ctx.fillText(ds[0], padL, H-8);
+  const lastLbl=ds[ds.length-1], tw=ctx.measureText(lastLbl).width;
+  ctx.fillText(lastLbl, W-padR-tw, H-8);
+  // พื้นที่ใต้น้ำ
+  const grad=ctx.createLinearGradient(0,padT,0,H-padB);
+  grad.addColorStop(0,'rgba(192,57,43,0.06)'); grad.addColorStop(1,'rgba(192,57,43,0.30)');
+  ctx.beginPath(); ctx.moveTo(X(0),Y(0));
+  dd.forEach((v,i)=>ctx.lineTo(X(i),Y(v)));
+  ctx.lineTo(X(dd.length-1),Y(0)); ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
+  ctx.beginPath(); dd.forEach((v,i)=>{ const x=X(i),y=Y(v); i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+  ctx.strokeStyle='#C0392B'; ctx.lineWidth=1.8; ctx.stroke();
+  // จุดต่ำสุดของช่วงที่กำลังดู
+  let wi=0; for(let i=1;i<dd.length;i++) if(dd[i]<dd[wi]) wi=i;
+  if(dd[wi]<-0.0005){
+    const wx=X(wi), wy=Y(dd[wi]);
+    ctx.beginPath(); ctx.arc(wx,wy,3.2,0,Math.PI*2); ctx.fillStyle='#922B21'; ctx.fill();
+    const lbl=(dd[wi]*100).toFixed(1)+'%';
+    ctx.font='600 11px Anuphan';
+    const lw=ctx.measureText(lbl).width;
+    let lx=wx-lw/2; lx=Math.max(padL+2, Math.min(lx, W-padR-lw));
+    const ly=Math.min(wy+15, H-padB-3);
+    ctx.fillStyle='#922B21'; ctx.textAlign='left'; ctx.fillText(lbl, lx, ly);
+    ctx.font='10px Anuphan';
+  }
 }
 
 /* ============================================================
@@ -2516,7 +2595,7 @@ return {openOwner,submitOwner,switchTab,gotoSettings,toggleMask,selectPort,openP
   openAddModal,pickFormPort,submitLot,deleteLot,onBuyInput,recalcBuy,openSellModal,submitSell,onSAmountInput,setSellMode,sellAllQuick,recalcSell,onSellDateInput,closeModal,viewSlip,
   onSlipFile,openManualAdd,maChoose,maSellTicker,confirmPending,deletePending,
   msToggle,msAuto,msSetMode,msRecalc,onMsAmountInput,onMsDate,msSellAllSel,msSubmit,
-  setTf,setVsGran,refreshPrices,
+  setTf,setEqMode,setVsGran,refreshPrices,
   selectRbPort,rbUseCurrent,renderRebalance,openTargetsModal,addTgtRow,updateTgtSum,submitTargets,
   setView,toggleDense,setSort,toggleGroup,openGa,gaAssign,gaCreateAssign,openGm,gmAddRow,gmDelRow,gmSubmit,deleteSell,openPm,pmDelete,
   driveConnect,driveSyncNow,driveDisconnect,drivePillTap};
