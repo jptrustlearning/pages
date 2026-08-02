@@ -86,6 +86,16 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .eq-leg-item{display:flex;align-items:center;gap:6px;font-size:.7rem;color:var(--text-muted)}
 .eq-leg-dot{width:10px;height:2px;border-radius:1px}
 
+/* === VS BENCHMARK (SPY) === */
+.vs-sum{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.vs-cell{flex:1 1 30%;min-width:92px;background:var(--cream-warm);border:1px solid var(--border-gold);border-radius:11px;padding:8px 10px}
+.vs-cell.lead{background:linear-gradient(135deg,rgba(212,175,55,0.13),rgba(114,47,55,0.06));border-color:var(--border-gold-strong)}
+.vs-cell-lbl{font-family:var(--font-label);font-size:.53rem;letter-spacing:1.5px;color:var(--gold-dark);text-transform:uppercase;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vs-cell-val{font-family:var(--font-number);font-size:1.12rem;line-height:1.12}
+.vs-cell-val.pos{color:var(--green)}.vs-cell-val.neg{color:var(--red)}.vs-cell-val.zero{color:var(--text-muted)}
+.vs-cell-note{font-size:.61rem;color:var(--text-muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vs-foot{font-size:.65rem;color:var(--text-muted);text-align:center;margin-top:9px;line-height:1.55;padding-top:8px;border-top:1px dashed var(--border-gold)}
+
 /* === LOT CARDS === */
 .lots-list{display:flex;flex-direction:column;gap:11px}
 .lot-card{background:var(--cream-card);border:1px solid var(--border-gold);border-radius:12px;padding:14px;box-shadow:0 1px 6px rgba(114,47,55,0.04)}
@@ -363,6 +373,20 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
         <div class="eq-leg-item"><span class="eq-leg-dot" style="background:#D4AF37"></span>มูลค่าพอร์ต (ถือ + เงินสด)</div>
         <div class="eq-leg-item"><span class="eq-leg-dot" style="background:#722F37"></span>เงินต้นสุทธิ</div>
       </div>
+    </div>
+
+    <div class="eq-card">
+      <div class="eq-head">
+        <div class="eq-title">VS S&amp;P 500</div>
+        <div class="eq-tf" id="vsGranBar"></div>
+      </div>
+      <div class="vs-sum" id="vsSum"></div>
+      <div class="eq-canvas-wrap" style="height:236px"><canvas id="vsCanvas"></canvas><div class="eq-empty hidden" id="vsEmpty">บันทึกการซื้อครั้งแรกเพื่อเทียบกับ S&amp;P 500</div></div>
+      <div class="eq-legend">
+        <div class="eq-leg-item"><span class="eq-leg-dot" style="background:#2E9F5F"></span>พอร์ตของคุณ</div>
+        <div class="eq-leg-item"><span class="eq-leg-dot" style="background:#722F37"></span>S&amp;P 500 (SPY)</div>
+      </div>
+      <div class="vs-foot" id="vsFoot"></div>
     </div>
 
     <div class="tabs" id="viewTabs">
@@ -659,6 +683,7 @@ const PORT_MAX      = 10;
 const ALL           = '__all__';
 const DUST_SHARES   = 5e-5; // เศษหุ้นต่ำกว่านี้ = ถือว่าไม้ปิดแล้ว (ตาม my-portfolio)
 const LS_DATA='pr:data', LS_PRICES='pr:prices', LS_CFG='pr:cfg', LS_MASK='pr:mask', LS_DRIVE='pr:drive';
+const BENCH = 'SPY';        // ตัวเทียบมาตรฐาน = SPDR S&P 500 ETF
 
 /* ---------- STATE ---------- */
 let D = null;          // main data {v, portfolios:[], lots:[], sells:[], pending:[]}
@@ -669,6 +694,8 @@ let sel = ALL;         // selected portfolio id (dashboard)
 let rbSel = null;      // selected portfolio id (rebalance)
 let mask = false;
 let curTf = 'All';
+let vsGran = 'y';      // 'y' = รายปี, 'm' = รายเดือน (12 เดือนล่าสุด)
+try{ vsGran = localStorage.getItem('pr:vsgran')||'y'; }catch(e){}
 let editLotId = null, sellLotId = null, editPortId = null, tgtPortId = null;
 let viewMode = 'lots';
 let dense = false;
@@ -882,7 +909,7 @@ function portStats(pid){
 }
 
 /* ---------- RENDER: DASHBOARD ---------- */
-function renderAll(){ renderOwner(); renderChips(); renderHero(); renderStats(); renderView(); renderEqTf(); drawEquity(); }
+function renderAll(){ renderOwner(); renderChips(); renderHero(); renderStats(); renderView(); renderEqTf(); drawEquity(); renderVsGran(); drawVsChart(); }
 function renderOwner(){
   const sub=$('ownerSub'), nmEl=$('ownerName'); if(!sub||!nmEl) return;
   const nm=(D&&D.owner)||'';
@@ -1502,6 +1529,11 @@ async function refreshPrices(manual){
   const btn=$('refreshBtn'); if(btn){ btn.disabled=true; btn.textContent='⟳ …'; }
   const tks={};
   D.lots.forEach(l=>{ const f=tks[l.ticker]; tks[l.ticker]= (!f||l.date<f)? l.date : f; });
+  // benchmark: โหลด SPY ตั้งแต่ไม้แรกสุดของทุกพอร์ต (ใช้ในกราฟ VS S&P 500)
+  if(D.lots.length){
+    const first=D.lots.reduce((a,l)=> (l.date&&l.date<a)? l.date : a, D.lots[0].date);
+    tks[BENCH] = (tks[BENCH] && tks[BENCH]<first)? tks[BENCH] : first;
+  }
   let ok=0, fail=0;
   for(const tk of Object.keys(tks)){
     const r=await ensureHistory(tk, tks[tk]); r?ok++:fail++;
@@ -1666,6 +1698,186 @@ function drawEquity(){
   ctx.lineTo(X(val.length-1),H-padB); ctx.lineTo(X(0),H-padB); ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
   ctx.beginPath(); val.forEach((v,i)=>{ const x=X(i),y=Y(v); i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
   ctx.strokeStyle='#C9A227'; ctx.lineWidth=2; ctx.stroke();
+}
+
+/* ============================================================
+   VS S&P 500 (SPY)  — บาร์เทียบผลตอบแทนรายปี/รายเดือน
+   ผลตอบแทนพอร์ตในกราฟนี้ = Time-Weighted (สูตรเดียวกับ portMetrics)
+   เพราะพอร์ตมีเติม/ถอนเงินระหว่างทาง → ถ้าคิดจากมูลค่าตรงๆ เงินเติมจะกลายเป็น "กำไรปลอม"
+   ทำให้เทียบกับ SPY (ซื้อแล้วถือเฉยๆ) ไม่ตรง
+============================================================ */
+const TH_MON=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const VS_MAX_M = 12;        // รายเดือน = แสดง 12 เดือนล่าสุด (ไม่งั้นบาร์ผอมจนอ่านเลขไม่ออก)
+function renderVsGran(){
+  const bar=$('vsGranBar'); if(!bar) return;
+  const opt=[['y','รายปี'],['m','รายเดือน']];
+  bar.innerHTML=opt.map(o=>'<button class="eq-tf-btn'+(o[0]===vsGran?' active':'')+'" onclick="PR.setVsGran(\''+o[0]+'\')">'+o[1]+'</button>').join('');
+}
+function setVsGran(g){
+  vsGran=g; try{ localStorage.setItem('pr:vsgran', g); }catch(e){}
+  renderVsGran(); drawVsChart();
+}
+/* index Time-Weighted ของพอร์ต (ตัด cash flow ออก) — คืน {dates, idx} */
+function twrIndex(pid){
+  const c=buildCurve(pid); if(!c || c.dates.length<2) return null;
+  const {dates,val,inv}=c;
+  const idx=[1];
+  for(let i=1;i<val.length;i++){
+    const cf=(inv[i]||0)-(inv[i-1]||0);
+    const base=val[i-1]+cf;
+    const r = base>1e-9 ? val[i]/base-1 : 0;
+    idx.push(idx[i-1]*(1+r));
+  }
+  return {dates, idx};
+}
+function benchReady(){ const p=PRICES[BENCH]; return !!(p && p.dates && p.dates.length>1); }
+function buildVsSeries(pid){
+  const t=twrIndex(pid); if(!t) return null;
+  if(!benchReady()) return {noBench:true};
+  const {dates,idx}=t;
+  const bStart=closeOn(BENCH, dates[0], null);
+  if(!bStart) return {noBench:true};
+  const keyOf = d => vsGran==='m' ? d.slice(0,7) : d.slice(0,4);
+  // ค่าปลายงวดของแต่ละถัง (ถังเรียงตามเวลาอยู่แล้ว เพราะ dates sort มาแล้ว)
+  const order=[], last={};
+  for(let i=0;i<dates.length;i++){
+    const k=keyOf(dates[i]);
+    if(!(k in last)) order.push(k);
+    last[k]={i, date:dates[i]};
+  }
+  const rows=[];
+  let pIdx=idx[0], pDate=dates[0];
+  order.forEach(k=>{
+    const e=last[k];
+    const port = pIdx>1e-12 ? idx[e.i]/pIdx-1 : 0;
+    const b0=closeOn(BENCH, pDate, null), b1=closeOn(BENCH, e.date, null);
+    const bench = (b0>0 && b1>0) ? b1/b0-1 : null;
+    rows.push({key:k, port, bench, endDate:e.date});
+    pIdx=idx[e.i]; pDate=e.date;
+  });
+  const shown = (vsGran==='m' && rows.length>VS_MAX_M) ? rows.slice(-VS_MAX_M) : rows;
+  const bEnd=closeOn(BENCH, dates[dates.length-1], null);
+  return {
+    rows: shown,
+    trimmed: rows.length-shown.length,
+    totPort: idx[idx.length-1]/idx[0]-1,
+    totBench: (bStart>0 && bEnd>0) ? bEnd/bStart-1 : null,
+    from: dates[0], to: dates[dates.length-1]
+  };
+}
+function vsLabel(k){
+  if(vsGran==='y') return k;
+  const y=+k.slice(0,4), m=+k.slice(5,7);
+  return TH_MON[m-1]+(m===1? ' '+String(y+543).slice(-2) : '');
+}
+function renderVsSummary(s){
+  const box=$('vsSum'), foot=$('vsFoot'); if(!box) return;
+  const sgn=x=>(x>=0?'+':'')+(x*100).toFixed(1)+'%';
+  const cls=x=>Math.abs(x)<1e-9?'zero':(x>0?'pos':'neg');
+  if(!s || s.noBench){
+    box.innerHTML='';
+    if(foot) foot.textContent = s&&s.noBench ? 'ยังไม่มีข้อมูล S&P 500 — แตะปุ่ม ⟳ ราคา ด้านบนเพื่อโหลด' : '';
+    return;
+  }
+  const diff = (s.totBench==null)? null : s.totPort-s.totBench;
+  const span = 'ตั้งแต่ '+s.from;
+  box.innerHTML =
+    '<div class="vs-cell"><div class="vs-cell-lbl">พอร์ตของคุณ</div><div class="vs-cell-val '+cls(s.totPort)+'">'+sgn(s.totPort)+'</div><div class="vs-cell-note">'+span+'</div></div>'
+   +'<div class="vs-cell"><div class="vs-cell-lbl">S&amp;P 500</div><div class="vs-cell-val '+(s.totBench==null?'zero':cls(s.totBench))+'">'+(s.totBench==null?'—':sgn(s.totBench))+'</div><div class="vs-cell-note">ช่วงเวลาเดียวกัน</div></div>'
+   +'<div class="vs-cell lead"><div class="vs-cell-lbl">ชนะ / แพ้ ตลาด</div><div class="vs-cell-val '+(diff==null?'zero':cls(diff))+'">'+(diff==null?'—':sgn(diff))+'</div><div class="vs-cell-note">'+(diff==null?'—':(diff>=0?'ชนะ S&P 500':'แพ้ S&P 500'))+'</div></div>';
+  if(foot){
+    let t='ผลตอบแทนในกราฟนี้คิดแบบ Time-Weighted (ตัดผลของการเติม/ถอนเงินออก) จึงอาจไม่เท่า % บนการ์ดบนสุด แต่เป็นวิธีเดียวที่เทียบกับ S&P 500 ได้ตรง';
+    if(s.trimmed>0) t+=' · แสดง '+VS_MAX_M+' เดือนล่าสุด';
+    foot.textContent=t;
+  }
+}
+function drawVsChart(){
+  const cv=$('vsCanvas'); if(!cv) return;
+  const empty=$('vsEmpty'), wrap=cv.parentElement;
+  const s=buildVsSeries(sel);
+  renderVsSummary(s);
+  if(!s || s.noBench || !s.rows.length){
+    cv.style.display='none';
+    if(empty){
+      empty.classList.remove('hidden');
+      empty.textContent = (s&&s.noBench)? 'ยังไม่มีข้อมูล S&P 500 — แตะปุ่ม ⟳ ราคา เพื่อโหลด'
+                                        : 'บันทึกการซื้อครั้งแรกเพื่อเทียบกับ S&P 500';
+    }
+    return;
+  }
+  cv.style.display='block'; if(empty) empty.classList.add('hidden');
+  const rows=s.rows, n=rows.length;
+  const dpr=window.devicePixelRatio||1, W=wrap.clientWidth, H=wrap.clientHeight;
+  cv.width=W*dpr; cv.height=H*dpr; cv.style.width=W+'px'; cv.style.height=H+'px';
+  const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W,H);
+  const padL=40, padR=8, padT=24, padB=26;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  // สเกล Y — ครอบ 0 เสมอ
+  let mn=0, mx=0;
+  rows.forEach(r=>{ mn=Math.min(mn,r.port, r.bench==null?0:r.bench); mx=Math.max(mx,r.port, r.bench==null?0:r.bench); });
+  if(mx-mn<0.02){ mx+=0.01; mn-=0.01; }
+  const padv=(mx-mn)*0.16; mx+=padv; mn-=padv;
+  const Y=v=> padT + (1-(v-mn)/(mx-mn))*plotH;
+  // gridlines + labels
+  ctx.font='10px Anuphan'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  for(let g=0;g<=4;g++){
+    const v=mn+(mx-mn)*g/4, y=Y(v);
+    ctx.strokeStyle='rgba(212,175,55,0.16)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(W-padR,y); ctx.stroke();
+    ctx.fillStyle='#7A6F62'; ctx.fillText((v*100).toFixed(0)+'%', 2, y+3);
+  }
+  // เส้นศูนย์
+  if(mn<0 && mx>0){
+    const y0=Y(0);
+    ctx.strokeStyle='rgba(114,47,55,0.45)'; ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.moveTo(padL,y0); ctx.lineTo(W-padR,y0); ctx.stroke();
+  }
+  const groupW=plotW/n;
+  const barW=Math.max(4, Math.min(groupW*0.32, 46));
+  const y0=Y(0);
+  const fs = groupW>=70?10 : groupW>=52?9 : 8;
+  ctx.font=fs+'px Anuphan';
+  const need=ctx.measureText('-99.9%').width;
+  const horiz = groupW >= need*2+10;
+  const rot   = !horiz && barW>=7;
+  const drawBar=(cx,v,col)=>{
+    const y=Y(v), top=Math.min(y,y0), h=Math.max(1.5,Math.abs(y-y0));
+    ctx.fillStyle=col;
+    if(ctx.roundRect){ ctx.beginPath(); ctx.roundRect(cx-barW/2, top, barW, h, 3); ctx.fill(); }
+    else ctx.fillRect(cx-barW/2, top, barW, h);
+    return {top, bot:top+h};
+  };
+  const drawTxt=(cx,box,v,col)=>{
+    if(!horiz && !rot) return;
+    const txt=(v>=0?'+':'')+(v*100).toFixed(1)+'%';
+    ctx.fillStyle=col;
+    if(horiz){
+      ctx.textAlign='center';
+      ctx.fillText(txt, cx, v>=0 ? box.top-4 : box.bot+fs+1);
+    }else{
+      ctx.save();
+      ctx.textAlign = v>=0 ? 'left' : 'right';
+      ctx.translate(cx, v>=0 ? box.top-4 : box.bot+4);
+      ctx.rotate(-Math.PI/2);
+      ctx.fillText(txt, 0, fs*0.36);
+      ctx.restore();
+    }
+    ctx.textAlign='left';
+  };
+  rows.forEach((r,i)=>{
+    const gc=padL+groupW*(i+0.5);
+    const cxP=gc-(barW/2)-1.5, cxB=gc+(barW/2)+1.5;
+    const bP=drawBar(cxP, r.port, r.port>=0? '#2E9F5F' : '#C0392B');
+    drawTxt(cxP, bP, r.port, r.port>=0? '#226F44' : '#922B21');
+    if(r.bench!=null){
+      const bB=drawBar(cxB, r.bench, '#722F37');
+      drawTxt(cxB, bB, r.bench, '#722F37');
+    }
+    // x label
+    ctx.font=(groupW>=40?9:8)+'px Anuphan'; ctx.fillStyle='#7A6F62'; ctx.textAlign='center';
+    ctx.fillText(vsLabel(r.key), gc, H-8);
+    ctx.font=fs+'px Anuphan'; ctx.textAlign='left';
+  });
 }
 
 /* ============================================================
@@ -2273,7 +2485,7 @@ function renderSettings(){
 function init(){
   loadLocal();
   renderEye(); renderDrivePill(); renderAll(); renderSettings();
-  window.addEventListener('resize', ()=>drawEquity());
+  window.addEventListener('resize', ()=>{ drawEquity(); drawVsChart(); });
   document.addEventListener('visibilitychange', ()=>{
     if(document.visibilityState==='hidden' && DRIVE.connected && saveTimer){
       clearTimeout(saveTimer); saveTimer=null; drivePush().catch(()=>{});
@@ -2300,7 +2512,7 @@ return {openOwner,submitOwner,switchTab,gotoSettings,toggleMask,selectPort,openP
   openAddModal,pickFormPort,submitLot,deleteLot,onBuyInput,recalcBuy,openSellModal,submitSell,onSAmountInput,setSellMode,sellAllQuick,recalcSell,onSellDateInput,closeModal,viewSlip,
   onSlipFile,openManualAdd,maChoose,maSellTicker,confirmPending,deletePending,
   msToggle,msAuto,msSetMode,msRecalc,onMsAmountInput,onMsDate,msSellAllSel,msSubmit,
-  setTf,refreshPrices,
+  setTf,setVsGran,refreshPrices,
   selectRbPort,rbUseCurrent,renderRebalance,openTargetsModal,addTgtRow,updateTgtSum,submitTargets,
   setView,toggleDense,setSort,toggleGroup,openGa,gaAssign,gaCreateAssign,openGm,gmAddRow,gmDelRow,gmSubmit,deleteSell,openPm,pmDelete,
   driveConnect,driveSyncNow,driveDisconnect,drivePillTap};
