@@ -1031,17 +1031,23 @@ function setSort(v){
 }
 function lotCurVal(l){ const rem=remShares(l); return rem>1e-9? rem*priceInfo(l).price : 0; }
 function lotPnlPct(l){ const rem=remShares(l); return (rem>1e-9 && l.price>0)? (priceInfo(l).price-l.price)/l.price*100 : null; }
+/* ไม้ที่ยังถืออยู่ (OPEN/PARTIAL) ขึ้นก่อนเสมอ ไม้ที่ปิดแล้วไปกองท้ายสุด
+   แล้วค่อยเรียงตามโหมดที่เลือกภายในแต่ละกลุ่ม */
+function lotClosedKey(l){ return remShares(l)>1e-9 ? 0 : 1; }
 function sortLots(arr){
   const a=arr.slice();
-  if(sortMode==='ticker') a.sort((x,y)=> x.ticker===y.ticker ? (y.date||'').localeCompare(x.date||'') : x.ticker.localeCompare(y.ticker));
-  else if(sortMode==='weight') a.sort((x,y)=> lotCurVal(y)-lotCurVal(x));
-  else if(sortMode==='pnl') a.sort((x,y)=>{
+  let cmp;
+  if(sortMode==='ticker') cmp=(x,y)=> x.ticker===y.ticker ? (y.date||'').localeCompare(x.date||'') : x.ticker.localeCompare(y.ticker);
+  else if(sortMode==='weight') cmp=(x,y)=> lotCurVal(y)-lotCurVal(x);
+  else if(sortMode==='pnl') cmp=(x,y)=>{
     const px=lotPnlPct(x), py=lotPnlPct(y);
     if(px==null&&py==null) return (y.date||'').localeCompare(x.date||'');
     if(px==null) return 1; if(py==null) return -1;
     return py-px;
-  });
-  return a; // 'recent' = ตาม visibleLots เดิม (วันที่ใหม่ก่อน)
+  };
+  else cmp=(x,y)=> (y.date||'').localeCompare(x.date||'');   // 'recent' = วันที่ใหม่ก่อน
+  a.sort((x,y)=> (lotClosedKey(x)-lotClosedKey(y)) || cmp(x,y));
+  return a;
 }
 function renderHero(){
   const st=portStats(sel);
@@ -1242,9 +1248,13 @@ function renderByTicker(){
   });
   let agg=Object.values(map);
   const grand=agg.reduce((a,t)=>a+t.rem*t.price,0);
-  if(sortMode==='ticker') agg.sort((a,b)=>a.ticker.localeCompare(b.ticker));
-  else if(sortMode==='pnl') agg.sort((a,b)=>((b.costOpen>0?(b.rem*b.price-b.costOpen)/b.costOpen:-1e9))-((a.costOpen>0?(a.rem*a.price-a.costOpen)/a.costOpen:-1e9)));
-  else agg.sort((a,b)=>(b.rem*b.price)-(a.rem*a.price)); // weight/recent = มูลค่ามาก่อน
+  // หุ้นที่ยังถืออยู่ขึ้นก่อน ที่ขายหมดแล้วไปท้ายสุด แล้วค่อยเรียงตามโหมดภายในกลุ่ม
+  const closedKey=t=> t.rem>1e-9 ? 0 : 1;
+  let cmpT;
+  if(sortMode==='ticker') cmpT=(a,b)=>a.ticker.localeCompare(b.ticker);
+  else if(sortMode==='pnl') cmpT=(a,b)=>((b.costOpen>0?(b.rem*b.price-b.costOpen)/b.costOpen:-1e9))-((a.costOpen>0?(a.rem*a.price-a.costOpen)/a.costOpen:-1e9));
+  else cmpT=(a,b)=>(b.rem*b.price)-(a.rem*a.price); // weight/recent = มูลค่ามาก่อน
+  agg.sort((a,b)=> (closedKey(a)-closedKey(b)) || cmpT(a,b));
   wrap.innerHTML=agg.map(t=>{
     const curVal=t.rem*t.price, unreal=curVal-t.costOpen, avg=t.rem>0? t.costOpen/t.rem : 0;
     const pct=t.costOpen>0? unreal/t.costOpen*100:0;
