@@ -316,6 +316,7 @@
       <button class="tab" data-t="dd" onclick="setChartTab('dd')">Drawdown</button>
       <button class="tab" data-t="yr" onclick="setChartTab('yr')">เทียบ SPY รายปี</button>
       <button class="tab" data-t="vol" onclick="setChartTab('vol')">Vol รายปี</button>
+      <button class="tab" data-t="dvol" onclick="setChartTab('dvol')">Vol ขาลง</button>
     </div>
     <canvas id="chart" width="920" height="380"></canvas>
     <div class="note" id="chartNote" style="display:none;"></div>
@@ -857,7 +858,8 @@ function setChartTab(t){
   if (t === 'eq') drawChart(LASTVIZ.dates, LASTVIZ.port);
   else if (t === 'dd') drawDD(LASTVIZ.dates, LASTVIZ.port);
   else if (t === 'yr') drawYearly(LASTVIZ.dates, LASTVIZ.port);
-  else if (t === 'vol') drawVolYearly();
+  else if (t === 'vol') drawVolYearly(false);
+  else if (t === 'dvol') drawVolYearly(true);
 }
 
 function drawDD(dates, vals){
@@ -958,7 +960,7 @@ function drawYearly(dates, vals){
 const VOLPAL = ['#f2c14e','#e08a2f','#6fd44a','#48d17a','#7fb8d4','#4a90d9',
                 '#a75cf0','#c86bd4','#e05c7f','#ff8a5c','#5cd4c8','#c8b45c'];
 
-function annualVolSeries(dates, vals){
+function annualVolSeries(dates, vals, downside){
   const by = {};
   for (let i = 1; i < dates.length; i++){
     const p0 = vals[i - 1], p1 = vals[i];
@@ -969,17 +971,23 @@ function annualVolSeries(dates, vals){
   return Object.keys(by).sort().map(y => {
     const a = by[y];
     if (a.length < 30) return { y, v: null };   // partial year — skip point
-    const mu = a.reduce((s, b) => s + b, 0) / a.length;
-    const sd = Math.sqrt(a.reduce((s, b) => s + (b - mu) * (b - mu), 0) / (a.length - 1));
+    let sd;
+    if (downside){
+      // semi-deviation (MAR = 0): only negative days count, denominator = all days (Sortino-style)
+      sd = Math.sqrt(a.reduce((s, b) => s + (b < 0 ? b * b : 0), 0) / a.length);
+    } else {
+      const mu = a.reduce((s, b) => s + b, 0) / a.length;
+      sd = Math.sqrt(a.reduce((s, b) => s + (b - mu) * (b - mu), 0) / (a.length - 1));
+    }
     return { y, v: sd * Math.sqrt(252) };
   });
 }
 
-function drawVolYearly(){
+function drawVolYearly(downside){
   const note = document.getElementById('chartNote');
   const { dates, port, series } = LASTVIZ;
 
-  const portVol = annualVolSeries(dates, port);
+  const portVol = annualVolSeries(dates, port, downside);
   const years = portVol.map(p => p.y);
 
   const lines = [];   // { label, color, width, dash, pts:Map(year→v) }
@@ -988,7 +996,7 @@ function drawVolYearly(){
     lines.push({
       label: (st ? COLS[st.col].ic + ' ' + st.th : s.id),
       color: VOLPAL[k % VOLPAL.length], width: 1.6, dash: [],
-      pts: new Map(annualVolSeries(dates, s.vals).map(p => [p.y, p.v]))
+      pts: new Map(annualVolSeries(dates, s.vals, downside).map(p => [p.y, p.v]))
     });
   });
   lines.push({ label:'พอร์ตรวม', color:'#D4AF37', width:3, dash:[],
@@ -1000,7 +1008,7 @@ function drawVolYearly(){
     if (f.length > 10){
       hasSpy = true;
       lines.push({ label:'SPY', color:'rgba(244,234,216,.85)', width:2, dash:[6,4],
-        pts: new Map(annualVolSeries(f.map(p => p[0]), f.map(p => p[1])).map(p => [p.y, p.v])) });
+        pts: new Map(annualVolSeries(f.map(p => p[0]), f.map(p => p[1]), downside).map(p => [p.y, p.v])) });
     }
   }
 
@@ -1063,7 +1071,10 @@ function drawVolYearly(){
       '<span style="width:14px;height:3px;border-radius:2px;background:' + l.color +
       (l.dash.length ? ';opacity:.85' : '') + ';"></span>' + l.label + '</span>'
     ).join('') + '</div>' +
-    '<div style="margin-top:6px;">ความผันผวนรายปี (SD ของผลตอบแทนรายวัน × √252) แยกตามปีปฏิทิน — ปีที่ข้อมูลไม่ถึง 30 วันทำการจะถูกข้าม' +
+    '<div style="margin-top:6px;">' +
+    (downside
+      ? 'ความผันผวนฝั่งขาลงรายปี (Downside Deviation: นับเฉพาะวันติดลบ, MAR 0, × √252 — ตัวหารเดียวกับ Sortino) แยกตามปีปฏิทิน — ปีที่ข้อมูลไม่ถึง 30 วันทำการจะถูกข้าม'
+      : 'ความผันผวนรายปี (SD ของผลตอบแทนรายวัน × √252) แยกตามปีปฏิทิน — ปีที่ข้อมูลไม่ถึง 30 วันทำการจะถูกข้าม') +
     (hasSpy ? '' : ' · ไม่มีข้อมูล SPY ในผลรันชุดนี้') + '</div>';
 }
 
