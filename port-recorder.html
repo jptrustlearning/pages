@@ -2388,9 +2388,12 @@ function renderRebalance(){
   });
   let html='', sumBuy=0, sumSell=0, maxDrift=0;
   rows.forEach(r=>{
-    r.cur = total>0? r.value/total*100 : 0;
+    r.cur  = total>0? r.value/total*100 : 0;                  // % ของพอร์ตวันนี้ (ไว้โชว์เฉยๆ)
+    r.curT = targetTotal>0? r.value/targetTotal*100 : 0;      // % เทียบฐานเป้าหมาย
     r.delta = r.tgt/100*targetTotal - r.value;
-    r.drift = r.cur - r.tgt;
+    // ต้องวัดบนฐานเดียวกับ delta ไม่งั้นตอนเติมเงิน เลขจะเพี้ยนจนสลับเครื่องหมาย
+    // (เช่น เติม 2000 แล้ว GLD ยังขาดอยู่ แต่ฐานเก่าอ่านได้ว่า "เกินเป้า")
+    r.drift = r.curT - r.tgt;
     r.within = Math.abs(r.drift)<=tol || Math.abs(r.delta)<0.01;
   });
   // ลำดับตามลำดับการลงมือจริง: ขายออกมากสุด → ... → ซื้อเพิ่มมากสุด → ที่ไม่ต้องทำอะไรไว้ท้ายสุด
@@ -2406,12 +2409,16 @@ function renderRebalance(){
     let cls='act-ok', act='<span class="rb-action ok">✓ อยู่ในเกณฑ์</span>';
     if(!within && r.delta>0){ cls='act-buy'; act='<span class="rb-action buy">🟢 ซื้อเพิ่ม '+fmtUSD(r.delta)+'</span>'; sumBuy+=r.delta; }
     else if(!within && r.delta<0){ cls='act-sell'; act='<span class="rb-action sell">🔴 ขายออก '+fmtUSD(-r.delta)+'</span>'; sumSell+=-r.delta; }
-    const barW=Math.min(100, r.cur);
+    const barW=Math.min(100, r.curT);
     const tgtX=Math.min(100, r.tgt);
+    const baseMoved = Math.abs(targetTotal-total)>0.01;
+    const curTxt = baseMoved
+      ? ('ตอนนี้ '+r.cur.toFixed(1)+'% → ฐานใหม่ '+r.curT.toFixed(1)+'%')
+      : ('ตอนนี้ '+r.cur.toFixed(1)+'%');
     html+='<div class="rb-card '+cls+'">'
       +'<div class="rb-head"><span class="rb-tk">'+esc(r.tk)+(r.stale?' <span class="lot-badge stale">ราคาไม่อัพเดต</span>':'')+(r.tgt===0?' <span class="lot-badge stale">ไม่มีเป้า</span>':'')+'</span>'+act+'</div>'
       +'<div class="rb-bar"><div class="rb-bar-fill" style="width:'+barW+'%"></div><div class="rb-bar-target" style="left:'+tgtX+'%"></div></div>'
-      +'<div class="rb-nums"><span>ตอนนี้ '+r.cur.toFixed(1)+'% · มูลค่า '+fmtUSD(r.value)+'</span><span>เป้า '+r.tgt.toFixed(1)+'% (เพี้ยน '+fmtPct(r.drift,true)+')</span></div>'
+      +'<div class="rb-nums"><span>'+curTxt+' · มูลค่า '+fmtUSD(r.value)+'</span><span>เป้า '+r.tgt.toFixed(1)+'% = '+fmtUSD(r.tgt/100*targetTotal)+' (เพี้ยน '+fmtPct(r.drift,true)+')</span></div>'
       +'</div>';
   });
   const sumTgt=tgtTks.reduce((a,t)=>a+targets[t],0);
@@ -2431,12 +2438,21 @@ function renderRebalance(){
     +'<div class="rb-sn-cell">ต้องซื้อรวม<span class="rb-sn-val" style="color:#4DE89A">'+fmtUSD(sumBuy)+'</span></div>'
     +'<div class="rb-sn-cell">ต้องขายรวม<span class="rb-sn-val" style="color:#FF6B6B">'+fmtUSD(sumSell)+'</span></div>'
     +'</div>';
+  // เงินที่แผนไม่ได้สั่งลง (เกิดจากตัวที่เพี้ยนน้อยกว่า tolerance เลยถูกข้าม)
+  const leftover = cashDelta - (sumBuy - sumSell);
+  if(Math.abs(leftover)>0.01){
+    sm+='<div style="font-size:.72rem;margin-top:8px;color:var(--gold-light);opacity:.9;line-height:1.5">'
+      +(leftover>0
+        ? 'เหลือเงินที่แผนไม่ได้สั่งลง '+fmtUSD(leftover)+' — เพราะบางตัวเพี้ยนไม่ถึงเกณฑ์ ±'+tol+'% เลยถูกข้าม · ตั้ง Tolerance เป็น 0 ถ้าอยากให้ลงครบทุกบาท'
+        : 'แผนสั่งลงเกินเงินที่มี '+fmtUSD(-leftover)+' — ตั้ง Tolerance เป็น 0 ถ้าอยากให้ตรงพอดี')
+      +'</div>';
+  }
   if(Math.abs(sumTgt-100)>0.01) sm+='<div style="font-size:.68rem;margin-top:8px;color:var(--gold-light);opacity:.85">⚠ เป้ารวม '+sumTgt.toFixed(1)+'% (ส่วนที่เหลือ '+(100-sumTgt).toFixed(1)+'% = ถือเป็นเงินสด/ไม่ระบุ)</div>';
   sm+='</div>';
   $('rbSummary').innerHTML=sm;
   $('rbList').innerHTML=html;
   rbPlan={ port:p.name, tol, total, targetTotal, add, sumBuy, sumSell, sumTgt, headline,
-           rows: rows.map(r=>({tk:r.tk, cur:r.cur, tgt:r.tgt, value:r.value, delta:r.delta,
+           rows: rows.map(r=>({tk:r.tk, cur:r.cur, curT:r.curT, tgt:r.tgt, value:r.value, delta:r.delta,
                                drift:r.drift, within:r.within, stale:r.stale})) };
   const pb=$('rbPrintRow'); if(pb) pb.style.display='block';
 }
@@ -2455,24 +2471,27 @@ function printRbPlan(){
   const oks  =P.rows.filter(r=>r.within);
   let body='';
   const line=(r,act)=>'<td>'+esc(r.tk)+(r.stale?' *':'')+'</td>'
-      +'<td class="n">'+r.cur.toFixed(1)+'%</td>'
+      +'<td class="n">'+(r.curT!=null?r.curT:r.cur).toFixed(1)+'%</td>'
       +'<td class="n">'+r.tgt.toFixed(1)+'%</td>'
       +'<td class="n">'+usd(r.value)+'</td>'
+      +'<td class="n">'+usd(r.tgt/100*P.targetTotal)+'</td>'
       +'<td class="n">'+act+'</td>';
   if(sells.length){
-    body+='<tr class="pp-sec"><td colspan="5">① ขายก่อน — รวม '+usd(P.sumSell)+'</td></tr>';
+    body+='<tr class="pp-sec"><td colspan="6">① ขายก่อน — รวม '+usd(P.sumSell)+'</td></tr>';
     sells.forEach(r=>{ body+='<tr class="g-sell">'+line(r,'ขาย '+usd(-r.delta))+'</tr>'; });
   }
   if(buys.length){
-    body+='<tr class="pp-sec"><td colspan="5">② แล้วค่อยซื้อ — รวม '+usd(P.sumBuy)+'</td></tr>';
+    body+='<tr class="pp-sec"><td colspan="6">② แล้วค่อยซื้อ — รวม '+usd(P.sumBuy)+'</td></tr>';
     buys.forEach(r=>{ body+='<tr class="g-buy">'+line(r,'ซื้อ '+usd(r.delta))+'</tr>'; });
   }
   if(oks.length){
-    body+='<tr class="pp-sec"><td colspan="5">③ ไม่ต้องทำอะไร (อยู่ในเกณฑ์ ±'+P.tol+'%)</td></tr>';
+    body+='<tr class="pp-sec"><td colspan="6">③ ไม่ต้องทำอะไร (อยู่ในเกณฑ์ ±'+P.tol+'%)</td></tr>';
     oks.forEach(r=>{ body+='<tr class="g-ok">'+line(r,'—')+'</tr>'; });
   }
   let warn='';
-  if(Math.abs(P.sumTgt-100)>0.01) warn='<div class="pp-note">เป้ารวม '+P.sumTgt.toFixed(1)+'% — ส่วนที่เหลือ '+(100-P.sumTgt).toFixed(1)+'% ถือเป็นเงินสด/ไม่ระบุ</div>';
+  const lo=(P.targetTotal-P.total)-(P.sumBuy-P.sumSell);
+  if(Math.abs(lo)>0.01) warn+='<div class="pp-note">'+(lo>0?('เหลือเงินที่แผนไม่ได้สั่งลง '+usd(lo)+' (บางตัวเพี้ยนไม่ถึงเกณฑ์ ±'+P.tol+'%)'):('แผนสั่งลงเกินเงินที่มี '+usd(-lo)))+'</div>';
+  if(Math.abs(P.sumTgt-100)>0.01) warn+='<div class="pp-note">เป้ารวม '+P.sumTgt.toFixed(1)+'% — ส่วนที่เหลือ '+(100-P.sumTgt).toFixed(1)+'% ถือเป็นเงินสด/ไม่ระบุ</div>';
   $('rbPrint').innerHTML =
      '<div class="pp-brand">JPTRUST PORT RECORDER</div>'
     +'<h1>แผนปรับสมดุลพอร์ต — '+esc(P.port)+'</h1>'
@@ -2486,7 +2505,7 @@ function printRbPlan(){
       +'<div class="pp-cell">ขายรวม / ซื้อรวม<b>'+usd(P.sumSell)+' / '+usd(P.sumBuy)+'</b></div>'
     +'</div>'
     + warn
-    +'<table><thead><tr><th>หุ้น</th><th class="n">ตอนนี้</th><th class="n">เป้า</th><th class="n">มูลค่าตอนนี้</th><th class="n">ต้องทำ</th></tr></thead><tbody>'+body+'</tbody></table>'
+    +'<table><thead><tr><th>หุ้น</th><th class="n">ตอนนี้</th><th class="n">เป้า</th><th class="n">มูลค่าตอนนี้</th><th class="n">เป้า (มูลค่า)</th><th class="n">ต้องทำ</th></tr></thead><tbody>'+body+'</tbody></table>'
     +'<div class="pp-foot">คำนวณจากราคาล่าสุดที่ดึงเข้าแอป ราคาจริงตอนส่งคำสั่งอาจต่างจากนี้ · เครื่องหมาย * = ราคาตัวนั้นยังไม่อัพเดต · เอกสารนี้เป็นบันทึกส่วนตัวของผู้ใช้ ไม่ใช่คำแนะนำการลงทุน<br>สร้างโดย JP Trust Learning — Port Recorder</div>';
   setTimeout(()=>{ window.print(); }, 60);
 }
