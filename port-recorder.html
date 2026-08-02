@@ -469,6 +469,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
           <input class="field-input num" id="rbNew" type="number" inputmode="decimal" step="any" placeholder="0.00" oninput="PR.renderRebalance()" onkeydown="if(event.key==='Enter'){event.preventDefault();PR.rbApplyNew();}">
           <button class="btn-secondary" style="flex:0 0 auto;padding:8px 13px;font-size:.72rem" onclick="PR.rbApplyNew()">✓ ใช้เลขนี้</button>
         </div>
+        <div class="field-hint" id="rbNewHint"></div>
       </div>
       <div class="preview-row" style="border-top:1px dashed var(--border-gold);padding-top:10px;margin-top:4px"><span style="font-weight:700;font-size:.84rem">เป้าหมายมูลค่าพอร์ตรวม</span><span class="preview-num" id="rbTargetTotal" style="font-size:1.15rem">$0.00</span></div>
     </div>
@@ -762,7 +763,7 @@ function freshData(){ return { v:1, owner:'', portfolios:[{id:uid(),name:'พอ
 function loadLocal(){
   try{ D = JSON.parse(localStorage.getItem(LS_DATA)) || null; }catch(e){ D=null; }
   if(!D || !Array.isArray(D.portfolios)) D = freshData();
-  D.portfolios.forEach(p=>{ if(!p.targets) p.targets={}; if(p.tolerance==null) p.tolerance=0; if(!Array.isArray(p.groups)) p.groups=[]; });
+  D.portfolios.forEach(p=>{ if(!p.targets) p.targets={}; if(p.tolerance==null) p.tolerance=0; if(p.rbNew==null) p.rbNew=0; if(!Array.isArray(p.groups)) p.groups=[]; });
   ['lots','sells','pending'].forEach(k=>{ if(!Array.isArray(D[k])) D[k]=[]; });
   try{ PRICES = JSON.parse(localStorage.getItem(LS_PRICES)) || {}; }catch(e){ PRICES={}; }
   try{ CFG = JSON.parse(localStorage.getItem(LS_CFG)) || {}; }catch(e){ CFG={}; }
@@ -2325,9 +2326,14 @@ function rbTotalNow(){ return holdingsOf(rbSel).reduce((a,h)=>a+h.value,0); }
 let rbPlan=null;
 function rbSeedInputs(){
   const total=rbTotalNow();
+  const p=portById(rbSel);
   $('rbBase').value=total>0? total.toFixed(2):'';
-  $('rbNew').value='';
+  // จำ "เงินใหม่ที่จะเติม" ไว้ต่อพอร์ต — สลับแท็บ/ปิดแอปแล้วกลับมาต้องยังอยู่
+  const keep=(p&&p.rbNew>0)? p.rbNew : 0;
+  $('rbNew').value = keep>0 ? String(keep) : '';
   $('rbBaseHint').textContent='มูลค่าพอร์ตปัจจุบัน '+fmtUSD(total)+' — ลดตัวเลขลง = ถอนกำไร/เงินออกจากพอร์ต';
+  const nh=$('rbNewHint');
+  if(nh) nh.textContent = keep>0 ? ('จำไว้ให้แล้ว '+fmtUSD(keep)+' — ลบตัวเลขออกถ้าไม่เติมแล้ว') : '';
 }
 function rbUseCurrent(){ rbSeedInputs(); renderRebalance(); toast('ใช้มูลค่าพอร์ตปัจจุบันแล้ว'); }
 /* ปุ่ม "ใช้เลขนี้": ตัวเลขคำนวณสดอยู่แล้วตอนพิมพ์ แต่บนมือถือคีย์บอร์ดบังกล่องสรุปจนไม่เห็นว่าขยับ
@@ -2375,6 +2381,8 @@ function renderRebalance(){
   const total=holds.reduce((a,h)=>a+h.value,0);
   let base=parseFloat($('rbBase').value); if(!(base>=0)) base=total;
   const add=Math.max(0, parseFloat($('rbNew').value)||0);
+  if((p.rbNew||0)!==add){ p.rbNew=add; saveData(); }
+  const nh=$('rbNewHint'); if(nh) nh.textContent = add>0 ? 'จำไว้ให้แล้ว — สลับหน้าไปมาตัวเลขนี้จะยังอยู่' : '';
   const targetTotal=Math.max(0, base+add);
   $('rbTargetTotal').textContent=fmtUSD(targetTotal);
   const cashDelta=targetTotal-total; // + = เติมสุทธิ, - = ถอนออกสุทธิ
