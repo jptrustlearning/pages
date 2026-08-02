@@ -759,11 +759,20 @@ function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('sho
 
 /* ---------- STORAGE ---------- */
 function freshData(){ return { v:1, owner:'', portfolios:[{id:uid(),name:'พอร์ตหลัก',color:PORT_COLORS[0],targets:{},tolerance:0}], lots:[], sells:[], pending:[] }; }
-function loadLocal(){
-  try{ D = JSON.parse(localStorage.getItem(LS_DATA)) || null; }catch(e){ D=null; }
+function normalizeData(){
   if(!D || !Array.isArray(D.portfolios)) D = freshData();
   D.portfolios.forEach(p=>{ if(!p.targets) p.targets={}; if(p.tolerance==null) p.tolerance=0; if(p.rbNew==null) p.rbNew=0; if(!Array.isArray(p.groups)) p.groups=[]; });
   ['lots','sells','pending'].forEach(k=>{ if(!Array.isArray(D[k])) D[k]=[]; });
+  // ย้ายค่า Tolerance ครั้งเดียว: 2 คือ default เก่าที่ระบบเซฟให้เองทุกครั้งที่เปิดหน้าปรับสมดุล
+  // ไม่ใช่ค่าที่ผู้ใช้ตั้งเอง → เปลี่ยนเป็น 0. ตั้งธงไว้ ถ้าหลังจากนี้ผู้ใช้พิมพ์ 2 เองจะไม่โดนทับอีก
+  if(!D.migTol0){
+    D.portfolios.forEach(p=>{ if(p.tolerance===2) p.tolerance=0; });
+    D.migTol0=1;
+  }
+}
+function loadLocal(){
+  try{ D = JSON.parse(localStorage.getItem(LS_DATA)) || null; }catch(e){ D=null; }
+  normalizeData();
   try{ PRICES = JSON.parse(localStorage.getItem(LS_PRICES)) || {}; }catch(e){ PRICES={}; }
   try{ CFG = JSON.parse(localStorage.getItem(LS_CFG)) || {}; }catch(e){ CFG={}; }
   try{ DRIVE = JSON.parse(localStorage.getItem(LS_DRIVE)) || {}; }catch(e){ DRIVE={}; }
@@ -2636,6 +2645,7 @@ async function drivePull(interactive){
   const j=await r.json();
   if(j&&j.data&&Array.isArray(j.data.portfolios)){
     D=j.data; if(j.prices) PRICES=j.prices;
+    normalizeData();
     persistLocal(); return true;
   }
   return false;
