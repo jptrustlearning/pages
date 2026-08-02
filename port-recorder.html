@@ -175,6 +175,9 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .tgt-tk{font-family:var(--font-number);font-size:1rem;color:var(--maroon);flex:1}
 .tgt-input{width:80px;background:var(--cream-warm);border:1.5px solid var(--border-gold);border-radius:8px;padding:8px;font-family:var(--font-number);font-size:1rem;text-align:center;color:var(--text-dark)}
 .tgt-input:focus{outline:none;border-color:var(--maroon)}
+.tgt-del{flex:0 0 auto;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--border-gold);background:var(--cream-warm);color:var(--maroon);font-size:1.05rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.tgt-del:active{background:rgba(192,57,43,0.12);border-color:var(--red)}
+.tgt-row .tgt-pct{font-size:.8rem;color:var(--text-muted);width:14px}
 .tgt-sum{padding:10px 12px;border-radius:10px;background:var(--cream-warm);font-size:.8rem;font-weight:600;margin:6px 0 14px;text-align:center}
 .tgt-sum.ok{color:var(--green-dark);background:rgba(46,159,95,0.08)}
 .tgt-sum.warn{color:var(--gold-dark);background:rgba(212,175,55,0.1)}
@@ -2387,7 +2390,7 @@ function openTargetsModal(){
   if(!requireDrive()) return;
   const p=portById(rbSel); if(!p){ toast('เลือกพอร์ตก่อน'); return; }
   tgtPortId=p.id;
-  $('tgtPortName').textContent='พอร์ต: '+p.name+' — กำหนด % ที่อยากให้แต่ละหุ้นเป็น (รวมไม่เกิน 100)';
+  $('tgtPortName').textContent='พอร์ต: '+p.name+' — กำหนด % ที่อยากให้แต่ละหุ้นเป็น (รวมไม่เกิน 100) · กด × เพื่อเอาออกจากแผน';
   const holds=holdingsOf(p.id);
   const tset=new Set(holds.map(h=>h.ticker)); Object.keys(p.targets||{}).forEach(t=>tset.add(t));
   const tks=[...tset].sort();
@@ -2397,7 +2400,7 @@ function openTargetsModal(){
   openModal('mdlTgt');
 }
 function tgtRowHtml(tk,val){
-  return '<div class="tgt-row" data-tk="'+esc(tk)+'"><span class="tgt-tk">'+esc(tk)+'</span><input class="tgt-input" type="number" min="0" max="100" step="0.5" value="'+val+'" oninput="PR.updateTgtSum()"><span style="font-size:.8rem;color:var(--text-muted)">%</span></div>';
+  return '<div class="tgt-row" data-tk="'+esc(tk)+'"><span class="tgt-tk">'+esc(tk)+'</span><input class="tgt-input" type="number" min="0" max="100" step="0.5" value="'+val+'" oninput="PR.updateTgtSum()"><span class="tgt-pct">%</span><button class="tgt-del" title="ลบ '+esc(tk)+' ออกจากแผน" onclick="PR.delTgtRow(this)">×</button></div>';
 }
 function addTgtRow(){
   const inp=$('tgtNewTk'); const tk=inp.value.trim().toUpperCase();
@@ -2405,6 +2408,14 @@ function addTgtRow(){
   if(document.querySelector('#tgtRows .tgt-row[data-tk="'+tk+'"]')){ toast('มี '+tk+' อยู่แล้ว'); return; }
   inp.closest('.tgt-row').insertAdjacentHTML('beforebegin', tgtRowHtml(tk,''));
   inp.value=''; updateTgtSum();
+}
+function delTgtRow(btn){
+  const row=btn.closest('.tgt-row'); if(!row) return;
+  const tk=row.dataset.tk;
+  const held=holdingsOf(tgtPortId).some(h=>h.ticker===tk);
+  row.remove(); updateTgtSum();
+  // ถ้ายังถือหุ้นตัวนี้อยู่ แถวจะกลับมาเป็นช่องว่างตอนเปิดใหม่ (ไม่มีเป้า = แผนสั่งขายออกทั้งหมด)
+  toast(held ? (tk+' ไม่มีเป้าแล้ว — แผนจะให้ขายออกทั้งหมด') : ('ลบ '+tk+' ออกจากแผนแล้ว'));
 }
 function updateTgtSum(){
   let sum=0;
@@ -2595,7 +2606,7 @@ return {openOwner,submitOwner,switchTab,gotoSettings,toggleMask,selectPort,openP
   openAddModal,pickFormPort,submitLot,deleteLot,onBuyInput,recalcBuy,openSellModal,submitSell,onSAmountInput,setSellMode,sellAllQuick,recalcSell,onSellDateInput,closeModal,viewSlip,
   onSlipFile,openManualAdd,maChoose,maSellTicker,confirmPending,deletePending,
   msToggle,msAuto,msSetMode,msRecalc,onMsAmountInput,onMsDate,msSellAllSel,msSubmit,
-  setTf,setEqMode,setVsGran,refreshPrices,
+  setTf,setEqMode,setVsGran,delTgtRow,refreshPrices,
   selectRbPort,rbUseCurrent,renderRebalance,openTargetsModal,addTgtRow,updateTgtSum,submitTargets,
   setView,toggleDense,setSort,toggleGroup,openGa,gaAssign,gaCreateAssign,openGm,gmAddRow,gmDelRow,gmSubmit,deleteSell,openPm,pmDelete,
   driveConnect,driveSyncNow,driveDisconnect,drivePillTap};
