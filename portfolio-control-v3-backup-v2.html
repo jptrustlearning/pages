@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Portfolio Control v3 — JP Trust Learning</title>
+<script src="./jp-gate.js?v=1785594095"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Cinzel:wght@500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg0:#0b0805; --bg1:#171009; --card:#1b140c; --card2:#241a0f;
+    --gold:#D4AF37; --gold2:#F4E4BA; --goldD:#8a6d1f;
+    --txt:#f4ead8; --dim:rgba(244,234,216,.55);
+    --line:rgba(212,175,55,.28); --red:#c0392b;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  body{
+    font-family:'Sarabun',sans-serif; color:var(--txt); min-height:100vh; padding-bottom:60px;
+    background:
+      radial-gradient(60% 34% at 85% 0%, rgba(212,175,55,.16), transparent 60%),
+      radial-gradient(40% 26% at 10% 100%, rgba(212,175,55,.07), transparent 60%),
+      linear-gradient(175deg, #14100a 0%, var(--bg0) 45%, #0d0a06 100%);
+  }
+  .wrap{ max-width:960px; margin:0 auto; padding:0 16px; }
+
+  /* ---------- hero ---------- */
+  header{ padding:30px 16px 8px; position:relative; overflow:hidden; }
+  header .in{ max-width:960px; margin:0 auto; position:relative; }
+  .brand{ font-family:'Cinzel',serif; font-size:.66rem; letter-spacing:.34em; color:var(--gold); }
+  h1{
+    font-family:'Cinzel',serif; font-size:1.85rem; letter-spacing:.10em; margin:8px 0 2px;
+    background:linear-gradient(120deg,#F4E4BA 10%,#D4AF37 45%,#9c7c22 75%,#F4E4BA 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .kicker{ font-family:'Cinzel',serif; font-size:.6rem; letter-spacing:.5em; color:var(--gold); }
+  .sub{ font-size:.86rem; color:var(--dim); margin-top:10px; max-width:520px; line-height:1.65; }
+
+  /* ---------- cards ---------- */
+  .card{
+    background:linear-gradient(160deg,var(--card2),var(--card));
+    border:1px solid var(--line); border-radius:20px; padding:18px; margin-bottom:16px;
+    box-shadow:0 10px 26px rgba(0,0,0,.5), inset 0 1px 0 rgba(244,228,186,.07);
+  }
+  .card h2{ font-family:'Cinzel',serif; font-size:.72rem; letter-spacing:.26em; color:var(--gold2);
+            margin-bottom:14px; display:flex; align-items:center; gap:10px; }
+  .card h2 .en{ font-size:.6rem; letter-spacing:.2em; color:var(--gold); opacity:.8; }
+
+  /* ---------- global controls (icon row) ---------- */
+  .grow{ display:flex; flex-wrap:wrap; gap:12px; }
+  .gitem{ flex:1 1 150px; display:flex; align-items:center; gap:11px;
+          background:rgba(0,0,0,.28); border:1px solid rgba(212,175,55,.16); border-radius:16px; padding:11px 12px; }
+  .gico{ width:42px; height:42px; flex:none; border-radius:50%; display:flex; align-items:center; justify-content:center;
+         font-size:1.15rem; background:radial-gradient(circle at 32% 28%, #4a3410, #241a0a 70%);
+         border:1px solid var(--line); box-shadow:inset 0 1px 0 rgba(244,228,186,.2), 0 3px 8px rgba(0,0,0,.45); }
+  .gitem label{ display:block; font-size:.68rem; color:var(--dim); margin-bottom:2px; }
+  .gitem input, .gitem select{
+    width:100%; background:transparent; border:none; outline:none; color:var(--gold2);
+    font-family:'DM Serif Display',serif; font-size:1.2rem; padding:0;
+  }
+  .gitem select{ appearance:none; -webkit-appearance:none; }
+  .gbtn{ width:100%; margin-top:12px; background:transparent; border:1px solid var(--line); border-radius:14px;
+         color:var(--gold2); font-family:'Sarabun',sans-serif; font-size:.85rem; padding:11px; cursor:pointer; }
+
+  /* ---------- strategy mix strip ---------- */
+  #mixStrip{ display:flex; gap:10px; overflow-x:auto; padding:2px 2px 8px; scrollbar-width:none; }
+  #mixStrip::-webkit-scrollbar{ display:none; }
+  .mix{
+    flex:0 0 auto; width:148px; text-align:center; border-radius:16px; padding:12px 8px;
+    background:linear-gradient(165deg,#2a1f10,#1b140c); border:1px solid var(--line);
+    box-shadow:inset 0 1px 0 rgba(244,228,186,.1), 0 6px 14px rgba(0,0,0,.4);
+  }
+  .mix .ic{ font-size:1.3rem; }
+  .mix .pc{ font-family:'DM Serif Display',serif; font-size:1.35rem; color:var(--gold2); margin:3px 0 2px; }
+  .mix .nm{ font-size:.62rem; color:var(--dim); line-height:1.4; }
+  .mix .cf{ font-size:.6rem; color:var(--gold); line-height:1.45; margin-top:5px;
+            border-top:1px dashed rgba(212,175,55,.25); padding-top:5px; }
+  .mix-empty{ font-size:.78rem; color:var(--dim); padding:8px 2px; }
+
+  /* ---------- collection band + quad block (app-style) ---------- */
+  .col-band{
+    display:flex; align-items:center; gap:10px; margin:28px -16px 14px; padding:11px 18px;
+    background:linear-gradient(90deg, transparent 0%, rgba(212,175,55,.20) 14%, rgba(212,175,55,.20) 86%, transparent 100%);
+    border-top:1px solid rgba(212,175,55,.35); border-bottom:1px solid rgba(212,175,55,.35);
+  }
+  .col-band .ic{ font-size:1.05rem; }
+  .col-band .th{ font-size:1rem; font-weight:800; color:var(--gold2); letter-spacing:.02em; }
+  .col-band .en{ font-family:'Cinzel',serif; font-size:.56rem; letter-spacing:.28em; color:var(--gold); margin-left:auto; }
+
+  .quad{
+    position:relative; display:grid; grid-template-columns:1fr 1fr; gap:2px;
+    background:linear-gradient(120deg,#8a6d1f,#D4AF37 50%,#8a6d1f);
+    border:2px solid rgba(212,175,55,.55); border-radius:26px; overflow:hidden;
+    box-shadow:0 14px 32px rgba(0,0,0,.55);
+    margin-bottom:6px;
+  }
+  .qmed{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:56px; height:56px; border-radius:16px; z-index:5; pointer-events:none;
+    display:flex; align-items:center; justify-content:center; font-size:1.5rem;
+    background:radial-gradient(circle at 32% 28%, #4a3410, #1c1206 75%);
+    border:2px solid var(--gold); box-shadow:0 4px 14px rgba(0,0,0,.6), inset 0 1px 0 rgba(244,228,186,.35);
+  }
+
+  .strat{
+    position:relative; min-width:0; display:flex; flex-direction:column; align-items:center;
+    text-align:center; padding:16px 10px 14px; cursor:pointer; transition:filter .2s;
+  }
+  .strat:active{ filter:brightness(1.06); }
+  .num{
+    width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-family:'DM Serif Display',serif; font-size:1.05rem; border:1.5px solid currentColor; margin-bottom:9px;
+  }
+  .strat .name .th{ font-size:.88rem; font-weight:800; line-height:1.3; }
+  .strat .name .en{ font-family:'Cinzel',serif; font-size:.5rem; letter-spacing:.18em; margin-top:4px; overflow-wrap:anywhere; }
+  .dot{ position:absolute; top:10px; right:10px; width:9px; height:9px; border-radius:50%; background:#4a4038; }
+  .dot.idle{ background:rgba(120,105,90,.6); } .dot.load{ background:#e0b93e; animation:pulse 1s infinite; }
+  .dot.done{ background:#4caf7d; } .dot.err{ background:#e05555; }
+  @keyframes pulse{ 50%{ opacity:.35; } }
+
+  /* quadrant colours — same pattern as the app quad page */
+  .q0{ background:linear-gradient(165deg,#4c1c29,#2b0f18 70%,#230c13); }
+  .q0 .num{ color:#E9CE7F; } .q0 .name .th{ color:#FAF6ED; } .q0 .name .en{ color:#D4AF37; }
+  .q1{ background:linear-gradient(165deg,#F2DC8E 0%,#DDB44A 55%,#b8912e 100%); }
+  .q1 .num{ color:#3a1520; } .q1 .name .th{ color:#2a1208; } .q1 .name .en{ color:#6e5410; }
+  .q2{ background:linear-gradient(165deg,#FCF8EF,#F0E6CF); }
+  .q2 .num{ color:#8a2c40; } .q2 .name .th{ color:#5a1f2e; } .q2 .name .en{ color:#8a6d1f; }
+  .q3{ background:linear-gradient(165deg,#38141f,#20090f); }
+  .q3 .num{ color:#D4AF37; } .q3 .name .th{ color:#F4E4BA; } .q3 .name .en{ color:#b8932c; }
+
+  /* labels & config line per quadrant brightness */
+  .cfgline{ margin-top:9px; font-size:.62rem; display:flex; align-items:center; gap:5px; }
+  .cfgline .gear{ font-size:.78rem; }
+  .q0 .cfgline, .q3 .cfgline{ color:rgba(244,228,186,.7); }
+  .q1 .cfgline, .q2 .cfgline{ color:rgba(42,18,8,.72); }
+  .cfgline.custom{ font-weight:700; }
+  .q0 .cfgline.custom, .q3 .cfgline.custom{ color:var(--gold2); }
+  .q1 .cfgline.custom, .q2 .cfgline.custom{ color:#3a1520; }
+
+  .wgtrow{ margin-top:8px; width:100%; max-width:150px; }
+  .wgtrow label{ display:block; font-size:.6rem; margin-bottom:3px; }
+  .q0 .wgtrow label, .q3 .wgtrow label{ color:rgba(244,228,186,.6); }
+  .q1 .wgtrow label, .q2 .wgtrow label{ color:rgba(42,18,8,.65); }
+  .wgtrow input{
+    width:100%; background:rgba(12,7,4,.82); border:1px solid rgba(212,175,55,.35); border-radius:12px;
+    color:var(--gold2); font-family:'DM Serif Display',serif; font-size:1.05rem; padding:6px 10px;
+    text-align:center; outline:none;
+    box-shadow:inset 2px 3px 6px rgba(0,0,0,.6), inset -1px -1px 3px rgba(255,246,220,.05);
+  }
+  .wgtrow input:focus{ border-color:var(--gold); }
+  .mini{ margin-top:6px; font-size:.6rem; display:none; line-height:1.5; }
+  .q0 .mini, .q3 .mini{ color:rgba(244,228,186,.72); }
+  .q1 .mini, .q2 .mini{ color:rgba(42,18,8,.75); }
+  .mini b{ font-weight:700; }
+  .q0 .mini b, .q3 .mini b{ color:var(--gold2); }
+  .q1 .mini b, .q2 .mini b{ color:#2a1208; }
+  .mini .neg{ color:#c0392b; }
+  .q0 .mini .neg, .q3 .mini .neg{ color:#e08a8a; }
+
+  /* OFF = the quadrant colour drops (veil), rocker stays vivid above it */
+  .strat.off::after{
+    content:''; position:absolute; inset:0; background:rgba(14,9,5,.66); pointer-events:none; z-index:2;
+  }
+  .strat .sw{ position:relative; z-index:3; margin-top:10px; }
+  /* rocker (unchanged colours in every state) */
+  .sw{ display:inline-flex; flex:none; border-radius:11px; overflow:hidden; cursor:pointer;
+       border:1px solid rgba(212,175,55,.45);
+       box-shadow:inset 2px 2px 6px rgba(0,0,0,.5), 0 2px 6px rgba(0,0,0,.35); }
+  .sw input{ display:none; }
+  .sw span{ font-family:'Cinzel',serif; font-size:.6rem; font-weight:700; letter-spacing:.14em;
+            padding:5px 11px; color:rgba(244,234,216,.30); background:rgba(10,6,3,.55);
+            transition:all .15s; user-select:none; }
+  .sw input:not(:checked) ~ .off{
+    background:linear-gradient(150deg,#6e2a22,#4c1c15); color:#f0b0a2;
+    box-shadow:0 1px 4px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.16); }
+  .sw input:checked ~ .on{
+    background:linear-gradient(150deg,var(--gold2),var(--gold) 45%,#a8862a); color:#221507;
+    text-shadow:0 1px 0 rgba(255,255,255,.35);
+    box-shadow:0 1px 5px rgba(212,175,55,.4), inset 0 1px 0 rgba(255,255,255,.45); }
+
+  /* ---------- run bar ---------- */
+  .sumbar{ position:sticky; bottom:0; z-index:30; background:rgba(12,9,5,.96); backdrop-filter:blur(10px);
+           border-top:1px solid var(--line); padding:10px 16px calc(10px + env(safe-area-inset-bottom)); }
+  .sumin{ max-width:960px; margin:0 auto; display:flex; align-items:center; gap:14px; }
+  .sumtxt{ flex:1; font-size:.85rem; color:var(--dim); }
+  .sumtxt b{ font-family:'DM Serif Display',serif; font-size:1.15rem; color:var(--gold2); }
+  .sumtxt.bad b{ color:#e08a8a; }
+  .btn{
+    background:linear-gradient(120deg,#F4E4BA 0%,#D4AF37 45%,#b8932c 100%); color:#221507;
+    border:none; border-radius:14px; font-family:'Sarabun',sans-serif; font-weight:800; font-size:.95rem;
+    padding:13px 22px; cursor:pointer; box-shadow:0 6px 16px rgba(212,175,55,.28), inset 0 1px 0 rgba(255,255,255,.5);
+  }
+  .btn:disabled{ opacity:.35; cursor:default; box-shadow:none; }
+  .btn2{ background:transparent; color:var(--gold2); border:1px solid var(--line); border-radius:10px;
+         font-family:'Sarabun',sans-serif; font-size:.8rem; padding:8px 14px; cursor:pointer; }
+
+  /* ---------- progress ---------- */
+  #progress{ display:none; }
+  #progress ul{ list-style:none; }
+  #progress li{ display:flex; align-items:center; gap:10px; padding:6px 0; font-size:.85rem;
+                border-bottom:1px dashed rgba(212,175,55,.14); }
+  #progress li:last-child{ border-bottom:none; }
+  #progress li .st{ margin-left:auto; font-size:.72rem; color:var(--dim); }
+  .note{ font-size:.74rem; color:var(--dim); margin-top:10px; line-height:1.65; }
+
+  /* ---------- results ---------- */
+  #results{ display:none; }
+  .bigval{ margin-bottom:14px; }
+  .bigval .l{ font-size:.78rem; color:var(--dim); }
+  .bigval .v{ font-family:'DM Serif Display',serif; font-size:2.1rem; color:var(--gold2); line-height:1.15; }
+  .bigval .r{ font-family:'DM Serif Display',serif; font-size:1rem; margin-left:8px; }
+  .bigval .r.pos{ color:#5fbf8f; } .bigval .r.neg{ color:#e08a8a; }
+  .statgrid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-bottom:16px; }
+  .stat{ background:rgba(0,0,0,.30); border:1px solid rgba(212,175,55,.18); border-radius:14px; padding:11px; text-align:center; }
+  .stat .v{ font-family:'DM Serif Display',serif; font-size:1.25rem; color:var(--gold2); }
+  .stat .v.neg{ color:#e08a8a; }
+  .stat .l{ font-size:.66rem; color:var(--dim); margin-top:2px; }
+  canvas{ width:100%; height:auto; display:block; border-radius:14px; background:rgba(0,0,0,.32); }
+  .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+  .tab{
+    background:rgba(0,0,0,.32); border:1px solid rgba(212,175,55,.30); border-radius:999px;
+    color:var(--dim); font-family:'Sarabun',sans-serif; font-size:.78rem; font-weight:600;
+    padding:7px 14px; cursor:pointer; transition:all .15s;
+  }
+  .tab.on{
+    background:linear-gradient(120deg,var(--gold2),var(--gold) 60%,#a8862a); color:#221507;
+    border-color:transparent; box-shadow:0 2px 8px rgba(212,175,55,.3);
+  }
+
+  table{ width:100%; border-collapse:collapse; font-size:.78rem; margin-top:14px; }
+  th{ font-family:'Cinzel',serif; font-size:.56rem; letter-spacing:.15em; color:var(--gold); text-align:right;
+      padding:8px 6px; border-bottom:1px solid var(--line); }
+  th:first-child{ text-align:left; }
+  td{ padding:8px 6px; text-align:right; border-bottom:1px dashed rgba(212,175,55,.13);
+      font-family:'DM Serif Display',serif; }
+  td:first-child{ text-align:left; font-family:'Sarabun',sans-serif; font-weight:600; font-size:.8rem; }
+  td.neg{ color:#e08a8a; }
+  .foot{ text-align:center; font-size:.7rem; color:rgba(244,234,216,.4); margin-top:28px; line-height:1.7; }
+
+  /* ---------- settings modal ---------- */
+  #cfgModal{ display:none; position:fixed; inset:0; z-index:200; background:rgba(8,5,3,.86); backdrop-filter:blur(5px); }
+  #cfgModal.open{ display:block; }
+  #cfgModal .box{ position:absolute; inset:0; display:flex; flex-direction:column; }
+  #cfgModal .bar{ flex:none; display:flex; align-items:center; gap:10px;
+                  background:rgba(14,10,6,.98); border-bottom:1px solid var(--line); padding:10px 14px; }
+  #cfgModal .bar .t{ flex:1; font-size:.85rem; font-weight:600; color:var(--gold2);
+                     white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #cfgModal .bar .x{ flex:none; background:transparent; border:1px solid var(--line); color:var(--gold2);
+                     border-radius:10px; font-size:1rem; width:36px; height:36px; cursor:pointer; }
+  #cfgModal iframe{ flex:1; width:100%; border:0; background:#0d0a06; }
+  #cfgModal .hint{ flex:none; font-size:.68rem; color:var(--dim);
+                   background:rgba(14,10,6,.98); border-top:1px solid var(--line);
+                   padding:8px 14px calc(8px + env(safe-area-inset-bottom)); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="in">
+    <div class="brand">JPTRUST</div>
+    <h1>PORTFOLIO CONTROL</h1>
+    <div class="kicker">SIMULATION</div>
+    <div class="sub">จำลองพอร์ตการลงทุนด้วยหลากหลายกลยุทธ์ ตั้งสัดส่วนเอง แล้ววิเคราะห์ผลตอบแทนและความเสี่ยงของพอร์ตรวม</div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ===== GLOBAL ===== -->
+  <div class="card">
+    <h2>ตัวคุมพอร์ตรวม <span class="en">GLOBAL</span></h2>
+    <div class="grow">
+      <div class="gitem">
+        <div class="gico">💰</div>
+        <div style="flex:1; min-width:0;">
+          <label>เงินลงทุนเริ่มต้น (บาท)</label>
+          <input type="number" id="gCapital" value="100000" min="1000" step="1000">
+        </div>
+      </div>
+      <div class="gitem">
+        <div class="gico">📅</div>
+        <div style="flex:1; min-width:0;">
+          <label>เริ่มลงทุนตั้งแต่ปี</label>
+          <select id="gStartYear"></select>
+        </div>
+      </div>
+    </div>
+    <button class="gbtn" onclick="equalizeWeights()">แบ่งสัดส่วนเท่ากันทุกกลยุทธ์ที่เปิด</button>
+    <div class="note">เปลี่ยนปีเริ่ม = ต้องกดรันใหม่ (กลยุทธ์เริ่มลงเงินจริงปีนั้น) · เงินรวมเป็นตัวตั้งต้นตัวเดียว — ทุกกลยุทธ์คิดจากสัดส่วน % ของเงินก้อนนี้ · rebalance กลับเข้าสัดส่วนเป้าหมายทุกต้นเดือน · ยังไม่รวมค่าธรรมเนียม ภาษี และอัตราแลกเปลี่ยน</div>
+  </div>
+
+  <!-- ===== STRATEGY MIX ===== -->
+  <div class="card">
+    <h2>STRATEGY MIX <span class="en">สัดส่วนที่ตั้งไว้</span></h2>
+    <div id="mixStrip"><div class="mix-empty">ยังไม่ได้เปิดกลยุทธ์ — เปิดสวิตช์แล้วใส่ % ด้านล่าง</div></div>
+  </div>
+
+  <!-- ===== STRATEGY GRID (built by JS) ===== -->
+  <div id="stratHost"></div>
+
+  <!-- ===== PROGRESS ===== -->
+  <div class="card" id="progress">
+    <h2>กำลังคำนวณ <span class="en">RUNNING</span></h2>
+    <ul id="progList"></ul>
+    <div class="note">การรันครั้งแรกต้องโหลดข้อมูลราคาย้อนหลัง (ไฟล์ใหญ่ ~65MB) — กลยุทธ์ตัวถัดไปจะเร็วขึ้นเพราะใช้ไฟล์เดิมจาก cache · เปลี่ยนเฉพาะ % สัดส่วนหรือปีเริ่ม ไม่ต้องรันใหม่ ระบบคำนวณซ้ำทันที</div>
+  </div>
+
+  <!-- ===== RESULTS ===== -->
+  <div class="card" id="results">
+    <h2>ผลพอร์ตรวม <span class="en">COMBINED RESULT</span></h2>
+    <div class="statgrid" id="statGrid"></div>
+    <div class="tabs" id="chartTabs">
+      <button class="tab on" data-t="eq" onclick="setChartTab('eq')">เส้นพอร์ต</button>
+      <button class="tab" data-t="dd" onclick="setChartTab('dd')">Drawdown</button>
+      <button class="tab" data-t="yr" onclick="setChartTab('yr')">เทียบ SPY รายปี</button>
+    </div>
+    <canvas id="chart" width="920" height="380"></canvas>
+    <div class="note" id="chartNote" style="display:none;"></div>
+    <div class="tabs" id="tlTabs" style="margin-top:18px; display:none;"></div>
+    <div id="tlHost" style="display:none;"><iframe id="tlFrame" style="width:100%;height:480px;border:1px solid var(--line);border-radius:14px;background:#FAF6ED;"></iframe></div>
+    <table id="perTable">
+      <thead>
+        <tr><th>กลยุทธ์</th><th>สัดส่วน</th><th>CAGR</th><th>Max DD</th><th>Vol/ปี</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div class="note" id="rangeNote"></div>
+  </div>
+
+  <div class="foot">JP Trust Learning · Portfolio Control (ทดสอบภายใน)<br>ผลทดสอบย้อนหลังไม่ใช่การรับประกันผลตอบแทนในอนาคต</div>
+</div>
+
+<!-- sticky weight sum + run -->
+<div class="sumbar">
+  <div class="sumin">
+    <div class="sumtxt" id="sumTxt">รวมสัดส่วน <b>0%</b></div>
+    <button class="btn" id="runBtn" onclick="runAll()" disabled>▶ เริ่มการจำลองพอร์ต</button>
+  </div>
+</div>
+
+<div id="cfgModal">
+  <div class="box">
+    <div class="bar">
+      <div class="t" id="cfgTitle"></div>
+      <button class="x" onclick="closeCfgModal()">✕</button>
+    </div>
+    <iframe id="cfgFrame" src="about:blank"></iframe>
+    <div class="hint">ตั้งค่าได้ทุกอย่างเหมือนหน้ากลยุทธ์ปกติ · ปีเริ่มและเงินตั้งต้นใช้ค่าจากหน้าพอร์ตรวม · กด "ใช้ค่านี้กับพอร์ตรวม" เพื่อบันทึก — ไม่กระทบค่าที่ Save ไว้ในหน้ากลยุทธ์จริง</div>
+  </div>
+</div>
+
+<div id="iframeHost" style="position:absolute; left:-10000px; top:0; width:1280px; height:900px; overflow:hidden;" aria-hidden="true"></div>
+
+<script>
+/* =====================================================================
+   STRATEGY REGISTRY — 12 tiles, mirrors the 3 Lab quad pages exactly.
+   cfg: which per-strategy inputs to show. params: passed to engine hook.
+   ===================================================================== */
+const STRATS = [
+  /* ---- กระทิงแถวหน้า (no group cap) ---- */
+  { id:'fb1', col:'fb', th:'ลงทีเดียว ครึ่งปี',      en:'TWICE-A-YEAR',
+    url:'sp500-strategy-pro.html',                 base:{ sy:2015 },                       cfg:'topn', topn:10 },
+  { id:'fb2', col:'fb', th:'ลงทีเดียว ยืดตอนหมี',    en:'TWICE-A-YEAR · DEFENSIVE',
+    url:'sp500-strategy-pro_defensive_uat.html',   base:{ start:2015 },                    cfg:'topn', topn:10 },
+  { id:'fb3', col:'fb', th:'แบ่ง 6 ไม้ ทุกเดือน',     en:'ROLLING-6M',
+    url:'sp500-rolling-6m-momentum.html',          base:{ sy:2015 },                       cfg:'topn', topn:10 },
+  { id:'fb4', col:'fb', th:'แบ่ง 6 ไม้ ยืดตอนหมี',    en:'ROLLING-6M · DEFENSIVE',
+    url:'sp500-rolling-lb6-hold6_lab_v7_hist1996.html', base:{ start:2015 },               cfg:'topn', topn:10 },
+
+  /* ---- ผู้ชนะสิบทิศ (theme cap 28) ---- */
+  { id:'tw1', col:'tw', th:'ลงทีเดียว ครึ่งปี',      en:'THEME-CAPPED · SEMI',
+    url:'sp500-rolling-lb6-hold6_lab_v10theme_hist1996.html', base:{ cadence:'semi', start:2015, macro:'off' }, cfg:'theme', tc:4, pt:3 },
+  { id:'tw2', col:'tw', th:'ลงทีเดียว ยืดตอนหมี',    en:'THEME-CAPPED · SEMI · DEF',
+    url:'sp500-rolling-lb6-hold6_lab_v10theme_hist1996.html', base:{ cadence:'semi', start:2015 },              cfg:'theme', tc:4, pt:3 },
+  { id:'tw3', col:'tw', th:'กระจายธีม ทุกเดือน',     en:'THEME-CAPPED',
+    url:'sp500-rolling-lb6-hold6_lab_v10theme_hist1996.html', base:{ start:2015, macro:'off' },                 cfg:'theme', tc:4, pt:3 },
+  { id:'tw4', col:'tw', th:'แบ่ง 6 ไม้ ยืดตอนหมี',    en:'THEME-CAPPED · DEF',
+    url:'sp500-rolling-lb6-hold6_lab_v10theme_hist1996.html', base:{ start:2015 },                              cfg:'theme', tc:4, pt:3 },
+
+  /* ---- ผู้นำอุตสาหกรรมใหญ่ (GICS sector cap 11) ---- */
+  { id:'sl1', col:'sl', th:'ลงทีเดียว ครึ่งปี',      en:'SECTOR-CAPPED · SEMI',
+    url:'sp500-rolling-lb6-hold6_lab_v10theme_hist1996.html', base:{ map:'sector', cadence:'semi', start:2015, macro:'off' }, cfg:'sector', tc:4, pt:3 },
+  { id:'sl2', col:'sl', th:'ลงทีเดียว ยืดตอนหมี',    en:'SECTOR-CAPPED · SEMI · DEF',
+    url:'sp500-rolling-lb6-hold6_lab_v10theme_hist1996.html', base:{ map:'sector', cadence:'semi', start:2015 },              cfg:'sector', tc:4, pt:3 },
+  { id:'sl3', col:'sl', th:'ผู้นำ 4 อุต ทุกเดือน',    en:'SECTOR-CAPPED',
+    url:'sp500-rolling-lb6-hold6_lab_v10theme_hist1996.html', base:{ map:'sector', start:2015, macro:'off' },                 cfg:'sector', tc:4, pt:3 },
+  { id:'sl4', col:'sl', th:'แบ่ง 6 ไม้ ยืดตอนหมี',    en:'SECTOR-CAPPED · DEF',
+    url:'sp500-rolling-lb6-hold6_lab_v10theme_hist1996.html', base:{ map:'sector', start:2015 },                              cfg:'sector', tc:4, pt:3 }
+];
+
+const COLS = {
+  fb:{ th:'กระทิงแถวหน้า',       en:'FRONT-ROW BULLS',      ic:'🐂' },
+  tw:{ th:'ผู้ชนะสิบทิศ',         en:'WINNER OF TEN WINDS',  ic:'👑' },
+  sl:{ th:'ผู้นำอุตสาหกรรมใหญ่',  en:'SECTOR LEADERS',       ic:'🏭' }
+};
+
+/* runtime state */
+const S = {};            // per strategy: { on, weight, cfg (captured map JSON|null), curve, cacheKey }
+STRATS.forEach(s => { S[s.id] = { on:false, weight:0, cfg:null, status:'idle', curve:null, cacheKey:null }; });
+const CACHE = {};        // cacheKey -> curve
+let lastRun = null;      // { ids:[...] } strategies included in last completed run
+
+/* ===================== BUILD UI ===================== */
+(function buildUI(){
+  const host = document.getElementById('stratHost');
+  let html = '';
+  for (const ck of ['fb','tw','sl']){
+    const list = STRATS.filter(x => x.col === ck);      // canonical order: 1,2,3,4
+    const disp = [0, 2, 1, 3];                          // app layout: 1,3 on top — 2,4 below
+    const nums = [1, 3, 2, 4];
+    html += `<div class="col-band"><span class="ic">${COLS[ck].ic}</span><span class="th">${COLS[ck].th}</span><span class="en">${COLS[ck].en}</span></div>`;
+    html += `<div class="quad">`;
+    disp.forEach((oi, pi) => {
+      const s = list[oi];
+      html += `
+      <div class="strat off q${pi}" id="card-${s.id}" onclick="cardTap(event,'${s.id}')">
+        <span class="dot idle" id="dot-${s.id}"></span>
+        <div class="num">${nums[pi]}</div>
+        <div class="name"><div class="th">${s.th}</div><div class="en">${s.en}</div></div>
+        <label class="sw"><input type="checkbox" onchange="toggleStrat('${s.id}',this.checked)"><span class="on">ON</span><span class="off">OFF</span></label>
+        <div class="wgtrow">
+          <label>สัดส่วน %</label>
+          <input type="number" min="0" max="100" step="1" value="0" id="w-${s.id}" onchange="setWeight('${s.id}',this.value)">
+        </div>
+        <div class="cfgline" id="cfg-${s.id}"><span class="gear">⚙</span> ค่าโรงงาน · แตะเพื่อตั้งค่า</div>
+        <div class="mini" id="mini-${s.id}"></div>
+      </div>`;
+    });
+    html += `<div class="qmed">${COLS[ck].ic}</div></div>`;
+  }
+  host.innerHTML = html;
+
+  const ySel = document.getElementById('gStartYear');
+  const nowY = new Date().getFullYear();
+  for (let y = 2015; y <= nowY; y++){
+    const o = document.createElement('option'); o.value = y; o.textContent = y; ySel.appendChild(o);
+  }
+  ySel.value = 2015;
+  ySel.addEventListener('change', () => {
+    if (lastRun){
+      lastRun = null;
+      document.getElementById('results').style.display = 'none';
+      document.getElementById('progress').style.display = 'none';
+      STRATS.forEach(s => setDot(s.id, S[s.id].on ? 'idle' : 'idle'));
+    }
+  });
+  document.getElementById('gCapital').addEventListener('change', () => { if (lastRun) computeAndRender(); });
+  updateSum();
+})();
+
+/* ===================== UI HANDLERS ===================== */
+function toggleStrat(id, on){
+  S[id].on = on;
+  document.getElementById('card-' + id).classList.toggle('on', on);
+  document.getElementById('card-' + id).classList.toggle('off', !on);
+  if (!on){ S[id].weight = 0; document.getElementById('w-' + id).value = 0; }
+  updateSum();
+}
+function setWeight(id, v){
+  S[id].weight = Math.max(0, Math.min(100, parseFloat(v) || 0));
+  document.getElementById('w-' + id).value = S[id].weight;
+  updateSum();
+}
+/* ---------- tile tap → settings modal (engine's own #settingsPanel) ---------- */
+function cardTap(ev, id){
+  if (ev.target.closest('.sw') || ev.target.closest('.wgtrow')) return;
+  openCfgModal(id);
+}
+let cfgOpenId = null;
+function openCfgModal(id){
+  if (RUNNING) return;
+  const s = STRATS.find(x => x.id === id);
+  cfgOpenId = id;
+  const p = new URLSearchParams();
+  Object.entries(s.base).forEach(([k, v]) => p.set(k, v));
+  p.set('ctlcfg', '1'); p.set('ctlid', 'cfg-' + id);
+  let src = s.url + '?' + p.toString();
+  if (S[id].cfg) src += '#jptcfg=' + encodeURIComponent(S[id].cfg);
+  document.getElementById('cfgTitle').textContent = COLS[s.col].th + ' · ' + s.th;
+  const m = document.getElementById('cfgModal');
+  m.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  const fr = document.getElementById('cfgFrame');
+  fr.src = src;
+}
+function closeCfgModal(){
+  cfgOpenId = null;
+  document.getElementById('cfgModal').classList.remove('open');
+  document.getElementById('cfgFrame').src = 'about:blank';
+  document.body.style.overflow = '';
+}
+window.addEventListener('message', (ev) => {
+  const d = ev.data;
+  if (!d || !cfgOpenId || d.id !== 'cfg-' + cfgOpenId) return;
+  if (d.type === 'jpt-ctlcfg-save' && d.cfg){
+    S[cfgOpenId].cfg = JSON.stringify(d.cfg);
+    const c = document.getElementById('cfg-' + cfgOpenId);
+    if (c){ c.classList.add('custom'); c.innerHTML = '<span class="gear">⚙</span> ตั้งค่าเองแล้ว ✓ · แตะเพื่อแก้'; }
+    renderMix();
+    closeCfgModal();
+  } else if (d.type === 'jpt-ctlcfg-cancel'){
+    closeCfgModal();
+  }
+});
+function equalizeWeights(){
+  const on = STRATS.filter(s => S[s.id].on);
+  if (!on.length) return;
+  const base = Math.floor(100 / on.length);
+  let rem = 100 - base * on.length;
+  on.forEach(s => {
+    const w = base + (rem > 0 ? 1 : 0); if (rem > 0) rem--;
+    S[s.id].weight = w; document.getElementById('w-' + s.id).value = w;
+  });
+  updateSum();
+}
+function weightSum(){
+  return STRATS.reduce((a, s) => a + (S[s.id].on ? S[s.id].weight : 0), 0);
+}
+function renderMix(){
+  const host = document.getElementById('mixStrip');
+  if (!host) return;
+  const on = STRATS.filter(s => S[s.id].on && S[s.id].weight > 0);
+  if (!on.length){
+    host.innerHTML = '<div class="mix-empty">ยังไม่ได้เปิดกลยุทธ์ — เปิดสวิตช์แล้วใส่ % ด้านล่าง</div>';
+    return;
+  }
+  host.innerHTML = on.map(s =>
+    `<div class="mix"><div class="ic">${COLS[s.col].ic}</div>
+       <div class="pc">${S[s.id].weight}%</div>
+       <div class="nm">${COLS[s.col].th}<br>${s.th}</div>
+       <div class="cf">${cfgSummary(s.id)}</div></div>`).join('');
+}
+function cfgSummary(id){
+  if (!S[id].cfg) return 'ค่าโรงงาน';
+  let raw; try { raw = JSON.parse(S[id].cfg); } catch(e){ return 'ตั้งค่าเอง'; }
+  const v = k => raw[k] && raw[k].v;
+  const parts = [];
+  if (v('topNInput')) parts.push('หุ้น ' + v('topNInput'));
+  if (v('themeCountInput') && v('perThemeInput')) parts.push(v('themeCountInput') + ' กลุ่ม × ' + v('perThemeInput'));
+  if (v('weightSlider') !== undefined && v('weightSlider') !== null && v('weightSlider') !== '')
+    parts.push('R' + v('weightSlider') + '/V' + (100 - parseInt(v('weightSlider'))));
+  if (raw.__gf && raw.__gf.x && raw.__gf.x.length) parts.push('เว้น ' + raw.__gf.x.length + ' กลุ่ม');
+  return parts.length ? parts.join(' · ') : 'ตั้งค่าเอง';
+}
+function updateSum(){
+  renderMix();
+  const sum = weightSum();
+  const t = document.getElementById('sumTxt');
+  const ok = Math.abs(sum - 100) < 0.001 && STRATS.some(s => S[s.id].on);
+  t.className = 'sumtxt' + (ok ? '' : ' bad');
+  t.innerHTML = 'รวมสัดส่วน <b>' + (Math.round(sum * 10) / 10) + '%</b>' + (ok ? '' : ' <span style="font-size:.72rem;">(ต้องครบ 100%)</span>');
+  document.getElementById('runBtn').disabled = !ok || RUNNING;
+}
+
+/* ===================== ENGINE RUNNER ===================== */
+let RUNNING = false;
+let seq = 0;
+
+function chosenYear(){ return parseInt(document.getElementById('gStartYear').value) || 2015; }
+function cacheKeyOf(s){
+  const p = new URLSearchParams();
+  Object.entries(s.base).forEach(([k, v]) => p.set(k, v));
+  return s.url + '?' + p.toString() + '|sy:' + chosenYear() + '|cfg:' + (S[s.id].cfg || 'factory');
+}
+
+function runOne(s){
+  return new Promise((resolve) => {
+    const key = cacheKeyOf(s);
+    if (CACHE[key]){ S[s.id].curve = CACHE[key]; S[s.id].cacheKey = key; setDot(s.id, 'done'); setProg(s.id, 'จาก cache ✓'); return resolve(true); }
+
+    const ctlid = 'r' + (++seq);
+    const p = new URLSearchParams();
+    Object.entries(s.base).forEach(([k, v]) => p.set(k, v));
+    p.set('sy', chosenYear());          // engine ACTUALLY starts this year (ramp-up included)
+    p.set('ctl', '1'); p.set('ctlid', ctlid);
+
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'width:1280px;height:900px;border:0;';
+    let settled = false;
+    const t0 = Date.now();
+    let lastHb = 0, lastRows = 0;
+    const cleanup = () => {
+      window.removeEventListener('message', onMsg);
+      clearInterval(watch);
+      try { iframe.remove(); } catch(e){}
+    };
+    const fail = (msg) => {
+      if (settled) return; settled = true; cleanup();
+      setDot(s.id, 'err'); setProg(s.id, msg);
+      resolve(false);
+    };
+    /* watchdog: no heartbeat at all within 45s = page failed to boot ·
+       heartbeats but data never arrives = give the download up to 8 min ·
+       data arrived but no result within 3 more min = computation stuck   */
+    const watch = setInterval(() => {
+      if (settled) return;
+      const el = Date.now() - t0;
+      const sec = Math.round(el / 1000);
+      if (!lastHb && el > 45000)               return fail('หน้า engine ไม่ตอบสนอง — ลองใหม่');
+      if (lastHb && Date.now() - lastHb > 30000) return fail('ขาดสัญญาณจาก engine — ลองใหม่');
+      if (lastRows === 0 && el > 480000)       return fail('โหลดข้อมูลไม่สำเร็จใน 8 นาที (เน็ตช้าหรือไฟล์ใหญ่) — ลองใหม่');
+      if (lastRows > 0 && lastHb && Date.now() - hbDataAt > 180000) return fail('คำนวณค้างเกิน 3 นาที — ลองใหม่');
+      if (lastHb) setProg(s.id, (lastRows > 0 ? 'ข้อมูลมาแล้ว กำลังคำนวณ… ' : 'กำลังโหลดข้อมูล… ') + sec + ' วิ');
+    }, 2000);
+    let hbDataAt = 0, errHb = 0;
+
+    function onMsg(ev){
+      const d = ev.data;
+      if (!d || d.id !== ctlid || settled) return;
+      if (d.type === 'jpt-ctl-hb'){
+        lastHb = Date.now();
+        if (d.rows > 0 && lastRows === 0) hbDataAt = Date.now();
+        lastRows = d.rows || 0;
+        if (d.err && lastRows === 0){
+          errHb++;
+          if (errHb >= 2) fail('โหลดข้อมูลไม่สำเร็จ (engine รายงาน error) — ลองใหม่');
+        } else { errHb = 0; }
+        return;
+      }
+      if (d.type === 'jpt-ctl-result' && Array.isArray(d.curve) && d.curve.length > 10){
+        settled = true; cleanup();
+        CACHE[key] = d.curve; S[s.id].curve = d.curve; S[s.id].cacheKey = key;
+        S[s.id].tradelog = d.tradelog || null; S[s.id].tlcss = d.tlcss || null;
+        if (d.spy && (!window.__SPY || d.spy.length > window.__SPY.length)) window.__SPY = d.spy;
+        setDot(s.id, 'done'); setProg(s.id, 'เสร็จ ✓ (' + d.curve.length + ' วัน' + (d.warn ? ' · มีคำเตือน' : '') + ')');
+        resolve(true);
+      } else if (d.type === 'jpt-ctl-error'){
+        settled = true; cleanup();
+        setDot(s.id, 'err'); setProg(s.id, 'ผิดพลาด: ' + (d.msg || '').slice(0, 80));
+        resolve(false);
+      }
+    }
+    window.addEventListener('message', onMsg);
+    setDot(s.id, 'load'); setProg(s.id, 'กำลังเปิด engine…');
+    iframe.src = s.url + '?' + p.toString() +
+                 (S[s.id].cfg ? '#jptcfg=' + encodeURIComponent(S[s.id].cfg) : '');
+    document.getElementById('iframeHost').appendChild(iframe);
+  });
+}
+
+async function runAll(){
+  if (RUNNING) return;
+  const active = STRATS.filter(s => S[s.id].on && S[s.id].weight > 0);
+  if (!active.length || Math.abs(weightSum() - 100) > 0.001) return;
+
+  RUNNING = true; updateSum();
+  document.getElementById('results').style.display = 'none';
+  const prog = document.getElementById('progress');
+  prog.style.display = 'block';
+  document.getElementById('progList').innerHTML = active.map(s =>
+    `<li><span class="dot idle" id="pdot-${s.id}"></span> ${COLS[s.col].th} · ${s.th} <span class="st" id="pst-${s.id}">รอคิว</span></li>`
+  ).join('');
+  prog.scrollIntoView({ behavior:'smooth', block:'center' });
+
+  let okCount = 0;
+  for (const s of active){                 // sequential: one heavy iframe at a time
+    const ok = await runOne(s);
+    if (ok) okCount++;
+  }
+
+  RUNNING = false; updateSum();
+  const failed = active.filter(s => !S[s.id].curve);
+  if (failed.length){
+    const btn = document.createElement('button');
+    btn.className = 'btn2'; btn.style.marginTop = '10px';
+    btn.textContent = 'ลองรันตัวที่พลาดอีกครั้ง (' + failed.length + ' ตัว)';
+    btn.onclick = () => { btn.remove(); retryFailed(failed); };
+    document.getElementById('progress').appendChild(btn);
+  }
+  if (okCount === 0){
+    setProgNote('ทุกกลยุทธ์รันไม่สำเร็จ — เช็คอินเทอร์เน็ตแล้วลองใหม่');
+    return;
+  }
+  if (failed.length){
+    setProgNote('บางกลยุทธ์รันไม่สำเร็จ — ผลด้านล่างคิดจากตัวที่สำเร็จ โดยปรับสัดส่วนใหม่ให้ครบ 100% อัตโนมัติ');
+  }
+  lastRun = { ids: active.filter(s => S[s.id].curve).map(s => s.id) };
+  computeAndRender();
+}
+
+async function retryFailed(list){
+  if (RUNNING) return;
+  RUNNING = true; updateSum();
+  let ok = 0;
+  for (const s of list){ if (await runOne(s)) ok++; }
+  RUNNING = false; updateSum();
+  const active = STRATS.filter(s => S[s.id].on && S[s.id].weight > 0 && S[s.id].curve);
+  if (active.length){ lastRun = { ids: active.map(s => s.id) }; computeAndRender(); }
+}
+
+function setDot(id, cls){
+  const a = document.getElementById('dot-' + id);  if (a) a.className = 'dot ' + cls;
+  const b = document.getElementById('pdot-' + id); if (b) b.className = 'dot ' + cls;
+}
+function setProg(id, txt){ const e = document.getElementById('pst-' + id); if (e) e.textContent = txt; }
+function setProgNote(txt){
+  const n = document.createElement('div'); n.className = 'note'; n.textContent = txt;
+  document.getElementById('progress').appendChild(n);
+}
+
+/* ===================== PORTFOLIO MATH ===================== */
+/* Curves are [ [dateStr, equity], ... ] daily. We slice at the chosen start
+   year, align on the intersection of dates, normalise each strategy to 1.0,
+   then compound with monthly rebalancing back to target weights.            */
+
+function computeAndRender(){
+  if (!lastRun) return;
+  const ids = lastRun.ids.filter(id => S[id].curve);
+  if (!ids.length) return;
+  const requested = STRATS.filter(s => S[s.id].on && S[s.id].weight > 0);
+  const excluded = requested.filter(s => !ids.includes(s.id));
+
+  const capital   = parseFloat(document.getElementById('gCapital').value) || 100000;
+
+  // date intersection (curves already begin at the chosen start year — real start, ramp-up included)
+  const maps = {};
+  let common = null;
+  for (const id of ids){
+    const m = new Map();
+    for (const [d, v] of S[id].curve){ if (v > 0) m.set(d, v); }
+    maps[id] = m;
+    const ds = new Set(m.keys());
+    common = common === null ? ds : new Set([...common].filter(d => ds.has(d)));
+  }
+  const dates = [...common].sort();
+  if (dates.length < 40){
+    alert('ช่วงข้อมูลสั้นเกินไป — ลองเลือกปีเริ่มที่เก่ากว่านี้');
+    return;
+  }
+
+  // per-strategy normalised series + daily returns
+  const norm = {}, rets = {};
+  for (const id of ids){
+    const base = maps[id].get(dates[0]);
+    norm[id] = dates.map(d => maps[id].get(d) / base);
+    rets[id] = norm[id].map((v, i) => i === 0 ? 0 : v / norm[id][i - 1] - 1);
+  }
+
+  // weights renormalised over the strategies that actually returned a curve
+  const wsum = ids.reduce((a, id) => a + S[id].weight, 0);
+  const W = {}; ids.forEach(id => W[id] = S[id].weight / wsum);
+
+  // combined curve, monthly rebalance to target weights
+  const port = new Array(dates.length);
+  let alloc = {}; ids.forEach(id => alloc[id] = W[id] * capital);
+  port[0] = capital;
+  let curMonth = dates[0].slice(0, 7);
+  for (let i = 1; i < dates.length; i++){
+    const m = dates[i].slice(0, 7);
+    if (m !== curMonth){  // first trading day of a new month → rebalance
+      const tot = Object.values(alloc).reduce((a, b) => a + b, 0);
+      ids.forEach(id => alloc[id] = W[id] * tot);
+      curMonth = m;
+    }
+    let tot = 0;
+    for (const id of ids){ alloc[id] *= (1 + rets[id][i]); tot += alloc[id]; }
+    port[i] = tot;
+  }
+
+  const stats = curveStats(dates, port);
+  const per = ids.map(id => {
+    const c = norm[id].map(v => v * capital);
+    return { id, w: W[id], s: curveStats(dates, c) };
+  });
+  // weighted-average standalone vol → diversification benefit
+  const wavgVol = per.reduce((a, p) => a + p.w * p.s.vol, 0);
+
+  renderResults(dates, port, stats, per, wavgVol, capital, excluded, requested.length);
+}
+
+function curveStats(dates, vals){
+  const n = vals.length;
+  const years = (new Date(dates[n - 1]) - new Date(dates[0])) / (365.25 * 24 * 3600 * 1000);
+  const totRet = vals[n - 1] / vals[0] - 1;
+  const cagr = years > 0.2 ? Math.pow(vals[n - 1] / vals[0], 1 / years) - 1 : totRet;
+  let peak = vals[0], mdd = 0;
+  const dr = [];
+  for (let i = 1; i < n; i++){
+    dr.push(vals[i] / vals[i - 1] - 1);
+    if (vals[i] > peak) peak = vals[i];
+    const dd = vals[i] / peak - 1;
+    if (dd < mdd) mdd = dd;
+  }
+  const mu = dr.reduce((a, b) => a + b, 0) / dr.length;
+  const sd = Math.sqrt(dr.reduce((a, b) => a + (b - mu) * (b - mu), 0) / (dr.length - 1));
+  const vol = sd * Math.sqrt(252);
+  const sharpe = vol > 0 ? (mu * 252) / vol : 0;
+  return { totRet, cagr, mdd, vol, sharpe, end: vals[n - 1], years };
+}
+
+/* ===================== RENDER ===================== */
+const fmtB = v => v.toLocaleString('th-TH', { maximumFractionDigits:0 });
+const fmtP = v => (v >= 0 ? '+' : '') + (v * 100).toFixed(1) + '%';
+const fmtP0 = v => (v * 100).toFixed(1) + '%';
+
+function renderResults(dates, port, st, per, wavgVol, capital, excluded, nRequested){
+  document.getElementById('results').style.display = 'block';
+
+  document.getElementById('statGrid').innerHTML = `
+    <div class="bigval" style="grid-column:1/-1;">
+      <div class="l">มูลค่าพอร์ตสุดท้าย (เริ่ม ${fmtB(capital)} ฿)</div>
+      <div class="v">${fmtB(st.end)} ฿<span class="r ${st.totRet < 0 ? 'neg' : 'pos'}">${fmtP(st.totRet)}</span></div>
+    </div>
+    <div class="stat"><div class="v ${st.cagr < 0 ? 'neg' : ''}">${fmtP(st.cagr)}</div><div class="l">ผลตอบแทนเฉลี่ยต่อปี (CAGR)</div></div>
+    <div class="stat"><div class="v neg">${fmtP0(st.mdd)}</div><div class="l">Max Drawdown</div></div>
+    <div class="stat"><div class="v">${fmtP0(st.vol)}</div><div class="l">ความผันผวน (SD)</div></div>
+    <div class="stat"><div class="v">${st.sharpe.toFixed(2)}</div><div class="l">Sharpe Ratio</div></div>`;
+
+  LASTVIZ = { dates, port };
+  setChartTab('eq');
+  renderTradelogTabs();
+
+  const tb = document.querySelector('#perTable tbody');
+  tb.innerHTML = per.map(p => {
+    const s = STRATS.find(x => x.id === p.id);
+    return `<tr><td>${COLS[s.col].th} · ${s.th}</td><td>${(p.w * 100).toFixed(0)}%</td>
+      <td class="${p.s.cagr < 0 ? 'neg' : ''}">${fmtP(p.s.cagr)}</td>
+      <td class="neg">${fmtP0(p.s.mdd)}</td><td>${fmtP0(p.s.vol)}</td></tr>`;
+  }).join('') + `<tr><td style="color:var(--gold2);">พอร์ตรวม</td><td>100%</td>
+      <td class="${st.cagr < 0 ? 'neg' : ''}" style="color:var(--gold2);">${fmtP(st.cagr)}</td>
+      <td class="neg">${fmtP0(st.mdd)}</td><td style="color:var(--gold2);">${fmtP0(st.vol)}</td></tr>`;
+
+  const divBen = wavgVol - st.vol;
+  const exclTxt = (excluded && excluded.length)
+    ? '<span style="color:#f0a0a0;">⚠ คำนวณจาก ' + per.length + '/' + nRequested +
+      ' กลยุทธ์ — ไม่รวม: ' + excluded.map(s => s.th).join(', ') +
+      ' (รันไม่สำเร็จ · สัดส่วนถูกปรับใหม่ให้ครบ 100%)</span> · '
+    : '';
+  document.getElementById('rangeNote').innerHTML = exclTxt +
+    'ช่วงทดสอบ ' + dates[0] + ' → ' + dates[dates.length - 1] +
+    ' (' + st.years.toFixed(1) + ' ปี) · ทุกกลยุทธ์เริ่มลงเงินจริงปีที่เลือก (รวมช่วง ramp-up เหมือนหน้ากลยุทธ์เดี่ยว) · rebalance เข้าสัดส่วนเป้าหมายทุกต้นเดือน' +
+    (divBen > 0.001 ? ' · การกระจายช่วยลดความผันผวนลง ' + fmtP0(divBen) + ' เทียบกับค่าเฉลี่ยถ่วงน้ำหนักของแต่ละกลยุทธ์' : '') +
+    ' · แต่ละกลยุทธ์คำนวณจาก engine หน้าจริงของตัวเอง · กลยุทธ์ที่ไม่ได้แตะตั้งค่า = ค่าโรงงาน (ไม่อ่านค่าที่เคย Save ส่วนตัว เพื่อให้ผลเทียบกันได้ทุกคน) · วันสุดท้ายของช่วงทดสอบ = รุ่นข้อมูลที่ใช้ ถ้ารันคนละวันข้อมูลอาจอัพเดตแล้ว';
+
+  // mini stats on the cards
+  per.forEach(p => {
+    const m = document.getElementById('mini-' + p.id);
+    if (m){ m.style.display = 'block';
+      m.innerHTML = `CAGR <b>${fmtP(p.s.cagr)}</b> · DD <b class="neg">${fmtP0(p.s.mdd)}</b> · Vol <b>${fmtP0(p.s.vol)}</b>`; }
+  });
+
+  document.getElementById('results').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+let LASTVIZ = null;
+let TLURL = null;
+
+function setChartTab(t){
+  document.querySelectorAll('#chartTabs .tab').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+  const note = document.getElementById('chartNote');
+  note.style.display = 'none';
+  if (!LASTVIZ) return;
+  if (t === 'eq') drawChart(LASTVIZ.dates, LASTVIZ.port);
+  else if (t === 'dd') drawDD(LASTVIZ.dates, LASTVIZ.port);
+  else if (t === 'yr') drawYearly(LASTVIZ.dates, LASTVIZ.port);
+}
+
+function drawDD(dates, vals){
+  const { g, X, Yr, wCss, hCss, padL, padT, W, H } = chartBase(dates, null);
+  const dd = []; let peak = vals[0];
+  for (let i = 0; i < vals.length; i++){ if (vals[i] > peak) peak = vals[i]; dd.push(vals[i] / peak - 1); }
+  const mn = Math.min(...dd, -0.01);
+  const Y = v => padT + ((0 - v) / (0 - mn)) * H;
+  g.font = '11px Sarabun'; g.fillStyle = 'rgba(244,234,216,.55)';
+  g.strokeStyle = 'rgba(212,175,55,.14)'; g.lineWidth = 1;
+  for (let k = 0; k <= 4; k++){
+    const v = (k / 4) * mn, y = Y(v);
+    g.beginPath(); g.moveTo(padL, y); g.lineTo(wCss - 14, y); g.stroke();
+    g.textAlign = 'right'; g.fillText((v * 100).toFixed(0) + '%', padL - 8, y + 4);
+  }
+  drawYearTicks(g, dates, X, hCss);
+  const grad = g.createLinearGradient(0, padT, 0, padT + H);
+  grad.addColorStop(0, 'rgba(224,85,85,0)'); grad.addColorStop(1, 'rgba(224,85,85,.4)');
+  g.beginPath(); g.moveTo(X(0), Y(dd[0]));
+  for (let i = 1; i < dd.length; i++) g.lineTo(X(i), Y(dd[i]));
+  g.lineTo(X(dd.length - 1), padT); g.lineTo(X(0), padT); g.closePath();
+  g.fillStyle = grad; g.fill();
+  g.beginPath(); g.moveTo(X(0), Y(dd[0]));
+  for (let i = 1; i < dd.length; i++) g.lineTo(X(i), Y(dd[i]));
+  g.strokeStyle = '#e05555'; g.lineWidth = 2; g.stroke();
+}
+
+function yearlyFrom(dates, vals){
+  const byYear = {};
+  for (let i = 0; i < dates.length; i++){
+    const y = dates[i].slice(0, 4);
+    if (!byYear[y]) byYear[y] = { first: vals[i], last: vals[i] };
+    byYear[y].last = vals[i];
+  }
+  const years = Object.keys(byYear).sort();
+  return years.map((y, i) => {
+    const base = i === 0 ? byYear[y].first : byYear[years[i - 1]].last;
+    return { y, r: byYear[y].last / base - 1 };
+  });
+}
+
+function drawYearly(dates, vals){
+  const note = document.getElementById('chartNote');
+  const py = yearlyFrom(dates, vals);
+  let sy = null;
+  if (window.__SPY){
+    const d0 = dates[0], d1 = dates[dates.length - 1];
+    const f = window.__SPY.filter(p => p[0] >= d0 && p[0] <= d1);
+    if (f.length > 10) sy = yearlyFrom(f.map(p => p[0]), f.map(p => p[1]));
+  }
+  const cv = document.getElementById('chart');
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const wCss = cv.clientWidth || 920, hCss = Math.round(wCss * 0.42);
+  cv.width = wCss * dpr; cv.height = hCss * dpr; cv.style.height = hCss + 'px';
+  const g = cv.getContext('2d'); g.scale(dpr, dpr);
+  g.clearRect(0, 0, wCss, hCss);
+  const padL = 46, padR = 10, padT = 26, padB = 30;
+  const W = wCss - padL - padR, H = hCss - padT - padB;
+  const all = py.map(p => p.r).concat(sy ? sy.map(p => p.r) : []);
+  let mx = Math.max(...all, 0.05), mn = Math.min(...all, 0);
+  const span = mx - mn || 1; mx += span * .1; mn -= span * .08;
+  const Y = v => padT + (1 - (v - mn) / (mx - mn)) * H;
+  g.font = '11px Sarabun'; g.strokeStyle = 'rgba(212,175,55,.14)'; g.lineWidth = 1;
+  g.fillStyle = 'rgba(244,234,216,.55)';
+  for (let k = 0; k <= 4; k++){
+    const v = mn + (k / 4) * (mx - mn), y = Y(v);
+    g.beginPath(); g.moveTo(padL, y); g.lineTo(wCss - padR, y); g.stroke();
+    g.textAlign = 'right'; g.fillText((v * 100).toFixed(0) + '%', padL - 6, y + 4);
+  }
+  const zy = Y(0);
+  g.strokeStyle = 'rgba(244,234,216,.35)'; g.beginPath(); g.moveTo(padL, zy); g.lineTo(wCss - padR, zy); g.stroke();
+  const n = py.length, slot = W / n, bw = Math.min(26, slot * (sy ? 0.32 : 0.5));
+  py.forEach((p, i) => {
+    const cx = padL + slot * i + slot / 2;
+    const x1 = sy ? cx - bw - 2 : cx - bw / 2;
+    g.fillStyle = p.r >= 0 ? '#D4AF37' : '#8a5a20';
+    g.fillRect(x1, Math.min(zy, Y(p.r)), bw, Math.abs(Y(p.r) - zy));
+    if (sy && sy[i]){
+      g.fillStyle = sy[i].r >= 0 ? 'rgba(244,234,216,.75)' : 'rgba(200,120,120,.75)';
+      g.fillRect(cx + 2, Math.min(zy, Y(sy[i].r)), bw, Math.abs(Y(sy[i].r) - zy));
+    }
+    g.fillStyle = 'rgba(244,234,216,.6)'; g.textAlign = 'center';
+    g.fillText(p.y, cx, hCss - 8);
+  });
+  // legend
+  g.fillStyle = '#D4AF37'; g.fillRect(padL, 8, 10, 10);
+  g.fillStyle = 'rgba(244,234,216,.8)'; g.textAlign = 'left'; g.fillText('พอร์ตรวม', padL + 15, 17);
+  if (sy){
+    g.fillStyle = 'rgba(244,234,216,.75)'; g.fillRect(padL + 82, 8, 10, 10);
+    g.fillText('SPY', padL + 97, 17);
+  } else {
+    note.style.display = 'block';
+    note.textContent = 'ไม่มีข้อมูล SPY ในผลรันชุดนี้ — รันใหม่อีกครั้งเพื่อดึงข้อมูลเทียบ';
+  }
+}
+
+function drawYearTicks(g, dates, X, hCss){
+  g.fillStyle = 'rgba(244,234,216,.55)'; g.textAlign = 'center'; g.font = '11px Sarabun';
+  let last = '';
+  for (let i = 0; i < dates.length; i++){
+    const yr = dates[i].slice(0, 4);
+    if (yr !== last){ last = yr; g.fillText(yr, X(i), hCss - 8); }
+  }
+}
+
+function chartBase(dates){
+  const cv = document.getElementById('chart');
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const wCss = cv.clientWidth || 920, hCss = Math.round(wCss * 0.42);
+  cv.width = wCss * dpr; cv.height = hCss * dpr; cv.style.height = hCss + 'px';
+  const g = cv.getContext('2d'); g.scale(dpr, dpr);
+  g.clearRect(0, 0, wCss, hCss);
+  const padL = 62, padR = 14, padT = 16, padB = 26;
+  const W = wCss - padL - padR, H = hCss - padT - padB;
+  const X = i => padL + (i / (dates.length - 1)) * W;
+  return { g, X, wCss, hCss, padL, padT, W, H };
+}
+
+/* ---------- trade log tabs (verbatim engine render, blob-URL iframe) ---------- */
+function renderTradelogTabs(){
+  const bar = document.getElementById('tlTabs');
+  const host = document.getElementById('tlHost');
+  const ids = (lastRun ? lastRun.ids : []).filter(id => S[id].tradelog);
+  if (!ids.length){ bar.style.display = 'none'; host.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  bar.innerHTML = '<span style="font-family:Cinzel,serif;font-size:.6rem;letter-spacing:.2em;color:var(--gold);align-self:center;margin-right:4px;">TRADE LOG</span>' +
+    ids.map(id => {
+      const s = STRATS.find(x => x.id === id);
+      return `<button class="tab" data-tl="${id}" onclick="openTradelog('${id}')">${COLS[s.col].ic} ${s.th}</button>`;
+    }).join('');
+  host.style.display = 'none';
+}
+function openTradelog(id){
+  document.querySelectorAll('#tlTabs .tab').forEach(b => b.classList.toggle('on', b.dataset.tl === id));
+  const host = document.getElementById('tlHost');
+  const fr = document.getElementById('tlFrame');
+  const doc = '<!DOCTYPE html><html><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+    '<style>' + (S[id].tlcss || '') + '</style>' +
+    '<style>body{background:#FAF6ED !important;margin:0;padding:12px;visibility:visible !important;}</style>' +
+    '</head><body>' + S[id].tradelog + '</body></html>';
+  /* blob-URL pattern: create blob → objectURL → iframe already in DOM → set src → revoke old */
+  const blob = new Blob([doc], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  if (TLURL) URL.revokeObjectURL(TLURL);
+  TLURL = url;
+  host.style.display = 'block';
+  fr.src = url;
+}
+
+function drawChart(dates, vals){
+  const cv = document.getElementById('chart');
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const wCss = cv.clientWidth || 920, hCss = Math.round(wCss * 0.42);
+  cv.width = wCss * dpr; cv.height = hCss * dpr; cv.style.height = hCss + 'px';
+  const g = cv.getContext('2d'); g.scale(dpr, dpr);
+  g.clearRect(0, 0, wCss, hCss);
+
+  const padL = 62, padR = 14, padT = 16, padB = 26;
+  const W = wCss - padL - padR, H = hCss - padT - padB;
+  let mn = Math.min(...vals), mx = Math.max(...vals);
+  const span = (mx - mn) || 1; mn -= span * 0.04; mx += span * 0.04;
+  const X = i => padL + (i / (vals.length - 1)) * W;
+  const Y = v => padT + (1 - (v - mn) / (mx - mn)) * H;
+
+  // gridlines + y labels
+  g.font = '11px Sarabun'; g.fillStyle = 'rgba(250,246,237,.55)';
+  g.strokeStyle = 'rgba(212,175,55,.14)'; g.lineWidth = 1;
+  for (let k = 0; k <= 4; k++){
+    const v = mn + (k / 4) * (mx - mn), y = Y(v);
+    g.beginPath(); g.moveTo(padL, y); g.lineTo(wCss - padR, y); g.stroke();
+    g.textAlign = 'right'; g.fillText(fmtB(v), padL - 8, y + 4);
+  }
+  // year ticks
+  g.textAlign = 'center';
+  let lastYr = '';
+  for (let i = 0; i < dates.length; i++){
+    const yr = dates[i].slice(0, 4);
+    if (yr !== lastYr){ lastYr = yr; g.fillText(yr, X(i), hCss - 8); }
+  }
+  // area + line
+  const grad = g.createLinearGradient(0, padT, 0, padT + H);
+  grad.addColorStop(0, 'rgba(212,175,55,.30)'); grad.addColorStop(1, 'rgba(212,175,55,0)');
+  g.beginPath(); g.moveTo(X(0), Y(vals[0]));
+  for (let i = 1; i < vals.length; i++) g.lineTo(X(i), Y(vals[i]));
+  g.lineTo(X(vals.length - 1), padT + H); g.lineTo(X(0), padT + H); g.closePath();
+  g.fillStyle = grad; g.fill();
+  g.beginPath(); g.moveTo(X(0), Y(vals[0]));
+  for (let i = 1; i < vals.length; i++) g.lineTo(X(i), Y(vals[i]));
+  g.strokeStyle = '#D4AF37'; g.lineWidth = 2; g.stroke();
+}
+</script>
+</body></html>
