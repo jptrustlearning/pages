@@ -4868,8 +4868,35 @@ window.switchStatsTab = function(tab) {
       for (var i = 0; i < src.length; i++) c[i] = [src[i].date, src[i].equity];
       if (c.length > 10){
         posted = true;
+        /* trade log exactly as the strategy page renders it (+ page CSS so the
+           control page can show it verbatim in a blob iframe) */
+        var tl = null, tlcss = null;
+        try {
+          if (typeof renderTradeLog === 'function'){ try { renderTradeLog(); } catch(e){} }
+          var tle = document.getElementById('tradeLogContainer');
+          if (tle && tle.innerHTML && tle.innerHTML.length > 50){
+            tl = tle.outerHTML;
+            tlcss = Array.prototype.map.call(document.querySelectorAll('style'),
+                      function(s){ return s.textContent; }).join('\n');
+          }
+        } catch(e){}
+        /* SPY closes for the benchmark tab (marketData is date → ticker → row) */
+        var spy = null;
+        try {
+          if (typeof state !== 'undefined' && state.marketData && state.sortedDates){
+            spy = [];
+            for (var k = 0; k < state.sortedDates.length; k++){
+              var dd = state.sortedDates[k];
+              var row = state.marketData[dd] && state.marketData[dd]['SPY'];
+              var px = row ? (row.c || row.close) : 0;
+              if (px > 0) spy.push([dd, px]);
+            }
+            if (spy.length < 10) spy = null;
+          }
+        } catch(e){ spy = null; }
         parent.postMessage({ type:'jpt-ctl-result', id: ctlId, n: c.length,
-                             warn: runErr ? String(runErr) : null, curve: c }, '*');
+                             warn: runErr ? String(runErr) : null, curve: c,
+                             spy: spy, tradelog: tl, tlcss: tlcss }, '*');
       } else if (runErr){
         posted = true;
         parent.postMessage({ type:'jpt-ctl-error', id: ctlId, msg: String(runErr) }, '*');

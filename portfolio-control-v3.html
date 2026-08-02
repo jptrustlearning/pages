@@ -218,6 +218,16 @@
   .stat .v.neg{ color:#e08a8a; }
   .stat .l{ font-size:.66rem; color:var(--dim); margin-top:2px; }
   canvas{ width:100%; height:auto; display:block; border-radius:14px; background:rgba(0,0,0,.32); }
+  .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+  .tab{
+    background:rgba(0,0,0,.32); border:1px solid rgba(212,175,55,.30); border-radius:999px;
+    color:var(--dim); font-family:'Sarabun',sans-serif; font-size:.78rem; font-weight:600;
+    padding:7px 14px; cursor:pointer; transition:all .15s;
+  }
+  .tab.on{
+    background:linear-gradient(120deg,var(--gold2),var(--gold) 60%,#a8862a); color:#221507;
+    border-color:transparent; box-shadow:0 2px 8px rgba(212,175,55,.3);
+  }
 
   table{ width:100%; border-collapse:collapse; font-size:.78rem; margin-top:14px; }
   th{ font-family:'Cinzel',serif; font-size:.56rem; letter-spacing:.15em; color:var(--gold); text-align:right;
@@ -301,7 +311,15 @@
   <div class="card" id="results">
     <h2>ผลพอร์ตรวม <span class="en">COMBINED RESULT</span></h2>
     <div class="statgrid" id="statGrid"></div>
+    <div class="tabs" id="chartTabs">
+      <button class="tab on" data-t="eq" onclick="setChartTab('eq')">เส้นพอร์ต</button>
+      <button class="tab" data-t="dd" onclick="setChartTab('dd')">Drawdown</button>
+      <button class="tab" data-t="yr" onclick="setChartTab('yr')">เทียบ SPY รายปี</button>
+    </div>
     <canvas id="chart" width="920" height="380"></canvas>
+    <div class="note" id="chartNote" style="display:none;"></div>
+    <div class="tabs" id="tlTabs" style="margin-top:18px; display:none;"></div>
+    <div id="tlHost" style="display:none;"><iframe id="tlFrame" style="width:100%;height:480px;border:1px solid var(--line);border-radius:14px;background:#FAF6ED;"></iframe></div>
     <table id="perTable">
       <thead>
         <tr><th>กลยุทธ์</th><th>สัดส่วน</th><th>CAGR</th><th>Max DD</th><th>Vol/ปี</th></tr>
@@ -604,6 +622,8 @@ function runOne(s){
       if (d.type === 'jpt-ctl-result' && Array.isArray(d.curve) && d.curve.length > 10){
         settled = true; cleanup();
         CACHE[key] = d.curve; S[s.id].curve = d.curve; S[s.id].cacheKey = key;
+        S[s.id].tradelog = d.tradelog || null; S[s.id].tlcss = d.tlcss || null;
+        if (d.spy && (!window.__SPY || d.spy.length > window.__SPY.length)) window.__SPY = d.spy;
         setDot(s.id, 'done'); setProg(s.id, 'เสร็จ ✓ (' + d.curve.length + ' วัน' + (d.warn ? ' · มีคำเตือน' : '') + ')');
         resolve(true);
       } else if (d.type === 'jpt-ctl-error'){
@@ -788,7 +808,9 @@ function renderResults(dates, port, st, per, wavgVol, capital, excluded, nReques
     <div class="stat"><div class="v">${fmtP0(st.vol)}</div><div class="l">ความผันผวน (SD)</div></div>
     <div class="stat"><div class="v">${st.sharpe.toFixed(2)}</div><div class="l">Sharpe Ratio</div></div>`;
 
-  drawChart(dates, port);
+  LASTVIZ = { dates, port };
+  setChartTab('eq');
+  renderTradelogTabs();
 
   const tb = document.querySelector('#perTable tbody');
   tb.innerHTML = per.map(p => {
@@ -820,6 +842,167 @@ function renderResults(dates, port, st, per, wavgVol, capital, excluded, nReques
   });
 
   document.getElementById('results').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+let LASTVIZ = null;
+let TLURL = null;
+
+function setChartTab(t){
+  document.querySelectorAll('#chartTabs .tab').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+  const note = document.getElementById('chartNote');
+  note.style.display = 'none';
+  if (!LASTVIZ) return;
+  if (t === 'eq') drawChart(LASTVIZ.dates, LASTVIZ.port);
+  else if (t === 'dd') drawDD(LASTVIZ.dates, LASTVIZ.port);
+  else if (t === 'yr') drawYearly(LASTVIZ.dates, LASTVIZ.port);
+}
+
+function drawDD(dates, vals){
+  const { g, X, Yr, wCss, hCss, padL, padT, W, H } = chartBase(dates, null);
+  const dd = []; let peak = vals[0];
+  for (let i = 0; i < vals.length; i++){ if (vals[i] > peak) peak = vals[i]; dd.push(vals[i] / peak - 1); }
+  const mn = Math.min(...dd, -0.01);
+  const Y = v => padT + ((0 - v) / (0 - mn)) * H;
+  g.font = '11px Sarabun'; g.fillStyle = 'rgba(244,234,216,.55)';
+  g.strokeStyle = 'rgba(212,175,55,.14)'; g.lineWidth = 1;
+  for (let k = 0; k <= 4; k++){
+    const v = (k / 4) * mn, y = Y(v);
+    g.beginPath(); g.moveTo(padL, y); g.lineTo(wCss - 14, y); g.stroke();
+    g.textAlign = 'right'; g.fillText((v * 100).toFixed(0) + '%', padL - 8, y + 4);
+  }
+  drawYearTicks(g, dates, X, hCss);
+  const grad = g.createLinearGradient(0, padT, 0, padT + H);
+  grad.addColorStop(0, 'rgba(224,85,85,0)'); grad.addColorStop(1, 'rgba(224,85,85,.4)');
+  g.beginPath(); g.moveTo(X(0), Y(dd[0]));
+  for (let i = 1; i < dd.length; i++) g.lineTo(X(i), Y(dd[i]));
+  g.lineTo(X(dd.length - 1), padT); g.lineTo(X(0), padT); g.closePath();
+  g.fillStyle = grad; g.fill();
+  g.beginPath(); g.moveTo(X(0), Y(dd[0]));
+  for (let i = 1; i < dd.length; i++) g.lineTo(X(i), Y(dd[i]));
+  g.strokeStyle = '#e05555'; g.lineWidth = 2; g.stroke();
+}
+
+function yearlyFrom(dates, vals){
+  const byYear = {};
+  for (let i = 0; i < dates.length; i++){
+    const y = dates[i].slice(0, 4);
+    if (!byYear[y]) byYear[y] = { first: vals[i], last: vals[i] };
+    byYear[y].last = vals[i];
+  }
+  const years = Object.keys(byYear).sort();
+  return years.map((y, i) => {
+    const base = i === 0 ? byYear[y].first : byYear[years[i - 1]].last;
+    return { y, r: byYear[y].last / base - 1 };
+  });
+}
+
+function drawYearly(dates, vals){
+  const note = document.getElementById('chartNote');
+  const py = yearlyFrom(dates, vals);
+  let sy = null;
+  if (window.__SPY){
+    const d0 = dates[0], d1 = dates[dates.length - 1];
+    const f = window.__SPY.filter(p => p[0] >= d0 && p[0] <= d1);
+    if (f.length > 10) sy = yearlyFrom(f.map(p => p[0]), f.map(p => p[1]));
+  }
+  const cv = document.getElementById('chart');
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const wCss = cv.clientWidth || 920, hCss = Math.round(wCss * 0.42);
+  cv.width = wCss * dpr; cv.height = hCss * dpr; cv.style.height = hCss + 'px';
+  const g = cv.getContext('2d'); g.scale(dpr, dpr);
+  g.clearRect(0, 0, wCss, hCss);
+  const padL = 46, padR = 10, padT = 26, padB = 30;
+  const W = wCss - padL - padR, H = hCss - padT - padB;
+  const all = py.map(p => p.r).concat(sy ? sy.map(p => p.r) : []);
+  let mx = Math.max(...all, 0.05), mn = Math.min(...all, 0);
+  const span = mx - mn || 1; mx += span * .1; mn -= span * .08;
+  const Y = v => padT + (1 - (v - mn) / (mx - mn)) * H;
+  g.font = '11px Sarabun'; g.strokeStyle = 'rgba(212,175,55,.14)'; g.lineWidth = 1;
+  g.fillStyle = 'rgba(244,234,216,.55)';
+  for (let k = 0; k <= 4; k++){
+    const v = mn + (k / 4) * (mx - mn), y = Y(v);
+    g.beginPath(); g.moveTo(padL, y); g.lineTo(wCss - padR, y); g.stroke();
+    g.textAlign = 'right'; g.fillText((v * 100).toFixed(0) + '%', padL - 6, y + 4);
+  }
+  const zy = Y(0);
+  g.strokeStyle = 'rgba(244,234,216,.35)'; g.beginPath(); g.moveTo(padL, zy); g.lineTo(wCss - padR, zy); g.stroke();
+  const n = py.length, slot = W / n, bw = Math.min(26, slot * (sy ? 0.32 : 0.5));
+  py.forEach((p, i) => {
+    const cx = padL + slot * i + slot / 2;
+    const x1 = sy ? cx - bw - 2 : cx - bw / 2;
+    g.fillStyle = p.r >= 0 ? '#D4AF37' : '#8a5a20';
+    g.fillRect(x1, Math.min(zy, Y(p.r)), bw, Math.abs(Y(p.r) - zy));
+    if (sy && sy[i]){
+      g.fillStyle = sy[i].r >= 0 ? 'rgba(244,234,216,.75)' : 'rgba(200,120,120,.75)';
+      g.fillRect(cx + 2, Math.min(zy, Y(sy[i].r)), bw, Math.abs(Y(sy[i].r) - zy));
+    }
+    g.fillStyle = 'rgba(244,234,216,.6)'; g.textAlign = 'center';
+    g.fillText(p.y, cx, hCss - 8);
+  });
+  // legend
+  g.fillStyle = '#D4AF37'; g.fillRect(padL, 8, 10, 10);
+  g.fillStyle = 'rgba(244,234,216,.8)'; g.textAlign = 'left'; g.fillText('พอร์ตรวม', padL + 15, 17);
+  if (sy){
+    g.fillStyle = 'rgba(244,234,216,.75)'; g.fillRect(padL + 82, 8, 10, 10);
+    g.fillText('SPY', padL + 97, 17);
+  } else {
+    note.style.display = 'block';
+    note.textContent = 'ไม่มีข้อมูล SPY ในผลรันชุดนี้ — รันใหม่อีกครั้งเพื่อดึงข้อมูลเทียบ';
+  }
+}
+
+function drawYearTicks(g, dates, X, hCss){
+  g.fillStyle = 'rgba(244,234,216,.55)'; g.textAlign = 'center'; g.font = '11px Sarabun';
+  let last = '';
+  for (let i = 0; i < dates.length; i++){
+    const yr = dates[i].slice(0, 4);
+    if (yr !== last){ last = yr; g.fillText(yr, X(i), hCss - 8); }
+  }
+}
+
+function chartBase(dates){
+  const cv = document.getElementById('chart');
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const wCss = cv.clientWidth || 920, hCss = Math.round(wCss * 0.42);
+  cv.width = wCss * dpr; cv.height = hCss * dpr; cv.style.height = hCss + 'px';
+  const g = cv.getContext('2d'); g.scale(dpr, dpr);
+  g.clearRect(0, 0, wCss, hCss);
+  const padL = 62, padR = 14, padT = 16, padB = 26;
+  const W = wCss - padL - padR, H = hCss - padT - padB;
+  const X = i => padL + (i / (dates.length - 1)) * W;
+  return { g, X, wCss, hCss, padL, padT, W, H };
+}
+
+/* ---------- trade log tabs (verbatim engine render, blob-URL iframe) ---------- */
+function renderTradelogTabs(){
+  const bar = document.getElementById('tlTabs');
+  const host = document.getElementById('tlHost');
+  const ids = (lastRun ? lastRun.ids : []).filter(id => S[id].tradelog);
+  if (!ids.length){ bar.style.display = 'none'; host.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  bar.innerHTML = '<span style="font-family:Cinzel,serif;font-size:.6rem;letter-spacing:.2em;color:var(--gold);align-self:center;margin-right:4px;">TRADE LOG</span>' +
+    ids.map(id => {
+      const s = STRATS.find(x => x.id === id);
+      return `<button class="tab" data-tl="${id}" onclick="openTradelog('${id}')">${COLS[s.col].ic} ${s.th}</button>`;
+    }).join('');
+  host.style.display = 'none';
+}
+function openTradelog(id){
+  document.querySelectorAll('#tlTabs .tab').forEach(b => b.classList.toggle('on', b.dataset.tl === id));
+  const host = document.getElementById('tlHost');
+  const fr = document.getElementById('tlFrame');
+  const doc = '<!DOCTYPE html><html><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+    '<style>' + (S[id].tlcss || '') + '</style>' +
+    '<style>body{background:#FAF6ED !important;margin:0;padding:12px;visibility:visible !important;}</style>' +
+    '</head><body>' + S[id].tradelog + '</body></html>';
+  /* blob-URL pattern: create blob → objectURL → iframe already in DOM → set src → revoke old */
+  const blob = new Blob([doc], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  if (TLURL) URL.revokeObjectURL(TLURL);
+  TLURL = url;
+  host.style.display = 'block';
+  fr.src = url;
 }
 
 function drawChart(dates, vals){
