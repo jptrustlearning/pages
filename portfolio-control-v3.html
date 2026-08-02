@@ -768,7 +768,8 @@ function computeAndRender(){
   // weighted-average standalone vol → diversification benefit
   const wavgVol = per.reduce((a, p) => a + p.w * p.s.vol, 0);
 
-  renderResults(dates, port, stats, per, wavgVol, capital, excluded, requested.length);
+  const series = ids.map(id => ({ id, vals: norm[id] }));
+  renderResults(dates, port, stats, per, wavgVol, capital, excluded, requested.length, series);
 }
 
 function curveStats(dates, vals){
@@ -796,7 +797,7 @@ const fmtB = v => v.toLocaleString('th-TH', { maximumFractionDigits:0 });
 const fmtP = v => (v >= 0 ? '+' : '') + (v * 100).toFixed(1) + '%';
 const fmtP0 = v => (v * 100).toFixed(1) + '%';
 
-function renderResults(dates, port, st, per, wavgVol, capital, excluded, nRequested){
+function renderResults(dates, port, st, per, wavgVol, capital, excluded, nRequested, series){
   document.getElementById('results').style.display = 'block';
 
   document.getElementById('statGrid').innerHTML = `
@@ -809,7 +810,7 @@ function renderResults(dates, port, st, per, wavgVol, capital, excluded, nReques
     <div class="stat"><div class="v">${fmtP0(st.vol)}</div><div class="l">ความผันผวน (SD)</div></div>
     <div class="stat"><div class="v">${st.sharpe.toFixed(2)}</div><div class="l">Sharpe Ratio</div></div>`;
 
-  LASTVIZ = { dates, port, series: ids.map(id => ({ id, vals: norm[id] })) };
+  LASTVIZ = { dates, port, series: series || [] };
   setChartTab('eq');
   renderTradelogTabs();
 
