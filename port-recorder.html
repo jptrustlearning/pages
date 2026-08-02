@@ -2366,12 +2366,20 @@ function holdingsOf(pid){
   return Object.values(map);
 }
 function renderRebalance(){
-  const p=portById(rbSel); if(!p){ $('rbSummary').innerHTML=''; $('rbList').innerHTML=''; return; }
+  const p=portById(rbSel); if(!p){ $('rbSummary').innerHTML=''; $('rbList').innerHTML=''; $('rbTargetTotal').textContent=fmtUSD(0); return; }
   const tol=Math.max(0,parseFloat($('rbTol').value)||0);
   p.tolerance=tol; saveData();
   const holds=holdingsOf(p.id);
   const targets=p.targets||{};
   const tgtTks=Object.keys(targets).filter(t=>targets[t]>0);
+  // ต้องคิด + โชว์ "เป้าหมายมูลค่าพอร์ตรวม" ก่อนทางออกลัดข้างล่าง
+  // ไม่งั้นพอสลับไปพอร์ตที่ยังไม่ตั้งเป้า ตัวเลขของพอร์ตก่อนหน้าจะค้างอยู่บนจอ
+  const total=holds.reduce((a,h)=>a+h.value,0);
+  let base=parseFloat($('rbBase').value); if(!(base>=0)) base=total;
+  const add=Math.max(0, parseFloat($('rbNew').value)||0);
+  if((p.rbNew||0)!==add){ p.rbNew=add; saveData(); }
+  const targetTotal=Math.max(0, base+add);
+  $('rbTargetTotal').textContent=fmtUSD(targetTotal);
   if(!holds.length && !tgtTks.length){
     $('rbSummary').innerHTML='';
     $('rbList').innerHTML='<div class="rb-empty-note">พอร์ต "'+esc(p.name)+'" ยังไม่มีหุ้นและยังไม่ตั้งเป้าหมาย<br>เพิ่มรายการซื้อก่อน แล้วกด "✎ ตั้งสัดส่วนเป้าหมาย"</div>';
@@ -2384,12 +2392,6 @@ function renderRebalance(){
     rbPlan=null; if($('rbPrintRow')) $('rbPrintRow').style.display='none';
     return;
   }
-  const total=holds.reduce((a,h)=>a+h.value,0);
-  let base=parseFloat($('rbBase').value); if(!(base>=0)) base=total;
-  const add=Math.max(0, parseFloat($('rbNew').value)||0);
-  if((p.rbNew||0)!==add){ p.rbNew=add; saveData(); }
-  const targetTotal=Math.max(0, base+add);
-  $('rbTargetTotal').textContent=fmtUSD(targetTotal);
   const cashDelta=targetTotal-total; // + = เติมสุทธิ, - = ถอนออกสุทธิ
   // union of tickers (held ∪ targeted)
   const tset=new Set(holds.map(h=>h.ticker)); tgtTks.forEach(t=>tset.add(t));
