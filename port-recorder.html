@@ -473,8 +473,8 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
       <div class="preview-row" style="border-top:1px dashed var(--border-gold);padding-top:10px;margin-top:4px"><span style="font-weight:700;font-size:.84rem">เป้าหมายมูลค่าพอร์ตรวม</span><span class="preview-num" id="rbTargetTotal" style="font-size:1.15rem">$0.00</span></div>
     </div>
     <div class="tol-row">
-      <span style="font-size:.78rem;color:var(--text-muted)">เกณฑ์เพี้ยนที่ยอมรับได้ (Tolerance) ±</span>
-      <input type="number" class="tol-input" id="rbTol" value="2" min="0" max="50" step="0.5" onchange="PR.renderRebalance()">
+      <span style="font-size:.78rem;color:var(--text-muted)" title="0 = ปรับให้ตรงเป้าทุกบาท · ตั้งมากกว่า 0 = ข้ามตัวที่เพี้ยนน้อย ไม่ต้องเทรดจุกจิก">เกณฑ์เพี้ยนที่ยอมรับได้ (Tolerance) ±</span>
+      <input type="number" class="tol-input" id="rbTol" value="0" min="0" max="50" step="0.5" onchange="PR.renderRebalance()">
       <span style="font-size:.78rem;color:var(--text-muted)">%</span>
       <button class="btn-secondary" style="flex:0 0 auto;margin-left:auto;padding:8px 14px;font-size:.76rem" onclick="PR.openTargetsModal()">✎ ตั้งสัดส่วนเป้าหมาย</button>
     </div>
@@ -758,11 +758,11 @@ let toastTimer=null;
 function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2600); }
 
 /* ---------- STORAGE ---------- */
-function freshData(){ return { v:1, owner:'', portfolios:[{id:uid(),name:'พอร์ตหลัก',color:PORT_COLORS[0],targets:{},tolerance:2}], lots:[], sells:[], pending:[] }; }
+function freshData(){ return { v:1, owner:'', portfolios:[{id:uid(),name:'พอร์ตหลัก',color:PORT_COLORS[0],targets:{},tolerance:0}], lots:[], sells:[], pending:[] }; }
 function loadLocal(){
   try{ D = JSON.parse(localStorage.getItem(LS_DATA)) || null; }catch(e){ D=null; }
   if(!D || !Array.isArray(D.portfolios)) D = freshData();
-  D.portfolios.forEach(p=>{ if(!p.targets) p.targets={}; if(p.tolerance==null) p.tolerance=2; if(!Array.isArray(p.groups)) p.groups=[]; });
+  D.portfolios.forEach(p=>{ if(!p.targets) p.targets={}; if(p.tolerance==null) p.tolerance=0; if(!Array.isArray(p.groups)) p.groups=[]; });
   ['lots','sells','pending'].forEach(k=>{ if(!Array.isArray(D[k])) D[k]=[]; });
   try{ PRICES = JSON.parse(localStorage.getItem(LS_PRICES)) || {}; }catch(e){ PRICES={}; }
   try{ CFG = JSON.parse(localStorage.getItem(LS_CFG)) || {}; }catch(e){ CFG={}; }
@@ -848,7 +848,7 @@ function submitPort(){
     if(D.portfolios.length>=PORT_MAX){ toast('สร้างได้สูงสุด '+PORT_MAX+' พอร์ต'); return; }
     const used=D.portfolios.map(p=>p.color);
     const color=PORT_COLORS.find(c=>!used.includes(c))||PORT_COLORS[D.portfolios.length%PORT_COLORS.length];
-    const p={id:uid(),name,color,targets:{},tolerance:2};
+    const p={id:uid(),name,color,targets:{},tolerance:0};
     D.portfolios.push(p); sel=p.id;
   }
   saveData(); closeModal('mdlPort'); renderAll(); toast('บันทึกพอร์ตแล้ว');
@@ -2318,7 +2318,7 @@ async function onSlipFile(input){
 function renderRbChips(){
   if(!rbSel || !portById(rbSel)) rbSel=D.portfolios[0].id;
   $('rbPortChips').innerHTML=D.portfolios.map(p=>'<button class="port-chip'+(p.id===rbSel?' active':'')+'" onclick="PR.selectRbPort(\''+p.id+'\')"><span class="pc-dot" style="background:'+p.color+'"></span>'+esc(p.name)+'</button>').join('');
-  const p=portById(rbSel); $('rbTol').value=p.tolerance!=null?p.tolerance:2;
+  const p=portById(rbSel); $('rbTol').value=p.tolerance!=null?p.tolerance:0;
   rbSeedInputs();
 }
 function rbTotalNow(){ return holdingsOf(rbSel).reduce((a,h)=>a+h.value,0); }
