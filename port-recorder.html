@@ -175,6 +175,30 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .tgt-tk{font-family:var(--font-number);font-size:1rem;color:var(--maroon);flex:1}
 .tgt-input{width:80px;background:var(--cream-warm);border:1.5px solid var(--border-gold);border-radius:8px;padding:8px;font-family:var(--font-number);font-size:1rem;text-align:center;color:var(--text-dark)}
 .tgt-input:focus{outline:none;border-color:var(--maroon)}
+#rbPrint{display:none}
+@media print{
+  body>*:not(#rbPrint){display:none!important}
+  body{background:#fff!important}
+  #rbPrint{display:block!important;font-family:'Anuphan',sans-serif;color:#1a1a1a;font-size:11pt}
+  #rbPrint .pp-brand{font-family:'Cinzel',serif;letter-spacing:2px;font-size:9pt;color:#722F37}
+  #rbPrint h1{font-size:15pt;margin:2px 0 2px;color:#722F37}
+  #rbPrint .pp-sub{font-size:9.5pt;color:#555;margin-bottom:10px}
+  #rbPrint .pp-line{border:0;border-top:1.5px solid #722F37;margin:6px 0 12px}
+  #rbPrint .pp-kv{display:flex;flex-wrap:wrap;gap:6px 0;margin-bottom:12px}
+  #rbPrint .pp-cell{width:25%;font-size:9pt;color:#555}
+  #rbPrint .pp-cell b{display:block;font-size:12pt;color:#1a1a1a;margin-top:2px}
+  #rbPrint .pp-note{background:#f6f1e6;border-left:3px solid #D4AF37;padding:7px 10px;font-size:10pt;margin-bottom:12px}
+  #rbPrint table{width:100%;border-collapse:collapse;font-size:10pt}
+  #rbPrint th{text-align:left;border-bottom:1.5px solid #722F37;padding:6px 4px;font-size:9pt;color:#722F37;text-transform:uppercase;letter-spacing:.5px}
+  #rbPrint td{border-bottom:1px solid #ddd;padding:6px 4px}
+  #rbPrint td.n,#rbPrint th.n{text-align:right}
+  #rbPrint tr.g-sell td:last-child{color:#B03A2E;font-weight:700}
+  #rbPrint tr.g-buy td:last-child{color:#1E7A4A;font-weight:700}
+  #rbPrint tr.g-ok td{color:#777}
+  #rbPrint .pp-sec td{background:#f6f1e6;font-weight:700;font-size:9.5pt;padding:5px 4px;color:#722F37}
+  #rbPrint .pp-foot{margin-top:14px;font-size:8.5pt;color:#777;border-top:1px solid #ddd;padding-top:7px;line-height:1.5}
+  @page{margin:14mm}
+}
 .tgt-del{flex:0 0 auto;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--border-gold);background:var(--cream-warm);color:var(--maroon);font-size:1.05rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
 .tgt-del:active{background:rgba(192,57,43,0.12);border-color:var(--red)}
 .tgt-row .tgt-pct{font-size:.8rem;color:var(--text-muted);width:14px}
@@ -434,14 +458,17 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
       <div class="field" style="margin-bottom:10px">
         <label class="field-label">เงินจากพอร์ตปัจจุบัน (USD)</label>
         <div style="display:flex;gap:8px">
-          <input class="field-input num" id="rbBase" type="number" inputmode="decimal" step="any" oninput="PR.renderRebalance()">
+          <input class="field-input num" id="rbBase" type="number" inputmode="decimal" step="any" oninput="PR.renderRebalance()" onkeydown="if(event.key==='Enter'){event.preventDefault();PR.rbApplyNew();}">
           <button class="btn-secondary" style="flex:0 0 auto;padding:8px 13px;font-size:.72rem" onclick="PR.rbUseCurrent()">⟳ ใช้ค่าปัจจุบัน</button>
         </div>
         <div class="field-hint" id="rbBaseHint">ลดตัวเลขลงต่ำกว่ามูลค่าปัจจุบัน = ถอนกำไร/เงินออกจากพอร์ต</div>
       </div>
       <div class="field" style="margin-bottom:10px">
         <label class="field-label">+ เงินใหม่ที่จะเติม (USD)</label>
-        <input class="field-input num" id="rbNew" type="number" inputmode="decimal" step="any" placeholder="0.00" oninput="PR.renderRebalance()">
+        <div style="display:flex;gap:8px">
+          <input class="field-input num" id="rbNew" type="number" inputmode="decimal" step="any" placeholder="0.00" oninput="PR.renderRebalance()" onkeydown="if(event.key==='Enter'){event.preventDefault();PR.rbApplyNew();}">
+          <button class="btn-secondary" style="flex:0 0 auto;padding:8px 13px;font-size:.72rem" onclick="PR.rbApplyNew()">✓ ใช้เลขนี้</button>
+        </div>
       </div>
       <div class="preview-row" style="border-top:1px dashed var(--border-gold);padding-top:10px;margin-top:4px"><span style="font-weight:700;font-size:.84rem">เป้าหมายมูลค่าพอร์ตรวม</span><span class="preview-num" id="rbTargetTotal" style="font-size:1.15rem">$0.00</span></div>
     </div>
@@ -452,6 +479,9 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
       <button class="btn-secondary" style="flex:0 0 auto;margin-left:auto;padding:8px 14px;font-size:.76rem" onclick="PR.openTargetsModal()">✎ ตั้งสัดส่วนเป้าหมาย</button>
     </div>
     <div id="rbSummary"></div>
+    <div id="rbPrintRow" style="display:none;margin:0 0 12px">
+      <button class="btn-secondary" style="width:100%;padding:11px;font-size:.8rem" onclick="PR.printRbPlan()">🖨 พิมพ์ / บันทึกแผนเป็น PDF</button>
+    </div>
     <div class="lots-list" id="rbList"></div>
   </div>
 
@@ -483,6 +513,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 </nav>
 
 <div class="toast" id="toast"></div>
+<div id="rbPrint"></div>
 
 <!-- MODAL: add/edit lot -->
 <div class="modal-backdrop" id="mdlLot">
@@ -2291,13 +2322,25 @@ function renderRbChips(){
   rbSeedInputs();
 }
 function rbTotalNow(){ return holdingsOf(rbSel).reduce((a,h)=>a+h.value,0); }
+let rbPlan=null;
 function rbSeedInputs(){
   const total=rbTotalNow();
   $('rbBase').value=total>0? total.toFixed(2):'';
   $('rbNew').value='';
   $('rbBaseHint').textContent='มูลค่าพอร์ตปัจจุบัน '+fmtUSD(total)+' — ลดตัวเลขลง = ถอนกำไร/เงินออกจากพอร์ต';
 }
-function rbUseCurrent(){ rbSeedInputs(); renderRebalance(); }
+function rbUseCurrent(){ rbSeedInputs(); renderRebalance(); toast('ใช้มูลค่าพอร์ตปัจจุบันแล้ว'); }
+/* ปุ่ม "ใช้เลขนี้": ตัวเลขคำนวณสดอยู่แล้วตอนพิมพ์ แต่บนมือถือคีย์บอร์ดบังกล่องสรุปจนไม่เห็นว่าขยับ
+   ปุ่มนี้เลยปิดคีย์บอร์ด + เลื่อนไปที่กล่องสรุป + toast ยืนยัน */
+function rbApplyNew(){
+  const el=$('rbNew'); if(el) el.blur();
+  const eb=$('rbBase'); if(eb) eb.blur();
+  renderRebalance();
+  const add=Math.max(0, parseFloat(($('rbNew')||{}).value)||0);
+  toast(add>0 ? ('เติมเงินใหม่ '+fmtUSD(add)+' — คำนวณแผนใหม่แล้ว') : 'ไม่เติมเงินใหม่ — คำนวณแผนใหม่แล้ว');
+  const s=$('rbSummary');
+  if(s && s.scrollIntoView) setTimeout(()=>s.scrollIntoView({behavior:'smooth',block:'start'}), 60);
+}
 function selectRbPort(id){ rbSel=id; renderRbChips(); renderRebalance(); }
 function holdingsOf(pid){
   const map={};
@@ -2320,11 +2363,13 @@ function renderRebalance(){
   if(!holds.length && !tgtTks.length){
     $('rbSummary').innerHTML='';
     $('rbList').innerHTML='<div class="rb-empty-note">พอร์ต "'+esc(p.name)+'" ยังไม่มีหุ้นและยังไม่ตั้งเป้าหมาย<br>เพิ่มรายการซื้อก่อน แล้วกด "✎ ตั้งสัดส่วนเป้าหมาย"</div>';
+    rbPlan=null; if($('rbPrintRow')) $('rbPrintRow').style.display='none';
     return;
   }
   if(!tgtTks.length){
     $('rbSummary').innerHTML='';
     $('rbList').innerHTML='<div class="rb-empty-note">ยังไม่ได้ตั้งสัดส่วนเป้าหมายของพอร์ตนี้<br>กด "✎ ตั้งสัดส่วนเป้าหมาย" เพื่อกำหนดว่าแต่ละหุ้นควรมีกี่ %</div>';
+    rbPlan=null; if($('rbPrintRow')) $('rbPrintRow').style.display='none';
     return;
   }
   const total=holds.reduce((a,h)=>a+h.value,0);
@@ -2390,6 +2435,60 @@ function renderRebalance(){
   sm+='</div>';
   $('rbSummary').innerHTML=sm;
   $('rbList').innerHTML=html;
+  rbPlan={ port:p.name, tol, total, targetTotal, add, sumBuy, sumSell, sumTgt, headline,
+           rows: rows.map(r=>({tk:r.tk, cur:r.cur, tgt:r.tgt, value:r.value, delta:r.delta,
+                               drift:r.drift, within:r.within, stale:r.stale})) };
+  const pb=$('rbPrintRow'); if(pb) pb.style.display='block';
+}
+
+/* ---------- PRINT / SAVE AS PDF ---------- */
+function printRbPlan(){
+  if(!rbPlan){ toast('ยังไม่มีแผนให้พิมพ์'); return; }
+  const P=rbPlan;
+  // แผ่นพิมพ์ไม่ซ่อนตัวเลข แม้เปิดโหมดซ่อนยอดอยู่ (พิมพ์เก็บไว้ดูเองแล้วตัวเลขต้องอ่านได้)
+  const usd=v=>{ const n=Number(v)||0; return (n<0?'-$':'$')+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  const d=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  const stamp=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes());
+  const sells=P.rows.filter(r=>!r.within && r.delta<0);
+  const buys =P.rows.filter(r=>!r.within && r.delta>0);
+  const oks  =P.rows.filter(r=>r.within);
+  let body='';
+  const line=(r,act)=>'<td>'+esc(r.tk)+(r.stale?' *':'')+'</td>'
+      +'<td class="n">'+r.cur.toFixed(1)+'%</td>'
+      +'<td class="n">'+r.tgt.toFixed(1)+'%</td>'
+      +'<td class="n">'+usd(r.value)+'</td>'
+      +'<td class="n">'+act+'</td>';
+  if(sells.length){
+    body+='<tr class="pp-sec"><td colspan="5">① ขายก่อน — รวม '+usd(P.sumSell)+'</td></tr>';
+    sells.forEach(r=>{ body+='<tr class="g-sell">'+line(r,'ขาย '+usd(-r.delta))+'</tr>'; });
+  }
+  if(buys.length){
+    body+='<tr class="pp-sec"><td colspan="5">② แล้วค่อยซื้อ — รวม '+usd(P.sumBuy)+'</td></tr>';
+    buys.forEach(r=>{ body+='<tr class="g-buy">'+line(r,'ซื้อ '+usd(r.delta))+'</tr>'; });
+  }
+  if(oks.length){
+    body+='<tr class="pp-sec"><td colspan="5">③ ไม่ต้องทำอะไร (อยู่ในเกณฑ์ ±'+P.tol+'%)</td></tr>';
+    oks.forEach(r=>{ body+='<tr class="g-ok">'+line(r,'—')+'</tr>'; });
+  }
+  let warn='';
+  if(Math.abs(P.sumTgt-100)>0.01) warn='<div class="pp-note">เป้ารวม '+P.sumTgt.toFixed(1)+'% — ส่วนที่เหลือ '+(100-P.sumTgt).toFixed(1)+'% ถือเป็นเงินสด/ไม่ระบุ</div>';
+  $('rbPrint').innerHTML =
+     '<div class="pp-brand">JPTRUST PORT RECORDER</div>'
+    +'<h1>แผนปรับสมดุลพอร์ต — '+esc(P.port)+'</h1>'
+    +'<div class="pp-sub">พิมพ์เมื่อ '+stamp+' · เกณฑ์เพี้ยนที่ยอมรับได้ ±'+P.tol+'%</div>'
+    +'<hr class="pp-line">'
+    +'<div class="pp-note">'+esc(P.headline)+'</div>'
+    +'<div class="pp-kv">'
+      +'<div class="pp-cell">มูลค่าตอนนี้<b>'+usd(P.total)+'</b></div>'
+      +'<div class="pp-cell">เงินใหม่ที่เติม<b>'+usd(P.add)+'</b></div>'
+      +'<div class="pp-cell">เป้าหลังปรับ<b>'+usd(P.targetTotal)+'</b></div>'
+      +'<div class="pp-cell">ขายรวม / ซื้อรวม<b>'+usd(P.sumSell)+' / '+usd(P.sumBuy)+'</b></div>'
+    +'</div>'
+    + warn
+    +'<table><thead><tr><th>หุ้น</th><th class="n">ตอนนี้</th><th class="n">เป้า</th><th class="n">มูลค่าตอนนี้</th><th class="n">ต้องทำ</th></tr></thead><tbody>'+body+'</tbody></table>'
+    +'<div class="pp-foot">คำนวณจากราคาล่าสุดที่ดึงเข้าแอป ราคาจริงตอนส่งคำสั่งอาจต่างจากนี้ · เครื่องหมาย * = ราคาตัวนั้นยังไม่อัพเดต · เอกสารนี้เป็นบันทึกส่วนตัวของผู้ใช้ ไม่ใช่คำแนะนำการลงทุน<br>สร้างโดย JP Trust Learning — Port Recorder</div>';
+  setTimeout(()=>{ window.print(); }, 60);
 }
 
 /* ---------- TARGETS EDITOR ---------- */
@@ -2614,7 +2713,7 @@ return {openOwner,submitOwner,switchTab,gotoSettings,toggleMask,selectPort,openP
   onSlipFile,openManualAdd,maChoose,maSellTicker,confirmPending,deletePending,
   msToggle,msAuto,msSetMode,msRecalc,onMsAmountInput,onMsDate,msSellAllSel,msSubmit,
   setTf,setEqMode,setVsGran,delTgtRow,refreshPrices,
-  selectRbPort,rbUseCurrent,renderRebalance,openTargetsModal,addTgtRow,updateTgtSum,submitTargets,
+  selectRbPort,rbUseCurrent,rbApplyNew,printRbPlan,renderRebalance,openTargetsModal,addTgtRow,updateTgtSum,submitTargets,
   setView,toggleDense,setSort,toggleGroup,openGa,gaAssign,gaCreateAssign,openGm,gmAddRow,gmDelRow,gmSubmit,deleteSell,openPm,pmDelete,
   driveConnect,driveSyncNow,driveDisconnect,drivePillTap};
 })();
