@@ -1,6 +1,177 @@
 {
-  "lastUpdated": "2026-08-01T08:20:00Z",
+  "lastUpdated": "2026-08-02T08:25:00Z",
   "batches": [
+    {
+      "file": "2026-08-02-0825.md",
+      "date": "2026-08-02T08:25:00Z",
+      "date_display": "2 ส.ค. 2026 · 08:25",
+      "summary": "สหรัฐฯ-อิสราเอลเตรียมถล่มโครงสร้างพลังงานอิหร่านชุดใหญ่สุด อาจเริ่มสุดสัปดาห์นี้ · OPEC+ ประชุมวันนี้ คาดเพิ่มโควตารอบสุดท้ายแล้วหยุดยาว · Berkshire รายงานงบจันทร์ · Bitcoin เข้าเดือนสิงหาที่ปิดแดง 4 ปีติด · จ้างงานสหรัฐฯ คืนศุกร์ชี้ทิศดอกเบี้ย",
+      "tickers": [
+        "USO",
+        "XLE",
+        "BNO",
+        "VLO",
+        "MPC",
+        "GLD",
+        "SPY",
+        "QQQ",
+        "TLT",
+        "BRK.B",
+        "BTC",
+        "IBIT",
+        "PLTR",
+        "AMD",
+        "CAT",
+        "PFE",
+        "DIS",
+        "LLY",
+        "PTT",
+        "PTTEP",
+        "TOP",
+        "BCP",
+        "SPRC",
+        "IRPC",
+        "AOT",
+        "CPALL",
+        "TU",
+        "KBANK",
+        "DELTA"
+      ],
+      "headlines": [
+        {
+          "title": "สหรัฐฯ-อิสราเอลเตรียมปฏิบัติการทิ้งระเบิดโครงสร้างพื้นฐานพลังงานอิหร่านชุดใหญ่ที่สุดตั้งแต่เริ่มสงคราม — อาจเริ่มภายในสุดสัปดาห์นี้ และมีการหารือให้จบก่อนตลาดเปิดวันจันทร์",
+          "tickers": [
+            {
+              "symbol": "USO",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "XLE",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "VLO",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTTEP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "TOP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "GLD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "SPY",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "negative"
+            }
+          ],
+          "tone_override": "MIXED",
+          "source": "CBS News, Wall Street Journal, Axios, Fortune, CNN, ABC News",
+          "published": "2 ส.ค. 2026"
+        },
+        {
+          "title": "OPEC+ ประชุมวันนี้ — คาดเพิ่มโควตาอีก 188,000 บาร์เรลต่อวันเป็นครั้งสุดท้าย แล้วหยุดยาวถึงสิ้นปี ขณะที่การผลิตจริงยังต่ำกว่าโควตามากเพราะช่องแคบ Hormuz",
+          "tickers": [
+            {
+              "symbol": "USO",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "XLE",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "PTTEP",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "TOP",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "Reuters, OilPrice, Al Jazeera, CNBC, Egypt Oil & Gas",
+          "published": "2 ส.ค. 2026"
+        },
+        {
+          "title": "Berkshire Hathaway รายงานงบไตรมาส 2 พรุ่งนี้ — บททดสอบแรกของยุค Greg Abel ในไตรมาสที่หุ้นแพ้ตลาด และเงินสดก้อนมหึมากลายเป็นข้อได้เปรียบอีกครั้ง",
+          "tickers": [
+            {
+              "symbol": "BRK.B",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "SPY",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "Zacks, TipRanks, Yahoo Finance, Investing.com",
+          "published": "2 ส.ค. 2026"
+        },
+        {
+          "title": "Bitcoin เข้าสู่เดือนสิงหาคม — เดือนเดียวในประวัติศาสตร์ที่ค่ากลางผลตอบแทนติดลบ และปิดแดงมาแล้ว 4 ปีติดต่อกัน ขณะเงินไหลเข้ากองทุน ETF ลดลง 83% จากจุดสูงสุดเดือนกรกฎาคม",
+          "tickers": [
+            {
+              "symbol": "BTC",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "IBIT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "ETH",
+              "sentiment": "negative"
+            }
+          ],
+          "source": "CoinGlass, BeInCrypto, CryptoTimes, KuCoin, Yahoo Finance",
+          "published": "2 ส.ค. 2026"
+        },
+        {
+          "title": "ปฏิทินสัปดาห์หน้า: ตัวเลขจ้างงานสหรัฐฯ วันศุกร์คือตัวชี้ขาดทิศทางดอกเบี้ย ระหว่างที่งบ Palantir, AMD, Disney และ Eli Lilly ทยอยออกทั้งสัปดาห์ บนพื้นหลังพันธบัตร 30 ปีที่ 5.23% สูงสุดในรอบ 19 ปี",
+          "tickers": [
+            {
+              "symbol": "PLTR",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "AMD",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "CAT",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "DIS",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "LLY",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "TLT",
+              "sentiment": "negative"
+            }
+          ],
+          "source": "Kiplinger, IG, Investrade, CNBC",
+          "published": "2 ส.ค. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-08-01-0820.md",
       "date": "2026-08-01T08:20:00Z",
