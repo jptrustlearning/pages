@@ -2346,11 +2346,18 @@ function renderRebalance(){
     r.cur = total>0? r.value/total*100 : 0;
     r.delta = r.tgt/100*targetTotal - r.value;
     r.drift = r.cur - r.tgt;
+    r.within = Math.abs(r.drift)<=tol || Math.abs(r.delta)<0.01;
   });
-  rows.sort((a,b)=>Math.abs(b.drift)-Math.abs(a.drift));
+  // ลำดับตามลำดับการลงมือจริง: ขายออกมากสุด → ... → ซื้อเพิ่มมากสุด → ที่ไม่ต้องทำอะไรไว้ท้ายสุด
+  // (ต้องขายให้ได้เงินสดมาก่อน ถึงจะเอาไปซื้อตัวที่ขาดได้)
+  rows.sort((a,b)=>{
+    if(a.within!==b.within) return a.within?1:-1;
+    if(a.within) return Math.abs(b.drift)-Math.abs(a.drift);
+    return a.delta-b.delta;
+  });
   rows.forEach(r=>{
     maxDrift=Math.max(maxDrift,Math.abs(r.drift));
-    const within = Math.abs(r.drift)<=tol || Math.abs(r.delta)<0.01;
+    const within = r.within;
     let cls='act-ok', act='<span class="rb-action ok">✓ อยู่ในเกณฑ์</span>';
     if(!within && r.delta>0){ cls='act-buy'; act='<span class="rb-action buy">🟢 ซื้อเพิ่ม '+fmtUSD(r.delta)+'</span>'; sumBuy+=r.delta; }
     else if(!within && r.delta<0){ cls='act-sell'; act='<span class="rb-action sell">🔴 ขายออก '+fmtUSD(-r.delta)+'</span>'; sumSell+=-r.delta; }
