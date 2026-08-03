@@ -495,6 +495,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
         <button class="btn-primary" style="flex:0 1 auto;padding:10px 18px;font-size:.82rem" id="driveConnectBtn" data-gis-btn data-gis-label="เชื่อมต่อ Google Drive" onclick="PR.driveConnect()">เชื่อมต่อ Google Drive</button>
         <button class="btn-secondary" style="flex:0 1 auto;padding:10px 16px;font-size:.8rem" id="driveSyncBtn" onclick="PR.driveSyncNow()" disabled>ซิงก์ตอนนี้</button>
         <button class="btn-secondary" style="flex:0 1 auto;padding:10px 16px;font-size:.8rem" id="driveForceBtn" onclick="PR.driveForcePull()" disabled>ดึงจาก Drive ทับเครื่องนี้</button>
+        <button class="btn-secondary" style="flex:0 1 auto;padding:10px 16px;font-size:.8rem" id="slipMigBtn" onclick="PR.migrateSlipsNow()" disabled>ย้ายรูปสลิปขึ้น Drive</button>
         <button class="btn-danger-ghost" id="driveDisconnectBtn" onclick="PR.driveDisconnect()" style="display:none">ยกเลิกการเชื่อมต่อ</button>
       </div>
       <div class="field-hint" id="driveLastSync" style="margin-top:8px"></div>
@@ -740,6 +741,8 @@ const DEFAULT_CLIENT_ID  = '732793988196-3bmbv27oatacajf50rmq8otp9k1mjqb3.apps.g
 const DRIVE_SCOPE   = 'https://www.googleapis.com/auth/drive.file';
 const DRIVE_FOLDER  = 'JP Port Recorder';
 const DATA_FILENAME = 'portfolio-data.json';
+const SLIP_FOLDER   = 'slips';   // โฟลเดอร์ย่อยเก็บรูปสลิปแยกเป็นไฟล์ต่อรายการ
+const SLIP_PH       = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 const PORT_COLORS   = ['#722F37','#B8860B','#2E9F5F','#8B2252','#5A3D20','#1F6F8B','#C0392B','#6B4E9B','#3C7A57','#A8642A'];
 const PORT_MAX      = 10;
 const ALL           = '__all__';
@@ -772,6 +775,8 @@ let tokenClient = null;
 let saveTimer = null;
 let needAuth = false, syncToastShown = false;
 let pushing = false, pushQueued = false;      // single-flight guard สำหรับ drivePush
+const slipCache = new Map();                  // fileId -> objectURL/dataURL (ต่อ session)
+let migRunning = false, migTimer = null;      // สถานะการย้ายสลิปขึ้น Drive
 let lsFailShown = false, lastLocalOk = true;  // สถานะการเขียน localStorage
 
 /* ---------- UTILS ---------- */
@@ -811,22 +816,43 @@ function loadLocal(){
   try{ DRIVE = JSON.parse(localStorage.getItem(LS_DRIVE)) || {}; }catch(e){ DRIVE={}; }
   mask = localStorage.getItem(LS_MASK)==='1';
 }
+/* localStorage เก็บได้ ~5 MB เท่านั้น — รูปสลิปที่ยังเป็น dataURL ห้ามลงไปด้วยเด็ดขาด
+   ตัวจริงของรูปอยู่บน Drive (ไฟล์แยก) ในเครื่องเก็บแค่ตัวเลขกับ slipId */
+function localSnapshot(){
+  const out={};
+  for(const k in D) out[k]=D[k];
+  ['lots','sells','pending'].forEach(k=>{
+    if(!Array.isArray(D[k])) return;
+    out[k]=D[k].map(it=>{
+      if(!it || !it.slip) return it;
+      const c={}; for(const p in it){ if(p!=='slip') c[p]=it[p]; }
+      return c;
+    });
+  });
+  return out;
+}
 function persistLocal(){
   let ok=true;
-  try{ localStorage.setItem(LS_DATA, JSON.stringify(D)); }
+  try{ localStorage.setItem(LS_DATA, JSON.stringify(localSnapshot())); }
   catch(e){ ok=false; console.warn('localStorage write failed', e); }
   try{ localStorage.setItem(LS_PRICES, JSON.stringify(PRICES)); }catch(e){}
   lastLocalOk=ok;
   return ok;
 }
-function dataSizeKB(){ try{ return Math.round(JSON.stringify(D).length/1024); }catch(e){ return -1; } }
+function dataSizeKB(){ try{ return Math.round(JSON.stringify(localSnapshot()).length/1024); }catch(e){ return -1; } }
+function driveSizeKB(){ try{ return Math.round(JSON.stringify(D).length/1024); }catch(e){ return -1; } }
+function slipPending(){
+  const out=[];
+  ['lots','sells','pending'].forEach(k=>{ (D[k]||[]).forEach(it=>{ if(it && it.slip) out.push(it); }); });
+  return out;
+}
 /* เขียนลงเครื่องไม่ได้ = ห้ามเงียบ ไม่งั้นผู้ใช้เห็นว่า 'บันทึกแล้ว' ทั้งที่รีเฟรชแล้วหาย */
 function warnLocalWriteFailed(){
   if(lsFailShown) return; lsFailShown=true;
   showAlert('⚠ บันทึกลงเครื่องไม่สำเร็จ',
     'ข้อมูลในแอปใหญ่เกินที่เบราว์เซอร์ยอมให้เก็บแล้ว (~'+dataSizeKB().toLocaleString()+' KB)<br><br>'+
-    'รายการที่เพิ่งบันทึก <b>จะหายเมื่อรีเฟรช</b> ถ้ายังซิงก์ขึ้น Drive ไม่สำเร็จ<br><br>'+
-    'แตะป้าย Drive ด้านบนเพื่อซิงก์ทันที แล้วรอจนขึ้นว่าซิงก์แล้วค่อยปิดแอป',
+    'แตะป้าย Drive ด้านบนเพื่อซิงก์ทันที แล้วรอจนขึ้นว่าซิงก์แล้วค่อยปิดแอป<br><br>'+
+    'ถ้าขึ้นซ้ำอีก ให้ไปที่ <b>ตั้งค่า → ย้ายรูปสลิปขึ้น Drive</b>',
     'เข้าใจแล้ว');
 }
 function saveData(){
@@ -838,6 +864,7 @@ function saveData(){
     clearTimeout(saveTimer);
     saveTimer=setTimeout(()=>{ saveTimer=null; requestPush(false); }, 1000);
   }
+  scheduleSlipMigration();
 }
 /* single-flight: ห้ามมี drivePush ซ้อนกันเด็ดขาด
    ถ้าปล่อยให้ซ้อน ตัวที่ยิงก่อน (ข้อมูลเก่ากว่า) อาจไปถึง Drive ทีหลัง = ทับข้อมูลใหม่ทิ้ง
@@ -1070,6 +1097,7 @@ function renderView(){
   else if(viewMode==='group') renderGroups();
   else if(viewMode==='sells') renderSells();
   else renderLots();
+  hydrateSlips();   // ทุกครั้งที่วาดรายการใหม่ (สลับมุมมอง/เรียง/กางกลุ่ม) ต้องดึงรูปมาใส่ด้วย
 }
 function applyDense(){
   const w=$('denseWrap'), l=$('lotsList'), b=$('denseBtn');
@@ -1135,7 +1163,7 @@ function renderLots(){
     const pi=priceInfo(l);
     const pv=rem*pi.price, pc=rem*l.price, pnl=pv-pc, pnlPct=pc>0?pnl/pc*100:0;
     const pname = sel===ALL ? (portById(l.portfolioId)||{}).name : null;
-    const slip = l.slip? '<img class="slip-thumb" src="'+l.slip+'" onclick="PR.viewSlip(\''+l.id+'\',\'lot\')" alt="สลิป">':'';
+    const slip = slipTag(l,'lot','');
     return '<div class="lot-card '+(status==='closed'?'closed':'')+'">'
       +'<div class="lot-head"><div style="flex:1;min-width:0">'
       +'<div class="lot-ticker-row"><span class="lot-ticker">'+esc(l.ticker)+'</span>'+badge+grpChip(l)+(pi.stale&&rem>0?'<span class="lot-badge stale" title="ยังไม่มีราคาจากตลาด ใช้ราคาซื้อแทน">ราคาไม่อัพเดต</span>':'')+'</div>'
@@ -1167,10 +1195,42 @@ function sellHistoryHtml(l){
       +'<button class="sell-row-del" onclick="PR.deleteSell(\''+s.id+'\')">ลบ</button></div>';
   }).join('')+'</div>';
 }
+/* ---------- SLIP IMAGES (เก็บเป็นไฟล์แยกบน Drive) ---------- */
+function slipTag(it, kind, sizeStyle){
+  if(!it) return '';
+  const click=' onclick="event.stopPropagation();PR.viewSlip(\''+it.id+'\',\''+kind+'\')"';
+  const st=sizeStyle? ' style="'+sizeStyle+'"' : '';
+  if(it.slip)   return '<img class="slip-thumb"'+st+' src="'+it.slip+'"'+click+' alt="สลิป">';
+  if(it.slipId) return '<img class="slip-thumb"'+st+' data-sid="'+esc(it.slipId)+'" src="'+SLIP_PH+'"'+click+' alt="สลิป">';
+  return '';
+}
+async function slipUrl(fid){
+  if(slipCache.has(fid)) return slipCache.get(fid);
+  const r=await gapi('https://www.googleapis.com/drive/v3/files/'+fid+'?alt=media', null, false);
+  const blob=await r.blob();
+  const u=URL.createObjectURL(blob);
+  slipCache.set(fid,u);
+  return u;
+}
+/* หลังวาดรายการเสร็จ ค่อยไปดึงรูปจาก Drive มาใส่ทีหลัง — รายการขึ้นก่อน ไม่ต้องรอรูป */
+function hydrateSlips(){
+  document.querySelectorAll('img[data-sid]').forEach(img=>{
+    if(img.dataset.sloaded==='1') return;
+    const fid=img.getAttribute('data-sid'); if(!fid) return;
+    img.dataset.sloaded='1';
+    slipUrl(fid).then(u=>{ img.src=u; })
+      .catch(()=>{ img.dataset.sloaded=''; img.style.opacity='.35'; });
+  });
+}
 function viewSlip(id,kind){
   const arr = kind==='lot'? D.lots : (kind==='sell'? D.sells : D.pending);
-  const it=arr.find(x=>x.id===id);
-  if(it&&it.slip){ $('slipFull').src=it.slip; openModal('mdlSlip'); }
+  const it=arr.find(x=>x.id===id); if(!it) return;
+  if(it.slip){ $('slipFull').src=it.slip; openModal('mdlSlip'); return; }
+  if(it.slipId){
+    $('slipFull').removeAttribute('src'); openModal('mdlSlip');
+    slipUrl(it.slipId).then(u=>{ $('slipFull').src=u; })
+      .catch(()=>{ closeModal('mdlSlip'); toast('โหลดรูปสลิปไม่สำเร็จ — แตะป้าย Drive เพื่อซิงก์แล้วลองใหม่'); });
+  }
 }
 
 /* ---------- GROUPS ---------- */
@@ -1356,7 +1416,7 @@ function renderSells(){
     const days=l? Math.max(0, Math.round((Date.parse(s.date)-Date.parse(l.date))/86400000)) : null;
     return '<div class="lot-card">'
       +'<div class="lot-head"><div style="flex:1;min-width:0">'
-      +'<div class="lot-ticker-row"><span class="lot-ticker">'+esc(tk)+'</span><span class="lot-badge closed">SOLD</span>'+(s.slip?'<img class="slip-thumb" style="width:34px;height:34px" src="'+s.slip+'" onclick="event.stopPropagation();PR.viewSlip(\''+s.id+'\',\'sell\')" alt="สลิป">':'')+'</div>'
+      +'<div class="lot-ticker-row"><span class="lot-ticker">'+esc(tk)+'</span><span class="lot-badge closed">SOLD</span>'+slipTag(s,'sell','width:34px;height:34px')+'</div>'
       +'<div class="lot-meta">ขาย '+esc(s.date)+' · '+fmtSh(s.shares)+' Shares @ $'+s.price.toFixed(2)+(l?'<br>ต้นทุน $'+l.price.toFixed(2)+'/หุ้น · ได้รับ '+fmtUSD(s.shares*s.price)+(days!=null?' · ถือ '+days+' วัน':''):'')+'</div></div>'
       +'<div class="lot-pnl"><div class="lot-pnl-val '+pnlClass(pnl)+'">'+fmtUSDsigned(pnl)+'</div><div class="lot-pnl-pct '+pnlClass(pnl)+'">'+fmtPct(pct,true)+'</div></div>'
       +'</div>'
@@ -2083,7 +2143,7 @@ function renderPending(){
   const wrap=$('pendingList');
   if(!D.pending.length){ wrap.innerHTML='<div class="empty" style="padding:26px 20px"><div class="empty-icon">📥</div><div class="empty-text">ยังไม่มีรายการรอ</div><div class="empty-sub">อัพสลิปด้านบน — รายการจะขึ้นที่นี่ให้ตรวจก่อนเข้าพอร์ตจริง</div></div>'; return; }
   wrap.innerHTML=D.pending.map(p=>{
-    const slip=p.slip?'<img class="slip-thumb" style="width:56px;height:56px" src="'+p.slip+'" onclick="PR.viewSlip(\''+p.id+'\',\'pending\')" alt="สลิป">':'';
+    const slip=slipTag(p,'pending','width:56px;height:56px');
     return '<div class="pending-card"><div class="pending-head">'+slip
       +'<div class="pending-info"><div class="pending-tk">'+esc(p.ticker||'—')+'</div>'
       +'<div class="pending-meta">'+(p.side==='sell'?'🔴 ขาย':'🟢 ซื้อ')+' · '+(p.date||'ไม่พบวันที่')
@@ -2094,6 +2154,7 @@ function renderPending(){
       +'<button class="lot-btn delete" onclick="PR.deletePending(\''+p.id+'\')">ทิ้ง</button>'
       +'</div></div>';
   }).join('');
+  hydrateSlips();
 }
 function openManualAdd(){
   if(!requireDrive()) return;
@@ -2696,6 +2757,77 @@ async function driveFindDataFile(interactive){
   if(j.files&&j.files.length){ DRIVE.dataFileId=j.files[0].id; persistDrive(); return DRIVE.dataFileId; }
   return null;
 }
+async function driveEnsureSlipFolder(interactive){
+  if(DRIVE.slipFolderId) return DRIVE.slipFolderId;
+  const parent=await driveEnsureFolder(interactive);
+  const q=encodeURIComponent("name='"+SLIP_FOLDER+"' and mimeType='application/vnd.google-apps.folder' and '"+parent+"' in parents and trashed=false");
+  let r=await gapi('https://www.googleapis.com/drive/v3/files?q='+q+'&fields=files(id)', null, interactive);
+  let j=await r.json();
+  if(j.files&&j.files.length){ DRIVE.slipFolderId=j.files[0].id; persistDrive(); return DRIVE.slipFolderId; }
+  r=await gapi('https://www.googleapis.com/drive/v3/files',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name:SLIP_FOLDER,mimeType:'application/vnd.google-apps.folder',parents:[parent]})}, interactive);
+  j=await r.json(); DRIVE.slipFolderId=j.id; persistDrive(); return DRIVE.slipFolderId;
+}
+/* อัปโหลดรูปเดียวเป็นไฟล์ของตัวเองใน Drive → คืน fileId */
+async function uploadSlip(dataUrl, name, interactive){
+  const fid=await driveEnsureSlipFolder(interactive);
+  const m=/^data:([^;,]+)[;,]/.exec(dataUrl);
+  const mime=(m&&m[1])||'image/jpeg';
+  const b64=dataUrl.slice(dataUrl.indexOf(',')+1);
+  const meta={name:name, parents:[fid], mimeType:mime};
+  const boundary='prs'+Date.now()+Math.random().toString(36).slice(2,8);
+  const body='--'+boundary+'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n'+JSON.stringify(meta)
+    +'\r\n--'+boundary+'\r\nContent-Type: '+mime+'\r\nContent-Transfer-Encoding: base64\r\n\r\n'+b64
+    +'\r\n--'+boundary+'--';
+  const r=await gapi('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',
+    {method:'POST',headers:{'Content-Type':'multipart/related; boundary='+boundary},body}, interactive);
+  const j=await r.json();
+  if(!j.id) throw new Error('upload slip failed');
+  return j.id;
+}
+/* ย้ายสลิปที่ยังฝังอยู่ใน JSON ออกไปเป็นไฟล์แยก ทีละรูป ทำซ้ำได้ ไม่พังถ้าค้างกลางทาง */
+async function migrateSlips(interactive){
+  if(migRunning) return;
+  const list=slipPending();
+  if(!list.length) return;
+  migRunning=true;
+  let done=0, fail=0;
+  try{
+    for(let i=0;i<list.length;i++){
+      const it=list[i];
+      if(!it.slip) continue;
+      try{
+        toast('กำลังย้ายรูปสลิปขึ้น Drive '+(done+1)+'/'+list.length+'…');
+        const fid=await uploadSlip(it.slip, 'slip-'+it.id+'.jpg', interactive);
+        slipCache.set(fid, it.slip);   // ยังโชว์รูปเดิมได้ทันที ไม่ต้องโหลดซ้ำ
+        it.slipId=fid; delete it.slip;
+        done++;
+        if(done%5===0){ D.rev=(Number(D.rev)||0)+1; persistLocal(); }
+      }catch(err){
+        fail++; console.warn('slip upload failed', err);
+        if(String(err&&err.message).indexOf('need-interactive')>=0) break;
+      }
+    }
+  } finally {
+    migRunning=false;
+    if(done){
+      D.rev=(Number(D.rev)||0)+1; D.savedAt=new Date().toISOString();
+      persistLocal();
+      if(DRIVE.connected){ DRIVE.dirty=true; persistDrive(); await requestPush(interactive); }
+    }
+    renderAll(); renderPending(); renderSettings();
+    if(done) toast(fail? ('ย้ายรูปแล้ว '+done+' · ค้าง '+fail+' รูป ลองใหม่อีกครั้ง')
+                       : ('ย้ายรูปสลิปขึ้น Drive ครบ '+done+' รูป ✓ ข้อมูลเหลือ '+dataSizeKB().toLocaleString()+' KB'));
+    else if(fail) toast('ย้ายรูปไม่สำเร็จ — แตะป้าย Drive เพื่อยืนยันตัวตนแล้วลองใหม่');
+  }
+}
+function migrateSlipsNow(){ migrateSlips(true); }
+function scheduleSlipMigration(){
+  if(migRunning || !DRIVE.connected || !driveToken()) return;
+  if(!slipPending().length) return;
+  clearTimeout(migTimer);
+  migTimer=setTimeout(()=>migrateSlips(false), 3000);
+}
 async function drivePush(interactive){
   const revAtStart=Number(D.rev)||0;
   const payload=JSON.stringify({data:D, prices:PRICES, rev:revAtStart, savedAt:new Date().toISOString()});
@@ -2847,10 +2979,18 @@ function renderSettings(){
   $('driveSyncBtn').disabled=!on;
   const fb=$('driveForceBtn'); if(fb) fb.disabled=!on;
   $('driveLastSync').textContent = DRIVE.lastSync? ('ซิงก์ล่าสุด: '+new Date(DRIVE.lastSync).toLocaleString('th-TH')):'';
+  const nPend=slipPending().length;
+  const mb=$('slipMigBtn');
+  if(mb){
+    mb.disabled = !on || !nPend || migRunning;
+    mb.style.display = nPend? '' : 'none';
+    mb.textContent = 'ย้ายรูปสลิปขึ้น Drive ('+nPend+')';
+  }
   const sh=$('storeHealth');
   if(sh){
-    sh.innerHTML='ขนาดข้อมูล: '+dataSizeKB().toLocaleString()+' KB · เก็บลงเครื่อง: '+
-      (lastLocalOk?'ปกติ':'<b style="color:#C0392B">เกินเพดานเบราว์เซอร์ — ต้องซิงก์ Drive ทุกครั้งก่อนปิดแอป</b>');
+    sh.innerHTML='ขนาดข้อมูลในเครื่อง: '+dataSizeKB().toLocaleString()+' KB · เก็บลงเครื่อง: '+
+      (lastLocalOk?'ปกติ':'<b style="color:#C0392B">เกินเพดานเบราว์เซอร์</b>')+
+      (nPend? '<br>รูปสลิปที่ยังไม่ได้ย้ายขึ้น Drive: <b>'+nPend+' รูป</b> (ไฟล์บน Drive '+driveSizeKB().toLocaleString()+' KB)' : '');
   }
 }
 /* ============================================================
@@ -2877,6 +3017,7 @@ function init(){
     }
   }
   refreshPrices(false);
+  setTimeout(scheduleSlipMigration, 2500);
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
 
@@ -2888,7 +3029,7 @@ return {openOwner,submitOwner,switchTab,gotoSettings,toggleMask,selectPort,openP
   onGisReady,syncGisButtons,
   selectRbPort,rbUseCurrent,rbApplyNew,printRbPlan,renderRebalance,openTargetsModal,addTgtRow,updateTgtSum,submitTargets,
   setView,toggleDense,setSort,toggleGroup,openGa,gaAssign,gaCreateAssign,openGm,gmAddRow,gmDelRow,gmSubmit,deleteSell,openPm,pmDelete,
-  driveConnect,driveSyncNow,driveForcePull,driveDisconnect,drivePillTap};
+  driveConnect,driveSyncNow,driveForcePull,migrateSlipsNow,driveDisconnect,drivePillTap};
 })();
 
 </script>
