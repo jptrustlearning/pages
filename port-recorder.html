@@ -356,7 +356,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
     <div class="set-card" id="driveGate" style="display:none;border:1.5px solid rgba(212,175,55,0.55);background:linear-gradient(135deg,#FFF8E7,#FFFEF8)">
       <div class="set-title">⚠️ เชื่อม Google Drive ก่อนเริ่มบันทึก</div>
       <div class="set-desc">แอปเก็บข้อมูลพอร์ต ราคา และสลิปไว้ใน <b>Google Drive ของคุณเอง</b> — ล้างแคชหรือเปลี่ยนเครื่องข้อมูลก็ไม่หาย · แอปเห็นเฉพาะไฟล์ที่แอปสร้าง ไม่เห็นไฟล์อื่นใน Drive</div>
-      <button class="btn-primary" style="width:100%" onclick="PR.driveConnect()">เชื่อมต่อ Google Drive เพื่อเริ่มใช้งาน</button>
+      <button class="btn-primary" style="width:100%" data-gis-btn data-gis-label="เชื่อมต่อ Google Drive เพื่อเริ่มใช้งาน" onclick="PR.driveConnect()">เชื่อมต่อ Google Drive เพื่อเริ่มใช้งาน</button>
     </div>
     <div class="port-bar">
       <div class="port-chips" id="portChips"></div>
@@ -492,7 +492,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
       <div class="set-desc">ที่เก็บหลักของข้อมูลพอร์ต ราคา และสลิป คือ Google Drive ของคุณเอง — <b>ต้องเชื่อมก่อนเริ่มบันทึก</b> เพื่อไม่ให้ข้อมูลหายเมื่อล้างแคชหรือเปลี่ยนเครื่อง · แอปเห็นเฉพาะไฟล์ที่แอปสร้าง (สิทธิ์ drive.file) ไม่มีใครเข้าถึงข้อมูลคุณได้นอกจากตัวคุณ</div>
       <div class="set-status off" id="driveStatus"><span>●</span> ยังไม่เชื่อมต่อ</div>
       <div class="set-row">
-        <button class="btn-primary" style="flex:0 1 auto;padding:10px 18px;font-size:.82rem" id="driveConnectBtn" onclick="PR.driveConnect()">เชื่อมต่อ Google Drive</button>
+        <button class="btn-primary" style="flex:0 1 auto;padding:10px 18px;font-size:.82rem" id="driveConnectBtn" data-gis-btn data-gis-label="เชื่อมต่อ Google Drive" onclick="PR.driveConnect()">เชื่อมต่อ Google Drive</button>
         <button class="btn-secondary" style="flex:0 1 auto;padding:10px 16px;font-size:.8rem" id="driveSyncBtn" onclick="PR.driveSyncNow()" disabled>ซิงก์ตอนนี้</button>
         <button class="btn-danger-ghost" id="driveDisconnectBtn" onclick="PR.driveDisconnect()" style="display:none">ยกเลิกการเชื่อมต่อ</button>
       </div>
@@ -694,7 +694,34 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
   </div>
 </div>
 
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+/* โหลด Google Identity Services เอง เพื่อจะรู้สถานะและลองใหม่ได้
+   iPad/Safari บางเครื่องโหลดสคริปต์นี้ช้าหรือโดนบล็อก แล้วผู้ใช้กดปุ่มก่อนที่มันจะพร้อม
+   → เดิมเด้ง 'gis-not-loaded' ทันทีโดยไม่บอกว่าต้องทำอะไรต่อ */
+window.GIS_STATE='loading';
+(function(){
+  var tries=0;
+  function ok(){ return !!(window.google && google.accounts && google.accounts.oauth2); }
+  function done(){ window.GIS_STATE='ready'; try{ window.PR && PR.onGisReady && PR.onGisReady(); }catch(e){} }
+  function load(){
+    if(ok()) return done();
+    tries++;
+    var s=document.createElement('script');
+    s.src='https://accounts.google.com/gsi/client'; s.async=true; s.defer=true;
+    s.onload=function(){ setTimeout(function(){ ok()? done() : fail(); }, 60); };
+    s.onerror=fail;
+    document.head.appendChild(s);
+    setTimeout(function(){ if(window.GIS_STATE==='loading' && !ok()) fail(); }, 9000);
+  }
+  function fail(){
+    if(ok()) return done();
+    if(tries<3){ setTimeout(load, 1500*tries); return; }
+    window.GIS_STATE='failed';
+    try{ window.PR && PR.onGisReady && PR.onGisReady(); }catch(e){}
+  }
+  load();
+})();
+</script>
 <script>
 /* ============================================================
    Port Recorder — JP Trust Learning (standalone, no login)
@@ -2598,7 +2625,9 @@ function ensureToken(interactive){
     if(!interactive){ rej(new Error('need-interactive')); return; } // ห้าม popup เองเด็ดขาด
     const cid=clientId();
     if(!cid){ rej(new Error('no-client-id')); return; }
-    if(!window.google || !google.accounts || !google.accounts.oauth2){ rej(new Error('gis-not-loaded')); return; }
+    if(!window.google || !google.accounts || !google.accounts.oauth2){
+      rej(new Error(window.GIS_STATE==='failed' ? 'gis-blocked' : 'gis-loading')); return;
+    }
     if(!tokenClient){
       tokenClient=google.accounts.oauth2.initTokenClient({client_id:cid, scope:DRIVE_SCOPE, callback:()=>{}});
     }
@@ -2662,6 +2691,25 @@ async function drivePull(interactive){
   }
   return false;
 }
+function driveErrMsg(e){
+  const m=(e&&e.message)||'';
+  if(m==='no-client-id')  return 'ระบบยังไม่พร้อม — ติดต่อ JP Trust Learning';
+  if(m==='gis-loading')   return 'กำลังโหลดระบบล็อกอิน Google — รอสักครู่แล้วกดใหม่อีกครั้ง';
+  if(m==='gis-blocked')   return 'โหลดระบบล็อกอิน Google ไม่ได้ — ปิดตัวบล็อกโฆษณา/ตัวติดตาม แล้วรีเฟรชหน้า (อย่าเปิดในโหมดส่วนตัว)';
+  if(m==='popup_closed_by_user'||m==='access_denied') return 'ยกเลิกการเชื่อมต่อ';
+  if(m==='popup_failed_to_open') return 'เบราว์เซอร์บล็อกหน้าต่างล็อกอิน — อนุญาต Pop-up ให้เว็บนี้แล้วลองใหม่';
+  return 'เชื่อมต่อไม่สำเร็จ: '+m;
+}
+/* ปุ่มเชื่อมต่อจะบอกสถานะเอง ผู้ใช้จะได้ไม่กดตอนที่ระบบยังโหลดไม่เสร็จ */
+function onGisReady(){ renderDrivePill(); renderSettings(); syncGisButtons(); }
+function syncGisButtons(){
+  const st=window.GIS_STATE||'loading';
+  document.querySelectorAll('[data-gis-btn]').forEach(b=>{
+    if(st==='ready'){ b.disabled=false; b.textContent=b.dataset.gisLabel||'เชื่อมต่อ Google Drive'; }
+    else if(st==='failed'){ b.disabled=false; b.textContent='ลองเชื่อมต่อ Google Drive อีกครั้ง'; }
+    else { b.disabled=true; b.textContent='กำลังเตรียมระบบ…'; }
+  });
+}
 async function driveConnect(){
   if(!clientId()){ toast('ระบบยังไม่พร้อม — ติดต่อ JP Trust Learning'); return; }
   try{
@@ -2679,7 +2727,7 @@ async function driveConnect(){
     toast('เชื่อมต่อ Google Drive แล้ว ✓ ข้อมูลจะซิงก์อัตโนมัติ');
   }catch(e){
     console.warn(e);
-    toast('เชื่อมต่อไม่สำเร็จ: '+(e.message==='no-client-id'?'ไม่มี Client ID':e.message));
+    toast(driveErrMsg(e));
   }
 }
 async function driveSyncNow(){
@@ -2729,7 +2777,7 @@ function renderSettings(){
 ============================================================ */
 function init(){
   loadLocal();
-  renderEye(); renderDrivePill(); renderAll(); renderSettings();
+  renderEye(); renderDrivePill(); renderAll(); renderSettings(); syncGisButtons();
   window.addEventListener('resize', ()=>{ drawEquity(); drawVsChart(); });
   document.addEventListener('visibilitychange', ()=>{
     if(document.visibilityState==='hidden' && DRIVE.connected && saveTimer){
@@ -2758,6 +2806,7 @@ return {openOwner,submitOwner,switchTab,gotoSettings,toggleMask,selectPort,openP
   onSlipFile,openManualAdd,maChoose,maSellTicker,confirmPending,deletePending,
   msToggle,msAuto,msSetMode,msRecalc,onMsAmountInput,onMsDate,msSellAllSel,msSubmit,
   setTf,setEqMode,setVsGran,delTgtRow,refreshPrices,
+  onGisReady,syncGisButtons,
   selectRbPort,rbUseCurrent,rbApplyNew,printRbPlan,renderRebalance,openTargetsModal,addTgtRow,updateTgtSum,submitTargets,
   setView,toggleDense,setSort,toggleGroup,openGa,gaAssign,gaCreateAssign,openGm,gmAddRow,gmDelRow,gmSubmit,deleteSell,openPm,pmDelete,
   driveConnect,driveSyncNow,driveDisconnect,drivePillTap};
