@@ -494,9 +494,11 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
       <div class="set-row">
         <button class="btn-primary" style="flex:0 1 auto;padding:10px 18px;font-size:.82rem" id="driveConnectBtn" data-gis-btn data-gis-label="เชื่อมต่อ Google Drive" onclick="PR.driveConnect()">เชื่อมต่อ Google Drive</button>
         <button class="btn-secondary" style="flex:0 1 auto;padding:10px 16px;font-size:.8rem" id="driveSyncBtn" onclick="PR.driveSyncNow()" disabled>ซิงก์ตอนนี้</button>
+        <button class="btn-secondary" style="flex:0 1 auto;padding:10px 16px;font-size:.8rem" id="driveForceBtn" onclick="PR.driveForcePull()" disabled>ดึงจาก Drive ทับเครื่องนี้</button>
         <button class="btn-danger-ghost" id="driveDisconnectBtn" onclick="PR.driveDisconnect()" style="display:none">ยกเลิกการเชื่อมต่อ</button>
       </div>
       <div class="field-hint" id="driveLastSync" style="margin-top:8px"></div>
+      <div class="field-hint" id="storeHealth" style="margin-top:4px"></div>
     </div>
 
     <div style="text-align:center;font-size:.68rem;color:var(--text-muted);padding:6px 10px 0;line-height:1.7">Port Recorder เป็นเครื่องมือบันทึกข้อมูลส่วนบุคคล ไม่ใช่คำแนะนำการลงทุน<br>© JP Trust Learning</div>
@@ -769,6 +771,8 @@ let openGroups = {};
 let tokenClient = null;
 let saveTimer = null;
 let needAuth = false, syncToastShown = false;
+let pushing = false, pushQueued = false;      // single-flight guard สำหรับ drivePush
+let lsFailShown = false, lastLocalOk = true;  // สถานะการเขียน localStorage
 
 /* ---------- UTILS ---------- */
 const $ = id => document.getElementById(id);
@@ -790,6 +794,8 @@ function normalizeData(){
   if(!D || !Array.isArray(D.portfolios)) D = freshData();
   D.portfolios.forEach(p=>{ if(!p.targets) p.targets={}; if(p.tolerance==null) p.tolerance=0; if(p.rbNew==null) p.rbNew=0; if(!Array.isArray(p.groups)) p.groups=[]; });
   ['lots','sells','pending'].forEach(k=>{ if(!Array.isArray(D[k])) D[k]=[]; });
+  // rev = ตัวนับรุ่นข้อมูล เพิ่มทุกครั้งที่บันทึก ใช้ตัดสินว่าเครื่องหรือ Drive ใหม่กว่ากัน
+  if(typeof D.rev!=='number' || !isFinite(D.rev)) D.rev=0;
   // ย้ายค่า Tolerance ครั้งเดียว: 2 คือ default เก่าที่ระบบเซฟให้เองทุกครั้งที่เปิดหน้าปรับสมดุล
   // ไม่ใช่ค่าที่ผู้ใช้ตั้งเอง → เปลี่ยนเป็น 0. ตั้งธงไว้ ถ้าหลังจากนี้ผู้ใช้พิมพ์ 2 เองจะไม่โดนทับอีก
   if(!D.migTol0){
@@ -806,27 +812,54 @@ function loadLocal(){
   mask = localStorage.getItem(LS_MASK)==='1';
 }
 function persistLocal(){
-  try{ localStorage.setItem(LS_DATA, JSON.stringify(D)); }catch(e){ console.warn('LS full?',e); }
+  let ok=true;
+  try{ localStorage.setItem(LS_DATA, JSON.stringify(D)); }
+  catch(e){ ok=false; console.warn('localStorage write failed', e); }
   try{ localStorage.setItem(LS_PRICES, JSON.stringify(PRICES)); }catch(e){}
+  lastLocalOk=ok;
+  return ok;
+}
+function dataSizeKB(){ try{ return Math.round(JSON.stringify(D).length/1024); }catch(e){ return -1; } }
+/* เขียนลงเครื่องไม่ได้ = ห้ามเงียบ ไม่งั้นผู้ใช้เห็นว่า 'บันทึกแล้ว' ทั้งที่รีเฟรชแล้วหาย */
+function warnLocalWriteFailed(){
+  if(lsFailShown) return; lsFailShown=true;
+  showAlert('⚠ บันทึกลงเครื่องไม่สำเร็จ',
+    'ข้อมูลในแอปใหญ่เกินที่เบราว์เซอร์ยอมให้เก็บแล้ว (~'+dataSizeKB().toLocaleString()+' KB)<br><br>'+
+    'รายการที่เพิ่งบันทึก <b>จะหายเมื่อรีเฟรช</b> ถ้ายังซิงก์ขึ้น Drive ไม่สำเร็จ<br><br>'+
+    'แตะป้าย Drive ด้านบนเพื่อซิงก์ทันที แล้วรอจนขึ้นว่าซิงก์แล้วค่อยปิดแอป',
+    'เข้าใจแล้ว');
 }
 function saveData(){
-  persistLocal();
+  D.rev=(Number(D.rev)||0)+1;
+  D.savedAt=new Date().toISOString();
+  if(!persistLocal()) warnLocalWriteFailed();
   if(DRIVE.connected){
     DRIVE.dirty=true; persistDrive();
     clearTimeout(saveTimer);
-    saveTimer=setTimeout(()=>{ saveTimer=null;
-      drivePush(false).catch(e=>{
-        console.warn('drive push',e);
-        if(String(e.message).indexOf('need-interactive')>=0){
-          needAuth=true; renderDrivePill();
-          if(!syncToastShown){ syncToastShown=true; toast('เซสชัน Google หมดเวลา — ข้อมูลเก็บในเครื่องแล้ว แตะป้าย Drive ด้านบนเพื่อซิงก์'); }
-        }else{
-          toast('⚠ ซิงก์ขึ้น Drive ไม่สำเร็จ — จะลองใหม่อัตโนมัติ');
-          setTimeout(()=>drivePush(false).catch(()=>{}), 8000);
-        }
-      });
-    }, 1000);
+    saveTimer=setTimeout(()=>{ saveTimer=null; requestPush(false); }, 1000);
   }
+}
+/* single-flight: ห้ามมี drivePush ซ้อนกันเด็ดขาด
+   ถ้าปล่อยให้ซ้อน ตัวที่ยิงก่อน (ข้อมูลเก่ากว่า) อาจไปถึง Drive ทีหลัง = ทับข้อมูลใหม่ทิ้ง
+   มีคำขอเข้ามาระหว่างกำลัง push → ตั้งธง pushQueued ไว้ แล้ว push อีกรอบด้วย snapshot ล่าสุด */
+async function requestPush(interactive){
+  if(pushing){ pushQueued=true; return; }
+  pushing=true;
+  try{
+    do{
+      pushQueued=false;
+      await drivePush(interactive);
+    }while(pushQueued);
+  }catch(e){
+    console.warn('drive push',e);
+    if(String(e&&e.message).indexOf('need-interactive')>=0){
+      needAuth=true; renderDrivePill();
+      if(!syncToastShown){ syncToastShown=true; toast('เซสชัน Google หมดเวลา — ข้อมูลเก็บในเครื่องแล้ว แตะป้าย Drive ด้านบนเพื่อซิงก์'); }
+    }else{
+      toast('⚠ ซิงก์ขึ้น Drive ไม่สำเร็จ — จะลองใหม่อัตโนมัติ');
+      setTimeout(()=>{ if(DRIVE.dirty) requestPush(false); }, 8000);
+    }
+  }finally{ pushing=false; }
 }
 function requireDrive(){
   if(DRIVE.connected) return true;
@@ -2664,7 +2697,8 @@ async function driveFindDataFile(interactive){
   return null;
 }
 async function drivePush(interactive){
-  const payload=JSON.stringify({data:D, prices:PRICES, savedAt:new Date().toISOString()});
+  const revAtStart=Number(D.rev)||0;
+  const payload=JSON.stringify({data:D, prices:PRICES, rev:revAtStart, savedAt:new Date().toISOString()});
   let fileId=await driveFindDataFile(interactive);
   if(fileId){
     await gapi('https://www.googleapis.com/upload/drive/v3/files/'+fileId+'?uploadType=media',{method:'PATCH',headers:{'Content-Type':'application/json'},body:payload}, interactive);
@@ -2677,19 +2711,48 @@ async function drivePush(interactive){
     const r=await gapi('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+boundary},body}, interactive);
     const j=await r.json(); DRIVE.dataFileId=j.id;
   }
-  DRIVE.lastSync=Date.now(); DRIVE.dirty=false; needAuth=false;
+  DRIVE.lastSync=Date.now(); needAuth=false;
+  // เคลียร์ dirty ได้เฉพาะเมื่อสิ่งที่เพิ่งอัปโหลดคือข้อมูลล่าสุดจริงๆ
+  // ถ้าผู้ใช้บันทึกเพิ่มระหว่างอัปโหลด ต้องคง dirty ไว้แล้วยิงอีกรอบ
+  if((Number(D.rev)||0)===revAtStart) DRIVE.dirty=false; else pushQueued=true;
   persistDrive(); renderDrivePill(); renderSettings();
 }
 async function drivePull(interactive){
   const fileId=await driveFindDataFile(interactive); if(!fileId) return false;
+  const revBefore=Number(D.rev)||0;
   const r=await gapi('https://www.googleapis.com/drive/v3/files/'+fileId+'?alt=media', null, interactive);
   const j=await r.json();
+  // ระหว่างดาวน์โหลด ถ้าผู้ใช้บันทึกอะไรใหม่ = ยกเลิก ห้ามทับเด็ดขาด
+  if((Number(D.rev)||0)!==revBefore) return false;
   if(j&&j.data&&Array.isArray(j.data.portfolios)){
     D=j.data; if(j.prices) PRICES=j.prices;
     normalizeData();
     persistLocal(); return true;
   }
   return false;
+}
+/* ตัวตัดสินใจกลาง — เทียบ rev สองฝั่งแล้วให้ฝั่งที่ใหม่กว่าชนะ
+   เดิมใช้ธง dirty อย่างเดียว ทำให้ 'เครื่องที่ข้อมูลเก่าแต่ dirty=true' push ทับของดีบน Drive ได้ */
+async function driveSync(interactive){
+  const fileId=await driveFindDataFile(interactive);
+  if(!fileId){ await requestPush(interactive); return 'push'; }
+  const revBefore=Number(D.rev)||0;
+  const r=await gapi('https://www.googleapis.com/drive/v3/files/'+fileId+'?alt=media', null, interactive);
+  const j=await r.json();
+  if((Number(D.rev)||0)!==revBefore){ await requestPush(interactive); return 'push'; }
+  const rRev=(j&&j.data&&Number(j.data.rev))||0;
+  const lRev=Number(D.rev)||0;
+  const takeRemote = (rRev!==lRev) ? (rRev>lRev) : !DRIVE.dirty;   // เสมอ = ใช้พฤติกรรมเดิม
+  if(takeRemote && j && j.data && Array.isArray(j.data.portfolios)){
+    D=j.data; if(j.prices) PRICES=j.prices;
+    normalizeData(); persistLocal();
+    DRIVE.dirty=false; DRIVE.lastSync=Date.now(); needAuth=false;
+    persistDrive(); renderDrivePill(); renderSettings();
+    renderAll(); renderPending();
+    return 'pull';
+  }
+  await requestPush(interactive);
+  return 'push';
 }
 function driveErrMsg(e){
   const m=(e&&e.message)||'';
@@ -2720,7 +2783,7 @@ async function driveConnect(){
       const ok=await drivePull(true);
       if(ok) toast('ดึงข้อมูลเดิมจาก Drive แล้ว ✓');
     }else{
-      await drivePush(true);
+      await requestPush(true);
     }
     DRIVE.connected=true; persistDrive();
     renderDrivePill(); renderSettings(); renderAll();
@@ -2732,14 +2795,26 @@ async function driveConnect(){
 }
 async function driveSyncNow(){
   try{
-    if(DRIVE.dirty){ await drivePush(true); }
-    else{
-      const ok=await drivePull(true);
-      if(ok){ renderAll(); renderPending(); }
-      DRIVE.lastSync=Date.now(); needAuth=false; persistDrive(); renderDrivePill(); renderSettings();
-    }
-    toast('ซิงก์แล้ว ✓');
+    const how=await driveSync(true);
+    DRIVE.lastSync=Date.now(); needAuth=false; persistDrive(); renderDrivePill(); renderSettings();
+    toast(how==='pull' ? 'ดึงข้อมูลล่าสุดจาก Drive แล้ว ✓' : 'ซิงก์ขึ้น Drive แล้ว ✓');
   }catch(e){ toast('ซิงก์ไม่สำเร็จ: '+(String(e.message).indexOf('need-interactive')>=0?'ยกเลิกการยืนยันตัวตน':e.message)); }
+}
+/* ปุ่มกู้ข้อมูล — บังคับเอาของบน Drive ทับเครื่องนี้ ใช้เมื่อเครื่องนี้ค้างข้อมูลเก่า/เพี้ยน */
+function driveForcePull(){
+  showConfirm('ดึงข้อมูลจาก Drive ทับเครื่องนี้?',
+    'ข้อมูลในเครื่องนี้ที่ยังไม่ได้ซิงก์ <b>จะถูกแทนที่ทั้งหมด</b><br>ใช้เมื่อเครื่องนี้แสดงข้อมูลเก่าหรือผิดพลาด',
+    'ดึงทับเลย', ()=>{
+      clearTimeout(saveTimer); saveTimer=null;
+      DRIVE.dirty=false; persistDrive();
+      drivePull(true).then(ok=>{
+        if(ok){
+          DRIVE.lastSync=Date.now(); needAuth=false; persistDrive();
+          renderDrivePill(); renderSettings(); renderAll(); renderPending();
+          toast('ดึงข้อมูลจาก Drive แล้ว ✓');
+        }else toast('ไม่พบไฟล์ข้อมูลบน Drive');
+      }).catch(e=>toast('ดึงไม่สำเร็จ: '+e.message));
+    });
 }
 function drivePillTap(){
   if(DRIVE.connected) driveSyncNow();
@@ -2770,29 +2845,33 @@ function renderSettings(){
   $('driveConnectBtn').style.display = on?'none':'';
   $('driveDisconnectBtn').style.display = on?'':'none';
   $('driveSyncBtn').disabled=!on;
+  const fb=$('driveForceBtn'); if(fb) fb.disabled=!on;
   $('driveLastSync').textContent = DRIVE.lastSync? ('ซิงก์ล่าสุด: '+new Date(DRIVE.lastSync).toLocaleString('th-TH')):'';
+  const sh=$('storeHealth');
+  if(sh){
+    sh.innerHTML='ขนาดข้อมูล: '+dataSizeKB().toLocaleString()+' KB · เก็บลงเครื่อง: '+
+      (lastLocalOk?'ปกติ':'<b style="color:#C0392B">เกินเพดานเบราว์เซอร์ — ต้องซิงก์ Drive ทุกครั้งก่อนปิดแอป</b>');
+  }
 }
 /* ============================================================
    INIT
 ============================================================ */
 function init(){
   loadLocal();
+  persistLocal();   // เช็คตั้งแต่เปิดว่าเครื่องยังเขียนไหวไหม (แสดงในแท็บตั้งค่า)
   renderEye(); renderDrivePill(); renderAll(); renderSettings(); syncGisButtons();
   window.addEventListener('resize', ()=>{ drawEquity(); drawVsChart(); });
   document.addEventListener('visibilitychange', ()=>{
-    if(document.visibilityState==='hidden' && DRIVE.connected && saveTimer){
-      clearTimeout(saveTimer); saveTimer=null; drivePush().catch(()=>{});
+    if(document.visibilityState==='hidden' && DRIVE.connected && (saveTimer||DRIVE.dirty)){
+      clearTimeout(saveTimer); saveTimer=null; requestPush(false);
     }
   });
   if(DRIVE.connected){
     if(driveToken()){
-      if(DRIVE.dirty){
-        // มีการแก้ในเครื่องที่ยังไม่ได้ push (เช่น เปลี่ยนชื่อพอร์ตแล้วปิดแอปก่อนซิงก์) → push ก่อน ห้าม pull ทับ
-        drivePush(false).catch(e=>{ console.warn('init push',e);
-          if(String(e&&e.message).indexOf('need-interactive')>=0){ needAuth=true; renderDrivePill(); } });
-      }else{
-        drivePull(false).then(ch=>{ if(ch){ renderAll(); renderPending(); } }).catch(e=>console.warn('pull',e));
-      }
+      // เทียบ rev ทั้งสองฝั่งก่อนเสมอ — ใครใหม่กว่าชนะ
+      // ไม่ push ของเก่าทับของใหม่ และไม่ pull ทับของที่เพิ่งบันทึก
+      driveSync(false).catch(e=>{ console.warn('init sync',e);
+        if(String(e&&e.message).indexOf('need-interactive')>=0){ needAuth=true; renderDrivePill(); } });
     }else{
       needAuth=true; renderDrivePill(); // เงียบๆ ไม่มี popup — ใช้ข้อมูล cache ในเครื่องไปก่อน
     }
@@ -2809,7 +2888,7 @@ return {openOwner,submitOwner,switchTab,gotoSettings,toggleMask,selectPort,openP
   onGisReady,syncGisButtons,
   selectRbPort,rbUseCurrent,rbApplyNew,printRbPlan,renderRebalance,openTargetsModal,addTgtRow,updateTgtSum,submitTargets,
   setView,toggleDense,setSort,toggleGroup,openGa,gaAssign,gaCreateAssign,openGm,gmAddRow,gmDelRow,gmSubmit,deleteSell,openPm,pmDelete,
-  driveConnect,driveSyncNow,driveDisconnect,drivePillTap};
+  driveConnect,driveSyncNow,driveForcePull,driveDisconnect,drivePillTap};
 })();
 
 </script>
