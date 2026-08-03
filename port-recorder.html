@@ -740,7 +740,8 @@ const DEFAULT_WORKER_URL = 'https://port-price.jptrustlearning.workers.dev';
 const DEFAULT_CLIENT_ID  = '732793988196-3bmbv27oatacajf50rmq8otp9k1mjqb3.apps.googleusercontent.com';
 const DRIVE_SCOPE   = 'https://www.googleapis.com/auth/drive.file';
 const DRIVE_FOLDER  = 'JP Port Recorder';
-const DATA_FILENAME = 'portfolio-data.json';
+const DATA_FILENAME   = 'portfolio-data.json';
+const PRICES_FILENAME = 'prices.json';   // ราคาย้อนหลังแยกไฟล์ — โตทุกวันแต่หายแล้วดึงใหม่ได้
 const SLIP_FOLDER   = 'slips';   // โฟลเดอร์ย่อยเก็บรูปสลิปแยกเป็นไฟล์ต่อรายการ
 const SLIP_PH       = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 const PORT_COLORS   = ['#722F37','#B8860B','#2E9F5F','#8B2252','#5A3D20','#1F6F8B','#C0392B','#6B4E9B','#3C7A57','#A8642A'];
@@ -778,6 +779,7 @@ let pushing = false, pushQueued = false;      // single-flight guard สำห�
 const slipCache = new Map();                  // fileId -> objectURL/dataURL (ต่อ session)
 let migRunning = false, migTimer = null;      // สถานะการย้ายสลิปขึ้น Drive
 let syncSettled = false;                      // driveSync ตัดสินเสร็จแล้วหรือยัง (ประตูของ migration)
+let pushingPrices = false, pricesQueued = false, pricesTimer = null;
 let lsFailShown = false, lastLocalOk = true;  // สถานะการเขียน localStorage
 
 /* ---------- UTILS ---------- */
@@ -842,6 +844,7 @@ function persistLocal(){
 }
 function dataSizeKB(){ try{ return Math.round(JSON.stringify(localSnapshot()).length/1024); }catch(e){ return -1; } }
 function driveSizeKB(){ try{ return Math.round(JSON.stringify(D).length/1024); }catch(e){ return -1; } }
+function pricesSizeKB(){ try{ return Math.round(JSON.stringify(PRICES).length/1024); }catch(e){ return -1; } }
 function slipPending(){
   const out=[];
   ['lots','sells','pending'].forEach(k=>{ (D[k]||[]).forEach(it=>{ if(it && it.slip) out.push(it); }); });
@@ -889,16 +892,17 @@ async function requestPush(interactive){
     }
   }finally{ pushing=false; }
 }
-/* saveAux = บันทึกที่ไม่ใช่การแก้ข้อมูลของผู้ใช้ (เช่น ราคาที่เพิ่งโหลดมา)
+/* savePrices = ราคาที่เพิ่งโหลดมา ไม่ใช่การแก้ข้อมูลของผู้ใช้
    ห้ามเดิน D.rev เพราะ rev คือตัวชี้ว่า "ข้อมูลผู้ใช้" ฝั่งไหนใหม่กว่า
    บั๊กเดิม: refreshPrices เรียก saveData ตอนเปิดแอป -> rev เดินทุกครั้ง
-   -> driveSync คิดว่าผู้ใช้แก้อะไรระหว่างดาวน์โหลด -> ยกเลิก pull แล้ว push ของเก่าทับ */
-function saveAux(){
+   -> driveSync คิดว่าผู้ใช้แก้อะไรระหว่างดาวน์โหลด -> ยกเลิก pull แล้ว push ของเก่าทับ
+   และตอนนี้ราคาแยกไฟล์แล้ว จึงยิงเฉพาะ prices.json ไม่ไปแตะไฟล์ข้อมูลเลย */
+function savePrices(){
   persistLocal();
   if(!DRIVE.connected || !syncSettled) return;   // ยังซิงก์ไม่จบ = ห้าม push ทับ
-  DRIVE.dirty=true; persistDrive();
-  clearTimeout(saveTimer);
-  saveTimer=setTimeout(()=>{ saveTimer=null; requestPush(false); }, 1000);
+  DRIVE.pricesDirty=true; persistDrive();
+  clearTimeout(pricesTimer);
+  pricesTimer=setTimeout(()=>{ pricesTimer=null; requestPushPrices(false); }, 1500);
 }
 function requireDrive(){
   if(DRIVE.connected) return true;
@@ -1736,7 +1740,7 @@ async function refreshPrices(manual){
   if(btn){ btn.disabled=false; btn.textContent='⟳ ราคา'; }
   renderAll();
   if(manual) toast(fail? ('อัพเดตแล้ว '+ok+' · ไม่สำเร็จ '+fail+' ticker') : 'อัพเดตราคาแล้ว ✓');
-  saveAux();
+  savePrices();
 }
 
 /* ============================================================
@@ -2853,9 +2857,76 @@ function scheduleSlipMigration(){
   clearTimeout(migTimer);
   migTimer=setTimeout(()=>migrateSlips(false), 1500);
 }
+/* ---------- ไฟล์ราคา (prices.json) แยกจากไฟล์ข้อมูล ---------- */
+async function driveFindPricesFile(interactive){
+  if(DRIVE.pricesFileId) return DRIVE.pricesFileId;
+  const fid=await driveEnsureFolder(interactive);
+  const q=encodeURIComponent("name='"+PRICES_FILENAME+"' and '"+fid+"' in parents and trashed=false");
+  const r=await gapi('https://www.googleapis.com/drive/v3/files?q='+q+'&fields=files(id)', null, interactive);
+  const j=await r.json();
+  if(j.files&&j.files.length){ DRIVE.pricesFileId=j.files[0].id; persistDrive(); return DRIVE.pricesFileId; }
+  return null;
+}
+async function drivePushPrices(interactive){
+  const payload=JSON.stringify({prices:PRICES, savedAt:new Date().toISOString()});
+  let fileId=await driveFindPricesFile(interactive);
+  if(fileId){
+    await gapi('https://www.googleapis.com/upload/drive/v3/files/'+fileId+'?uploadType=media',
+      {method:'PATCH',headers:{'Content-Type':'application/json'},body:payload}, interactive);
+  }else{
+    const fid=await driveEnsureFolder(interactive);
+    const meta={name:PRICES_FILENAME,parents:[fid],mimeType:'application/json'};
+    const boundary='prp'+Date.now();
+    const body='--'+boundary+'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n'+JSON.stringify(meta)
+      +'\r\n--'+boundary+'\r\nContent-Type: application/json\r\n\r\n'+payload+'\r\n--'+boundary+'--';
+    const r=await gapi('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',
+      {method:'POST',headers:{'Content-Type':'multipart/related; boundary='+boundary},body}, interactive);
+    const j=await r.json(); DRIVE.pricesFileId=j.id;
+  }
+  DRIVE.pricesDirty=false; DRIVE.pricesSync=Date.now();
+  persistDrive(); renderSettings();
+}
+/* single-flight เหมือนฝั่งข้อมูล — ราคาชนกันเองไม่ได้ */
+async function requestPushPrices(interactive){
+  if(pushingPrices){ pricesQueued=true; return; }
+  pushingPrices=true;
+  try{
+    do{ pricesQueued=false; await drivePushPrices(interactive); }while(pricesQueued);
+  }catch(e){
+    console.warn('prices push',e);
+    if(String(e&&e.message).indexOf('need-interactive')<0)
+      setTimeout(()=>{ if(DRIVE.pricesDirty) requestPushPrices(false); }, 12000);
+  }finally{ pushingPrices=false; }
+}
+/* ดึงราคาจาก Drive แล้ว "รวม" กับของในเครื่อง ไม่ทับ — ราคาเป็นข้อมูลสะสม ยิ่งรวมยิ่งครบ */
+async function drivePullPrices(interactive){
+  const fileId=await driveFindPricesFile(interactive); if(!fileId) return false;
+  const r=await gapi('https://www.googleapis.com/drive/v3/files/'+fileId+'?alt=media', null, interactive);
+  const j=await r.json();
+  if(!j || !j.prices) return false;
+  Object.keys(j.prices).forEach(tk=>{
+    const s=j.prices[tk];
+    if(s && Array.isArray(s.dates) && s.dates.length) mergeSeries(tk, s);
+  });
+  persistLocal();
+  return true;
+}
+/* ไฟล์รุ่นเก่ามี prices ฝังอยู่ในไฟล์ข้อมูล -> ย้ายออกมาไว้ prices.json
+   ต้องอัปไฟล์ราคาให้สำเร็จ "ก่อน" ที่ไฟล์ข้อมูลรุ่นใหม่ (ไม่มี prices) จะถูกเขียนทับ */
+async function absorbInlinePrices(j, interactive){
+  if(!j || !j.prices || !Object.keys(j.prices).length) return false;
+  Object.keys(j.prices).forEach(tk=>{
+    const s=j.prices[tk];
+    if(s && Array.isArray(s.dates) && s.dates.length) mergeSeries(tk, s);
+  });
+  persistLocal();
+  DRIVE.pricesDirty=true; persistDrive();
+  if(interactive!==undefined) await requestPushPrices(interactive);
+  return true;
+}
 async function drivePush(interactive){
   const revAtStart=Number(D.rev)||0;
-  const payload=JSON.stringify({data:D, prices:PRICES, rev:revAtStart, savedAt:new Date().toISOString()});
+  const payload=JSON.stringify({data:D, rev:revAtStart, savedAt:new Date().toISOString()});
   let fileId=await driveFindDataFile(interactive);
   if(fileId){
     await gapi('https://www.googleapis.com/upload/drive/v3/files/'+fileId+'?uploadType=media',{method:'PATCH',headers:{'Content-Type':'application/json'},body:payload}, interactive);
@@ -2882,9 +2953,11 @@ async function drivePull(interactive){
   // ระหว่างดาวน์โหลด ถ้าผู้ใช้บันทึกอะไรใหม่ = ยกเลิก ห้ามทับเด็ดขาด
   if((Number(D.rev)||0)!==revBefore) return false;
   if(j&&j.data&&Array.isArray(j.data.portfolios)){
-    D=j.data; if(j.prices) PRICES=j.prices;
+    D=j.data;
     normalizeData();
-    persistLocal(); return true;
+    persistLocal();
+    absorbInlinePrices(j).catch(()=>{});   // ไฟล์รุ่นเก่าที่ยังมี prices ฝังอยู่
+    return true;
   }
   return false;
 }
@@ -2901,17 +2974,29 @@ async function driveSync(interactive){
   const lRev=Number(D.rev)||0;
   const takeRemote = (rRev!==lRev) ? (rRev>lRev) : !DRIVE.dirty;   // เสมอ = ใช้พฤติกรรมเดิม
   if(takeRemote && j && j.data && Array.isArray(j.data.portfolios)){
-    D=j.data; if(j.prices) PRICES=j.prices;
+    D=j.data;
     normalizeData(); persistLocal();
     DRIVE.dirty=false; DRIVE.lastSync=Date.now(); needAuth=false;
     persistDrive(); renderDrivePill(); renderSettings();
     renderAll(); renderPending();
     syncSettled=true; scheduleSlipMigration();
+    await settlePrices(j, interactive);
     return 'pull';
   }
   await requestPush(interactive);
   syncSettled=true; scheduleSlipMigration();
+  await settlePrices(j, interactive);
   return 'push';
+}
+/* จัดการฝั่งราคาหลังไฟล์ข้อมูลลงตัวแล้ว — ไม่ให้สองไฟล์แย่งกันอัปตอนเปิดแอป */
+async function settlePrices(j, interactive){
+  try{
+    const moved=await absorbInlinePrices(j, interactive);
+    if(moved) return;                       // ย้ายของเก่าออกมาแล้ว ไม่ต้อง pull ซ้ำ
+    await drivePullPrices(interactive);
+    if(DRIVE.pricesDirty) await requestPushPrices(interactive);
+    renderAll();
+  }catch(e){ console.warn('prices sync', e); }
 }
 function driveErrMsg(e){
   const m=(e&&e.message)||'';
@@ -3015,7 +3100,7 @@ function renderSettings(){
   }
   const sh=$('storeHealth');
   if(sh){
-    sh.innerHTML='ขนาดข้อมูลในเครื่อง: '+dataSizeKB().toLocaleString()+' KB · เก็บลงเครื่อง: '+
+    sh.innerHTML='ข้อมูลซื้อขาย: '+dataSizeKB().toLocaleString()+' KB · ราคาย้อนหลัง: '+pricesSizeKB().toLocaleString()+' KB<br>เก็บลงเครื่อง: '+
       (lastLocalOk?'ปกติ':'<b style="color:#C0392B">เกินเพดานเบราว์เซอร์</b>')+
       (nPend? '<br>รูปสลิปที่ยังไม่ได้ย้ายขึ้น Drive: <b>'+nPend+' รูป</b> (ไฟล์บน Drive '+driveSizeKB().toLocaleString()+' KB)' : '');
   }
