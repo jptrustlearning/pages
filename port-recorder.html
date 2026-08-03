@@ -777,6 +777,7 @@ let needAuth = false, syncToastShown = false;
 let pushing = false, pushQueued = false;      // single-flight guard สำหรับ drivePush
 const slipCache = new Map();                  // fileId -> objectURL/dataURL (ต่อ session)
 let migRunning = false, migTimer = null;      // สถานะการย้ายสลิปขึ้น Drive
+let syncSettled = false;                      // driveSync ตัดสินเสร็จแล้วหรือยัง (ประตูของ migration)
 let lsFailShown = false, lastLocalOk = true;  // สถานะการเขียน localStorage
 
 /* ---------- UTILS ---------- */
@@ -887,6 +888,17 @@ async function requestPush(interactive){
       setTimeout(()=>{ if(DRIVE.dirty) requestPush(false); }, 8000);
     }
   }finally{ pushing=false; }
+}
+/* saveAux = บันทึกที่ไม่ใช่การแก้ข้อมูลของผู้ใช้ (เช่น ราคาที่เพิ่งโหลดมา)
+   ห้ามเดิน D.rev เพราะ rev คือตัวชี้ว่า "ข้อมูลผู้ใช้" ฝั่งไหนใหม่กว่า
+   บั๊กเดิม: refreshPrices เรียก saveData ตอนเปิดแอป -> rev เดินทุกครั้ง
+   -> driveSync คิดว่าผู้ใช้แก้อะไรระหว่างดาวน์โหลด -> ยกเลิก pull แล้ว push ของเก่าทับ */
+function saveAux(){
+  persistLocal();
+  if(!DRIVE.connected || !syncSettled) return;   // ยังซิงก์ไม่จบ = ห้าม push ทับ
+  DRIVE.dirty=true; persistDrive();
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{ saveTimer=null; requestPush(false); }, 1000);
 }
 function requireDrive(){
   if(DRIVE.connected) return true;
@@ -1196,6 +1208,15 @@ function sellHistoryHtml(l){
   }).join('')+'</div>';
 }
 /* ---------- SLIP IMAGES (เก็บเป็นไฟล์แยกบน Drive) ---------- */
+/* ย้ายรูปจากรายการรอไปยังไม้/รายการขาย — ต้องส่งทั้ง slip (ยังไม่ย้าย) และ slipId (ย้ายแล้ว)
+   บั๊กเดิม: ส่งแต่ slip พอ migration ย้ายรูปขึ้น Drive ก่อนที่ผู้ใช้จะกดยืนยัน
+   pd.slip จะหายไปแล้ว รายการที่สร้างจึงไม่มีรูปติดไปเลย */
+function carrySlip(dst, pd){
+  if(!dst || !pd) return dst;
+  if(pd.slip)   dst.slip   = pd.slip;
+  if(pd.slipId) dst.slipId = pd.slipId;
+  return dst;
+}
 function slipTag(it, kind, sizeStyle){
   if(!it) return '';
   const click=' onclick="event.stopPropagation();PR.viewSlip(\''+it.id+'\',\''+kind+'\')"';
@@ -1509,7 +1530,7 @@ function submitLot(){
     const lot={id:uid(),ticker:tk,price,shares,amount,date,portfolioId:pid,slip:null,createdAt:Date.now()};
     if(pendingToConvert){
       const pd=D.pending.find(p=>p.id===pendingToConvert);
-      if(pd){ lot.slip=pd.slip||null; D.pending=D.pending.filter(p=>p.id!==pendingToConvert); }
+      if(pd){ carrySlip(lot, pd); D.pending=D.pending.filter(p=>p.id!==pendingToConvert); }
     }
     D.lots.push(lot);
   }
@@ -1633,7 +1654,7 @@ function submitSell(){
   const sell={id:uid(),lotId:l.id,shares,price,date,createdAt:Date.now()};
   if(sellPendingId){
     const pd=D.pending.find(p=>p.id===sellPendingId);
-    if(pd){ if(pd.slip) sell.slip=pd.slip; D.pending=D.pending.filter(p=>p.id!==sellPendingId); }
+    if(pd){ carrySlip(sell, pd); D.pending=D.pending.filter(p=>p.id!==sellPendingId); }
     sellPendingId=null;
   }
   D.sells.push(sell);
@@ -1715,7 +1736,7 @@ async function refreshPrices(manual){
   if(btn){ btn.disabled=false; btn.textContent='⟳ ราคา'; }
   renderAll();
   if(manual) toast(fail? ('อัพเดตแล้ว '+ok+' · ไม่สำเร็จ '+fail+' ticker') : 'อัพเดตราคาแล้ว ✓');
-  if(DRIVE.connected) saveData();
+  saveAux();
 }
 
 /* ============================================================
@@ -2373,7 +2394,7 @@ function msSubmit(){
   cutLots.forEach(id=>{
     const l=D.lots.find(x=>x.id===id); const cut=a.cuts[id];
     const sell={id:uid(),lotId:id,shares:cut,price,date,createdAt:Date.now()};
-    if(first && pd && pd.slip){ sell.slip=pd.slip; first=false; }
+    if(first && pd && (pd.slip||pd.slipId)){ carrySlip(sell, pd); first=false; }
     pnl+=(price-l.price)*cut;
     D.sells.push(sell);
   });
@@ -2821,12 +2842,16 @@ async function migrateSlips(interactive){
     else if(fail) toast('ย้ายรูปไม่สำเร็จ — แตะป้าย Drive เพื่อยืนยันตัวตนแล้วลองใหม่');
   }
 }
-function migrateSlipsNow(){ migrateSlips(true); }
+function migrateSlipsNow(){ syncSettled=true; migrateSlips(true); }
+/* ห้ามเริ่มย้ายรูปก่อนที่ driveSync จะตัดสินเสร็จว่าจะใช้ข้อมูลชุดไหน
+   บั๊กเดิม: ตั้งเวลา 5.5 วิ แล้วเริ่มเลย — ระหว่างนั้นไฟล์ 4.9 MB ยังโหลดไม่เสร็จ
+   migration จึงทำงานบนข้อมูลเก่าในเครื่อง แล้ว push ทับของจริงบน Drive */
 function scheduleSlipMigration(){
   if(migRunning || !DRIVE.connected || !driveToken()) return;
+  if(!syncSettled) return;              // ← ประตูใหม่
   if(!slipPending().length) return;
   clearTimeout(migTimer);
-  migTimer=setTimeout(()=>migrateSlips(false), 3000);
+  migTimer=setTimeout(()=>migrateSlips(false), 1500);
 }
 async function drivePush(interactive){
   const revAtStart=Number(D.rev)||0;
@@ -2867,11 +2892,11 @@ async function drivePull(interactive){
    เดิมใช้ธง dirty อย่างเดียว ทำให้ 'เครื่องที่ข้อมูลเก่าแต่ dirty=true' push ทับของดีบน Drive ได้ */
 async function driveSync(interactive){
   const fileId=await driveFindDataFile(interactive);
-  if(!fileId){ await requestPush(interactive); return 'push'; }
+  if(!fileId){ await requestPush(interactive); syncSettled=true; scheduleSlipMigration(); return 'push'; }
   const revBefore=Number(D.rev)||0;
   const r=await gapi('https://www.googleapis.com/drive/v3/files/'+fileId+'?alt=media', null, interactive);
   const j=await r.json();
-  if((Number(D.rev)||0)!==revBefore){ await requestPush(interactive); return 'push'; }
+  if((Number(D.rev)||0)!==revBefore){ await requestPush(interactive); syncSettled=true; scheduleSlipMigration(); return 'push'; }
   const rRev=(j&&j.data&&Number(j.data.rev))||0;
   const lRev=Number(D.rev)||0;
   const takeRemote = (rRev!==lRev) ? (rRev>lRev) : !DRIVE.dirty;   // เสมอ = ใช้พฤติกรรมเดิม
@@ -2881,9 +2906,11 @@ async function driveSync(interactive){
     DRIVE.dirty=false; DRIVE.lastSync=Date.now(); needAuth=false;
     persistDrive(); renderDrivePill(); renderSettings();
     renderAll(); renderPending();
+    syncSettled=true; scheduleSlipMigration();
     return 'pull';
   }
   await requestPush(interactive);
+  syncSettled=true; scheduleSlipMigration();
   return 'push';
 }
 function driveErrMsg(e){
@@ -3017,7 +3044,8 @@ function init(){
     }
   }
   refreshPrices(false);
-  setTimeout(scheduleSlipMigration, 2500);
+  // ต่อ Drive ไม่ได้ = ไม่มี sync ให้รอ ปลดล็อกไว้เพื่อให้ผู้ใช้กดย้ายเองจากแท็บตั้งค่าได้
+  if(!DRIVE.connected || !driveToken()) syncSettled=true;
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
 
