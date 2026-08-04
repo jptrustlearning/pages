@@ -366,12 +366,12 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
       <button class="hero-eye" id="eyeBtn" onclick="PR.toggleMask()" aria-label="ซ่อน/แสดงจำนวนเงิน"></button>
       <div class="hero-label">MY PORTFOLIO</div>
       <div class="hero-title">มูลค่าพอร์ตปัจจุบัน</div>
-      <div class="hero-value-row"><span class="hero-value" id="heroValue">$0.00</span><span class="hero-value-cur">USD</span></div>
+      <div class="hero-value-row"><span class="hero-value" id="heroValue">$0.0000</span><span class="hero-value-cur">USD</span></div>
       <div><span class="hero-total-pct pnl-zero" id="heroPct">0.00%</span></div>
       <div class="hero-sub" id="heroSub">ยังไม่มีรายการ</div>
       <div class="hero-pnl-row">
-        <div><div class="pnl-cell-label">REALIZED P&amp;L</div><div class="pnl-cell-value" id="heroRealized">$0.00</div><div class="pnl-cell-pct" id="heroRealizedSub">ยังไม่มีการขาย</div></div>
-        <div><div class="pnl-cell-label">UNREALIZED P&amp;L</div><div class="pnl-cell-value" id="heroUnreal">$0.00</div><div class="pnl-cell-pct" id="heroUnrealSub">—</div></div>
+        <div><div class="pnl-cell-label">REALIZED P&amp;L</div><div class="pnl-cell-value" id="heroRealized">$0.0000</div><div class="pnl-cell-pct" id="heroRealizedSub">ยังไม่มีการขาย</div></div>
+        <div><div class="pnl-cell-label">UNREALIZED P&amp;L</div><div class="pnl-cell-value" id="heroUnreal">$0.0000</div><div class="pnl-cell-pct" id="heroUnrealSub">—</div></div>
       </div>
     </div>
 
@@ -470,7 +470,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
           <button class="btn-secondary" style="flex:0 0 auto;padding:8px 13px;font-size:.72rem" onclick="PR.rbApplyNew()">✓ ใช้เลขนี้</button>
         </div>
       </div>
-      <div class="preview-row" style="border-top:1px dashed var(--border-gold);padding-top:10px;margin-top:4px"><span style="font-weight:700;font-size:.84rem">เป้าหมายมูลค่าพอร์ตรวม</span><span class="preview-num" id="rbTargetTotal" style="font-size:1.15rem">$0.00</span></div>
+      <div class="preview-row" style="border-top:1px dashed var(--border-gold);padding-top:10px;margin-top:4px"><span style="font-weight:700;font-size:.84rem">เป้าหมายมูลค่าพอร์ตรวม</span><span class="preview-num" id="rbTargetTotal" style="font-size:1.15rem">$0.0000</span></div>
     </div>
     <div class="tol-row">
       <span style="font-size:.78rem;color:var(--text-muted)" title="0 = ปรับให้ตรงเป้าทุกบาท · ตั้งมากกว่า 0 = ข้ามตัวที่เพี้ยนน้อย ไม่ต้องเทรดจุกจิก">เกณฑ์เพี้ยนที่ยอมรับได้ (Tolerance) ±</span>
@@ -788,9 +788,9 @@ const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,8
 const todayStr = () => { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
 const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const MASK_STR='••••••';
-function fmtUSD(v){ if(mask) return '$'+MASK_STR; const n=Number(v)||0; return (n<0?'-$':'$')+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-function fmtUSDsigned(v){ if(mask) return (v<0?'-$':'+$')+MASK_STR; const n=Number(v)||0; return (n<0?'-$':'+$')+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-function fmtSh(v){ const n=Number(v)||0; return mask ? MASK_STR : n.toLocaleString('en-US',{maximumFractionDigits:4}); }
+function fmtUSD(v){ if(mask) return '$'+MASK_STR; const n=Number(v)||0; return (n<0?'-$':'$')+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:4,maximumFractionDigits:4}); }
+function fmtUSDsigned(v){ if(mask) return (v<0?'-$':'+$')+MASK_STR; const n=Number(v)||0; return (n<0?'-$':'+$')+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:4,maximumFractionDigits:4}); }
+function fmtSh(v){ const n=Number(v)||0; return mask ? MASK_STR : n.toLocaleString('en-US',{maximumFractionDigits:6}); }
 function fmtPct(v,signed){ const n=Number(v)||0; return (signed&&n>0?'+':'')+n.toFixed(2)+'%'; }
 function pnlClass(v){ return v>0.0001?'pnl-pos':(v<-0.0001?'pnl-neg':'pnl-zero'); }
 let toastTimer=null;
@@ -1183,13 +1183,13 @@ function renderLots(){
     return '<div class="lot-card '+(status==='closed'?'closed':'')+'">'
       +'<div class="lot-head"><div style="flex:1;min-width:0">'
       +'<div class="lot-ticker-row"><span class="lot-ticker">'+esc(l.ticker)+'</span>'+badge+grpChip(l)+(pi.stale&&rem>0?'<span class="lot-badge stale" title="ยังไม่มีราคาจากตลาด ใช้ราคาซื้อแทน">ราคาไม่อัพเดต</span>':'')+'</div>'
-      +'<div class="lot-meta">'+(pname?esc(pname)+' · ':'')+'ซื้อ '+esc(l.date)+' @ $'+l.price.toFixed(2)+'<br>'+fmtSh(l.shares)+' Shares · ลงทุน '+fmtUSD(lotAmount(l))+(rem>0&&st.curVal>0?' · <b style="color:var(--gold-dark)">'+(pv/st.curVal*100).toFixed(1)+'% ของพอร์ต</b>':'')+'</div>'
+      +'<div class="lot-meta">'+(pname?esc(pname)+' · ':'')+'ซื้อ '+esc(l.date)+' @ $'+l.price.toFixed(4)+'<br>'+fmtSh(l.shares)+' Shares · ลงทุน '+fmtUSD(lotAmount(l))+(rem>0&&st.curVal>0?' · <b style="color:var(--gold-dark)">'+(pv/st.curVal*100).toFixed(1)+'% ของพอร์ต</b>':'')+'</div>'
       +'</div>'+slip
       +(rem>0?'<div class="lot-pnl"><div class="lot-pnl-val '+pnlClass(pnl)+'">'+fmtUSDsigned(pnl)+'</div><div class="lot-pnl-pct '+pnlClass(pnl)+'">'+fmtPct(pnlPct,true)+'</div></div>':'')
       +'</div>'
       +(rem>0?'<div class="lot-detail-row">'
         +'<div><div class="lot-detail-label">ถืออยู่</div><div class="lot-detail-val">'+fmtSh(rem)+' Shares</div></div>'
-        +'<div><div class="lot-detail-label">ราคาตอนนี้'+(pi.stale?' (ราคาซื้อ)':'')+'</div><div class="lot-detail-val">$'+pi.price.toFixed(2)+'</div></div>'
+        +'<div><div class="lot-detail-label">ราคาตอนนี้'+(pi.stale?' (ราคาซื้อ)':'')+'</div><div class="lot-detail-val">$'+pi.price.toFixed(4)+'</div></div>'
         +'<div><div class="lot-detail-label">มูลค่าตอนนี้</div><div class="lot-detail-val">'+fmtUSD(pv)+'</div></div>'
         +'<div><div class="lot-detail-label">Unrealized</div><div class="lot-detail-val '+pnlClass(pnl)+'">'+fmtUSDsigned(pnl)+'</div></div>'
         +'</div>':'')
@@ -1206,7 +1206,7 @@ function sellHistoryHtml(l){
   if(!ss.length) return '';
   return '<div class="sell-history">'+ss.map(s=>{
     const pnl=(s.price-l.price)*s.shares;
-    return '<div class="sell-row"><div class="sell-row-left"><span class="sell-row-tag">SELL</span><span>'+esc(s.date)+'</span><span>'+fmtSh(s.shares)+' @ $'+s.price.toFixed(2)+'</span></div>'
+    return '<div class="sell-row"><div class="sell-row-left"><span class="sell-row-tag">SELL</span><span>'+esc(s.date)+'</span><span>'+fmtSh(s.shares)+' @ $'+s.price.toFixed(4)+'</span></div>'
       +'<span class="sell-row-pnl '+pnlClass(pnl)+'">'+fmtUSDsigned(pnl)+'</span>'
       +'<button class="sell-row-del" onclick="PR.deleteSell(\''+s.id+'\')">ลบ</button></div>';
   }).join('')+'</div>';
@@ -1406,12 +1406,12 @@ function renderByTicker(){
     return '<div class="lot-card">'
       +'<div class="lot-head"><div style="flex:1;min-width:0">'
       +'<div class="lot-ticker-row"><span class="lot-ticker" style="font-size:1.4rem">'+esc(t.ticker)+'</span>'+(t.stale?'<span class="lot-badge stale">ราคาไม่อัพเดต</span>':'')+'</div>'
-      +'<div class="lot-meta">'+t.n+' ไม้ · ราคาตอนนี้ $'+t.price.toFixed(2)+(t.rem>0&&grand>0?' · <b style="color:var(--gold-dark)">'+(t.rem*t.price/grand*100).toFixed(1)+'% ของพอร์ต</b>':'')+'</div></div>'
+      +'<div class="lot-meta">'+t.n+' ไม้ · ราคาตอนนี้ $'+t.price.toFixed(4)+(t.rem>0&&grand>0?' · <b style="color:var(--gold-dark)">'+(t.rem*t.price/grand*100).toFixed(1)+'% ของพอร์ต</b>':'')+'</div></div>'
       +(t.rem>0?'<div class="lot-pnl"><div class="lot-pnl-val '+pnlClass(unreal)+'">'+fmtUSDsigned(unreal)+'</div><div class="lot-pnl-pct '+pnlClass(unreal)+'">'+fmtPct(pct,true)+'</div></div>':'')
       +'</div>'
       +'<div class="lot-detail-row">'
       +'<div><div class="lot-detail-label">ถืออยู่</div><div class="lot-detail-val">'+fmtSh(t.rem)+' Shares</div></div>'
-      +'<div><div class="lot-detail-label">ต้นทุนเฉลี่ย</div><div class="lot-detail-val">$'+avg.toFixed(2)+'</div></div>'
+      +'<div><div class="lot-detail-label">ต้นทุนเฉลี่ย</div><div class="lot-detail-val">$'+avg.toFixed(4)+'</div></div>'
       +'<div><div class="lot-detail-label">มูลค่าตอนนี้</div><div class="lot-detail-val">'+fmtUSD(curVal)+'</div></div>'
       +'<div><div class="lot-detail-label">Realized</div><div class="lot-detail-val '+pnlClass(t.realized)+'">'+fmtUSDsigned(t.realized)+'</div></div>'
       +'</div></div>';
@@ -1442,7 +1442,7 @@ function renderSells(){
     return '<div class="lot-card">'
       +'<div class="lot-head"><div style="flex:1;min-width:0">'
       +'<div class="lot-ticker-row"><span class="lot-ticker">'+esc(tk)+'</span><span class="lot-badge closed">SOLD</span>'+slipTag(s,'sell','width:34px;height:34px')+'</div>'
-      +'<div class="lot-meta">ขาย '+esc(s.date)+' · '+fmtSh(s.shares)+' Shares @ $'+s.price.toFixed(2)+(l?'<br>ต้นทุน $'+l.price.toFixed(2)+'/หุ้น · ได้รับ '+fmtUSD(s.shares*s.price)+(days!=null?' · ถือ '+days+' วัน':''):'')+'</div></div>'
+      +'<div class="lot-meta">ขาย '+esc(s.date)+' · '+fmtSh(s.shares)+' Shares @ $'+s.price.toFixed(4)+(l?'<br>ต้นทุน $'+l.price.toFixed(4)+'/หุ้น · ได้รับ '+fmtUSD(s.shares*s.price)+(days!=null?' · ถือ '+days+' วัน':''):'')+'</div></div>'
       +'<div class="lot-pnl"><div class="lot-pnl-val '+pnlClass(pnl)+'">'+fmtUSDsigned(pnl)+'</div><div class="lot-pnl-pct '+pnlClass(pnl)+'">'+fmtPct(pct,true)+'</div></div>'
       +'</div>'
       +'<div class="lot-actions"><button class="lot-btn delete" style="flex:1" onclick="PR.deleteSell(\''+s.id+'\')">ลบรายการขายนี้ (คืนหุ้นเข้าไม้)</button></div>'
@@ -1496,10 +1496,10 @@ async function fetchBuyPrice(){
   const idx=closeIdxOn(tk, date);
   if(idx>=0){
     const p=PRICES[tk], effDate=p.dates[idx];
-    $('fPrevPrice').value=p.closes[idx].toFixed(2);
+    $('fPrevPrice').value=p.closes[idx].toFixed(4);
     buyRange=priceRangeAt(tk, idx);
     $('fPriceHint').textContent='ราคาปิด '+tk+' ณ '+effDate+(effDate!==date?' (วันก่อนหน้า — วันที่เลือกตลาดปิด)':'')
-      +(buyRange?' · ช่วงราคาที่อนุญาต $'+buyRange.min.toFixed(2)+' — $'+buyRange.max.toFixed(2):'')
+      +(buyRange?' · ช่วงราคาที่อนุญาต $'+buyRange.min.toFixed(4)+' — $'+buyRange.max.toFixed(4):'')
       +' — แก้เป็นราคา fill จริงได้';
   }else{
     buyRange=null;
@@ -1522,7 +1522,7 @@ function submitLot(){
   if(!(amount>0)||!(price>0)||!date){ err.textContent='กรุณากรอกเงินลงทุน ราคา และวันที่ให้ครบ'; err.classList.remove('hidden'); return; }
   if(date>todayStr()){ err.textContent='วันที่ซื้อเป็นอนาคตไม่ได้'; err.classList.remove('hidden'); return; }
   if(buyRange && (price < buyRange.min-0.005 || price > buyRange.max+0.005)){
-    err.textContent='ราคาอยู่นอกช่วงซื้อขายจริงของวันนั้น ($'+buyRange.min.toFixed(2)+' — $'+buyRange.max.toFixed(2)+') — ตรวจราคา/วันที่อีกครั้ง';
+    err.textContent='ราคาอยู่นอกช่วงซื้อขายจริงของวันนั้น ($'+buyRange.min.toFixed(4)+' — $'+buyRange.max.toFixed(4)+') — ตรวจราคา/วันที่อีกครั้ง';
     err.classList.remove('hidden'); return;
   }
   const shares=amount/price;
@@ -1539,7 +1539,7 @@ function submitLot(){
     D.lots.push(lot);
   }
   saveData(); closeModal('mdlLot');
-  toast(editLotId?'แก้ไขแล้ว':'บันทึกเข้าพอร์ตแล้ว ✓ ('+(amount/price).toFixed(4)+' Shares)');
+  toast(editLotId?'แก้ไขแล้ว':'บันทึกเข้าพอร์ตแล้ว ✓ ('+(amount/price).toFixed(6)+' Shares)');
   editLotId=null; pendingToConvert=null;
   renderAll(); renderPending();
   ensureHistory(tk, date).then(()=>{ renderAll(); }).catch(()=>{});
@@ -1565,16 +1565,16 @@ function openSellModal(lotId, fromPendingId){
   sellMode = (pd && pd.shares>0)? 'shares' : 'usd';
   document.querySelectorAll('#sModeSeg .seg-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===sellMode));
   $('mdlSellTitle').textContent='ขาย '+l.ticker+(pd?' (จากสลิป)':'');
-  $('sInfo').innerHTML='<div class="preview-row"><span>ถืออยู่</span><span class="preview-num">'+fmtSh(rem)+' Shares</span></div><div class="preview-row"><span>ต้นทุนเฉลี่ย</span><span class="preview-num">$'+l.price.toFixed(2)+'/หุ้น</span></div>'
-    +(pd?'<div class="field-hint" style="margin-top:6px">ข้อมูลจากสลิป: '+(pd.shares!=null?fmtSh(pd.shares)+' Shares ':'')+(pd.price!=null?'@ $'+Number(pd.price).toFixed(2):'')+' — ตรวจ/แก้ก่อนบันทึก</div>':'');
+  $('sInfo').innerHTML='<div class="preview-row"><span>ถืออยู่</span><span class="preview-num">'+fmtSh(rem)+' Shares</span></div><div class="preview-row"><span>ต้นทุนเฉลี่ย</span><span class="preview-num">$'+l.price.toFixed(4)+'/หุ้น</span></div>'
+    +(pd?'<div class="field-hint" style="margin-top:6px">ข้อมูลจากสลิป: '+(pd.shares!=null?fmtSh(pd.shares)+' Shares ':'')+(pd.price!=null?'@ $'+Number(pd.price).toFixed(4):'')+' — ตรวจ/แก้ก่อนบันทึก</div>':'');
   $('sDate').value = (pd && pd.date && pd.date>=l.date && pd.date<=todayStr())? pd.date : todayStr();
   $('sAmount').value = pd? (pd.shares>0? pd.shares : (pd.amount>0? pd.amount : '')) : '';
   const pi=priceInfo(l);
   const initPrice = (pd && pd.price>0)? pd.price : pi.price;
-  $('sPrevPrice').value=initPrice.toFixed(2);
+  $('sPrevPrice').value=initPrice.toFixed(4);
   sellRange = pi.stale? null : priceRangeAt(l.ticker, closeIdxOn(l.ticker, (pd&&pd.date)? pd.date : pi.date));
-  $('sPriceHint').textContent = pd? 'ราคาจากสลิป'+(sellRange?' · ช่วงที่อนุญาต $'+sellRange.min.toFixed(2)+' — $'+sellRange.max.toFixed(2):'')+' — แก้ได้'
-    : (pi.stale? 'ไม่พบราคาตลาด — กรอกราคาขายจริงเอง' : 'ราคาปิดล่าสุด ('+pi.date+')'+(sellRange?' · ช่วงที่อนุญาต $'+sellRange.min.toFixed(2)+' — $'+sellRange.max.toFixed(2):'')+' — แก้เป็นราคา fill จริงได้');
+  $('sPriceHint').textContent = pd? 'ราคาจากสลิป'+(sellRange?' · ช่วงที่อนุญาต $'+sellRange.min.toFixed(4)+' — $'+sellRange.max.toFixed(4):'')+' — แก้ได้'
+    : (pi.stale? 'ไม่พบราคาตลาด — กรอกราคาขายจริงเอง' : 'ราคาปิดล่าสุด ('+pi.date+')'+(sellRange?' · ช่วงที่อนุญาต $'+sellRange.min.toFixed(4)+' — $'+sellRange.max.toFixed(4):'')+' — แก้เป็นราคา fill จริงได้');
   $('sErr').classList.add('hidden');
   updateSellMax(); recalcSell();
   openModal('mdlSell');
@@ -1598,7 +1598,7 @@ function updateSellMax(){
 function sellAllQuick(){
   const l=D.lots.find(x=>x.id===sellLotId); if(!l) return;
   const rem=remShares(l);
-  $('sAmount').value = sellMode==='usd' ? (rem*sellPrice()).toFixed(2) : rem;
+  $('sAmount').value = sellMode==='usd' ? (rem*sellPrice()).toFixed(4) : rem;
   sellAllArmed=true; // ใช้จำนวนคงเหลือเป๊ะ ไม่เพี้ยนจากการปัดทศนิยม
   recalcSell();
 }
@@ -1623,10 +1623,10 @@ function onSellDateInput(){
     const idx=closeIdxOn(l.ticker, date);
     if(idx>=0){
       const p=PRICES[l.ticker], effDate=p.dates[idx];
-      $('sPrevPrice').value=p.closes[idx].toFixed(2);
+      $('sPrevPrice').value=p.closes[idx].toFixed(4);
       sellRange=priceRangeAt(l.ticker, idx);
       $('sPriceHint').textContent='ราคาปิด '+l.ticker+' ณ '+effDate+(effDate!==date?' (วันก่อนหน้า)':'')
-        +(sellRange?' · ช่วงที่อนุญาต $'+sellRange.min.toFixed(2)+' — $'+sellRange.max.toFixed(2):'');
+        +(sellRange?' · ช่วงที่อนุญาต $'+sellRange.min.toFixed(4)+' — $'+sellRange.max.toFixed(4):'');
     }
     else{ sellRange=null; $('sPriceHint').textContent='ไม่พบราคาวันนั้น — กรอกราคาขายเอง'; }
     updateSellMax(); recalcSell();
@@ -1652,7 +1652,7 @@ function submitSell(){
   if(date<l.date){ err.textContent='วันขายก่อนวันซื้อไม่ได้'; err.classList.remove('hidden'); return; }
   if(date>todayStr()){ err.textContent='วันขายเป็นอนาคตไม่ได้'; err.classList.remove('hidden'); return; }
   if(sellRange && (price < sellRange.min-0.005 || price > sellRange.max+0.005)){
-    err.textContent='ราคาขายอยู่นอกช่วงซื้อขายจริงของวันนั้น ($'+sellRange.min.toFixed(2)+' — $'+sellRange.max.toFixed(2)+')';
+    err.textContent='ราคาขายอยู่นอกช่วงซื้อขายจริงของวันนั้น ($'+sellRange.min.toFixed(4)+' — $'+sellRange.max.toFixed(4)+')';
     err.classList.remove('hidden'); return;
   }
   const sell={id:uid(),lotId:l.id,shares,price,date,createdAt:Date.now()};
@@ -2172,7 +2172,7 @@ function renderPending(){
     return '<div class="pending-card"><div class="pending-head">'+slip
       +'<div class="pending-info"><div class="pending-tk">'+esc(p.ticker||'—')+'</div>'
       +'<div class="pending-meta">'+(p.side==='sell'?'🔴 ขาย':'🟢 ซื้อ')+' · '+(p.date||'ไม่พบวันที่')
-      +'<br>ราคา '+(p.price!=null?('$'+Number(p.price).toFixed(2)):'—')+' · '+(p.amount!=null?('มูลค่า '+fmtUSD(p.amount)):('จำนวน '+(p.shares!=null?fmtSh(p.shares):'—')+' Shares'))
+      +'<br>ราคา '+(p.price!=null?('$'+Number(p.price).toFixed(4)):'—')+' · '+(p.amount!=null?('มูลค่า '+fmtUSD(p.amount)):('จำนวน '+(p.shares!=null?fmtSh(p.shares):'—')+' Shares'))
       +(p.note?'<br><span style="color:var(--gold-dark)">'+esc(p.note)+'</span>':'')+'</div></div></div>'
       +'<div class="pending-actions">'
       +'<button class="lot-btn sell" onclick="PR.confirmPending(\''+p.id+'\')">✓ ตรวจ &amp; บันทึกเข้าพอร์ต</button>'
@@ -2242,7 +2242,7 @@ function openMultiSell(tk, pendingId){
   const lots=msLots();
   const cap=lots.reduce((a,l)=>a+remShares(l),0);
   $('msTitle').textContent='ขาย '+tk+(pd?' (จากสลิป)':'');
-  $('msSub').innerHTML='ถือรวม '+fmtSh(cap)+' Shares · '+lots.length+' ไม้'+(pd? '<br>ข้อมูลจากสลิป: '+(pd.shares!=null?fmtSh(pd.shares)+' Shares ':'')+(pd.price!=null?'@ $'+Number(pd.price).toFixed(2):'')+' — ตรวจ/แก้ก่อนบันทึก':'');
+  $('msSub').innerHTML='ถือรวม '+fmtSh(cap)+' Shares · '+lots.length+' ไม้'+(pd? '<br>ข้อมูลจากสลิป: '+(pd.shares!=null?fmtSh(pd.shares)+' Shares ':'')+(pd.price!=null?'@ $'+Number(pd.price).toFixed(4):'')+' — ตรวจ/แก้ก่อนบันทึก':'');
   $('msDate').value = (pd && pd.date && pd.date<=todayStr())? pd.date : todayStr();
   if(pd && pd.shares>0){ msMode='shares'; $('msAmount').value=pd.shares; }
   else if(pd && pd.amount>0){ msMode='usd'; $('msAmount').value=pd.amount; }
@@ -2251,9 +2251,9 @@ function openMultiSell(tk, pendingId){
   // ราคาเริ่มต้น: จากสลิป > ราคาปิดล่าสุด
   const pi=priceInfo(lots[0]);
   const initPrice = (pd && pd.price>0)? pd.price : pi.price;
-  $('msPrice').value=initPrice.toFixed(2);
+  $('msPrice').value=initPrice.toFixed(4);
   msRange = pi.stale? null : priceRangeAt(tk, closeIdxOn(tk, $('msDate').value));
-  $('msPriceHint').textContent=(pd?'ราคาจากสลิป':'ราคาปิดล่าสุด')+(msRange?' · ช่วงที่อนุญาต $'+msRange.min.toFixed(2)+' — $'+msRange.max.toFixed(2):'')+' — แก้ได้';
+  $('msPriceHint').textContent=(pd?'ราคาจากสลิป':'ราคาปิดล่าสุด')+(msRange?' · ช่วงที่อนุญาต $'+msRange.min.toFixed(4)+' — $'+msRange.max.toFixed(4):'')+' — แก้ได้';
   $('msErr').classList.add('hidden');
   msRender(); msRecalc();
   openModal('mdlMs');
@@ -2269,9 +2269,9 @@ function onMsDate(){
     const idx=closeIdxOn(msTicker, date);
     if(idx>=0){
       const p=PRICES[msTicker], effDate=p.dates[idx];
-      $('msPrice').value=p.closes[idx].toFixed(2);
+      $('msPrice').value=p.closes[idx].toFixed(4);
       msRange=priceRangeAt(msTicker, idx);
-      $('msPriceHint').textContent='ราคาปิด '+msTicker+' ณ '+effDate+(effDate!==date?' (วันก่อนหน้า)':'')+(msRange?' · ช่วงที่อนุญาต $'+msRange.min.toFixed(2)+' — $'+msRange.max.toFixed(2):'')+' — แก้ได้';
+      $('msPriceHint').textContent='ราคาปิด '+msTicker+' ณ '+effDate+(effDate!==date?' (วันก่อนหน้า)':'')+(msRange?' · ช่วงที่อนุญาต $'+msRange.min.toFixed(4)+' — $'+msRange.max.toFixed(4):'')+' — แก้ได้';
     }else{ msRange=null; $('msPriceHint').textContent='ไม่พบราคาวันนั้น — กรอกราคาขายเอง'; }
     msRecalc();
   }, 550);
@@ -2297,7 +2297,7 @@ function msAuto(){
 function msSellAllSel(){
   const cap=msSelCap();
   if(cap<=0){ toast('แตะเลือกไม้ก่อน'); return; }
-  $('msAmount').value = msMode==='shares'? cap : (cap*msPriceVal()).toFixed(2);
+  $('msAmount').value = msMode==='shares'? cap : (cap*msPriceVal()).toFixed(4);
   msAllArmed=true; // ตัดเต็มทุกไม้ที่เลือก ไม่เหลือเศษ
   msRecalc();
 }
@@ -2338,7 +2338,7 @@ function msRender(){
       +'<span class="port-chip" style="padding:3px 10px;font-size:.66rem;pointer-events:none"><span class="pc-dot" style="background:'+p.color+'"></span>'+esc(p.name)+'</span>'
       +(l.groupId&&grpOf(l)?'<span class="grp-chip has" style="pointer-events:none">'+esc(grpOf(l).name)+'</span>':'')
       +'</span>'
-      +'<span style="display:block;font-size:.7rem;color:var(--text-muted);font-weight:500">ซื้อ '+esc(l.date)+' @ $'+l.price.toFixed(2)+' · ถือ '+fmtSh(rem)+' Sh · มูลค่า '+fmtUSD(rem*pi.price)+'</span>'
+      +'<span style="display:block;font-size:.7rem;color:var(--text-muted);font-weight:500">ซื้อ '+esc(l.date)+' @ $'+l.price.toFixed(4)+' · ถือ '+fmtSh(rem)+' Sh · มูลค่า '+fmtUSD(rem*pi.price)+'</span>'
       +'<span class="ms-alloc" id="msAl-'+l.id+'"></span>'
       +'</span></button>';
   }).join('');
@@ -2381,7 +2381,7 @@ function msSubmit(){
   if(!(price>0)||!date){ err.textContent='กรุณากรอกราคาและวันที่'; err.classList.remove('hidden'); return; }
   if(date>todayStr()){ err.textContent='วันขายเป็นอนาคตไม่ได้'; err.classList.remove('hidden'); return; }
   if(msRange && (price < msRange.min-0.005 || price > msRange.max+0.005)){
-    err.textContent='ราคาขายอยู่นอกช่วงซื้อขายจริงของวันนั้น ($'+msRange.min.toFixed(2)+' — $'+msRange.max.toFixed(2)+')';
+    err.textContent='ราคาขายอยู่นอกช่วงซื้อขายจริงของวันนั้น ($'+msRange.min.toFixed(4)+' — $'+msRange.max.toFixed(4)+')';
     err.classList.remove('hidden'); return;
   }
   if(a.leftover>1e-6){
@@ -2455,7 +2455,7 @@ async function onSlipFile(input){
       if(!(price>0)) price=null;
       if(!(shares>0)) shares=null;
       if(!(amount>0)) amount=null;
-      if(amount==null && price&&shares) amount=Math.round(price*shares*100)/100;
+      if(amount==null && price&&shares) amount=Math.round(price*shares*10000)/10000;
       if(shares==null && price&&amount) shares=amount/price;
       if(!ticker && price==null && shares==null && amount==null) return;
       let date=(t.date||'').toString().slice(0,10);
@@ -2491,7 +2491,7 @@ let rbPlan=null;
 function rbSeedInputs(){
   const total=rbTotalNow();
   const p=portById(rbSel);
-  $('rbBase').value=total>0? total.toFixed(2):'';
+  $('rbBase').value=total>0? total.toFixed(4):'';
   // จำ "เงินใหม่ที่จะเติม" ไว้ต่อพอร์ต — สลับแท็บ/ปิดแอปแล้วกลับมาต้องยังอยู่
   const keep=(p&&p.rbNew>0)? p.rbNew : 0;
   $('rbNew').value = keep>0 ? String(keep) : '';
@@ -2633,7 +2633,7 @@ function printRbPlan(){
   if(!rbPlan){ toast('ยังไม่มีแผนให้พิมพ์'); return; }
   const P=rbPlan;
   // แผ่นพิมพ์ไม่ซ่อนตัวเลข แม้เปิดโหมดซ่อนยอดอยู่ (พิมพ์เก็บไว้ดูเองแล้วตัวเลขต้องอ่านได้)
-  const usd=v=>{ const n=Number(v)||0; return (n<0?'-$':'$')+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  const usd=v=>{ const n=Number(v)||0; return (n<0?'-$':'$')+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:4,maximumFractionDigits:4}); };
   const d=new Date();
   const pad=n=>String(n).padStart(2,'0');
   const stamp=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes());
