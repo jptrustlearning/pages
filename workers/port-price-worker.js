@@ -215,7 +215,8 @@ async function ocr(request, env, ctx, CORS) {
       },
       body: JSON.stringify({
         model: 'claude-opus-5',
-        max_tokens: 2000,
+        max_tokens: 4000,
+        output_config: { effort: 'medium' },
         messages: [{
           role: 'user',
           content: [
