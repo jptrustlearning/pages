@@ -177,24 +177,31 @@ async function ocr(request, env, ctx, CORS) {
   if (image.length > 2400000) return json({ error: 'image too large' }, 413, CORS);
 
   const today = new Date().toISOString().slice(0, 10);
-  const prompt = 'You are reading a screenshot from a stock brokerage app (Thai brokers like Dime!, InnovestX, Streaming, or international apps). It may show ONE order detail page, or a LIST of multiple orders.\n'
+  const prompt = 'You are reading a screenshot from a stock brokerage app (Thai brokers like Dime!, InnovestX, Streaming, or international apps). The app language may be THAI or ENGLISH. It may show ONE order detail page, or a LIST of multiple orders.\n'
     + 'Extract every distinct EXECUTED trade visible. Respond with ONLY this JSON, no markdown fences, no other text:\n'
     + '{"trades":[{"side":"buy"|"sell","ticker":"SYMBOL","price":number or null,"shares":number or null,"amount":number or null,"date":"YYYY-MM-DD" or null,"confidence":"high"|"low"}]}\n'
+    + 'EVERY number you output MUST be in USD. Never output a THB value.\n'
+    + 'STEP 1 — CURRENCY CHECK. Do this FIRST, before reading any other number. Look at the big headline amount near the top of the order (next to Buy/Sell + ticker). It is labelled either THB or USD.\n'
+    + 'CASE A — headline is THB (e.g. "1,329.86 THB"): the app is displaying Thai baht totals. IGNORE EVERY THB NUMBER on the screen — the headline amount, "Stock Amount", "มูลค่าหุ้น", "Commission Fee", "ค่าธรรมเนียม", "VAT". Do NOT convert them yourself. Do NOT use the "Exchange Rate" / "อัตราแลกเปลี่ยน" row for anything.\n'
+    + '  For CASE A: price = "Executed Price" (this field is already USD), shares = "Shares", amount = price x shares. Then sanity-check against the "USD Amount" row if present: it should match price x shares within 1%. If it differs by more than 1%, still output price x shares but set confidence "low".\n'
+    + 'CASE B — headline is USD: the app is displaying dollars, use the amount rules below normally.\n'
     + 'Rules per trade:\n'
-    + '- side: ซื้อ/Buy = "buy"; ขาย/Sell = "sell".\n'
-    + '- ticker: symbol only, uppercase (AAPL, PTT.BK). Strip exchange tags like ":NASDAQ" and company names.\n'
-    + '- price: the FILLED price per share. Thai labels: "ราคาที่ได้จริง", "ราคาเฉลี่ย", "ราคาที่จับคู่". NOT the limit price, NOT current market price.\n'
-    + '- shares: filled quantity ("จำนวนหุ้น"), may be fractional like 0.2138450.\n'
-    + '- amount: value of shares EXCLUDING commission/fees/VAT. Thai label "มูลค่าหุ้น". The big headline amount (e.g. "25.00 USD") often INCLUDES fees — prefer "มูลค่าหุ้น" or compute price x shares. Numbers may contain thousands commas (2,088.00 = 2088).\n'
+    + '- side: ซื้อ/Buy = "buy"; ขาย/Sell = "sell". On detail pages the word sits right before the ticker (e.g. "Buy LUV").\n'
+    + '- ticker: symbol only, uppercase (AAPL, LUV, PTT.BK). Strip exchange tags/flags like ":NASDAQ", "NYSE" and company names.\n'
+    + '- price: the FILLED price per share, always USD. Labels: "Executed Price", "Average Price", "ราคาที่ได้จริง", "ราคาเฉลี่ย", "ราคาที่จับคู่". NEVER use "Limit Price" / "ราคาที่ตั้ง" (that is the order price, not the fill) and never the current market price.\n'
+    + '- shares: filled quantity ("Shares", "จำนวนหุ้น"), may be fractional like 0.8039926.\n'
+    + '- amount (CASE B only): value of shares EXCLUDING commission/fees/VAT. Labels "มูลค่าหุ้น" / "Stock Amount". The big headline amount (e.g. "25.00 USD") often INCLUDES fees — prefer "มูลค่าหุ้น"/"Stock Amount" or compute price x shares. Numbers may contain thousands commas (2,088.00 = 2088).\n'
     + '- Cross-check: price x shares should ~= amount within 1%; if inconsistent, trust price and shares.\n'
-    + '- date: execution/fill date ("วันที่คำสั่งสำเร็จ" preferred over order-sent date) as YYYY-MM-DD.\n'
-    + '- THAI BUDDHIST ERA years: 4-digit >= 2500 -> subtract 543 (2569 -> 2026). TWO-DIGIT Thai years are BE too: "1 ก.ค. 69" means BE 2569 -> 2026-07-01 (NOT 1969/2069). Convert: 2-digit yy -> 2500+yy -> minus 543.\n'
+    + '- date: the EXECUTION/FILL date. Prefer "Completion date" / "วันที่คำสั่งสำเร็จ" over "Submission Date" / "วันที่ส่งคำสั่ง" (order-sent). Output YYYY-MM-DD, drop the time.\n'
+    + '- English date format "11 Feb 2026 - 10:50 PM" -> 2026-02-11. English months: Jan=01 Feb=02 Mar=03 Apr=04 May=05 Jun=06 Jul=07 Aug=08 Sep=09 Oct=10 Nov=11 Dec=12.\n'
+    + '- YEAR RULE: a 4-digit year BELOW 2500 is already Gregorian (CE) — use it as-is, do NOT subtract 543 (2026 stays 2026). A 4-digit year >= 2500 is Thai Buddhist Era — subtract 543 (2569 -> 2026).\n'
+    + '- TWO-DIGIT years on Thai screens are Buddhist Era too: "1 ก.ค. 69" means BE 2569 -> 2026-07-01 (NOT 1969/2069). Convert: 2-digit yy -> 2500+yy -> minus 543.\n'
     + '- Thai months: ม.ค.=01 ก.พ.=02 มี.ค.=03 เม.ย.=04 พ.ค.=05 มิ.ย.=06 ก.ค.=07 ส.ค.=08 ก.ย.=09 ต.ค.=10 พ.ย.=11 ธ.ค.=12. Thai numeric dates are day/month/year.\n'
     + '- Today is ' + today + '; dates must not be in the future.\n'
-    + '- List screens: one element per order row (same ticker on different rows/times = separate trades). Include only executed/filled orders — status "จับคู่แล้ว"/"กำลังคืนเงิน"/Filled counts as executed; skip pending/cancelled.\n'
-    + '- SKIP rows that are NOT stock trades: dividends (ปันผล/รับเงินเข้า), withholding tax (ภาษีหัก ณ ที่จ่าย), fees (ค่าธรรมเนียม...), deposits/withdrawals, interest. Only ซื้อ/ขาย orders become trades.\n'
+    + '- List screens: one element per order row (same ticker on different rows/times = separate trades). Include only executed/filled orders — status "จับคู่แล้ว"/"กำลังคืนเงิน"/"Filled"/"Completed" counts as executed; skip pending/cancelled.\n'
+    + '- SKIP rows that are NOT stock trades: dividends (ปันผล/รับเงินเข้า/Dividend), withholding tax (ภาษีหัก ณ ที่จ่าย), fees (ค่าธรรมเนียม/Commission), deposits/withdrawals, interest, coupons/discounts (Special Coupons). Only ซื้อ/ขาย/Buy/Sell orders become trades.\n'
     + '- SELL rows in lists: the big headline number is the SHARE COUNT ("0.3650863 หุ้น"), not money. price = ราคาที่ได้จริง; amount = price x shares.\n'
-    + '- SELL detail pages: use "มูลค่าหุ้น" (gross) as amount, NOT "ยอดที่จะได้รับคืน" (net proceeds after fees).\n'
+    + '- SELL detail pages: use "มูลค่าหุ้น"/"Stock Amount" (gross) as amount, NOT "ยอดที่จะได้รับคืน" (net proceeds after fees) — and if those are in THB, fall back to CASE A rules.\n'
     + '- confidence "low" only if blurry or a key field is ambiguous.';
 
   let ar;
@@ -207,8 +214,8 @@ async function ocr(request, env, ctx, CORS) {
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1200,
+        model: 'claude-opus-5',
+        max_tokens: 2000,
         messages: [{
           role: 'user',
           content: [
