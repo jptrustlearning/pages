@@ -1,6 +1,195 @@
 {
-  "lastUpdated": "2026-08-04T08:40:00Z",
+  "lastUpdated": "2026-08-05T08:50:00Z",
   "batches": [
+    {
+      "file": "2026-08-05-0850.md",
+      "date": "2026-08-05T08:50:00Z",
+      "date_display": "5 ส.ค. 2026 · 08:50",
+      "summary": "S&P 500 ทำจุดสูงสุดใหม่ครั้งแรกในรอบสองเดือน Dow ข้ามเส้น 54,000 จุด SpaceX และ AMD ทำงบดีกว่าคาดแต่หุ้นร่วงทั้งคู่ Brent หลุด 80 ดอลลาร์ และความน่าจะเป็นที่ Fed จะขึ้นดอกเบี้ยเดือนกันยายนลดเหลือ 57%",
+      "tickers": [
+        "SPY",
+        "DIA",
+        "QQQ",
+        "PLTR",
+        "SPCX",
+        "AMD",
+        "NVDA",
+        "INTC",
+        "DIS",
+        "USO",
+        "XLE",
+        "GLD",
+        "TLT",
+        "UUP",
+        "PTT",
+        "PTTEP",
+        "TOP",
+        "BCP",
+        "SPRC",
+        "IRPC",
+        "AOT",
+        "ERW",
+        "MINT",
+        "CENTEL",
+        "DELTA",
+        "KCE",
+        "HANA",
+        "KBANK"
+      ],
+      "headlines": [
+        {
+          "title": "S&P 500 ปิดทำจุดสูงสุดใหม่ครั้งแรกในรอบสองเดือน Dow ข้ามเส้น 54,000 จุดเป็นครั้งแรกในประวัติศาสตร์ — Palantir บวก 29% ในวันเดียว แต่คนขับรถคันนี้จริงๆ คือช่องแคบ Hormuz",
+          "tickers": [
+            {
+              "symbol": "SPY",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DIA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PLTR",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "KCE",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "HANA",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "CNN, CNBC, Trading Economics, Yahoo Finance",
+          "published": "5 ส.ค. 2026"
+        },
+        {
+          "title": "SpaceX รายงานงบครั้งแรกในฐานะบริษัทมหาชน รายได้โต 92% ขาดทุนลดจากปีก่อนกว่าครึ่ง แต่หุ้นร่วง 8.8% นอกเวลาทำการ — เพราะตัวเลขงบลงทุน 18,400 ล้านดอลลาร์",
+          "tickers": [
+            {
+              "symbol": "SPCX",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "Bloomberg, CBS News, CNN, Forbes",
+          "published": "5 ส.ค. 2026"
+        },
+        {
+          "title": "AMD ทำรายได้สูงสุดเป็นประวัติการณ์ 11,536 ล้านดอลลาร์ ธุรกิจศูนย์ข้อมูลโต 107% และให้ประมาณการไตรมาสหน้าดีกว่าคาด — หุ้นกลับร่วง 8%",
+          "tickers": [
+            {
+              "symbol": "AMD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "INTC",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "TheStreet, Yahoo Finance, 24/7 Wall St., Zacks",
+          "published": "5 ส.ค. 2026"
+        },
+        {
+          "title": "Brent หลุด 80 ดอลลาร์เป็นครั้งแรกนับตั้งแต่สงครามปะทุรอบใหม่ รัฐมนตรีคลังสหรัฐฯ ระบุข้อตกลงเปิดช่องแคบอาจได้ข้อสรุปภายในสองวัน — ขณะที่อิหร่านยืนยันว่าคุยอยู่กับโอมานเท่านั้น",
+          "tickers": [
+            {
+              "symbol": "USO",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "XLE",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "PTTEP",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "PTT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "TOP",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "SPRC",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "ERW",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "MINT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "CENTEL",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "The National, CNBC, Trading Economics, Reuters",
+          "published": "5 ส.ค. 2026"
+        },
+        {
+          "title": "ทองคำขึ้นเพราะน้ำมันลง — ความน่าจะเป็นที่ธนาคารกลางสหรัฐฯ จะขึ้นดอกเบี้ยเดือนกันยายนลดจาก 63% เหลือ 57% และตัวเลขจ้างงานวันศุกร์คือด่านตัดสิน",
+          "tickers": [
+            {
+              "symbol": "GLD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "TLT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "UUP",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DIS",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "KBANK",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "negative"
+            }
+          ],
+          "source": "CNBC, Kitco, Trading Economics, Bureau of Labor Statistics",
+          "published": "5 ส.ค. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-08-04-0840.md",
       "date": "2026-08-04T08:40:00Z",
