@@ -1,6 +1,229 @@
 {
-  "lastUpdated": "2026-08-06T09:45:00Z",
+  "lastUpdated": "2026-08-07T08:55:00Z",
   "batches": [
+    {
+      "file": "2026-08-07-0855.md",
+      "date": "2026-08-07T08:55:00Z",
+      "date_display": "7 ส.ค. 2026 · 08:55",
+      "summary": "Dow ร่วง 464 จุด หยุดสถิติ 5 วันติด อิหร่านเปิดร่างเงื่อนไข Hormuz ที่เข้มกว่าคาดทำน้ำมัน Brent ดีดกลับ 3.8% AppLovin ร่วง 19% หุ้นหน่วยความจำถูกเทขายทั่วโลก Western Digital -14% SK Hynix -10% Salesforce ร่วง 4% หลังเปลี่ยนผู้บริหาร และคืนนี้ 19:30 น. ตัวเลขจ้างงานสหรัฐฯ ตัวชี้ขาดดอกเบี้ยกันยายน",
+      "tickers": [
+        "DIA",
+        "SPY",
+        "QQQ",
+        "USO",
+        "XLE",
+        "APP",
+        "WDC",
+        "SNDK",
+        "MU",
+        "STX",
+        "CRM",
+        "GLD",
+        "TLT",
+        "UUP",
+        "PTT",
+        "PTTEP",
+        "TOP",
+        "SPRC",
+        "AOT",
+        "ERW",
+        "DELTA",
+        "KCE",
+        "HANA"
+      ],
+      "headlines": [
+        {
+          "title": "Dow ปิดลบ 464 จุด หยุดสถิติทำจุดสูงสุดใหม่ 5 วันติดต่อกัน — แรงกดมาจากน้ำมันที่กลับมาขึ้นและผลตอบแทนพันธบัตรที่ขยับ",
+          "tickers": [
+            {
+              "symbol": "DIA",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "SPY",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "XLE",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "TLT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "CNBC, Yahoo Finance, Bloomberg, TheStreet",
+          "published": "7 ส.ค. 2026"
+        },
+        {
+          "title": "อิหร่านเปิดร่างเงื่อนไข Hormuz ที่เข้มกว่าตลาดคาด — น้ำมัน Brent ดีดกลับ 3.8% ปิดที่ 82.49 ดอลลาร์",
+          "tickers": [
+            {
+              "symbol": "USO",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "XLE",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTTEP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "TOP",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "SPRC",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "ERW",
+              "sentiment": "negative"
+            }
+          ],
+          "source": "CNBC, Reuters, Bloomberg, The Irish Times",
+          "published": "7 ส.ค. 2026"
+        },
+        {
+          "title": "AppLovin ร่วง 19% — รายได้โต 53% แต่ยังต่ำกว่าที่นักวิเคราะห์คาด และประมาณการไตรมาสหน้าไม่ถึงเป้า",
+          "tickers": [
+            {
+              "symbol": "APP",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "META",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "GOOGL",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "CNBC, Yahoo Finance, Motley Fool",
+          "published": "7 ส.ค. 2026"
+        },
+        {
+          "title": "หุ้นกลุ่มหน่วยความจำถูกเทขายทั่วโลก — Western Digital ร่วง 14% ทั้งที่งบดีกว่าคาด SK Hynix ลง 10% Samsung ลง 6%",
+          "tickers": [
+            {
+              "symbol": "WDC",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "SNDK",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "MU",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "STX",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "KCE",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "HANA",
+              "sentiment": "negative"
+            }
+          ],
+          "source": "CNBC, Bloomberg, Proactive Investors",
+          "published": "7 ส.ค. 2026"
+        },
+        {
+          "title": "Salesforce ร่วงราว 4% หลังประกาศเปลี่ยนผู้บริหารหลายตำแหน่งพร้อมกัน — เป็นตัวถ่วง Dow มากที่สุดของวัน",
+          "tickers": [
+            {
+              "symbol": "CRM",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DIA",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "MSFT",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "NOW",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "CNBC, The Information, Investing.com",
+          "published": "7 ส.ค. 2026"
+        },
+        {
+          "title": "คืนนี้ 19:30 น. ตัวเลขจ้างงานสหรัฐฯ เดือนกรกฎาคม — ตัวเลขเดียวที่จะชี้ว่าธนาคารกลางจะขึ้นดอกเบี้ยเดือนกันยายนหรือไม่ ทองคำขึ้นแตะจุดสูงสุดในรอบ 7 สัปดาห์รอผลอยู่แล้ว",
+          "tickers": [
+            {
+              "symbol": "GLD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "UUP",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "TLT",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "SPY",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "KBANK",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "Morningstar, FXStreet, Reuters, CNBC",
+          "published": "7 ส.ค. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-08-06-0945.md",
       "date": "2026-08-06T09:45:00Z",
