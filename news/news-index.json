@@ -1,6 +1,275 @@
 {
-  "lastUpdated": "2026-08-07T08:55:00Z",
+  "lastUpdated": "2026-08-08T08:40:00Z",
   "batches": [
+    {
+      "file": "2026-08-08-0840.md",
+      "date": "2026-08-08T08:40:00Z",
+      "date_display": "8 ส.ค. 2026 · 08:40",
+      "summary": "จ้างงานสหรัฐฯ กรกฎาคมติดลบ 23,000 ตำแหน่ง ตลาดถอดโอกาสขึ้นดอกเบี้ยกันยายนจาก 58% เหลือ 42% S&P 500 ปิดทำสถิติใหม่ 7,757.64 จุด ทองคำขึ้น 2.4% แตะ 4,347 ดอลลาร์ สัปดาห์ที่ดีที่สุดในรอบ 7 เดือน เจรจา Hormuz สะดุดเรื่องค่าผ่านทาง หุ้นซอฟต์แวร์ขึ้นแรงระดับ 30% ทั้งกลุ่ม ขณะที่ The Trade Desk ร่วง 21%",
+      "tickers": [
+        "SPY",
+        "QQQ",
+        "DIA",
+        "TLT",
+        "UUP",
+        "GLD",
+        "SLV",
+        "GDX",
+        "USO",
+        "XLE",
+        "TEAM",
+        "TWLO",
+        "DOCS",
+        "NET",
+        "COHR",
+        "TTD",
+        "ARW",
+        "PTT",
+        "PTTEP",
+        "TOP",
+        "AOT",
+        "ERW",
+        "DELTA",
+        "KCE",
+        "HANA"
+      ],
+      "headlines": [
+        {
+          "title": "จ้างงานสหรัฐฯ เดือนกรกฎาคมติดลบ 23,000 ตำแหน่ง — S&P 500 กลับปิดทำสถิติใหม่ที่ 7,757.64 จุด เพราะตลาดถอดโอกาสขึ้นดอกเบี้ยเดือนกันยายนออกไป",
+          "tickers": [
+            {
+              "symbol": "SPY",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DIA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "TLT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "UUP",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "KBANK",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "negative"
+            }
+          ],
+          "source": "CNBC, Reuters, Bloomberg, Yahoo Finance, Benzinga",
+          "published": "7 ส.ค. 2026"
+        },
+        {
+          "title": "ทองคำขึ้น 2.4% แตะ 4,347 ดอลลาร์ สูงสุดในรอบ 7 สัปดาห์ — ปิดสัปดาห์ที่ดีที่สุดในรอบ 7 เดือน เพราะน้ำมันลงและดอกเบี้ยถูกเลื่อน",
+          "tickers": [
+            {
+              "symbol": "GLD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SLV",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "GDX",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "UUP",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "TLT",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "Reuters, Trading Economics, Benzinga, LSEG",
+          "published": "7 ส.ค. 2026"
+        },
+        {
+          "title": "เจรจาช่องแคบ Hormuz สะดุดที่เรื่องค่าผ่านทาง — อิหร่านขอ 5-7% ของมูลค่าสินค้า โอมานต่อเหลือ 3% สหรัฐฯ ยืนยันไม่จ่ายสักบาท",
+          "tickers": [
+            {
+              "symbol": "USO",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "XLE",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "PTT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "PTTEP",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "TOP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SPRC",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "ERW",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "MINT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "CENTEL",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "CPALL",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "Reuters, Trading Economics, TheStreet",
+          "published": "7 ส.ค. 2026"
+        },
+        {
+          "title": "หุ้นซอฟต์แวร์ระเบิดพลังทั้งกลุ่ม — Doximity ขึ้น 33.3% Atlassian 30.8% Twilio 30.6% ในวันเดียว",
+          "tickers": [
+            {
+              "symbol": "DOCS",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "TEAM",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "TWLO",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "NET",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "ABNB",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "NTRA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "HALO",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "Benzinga, CNBC, Yahoo Finance",
+          "published": "7 ส.ค. 2026"
+        },
+        {
+          "title": "The Trade Desk ร่วง 21% แย่ที่สุดในดัชนี — บทเรียนว่าตลาดยังลงโทษการพลาดเป้าหนักมาก แม้บรรยากาศโดยรวมจะดี",
+          "tickers": [
+            {
+              "symbol": "TTD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "POST",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "ARW",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "FOUR",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "KCE",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "HANA",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "Benzinga, CNBC",
+          "published": "7 ส.ค. 2026"
+        },
+        {
+          "title": "Coherent ขึ้น 16.4% เป็นวันที่ 6 ติดต่อกัน — ข่าวสหรัฐฯ อาจคุมชิ้นส่วนศูนย์ข้อมูลจากจีน ดันกลุ่มออปติกในประเทศทั้งกลุ่ม",
+          "tickers": [
+            {
+              "symbol": "COHR",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AAOI",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SOXX",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "MP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SPCX",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "KCE",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "HANA",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "Benzinga, CNBC, Yahoo Finance",
+          "published": "7 ส.ค. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-08-07-0855.md",
       "date": "2026-08-07T08:55:00Z",
