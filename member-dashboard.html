@@ -949,6 +949,14 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .scan-all{width:100%;margin-top:14px;padding:13px;background:var(--cream-card);border:1.5px solid rgba(212,175,55,0.45);border-radius:12px;color:var(--text-dark-sub);font-family:'Anuphan',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 8px rgba(114,47,55,0.05);-webkit-tap-highlight-color:transparent}
 .scan-msg{text-align:center;color:var(--text-dark-muted);font-size:13px;padding:24px 0}
 
+.scan-fchip.sel{position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.scan-menu{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:40;background:var(--cream-card);border:1px solid rgba(212,175,55,0.4);border-radius:10px;box-shadow:0 8px 24px rgba(114,47,55,0.2);overflow:hidden;display:none}
+.scan-menu.open{display:block}
+.scan-menu button{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;padding:11px 12px;border:none;background:transparent;font-family:'Anuphan',sans-serif;font-size:13.5px;color:var(--text-dark);cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent}
+.scan-menu button:active{background:var(--cream-warm)}
+.scan-menu button.on{color:var(--gold-dark);font-weight:600}
+.scan-menu button svg{width:15px;height:15px;stroke:var(--gold-dark);opacity:0;flex-shrink:0}
+.scan-menu button.on svg{opacity:1}
 </style>
 </head>
 <body>
@@ -1163,7 +1171,15 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                 <div class="scan-stats" id="scanStats"></div>
                 <div class="scan-filters">
                     <div class="scan-fchip"><div class="fl">Universe</div><div class="fv">S&amp;P 500 <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div></div>
-                    <div class="scan-fchip"><div class="fl">Sort By</div><div class="fv">Momentum <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div></div>
+                    <div class="scan-fchip sel" id="scanSortChip">
+                        <div class="fl">Sort By</div>
+                        <div class="fv"><span id="scanSortLabel">Momentum</span> <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+                        <div class="scan-menu" id="scanSortMenu">
+                            <button data-sort="momentum" data-label="Momentum" class="on">Momentum <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 10 18 20 6"/></svg></button>
+                            <button data-sort="ticker" data-label="Ticker">Ticker (A–Z) <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 10 18 20 6"/></svg></button>
+                            <button data-sort="trend" data-label="Trend">Trend <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 10 18 20 6"/></svg></button>
+                        </div>
+                    </div>
                     <div class="scan-fchip"><div class="fl">Timeframe</div><div class="fv">1M <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div></div>
                     <div class="scan-fbtn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg></div>
                 </div>
@@ -3176,21 +3192,34 @@ window.addEventListener('appinstalled',()=>{hideIB();showInstallSuccessModal()})
   var TH_M=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
   function thDate(iso){try{var p=iso.split('-');return parseInt(p[2],10)+' '+TH_M[parseInt(p[1],10)-1];}catch(e){return iso;}}
 
+  var CUR=null, SORT='momentum';
+  var TREND_ORD={'Strong Up':0,'Up':1,'Mixed':2,'Down':3};
+  function sortRows(rows){
+    var a=rows.slice();
+    if(SORT==='ticker') a.sort(function(x,y){return x.ticker<y.ticker?-1:(x.ticker>y.ticker?1:0);});
+    else if(SORT==='trend') a.sort(function(x,y){var d=(TREND_ORD[x.trend]==null?9:TREND_ORD[x.trend])-(TREND_ORD[y.trend]==null?9:TREND_ORD[y.trend]);return d||(x.rank-y.rank);});
+    else a.sort(function(x,y){return x.rank-y.rank;});
+    return a;
+  }
+  function renderRows(){
+    var tb=document.getElementById('scanRows'); if(!tb||!CUR)return;
+    tb.innerHTML=sortRows(CUR.rows).slice(0,5).map(function(r,idx){
+      return '<tr><td class="t-rank">'+(idx+1)+'</td>'+
+        '<td><div class="t-sym"><div class="t-badge" style="background:'+badge(r.ticker)+'">'+esc(r.ticker.slice(0,2))+'</div><span class="t-tk">'+esc(r.ticker)+'</span></div></td>'+
+        '<td><div class="t-co">'+esc(r.company)+'</div></td>'+
+        '<td><div class="t-trend '+trendCls(r.trend)+'"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+trendIcon(r.trend)+'</svg>'+esc(r.trend)+'</div></td>'+
+        '<td class="t-mom '+momCls(r.momentum)+'">'+esc(r.momentum)+'</td></tr>';
+    }).join('');
+  }
   function render(d){
+    CUR=d;
     var as=document.getElementById('scanAsOf'); if(as)as.textContent=thDate(d.as_of);
     var st=document.getElementById('scanStats');
     if(st)st.innerHTML=
       '<div class="scan-stat bull"><div class="sl">Bullish</div><div class="sv">'+d.counts.bullish+'</div><div class="sp">'+d.pct.bullish+'%</div>'+spark('bull','#5Fc46a')+'</div>'+
       '<div class="scan-stat plain neu"><div class="sl">Neutral</div><div class="sv">'+d.counts.neutral+'</div><div class="sp">'+d.pct.neutral+'%</div>'+spark('neu','#C9A227')+'</div>'+
       '<div class="scan-stat plain bear"><div class="sl">Bearish</div><div class="sv">'+d.counts.bearish+'</div><div class="sp">'+d.pct.bearish+'%</div>'+spark('bear','#C62828')+'</div>';
-    var tb=document.getElementById('scanRows');
-    if(tb)tb.innerHTML=d.rows.slice(0,5).map(function(r){
-      return '<tr><td class="t-rank">'+r.rank+'</td>'+
-        '<td><div class="t-sym"><div class="t-badge" style="background:'+badge(r.ticker)+'">'+esc(r.ticker.slice(0,2))+'</div><span class="t-tk">'+esc(r.ticker)+'</span></div></td>'+
-        '<td><div class="t-co">'+esc(r.company)+'</div></td>'+
-        '<td><div class="t-trend '+trendCls(r.trend)+'"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+trendIcon(r.trend)+'</svg>'+esc(r.trend)+'</div></td>'+
-        '<td class="t-mom '+momCls(r.momentum)+'">'+esc(r.momentum)+'</td></tr>';
-    }).join('');
+    renderRows();
   }
   function fail(){var tb=document.getElementById('scanRows');if(tb)tb.innerHTML='<tr><td colspan="5"><div class="scan-msg">โหลดข้อมูลไม่สำเร็จ · ลองรีเฟรช</div></td></tr>';}
 
@@ -3211,6 +3240,20 @@ window.addEventListener('appinstalled',()=>{hideIB();showInstallSuccessModal()})
       if(p)p.classList.add('active');
       if(b.getAttribute('data-ptk')==='scanner')load();
     });});
+    var chip=document.getElementById('scanSortChip'), menu=document.getElementById('scanSortMenu');
+    if(chip&&menu){
+      chip.addEventListener('click',function(e){e.stopPropagation();menu.classList.toggle('open');});
+      menu.querySelectorAll('button').forEach(function(bt){bt.addEventListener('click',function(e){
+        e.stopPropagation();
+        SORT=bt.getAttribute('data-sort');
+        menu.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+        bt.classList.add('on');
+        var lb=document.getElementById('scanSortLabel'); if(lb)lb.textContent=bt.getAttribute('data-label');
+        menu.classList.remove('open');
+        renderRows();
+      });});
+      document.addEventListener('click',function(){menu.classList.remove('open');});
+    }
     var rf=document.getElementById('scanRefresh'); if(rf)rf.addEventListener('click',function(){loaded=false;var tb=document.getElementById('scanRows');if(tb)tb.innerHTML='<tr><td colspan="5"><div class="scan-msg">กำลังโหลดข้อมูล…</div></td></tr>';load();});
     load();
   }
