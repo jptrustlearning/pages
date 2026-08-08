@@ -894,6 +894,61 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
     .mig-steps{padding:12px 14px}
     .mig-step{font-size:13px;gap:9px}
 }
+/* ===== Planning Toolkit tabs + S&P500 scanner (added) ===== */
+.ptk-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--cream-deep);border:1px solid rgba(212,175,55,0.25);border-radius:14px;padding:5px;margin-bottom:16px}
+.ptk-tab{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 8px;border:none;border-radius:10px;background:transparent;color:var(--text-dark-muted);font-family:'Anuphan',sans-serif;font-size:14.5px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.01em;-webkit-tap-highlight-color:transparent}
+.ptk-tab svg{width:17px;height:17px;flex-shrink:0}
+.ptk-tab.active{background:linear-gradient(135deg,var(--burgundy-light) 0%,var(--burgundy-mid) 100%);color:var(--gold-light);box-shadow:0 3px 12px rgba(114,47,55,0.28),inset 0 1px 0 rgba(212,175,55,0.25);border:1px solid rgba(212,175,55,0.45)}
+.ptk-tab.active svg{stroke:var(--gold)}
+.ptk-panel{display:none}
+.ptk-panel.active{display:block;opacity:1;animation:ptkFade .3s ease forwards}
+@keyframes ptkFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.scan-head{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;margin-bottom:16px}
+.scan-head-ic{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--cream-card),var(--cream-warm));border:1px solid rgba(212,175,55,0.35);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(114,47,55,0.06)}
+.scan-head-ic svg{width:21px;height:21px;stroke:var(--gold-dark)}
+.scan-title{font-size:16.5px;font-weight:700;color:var(--text-dark);line-height:1.15}
+.scan-sub{font-size:12px;color:var(--text-dark-muted);margin-top:2px}
+.scan-upd{font-size:11px;color:var(--text-dark-muted);text-align:right;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.scan-upd svg{width:15px;height:15px;stroke:var(--gold-dark);cursor:pointer}
+.scan-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.scan-stat{border-radius:14px;padding:13px 13px 8px;position:relative;overflow:hidden;min-height:104px;display:flex;flex-direction:column}
+.scan-stat .sl{font-size:12px;font-weight:600;letter-spacing:.02em}
+.scan-stat .sv{font-family:'DM Serif Display',serif;font-size:30px;line-height:1.05;margin-top:4px}
+.scan-stat .sp{font-size:12.5px;font-weight:600;margin-top:1px}
+.scan-stat .spark{margin-top:auto;height:26px;width:100%}
+.scan-stat.bull{background:linear-gradient(150deg,var(--burgundy-light) 0%,var(--burgundy-dark) 100%);border:1px solid rgba(212,175,55,0.35);box-shadow:0 4px 14px rgba(114,47,55,0.22)}
+.scan-stat.bull .sl{color:var(--gold-light)}.scan-stat.bull .sv{color:var(--green-light)}.scan-stat.bull .sp{color:#cbb98f}
+.scan-stat.plain{background:var(--cream-card);border:1px solid rgba(212,175,55,0.18);box-shadow:0 2px 8px rgba(114,47,55,0.05)}
+.scan-stat.plain .sl{color:var(--text-dark-muted)}
+.scan-stat.neu .sv{color:var(--text-dark)}.scan-stat.bear .sv{color:var(--red)}
+.scan-stat.plain .sp{color:var(--text-dark-muted)}
+.scan-filters{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-bottom:14px}
+.scan-fchip{background:var(--cream-card);border:1px solid rgba(212,175,55,0.25);border-radius:10px;padding:7px 10px;display:flex;flex-direction:column;justify-content:center}
+.scan-fchip .fl{font-size:9.5px;color:var(--text-dark-muted);letter-spacing:.03em}
+.scan-fchip .fv{font-size:13px;font-weight:600;color:var(--text-dark);display:flex;align-items:center;justify-content:space-between}
+.scan-fchip .fv svg{width:13px;height:13px;stroke:var(--gold-dark);opacity:.7}
+.scan-fbtn{background:linear-gradient(135deg,var(--burgundy-light),var(--burgundy-mid));border:1px solid rgba(212,175,55,0.4);border-radius:10px;width:46px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.scan-fbtn svg{width:18px;height:18px;stroke:var(--gold-light)}
+.scan-tbl{width:100%;border-collapse:collapse}
+.scan-tbl thead th{font-size:10.5px;font-weight:600;color:var(--text-dark-muted);letter-spacing:.02em;text-align:left;padding:0 4px 8px;border-bottom:1px solid rgba(212,175,55,0.18)}
+.scan-tbl thead th.r{text-align:right}
+.scan-tbl tbody td{padding:11px 4px;border-bottom:1px solid rgba(212,175,55,0.1);vertical-align:middle}
+.scan-tbl tbody tr:last-child td{border-bottom:none}
+.t-rank{font-size:13px;font-weight:600;color:var(--text-dark-muted);width:22px}
+.t-sym{display:flex;align-items:center;gap:9px}
+.t-badge{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:10.5px;font-weight:700;color:#fff;letter-spacing:-.02em;box-shadow:0 2px 6px rgba(114,47,55,0.25)}
+.t-tk{font-size:13.5px;font-weight:700;color:var(--text-dark)}
+.t-co{font-size:12.5px;color:var(--text-dark-muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t-trend{display:flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600}
+.t-trend svg{width:15px;height:15px}
+.trend-up{color:var(--green)}.trend-up svg{stroke:var(--green)}
+.trend-mix{color:var(--gold-dark)}.trend-mix svg{stroke:var(--gold-dark)}
+.trend-down{color:var(--red)}.trend-down svg{stroke:var(--red)}
+.t-mom{font-size:12.5px;font-weight:700;text-align:right}
+.mom-strong{color:var(--green)}.mom-mod{color:var(--gold-dark)}.mom-weak{color:var(--text-dark-muted)}
+.scan-all{width:100%;margin-top:14px;padding:13px;background:var(--cream-card);border:1.5px solid rgba(212,175,55,0.45);border-radius:12px;color:var(--text-dark-sub);font-family:'Anuphan',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 8px rgba(114,47,55,0.05);-webkit-tap-highlight-color:transparent}
+.scan-msg{text-align:center;color:var(--text-dark-muted);font-size:13px;padding:24px 0}
+
 </style>
 </head>
 <body>
@@ -1093,6 +1148,33 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                 </div>
             </div>
             <div class="section-header fade-up fade-up-3"><div class="section-title">Planning Toolkit</div></div>
+            <div class="ptk-tabs fade-up fade-up-3">
+                <button class="ptk-tab active" data-ptk="scanner">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/></svg>S&amp;P 500 Scanner</button>
+                <button class="ptk-tab" data-ptk="planning">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l7 4"/></svg>Planning Tools</button>
+            </div>
+            <div class="ptk-panel active" id="ptk-scanner">
+                <div class="scan-head">
+                    <div class="scan-head-ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg></div>
+                    <div><div class="scan-title">S&amp;P 500 Momentum Scanner</div><div class="scan-sub">ค้นหาหุ้นที่แข็งแกร่ง ด้วยพลังของข้อมูลและโมเมนตัม</div></div>
+                    <div class="scan-upd">อัปเดต <span id="scanAsOf">—</span><svg id="scanRefresh" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></div>
+                </div>
+                <div class="scan-stats" id="scanStats"></div>
+                <div class="scan-filters">
+                    <div class="scan-fchip"><div class="fl">Universe</div><div class="fv">S&amp;P 500 <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div></div>
+                    <div class="scan-fchip"><div class="fl">Sort By</div><div class="fv">Momentum <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div></div>
+                    <div class="scan-fchip"><div class="fl">Timeframe</div><div class="fv">1M <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div></div>
+                    <div class="scan-fbtn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg></div>
+                </div>
+                <table class="scan-tbl">
+                    <thead><tr><th>#</th><th>Symbol</th><th>Company</th><th>Trend</th><th class="r">Momentum</th></tr></thead>
+                    <tbody id="scanRows"><tr><td colspan="5"><div class="scan-msg">กำลังโหลดข้อมูล…</div></td></tr></tbody>
+                </table>
+                <button class="scan-all" onclick="openIframe('S&amp;P 500 Scanner','./Free_scannerSP500%20(6).html?v=1783496563')">ดูทั้งหมด ›</button>
+            </div>
+            <div class="ptk-panel" id="ptk-planning">
+
             <div class="planning-stack fade-up fade-up-3">
                 <div class="planning-shortcut" onclick="openIframe('วางแผนการเงินส่วนบุคคล','./finance-planner.html?v=1783496563')">
                     <div class="planning-shortcut-icon"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/><path d="M8 17l2-2 2 1 4-4"/></svg></span></div>
@@ -1110,6 +1192,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                     </div>
                     <div class="planning-shortcut-arrow">›</div>
                 </div>
+            </div>
             </div>
             <div class="section-header fade-up fade-up-4"><div class="section-title">กิจกรรมล่าสุด</div></div>
             <div class="event-card fade-up fade-up-5">
@@ -3079,5 +3162,60 @@ window.addEventListener('appinstalled',()=>{hideIB();showInstallSuccessModal()})
         <div class="jpt-redirect-foot">JP TRUST LEARNING</div>
     </div>
 </div>
+
+<script>
+/* ===== Planning Toolkit: tabs + S&P500 momentum scanner (added) ===== */
+(function(){
+  var SPARK={bull:'2,22 14,18 26,19 40,12 54,13 68,6 82,3',neu:'2,14 16,12 30,15 44,11 58,14 72,10 82,12',bear:'2,4 16,8 30,6 44,12 58,10 72,16 82,20'};
+  function spark(k,c){return '<svg class="spark" viewBox="0 0 84 26" preserveAspectRatio="none" fill="none"><polyline points="'+SPARK[k]+'" stroke="'+c+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/></svg>';}
+  function badge(tk){var h=0;for(var i=0;i<tk.length;i++)h=(h*31+tk.charCodeAt(i))%360;return 'linear-gradient(135deg,hsl('+h+',45%,32%),hsl('+((h+40)%360)+',50%,45%))';}
+  function trendCls(t){return (t.indexOf('Up')>-1)?'trend-up':(t==='Down'?'trend-down':'trend-mix');}
+  function trendIcon(t){return (t.indexOf('Up')>-1)?'<polyline points="4 14 10 8 14 12 20 5"/><polyline points="15 5 20 5 20 10"/>':(t==='Down'?'<polyline points="4 8 10 14 14 10 20 17"/><polyline points="15 17 20 17 20 12"/>':'<line x1="4" y1="12" x2="20" y2="12"/>');}
+  function momCls(m){return m==='Strong'?'mom-strong':(m==='Moderate'?'mom-mod':'mom-weak');}
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  var TH_M=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  function thDate(iso){try{var p=iso.split('-');return parseInt(p[2],10)+' '+TH_M[parseInt(p[1],10)-1];}catch(e){return iso;}}
+
+  function render(d){
+    var as=document.getElementById('scanAsOf'); if(as)as.textContent=thDate(d.as_of);
+    var st=document.getElementById('scanStats');
+    if(st)st.innerHTML=
+      '<div class="scan-stat bull"><div class="sl">Bullish</div><div class="sv">'+d.counts.bullish+'</div><div class="sp">'+d.pct.bullish+'%</div>'+spark('bull','#5Fc46a')+'</div>'+
+      '<div class="scan-stat plain neu"><div class="sl">Neutral</div><div class="sv">'+d.counts.neutral+'</div><div class="sp">'+d.pct.neutral+'%</div>'+spark('neu','#C9A227')+'</div>'+
+      '<div class="scan-stat plain bear"><div class="sl">Bearish</div><div class="sv">'+d.counts.bearish+'</div><div class="sp">'+d.pct.bearish+'%</div>'+spark('bear','#C62828')+'</div>';
+    var tb=document.getElementById('scanRows');
+    if(tb)tb.innerHTML=d.rows.slice(0,5).map(function(r){
+      return '<tr><td class="t-rank">'+r.rank+'</td>'+
+        '<td><div class="t-sym"><div class="t-badge" style="background:'+badge(r.ticker)+'">'+esc(r.ticker.slice(0,2))+'</div><span class="t-tk">'+esc(r.ticker)+'</span></div></td>'+
+        '<td><div class="t-co">'+esc(r.company)+'</div></td>'+
+        '<td><div class="t-trend '+trendCls(r.trend)+'"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+trendIcon(r.trend)+'</svg>'+esc(r.trend)+'</div></td>'+
+        '<td class="t-mom '+momCls(r.momentum)+'">'+esc(r.momentum)+'</td></tr>';
+    }).join('');
+  }
+  function fail(){var tb=document.getElementById('scanRows');if(tb)tb.innerHTML='<tr><td colspan="5"><div class="scan-msg">โหลดข้อมูลไม่สำเร็จ · ลองรีเฟรช</div></td></tr>';}
+
+  var loaded=false;
+  function load(){
+    if(loaded)return; loaded=true;
+    fetch('scanner-summary.json',{cache:'no-cache'}).then(function(r){if(!r.ok)throw 0;return r.json();}).then(render).catch(function(){loaded=false;fail();});
+  }
+
+  function initTabs(){
+    var tabs=document.querySelectorAll('.ptk-tab');
+    if(!tabs.length){return setTimeout(initTabs,120);}
+    tabs.forEach(function(b){b.addEventListener('click',function(){
+      document.querySelectorAll('.ptk-tab').forEach(function(x){x.classList.remove('active');});
+      document.querySelectorAll('.ptk-panel').forEach(function(x){x.classList.remove('active');});
+      b.classList.add('active');
+      var p=document.getElementById('ptk-'+b.getAttribute('data-ptk'));
+      if(p)p.classList.add('active');
+      if(b.getAttribute('data-ptk')==='scanner')load();
+    });});
+    var rf=document.getElementById('scanRefresh'); if(rf)rf.addEventListener('click',function(){loaded=false;var tb=document.getElementById('scanRows');if(tb)tb.innerHTML='<tr><td colspan="5"><div class="scan-msg">กำลังโหลดข้อมูล…</div></td></tr>';load();});
+    load();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initTabs);else initTabs();
+})();
+</script>
 
 </body></html>
