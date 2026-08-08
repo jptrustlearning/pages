@@ -2089,7 +2089,7 @@ function drawPivotChart(tab){
         if(lv.isUPZ){
           // UPZ label: single line — zone type $price ★★★ sources
           const stars='★'.repeat(Math.min(lv.confluence,5));
-          const text=lv.tf+' '+fp(lv.value)+' '+stars+' '+lv.sources;
+          const text=lv.tf+' '+fp(lv.value)+' '+stars;
           ctx.font='bold 10px Anuphan, sans-serif';
           const w=ctx.measureText(text).width+10;
           // Drop shadow + solid cream background + gold border
