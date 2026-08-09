@@ -1,6 +1,193 @@
 {
-  "lastUpdated": "2026-08-08T08:40:00Z",
+  "lastUpdated": "2026-08-09T09:45:00Z",
   "batches": [
+    {
+      "file": "2026-08-09-0945.md",
+      "date": "2026-08-09T09:45:00Z",
+      "date_display": "9 ส.ค. 2026 · 09:45",
+      "summary": "จับตา CPI สหรัฐฯ คืนวันพุธ หลังตลาดปิดสัปดาห์แรงสุดตั้งแต่เม.ย. · Hormuz เจรจาโค้งสุดท้ายแต่ยังไม่จบ · ทองปิดสัปดาห์ดีสุดรอบ 7 เดือน · บิตคอยน์แกว่งใต้ 65,000",
+      "tickers": [
+        "SPY",
+        "QQQ",
+        "GLD",
+        "SLV",
+        "USO",
+        "XLE",
+        "BTC",
+        "ETH",
+        "PTT",
+        "AOT",
+        "DELTA",
+        "CPALL"
+      ],
+      "headlines": [
+        {
+          "title": "สัปดาห์นี้ทั้งตลาดจับตาตัวเลขเงินเฟ้อคืนวันพุธ — หลังหุ้นสหรัฐฯ ปิดสัปดาห์ที่ดีที่สุดตั้งแต่เดือนเมษายน ทำสถิติใหม่ทั้งสามดัชนี",
+          "tickers": [
+            {
+              "symbol": "SPY",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "DIA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "TLT",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "AMAT",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "CSCO",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "CRWV",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "SOXX",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "UUP",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "KBANK",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "SCB",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "GULF",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "KCE",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "HANA",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "CNBC, Reuters, Yahoo Finance, Bloomberg",
+          "published": "9 ส.ค. 2026"
+        },
+        {
+          "title": "ช่องแคบ Hormuz เข้าโค้งสุดท้ายของการเจรจา แต่ยังไม่จบ — อิหร่านแยกเรื่อง \"เปิดช่องแคบ\" ออกจากดีล น้ำมัน Brent ปิดสัปดาห์ติดลบกว่า 7% แม้มีเหตุโจมตีเรือใหม่",
+          "tickers": [
+            {
+              "symbol": "USO",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "XLE",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "PTT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "PTTEP",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "TOP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SPRC",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "BCP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "ERW",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "MINT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "CPALL",
+              "sentiment": "positive"
+            }
+          ],
+          "tone_override": "mixed",
+          "source": "Al Jazeera, ABC News, CNN, Reuters, Trading Economics",
+          "published": "9 ส.ค. 2026"
+        },
+        {
+          "title": "ทองคำปิดสัปดาห์ที่ดีที่สุดในรอบ 7 เดือน แตะ 4,347 ดอลลาร์ — เงินพุ่ง 5% วันเดียว จุดขับเคลื่อนเปลี่ยนจาก \"สงคราม\" มาเป็น \"น้ำมันลง + ดอกเบี้ยถูกเลื่อน\"",
+          "tickers": [
+            {
+              "symbol": "GLD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SLV",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "GDX",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "TLT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "UUP",
+              "sentiment": "negative"
+            }
+          ],
+          "source": "Reuters, Bloomberg, Trading Economics, CNBC",
+          "published": "9 ส.ค. 2026"
+        },
+        {
+          "title": "บิตคอยน์แกว่งแคบใต้เพดาน 65,000 ดอลลาร์ตลอดสุดสัปดาห์ — เงินไหลเข้าเหรียญใหญ่ ทิ้ง altcoin รอสองปัจจัยชี้ทาง: เงินเฟ้อสหรัฐฯ และกฎหมายคริปโตที่ยังค้าง",
+          "tickers": [
+            {
+              "symbol": "BTC",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "ETH",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "XRP",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "CoinDesk, Yahoo Finance, Forbes",
+          "published": "9 ส.ค. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-08-08-0840.md",
       "date": "2026-08-08T08:40:00Z",
