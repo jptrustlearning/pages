@@ -161,7 +161,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .quick-action:active{transform:scale(.95);box-shadow:0 4px 16px rgba(114,47,55,0.08)}
 .qa-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(139,34,82,0.2)}
 .qa-icon .jpt-icon svg{width:22px;height:22px;color:#FFF0D4;stroke:#FFF0D4}
-.qa-icon.bg-gold{background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF5E1}.qa-icon.bg-blue{background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF5E1}.qa-icon.bg-green{background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF5E1}.qa-icon.bg-burgundy{background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF5E1}
+.qa-icon.bg-gold{background:linear-gradient(135deg,#3a1520 0%,#2d1018 50%,#1a0a0e 100%);color:#FFF5E1}.qa-icon.bg-blue{background:linear-gradient(135deg,#3a1520 0%,#2d1018 50%,#1a0a0e 100%);color:#FFF5E1}.qa-icon.bg-green{background:linear-gradient(135deg,#3a1520 0%,#2d1018 50%,#1a0a0e 100%);color:#FFF5E1}.qa-icon.bg-burgundy{background:linear-gradient(135deg,#3a1520 0%,#2d1018 50%,#1a0a0e 100%);color:#FFF5E1}
 .qa-label{font-size:11px;font-weight:500;color:var(--text-dark-muted);text-align:center;line-height:1.3}
 
 .section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
@@ -895,7 +895,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .ptk-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--cream-deep);border:1px solid rgba(212,175,55,0.25);border-radius:14px;padding:5px;margin-bottom:16px}
 .ptk-tab{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 8px;border:none;border-radius:10px;background:transparent;color:var(--text-dark-muted);font-family:'Anuphan',sans-serif;font-size:14.5px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.01em;-webkit-tap-highlight-color:transparent}
 .ptk-tab svg{width:17px;height:17px;flex-shrink:0}
-.ptk-tab.active{background:linear-gradient(135deg,var(--burgundy-light) 0%,var(--burgundy-mid) 100%);color:var(--gold-light);box-shadow:0 3px 12px rgba(114,47,55,0.28),inset 0 1px 0 rgba(212,175,55,0.25);border:1px solid rgba(212,175,55,0.45)}
+.ptk-tab.active{background:linear-gradient(160deg,#1a0a0e 0%,#2d1018 45%,#3a1520 62%,#1a0a0e 100%);color:var(--gold-light);box-shadow:0 4px 14px rgba(26,10,14,0.34),inset 0 1px 0 rgba(212,175,55,0.25);border:1px solid rgba(212,175,55,0.5)}
 .ptk-tab.active svg{stroke:var(--gold)}
 .ptk-panel{display:none}
 .ptk-panel.active{display:block;opacity:1;animation:ptkFade .3s ease forwards}
@@ -908,18 +908,19 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .scan-upd{font-size:11px;color:var(--text-dark-muted);text-align:right;display:flex;align-items:center;gap:6px;white-space:nowrap}
 .scan-upd svg{width:15px;height:15px;stroke:var(--gold-dark);cursor:pointer}
 .scan-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
-.scan-stat{border-radius:14px;padding:13px 13px 8px;position:relative;overflow:hidden;min-height:104px;display:flex;flex-direction:column}
+.scan-stat{border-radius:14px;padding:13px 13px 8px;position:relative;overflow:hidden;min-height:104px;display:flex;flex-direction:column;cursor:pointer;transition:transform .12s,box-shadow .2s,border-color .2s;-webkit-tap-highlight-color:transparent}
+.scan-stat:active{transform:scale(.97)}
 .scan-stat .sl{font-size:12px;font-weight:600;letter-spacing:.02em}
 .scan-stat .sv{font-family:'DM Serif Display',serif;font-size:30px;line-height:1.05;margin-top:4px}
 .scan-stat .sp{font-size:12.5px;font-weight:600;margin-top:1px}
 .scan-stat .spark{margin-top:auto;height:26px;width:100%}
-.scan-stat.bull{background:linear-gradient(150deg,var(--burgundy-light) 0%,var(--burgundy-dark) 100%);border:1px solid rgba(212,175,55,0.35);box-shadow:0 4px 14px rgba(114,47,55,0.22)}
-.scan-stat.bull .sl{color:var(--gold-light)}.scan-stat.bull .sv{color:var(--green-light)}.scan-stat.bull .sp{color:#cbb98f}
+.scan-stat.sel{background:linear-gradient(160deg,#1a0a0e 0%,#2d1018 45%,#3a1520 62%,#1a0a0e 100%);border:1px solid rgba(212,175,55,0.5);box-shadow:0 5px 16px rgba(26,10,14,0.4)}
+.scan-stat.sel .sl{color:var(--gold-light)}.scan-stat.sel .sp{color:#cbb98f}
+.scan-stat.sel.bull .sv{color:var(--green-light)}.scan-stat.sel.neu .sv{color:var(--gold-light)}.scan-stat.sel.bear .sv{color:#FF8484}
 .scan-stat.plain{background:var(--cream-card);border:1px solid rgba(212,175,55,0.18);box-shadow:0 2px 8px rgba(114,47,55,0.05)}
-.scan-stat.plain .sl{color:var(--text-dark-muted)}
-.scan-stat.neu .sv{color:var(--text-dark)}.scan-stat.bear .sv{color:var(--red)}
-.scan-stat.plain .sp{color:var(--text-dark-muted)}
-.scan-filters{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-bottom:14px}
+.scan-stat.plain .sl{color:var(--text-dark-muted)}.scan-stat.plain .sp{color:var(--text-dark-muted)}
+.scan-stat.plain.bull .sv{color:#2E7D32}.scan-stat.plain.neu .sv{color:var(--text-dark)}.scan-stat.plain.bear .sv{color:var(--red)}
+.scan-filters{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:14px}
 .scan-fchip{background:var(--cream-card);border:1px solid rgba(212,175,55,0.25);border-radius:10px;padding:7px 10px;display:flex;flex-direction:column;justify-content:center}
 .scan-fchip .fl{font-size:9.5px;color:var(--text-dark-muted);letter-spacing:.03em}
 .scan-fchip .fv{font-size:13px;font-weight:600;color:var(--text-dark);display:flex;align-items:center;justify-content:space-between}
@@ -1177,7 +1178,6 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                             <button data-sort="trend" data-label="Trend">Trend <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 10 18 20 6"/></svg></button>
                         </div>
                     </div>
-                    <div class="scan-fchip"><div class="fl">Timeframe</div><div class="fv">1M <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div></div>
                     <div class="scan-fbtn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg></div>
                 </div>
                 <table class="scan-tbl">
@@ -3158,7 +3158,9 @@ window.addEventListener('appinstalled',()=>{hideIB();showInstallSuccessModal()})
   var TH_M=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
   function thDate(iso){try{var p=iso.split('-');return parseInt(p[2],10)+' '+TH_M[parseInt(p[1],10)-1];}catch(e){return iso;}}
 
-  var CUR=null, SORT='momentum';
+  var CUR=null, SORT='momentum', SENT='bullish';
+  var SENT_CLS={bullish:'bull',neutral:'neu',bearish:'bear'};
+  var SENT_SPARK={bullish:['bull','#5Fc46a'],neutral:['neu','#C9A227'],bearish:['bear','#C62828']};
   var TREND_ORD={'Strong Up':0,'Up':1,'Mixed':2,'Down':3};
   function sortRows(rows){
     var a=rows.slice();
@@ -3169,7 +3171,9 @@ window.addEventListener('appinstalled',()=>{hideIB();showInstallSuccessModal()})
   }
   function renderRows(){
     var tb=document.getElementById('scanRows'); if(!tb||!CUR)return;
-    tb.innerHTML=sortRows(CUR.rows).slice(0,5).map(function(r,idx){
+    var src=CUR['rows_'+SENT]||CUR.rows||[];
+    if(!src.length){tb.innerHTML='<tr><td colspan="5"><div class="scan-msg">ไม่มีข้อมูลในกลุ่มนี้</div></td></tr>';return;}
+    tb.innerHTML=sortRows(src).slice(0,5).map(function(r,idx){
       return '<tr><td class="t-rank">'+(idx+1)+'</td>'+
         '<td><div class="t-sym"><div class="t-badge" style="background:'+badge(r.ticker)+'">'+esc(r.ticker.slice(0,2))+'</div><span class="t-tk">'+esc(r.ticker)+'</span></div></td>'+
         '<td><div class="t-co">'+esc(r.company)+'</div></td>'+
@@ -3177,14 +3181,19 @@ window.addEventListener('appinstalled',()=>{hideIB();showInstallSuccessModal()})
         '<td class="t-mom '+momCls(r.momentum)+'">'+esc(r.momentum)+'</td></tr>';
     }).join('');
   }
+  function renderStats(){
+    var st=document.getElementById('scanStats'); if(!st||!CUR)return;
+    st.innerHTML=[['bullish','Bullish'],['neutral','Neutral'],['bearish','Bearish']].map(function(p){
+      var sent=p[0], sp=SENT_SPARK[sent], state=(sent===SENT)?'sel':'plain';
+      return '<div class="scan-stat '+SENT_CLS[sent]+' '+state+'" data-sent="'+sent+'" role="button" tabindex="0">'+
+        '<div class="sl">'+p[1]+'</div><div class="sv">'+CUR.counts[sent]+'</div><div class="sp">'+CUR.pct[sent]+'%</div>'+
+        spark(sp[0],sp[1])+'</div>';
+    }).join('');
+  }
   function render(d){
     CUR=d;
     var as=document.getElementById('scanAsOf'); if(as)as.textContent=thDate(d.as_of);
-    var st=document.getElementById('scanStats');
-    if(st)st.innerHTML=
-      '<div class="scan-stat bull"><div class="sl">Bullish</div><div class="sv">'+d.counts.bullish+'</div><div class="sp">'+d.pct.bullish+'%</div>'+spark('bull','#5Fc46a')+'</div>'+
-      '<div class="scan-stat plain neu"><div class="sl">Neutral</div><div class="sv">'+d.counts.neutral+'</div><div class="sp">'+d.pct.neutral+'%</div>'+spark('neu','#C9A227')+'</div>'+
-      '<div class="scan-stat plain bear"><div class="sl">Bearish</div><div class="sv">'+d.counts.bearish+'</div><div class="sp">'+d.pct.bearish+'%</div>'+spark('bear','#C62828')+'</div>';
+    renderStats();
     renderRows();
   }
   function fail(){var tb=document.getElementById('scanRows');if(tb)tb.innerHTML='<tr><td colspan="5"><div class="scan-msg">โหลดข้อมูลไม่สำเร็จ · ลองรีเฟรช</div></td></tr>';}
@@ -3220,6 +3229,12 @@ window.addEventListener('appinstalled',()=>{hideIB();showInstallSuccessModal()})
       });});
       document.addEventListener('click',function(){menu.classList.remove('open');});
     }
+    var stEl=document.getElementById('scanStats');
+    if(stEl){stEl.addEventListener('click',function(e){
+      var box=e.target.closest('.scan-stat'); if(!box)return;
+      var s=box.getAttribute('data-sent'); if(!s||s===SENT)return;
+      SENT=s; renderStats(); renderRows();
+    });}
     var rf=document.getElementById('scanRefresh'); if(rf)rf.addEventListener('click',function(){loaded=false;var tb=document.getElementById('scanRows');if(tb)tb.innerHTML='<tr><td colspan="5"><div class="scan-msg">กำลังโหลดข้อมูล…</div></td></tr>';load();});
     load();
   }

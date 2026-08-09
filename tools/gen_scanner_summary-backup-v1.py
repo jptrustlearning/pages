@@ -35,9 +35,6 @@ NAME_SRCS = [(CONS, 'Symbol', 'Security'),
              (os.path.join(SP500, 'output_combined_score_sp500.csv'), 'Ticker', 'Company'),
              (os.path.join(SP500, 'all_profiles.csv'), 'Ticker', 'Company')]
 TOPN = 25
-# Final fallback for tickers missing from every name source (dataset lags a few names)
-MANUAL_NAMES = {'EPAM': 'EPAM Systems', 'MOH': 'Molina Healthcare',
-                'LW': 'Lamb Weston', 'PAYC': 'Paycom Software'}
 
 def load_names():
     comp = {}
@@ -74,7 +71,7 @@ def main():
         ret6m = (latest - c[-127]) / c[-127] * 100
         ret1y = (latest - c[-253]) / c[-253] * 100
         sma50 = c[-50:].mean(); sma200 = c[-200:].mean()
-        nm = comp.get(tk) or MANUAL_NAMES.get(tk); nm = tk if (nm is None or str(nm).strip().lower() in ('', 'nan')) else str(nm)
+        nm = comp.get(tk); nm = tk if (nm is None or str(nm).strip().lower() in ('', 'nan')) else str(nm)
         recs.append(dict(ticker=tk, company=nm,
                          ret1m=round(ret1m, 2), ret3m=round(ret3m, 2), ret6m=round(ret6m, 2), ret1y=round(ret1y, 2),
                          rsi=round(float(rsi14(c)), 1), a50=bool(latest > sma50), a200=bool(latest > sma200)))
@@ -100,23 +97,13 @@ def main():
         m = r['mom']
         return 'Strong' if m >= 0.80 else ('Moderate' if m >= 0.55 else ('Weak' if m >= 0.30 else 'Very Weak'))
 
-    def mkrow(i, r):
-        return dict(rank=i + 1, ticker=r['ticker'], company=r['company'], trend=trend(r), momentum=momlab(r),
-                    ret1m=r['ret1m'], ret3m=r['ret3m'], ret6m=r['ret6m'], ret1y=r['ret1y'], rsi=r['rsi'])
-
-    # per-sentiment top lists (recs already sorted by momentum desc)
-    bull = [r for r in recs if cls(r) == 'bullish']
-    neu = [r for r in recs if cls(r) == 'neutral']
-    bear = sorted([r for r in recs if cls(r) == 'bearish'], key=lambda r: r['mom'])  # weakest first
-    rows_bullish = [mkrow(i, r) for i, r in enumerate(bull[:TOPN])]
-    rows_neutral = [mkrow(i, r) for i, r in enumerate(neu[:TOPN])]
-    rows_bearish = [mkrow(i, r) for i, r in enumerate(bear[:TOPN])]
+    rows = [dict(rank=i + 1, ticker=r['ticker'], company=r['company'], trend=trend(r), momentum=momlab(r),
+                 ret1m=r['ret1m'], ret3m=r['ret3m'], ret6m=r['ret6m'], ret1y=r['ret1y'], rsi=r['rsi'])
+            for i, r in enumerate(recs[:TOPN])]
 
     summary = dict(as_of=max_date, generated_at=datetime.datetime.now(datetime.UTC).strftime('%Y-%m-%dT%H:%M:%SZ'),
                    universe='S&P 500', total=N, counts=counts,
-                   pct={k: round(v / N * 100, 1) for k, v in counts.items()},
-                   rows=rows_bullish,
-                   rows_bullish=rows_bullish, rows_neutral=rows_neutral, rows_bearish=rows_bearish)
+                   pct={k: round(v / N * 100, 1) for k, v in counts.items()}, rows=rows)
     json.dump(summary, open(OUT, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
     print('wrote', OUT, '| as_of', max_date, '| total', N, '| counts', counts)
 
