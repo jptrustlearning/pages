@@ -2506,7 +2506,7 @@ function renderHeadlineCard(h){
   const safeFile=encodeURIComponent(h._file||'');
   const tickers=normalizeTickers(h.tickers);
   const tone=deriveTone(tickers,h.tone_override);
-  const tagsHtml=tickers.slice(0,5).map(t=>'<span class="story-tag '+(t.sentiment||'neutral')+'">'+escapeText(t.symbol)+'</span>').join('');
+  const tagsHtml=tickers.slice(0,4).map(t=>'<span class="story-tag '+(t.sentiment||'neutral')+'">'+escapeText(t.symbol)+'</span>').join('');
   const time=timeAgo(h._batchDate);
   return '<article class="news-dash-card" onclick="openNewsDetail(\''+safeFile+'\','+(h._origIndex||0)+')">'
     +'<div class="story-lead">'+impactIcon(tone.impactClass)+'</div>'
