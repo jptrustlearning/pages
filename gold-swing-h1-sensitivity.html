@@ -73,6 +73,24 @@ canvas{display:block;width:100%!important}
 .hm-label{font-family:'Anuphan',sans-serif;font-size:.72rem;color:var(--dim);margin-bottom:.3rem}
 .hm-note{font-size:.68rem;color:var(--mut);margin-top:.3rem;line-height:1.4}
 @media(max-width:768px){.w{padding:.5rem .4rem 2rem}.tabs{flex-direction:column}.stats{grid-template-columns:repeat(3,1fr)}.tg{grid-template-columns:1fr}}
+/* === Single vs Multi comparison: responsive === */
+.cmp-desktop{display:block}
+.cmp-mobile{display:none}
+.cmp-mobile{gap:.55rem}
+.cmp-card{background:var(--s);border:1px solid var(--bd);border-radius:9px;overflow:hidden}
+.cmp-card-h{display:flex;justify-content:space-between;align-items:center;gap:.5rem;padding:.5rem .6rem;background:var(--s2);border-bottom:1px solid var(--bd)}
+.cmp-card-h .nm{font-size:.84rem;font-weight:700;color:var(--gold)}
+.cmp-delta{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;color:var(--em);background:rgba(91,196,142,.14);border:1px solid rgba(91,196,142,.4);border-radius:20px;padding:.15rem .55rem;white-space:nowrap}
+.cmp-grid{width:100%;border-collapse:collapse;font-size:.74rem}
+.cmp-grid th{font-size:.6rem;text-transform:uppercase;letter-spacing:.04em;color:var(--mut);font-weight:600;padding:.35rem .55rem .3rem;text-align:right}
+.cmp-grid th:first-child{text-align:left}
+.cmp-grid th.win{color:var(--em)}
+.cmp-grid td{padding:.26rem .55rem;text-align:right;font-family:'JetBrains Mono',monospace;border-top:1px solid rgba(212,175,55,.07)}
+.cmp-grid td:first-child{text-align:left;font-family:'Anuphan',sans-serif;color:var(--dim);font-size:.68rem}
+.cmp-grid .mcol{background:rgba(91,196,142,.05)}
+.cmp-grid tr.tot td{font-weight:700;font-size:.82rem;border-top:1px solid var(--bd)}
+.cmp-grid tr.tot td.mcol{color:var(--em)}
+@media(max-width:720px){.cmp-desktop{display:none}.cmp-mobile{display:grid}}
 </style>
   <!-- JP Trust hard auth-gate (redirect to login if no session) -->
   <script src="./jp-gate.js?v=1783134367"></script>
@@ -87,7 +105,7 @@ canvas{display:block;width:100%!important}
 
 <div style="margin:.6rem 0;padding:.6rem;background:var(--s);border:1px solid var(--bd);border-radius:8px">
 <div style="font-size:.78rem;font-weight:600;color:var(--gold);margin-bottom:.35rem">📊 Single vs Multi — Breakout Fixed (1 entry per swing break)</div>
-<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.66rem;font-family:'JetBrains Mono',monospace">
+<div class="cmp-desktop"><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.66rem;font-family:'JetBrains Mono',monospace">
 <tr style="border-bottom:1px solid var(--bd)"><th style="text-align:left;padding:.2rem .3rem;color:var(--gold)">Strategy</th><th style="padding:.2rem;color:var(--gold)">Mode</th><th style="padding:.2rem;color:var(--gold)">Trades</th><th style="padding:.2rem;color:var(--gold)">WR</th><th style="padding:.2rem;color:var(--gold)">PF</th><th style="padding:.2rem;color:var(--gold)">Total</th><th style="padding:.2rem;color:var(--gold)">AvgW</th><th style="padding:.2rem;color:var(--gold)">AvgL</th><th style="padding:.2rem;color:var(--gold)">Hold</th><th style="padding:.2rem;color:var(--gold)">MaxDD</th><th style="padding:.2rem;color:var(--gold)">MaxC</th><th style="padding:.2rem;color:var(--gold)">Δ</th></tr>
 <tr><td style="padding:.18rem .3rem" rowspan=2>SwingRev N=5</td><td style="color:var(--dim)">Single</td><td>244</td><td>41%</td><td>1.60</td><td>+$2,477</td><td>$65</td><td>$29</td><td>40h</td><td>$366</td><td>1</td><td rowspan=2 style="color:var(--em);font-weight:700;vertical-align:middle">+60%</td></tr>
 <tr style="border-bottom:1px solid var(--bd);background:rgba(91,196,142,.04)"><td style="color:var(--em)">Multi</td><td style="color:var(--em)">874</td><td>38%</td><td>1.30</td><td style="color:var(--em)">+$3,975</td><td>$52</td><td>$24</td><td>28h</td><td>$664</td><td>8</td></tr>
@@ -95,7 +113,17 @@ canvas{display:block;width:100%!important}
 <tr style="border-bottom:1px solid var(--bd);background:rgba(91,196,142,.04)"><td style="color:var(--em)">Multi</td><td style="color:var(--em)">465</td><td style="color:var(--em)">43%</td><td>1.24</td><td style="color:var(--em)">+$2,626</td><td>$74</td><td>$51</td><td>76h</td><td>$1,836</td><td>6</td></tr>
 <tr><td style="padding:.18rem .3rem" rowspan=2>SwingRev N=7</td><td style="color:var(--dim)">Single</td><td>203</td><td>40%</td><td>1.47</td><td>+$1,823</td><td>$70</td><td>$32</td><td>49h</td><td>$267</td><td>1</td><td rowspan=2 style="color:var(--em);font-weight:700;vertical-align:middle">+76%</td></tr>
 <tr style="border-bottom:1px solid var(--bd);background:rgba(91,196,142,.04)"><td style="color:var(--em)">Multi</td><td style="color:var(--em)">637</td><td>39%</td><td>1.31</td><td style="color:var(--em)">+$3,215</td><td>$56</td><td>$27</td><td>35h</td><td>$662</td><td>6</td></tr>
-</table></div>
+</table></div></div>
+<div class="cmp-mobile"><div class="cmp-card">
+<div class="cmp-card-h"><span class="nm">SwingRev N=5</span><span class="cmp-delta">Multi +60%</span></div>
+<table class="cmp-grid"><tr><th>Metric</th><th>Single</th><th class="win">Multi ★</th></tr><tr class="tot"><td>Total P&L</td><td>+$2,477</td><td class="mcol">+$3,975</td></tr><tr><td>Trades</td><td>244</td><td class="mcol">874</td></tr><tr><td>Win Rate</td><td>41%</td><td class="mcol">38%</td></tr><tr><td>PF</td><td>1.60</td><td class="mcol">1.30</td></tr><tr><td>Avg Win</td><td>$65</td><td class="mcol">$52</td></tr><tr><td>Avg Loss</td><td>$29</td><td class="mcol">$24</td></tr><tr><td>Hold</td><td>40h</td><td class="mcol">28h</td></tr><tr><td>MaxDD</td><td>$366</td><td class="mcol">$664</td></tr><tr><td>MaxConc</td><td>1</td><td class="mcol">8</td></tr></table>
+</div><div class="cmp-card">
+<div class="cmp-card-h"><span class="nm">Breakout N=7</span><span class="cmp-delta">Multi +410%</span></div>
+<table class="cmp-grid"><tr><th>Metric</th><th>Single</th><th class="win">Multi ★</th></tr><tr class="tot"><td>Total P&L</td><td>+$515</td><td class="mcol">+$2,626</td></tr><tr><td>Trades</td><td>169</td><td class="mcol">465</td></tr><tr><td>Win Rate</td><td>41%</td><td class="mcol">43%</td></tr><tr><td>PF</td><td>1.12</td><td class="mcol">1.24</td></tr><tr><td>Avg Win</td><td>$71</td><td class="mcol">$74</td></tr><tr><td>Avg Loss</td><td>$45</td><td class="mcol">$51</td></tr><tr><td>Hold</td><td>75h</td><td class="mcol">76h</td></tr><tr><td>MaxDD</td><td>$808</td><td class="mcol">$1,836</td></tr><tr><td>MaxConc</td><td>1</td><td class="mcol">6</td></tr></table>
+</div><div class="cmp-card">
+<div class="cmp-card-h"><span class="nm">SwingRev N=7</span><span class="cmp-delta">Multi +76%</span></div>
+<table class="cmp-grid"><tr><th>Metric</th><th>Single</th><th class="win">Multi ★</th></tr><tr class="tot"><td>Total P&L</td><td>+$1,823</td><td class="mcol">+$3,215</td></tr><tr><td>Trades</td><td>203</td><td class="mcol">637</td></tr><tr><td>Win Rate</td><td>40%</td><td class="mcol">39%</td></tr><tr><td>PF</td><td>1.47</td><td class="mcol">1.31</td></tr><tr><td>Avg Win</td><td>$70</td><td class="mcol">$56</td></tr><tr><td>Avg Loss</td><td>$32</td><td class="mcol">$27</td></tr><tr><td>Hold</td><td>49h</td><td class="mcol">35h</td></tr><tr><td>MaxDD</td><td>$267</td><td class="mcol">$662</td></tr><tr><td>MaxConc</td><td>1</td><td class="mcol">6</td></tr></table>
+</div></div>
 <div style="margin-top:.35rem;font-size:.68rem;color:var(--dim);line-height:1.45">
 <strong style="color:var(--em)">Multi ชนะทุก strategy</strong> · Breakout fixed: 1 entry per swing break (ไม่เปิดซ้ำทุกแท่ง) · <strong style="color:var(--txt)">SwingRev N=5 Multi = #1</strong> (+$3,975, MaxConc 8)
 </div>
