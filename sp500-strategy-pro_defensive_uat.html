@@ -3172,8 +3172,17 @@ function runBacktest() {
       let nextRebalMonth = -1;
       let nextRebalYear = lastYear;
 
+      // BUGFIX (13 Aug 2026): previous condition `getDate() > 7` was inverted — after the
+      // entry day, the PENDING card kept pointing at the rebalance month that already executed
+      // (e.g. showed 2026-Aug-03 while that round was already OPEN). Now checks tradeLog:
+      // if this month's rebalance already fired, skip forward to the next scheduled round.
+      const _lastTradeObj = state.tradeLog.length > 0
+        ? new Date(state.tradeLog[state.tradeLog.length - 1].date) : null;
+      const _rebalDone = (y, m) => !!_lastTradeObj &&
+        _lastTradeObj.getFullYear() === y && _lastTradeObj.getMonth() === m;
+
       for (const m of sortedRebalMonths) {
-        if (m > lastMonth || (m === lastMonth && lastDateObj.getDate() > 7)) {
+        if (m >= lastMonth && !_rebalDone(lastYear, m)) {
           nextRebalMonth = m;
           break;
         }
