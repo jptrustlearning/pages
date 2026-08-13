@@ -232,6 +232,21 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .lab-see-all{font-size:13px;color:var(--text-dark-muted);display:inline-flex;align-items:center;gap:3px;cursor:pointer;background:none;border:none;font-family:inherit;padding:4px 0}
 .lab-see-all:hover{color:var(--gold-dark)}
 
+/* Collapsible lab sections + latest-3 cap */
+.lab-head-btn{width:100%;background:none;border:none;font-family:inherit;color:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.lab-head-btn:active{opacity:.75}
+.lab-head-right{display:inline-flex;align-items:center;gap:8px;flex-shrink:0}
+.lab-head-count{padding:2px 9px;border-radius:999px;background:var(--cream-warm);border:1px solid var(--gold-border);font-size:11px;font-weight:700;color:var(--gold-dark);line-height:1.6}
+.lab-head-chev{width:18px;height:18px;fill:none;stroke:var(--gold-dark);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .25s ease}
+.lab-head-btn.is-collapsed .lab-head-chev{transform:rotate(-90deg)}
+.lab-sec-body{overflow:hidden;transition:max-height .3s ease,opacity .22s ease}
+.lab-sec-body.collapsed{max-height:0!important;opacity:0}
+.lab-more{display:none;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:2px;padding:11px 12px;border-radius:14px;background:var(--cream-warm);border:1.5px dashed rgba(212,175,55,0.45);color:var(--text-dark-sub);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all .18s}
+.lab-more:hover{border-color:var(--gold);color:var(--gold-dark)}
+.lab-more:active{transform:scale(.985)}
+.lab-more svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .25s ease}
+.lab-more.is-open svg{transform:rotate(180deg)}
+
 /* Filter chips */
 .lab-chips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:18px}
 .lab-chip{display:flex;align-items:center;gap:6px;padding:19px 8px;border-radius:14px;background:var(--cream-card);border:1.5px solid rgba(212,175,55,0.30);cursor:pointer;transition:all .18s;text-align:left;font-family:inherit;color:inherit;box-shadow:0 2px 8px rgba(114,47,55,0.05);min-width:0}
@@ -1330,10 +1345,11 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
         <div class="placeholder-hero"><div class="balance-card"><div class="balance-label">Lab</div><div class="balance-row"><div class="balance-amount">9</div><div class="balance-currency">กลยุทธ์</div></div><div class="balance-change up">Momentum + Gold Studies</div></div><img class="lab-flask" src="lab-flask.png?v=1783496563" alt="" aria-hidden="true"></div>
         <div class="screen-content">
             <!-- ===== My Strategies ===== -->
-            <div class="lab-section-head fade-up fade-up-1">
+            <button class="lab-section-head lab-head-btn fade-up fade-up-1" type="button" id="labStrategyHead" aria-expanded="true" onclick="toggleLabSection(this,'labStrategyBody')">
               <div class="lab-section-title">My Strategies</div>
-              <button class="lab-see-all" onclick="jptToast('🚧 ดูทั้งหมด · เร็วๆ นี้')">ดูทั้งหมด ›</button>
-            </div>
+              <span class="lab-head-right"><span class="lab-head-count" id="labStrategyCount">3</span><svg class="lab-head-chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+            </button>
+            <div class="lab-sec-body" id="labStrategyBody">
 
             <!-- Filter chips -->
             <div class="lab-chips fade-up fade-up-1">
@@ -1390,48 +1406,15 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                 </a>
               </div>
               <!-- Gold (hidden by default) -->
-              <a class="strategy-card filter-gold" style="display:none" onclick="openIframe('SMC Patient Hunter — Gold Strategy','./smc-patient-hunter-report.html')">
-                <div class="sc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/><path d="M8 16l2-2 2 2 3-3"/></svg></div>
+              <a class="strategy-card filter-gold" style="display:none" onclick="openIframe('Zone Trading · Backtest — Gold','./gold-zone-backtest.html?v=1786598458','lab')">
+                <div class="sc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h18"/><path d="M3 12h18"/><path d="M3 16h18"/><path d="M7 5v14"/><path d="M17 5v14"/></svg></div>
                 <div class="sc-meta">
-                  <div class="sc-title">SMC Patient Hunter</div>
-                  <div class="sc-sub">Gold H1 Strategy Report</div>
+                  <div class="sc-title">Zone Trading · Backtest</div>
+                  <div class="sc-sub">21 ระดับ · Confluence · Momentum</div>
                   <span class="sc-tag tag-gold">Gold</span>
                   <div class="sc-status active"><span class="dot"></span>Active</div>
                 </div>
-                <div class="sc-spark"><svg viewBox="0 0 72 32" preserveAspectRatio="none"><polyline points="2,24 12,18 22,22 30,16 40,18 50,12 60,14 70,7" fill="none" stroke="#B8860B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-                <div class="sc-arrow">›</div>
-              </a>
-              <a class="strategy-card filter-gold" style="display:none" onclick="openIframe('Golden Cross — Gold','./gold-golden-cross.html?v=1786193877','lab')">
-                <div class="sc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M3 7l6 6 4-4 8 8"/></svg></div>
-                <div class="sc-meta">
-                  <div class="sc-title">Golden Cross</div>
-                  <div class="sc-sub">SMA 50/200 · Backtest ทองคำ</div>
-                  <span class="sc-tag tag-gold">Gold</span>
-                  <div class="sc-status active"><span class="dot"></span>Active</div>
-                </div>
-                <div class="sc-spark"><svg viewBox="0 0 72 32" preserveAspectRatio="none"><polyline points="2,22 12,20 22,14 30,16 40,10 50,12 60,6 70,8" fill="none" stroke="#B8860B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-                <div class="sc-arrow">›</div>
-              </a>
-              <a class="strategy-card filter-gold" style="display:none" onclick="openIframe('Gold H1 Swing — Sensitivity Analysis','./gold-swing-h1-sensitivity.html?v=1786250873')">
-                <div class="sc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-6 4 4 5-7"/></svg></div>
-                <div class="sc-meta">
-                  <div class="sc-title">Gold H1 Swing</div>
-                  <div class="sc-sub">Sensitivity Analysis (N × TP)</div>
-                  <span class="sc-tag tag-gold">Gold</span>
-                  <div class="sc-status active"><span class="dot"></span>Active</div>
-                </div>
-                <div class="sc-spark"><svg viewBox="0 0 72 32" preserveAspectRatio="none"><polyline points="2,20 12,16 22,19 30,14 40,17 50,11 60,13 70,9" fill="none" stroke="#B8860B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-                <div class="sc-arrow">›</div>
-              </a>
-              <a class="strategy-card filter-gold" style="display:none" onclick="openIframe('Zone Trading — Multi-TF Pivot &amp; Confluence','./gold-zone-strategy.html?v=1786257650','lab')">
-                <div class="sc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h18"/><path d="M3 12h18"/><path d="M3 16h18"/><circle cx="14" cy="12" r="2.6" fill="currentColor" stroke="none"/></svg></div>
-                <div class="sc-meta">
-                  <div class="sc-title">Zone Trading</div>
-                  <div class="sc-sub">Multi-TF Pivot &amp; Confluence</div>
-                  <span class="sc-tag tag-gold">Gold</span>
-                  <div class="sc-status active"><span class="dot"></span>Active</div>
-                </div>
-                <div class="sc-spark"><svg viewBox="0 0 72 32" preserveAspectRatio="none"><polyline points="2,18 12,22 22,15 30,19 40,12 50,15 60,9 70,11" fill="none" stroke="#B8860B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="sc-spark"><svg viewBox="0 0 72 32" preserveAspectRatio="none"><polyline points="2,14 12,16 22,13 30,20 40,17 50,22 60,19 70,23" fill="none" stroke="#B8860B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
                 <div class="sc-arrow">›</div>
               </a>
               <a class="strategy-card filter-gold" style="display:none" onclick="openIframe('โมเมนตัม 6 เดือน — Gold','./gold-momentum-6m.html?v=1786368937','lab')">
@@ -1445,15 +1428,48 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                 <div class="sc-spark"><svg viewBox="0 0 72 32" preserveAspectRatio="none"><polyline points="2,21 12,17 22,20 30,13 40,15 50,9 60,12 70,6" fill="none" stroke="#B8860B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
                 <div class="sc-arrow">›</div>
               </a>
-              <a class="strategy-card filter-gold" style="display:none" onclick="openIframe('Zone Trading · Backtest — Gold','./gold-zone-backtest.html?v=1786598458','lab')">
-                <div class="sc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h18"/><path d="M3 12h18"/><path d="M3 16h18"/><path d="M7 5v14"/><path d="M17 5v14"/></svg></div>
+              <a class="strategy-card filter-gold" style="display:none" onclick="openIframe('Zone Trading — Multi-TF Pivot &amp; Confluence','./gold-zone-strategy.html?v=1786257650','lab')">
+                <div class="sc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h18"/><path d="M3 12h18"/><path d="M3 16h18"/><circle cx="14" cy="12" r="2.6" fill="currentColor" stroke="none"/></svg></div>
                 <div class="sc-meta">
-                  <div class="sc-title">Zone Trading · Backtest</div>
-                  <div class="sc-sub">21 ระดับ · Confluence · Momentum</div>
+                  <div class="sc-title">Zone Trading</div>
+                  <div class="sc-sub">Multi-TF Pivot &amp; Confluence</div>
                   <span class="sc-tag tag-gold">Gold</span>
                   <div class="sc-status active"><span class="dot"></span>Active</div>
                 </div>
-                <div class="sc-spark"><svg viewBox="0 0 72 32" preserveAspectRatio="none"><polyline points="2,14 12,16 22,13 30,20 40,17 50,22 60,19 70,23" fill="none" stroke="#B8860B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="sc-spark"><svg viewBox="0 0 72 32" preserveAspectRatio="none"><polyline points="2,18 12,22 22,15 30,19 40,12 50,15 60,9 70,11" fill="none" stroke="#B8860B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="sc-arrow">›</div>
+              </a>
+              <a class="strategy-card filter-gold" style="display:none" onclick="openIframe('Gold H1 Swing — Sensitivity Analysis','./gold-swing-h1-sensitivity.html?v=1786250873')">
+                <div class="sc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-6 4 4 5-7"/></svg></div>
+                <div class="sc-meta">
+                  <div class="sc-title">Gold H1 Swing</div>
+                  <div class="sc-sub">Sensitivity Analysis (N × TP)</div>
+                  <span class="sc-tag tag-gold">Gold</span>
+                  <div class="sc-status active"><span class="dot"></span>Active</div>
+                </div>
+                <div class="sc-spark"><svg viewBox="0 0 72 32" preserveAspectRatio="none"><polyline points="2,20 12,16 22,19 30,14 40,17 50,11 60,13 70,9" fill="none" stroke="#B8860B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="sc-arrow">›</div>
+              </a>
+              <a class="strategy-card filter-gold" style="display:none" onclick="openIframe('Golden Cross — Gold','./gold-golden-cross.html?v=1786193877','lab')">
+                <div class="sc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M3 7l6 6 4-4 8 8"/></svg></div>
+                <div class="sc-meta">
+                  <div class="sc-title">Golden Cross</div>
+                  <div class="sc-sub">SMA 50/200 · Backtest ทองคำ</div>
+                  <span class="sc-tag tag-gold">Gold</span>
+                  <div class="sc-status active"><span class="dot"></span>Active</div>
+                </div>
+                <div class="sc-spark"><svg viewBox="0 0 72 32" preserveAspectRatio="none"><polyline points="2,22 12,20 22,14 30,16 40,10 50,12 60,6 70,8" fill="none" stroke="#B8860B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="sc-arrow">›</div>
+              </a>
+              <a class="strategy-card filter-gold" style="display:none" onclick="openIframe('SMC Patient Hunter — Gold Strategy','./smc-patient-hunter-report.html')">
+                <div class="sc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/><path d="M8 16l2-2 2 2 3-3"/></svg></div>
+                <div class="sc-meta">
+                  <div class="sc-title">SMC Patient Hunter</div>
+                  <div class="sc-sub">Gold H1 Strategy Report</div>
+                  <span class="sc-tag tag-gold">Gold</span>
+                  <div class="sc-status active"><span class="dot"></span>Active</div>
+                </div>
+                <div class="sc-spark"><svg viewBox="0 0 72 32" preserveAspectRatio="none"><polyline points="2,24 12,18 22,22 30,16 40,18 50,12 60,14 70,7" fill="none" stroke="#B8860B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
                 <div class="sc-arrow">›</div>
               </a>
               <!-- Experiment (empty placeholder, hidden by default) -->
@@ -1462,11 +1478,19 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
               </div>
             </div>
 
+            <!-- Show-all / collapse toggle for the strategy list -->
+            <button class="lab-more fade-up fade-up-2" type="button" id="labMoreBtn" onclick="toggleLabMore()">
+              <span class="lm-text">ดูทั้งหมด</span>
+              <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            </div><!-- /labStrategyBody -->
+
             <!-- ===== Library ===== -->
-            <div class="lab-section-head fade-up fade-up-3">
+            <button class="lab-section-head lab-head-btn fade-up fade-up-3" type="button" id="labLibraryHead" aria-expanded="true" onclick="toggleLabSection(this,'labLibraryBody')">
               <div class="lab-section-title">Library</div>
-              <button class="lab-see-all" onclick="jptToast('🚧 Library · เร็วๆ นี้')">ดูทั้งหมด ›</button>
-            </div>
+              <span class="lab-head-right"><span class="lab-head-count">3</span><svg class="lab-head-chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+            </button>
+            <div class="lab-sec-body" id="labLibraryBody">
             <div class="library-grid fade-up fade-up-3">
               <a class="library-card" onclick="jptToast('🚧 Momentum Research · กำลังพัฒนา · เร็วๆ นี้')">
                 <div class="lc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h10l4 4v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v5h5"/><polyline points="8 16 11 13 13 15 16 11"/></svg></div>
@@ -1487,6 +1511,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                 <div class="lc-status active"><span class="dot"></span>Active</div>
               </a>
             </div>
+            </div><!-- /labLibraryBody -->
 
             <!-- ===== Compare Strategies CTA (reads jpt_compare_list_v1 from localStorage) ===== -->
             <a class="create-strategy-cta fade-up fade-up-4" id="labCompareCTA" onclick="openLabCompare()">
@@ -2956,7 +2981,68 @@ function openNotifications(){
 }
 
 function jptToast(msg){let t=document.getElementById('jpt-toast');if(!t){t=document.createElement('div');t.id='jpt-toast';document.body.appendChild(t)}t.textContent=msg;t.classList.add('show');clearTimeout(t._hideTimer);t._hideTimer=setTimeout(()=>t.classList.remove('show'),2800)}
-function filterStrategies(btn,key){document.querySelectorAll('.lab-chip').forEach(c=>c.classList.remove('active'));btn.classList.add('active');const list=document.getElementById('labStrategyList');if(!list)return;list.querySelectorAll('.strategy-card,.strategy-empty,.lab-shelf-grid').forEach(el=>{const isMatch=el.classList.contains('filter-'+key);if(el.classList.contains('strategy-empty')){el.style.display=isMatch?'block':'none'}else{el.style.display=isMatch?'grid':'none'}})}
+/* ===== Lab: collapsible sections + show only the 3 newest cards ===== */
+var JPT_LAB_MAX=3, jptLabFilter='momentum', jptLabExpanded=false;
+function jptLabRenderList(){
+  var list=document.getElementById('labStrategyList'); if(!list)return;
+  var key=jptLabFilter, total=0;
+  list.querySelectorAll('.strategy-card,.strategy-empty,.lab-shelf-grid').forEach(function(el){
+    if(!el.classList.contains('filter-'+key)){el.style.display='none';return}
+    if(el.classList.contains('strategy-empty')){el.style.display='block';return}
+    if(el.classList.contains('lab-shelf-grid')){
+      el.style.display='flex';
+      el.querySelectorAll('.lsx-card').forEach(function(c){total++;c.style.display=(jptLabExpanded||total<=JPT_LAB_MAX)?'block':'none'});
+      return
+    }
+    total++;
+    el.style.display=(jptLabExpanded||total<=JPT_LAB_MAX)?'grid':'none'
+  });
+  var badge=document.getElementById('labStrategyCount');
+  if(badge)badge.textContent=(!jptLabExpanded&&total>JPT_LAB_MAX)?(JPT_LAB_MAX+'/'+total):String(total);
+  var more=document.getElementById('labMoreBtn');
+  if(more){
+    if(total>JPT_LAB_MAX){
+      more.style.display='flex';
+      more.classList.toggle('is-open',jptLabExpanded);
+      var t=more.querySelector('.lm-text');
+      if(t)t.textContent=jptLabExpanded?'ย่อรายการ':('ดูทั้งหมด '+total+' รายการ')
+    }else{more.style.display='none'}
+  }
+  var body=document.getElementById('labStrategyBody');
+  if(body&&!body.classList.contains('collapsed')){body.style.maxHeight='none';body.style.overflow='visible'}
+}
+function filterStrategies(btn,key){
+  document.querySelectorAll('.lab-chip').forEach(function(c){c.classList.remove('active')});
+  btn.classList.add('active'); jptLabFilter=key; jptLabExpanded=false; jptLabRenderList()
+}
+function toggleLabMore(){jptLabExpanded=!jptLabExpanded;jptLabRenderList()}
+function toggleLabSection(btn,id){
+  var b=document.getElementById(id); if(!b)return;
+  var collapse=!b.classList.contains('collapsed');
+  if(collapse){
+    b.style.overflow='hidden'; b.style.maxHeight=b.scrollHeight+'px';
+    requestAnimationFrame(function(){b.classList.add('collapsed');b.style.maxHeight='0px'})
+  }else{
+    b.classList.remove('collapsed'); b.style.overflow='hidden'; b.style.maxHeight='0px';
+    void b.offsetHeight;
+    requestAnimationFrame(function(){b.style.maxHeight=b.scrollHeight+'px'});
+    setTimeout(function(){if(!b.classList.contains('collapsed')){b.style.maxHeight='none';b.style.overflow='visible'}},340)
+  }
+  btn.classList.toggle('is-collapsed',collapse);
+  btn.setAttribute('aria-expanded',collapse?'false':'true');
+  try{localStorage.setItem('jpt_lab_col_'+id,collapse?'1':'0')}catch(e){}
+}
+function jptLabInit(){
+  jptLabRenderList();
+  [['labStrategyHead','labStrategyBody'],['labLibraryHead','labLibraryBody']].forEach(function(p){
+    var btn=document.getElementById(p[0]), b=document.getElementById(p[1]);
+    if(!btn||!b)return;
+    var saved='0'; try{saved=localStorage.getItem('jpt_lab_col_'+p[1])||'0'}catch(e){}
+    if(saved==='1'){b.classList.add('collapsed');b.style.maxHeight='0px';b.style.overflow='hidden';btn.classList.add('is-collapsed');btn.setAttribute('aria-expanded','false')}
+    else{b.style.maxHeight='none';b.style.overflow='visible'}
+  })
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',jptLabInit);else jptLabInit();
 function btcComingSoon(e){if(e){e.stopPropagation();e.preventDefault()}jptToast('🚧 Bitcoin · กำลังพัฒนา · เร็วๆ นี้')}
 let lastScreen='home';
 function openIframe(title,url,navScreen){const tEl=document.getElementById('iframeTitle'),tb=document.getElementById('iframeTopbar'),ld=document.getElementById('iframeLoading'),ct=document.getElementById('iframeContainer'),ifr=document.getElementById('iframeContent');const cur=document.querySelector('.screen.active');if(cur)lastScreen=cur.id.replace('screen-','');if(tEl)tEl.textContent=title;/* Hide topbar only for pages that already own their header (sp500-combined-strategy); show for everything else including news-detail */if(tb){const hideTopbar=/sp500-combined-strategy|sp500-strategy-pro|sp500-rolling-6m-momentum|gold-momentum-app|roadmap\.html|portfolio-planner|finance-planner|my-portfolio|user-guide/.test(url);tb.style.display=hideTopbar?'none':'flex'}ld.style.display='flex';ct.style.display='none';ifr.src='about:blank';document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-iframe').classList.add('active');/* Sync bottom nav highlight — auto-detect tab from URL when navScreen not explicitly passed */if(!navScreen){if(/sp500-(strategy-pro|combined-strategy|rolling-6m-momentum)|smc-patient-hunter|gold-swing-h1-sensitivity/.test(url))navScreen='lab';else if(/gold-momentum-app|Free_scannerSP500|my-portfolio|user-guide/.test(url))navScreen='more';else if(/portfolio-planner|finance-planner/.test(url))navScreen='roadmap';else if(/news-detail/.test(url))navScreen='news'}document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));if(navScreen){const b=document.querySelector('.nav-item[data-screen="'+navScreen+'"]');if(b)b.classList.add('active')}setTimeout(()=>{ifr.src=url;ifr.onload=function(){ld.style.display='none';ct.style.display='block'}},100);window.scrollTo({top:0});/* Strip cache-bust ?v= for cleaner analytics URLs */const cleanUrl=url.replace(/\?v=\d+/,'');logEvent('page_view',{screen:'iframe',url:cleanUrl})}
