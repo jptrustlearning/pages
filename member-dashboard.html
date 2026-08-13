@@ -2443,11 +2443,12 @@ function timeAgo(iso){
 function deriveTone(tickers,override){
   // Manual override from batch JSON wins over rule-based derivation.
   // Allowed values: 'bullish' | 'bearish' | 'mixed' | 'neutral'
+  // NOTE: 'mixed' is kept as a DATA key (news-index.json) but is DISPLAYED as "Neutral".
   if(override){
     const o=String(override).toLowerCase();
     if(o==='bullish')return{impactClass:'bullish',impactText:'Bullish'};
     if(o==='bearish')return{impactClass:'bearish',impactText:'Bearish'};
-    if(o==='mixed')return{impactClass:'neutral',impactText:'Mixed'};
+    if(o==='mixed')return{impactClass:'neutral',impactText:'Neutral'};
     if(o==='neutral')return{impactClass:'neutral',impactText:'Neutral'};
   }
   if(!tickers||!tickers.length)return{impactClass:'neutral',impactText:'Neutral'};
@@ -2456,7 +2457,7 @@ function deriveTone(tickers,override){
   const sentTotal=c.positive+c.negative;
   if(c.positive>c.negative&&c.positive>=sentTotal*0.7)return{impactClass:'bullish',impactText:'Bullish'};
   if(c.negative>c.positive&&c.negative>=sentTotal*0.7)return{impactClass:'bearish',impactText:'Bearish'};
-  return{impactClass:'neutral',impactText:'Mixed'};
+  return{impactClass:'neutral',impactText:'Neutral'};
 }
 function impactIcon(impactClass){
   if(impactClass==='bullish'){
@@ -2465,7 +2466,7 @@ function impactIcon(impactClass){
   if(impactClass==='bearish'){
     return '<img class="impact-icon" src="icon-bear-red.png?v=1783496563" alt="Bearish" loading="lazy">';
   }
-  return '<img class="impact-icon" src="icon-owl-gold.png?v=1783496563" alt="Mixed" loading="lazy">';
+  return '<img class="impact-icon" src="icon-owl-gold.png?v=1783496563" alt="Neutral" loading="lazy">';
 }
 
 const NEWS_INDEX_URL='https://app.jptrustlearning.com/news/news-index.json';
