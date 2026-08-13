@@ -2832,17 +2832,26 @@ function runBacktest() {
       let nextRebalMonth = -1;
       let nextRebalYear = lastYear;
 
-      // BUGFIX (13 Aug 2026): previous condition `getDate() > 7` was inverted — after the
-      // entry day, the PENDING card kept pointing at the rebalance month that already executed
-      // (e.g. showed 2026-Aug-03 while that round was already OPEN). Now checks tradeLog:
-      // if this month's rebalance already fired, skip forward to the next scheduled round.
-      const _lastTradeObj = state.tradeLog.length > 0
-        ? new Date(state.tradeLog[state.tradeLog.length - 1].date) : null;
-      const _rebalDone = (y, m) => !!_lastTradeObj &&
-        _lastTradeObj.getFullYear() === y && _lastTradeObj.getMonth() === m;
+      // BUGFIX (13 Aug 2026, r2): original `getDate() > 7` was inverted — after the entry
+      // day the PENDING card kept pointing at the rebalance month that already executed.
+      // r2 also covers EXTENDED rounds (defensive_uat): a skipped/extended month pushes NO
+      // new tradeLog entry, so a month counts as "decided" if the last entry OR any extend
+      // event landed in it — and past the first week we always walk forward regardless
+      // (same semantics as the v10theme engine, which was correct all along).
+      const _lastLog = state.tradeLog.length > 0
+        ? state.tradeLog[state.tradeLog.length - 1] : null;
+      const _inMonth = (dstr, y, m) => {
+        const d = new Date(dstr);
+        return d.getFullYear() === y && d.getMonth() === m;
+      };
+      const _rebalDecided = (y, m) => !!_lastLog && (
+        _inMonth(_lastLog.date, y, m) ||
+        (_lastLog.extendHistory || []).some(e => _inMonth(e.date, y, m))
+      );
 
       for (const m of sortedRebalMonths) {
-        if (m >= lastMonth && !_rebalDone(lastYear, m)) {
+        if (m > lastMonth) { nextRebalMonth = m; break; }
+        if (m === lastMonth && lastDateObj.getDate() <= 7 && !_rebalDecided(lastYear, m)) {
           nextRebalMonth = m;
           break;
         }
