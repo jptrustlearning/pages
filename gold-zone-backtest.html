@@ -106,6 +106,24 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .zmap .sup{color:var(--emerald);font-weight:600}
 .zbar{display:inline-block;height:7px;border-radius:4px;background:var(--gold);vertical-align:middle}
 .rulebox{overflow-x:auto}
+.yr{width:100%;border-collapse:collapse;font-size:12.5px}
+.yr th{font-size:11px;color:var(--muted);font-weight:600;padding:0 6px 8px;border-bottom:1px solid var(--border);text-align:right}
+.yr th:first-child{text-align:left}
+.yr td{padding:8px 6px;border-bottom:1px solid rgba(212,175,55,.10);text-align:right;font-variant-numeric:tabular-nums}
+.yr td:first-child{text-align:left;font-weight:600;color:var(--maroon)}
+.yr tr:last-child td{border-bottom:none}
+.yr tfoot td{border-top:2px solid var(--border);font-weight:700;padding-top:10px}
+.tlog-wrap{max-height:330px;overflow-y:auto;border:1px solid rgba(212,175,55,.16);border-radius:10px}
+.tlog{width:100%;border-collapse:collapse;font-size:12.5px}
+.tlog th{position:sticky;top:0;background:var(--card);font-size:11px;color:var(--muted);font-weight:600;
+  padding:9px 8px;border-bottom:1px solid var(--border);text-align:right;z-index:1}
+.tlog th:first-child,.tlog th:nth-child(2){text-align:left}
+.tlog td{padding:8px;border-bottom:1px solid rgba(212,175,55,.08);text-align:right;font-variant-numeric:tabular-nums}
+.tlog td:first-child,.tlog td:nth-child(2){text-align:left}
+.tlog tr:last-child td{border-bottom:none}
+.tlog .open{background:rgba(212,175,55,.10)}
+.sumrow{display:flex;flex-wrap:wrap;gap:16px;margin-top:12px;font-size:12.5px;color:var(--muted)}
+.sumrow b{color:var(--text)}
 .ruletbl{width:100%;border-collapse:collapse;font-size:12.5px;min-width:420px}
 .ruletbl th{font-size:11px;color:var(--muted);font-weight:600;text-align:left;
   padding:0 8px 8px;border-bottom:1px solid var(--border)}
@@ -203,6 +221,24 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
       <span><i style="background:#2E9E5B"></i>S1</span>
       <span><i class="sw" style="background:var(--gold-soft);border:1px solid var(--gold)"></i>ถือทอง</span>
     </div>
+  </div>
+
+  <div class="chart-card">
+    <h3>ผลย้อนหลังรายปี</h3>
+    <div class="csub" id="yrSub">ผลตอบแทนแต่ละปีปฏิทิน เทียบกับซื้อถือยาวในปีเดียวกัน</div>
+    <table class="yr"><thead><tr>
+      <th>ปี</th><th>Zone Trading</th><th>Buy &amp; Hold</th><th>ส่วนต่าง</th><th>ถือทอง</th><th>สลับ</th>
+    </tr></thead><tbody id="yrBody"></tbody><tfoot id="yrFoot"></tfoot></table>
+    <div class="sumrow" id="yrSum"></div>
+  </div>
+
+  <div class="chart-card">
+    <h3>รายการเข้า–ออกย้อนหลังทั้งหมด</h3>
+    <div class="csub" id="tlogSub">ทุกครั้งที่กลยุทธ์เข้าถือทองและออก · ผลตอบแทนหักค่าธรรมเนียมแล้ว</div>
+    <div class="tlog-wrap"><table class="tlog"><thead><tr>
+      <th>#</th><th>เข้า</th><th>ราคาเข้า</th><th>ออก</th><th>ราคาออก</th><th>วัน</th><th>ผล</th>
+    </tr></thead><tbody id="tlogBody"></tbody></table></div>
+    <div class="sumrow" id="tlogSum"></div>
   </div>
 
   <div class="chart-card">
@@ -429,18 +465,45 @@ function backtest(lag,cost,minThick,startYear){
 
   const idx=[],px=[],eqS=[],eqB=[],mask=[],dS=[],dB=[],r1=[],pp=[],s1=[];
   let cS=1,cB=1,sw=0,ld=0;
+  const yrs=[], ymap={};
   for(let i=s0;i<n;i++){
     let sr=pos[i]*RET[i];
+    const y=DATES[i].slice(0,4);
+    if(!(y in ymap)){ ymap[y]={y:y,s:1,b:1,d:0,h:0,sw:0}; yrs.push(ymap[y]); }
+    const Y=ymap[y];
     if(i>s0){
-      if(pos[i]!==pos[i-1]){ sw++; sr-=cost/10000; }
+      if(pos[i]!==pos[i-1]){ sw++; Y.sw++; sr-=cost/10000; }
       cS*=(1+sr); cB*=(1+RET[i]); dS.push(sr); dB.push(RET[i]);
+      Y.s*=(1+sr); Y.b*=(1+RET[i]);
     }
-    if(pos[i]===1) ld++;
+    Y.d++; if(pos[i]===1){ ld++; Y.h++; }
     idx.push(DATES[i]); px.push(CLOSE[i]);
     r1.push(DR1[i]); pp.push(DPP[i]); s1.push(DS1[i]);
     eqS.push(cS*100); eqB.push(cB*100); mask.push(pos[i]===1);
   }
-  return {idx,px,r1,pp,s1,eqS,eqB,mask,dS,dB,sw,ld,s0};
+
+  // trade log — pos[i]=1 means we earn RET[i], so entry is at close of day i-1
+  const trades=[];
+  for(let i=s0+1;i<n;i++){
+    if(pos[i]===1 && pos[i-1]===0){
+      const ei=i-1;
+      let xi=n-1, open=true;
+      for(let k=i;k<n;k++){
+        if(k===n-1){ xi=k; open=true; break; }
+        if(pos[k+1]===0){ xi=k; open=false; break; }
+      }
+      // read the trade's contribution straight off the equity curve so fees
+      // compound exactly the same way they do in the backtest
+      // exit fee is charged on the day the position flips back to 0 (xi+1),
+      // so a closed trade's window must include that day
+      const xEnd = open ? xi : Math.min(xi+1, n-1);
+      const ret=eqS[xEnd-s0]/eqS[ei-s0]-1;
+      trades.push({eD:DATES[ei],eP:CLOSE[ei],xD:DATES[xi],xP:CLOSE[xi],
+                   days:xi-ei,ret:ret,open:open});
+      i=xi;
+    }
+  }
+  return {idx,px,r1,pp,s1,eqS,eqB,mask,dS,dB,sw,ld,s0,yrs,trades};
 }
 function ann(a){ if(!a.length) return 0;
   const m=a.reduce((x,y)=>x+y,0)/a.length;
@@ -495,13 +558,55 @@ function run(){
     ${card('จำนวนครั้งสลับเข้าออก',r.sw.toLocaleString(),'ตลอดช่วงทดสอบ',null,1)}
     ${card('เวลาถือทอง',tim.toFixed(0)+'%','ของช่วงเวลา',null,1)}`;
 
-  drawZoneMap(); drawRules(key); drawEq(r); drawPrice(r);
+  drawYearly(r); drawTrades(r); drawZoneMap(); drawRules(key); drawEq(r); drawPrice(r);
 }
 function card(k,v,cmp,cls,sv){
   const vc = sv!=null ? (sv>=0?'pos':'neg') : '';
   const c = cls?`<div class="cmp"><b class="${cls}">${cls==='win'?'ชนะ':'แพ้'}</b> · ${cmp}</div>`
                :`<div class="cmp">${cmp}</div>`;
   return `<div class="stat"><div class="k">${k}</div><div class="v ${vc}">${v}</div>${c}</div>`;
+}
+
+function drawYearly(r){
+  const cls=x=>x>=0?'pos':'neg';
+  document.getElementById('yrBody').innerHTML=r.yrs.map(y=>{
+    const sr=y.s-1, br=y.b-1, df=sr-br;
+    return `<tr><td>${y.y}</td>
+      <td class="${cls(sr)}">${pct2(sr)}</td>
+      <td class="${cls(br)}">${pct2(br)}</td>
+      <td class="${df>=0?'win':'lose'}">${pct2(df)}</td>
+      <td>${(y.h/y.d*100).toFixed(0)}%</td><td>${y.sw}</td></tr>`;
+  }).join('');
+  const wins=r.yrs.filter(y=>(y.s-1)>(y.b-1)).length;
+  const tot=r.yrs.length;
+  document.getElementById('yrFoot').innerHTML=
+    `<tr><td>ชนะ B&amp;H</td><td colspan="2">${wins} / ${tot} ปี</td>
+     <td colspan="3">${(wins/tot*100).toFixed(0)}% ของปีทั้งหมด</td></tr>`;
+  const pos_=r.yrs.filter(y=>y.s>1).length;
+  document.getElementById('yrSum').innerHTML=
+    `ปีที่กลยุทธ์เป็นบวก <b>${pos_}/${tot}</b> · ปีที่ชนะซื้อถือยาว <b>${wins}/${tot}</b>`;
+}
+
+function drawTrades(r){
+  const t=r.trades;
+  if(!t.length){ document.getElementById('tlogBody').innerHTML=
+      '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px">ไม่มีรายการในช่วงนี้</td></tr>';
+    document.getElementById('tlogSum').innerHTML=''; return; }
+  document.getElementById('tlogBody').innerHTML=t.map((x,i)=>
+    `<tr class="${x.open?'open':''}"><td>${i+1}</td>
+      <td>${x.eD}</td><td>$${x.eP.toFixed(1)}</td>
+      <td>${x.open?'<i style="opacity:.7">ยังถืออยู่</i>':x.xD}</td>
+      <td>$${x.xP.toFixed(1)}</td><td>${x.days}</td>
+      <td class="${x.ret>=0?'pos':'neg'}">${pct2(x.ret)}</td></tr>`).join('');
+  const w=t.filter(x=>x.ret>0).length;
+  const avg=t.reduce((a,b)=>a+b.ret,0)/t.length;
+  const avgD=t.reduce((a,b)=>a+b.days,0)/t.length;
+  const best=t.reduce((a,b)=>b.ret>a.ret?b:a);
+  const worst=t.reduce((a,b)=>b.ret<a.ret?b:a);
+  document.getElementById('tlogSum').innerHTML=
+    `ทั้งหมด <b>${t.length}</b> ครั้ง · ชนะ <b>${w}</b> (${(w/t.length*100).toFixed(0)}%) · `+
+    `เฉลี่ยต่อครั้ง <b>${pct2(avg)}</b> · ถือเฉลี่ย <b>${avgD.toFixed(0)}</b> วัน · `+
+    `ดีสุด <b>${pct2(best.ret)}</b> · แย่สุด <b>${pct2(worst.ret)}</b>`;
 }
 
 function drawZoneMap(){
