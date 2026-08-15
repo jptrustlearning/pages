@@ -1892,6 +1892,7 @@
         <button class="tab-btn" onclick="openChartTab(event, 'chart-dd')">DRAWDOWN</button>
         <button class="tab-btn" onclick="openChartTab(event, 'chart-vs')">VS S&P500</button>
         <button class="tab-btn" onclick="openChartTab(event, 'chart-breadth')">BREADTH</button>
+        <button class="tab-btn" onclick="openChartTab(event, 'chart-entryspy')">ENTRY vs SPY</button>
       </div>
       
       <div id="chart-equity" class="tab-content active" style="height: 400px;">
@@ -1912,6 +1913,27 @@
       <div id="chart-breadth" class="tab-content" style="height: 400px;">
         <canvas id="breadthChart"></canvas>
       </div>
+      <!-- Tab: Entry vs SPY (A65) — เห็นภาพว่าเข้าตอนฟื้นจากก้นเหวยังไง -->
+      <div id="chart-entryspy" class="tab-content">
+        <div style="font-family:'Anuphan',sans-serif;font-size:0.82rem;color:var(--text-muted);margin:6px 2px 14px;line-height:1.7;">
+          จุดเขียว = <strong>วันเข้าซื้อจริง</strong> ของทุกไม้ วางบนเส้น SPY — ดูว่าสัญญาณตกลงมาจอดตรงไหนของรอบตลาด
+        </div>
+        <div style="height: 320px; position: relative;">
+          <canvas id="entrySpyChart"></canvas>
+        </div>
+
+        <div class="entry-stat-row" id="entryStatRow"></div>
+
+        <div style="font-family:'Anuphan',sans-serif;font-size:0.82rem;color:var(--text-muted);margin:20px 2px 12px;line-height:1.7;">
+          <strong>ซูมรอบวันเข้า</strong> — ตั้ง SPY วันเข้า = 100 ทุกไม้ แล้ววางซ้อนกัน · เส้นจางคือไม้แต่ละไม้ เส้นทองหนาคือค่าเฉลี่ย ·
+          ครึ่งซ้ายของกราฟคือ<strong>ขาลงก่อนเข้า</strong> ครึ่งขวาคือ<strong>หลังเข้า</strong>
+        </div>
+        <div style="height: 320px; position: relative;">
+          <canvas id="entryEventChart"></canvas>
+        </div>
+        <div id="entryEventNote" style="font-family:'Anuphan',sans-serif;font-size:0.78rem;color:var(--text-muted);margin-top:12px;line-height:1.7;"></div>
+      </div>
+
     </div>
 
     <!-- BOTTOM TABS -->
@@ -1923,7 +1945,6 @@
         <button class="tab-btn" onclick="openBottomTab(event, 'tab-stats')">STATISTICS</button>
         <button class="tab-btn" onclick="openBottomTab(event, 'tab-opt')">HOLD COMPARE</button>
         <button class="tab-btn" onclick="openBottomTab(event, 'tab-annual')">ANNUAL CHART</button>
-        <button class="tab-btn" onclick="openBottomTab(event, 'tab-entryspy')">ENTRY vs SPY</button>
       </div>
 
       <!-- Tab 0: Hold-period comparison (A61 Exp 6) -->
@@ -1950,27 +1971,6 @@
           โหมดนี้<strong>ยิงทุกสัญญาณด้วยทุนไม้ละเท่ากัน</strong> (ถือซ้อนกันได้ — คอลัมน์ขวาสุดบอกว่าต้องเตรียมเงินสดกี่ไม้) · ตัวเลขรวมผล<strong>ยืดตอนหมี</strong>ตามที่ตั้งค่าไว้ · บทบาทที่งานวิจัยของเราสรุป: <strong>ถือ 1–2 เดือน = กติกาเอาเงินสดที่นอนอยู่ลงช่วงจังหวะพิเศษ</strong> (ช่วงหลังตลาดล้าง SPY เองก็วิ่งแรงกว่าปกติ ~2.5 เท่าใน 1 เดือน แต่ผลนี้จางหมดภายใน ~6 เดือน) ·
           ส่วน <strong>ถือ 6 เดือน</strong> ตัวเลขจะสวยเป็นพิเศษเพราะแทบไม่ต่างจากถือ Momentum ยาวตลอด — ตัวเลขต่อปีของโหมดนี้อ่อนไหวกับวันเริ่มมาก (phase luck) อย่านำไปเทียบกับกลยุทธ์หลักตรงๆ
         </div>
-      </div>
-
-      <!-- Tab: Entry vs SPY (A65) — เห็นภาพว่าเข้าตอนฟื้นจากก้นเหวยังไง -->
-      <div id="tab-entryspy" class="tab-content">
-        <div style="font-family:'Anuphan',sans-serif;font-size:0.82rem;color:var(--text-muted);margin:6px 2px 14px;line-height:1.7;">
-          จุดเขียว = <strong>วันเข้าซื้อจริง</strong> ของทุกไม้ วางบนเส้น SPY — ดูว่าสัญญาณตกลงมาจอดตรงไหนของรอบตลาด
-        </div>
-        <div style="height: 320px; position: relative;">
-          <canvas id="entrySpyChart"></canvas>
-        </div>
-
-        <div class="entry-stat-row" id="entryStatRow"></div>
-
-        <div style="font-family:'Anuphan',sans-serif;font-size:0.82rem;color:var(--text-muted);margin:20px 2px 12px;line-height:1.7;">
-          <strong>ซูมรอบวันเข้า</strong> — ตั้ง SPY วันเข้า = 100 ทุกไม้ แล้ววางซ้อนกัน · เส้นจางคือไม้แต่ละไม้ เส้นทองหนาคือค่าเฉลี่ย ·
-          ครึ่งซ้ายของกราฟคือ<strong>ขาลงก่อนเข้า</strong> ครึ่งขวาคือ<strong>หลังเข้า</strong>
-        </div>
-        <div style="height: 320px; position: relative;">
-          <canvas id="entryEventChart"></canvas>
-        </div>
-        <div id="entryEventNote" style="font-family:'Anuphan',sans-serif;font-size:0.78rem;color:var(--text-muted);margin-top:12px;line-height:1.7;"></div>
       </div>
 
       <!-- Tab: Yearly Summary (NEW in Phase 6) -->
