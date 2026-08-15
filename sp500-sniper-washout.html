@@ -1637,11 +1637,11 @@
       </div>
       <div class="headline-text">
         <div class="headline-line-1">
-          ผลการทดสอบ หากยิงตามสัญญาณทุกครั้ง<br>
-          ตลอด <strong id="headlineYears">—</strong> ปีที่ผ่านมา กำไรเฉลี่ย
+          ผลการทดสอบ หากลงทุนด้วยกลยุทธ์นี้<br>
+          ตั้งแต่ <strong id="headlineYears">—</strong> ปีที่แล้ว ผลตอบแทนเฉลี่ย
         </div>
         <div class="headline-line-2">
-          ไม้ละ <span class="headline-cagr" id="headlineCagr">—</span> จาก <span id="headlineTrades">—</span> ไม้
+          ปีละ <span class="headline-cagr" id="headlineCagr">—</span> แบบไม่ทบต้น
         </div>
       </div>
     </div>
@@ -1665,24 +1665,24 @@
       <!-- 4 KPI pillars (Weekly format) -->
       <div class="rsc-metrics-grid">
         <div class="rsc-metric">
-          <div class="rsc-metric-label">Avg / Trade</div>
+          <div class="rsc-metric-label">Annualized Return</div>
           <div class="rsc-metric-value" id="rscAnnRoi">0.0%</div>
-          <div class="rsc-metric-desc">กำไรเฉลี่ยต่อไม้ หลังหักค่าธรรมเนียม</div>
+          <div class="rsc-metric-desc">ผลตอบแทนเฉลี่ยต่อปีจากเงินลงทุน</div>
         </div>
         <div class="rsc-metric">
-          <div class="rsc-metric-label">Win Rate</div>
+          <div class="rsc-metric-label">Sharpe Ratio</div>
           <div class="rsc-metric-value" id="rscSharpe">—</div>
-          <div class="rsc-metric-desc" id="rscSharpeDesc">สัดส่วนไม้ที่ปิดกำไร</div>
+          <div class="rsc-metric-desc" id="rscSharpeDesc">กำไรต่อหน่วยความเสี่ยง — สูงกว่า 1 ถือว่าดี</div>
         </div>
         <div class="rsc-metric">
-          <div class="rsc-metric-label">ชนะ SPY / ไม้</div>
+          <div class="rsc-metric-label">Alpha</div>
           <div class="rsc-metric-value" id="rscAlpha">—</div>
-          <div class="rsc-metric-desc" id="rscAlphaDesc">เทียบเอาเงินก้อนเดียวกันซื้อ SPY ช่วงเวลาเดียวกันทุกไม้</div>
+          <div class="rsc-metric-desc" id="rscAlphaDesc">ผลตอบแทนส่วนที่เอาชนะตลาด หลังหักความเสี่ยง</div>
         </div>
         <div class="rsc-metric">
-          <div class="rsc-metric-label">ไม้แย่สุด</div>
+          <div class="rsc-metric-label">Max Drawdown</div>
           <div class="rsc-metric-value" id="rscMaxDD" style="color:var(--red);">0.0%</div>
-          <div class="rsc-metric-desc">ขาดทุนหนักสุดในไม้เดียว — เอาไว้วัดความอดทนที่ต้องมี</div>
+          <div class="rsc-metric-desc">พอร์ตเคยลดจากจุดสูงสุดมากที่สุด — เอาไว้วัดความอดทนที่ต้องมี</div>
         </div>
       </div>
 
@@ -3242,24 +3242,32 @@ function calculateStats() {
   const annOnChest = Math.pow(1 + totalPnl / warChest, 1 / years) - 1;
   const consistency = sdTrade > 0 ? avgTrade / sdTrade : 0;
 
-  // ===== Max DD ของกำไรสะสม (% ของเงินสดที่เตรียม) =====
-  let peak = -Infinity, maxDDusd = 0;
+  // ===== Max DD — แบบ Weekly (computeEquityDDPct): peak-to-trough ของ curve มูลค่า
+  //       curve มูลค่า = งบตั้งต้น (war chest) + กำไรสะสม — ตรงกับ DD chart =====
+  let peak = -Infinity, maxDD = 0, maxDDusd = 0, peakUsd = 0;
   curve.forEach(e => {
-    if (e.equity > peak) peak = e.equity;
-    const dd = e.equity - peak;
-    if (dd < maxDDusd) maxDDusd = dd;
+    const v = warChest + e.equity;
+    if (v > peak) peak = v;
+    const dd = (v - peak) / peak;
+    if (dd < maxDD) { maxDD = dd; maxDDusd = v - peak; }
   });
-  const maxDD = warChest > 0 ? maxDDusd / warChest : 0;
 
   const fmt = (n, p = 1) => (n * 100).toFixed(p) + '%';
   const usd = (n) => (n >= 0 ? '+' : '-') + '$' + Math.abs(Math.round(n)).toLocaleString();
   const $id = (i) => document.getElementById(i);
   const setTxt = (i, v) => { const e = $id(i); if (e) e.innerText = v; };
 
-  // ── headline ──
+  // ── Weekly-standard: annualized แบบไม่ทบต้นบนงบตั้งต้น (= เงินสดสูงสุดที่ต้องเตรียม) ──
+  // อ้างสูตร sp500-combined-strategy: ไม้ไม่ทบต้นต่อกัน → geometric CAGR ผิดความหมาย
+  const annualizedRoi = warChest > 0 ? ((totalPnl / warChest) * 100) / years : 0;
+  state.annualizedRoi = annualizedRoi;
+  const monthsSpan = Math.max(days / 30.44, 1);
+  const avgPerMonth = totalPnl / monthsSpan;
+
+  // ── headline (weekly wording) ──
   setTxt('headlineYears', String(Math.max(1, Math.round(years))));
   const hc = $id('headlineCagr');
-  if (hc) { hc.innerText = (avgTrade >= 0 ? '+' : '') + fmt(avgTrade); hc.classList.toggle('negative', avgTrade < 0); }
+  if (hc) { hc.innerText = (annualizedRoi >= 0 ? '+' : '') + annualizedRoi.toFixed(1) + '%'; hc.classList.toggle('negative', annualizedRoi < 0); }
   setTxt('headlineTrades', String(totalTrades));
 
   // ── summary card hero ──
@@ -3272,24 +3280,54 @@ function calculateStats() {
   const heroPnl = $id('rscTotalPnl');
   if (heroPnl) { heroPnl.innerText = usd(totalPnl); heroPnl.className = 'rsc-hero-value ' + (totalPnl >= 0 ? 'positive' : 'negative'); }
   const rMA = $id('rscMonthlyAvg');
-  if (rMA) rMA.innerHTML = `จากทุนไม้ละ <strong>$${PT.toLocaleString()}</strong> × ${totalTrades} ไม้ (ใส่รวม $${deployed.toLocaleString()}) &middot; เงินสดสูงสุดที่ใช้พร้อมกัน <strong>$${warChest.toLocaleString()}</strong> (${maxConc} ไม้)`;
+  if (rMA) rMA.innerHTML = `ตกเฉลี่ย <strong>${avgPerMonth >= 0 ? '+' : '-'}$${Math.abs(Math.round(avgPerMonth)).toLocaleString()}</strong> / เดือน &middot; จากงบตั้งต้น <strong>$${warChest.toLocaleString()}</strong> (ซ้อนสูงสุด ${maxConc} ไม้ × ทุนไม้ละ $${PT.toLocaleString()})`;
 
-  // ── rsc 4 metrics ──
+  // ── rsc 4 metrics — สูตรตาม sp500-combined-strategy (weekly house standard) ──
   const annRoi = $id('rscAnnRoi');
-  if (annRoi) { annRoi.innerText = (avgTrade >= 0 ? '+' : '') + fmt(avgTrade); annRoi.style.color = avgTrade >= 0 ? 'var(--green)' : 'var(--red)'; }
-  setTxt('rscSharpe', fmt(winRate, 0));
-  const wrDesc = $id('rscSharpeDesc');
-  if (wrDesc) {
-    if (winRate >= 0.8) wrDesc.innerText = 'ชนะบ่อยมาก — ' + roundWins + ' จาก ' + nR + ' ไม้';
-    else if (winRate >= 0.65) wrDesc.innerText = 'ชนะเป็นส่วนใหญ่ — ' + roundWins + ' จาก ' + nR + ' ไม้';
-    else if (winRate >= 0.5) wrDesc.innerText = 'ชนะเกินครึ่ง — ' + roundWins + ' จาก ' + nR + ' ไม้';
-    else wrDesc.innerText = 'ชนะไม่ถึงครึ่ง — ' + roundWins + ' จาก ' + nR + ' ไม้';
+  if (annRoi) { annRoi.innerText = (annualizedRoi >= 0 ? '+' : '') + annualizedRoi.toFixed(1) + '%'; annRoi.style.color = annualizedRoi >= 0 ? 'var(--green)' : 'var(--red)'; }
+
+  // Sharpe: per-ไม้ returns · periodsPerYear = 252/H · Rf = 0 (house standard)
+  const ppy = 252 / Math.max(CONFIG.holdDays, 1);
+  const rsSharpe = $id('rscSharpe'), rsSharpeDesc = $id('rscSharpeDesc');
+  let sharpeW = null;
+  if (nR >= 10) {
+    const sd1 = nR > 1 ? Math.sqrt(roundReturns.reduce((s, r) => s + Math.pow(r - avgTrade, 2), 0) / (nR - 1)) : 0;
+    const volAnn = sd1 * Math.sqrt(ppy);
+    sharpeW = volAnn > 0 ? (annualizedRoi / 100) / volAnn : 0;
   }
-  const rscAl = $id('rscAlpha');
-  if (rscAl) { rscAl.innerText = (edge >= 0 ? '+' : '') + (edge * 100).toFixed(1) + ' จุด'; rscAl.style.color = edge >= 0 ? 'var(--green)' : 'var(--red)'; }
-  const alDesc = $id('rscAlphaDesc');
-  if (alDesc) alDesc.innerText = `ชนะ SPY ${beatSpy}/${nSpy} ไม้ (หน้าต่างเวลาเดียวกัน)`;
-  setTxt('rscMaxDD', fmt(worst));
+  if (rsSharpe && rsSharpeDesc) {
+    if (sharpeW !== null) {
+      rsSharpe.innerText = sharpeW.toFixed(2);
+      rsSharpe.style.color = sharpeW > 1 ? 'var(--green)' : sharpeW > 0.5 ? 'var(--accent)' : 'var(--red)';
+      rsSharpeDesc.innerText = sharpeW > 1.5 ? 'ดีมาก — กำไรคุ้มเสี่ยงสูง'
+        : sharpeW > 1 ? 'ดี — กำไรต่อหน่วยความเสี่ยงใช้ได้'
+        : sharpeW > 0.5 ? 'พอใช้ — กำไรยังไม่ชัดกว่าเสี่ยงมาก'
+        : 'ต่ำ — ความเสี่ยงสูงกว่ากำไร';
+    } else { rsSharpe.innerText = '—'; rsSharpeDesc.innerText = 'ต้องมีอย่างน้อย 10 รอบถึงจะวัดได้'; }
+  }
+
+  // Alpha: Jensen's alpha annualized — คู่ per-ไม้ vs SPY หน้าต่างเดียวกัน (แบบ weekly)
+  const rsAlpha = $id('rscAlpha'), rsAlphaDesc = $id('rscAlphaDesc');
+  let alphaJ = null;
+  if (nSpy >= 10) {
+    const pm = spyPairs.reduce((s, p) => s + p.r, 0) / nSpy;
+    const mm = spyPairs.reduce((s, p) => s + p.spy, 0) / nSpy;
+    let cov = 0, mv = 0;
+    for (const p of spyPairs) { cov += (p.r - pm) * (p.spy - mm); mv += Math.pow(p.spy - mm, 2); }
+    const beta = mv > 0 ? cov / mv : 1;
+    alphaJ = (pm * ppy) - beta * (mm * ppy);   // Rf = 0
+  }
+  if (rsAlpha && rsAlphaDesc) {
+    if (alphaJ !== null) {
+      rsAlpha.innerText = (alphaJ >= 0 ? '+' : '') + (alphaJ * 100).toFixed(2) + '%';
+      rsAlpha.style.color = alphaJ > 0 ? 'var(--green)' : 'var(--red)';
+      rsAlphaDesc.innerText = alphaJ > 0.05 ? 'เอาชนะตลาดได้ชัดเจน'
+        : alphaJ > 0 ? 'พอเอาชนะตลาดได้'
+        : 'ยังไม่เอาชนะตลาด';
+    } else { rsAlpha.innerText = '—'; rsAlphaDesc.innerText = 'ต้องมีอย่างน้อย 10 รอบถึงจะวัดได้'; }
+  }
+
+  setTxt('rscMaxDD', fmt(maxDD));
 
   // ── bench pane (ต่อไม้ทั้งสองฝั่ง) ──
   const bsr = $id('rssBenchStratReturn');
@@ -3359,7 +3397,8 @@ function calculateStats() {
   setTxt('kpi-pf', pf.toFixed(2));
   setTxt('bench-strat-cagr', fmt(avgTrade));
   setTxt('bench-strat-vol', fmt(sdTrade));
-  setTxt('stat-cagr-mirror', fmt(annOnChest));   // JPCompare อ่านตัวนี้ (ต่อปีบนเงินสดที่เตรียม)
+  const scm = $id('stat-cagr-mirror');
+  if (scm) scm.innerText = (annualizedRoi >= 0 ? '+' : '') + annualizedRoi.toFixed(1) + '%';   // JPCompare อ่านตัวนี้ (weekly-standard annualized)
 
   // ── สถิติฝั่งขาลง (jp-drawdown.js) — ป้อน curve ฐานเงินสดที่เตรียม ──
   try {
