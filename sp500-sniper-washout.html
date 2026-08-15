@@ -1641,7 +1641,7 @@
           ตั้งแต่ <strong id="headlineYears">—</strong> ปีที่แล้ว ผลตอบแทนเฉลี่ย
         </div>
         <div class="headline-line-2">
-          ปีละ <span class="headline-cagr" id="headlineCagr">—</span> แบบไม่ทบต้น
+          ปีละ <span class="headline-cagr" id="headlineCagr">—</span> (เฉลี่ยรายปี)
         </div>
       </div>
     </div>
@@ -1667,7 +1667,7 @@
         <div class="rsc-metric">
           <div class="rsc-metric-label">Annualized Return</div>
           <div class="rsc-metric-value" id="rscAnnRoi">0.0%</div>
-          <div class="rsc-metric-desc">ผลตอบแทนเฉลี่ยต่อปีจากเงินลงทุน</div>
+          <div class="rsc-metric-desc">เฉลี่ยผลตอบแทนรายปี — ฐานคิดแต่ละปี = เงินที่ต้องวางจริงปีนั้น</div>
         </div>
         <div class="rsc-metric">
           <div class="rsc-metric-label">Sharpe Ratio</div>
@@ -1936,18 +1936,22 @@
         <div class="heatmap-wrapper">
           <table id="yearlyTable" class="simple-table">
             <thead><tr>
-              <th style="text-align:left;">Year</th>
-              <th>Trades</th>
-              <th>Wins</th>
-              <th>Losses</th>
-              <th>Win Rate</th>
-              <th>P&L</th>
-              <th>Best</th>
-              <th>Worst</th>
+              <th style="text-align:left;">ปี</th>
+              <th>เปิดไม้</th>
+              <th>ปิดไม้ (ชนะ)</th>
+              <th>ซ้อนสูงสุด</th>
+              <th>เงินที่ต้องวางปีนั้น</th>
+              <th>กำไรปีนั้น</th>
+              <th>ผลตอบแทน</th>
             </tr></thead>
             <tbody id="yearlyBody"></tbody>
             <tfoot id="yearlyFoot"></tfoot>
           </table>
+        </div>
+        <div style="font-family:'Anuphan',sans-serif;font-size:0.78rem;color:var(--text-muted);margin-top:12px;line-height:1.7;">
+          <strong>กำไรปีนั้น</strong> = กำไรสะสมปลายปี − ปลายปีก่อน (ตีมูลค่าไม้ที่ยังเปิดค้างตามราคาสิ้นปี) — ไม่ต้องรอไม้ปิด ·
+          <strong>เงินที่ต้องวางปีนั้น</strong> = ไม้ซ้อนสูงสุดในปีนั้น × ทุนไม้ ปีไหนเปิดไม้เดียวก็นับแค่ทุนไม้เดียว ·
+          <strong>ผลตอบแทนเฉลี่ยต่อปี</strong> ในการ์ดสรุป = ค่าเฉลี่ยของคอลัมน์ขวาสุด เฉพาะปีที่จบแล้ว
         </div>
       </div>
 
@@ -2200,6 +2204,7 @@ let CONFIG = {
   zWindow: 60,                 // หน้าต่าง SMA/STD ของ z-score
   zThresh: -2,                 // นับเป็น washout เมื่อ z < −2
   breadthArm: 19.0,            // arm เมื่อ breadth ≥ 19% (p95 จากข้อมูลจริง — A61 ตรึงไว้ ไม่จูน)
+  episodeReset: 21,            // จบ episode เมื่อ breadth < arm ติดกัน 21 วันเทรด → ลืมพีคเดิม (A65 ข้อ C)
   lb: 126,                     // LB6 = ผลตอบแทน 126 วันเทรดล้วน (ไม่ผสม volume)
   feeSide: 0.0005,             // ค่าธรรมเนียม 0.05% ต่อข้าง
   startYear: 2015,
@@ -2851,15 +2856,24 @@ function buildSniperSeries() {
   const breadth = new Float64Array(n);
   for (let i = 0; i < n; i++) breadth[i] = den[i] > 0 ? (num[i] / den[i]) * 100 : 0;
   // --- signal state machine ---
+  // --- signal state machine (A65 ข้อ C: กัน ratchet ลงภายใน episode เดียวกัน) ---
+  // เดิม: ยิงแล้ว arm ใหม่ได้ทันทีที่ breadth เด้ง ≥19% → พีคเล็กลงเรื่อยๆ → ยิงซ้ำคลื่นเดิม
+  // ใหม่: ยิงได้เฉพาะเมื่อพีครอบนี้ ≥ พีคของรอบที่ยิงล่าสุด (refPeak)
+  //       refPeak ลืมได้เมื่อ breadth ต่ำกว่าเกณฑ์ arm ติดกันครบ episodeReset วัน = พายุจบจริง
   const signals = [];
-  let armed = false, peakB = 0;
+  let armed = false, peakB = 0, refPeak = 0, quietDays = 0;
   for (let i = 0; i < n; i++) {
     const b = breadth[i];
+    if (b < CONFIG.breadthArm) { quietDays++; if (quietDays >= CONFIG.episodeReset) refPeak = 0; }
+    else quietDays = 0;
     if (!armed) {
       if (b >= CONFIG.breadthArm) { armed = true; peakB = b; }
     } else {
       if (b > peakB) peakB = b;
-      if (b <= peakB / 2) { signals.push(i); armed = false; peakB = 0; }
+      if (b <= peakB / 2) {
+        if (peakB >= refPeak) { signals.push(i); refPeak = peakB; }   // พีคไม่ถึงพีคเดิม = คลื่นลูกเดิม ไม่ยิง
+        armed = false; peakB = 0;
+      }
     }
   }
   // --- macro regime (ยืดตอนหมี): carry-forward close ของ 4 สินทรัพย์ · Δ126 วันเทรด ---
@@ -2889,7 +2903,7 @@ function buildSniperSeries() {
     macroBenign[i] = (ranked[0].spy || ranked[1].spy) ? 1 : 0;
   }
   state._sniper = { n, m, offset, dates, tickers, closeA, openA, breadth, signals,
-                    lastArmed: armed, lastPeak: peakB, macroBenign };
+                    lastArmed: armed, lastPeak: peakB, lastRefPeak: refPeak, macroBenign };
   return state._sniper;
 }
 
@@ -2937,6 +2951,7 @@ function sniperRun(H, topN, perTrade, startIdx) {
   const equity = [], closed = [];
   const active = [];
   let closedPnl = 0, entered = 0, maxConcurrent = 0, k = 0;
+  const yearMaxConc = {};      // ปี → จำนวนไม้ซ้อนสูงสุดในปีนั้น (ฐานคิดผลตอบแทนรายปี)
   const useExtend = CONFIG.defensiveExtend !== false;
   const benign = S.macroBenign;
   for (let i = t0; i < n; i++) {
@@ -2991,6 +3006,8 @@ function sniperRun(H, topN, perTrade, startIdx) {
       if (active.length > maxConcurrent) maxConcurrent = active.length;
       k++;
     }
+    const _yr = dates[i].substring(0, 4);
+    if (!(yearMaxConc[_yr] >= active.length)) yearMaxConc[_yr] = active.length;
     let mtm = 0;
     for (const tr of active) {
       for (const lg of tr.legs) mtm += lg.sh * lg.lp;   // lp = close ล่าสุดที่มีจริง (carry)
@@ -3009,7 +3026,7 @@ function sniperRun(H, topN, perTrade, startIdx) {
     legs: tr.legs.map(lg => ({ ticker: tickers[lg.j], lb6: lg.r, entryPrice: lg.po }))
   }));
   return { equity: equity, closed: closed, openLots: openLots, firePending: firePending,
-           entered: entered, maxConcurrent: maxConcurrent,
+           entered: entered, maxConcurrent: maxConcurrent, yearMaxConc: yearMaxConc,
            deployedTotal: entered * perTrade };
 }
 
@@ -3077,6 +3094,7 @@ function runSniperBacktest() {
   state.lots = res.openLots;
   state.deployedTotal = res.deployedTotal;
   state.maxConcurrent = res.maxConcurrent;
+  state.yearMaxConc = res.yearMaxConc || {};
   state.extendedCount = [...res.closed, ...res.openLots].filter(t => (t.extendCount || 0) > 0).length;
   state.warChest = Math.max(res.maxConcurrent, 1) * PT;
 
@@ -3173,6 +3191,40 @@ function runSniperBacktest() {
 
 function runBacktest() { return runSniperBacktest(); }
 
+// ============================================================
+// ผลตอบแทนรายปี (A65) — ฐานคิด = เงินที่ต้องวางจริง "ในปีนั้น" เท่านั้น
+// ปีไหนเปิดไม้เดียว ฐาน = 1 × ทุนไม้ · ปีไหนซ้อน 3 ไม้ ฐาน = 3 × ทุนไม้
+// กำไรของปี = equity (กำไรสะสม MTM) ปลายปี − ปลายปีก่อน  → "ต้นปีเทียบปลายปี"
+// annualized = ค่าเฉลี่ยเลขคณิตของผลตอบแทนรายปี (ไม่รวมปีปัจจุบันที่ยังไม่จบ)
+// ============================================================
+function computeYearlyReturns() {
+  const curve = state.equityCurve || [];
+  const PT = CONFIG.perTradeCapital || 1;
+  const ymc = state.yearMaxConc || {};
+  if (curve.length === 0) return { rows: [], avg: 0, nFull: 0 };
+  const lastDate = curve[curve.length - 1].date;
+  const years = [...new Set(curve.map(e => e.date.substring(0, 4)))].sort();
+  const rows = [];
+  let prev = 0;
+  years.forEach(y => {
+    const rel = curve.filter(e => e.date.startsWith(y));
+    if (rel.length === 0) return;
+    const end = rel[rel.length - 1].equity;
+    const pnl = end - prev;
+    prev = end;
+    const conc = ymc[y] || 0;
+    const base = conc * PT;
+    const lots = [...(state.closedLots || []), ...(state.lots || [])]
+                   .filter(t => t.entryDate && t.entryDate.startsWith(y)).length;
+    const partial = (y === lastDate.substring(0, 4)) && !lastDate.endsWith('-12-31');
+    rows.push({ year: y, pnl: pnl, lots: lots, conc: conc, base: base,
+                ret: base > 0 ? pnl / base : null, partial: partial });
+  });
+  const full = rows.filter(r => !r.partial && r.ret !== null);
+  const avg = full.length ? full.reduce((a, r) => a + r.ret, 0) / full.length : 0;
+  return { rows: rows, avg: avg, nFull: full.length };
+}
+
 function calculateStats() {
   const curve = state.equityCurve;               // กำไรสะสม (P&L) รวมทุกไม้
   if (curve.length === 0) return;
@@ -3257,10 +3309,15 @@ function calculateStats() {
   const $id = (i) => document.getElementById(i);
   const setTxt = (i, v) => { const e = $id(i); if (e) e.innerText = v; };
 
-  // ── Weekly-standard: annualized แบบไม่ทบต้นบนงบตั้งต้น (= เงินสดสูงสุดที่ต้องเตรียม) ──
-  // อ้างสูตร sp500-combined-strategy: ไม้ไม่ทบต้นต่อกัน → geometric CAGR ผิดความหมาย
-  const annualizedRoi = warChest > 0 ? ((totalPnl / warChest) * 100) / years : 0;
+  // ── annualized (A65) = เฉลี่ยผลตอบแทนรายปี ──
+  // เดิมใช้ war chest (ซ้อนสูงสุดตลอดกาล) เป็นตัวหารทุกปี — ไม่ยุติธรรมเพราะปีที่เปิดไม้เดียว
+  // ก็ไม่ได้วางเงินก้อนนั้นไว้ ตอนนี้คิดเป็นปีๆ (ฐาน = เงินที่ต้องวางจริงในปีนั้น) แล้วเฉลี่ย
+  const yearly = computeYearlyReturns();
+  state.yearlyStats = yearly;
+  const annualizedRoi = yearly.avg * 100;
   state.annualizedRoi = annualizedRoi;
+  const annOnChestLegacy = warChest > 0 ? ((totalPnl / warChest) * 100) / years : 0;   // สูตรเดิม เก็บไว้เทียบ
+  state.annualizedRoiLegacy = annOnChestLegacy;
   const monthsSpan = Math.max(days / 30.44, 1);
   const avgPerMonth = totalPnl / monthsSpan;
 
@@ -3280,7 +3337,7 @@ function calculateStats() {
   const heroPnl = $id('rscTotalPnl');
   if (heroPnl) { heroPnl.innerText = usd(totalPnl); heroPnl.className = 'rsc-hero-value ' + (totalPnl >= 0 ? 'positive' : 'negative'); }
   const rMA = $id('rscMonthlyAvg');
-  if (rMA) rMA.innerHTML = `ตกเฉลี่ย <strong>${avgPerMonth >= 0 ? '+' : '-'}$${Math.abs(Math.round(avgPerMonth)).toLocaleString()}</strong> / เดือน &middot; จากงบตั้งต้น <strong>$${warChest.toLocaleString()}</strong> (ซ้อนสูงสุด ${maxConc} ไม้ × ทุนไม้ละ $${PT.toLocaleString()})`;
+  if (rMA) rMA.innerHTML = `ตกเฉลี่ย <strong>${avgPerMonth >= 0 ? '+' : '-'}$${Math.abs(Math.round(avgPerMonth)).toLocaleString()}</strong> / เดือน &middot; ผลตอบแทนคิดเป็นรายปี แล้วเฉลี่ย ${yearly.nFull} ปี (ฐานแต่ละปี = ไม้ซ้อนสูงสุดปีนั้น × ทุนไม้ละ $${PT.toLocaleString()}) &middot; ช่วงถี่สุดต้องเตรียม $${warChest.toLocaleString()}`;
 
   // ── rsc 4 metrics — สูตรตาม sp500-combined-strategy (weekly house standard) ──
   const annRoi = $id('rscAnnRoi');
@@ -3576,66 +3633,51 @@ function renderDistChart() {
   });
 }
 
-// === PHASE 6: YEARLY SUMMARY TABLE — grouped by lot EXIT year ===
+// === YEARLY SUMMARY (A65) — ผลตอบแทน "เป็นปีๆ" ตามคำสั่ง Joon ===
+// กำไรของปี = equity (กำไรสะสม MTM) ปลายปี − ปลายปีก่อน  → ต้นปีเทียบปลายปี ไม่ต้องรอไม้ปิด
+// ฐานคิดของปี = ไม้ซ้อนสูงสุด "ในปีนั้น" × ทุนไม้ (เงินที่ต้องวางจริงปีนั้น ไม่ใช่ war chest ตลอดกาล)
 function renderYearly() {
   const tbody = document.getElementById('yearlyBody');
   const tfoot = document.getElementById('yearlyFoot');
   if (!tbody || !tfoot) return;
   tbody.innerHTML = ''; tfoot.innerHTML = '';
 
-  // Use closedLots (realized 6-month lots) — consistent with Win Rate in "ความแม่น" tab
-  const closedLots = state.closedLots || [];
-  if (closedLots.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text-muted);">ยังไม่มีไม้ที่ปิดแล้ว — รอสัญญาณแรกหลังปีเริ่มต้น</td></tr>';
+  const y = state.yearlyStats || computeYearlyReturns();
+  if (!y.rows || y.rows.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text-muted);">ยังไม่มีข้อมูล — รอสัญญาณแรกหลังปีเริ่มต้น</td></tr>';
     return;
   }
 
-  // Group closed trades by YEAR of exitDate (ปีที่ขายไม้)
-  const yearMap = {};
-  closedLots.forEach(cl => {
-    const year = cl.exitDate.substring(0, 4);
-    const pnl = cl.pl || 0;
-    const pct = (cl.returnPct || 0) * 100;
-    if (!yearMap[year]) yearMap[year] = [];
-    yearMap[year].push({ pnl, pct });
-  });
-
-  let gLots = 0, gWins = 0, gPnl = 0;
-  const years = Object.keys(yearMap).sort();
-
-  years.forEach(y => {
-    const lots = yearMap[y];
-    const wins = lots.filter(r => r.pct > 0).length;
-    const losses = lots.length - wins;
-    const winRate = lots.length > 0 ? (wins / lots.length * 100) : 0;
-    const pnl = lots.reduce((s, r) => s + r.pnl, 0);
-    const best = Math.max(...lots.map(r => r.pct));
-    const worst = Math.min(...lots.map(r => r.pct));
-    gLots += lots.length; gWins += wins; gPnl += pnl;
-
-    const pnlCls = pnl >= 0 ? 'text-green' : 'text-red';
-    tbody.innerHTML += `<tr>
-      <td style="text-align:left;color:var(--gold-deep);font-weight:700;">${y}</td>
-      <td>${lots.length}</td>
-      <td class="text-green">${wins}</td>
-      <td class="text-red">${losses}</td>
-      <td>${winRate.toFixed(0)}%</td>
-      <td class="${pnlCls}"><strong>$${Math.round(pnl).toLocaleString()}</strong></td>
-      <td class="text-green">+${best.toFixed(1)}%</td>
-      <td class="text-red">${worst.toFixed(1)}%</td>
+  const closed = state.closedLots || [];
+  y.rows.forEach(r => {
+    const closedInYear = closed.filter(c => c.exitDate && c.exitDate.startsWith(r.year));
+    const wins = closedInYear.filter(c => (c.returnPct || 0) > 0).length;
+    const pnlCls = r.pnl >= 0 ? 'text-green' : 'text-red';
+    const retTxt = r.ret === null ? '—' : (r.ret >= 0 ? '+' : '') + (r.ret * 100).toFixed(1) + '%';
+    const retCls = r.ret === null ? '' : (r.ret >= 0 ? 'text-green' : 'text-red');
+    tbody.innerHTML += `<tr${r.partial ? ' style="opacity:.72;"' : ''}>
+      <td style="text-align:left;color:var(--gold-deep);font-weight:700;">${r.year}${r.partial ? ' <span style="font-size:.72em;opacity:.8;">(ยังไม่จบปี)</span>' : ''}</td>
+      <td>${r.lots}</td>
+      <td>${closedInYear.length ? wins + '/' + closedInYear.length : '—'}</td>
+      <td>${r.conc || '—'}</td>
+      <td>${r.base ? '$' + r.base.toLocaleString() : '—'}</td>
+      <td class="${pnlCls}"><strong>${r.pnl >= 0 ? '+' : '-'}$${Math.abs(Math.round(r.pnl)).toLocaleString()}</strong></td>
+      <td class="${retCls}"><strong>${retTxt}</strong></td>
     </tr>`;
   });
 
-  const gWinRate = gLots > 0 ? (gWins / gLots * 100) : 0;
+  const gPnl = y.rows.reduce((s, r) => s + r.pnl, 0);
+  const gLots = y.rows.reduce((s, r) => s + r.lots, 0);
   const gPnlCls = gPnl >= 0 ? 'text-green' : 'text-red';
+  const avgTxt = (y.avg >= 0 ? '+' : '') + (y.avg * 100).toFixed(1) + '%';
   tfoot.innerHTML = `<tr style="font-weight:700;background:rgba(212,175,55,0.08);">
-    <td style="text-align:left;">TOTAL</td>
+    <td style="text-align:left;">รวม / เฉลี่ย</td>
     <td>${gLots}</td>
-    <td class="text-green">${gWins}</td>
-    <td class="text-red">${gLots - gWins}</td>
-    <td>${gWinRate.toFixed(0)}%</td>
-    <td class="${gPnlCls}"><strong>$${Math.round(gPnl).toLocaleString()}</strong></td>
-    <td>—</td><td>—</td>
+    <td>—</td>
+    <td>—</td>
+    <td>—</td>
+    <td class="${gPnlCls}"><strong>${gPnl >= 0 ? '+' : '-'}$${Math.abs(Math.round(gPnl)).toLocaleString()}</strong></td>
+    <td class="${y.avg >= 0 ? 'text-green' : 'text-red'}"><strong>${avgTxt}</strong></td>
   </tr>`;
 }
 
