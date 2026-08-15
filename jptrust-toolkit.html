@@ -825,7 +825,11 @@ function paintBreakdown(){
 /* ---------- ATR zone ladder ---------- */
 let ZONES=null;
 function calc(){
-  const open=+document.getElementById('openIn').value;
+  /* โหมดอัตโนมัติต้องยึดราคาจากข้อมูลเสมอ ไม่อ่านจากช่องกรอก
+     ถ้าช่องกรอกค้างค่าที่ผู้ใช้เคยพิมพ์ไว้ด้วยเหตุใดก็ตาม โซนจะได้ไม่ผิดตาม */
+  const inp=document.getElementById('openIn');
+  if(OPEN_MODE==='auto' && LAST && isFinite(LAST.open)) inp.value=LAST.open;
+  const open=+inp.value;
   if(!isFinite(open)||open<=0){
     document.getElementById('ladder').innerHTML=
       '<div class="empty-slot"><div class="e-t">DAILY ZONES</div><div class="e-d">ใส่ราคาเปิดเป็นตัวเลขก่อนครับ</div></div>';
