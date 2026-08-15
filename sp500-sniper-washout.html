@@ -2207,7 +2207,7 @@
     <div class="about-philosophy">
       <div class="philosophy-label">Trading Philosophy</div>
       <div class="philosophy-text">
-        <strong>ไม่ไล่ราคา · รอตลาดล้างแล้วค่อยยิง</strong> · เราวัด "ความกว้างของการเทขาย" (Breadth) = สัดส่วนหุ้นใน S&amp;P 500 ที่ราคาหลุดต่ำกว่าค่าเฉลี่ย 60 วันแบบรุนแรง (z-score &lt; −2) · วันที่ Breadth พุ่งเกิน <strong>19%</strong> = ตลาดกำลังล้างครั้งใหญ่ → เรา<strong>ยังไม่ซื้อ</strong> · รอจน Breadth หดกลับลงมา<strong>ต่ำกว่าครึ่งหนึ่งของจุดพีค</strong> (แรงเทเริ่มหมด) จึงยิง — ซื้อหุ้น Top 10 ที่โมเมนตัม 6 เดือนแรงสุด ที่ราคาเปิดวันถัดไป
+        <strong>ไม่ไล่ราคา · รอตลาดล้างแล้วค่อยยิง</strong> · เราวัด "ความกว้างของการเทขาย" (Breadth) = สัดส่วนหุ้นใน S&amp;P 500 ที่ราคาหลุดต่ำกว่าค่าเฉลี่ย 60 วันแบบรุนแรง (z-score &lt; −2) · วันที่ Breadth พุ่งเกิน <strong>19%</strong> = ตลาดกำลังล้างครั้งใหญ่ → เรา<strong>ยังไม่ซื้อ</strong> · รอจน Breadth หดกลับลงมา<strong>ต่ำกว่าครึ่งหนึ่งของจุดพีค</strong> (แรงเทเริ่มหมด) จึงยิง — ซื้อหุ้น Top 10 ที่โมเมนตัม 6 เดือนแรงสุด ที่ราคาเปิดวันถัดไป · ถ้าพายุลูกเดิมยังไม่จบแล้วเกิดคลื่นซ้ำ จะยิงอีกครั้ง<strong>เฉพาะเมื่อคลื่นใหม่แรงกว่าคลื่นที่เพิ่งยิงไปอย่างน้อย 15%</strong> — กันการยิงซ้ำคลื่นเดิมที่กำลังอ่อนแรงลง
       </div>
       <div class="philosophy-signature">Breadth Washout Trigger · Pure LB6 Picks</div>
     </div>
@@ -2219,7 +2219,7 @@
           <span class="pillar-title">TRIGGER</span>
         </div>
         <div class="pillar-subtitle">Breadth Washout</div>
-        <div class="pillar-desc">Breadth ≥ 19% (ค่า percentile 95 จากข้อมูลจริง — ตรึงไว้ ไม่จูน) แล้วหดกลับ ≤ ครึ่งพีค · ช่วงหลังสัญญาณ ตลาดโดยรวมมักฟื้นแรงกว่าเดือนปกติ <strong>~2.5 เท่า</strong> ใน 1 เดือนแรก</div>
+        <div class="pillar-desc">Breadth ≥ 19% (ค่า percentile 95 จากข้อมูลจริง — ตรึงไว้ ไม่จูน) แล้วหดกลับ ≤ ครึ่งพีค · คลื่นซ้ำในพายุลูกเดิมต้องแรงกว่าคลื่นก่อนหน้า ≥ 15% ถึงยิงอีกครั้ง · ช่วงหลังสัญญาณ ตลาดโดยรวมมักฟื้นแรงกว่าเดือนปกติ <strong>~2.5 เท่า</strong> ใน 1 เดือนแรก</div>
       </div>
       <div class="about-pillar vol">
         <div class="pillar-header">
@@ -2247,6 +2247,7 @@ let CONFIG = {
   zThresh: -2,                 // นับเป็น washout เมื่อ z < −2
   breadthArm: 19.0,            // arm เมื่อ breadth ≥ 19% (p95 จากข้อมูลจริง — A61 ตรึงไว้ ไม่จูน)
   episodeReset: 21,            // จบ episode เมื่อ breadth < arm ติดกัน 21 วันเทรด → ลืมพีคเดิม (A65 ข้อ C)
+  episodeEscalation: 1.15,     // พีคใหม่ต้อง ≥ 1.15 × พีคเดิม ถึงนับเป็นพายุลูกใหม่ (A65) — ดู ⚠️ เพดานใน buildSniperSeries
   lb: 126,                     // LB6 = ผลตอบแทน 126 วันเทรดล้วน (ไม่ผสม volume)
   feeSide: 0.0005,             // ค่าธรรมเนียม 0.05% ต่อข้าง
   startYear: 2015,
@@ -2900,8 +2901,11 @@ function buildSniperSeries() {
   // --- signal state machine ---
   // --- signal state machine (A65 ข้อ C: กัน ratchet ลงภายใน episode เดียวกัน) ---
   // เดิม: ยิงแล้ว arm ใหม่ได้ทันทีที่ breadth เด้ง ≥19% → พีคเล็กลงเรื่อยๆ → ยิงซ้ำคลื่นเดิม
-  // ใหม่: ยิงได้เฉพาะเมื่อพีครอบนี้ ≥ พีคของรอบที่ยิงล่าสุด (refPeak)
+  // ใหม่: ยิงได้เฉพาะเมื่อพีครอบนี้ ≥ episodeEscalation × พีคของรอบที่ยิงล่าสุด (refPeak)
   //       refPeak ลืมได้เมื่อ breadth ต่ำกว่าเกณฑ์ arm ติดกันครบ episodeReset วัน = พายุจบจริง
+  // ⚠️ breadth มีเพดาน 100% แต่กติกาคูณไม่มี → พีคแรกที่สูงเกิน 100/escalation จะล็อกไม่ให้ยิงรอบสองตลอดกาล
+  //    ที่ 1.15× เพดาน = 87.0% (พีคสูงสุดที่เคยเกิดจริง = 90.7% มี.ค. 2020 ซึ่งเป็นรอบสองอยู่แล้ว)
+  //    ห้ามขยับเกิน 1.55× เด็ดขาด — ไม้ก้น COVID (90.7 ÷ 57.6 = 1.57×) จะหลุด
   const signals = [];
   let armed = false, peakB = 0, refPeak = 0, quietDays = 0;
   for (let i = 0; i < n; i++) {
@@ -2913,7 +2917,7 @@ function buildSniperSeries() {
     } else {
       if (b > peakB) peakB = b;
       if (b <= peakB / 2) {
-        if (peakB >= refPeak) { signals.push(i); refPeak = peakB; }   // พีคไม่ถึงพีคเดิม = คลื่นลูกเดิม ไม่ยิง
+        if (peakB >= refPeak * CONFIG.episodeEscalation) { signals.push(i); refPeak = peakB; }   // ไม่แรงกว่าเดิมพอ = คลื่นลูกเดิม ไม่ยิง
         armed = false; peakB = 0;
       }
     }
@@ -4518,7 +4522,7 @@ window.switchStatsTab = function(tab) {
           'ทุนต่อไม้': '$' + (CONFIG.perTradeCapital || 0).toLocaleString(),
           'จำนวนหุ้นต่อไม้': CONFIG.topN + ' ตัว',
           'ระยะถือครอง': (typeof holdLabelTh === 'function' ? holdLabelTh() : ''),
-          'Trigger': 'Breadth ≥ 19% แล้วหด ≤ ครึ่งพีค',
+          'Trigger': 'Breadth ≥ 19% แล้วหด ≤ ครึ่งพีค (คลื่นซ้ำต้องแรงกว่าเดิม ≥ 15%)',
           'Ranking': 'LB6 ล้วน (126 วันเทรด)',
           'ปีเริ่มต้น': CONFIG.startYear
         }
