@@ -147,12 +147,19 @@ tbody tr{border-top:1px solid rgba(212,175,55,.14)}
 .dotlive.fb{background:var(--gold)}
 .atr-chip{margin-left:auto;font-size:11.5px;font-weight:500;color:#9a7d1e;background:var(--gold-soft);
   border:1px solid var(--line);border-radius:20px;padding:4px 11px;white-space:nowrap}
-.openbar{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-bottom:14px;
-  background:rgba(58,21,32,.04);border:1px solid var(--line);border-radius:11px;padding:11px 13px}
+.openbar{background:rgba(58,21,32,.04);border:1px solid var(--line);border-radius:11px;padding:11px 13px;margin-bottom:14px}
+.modeseg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-bottom:10px}
+.modeseg button{flex:1;border:none;background:none;padding:9px 10px;font-family:var(--f-b);font-size:13px;
+  color:var(--muted);cursor:pointer;font-weight:500}
+.modeseg button+button{border-left:1px solid var(--line)}
+.modeseg button.on{background:linear-gradient(135deg,var(--maroon),var(--maroon2));color:var(--gold-l);font-weight:600}
+.openrow{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
 .openbar label{font-size:12.5px;color:var(--muted);font-weight:600}
 .openbar input{flex:1;min-width:130px;padding:9px 12px;border:1px solid var(--line);border-radius:9px;
   background:var(--card);color:var(--ink);font-family:var(--f-n);font-size:18px}
 .openbar input:focus{outline:2px solid var(--gold);outline-offset:1px}
+.openbar input.locked{background:rgba(58,21,32,.05);color:var(--maroon);cursor:default}
+#btnCalc.hide{display:none}
 table.lad td,table.lad th{padding:8px 11px}
 table.lad td.num{font-family:var(--f-n);font-size:16px}
 tr.lv-r td{color:#9c3a2a}
@@ -294,10 +301,15 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
               <h3>โซนแนวรับ–แนวต้านของวันนี้</h3>
             </div>
             <div class="openbar">
-              <label for="openIn">ราคาเปิดวันนี้ (USD)</label>
-              <input id="openIn" type="number" step="0.1" inputmode="decimal" placeholder="เช่น 4408.2">
-              <button class="btn gold" id="btnCalc">คำนวณโซน</button>
-              <button class="btn" id="btnLast">ใช้ราคาเปิดล่าสุด</button>
+              <div class="modeseg" id="openMode">
+                <button type="button" data-m="auto" class="on">ใช้ราคาเปิดปัจจุบัน</button>
+                <button type="button" data-m="manual">พิมพ์เอง</button>
+              </div>
+              <div class="openrow">
+                <label for="openIn">ราคาเปิด (USD)</label>
+                <input id="openIn" type="number" step="0.1" inputmode="decimal" placeholder="เช่น 4408.2">
+                <button class="btn gold" id="btnCalc">คำนวณโซน</button>
+              </div>
               <div class="openhint" id="openHint"></div>
             </div>
             <div id="ladder"><div class="empty-slot"><div class="e-t">DAILY ZONES</div>
@@ -649,15 +661,7 @@ const thDate=s=>{const m=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ
 function renderAll(){
   ATR=wilderATR(PX); PIV=pivots(PX); TOL=Math.max(4,0.10*ATR);
   LAST={date:PX.d[PX.d.length-1],open:PX.o[PX.o.length-1],close:PX.c[PX.c.length-1]};
-  const inp=document.getElementById('openIn');
-  const untouched = !inp.value || +inp.value===PREV_OPEN;
-  if(untouched) inp.value=LAST.open;
-  PREV_OPEN=LAST.open;
-  document.getElementById('btnLast').textContent=`ใช้ราคาเปิด ${thDate(LAST.date)}`;
-  document.getElementById('openHint').innerHTML=
-    `ยังไม่รู้ราคาเปิดวันนี้? <a href="#" id="useClose">ใช้ราคาปิดล่าสุด $${f0(LAST.close)}</a> แทนได้`;
-  document.getElementById('useClose').onclick=e=>{e.preventDefault();
-    document.getElementById('openIn').value=LAST.close; calc();};
+  applyMode();
   paintKPIs(); paintGauge(); paintBreakdown(); calc(); drawChart();
 }
 function setStatus(state){
@@ -670,7 +674,35 @@ function setStatus(state){
   el.innerHTML=`<span class="dotlive ${txt[0]}"></span>${txt[1]} · ปิดล่าสุด ${thDate(LAST.date)} ที่ $${f0(LAST.close)}`;
 }
 
-let PREV_OPEN=null;
+let PREV_OPEN=null, OPEN_MODE='auto';
+
+/* โหมด auto = ใช้ราคาเปิดล่าสุดจากข้อมูล ช่องกรอกล็อกไว้ อัปเดตเองเมื่อข้อมูลสดมาถึง
+   โหมด manual = ผู้ใช้พิมพ์เอง ระบบจะไม่แตะค่าในช่องอีกเลย */
+function applyMode(){
+  const inp=document.getElementById('openIn');
+  const btn=document.getElementById('btnCalc');
+  const hint=document.getElementById('openHint');
+  if(OPEN_MODE==='auto'){
+    inp.value=LAST.open; inp.readOnly=true; inp.classList.add('locked');
+    btn.classList.add('hide');
+    hint.innerHTML=`ราคาเปิดของวันที่ ${thDate(LAST.date)} · อัปเดตให้อัตโนมัติเมื่อมีข้อมูลใหม่`;
+  }else{
+    inp.readOnly=false; inp.classList.remove('locked');
+    btn.classList.remove('hide');
+    hint.innerHTML=`พิมพ์ราคาเปิดของวันนี้แล้วกดคำนวณ · ยังไม่รู้ราคาเปิด? <a href="#" id="useClose">ใช้ราคาปิดล่าสุด $${f0(LAST.close)}</a> ได้`;
+    const uc=document.getElementById('useClose');
+    if(uc) uc.onclick=e=>{e.preventDefault(); inp.value=LAST.close; calc();};
+  }
+  PREV_OPEN=LAST.open;
+}
+document.getElementById('openMode').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  document.querySelectorAll('#openMode button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); OPEN_MODE=b.dataset.m;
+  applyMode();
+  if(OPEN_MODE==='auto') calc();
+  else document.getElementById('openIn').focus();
+});
 
 function boot(){
   /* 1) วาดทันทีจากข้อมูลในไฟล์ */
@@ -798,7 +830,6 @@ function calc(){
 }
 document.getElementById('btnCalc').onclick=calc;
 document.getElementById('openIn').addEventListener('keydown',e=>{if(e.key==='Enter')calc()});
-document.getElementById('btnLast').onclick=()=>{document.getElementById('openIn').value=LAST.open;calc()};
 
 /* ---------- 60-day chart with today's zones ---------- */
 function drawChart(){
