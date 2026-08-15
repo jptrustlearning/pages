@@ -6,8 +6,8 @@
 <title>JP Trust Tool &amp; Kit — Sentiment ทองคำรายวัน</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Cinzel:wght@500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;600&family=Cinzel:wght@500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 :root{
   --cream:#FAF6ED; --card:#FFFEF8; --line:rgba(212,175,55,.22);
@@ -643,28 +643,51 @@ const f2=x=>x.toFixed(2);
 const thDate=s=>{const m=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
   const p=s.split('-'); return (+p[2])+' '+m[+p[1]-1]+' '+(+p[0]+543).toString().slice(2);};
 
-async function boot(){
-  let pxT=null,scT=null,live=true;
-  try{
-    const [a,b]=await Promise.all([fetch(PX_URL,{cache:'no-store'}),fetch(SC_URL,{cache:'no-store'})]);
-    if(!a.ok||!b.ok) throw 0;
-    pxT=await a.text(); scT=await b.text();
-    if(pxT.length<3000) throw 0;
-    PX=parsePX(pxT); SC=parseSCLast(scT);
-  }catch(e){
-    live=false; PX=parsePX(FB_PX); SC=FB_SC;
-  }
+/* หน้าเดิมรอโหลด CSV 611 KB ก่อนจะวาดอะไรเลย บนมือถือจึงค้างขาวหลายวินาที
+   ตอนนี้วาดจากข้อมูลสำรองที่ฝังในไฟล์ทันที (0 ไบต์ ไม่ต้องรอเน็ต)
+   แล้วค่อยดึงของสดมาทับเงียบๆ เบื้องหลัง — ผู้ใช้เห็นเนื้อหาทันทีเสมอ */
+function renderAll(){
   ATR=wilderATR(PX); PIV=pivots(PX); TOL=Math.max(4,0.10*ATR);
   LAST={date:PX.d[PX.d.length-1],open:PX.o[PX.o.length-1],close:PX.c[PX.c.length-1]};
-  document.getElementById('asOf').innerHTML=
-    `<span class="dotlive ${live?'':'fb'}"></span>ข้อมูล${live?'สด':'สำรอง'} · ปิดล่าสุด ${thDate(LAST.date)} ที่ $${f0(LAST.close)}`;
-  document.getElementById('openIn').value=LAST.open;
+  const inp=document.getElementById('openIn');
+  const untouched = !inp.value || +inp.value===PREV_OPEN;
+  if(untouched) inp.value=LAST.open;
+  PREV_OPEN=LAST.open;
   document.getElementById('btnLast').textContent=`ใช้ราคาเปิด ${thDate(LAST.date)}`;
   document.getElementById('openHint').innerHTML=
     `ยังไม่รู้ราคาเปิดวันนี้? <a href="#" id="useClose">ใช้ราคาปิดล่าสุด $${f0(LAST.close)}</a> แทนได้`;
   document.getElementById('useClose').onclick=e=>{e.preventDefault();
     document.getElementById('openIn').value=LAST.close; calc();};
   paintKPIs(); paintGauge(); paintBreakdown(); calc(); drawChart();
+}
+function setStatus(state){
+  const el=document.getElementById('asOf');
+  const txt={
+    loading:['','กำลังอัปเดตข้อมูลล่าสุด…'],
+    live:   ['','ข้อมูลสด'],
+    stale:  ['fb','ข้อมูลสำรอง']
+  }[state];
+  el.innerHTML=`<span class="dotlive ${txt[0]}"></span>${txt[1]} · ปิดล่าสุด ${thDate(LAST.date)} ที่ $${f0(LAST.close)}`;
+}
+
+let PREV_OPEN=null;
+
+function boot(){
+  /* 1) วาดทันทีจากข้อมูลในไฟล์ */
+  PX=parsePX(FB_PX); SC=FB_SC;
+  renderAll(); setStatus('loading');
+
+  /* 2) ดึงของสดเบื้องหลัง ถ้าได้ค่อยวาดทับ */
+  Promise.all([
+    fetch(PX_URL,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject()),
+    fetch(SC_URL,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject())
+  ]).then(([pxT,scT])=>{
+    if(pxT.length<3000) throw new Error('สั้นผิดปกติ');
+    const px=parsePX(pxT), sc=parseSCLast(scT);
+    if(!px.c.length||!isFinite(+sc.Net_Score)) throw new Error('อ่านไม่ออก');
+    if(px.d[px.d.length-1] < LAST.date) throw new Error('เก่ากว่าที่มีอยู่');
+    PX=px; SC=sc; renderAll(); setStatus('live');
+  }).catch(()=>{ setStatus('stale'); });
 }
 
 /* ---------- KPI ---------- */
@@ -781,7 +804,11 @@ document.getElementById('btnLast').onclick=()=>{document.getElementById('openIn'
 function drawChart(){
   const slot=document.getElementById('chartSlot');
   if(typeof Chart==='undefined'){
-    slot.innerHTML='<div class="empty-slot"><div class="e-t">CHART</div><div class="e-d">กราฟต้องต่ออินเทอร์เน็ตเพื่อโหลดไลบรารี — ตัวเลขในหน้านี้ยังถูกต้องครบ</div></div>';
+    slot.innerHTML='<div class="empty-slot"><div class="e-t">CHART</div><div class="e-d">กำลังโหลดกราฟ…</div></div>';
+    window.addEventListener('load',()=>{
+      if(typeof Chart!=='undefined') drawChart();
+      else slot.innerHTML='<div class="empty-slot"><div class="e-t">CHART</div><div class="e-d">กราฟโหลดไม่สำเร็จ — ตัวเลขในหน้านี้ยังถูกต้องครบ</div></div>';
+    },{once:true});
     return;
   }
   if(!slot.querySelector('canvas')) slot.innerHTML='<canvas id="mainCv"></canvas>';
