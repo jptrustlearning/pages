@@ -1918,35 +1918,23 @@
         <div style="font-family:'Anuphan',sans-serif;font-size:0.82rem;color:var(--text-muted);margin:6px 2px 14px;line-height:1.7;">
           <strong>วันเข้าซื้อจริง</strong> ของทุกไม้ วางบนเส้น SPY — ดูว่าสัญญาณตกลงมาจอดตรงไหนของรอบตลาด<br>
           <span style="display:inline-flex;align-items:center;gap:6px;margin-top:8px;margin-right:14px;">
-            <span style="width:11px;height:11px;border-radius:50%;background:#2E9F5F;display:inline-block;"></span>
-            เข้าตอน SPY ยังติด macro top-2
+            <span style="width:13px;height:13px;background:rgba(31,58,95,0.10);border:2px solid #1F3A5F;display:inline-block;transform:rotate(45deg);"></span>
+            <strong>จุดเข้าซื้อ</strong> — ผ่านตัวกรอง 2 ใน 3
           </span>
           <span style="display:inline-flex;align-items:center;gap:6px;margin-right:14px;">
             <span style="width:11px;height:11px;border-radius:50%;background:#E8912B;border:1.5px solid #8a4a05;display:inline-block;"></span>
-            <strong>เข้าตอน SPY หลุด top-2</strong> (สองสัญญาณตรงกัน)
+            ในนั้น: ไม้ที่ SPY หลุด macro top-2
           </span>
           <span style="display:inline-flex;align-items:center;gap:6px;">
             <span style="width:16px;height:11px;background:rgba(214,91,110,0.20);border:1px solid rgba(214,91,110,0.45);display:inline-block;"></span>
             ช่วงที่ SPY หลุด macro top-2 <span style="opacity:.75">(แถบจางกว่า = ช่วงสั้นไม่ถึง 10 วัน)</span>
           </span>
-          <div style="margin-top:10px;padding-top:9px;border-top:1px dashed var(--border);">
-            <span style="display:inline-flex;align-items:center;gap:6px;">
-              <span style="width:15px;height:15px;border-radius:50%;background:rgba(124,77,168,0.45);display:inline-block;"></span>
-              <strong>วงม่วง = สัญญาณทดลอง "หาก้นจาก Drawdown"</strong>
-            </span>
-            <span style="opacity:.85"> — หาก้นจาก <strong>SPY หลุดจากยอด 60 วัน ≥ 7%</strong> (percentile 10 ของ drawdown จริง เผื่อ buffer) แทนการรอ breadth พุ่งถึง 19% ·
-            จากนั้นใช้กติกายิงเดิมทุกอย่าง — <strong>breadth ฟื้นลงเหลือครึ่งหนึ่งของพีครอบนั้น</strong> ·
-            <strong>วงม่วงที่ไม่มีจุดเขียว/ส้มข้างใน = จังหวะที่กติกาปัจจุบันมองไม่เห็น</strong> ·
-            ⚠️ ยังเป็นแค่ภาพเปรียบเทียบ <strong>ไม่ได้ยิงไม้จริง</strong> ตัวเลขทุกการ์ดยังมาจากกติกา breadth เดิม</span>
-          </div>
-          <div style="margin-top:8px;">
-            <span style="display:inline-flex;align-items:center;gap:6px;">
-              <span style="width:13px;height:13px;background:rgba(31,58,95,0.10);border:2px solid #1F3A5F;display:inline-block;transform:rotate(45deg);"></span>
-              <strong>วงข้าวหลามตัดกรมท่า = ผ่านตัวกรองซ้อนชั้น</strong>
-            </span>
-            <span style="opacity:.85"> — เข้าเมื่อมี <strong>2 ใน 3 สัญญาณ</strong>ตรงกัน: breadth ยิง · drawdown ยิง · SPY หลุด macro top-2 ·
-            นับย้อนหลังได้ไม่เกิน 5 วันเทรด (ห้ามมองอนาคต) · <strong>แตะที่จุดเพื่อดูว่าผ่านด้วยเงื่อนไขไหน</strong> ·
-            จุดที่ใกล้กันไม่ได้ถูกยุบรวม โชว์ทุกกรณีตามที่สั่งไว้</span>
+          <div style="margin-top:10px;padding-top:9px;border-top:1px dashed var(--border);opacity:.9">
+            <strong>กติกาเข้า = ต้องมี 2 ใน 3 สัญญาณตรงกัน</strong> ① breadth sniper ยิง (ตลาดล้าง — % หุ้นที่ z &lt; −2 พุ่งถึง 19% แล้วหดเหลือครึ่งพีค)
+            ② drawdown sniper ยิง (SPY หลุดจากยอด 60 วัน ≥ 7% แล้ว breadth หดเหลือครึ่งพีครอบนั้น)
+            ③ SPY หลุด macro top-2 (Δ6 เดือน เทียบ Yen / Oil / Gold) ·
+            นับย้อนหลังได้ไม่เกิน 5 วันเทรด <strong>ห้ามมองอนาคต</strong> ลงมือที่ราคาเปิดวันถัดไป ·
+            <strong>แตะที่ข้าวหลามตัดเพื่อดูว่าไม้นั้นผ่านด้วยเงื่อนไขไหน</strong>
           </div>
         </div>
         <div style="height: 320px; position: relative;">
@@ -3146,7 +3134,10 @@ function sniperRankLB6(S, t, topN) {
 function sniperRun(H, topN, perTrade, startIdx) {
   const S = buildSniperSeries();
   const n = S.n, m = S.m, dates = S.dates, tickers = S.tickers;
-  const closeA = S.closeA, openA = S.openA, signals = S.signals;
+  const closeA = S.closeA, openA = S.openA;
+  // สัญญาณที่ใช้ยิงจริง = ผ่านตัวกรองซ้อนชั้น 2 ใน 3 เท่านั้น (A65 · คำสั่ง Joon)
+  // S.signals (breadth ล้วน) กับ S.ddSignals ยังคำนวณไว้เพื่อใช้ประกอบตัวกรองและวาดกราฟ BREADTH
+  const signals = S.conflSignals || S.signals;
   const FEE = CONFIG.feeSide, LBn = CONFIG.lb;
   const t0 = Math.max(startIdx || 0, 0);
 
@@ -4004,18 +3995,14 @@ function renderEntrySpyChart() {
       datasets: [
         { label: 'SPY', data: line, borderColor: '#722F37', backgroundColor: 'rgba(114,47,55,0.06)',
           borderWidth: 1.4, pointRadius: 0, fill: true, tension: 0.1, spanGaps: true },
-        { label: `สัญญาณทดลอง Drawdown (${ddCount})`, data: dotsDD, borderColor: 'rgba(124,77,168,0)',
-          backgroundColor: 'rgba(124,77,168,0.45)', pointRadius: 8.5, pointHoverRadius: 10, showLine: false },
-        { label: 'เข้าตอน SPY ติด top-2', data: dots, borderColor: 'rgba(46,159,95,0)',
-          backgroundColor: '#2E9F5F', pointRadius: 4.5, pointHoverRadius: 7, showLine: false },
-        { label: 'เข้าตอน SPY หลุด top-2', data: dotsDef, borderColor: 'rgba(232,145,43,0)',
-          backgroundColor: '#E8912B', pointBorderColor: '#8a4a05', pointBorderWidth: 1.5,
-          pointRadius: 5.5, pointHoverRadius: 8, showLine: false },
-        { label: `ผ่านตัวกรอง 2 ใน 3 (${cfCount})`, data: dotsCF,
+        { label: `จุดเข้าซื้อ (${cfCount})`, data: dotsCF,
           borderColor: '#1F3A5F', backgroundColor: 'rgba(31,58,95,0.10)',
           pointBorderColor: '#1F3A5F', pointBorderWidth: 2.5,
           pointStyle: 'rectRot', pointRadius: 10, pointHoverRadius: 13, showLine: false,
-          _reasons: cfReason }
+          _reasons: cfReason },
+        { label: 'ในนั้น: SPY หลุด macro top-2', data: dotsDef, borderColor: 'rgba(232,145,43,0)',
+          backgroundColor: '#E8912B', pointBorderColor: '#8a4a05', pointBorderWidth: 1.5,
+          pointRadius: 5.5, pointHoverRadius: 8, showLine: false }
       ]
     },
     plugins: [{
@@ -4400,7 +4387,7 @@ function renderBreadthChart() {
   const S = state._sniper;
   const labels = S.dates;
   const bdata = Array.from(S.breadth).map(v => Math.round(v * 100) / 100);
-  // จุดเขียว = สัญญาณที่ยิงไม้จริง · จุดเทา = สัญญาณที่โดน Macro Filter ตัดทิ้ง
+  // จุดเขียว = สัญญาณ breadth ที่ยิงไม้จริง · จุดเทา = สัญญาณ breadth ที่ไม่ผ่านตัวกรอง 2 ใน 3
   const firedDates = new Set([...(state.closedLots || []), ...(state.lots || [])].map(t => t.signalDate));
   const sigSet = new Set(S.signals);
   const sigData     = labels.map((d, i) => (sigSet.has(i) && firedDates.has(d)) ? bdata[i] : null);
@@ -4418,7 +4405,7 @@ function renderBreadthChart() {
           borderDash: [6, 4], borderWidth: 1.2, pointRadius: 0, fill: false },
         { label: 'สัญญาณยิง', data: sigData, borderColor: 'rgba(46,159,95,0)',
           backgroundColor: '#2E9F5F', pointRadius: 4, pointHoverRadius: 6, showLine: false },
-        ...(hasSkipped ? [{ label: 'โดน Macro Filter ตัด', data: skippedData, borderColor: 'rgba(139,125,94,0)',
+        ...(hasSkipped ? [{ label: 'ไม่ผ่านตัวกรอง 2 ใน 3', data: skippedData, borderColor: 'rgba(139,125,94,0)',
           backgroundColor: 'rgba(139,125,94,0.55)', pointRadius: 4, pointHoverRadius: 6, showLine: false }] : [])
       ]
     },
