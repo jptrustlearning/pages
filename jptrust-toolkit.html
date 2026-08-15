@@ -58,6 +58,8 @@ body{background:var(--cream);color:var(--ink);font-family:var(--f-b);line-height
 .nav-s .ns-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .nav-s .lk{width:13px;height:13px;flex-shrink:0;margin-left:8px;color:rgba(212,175,55,.7)}
 .nav-s:hover .lk,.nav-s.on .lk{color:var(--gold)}
+.sb-build{margin:8px 20px 0;font-family:ui-monospace,Menlo,monospace;font-size:9.5px;
+  letter-spacing:.3px;color:rgba(244,228,186,.32)}
 .sb-legend{display:flex;align-items:center;gap:7px;margin:22px 20px 0;padding-top:13px;
   border-top:1px solid rgba(212,175,55,.16);font-size:11px;color:rgba(244,228,186,.5);font-weight:300}
 .sb-legend .lk{width:12px;height:12px;color:rgba(212,175,55,.7);flex-shrink:0}
@@ -495,7 +497,8 @@ MENU.forEach((g,gi)=>{
     }
   });
 });
-nav.innerHTML=html+'<div class="sb-legend">'+LOCK+' เนื้อหาเฉพาะสมาชิก</div>';
+nav.innerHTML=html+'<div class="sb-legend">'+LOCK+' เนื้อหาเฉพาะสมาชิก</div>'
+  +'<div class="sb-build">รุ่น a2f46dc · 15/08/2026 21:23</div>';
 document.querySelectorAll('[data-lock]').forEach(el=>el.outerHTML=LOCK);
 /* favicon reuses the sidebar mark — no duplicate payload */
 {const l=document.createElement('link');l.rel='icon';l.href=document.querySelector('.sb-mark').src;document.head.appendChild(l);}
