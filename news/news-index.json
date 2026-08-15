@@ -1,6 +1,269 @@
 {
-  "lastUpdated": "2026-08-13T09:35:00Z",
+  "lastUpdated": "2026-08-15T07:50:00Z",
   "batches": [
+    {
+      "file": "2026-08-15-0750.md",
+      "date": "2026-08-15T07:50:00Z",
+      "date_display": "15 ส.ค. 2026 · 07:50",
+      "summary": "ผู้บริโภคสหรัฐฯ ถอย ยอดค้าปลีก ก.ค. ลบ 0.6% ความเชื่อมั่นร่วงไป 51 · ตลาดเลิกเดิมพันขึ้นดอกเบี้ยเดือน ก.ย. รอแจ็กสันโฮล 28 ส.ค. · Brent กลับใกล้ 88 หลังสหรัฐฯ ปิดล้อมอิหร่านไม่มีกำหนด · ทองแตะสูงสุดตั้งแต่ 5 มิ.ย. โดยตัวขับเคลื่อนคือดอกเบี้ยไม่ใช่สงคราม · ชิปหน่วยความจำแตกตัวขึ้นสวน Broadcom ร่วง 5-7% · AMAT ทำสถิติทุกบรรทัดแต่หุ้นยังลง 5%",
+      "tickers": [
+        "SPY",
+        "QQQ",
+        "IWM",
+        "TLT",
+        "GLD",
+        "USO",
+        "XLE",
+        "SNDK",
+        "MU",
+        "AVGO",
+        "AMAT",
+        "AMD",
+        "PTT",
+        "PTTEP",
+        "DELTA",
+        "KCE",
+        "HANA",
+        "AOT"
+      ],
+      "headlines": [
+        {
+          "title": "ผู้บริโภคอเมริกันเริ่มถอย — ยอดค้าปลีก ก.ค. ลบ 0.6% แรงที่สุดในรอบกว่าหนึ่งปี ดัชนีความเชื่อมั่นร่วงลงไปที่ 51",
+          "tickers": [
+            {
+              "symbol": "SPY",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "IWM",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "XRT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "TLT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "UUP",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "TU",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "negative"
+            }
+          ],
+          "source": "US Census Bureau, University of Michigan, Reuters, Washington Post, Yahoo Finance",
+          "published": "15 ส.ค. 2026"
+        },
+        {
+          "title": "ตลาดเลิกเดิมพันว่าธนาคารกลางสหรัฐฯ จะขึ้นดอกเบี้ยเดือนหน้า — โอกาสร่วงจากเกิน 75% เหลือราวหนึ่งในสี่ ก่อนถึงเวทีแจ็กสันโฮล 28 ส.ค.",
+          "tickers": [
+            {
+              "symbol": "SPY",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "IWM",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "TLT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "GLD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "UUP",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "KBANK",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "negative"
+            }
+          ],
+          "source": "CME FedWatch, Reuters, CNBC, Yahoo Finance, Bloomberg",
+          "published": "15 ส.ค. 2026"
+        },
+        {
+          "title": "น้ำมัน Brent กลับขึ้นใกล้ 88 ดอลลาร์ ปิดสัปดาห์บวกราว 4-5% หลังสหรัฐฯ ประกาศปิดล้อมท่าเรืออิหร่านได้ \"ไม่มีกำหนด\"",
+          "tickers": [
+            {
+              "symbol": "USO",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "BNO",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "XLE",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTTEP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "TOP",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "BCP",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "CPALL",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "TU",
+              "sentiment": "negative"
+            }
+          ],
+          "source": "Reuters, CNBC, Bloomberg, IEA, Al Jazeera",
+          "published": "15 ส.ค. 2026"
+        },
+        {
+          "title": "ทองคำแตะจุดสูงสุดตั้งแต่ 5 มิ.ย. แล้วถูกขายทำกำไร — สิ่งที่ขับเคลื่อนราคารอบนี้คือดอกเบี้ย ไม่ใช่สงคราม",
+          "tickers": [
+            {
+              "symbol": "GLD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SLV",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "GDX",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "UUP",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "TLT",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "Reuters, Kitco, CNBC, Yahoo Finance",
+          "published": "15 ส.ค. 2026"
+        },
+        {
+          "title": "ชิปหน่วยความจำแตกตัวขึ้นทั้งกลุ่ม ขณะที่ Broadcom ร่วง 5-7% — ธีม AI เริ่มแยกผู้ชนะกับผู้แพ้ในตัวเอง",
+          "tickers": [
+            {
+              "symbol": "SNDK",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "MU",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "WDC",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "STX",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AMD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "RDDT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AVGO",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AMAT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "INTC",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "KCE",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "HANA",
+              "sentiment": "positive"
+            }
+          ],
+          "tone_override": "mixed",
+          "source": "Reuters, Yahoo Finance, CNBC, Bloomberg",
+          "published": "15 ส.ค. 2026"
+        },
+        {
+          "title": "Applied Materials ทำสถิติทุกบรรทัดและปรับเป้าขึ้นเหนือคาดมาก แต่หุ้นยังลง 5% — บทเรียนเรื่องราคาที่บรรจุความคาดหวังไว้แล้ว",
+          "tickers": [
+            {
+              "symbol": "AMAT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "LRCX",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "KLAC",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "MU",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "Reuters, Yahoo Finance, Jefferies commentary, CNBC",
+          "published": "15 ส.ค. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-08-13-0935.md",
       "date": "2026-08-13T09:35:00Z",
