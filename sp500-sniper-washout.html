@@ -1970,7 +1970,7 @@
       <div id="tab-opt" class="tab-content">
         <div style="font-family:'Anuphan',sans-serif;font-size:0.82rem;color:var(--text-muted);margin:6px 2px 14px;line-height:1.7;">
           เทียบผลของ <strong>ระยะถือครอง</strong> ทั้ง 3 แบบ ด้วยการตั้งค่าปัจจุบัน (Top N · ทุน · ปีเริ่ม เดียวกัน) —
-          สัญญาณเข้าเหมือนกันทุกแถว ต่างกันแค่ถือนานเท่าไร · แถวที่เลือกอยู่ = แถบทอง
+          สัญญาณเข้าเหมือนกันทุกแถว ต่างกันแค่ถือนานเท่าไร · <strong>กลยุทธ์นี้ใช้ 6 เดือนตายตัว (แถบทอง)</strong> อีกสองแถวไว้ดูเทียบเฉยๆ ปรับไม่ได้
         </div>
         <div class="heatmap-wrapper">
           <table class="simple-table">
@@ -2134,19 +2134,6 @@
   </div>
   <div class="panel-body">
 
-    <div class="section-label"><span>🎯 กติกาสัญญาณ &amp; การถือครอง</span><div class="line"></div></div>
-
-    <!-- 1. Hold Period -->
-    <div class="control-group">
-      <label>HOLD PERIOD — ระยะถือครองต่อไม้</label>
-      <select id="holdPeriodSelect" class="input-box">
-        <option value="21">1 เดือน (21 วันเทรด)</option>
-        <option value="42" selected>2 เดือน (42 วันเทรด)</option>
-        <option value="126">6 เดือน (126 วันเทรด)</option>
-      </select>
-      <span class="hint">ถือครบตามกำหนดแล้วขายที่ราคาเปิด ไม่มี TP/SL ระหว่างทาง · <strong>1–2 เดือน = บทบาทเงินสดรอจังหวะ</strong> (ค่าแนะนำจากงานวิจัย) · 6 เดือน ≈ กลายเป็นถือ Momentum ยาว — ตัวเลขอ่อนไหวกับวันเริ่มมาก</span>
-    </div>
-
     <div class="section-label"><span>📦 พอร์ตการลงทุน</span><div class="line"></div></div>
 
     <!-- 0. Initial Capital -->
@@ -2157,24 +2144,6 @@
         <input type="number" id="initialCapitalInput" class="input-box" value="10000" step="500" min="100">
       </div>
       <span class="hint">ทุกสัญญาณ = ยิงไม้ใหม่ด้วยเงินสดก้อนนี้ (ไม่ทบต้น · ไม่ต้องรอไม้เก่าขาย) · ถือซ้อนกันได้หลายไม้ช่วงสัญญาณถี่ — ดูตัวเลข "เงินสดสูงสุดที่ใช้พร้อมกัน" ในผลเพื่อเตรียมงบ</span>
-    </div>
-
-    <div class="control-group">
-      <label>MACRO FILTER — กรองสัญญาณด้วยภาวะตลาด</label>
-      <select id="macroFilterInput" class="input-box">
-        <option value="off" selected>ปิด — ยิงทุกสัญญาณ (ค่าเริ่มต้น)</option>
-        <option value="defensive">เฉพาะตอน SPY หลุด top-2 (จังหวะซ้อนสองชั้น)</option>
-      </select>
-      <span class="hint">ใช้สัญญาณมหภาคชุดเดียวกับ Defensive Extend — เทียบ Δ6 เดือนของ SPY / Yen / Oil / Gold ณ ปิดวันสัญญาณ · เปิดตัวกรองนี้ = ยิง<strong>เฉพาะไม้ที่ตลาดล้าง (breadth) พร้อมกับ SPY หลุด top-2 (มหภาคอ่อน)</strong> พร้อมกันทั้งสองอย่าง — ไม้น้อยลงมากแต่คัดเฉพาะจังหวะที่ทั้งสองสัญญาณตรงกัน · ⚠️ เหลือ 10 ไม้ใน 11 ปี กระจายแค่ 7 ปี — กลุ่มตัวอย่างเล็ก อย่าอ่านตัวเลขเป็นความจริงตายตัว</span>
-    </div>
-
-    <div class="control-group">
-      <label>DEFENSIVE EXTEND — ยืดตอนหมี</label>
-      <select id="defensiveExtendInput" class="input-box">
-        <option value="on" selected>เปิด (ค่าแนะนำ)</option>
-        <option value="off">ปิด — ขายตรงตามกำหนดเสมอ</option>
-      </select>
-      <span class="hint">แบบกลยุทธ์หลัก: วันครบกำหนดขาย เช็ค SPY เทียบ Yen / Oil / Gold (Δ6 เดือน ณ ปิดวันก่อนหน้า) — ถ้า SPY หลุด top-2 (= ตลาดหมี) จะ<strong>ไม่ขาย ยืดถือต่ออีก 1 ระยะถือ</strong>แล้วเช็คใหม่ · ระยะถือจริงจึงอาจยาวกว่าที่ตั้ง และเงินสดที่ต้องเตรียมอาจซ้อนมากขึ้น</span>
     </div>
 
     <!-- RANKING WEIGHT (ก็อปโครงจาก sp500-rolling-6m-momentum) -->
@@ -2284,7 +2253,7 @@
 let CONFIG = {
   perTradeCapital: 10000,      // ทุนต่อไม้ — ทุกสัญญาณยิงไม้ใหม่ด้วยเงินสดก้อนนี้ (แก้ได้ใน settings)
   topN: 10,                    // ซื้อ Top N ตาม LB6
-  holdDays: 42,                // ระยะถือครอง (วันเทรด): 21 = 1M · 42 = 2M · 126 = 6M
+  holdDays: 126,               // ระยะถือครอง = 6 เดือน ตายตัว (A65 — ถอดตัวเลือกออกจากหน้าตั้งค่าแล้ว)
   zWindow: 60,                 // หน้าต่าง SMA/STD ของ z-score
   zThresh: -2,                 // นับเป็น washout เมื่อ z < −2
   breadthArm: 19.0,            // arm เมื่อ breadth ≥ 19% (p95 จากข้อมูลจริง — A61 ตรึงไว้ ไม่จูน)
@@ -2302,8 +2271,8 @@ let CONFIG = {
   weightRet: 1.0,              // น้ำหนัก Return ในการจัดอันดับ (Volume = 1 − weightRet) · default 1.0 = ผลตอบแทนล้วน (A61)
   feeSide: 0.0005,             // ค่าธรรมเนียม 0.05% ต่อข้าง
   startYear: 2015,
-  defensiveExtend: true,       // ยืดตอนหมี — ครบกำหนดตอน SPY หลุด macro top-2 → ไม่ขาย ยืดอีก 1 hold
-  macroFilter: 'off',          // 'off' = ยิงทุกสัญญาณ · 'defensive' = ยิงเฉพาะตอน SPY หลุด macro top-2 ณ วันสัญญาณ
+  defensiveExtend: true,       // ยืดตอนหมี — ตายตัว "เปิด" เสมอ (A65 — ถอดตัวเลือกออกแล้ว)
+  macroFilter: 'off',          // ตายตัว 'off' = ยิงทุกสัญญาณที่ผ่านตัวกรอง 2 ใน 3 (A65 — ถอดตัวเลือกออกแล้ว)
   cloudCsvUrl: 'https://app.jptrustlearning.com/data/input_sp500_daily.csv',
   cloudBenchUrl: 'https://app.jptrustlearning.com/data/input_benchmark_daily.csv',
   // macro signal (แบบกลยุทธ์หลัก defensive): JPY spot + WTI/GOLD futures
@@ -2326,13 +2295,11 @@ const MACRO_DEFS = [
 
 // --- Default backtest settings (for Reset button) ---
 const DEFAULT_SNIPER = {
-  holdDays: 42,
   perTradeCapital: 10000,
   topN: 10,
   startYear: 2015,
-  defensiveExtend: true,
-  weightRet: 100,         // % — 100 = ผลตอบแทนล้วน (ตรงกับงานวิจัย A61)
-  macroFilter: 'off'      // ยิงทุกสัญญาณ (ตรงกับงานวิจัย A61)
+  weightRet: 100          // % — 100 = ผลตอบแทนล้วน (ตรงกับงานวิจัย A61)
+  // holdDays 126 · defensiveExtend true · macroFilter 'off' = ค่าตายตัวใน CONFIG ปรับไม่ได้แล้ว
 };
 
 // Cache for saved settings (needed for dynamic year-dropdown populate)
@@ -2355,16 +2322,13 @@ function jptToast(msg) {
   t._hideTimer = setTimeout(() => t.classList.remove('show'), 2500);
 }
 
+// A65: holdDays / defensiveExtend / macroFilter ถูกถอดออกจากหน้าตั้งค่าแล้ว — บังคับค่าตายตัว ไม่บันทึก ไม่อ่านคืน
 function getSniperSettings() {
-  const h = document.getElementById('holdPeriodSelect');
   const c = document.getElementById('initialCapitalInput');
   const n = document.getElementById('topNInput');
   const y = document.getElementById('startYearSelect');
   return {
-    holdDays: h ? parseInt(h.value, 10) || DEFAULT_SNIPER.holdDays : DEFAULT_SNIPER.holdDays,
     perTradeCapital: c ? parseFloat(c.value) || DEFAULT_SNIPER.perTradeCapital : DEFAULT_SNIPER.perTradeCapital,
-    defensiveExtend: (document.getElementById('defensiveExtendInput') || { value: 'on' }).value === 'on',
-    macroFilter: (document.getElementById('macroFilterInput') || { value: 'off' }).value,
     topN: n ? parseInt(n.value, 10) || DEFAULT_SNIPER.topN : DEFAULT_SNIPER.topN,
     startYear: y ? parseInt(y.value, 10) || DEFAULT_SNIPER.startYear : DEFAULT_SNIPER.startYear,
     weightRet: (() => { const w = document.getElementById('weightSlider');
@@ -2374,16 +2338,10 @@ function getSniperSettings() {
 
 function applySniperSettings(s) {
   if (!s) return;
-  const h = document.getElementById('holdPeriodSelect');
   const c = document.getElementById('initialCapitalInput');
   const n = document.getElementById('topNInput');
   const y = document.getElementById('startYearSelect');
-  if (h && s.holdDays != null) h.value = s.holdDays;
   if (c && s.perTradeCapital != null) c.value = s.perTradeCapital;
-  const dx = document.getElementById('defensiveExtendInput');
-  if (dx && s.defensiveExtend != null) dx.value = s.defensiveExtend ? 'on' : 'off';
-  const mf = document.getElementById('macroFilterInput');
-  if (mf && s.macroFilter != null) mf.value = s.macroFilter;
   if (n && s.topN != null) n.value = s.topN;
   if (y && s.startYear != null) y.value = s.startYear;
   const w = document.getElementById('weightSlider');
@@ -2446,11 +2404,8 @@ const el = {
   sliderValDisp: document.getElementById('slider-val-disp'),
   
   // Strategy Controls
-  inputHold: document.getElementById('holdPeriodSelect'),
   inputTopN: document.getElementById('topNInput'),
   inputInitCap: document.getElementById('initialCapitalInput'),
-  inputDefExt: document.getElementById('defensiveExtendInput'),
-  inputMacroFilter: document.getElementById('macroFilterInput'),
   inputStartYear: document.getElementById('startYearSelect'),
   sliderWeight: document.getElementById('weightSlider'),
   valRet: document.getElementById('val-ret'),
@@ -2539,16 +2494,13 @@ async function loadDataFromCloud() {
 // --- EVENTS ---
 el.input.addEventListener('change', handleUpload);
 el.sliderMarket.addEventListener('input', updateMarketAnalyzer);
-el.inputHold.addEventListener('change', runBacktest);
 el.inputTopN.addEventListener('change', runBacktest);
 if (el.sliderWeight) {
   el.sliderWeight.addEventListener('input', updateWeightsUI);          // ลากแล้วตัวเลข/แถบขยับทันที
   el.sliderWeight.addEventListener('change', () => { updateWeightsUI(); runBacktest(); });
 }
 el.inputInitCap.addEventListener('change', runBacktest);
-if (el.inputDefExt) el.inputDefExt.addEventListener('change', runBacktest);
 el.inputStartYear.addEventListener('change', runBacktest);
-if (el.inputMacroFilter) el.inputMacroFilter.addEventListener('change', runBacktest);
 
 // --- RANKING WEIGHT SLIDER (โครงจาก sp500-rolling-6m-momentum) ---
 function updateWeightsUI() {
@@ -3288,11 +3240,11 @@ function renderHoldCompare() {
 function runSniperBacktest() {
   CONFIG.topN = parseInt(el.inputTopN.value) || 10;
   CONFIG.perTradeCapital = parseFloat(el.inputInitCap.value) || 10000;
-  CONFIG.defensiveExtend = el.inputDefExt ? el.inputDefExt.value === 'on' : true;
-  CONFIG.holdDays = parseInt(el.inputHold.value) || 42;
+  CONFIG.defensiveExtend = true;   // ตายตัว
+  CONFIG.holdDays = 126;           // ตายตัว 6 เดือน
   CONFIG.startYear = parseInt(el.inputStartYear.value) || 2015;
   if (el.sliderWeight) CONFIG.weightRet = (parseInt(el.sliderWeight.value, 10) || 0) / 100;
-  CONFIG.macroFilter = el.inputMacroFilter ? el.inputMacroFilter.value : 'off';
+  CONFIG.macroFilter = 'off';      // ตายตัว
 
   const _S = buildSniperSeries();
   let startIndex = _S.dates.findIndex(d => d.startsWith(String(CONFIG.startYear)));
