@@ -1939,6 +1939,15 @@
             <strong>วงม่วงที่ไม่มีจุดเขียว/ส้มข้างใน = จังหวะที่กติกาปัจจุบันมองไม่เห็น</strong> ·
             ⚠️ ยังเป็นแค่ภาพเปรียบเทียบ <strong>ไม่ได้ยิงไม้จริง</strong> ตัวเลขทุกการ์ดยังมาจากกติกา breadth เดิม</span>
           </div>
+          <div style="margin-top:8px;">
+            <span style="display:inline-flex;align-items:center;gap:6px;">
+              <span style="width:12px;height:12px;background:#1F3A5F;border:1.5px solid #FAF6ED;display:inline-block;transform:rotate(45deg);"></span>
+              <strong>ข้าวหลามตัดกรมท่า = ผ่านตัวกรองซ้อนชั้น</strong>
+            </span>
+            <span style="opacity:.85"> — เข้าเมื่อมี <strong>2 ใน 3 สัญญาณ</strong>ตรงกัน: breadth ยิง · drawdown ยิง · SPY หลุด macro top-2 ·
+            นับย้อนหลังได้ไม่เกิน 5 วันเทรด (ห้ามมองอนาคต) · <strong>แตะที่จุดเพื่อดูว่าผ่านด้วยเงื่อนไขไหน</strong> ·
+            จุดที่ใกล้กันไม่ได้ถูกยุบรวม โชว์ทุกกรณีตามที่สั่งไว้</span>
+          </div>
         </div>
         <div style="height: 320px; position: relative;">
           <canvas id="entrySpyChart"></canvas>
@@ -2300,6 +2309,7 @@ let CONFIG = {
                                //  เพราะ DD ค้างนานกว่า breadth 3.6 เท่า — วัดเป็น "จำนวนวัน" ไม่แฟร์)
   ddClear: -0.02,              // ถือว่าพายุจบเมื่อ DD ฟื้นกลับมาเหนือ −2%
   ddEscalate: true,            // ยังไม่ฟื้นก็ arm ใหม่ได้ ถ้า DD ทำก้นลึกกว่าก้นที่ยิงไปแล้ว (กันพลาดก้น COVID)
+  conflWindow: 5,              // ตัวกรองซ้อนชั้น: นับสัญญาณอีกตัวที่เกิดภายในกี่วันเทรด "ย้อนหลัง" (ห้ามมองอนาคต)
   lb: 126,                     // LB6 = ผลตอบแทน 126 วันเทรด
   weightRet: 1.0,              // น้ำหนัก Return ในการจัดอันดับ (Volume = 1 − weightRet) · default 1.0 = ผลตอบแทนล้วน (A61)
   feeSide: 0.0005,             // ค่าธรรมเนียม 0.05% ต่อข้าง
@@ -3071,7 +3081,33 @@ function buildSniperSeries() {
     }
   }
 
+  // ============================================================
+  // ตัวกรองซ้อนชั้น (A65) — เข้าเมื่อมี "2 ใน 3 สัญญาณ" ตรงกัน
+  //   ① breadth sniper ยิง  ② drawdown sniper ยิง  ③ SPY หลุด macro top-2 ณ วันนั้น
+  // หมายเหตุ: จุดเขียว/จุดส้ม คือ "สัญญาณ breadth ตัวเดียวกัน" ต่างกันแค่ระบายสีตาม ③
+  //   → นับแยกเป็น 2 อย่างจะเท่ากับนับ ③ ซ้ำสองรอบ · เกณฑ์ "2 ใน 4" ของ Joon จึงเท่ากับ "2 ใน 3" ตรงนี้พอดี
+  // NO LOOKAHEAD: ณ วัน t มองย้อนหลังได้แค่ [t−conflWindow, t] เท่านั้น ห้ามนับสัญญาณที่ยังไม่เกิด
+  // ประเมินเฉพาะวันที่มีสัญญาณจริง (breadth หรือ DD) — ไม่รวมจุดที่ใกล้กันเข้าด้วยกัน โชว์ทุกกรณีตามที่ Joon สั่ง
+  const conflSignals = [], conflReasons = [];
+  {
+    const bSet = new Set(signals), dSet = new Set(ddSignals);
+    const Wc = CONFIG.conflWindow;
+    for (let t = 0; t < n; t++) {
+      if (!(bSet.has(t) || dSet.has(t))) continue;
+      let hb = false, hd = false;
+      for (let k = Math.max(0, t - Wc); k <= t; k++) { if (bSet.has(k)) hb = true; if (dSet.has(k)) hd = true; }
+      const hm = !!(macroBenign && !macroBenign[t]);
+      const cnt = (hb ? 1 : 0) + (hd ? 1 : 0) + (hm ? 1 : 0);
+      if (cnt >= 2) {
+        conflSignals.push(t);
+        conflReasons.push([hb ? 'breadth' : null, hd ? 'drawdown' : null, hm ? 'SPY หลุด top-2' : null]
+                          .filter(Boolean).join(' + ') + ` (${cnt}/3)`);
+      }
+    }
+  }
+
   state._sniper = { n, m, offset, dates, tickers, closeA, openA, volA, breadth, signals, ddSignals,
+                    conflSignals, conflReasons,
                     lastArmed: armed, lastPeak: peakB, lastRefPeak: refPeak, macroBenign };
   return state._sniper;
 }
@@ -3930,6 +3966,16 @@ function renderEntrySpyChart() {
   const dotsDD = labels.map((d, i) => (ddSet.has(i) && isFinite(spy[i + from])) ? r2(spy[i + from]) : null);
   const ddCount = ddSet.size;
 
+  // ข้าวหลามตัดกรมท่า = ผ่านตัวกรองซ้อนชั้น (2 ใน 3 สัญญาณ) · วาดที่วันเข้า = วันสัญญาณ + 1
+  const cfMap = new Map();
+  (S.conflSignals || []).forEach((t, k) => {
+    const e = t + 1;
+    if (e >= from && e < S.n) cfMap.set(e - from, (S.conflReasons || [])[k] || '');
+  });
+  const dotsCF   = labels.map((d, i) => (cfMap.has(i) && isFinite(spy[i + from])) ? r2(spy[i + from]) : null);
+  const cfReason = labels.map((d, i) => cfMap.has(i) ? cfMap.get(i) : '');
+  const cfCount  = cfMap.size;
+
   // ช่วงเวลาที่ SPY หลุด macro top-2 → ระบายพื้นหลังชมพูแดงอ่อน (index ในสเปซของ labels)
   // regime นี้คิดรายวันจึงกระพริบได้ (59 ช่วงใน 11 ปี · 23 ช่วงยาวแค่ 1–2 วัน)
   // → รวมช่วงที่ห่างกัน ≤3 วันเข้าด้วยกันเพื่อไม่ให้กราฟลายพร้อย แล้วทำแถบสั้นให้จางกว่าแถบยาว
@@ -3964,7 +4010,11 @@ function renderEntrySpyChart() {
           backgroundColor: '#2E9F5F', pointRadius: 4.5, pointHoverRadius: 7, showLine: false },
         { label: 'เข้าตอน SPY หลุด top-2', data: dotsDef, borderColor: 'rgba(232,145,43,0)',
           backgroundColor: '#E8912B', pointBorderColor: '#8a4a05', pointBorderWidth: 1.5,
-          pointRadius: 5.5, pointHoverRadius: 8, showLine: false }
+          pointRadius: 5.5, pointHoverRadius: 8, showLine: false },
+        { label: `ผ่านตัวกรอง 2 ใน 3 (${cfCount})`, data: dotsCF, borderColor: 'rgba(31,58,95,0)',
+          backgroundColor: '#1F3A5F', pointBorderColor: '#FAF6ED', pointBorderWidth: 1.5,
+          pointStyle: 'rectRot', pointRadius: 4, pointHoverRadius: 7, showLine: false,
+          _reasons: cfReason }
       ]
     },
     plugins: [{
@@ -3988,7 +4038,11 @@ function renderEntrySpyChart() {
       plugins: {
         legend: { display: true, labels: { boxWidth: 14 } },
         tooltip: { mode: 'index', intersect: false,
-          callbacks: { label: (c) => c.dataset.label + ': $' + (c.parsed.y || 0).toFixed(2) } }
+          callbacks: { label: (c) => {
+            const base = c.dataset.label + ': $' + (c.parsed.y || 0).toFixed(2);
+            const rs = c.dataset._reasons && c.dataset._reasons[c.dataIndex];
+            return rs ? base + ' — ' + rs : base;
+          } } }
       },
       scales: {
         x: { grid: { display: false },
