@@ -4542,7 +4542,10 @@ function renderDDChart() {
 // VS S&P500 — เทียบเป็น % รายปี 3 แท่ง (A65)
 //  ① กลยุทธ์      = กำไรปีนั้น ÷ เงินที่ต้องวางจริงปีนั้น (ไม้ซ้อนสูงสุด × ทุนไม้) — ฐานเดียวกับ YEARLY SUMMARY
 //  ② SPY ไม้เดียวกัน = เงาไม้ต่อไม้ (วันเข้า–ออกเดียวกัน ทุนเท่ากัน แต่ซื้อ SPY) ÷ ฐานเดียวกัน → เทียบตรงกับ ①
-//  ③ SPY ถือยาวทั้งปี = ซื้อต้นปีขายปลายปี (ราคาปิดวันทำการแรก → วันทำการสุดท้ายของปีนั้น)
+//  ③ SPY ถือยาวทั้งปี = ผลตอบแทนตามปีปฏิทินแบบต่อเนื่อง (ปิดปลายปีก่อน → ปิดปลายปีนี้)
+//     ⚠️ ต้องใช้ carry-forward ให้ตรงกับ sp500-rolling-6m-momentum เป๊ะ — ห้ามใช้ "ปิดวันทำการแรกของปี"
+//     เป็นฐาน เพราะจะตัดการเคลื่อนไหววันแรกทิ้ง ทำให้ตัวเลขไม่ตรงกับหน้ากลยุทธ์อื่น (เคยพลาดมาแล้ว A65)
+//     ปีแรกใช้ค่า ณ วันเริ่มแบ็คเทสเป็นฐาน (ตรงกับ marketStartIndex ของ rolling)
 function renderVsChart() {
   const pnl = state.equityCurve || [];
   const spy = state.spyPnlCurve || [];
@@ -4557,6 +4560,13 @@ function renderVsChart() {
   const stratD = [], spyD = [], bhD = [];
   let prevS = 0, prevM = 0;
   const uni = state.universeDaily || [];
+  // ฐานของปีแรก = ค่า SPY ณ วันเริ่มแบ็คเทส · ปีถัดไป = ปิดปลายปีก่อนหน้า (carry-forward เหมือน rolling)
+  let prevBH = null;
+  if (uni.length > 0 && pnl.length > 0) {
+    let si = uni.findIndex(u => u.date === pnl[0].date);
+    if (si === -1) si = 0;
+    prevBH = uni[si].val;
+  }
   years.forEach(y => {
     const base = (ymc[y] || 0) * PT;
     const es = lastOf(pnl, y);
@@ -4567,9 +4577,14 @@ function renderVsChart() {
     spyD.push(base > 0 ? (dM / base) * 100 : null);
     if (es !== null) prevS = es;
     if (em !== null) prevM = em;
-    // ③ SPY ถือยาว: ปิดวันทำการแรก → ปิดวันทำการสุดท้ายของปีนั้น
+    // ③ SPY ถือยาว: ปิดปลายปีก่อน → ปิดปลายปีนี้
     const rows = uni.filter(r => r.date.startsWith(y) && isFinite(r.val) && r.val > 0);
-    bhD.push(rows.length > 1 ? (rows[rows.length - 1].val / rows[0].val - 1) * 100 : null);
+    if (rows.length === 0 || !(prevBH > 0)) { bhD.push(null); }
+    else {
+      const endBH = rows[rows.length - 1].val;
+      bhD.push((endBH / prevBH - 1) * 100);
+      prevBH = endBH;
+    }
   });
   const ctx = document.getElementById('vsChart').getContext('2d');
   if (charts.vs) charts.vs.destroy();
