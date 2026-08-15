@@ -1916,7 +1916,19 @@
       <!-- Tab: Entry vs SPY (A65) — เห็นภาพว่าเข้าตอนฟื้นจากก้นเหวยังไง -->
       <div id="chart-entryspy" class="tab-content">
         <div style="font-family:'Anuphan',sans-serif;font-size:0.82rem;color:var(--text-muted);margin:6px 2px 14px;line-height:1.7;">
-          จุดเขียว = <strong>วันเข้าซื้อจริง</strong> ของทุกไม้ วางบนเส้น SPY — ดูว่าสัญญาณตกลงมาจอดตรงไหนของรอบตลาด
+          <strong>วันเข้าซื้อจริง</strong> ของทุกไม้ วางบนเส้น SPY — ดูว่าสัญญาณตกลงมาจอดตรงไหนของรอบตลาด<br>
+          <span style="display:inline-flex;align-items:center;gap:6px;margin-top:8px;margin-right:14px;">
+            <span style="width:11px;height:11px;border-radius:50%;background:#2E9F5F;display:inline-block;"></span>
+            เข้าตอน SPY ยังติด macro top-2
+          </span>
+          <span style="display:inline-flex;align-items:center;gap:6px;margin-right:14px;">
+            <span style="width:11px;height:11px;border-radius:50%;background:#E8912B;border:1.5px solid #8a4a05;display:inline-block;"></span>
+            <strong>เข้าตอน SPY หลุด top-2</strong> (สองสัญญาณตรงกัน)
+          </span>
+          <span style="display:inline-flex;align-items:center;gap:6px;">
+            <span style="width:16px;height:11px;background:rgba(214,91,110,0.20);border:1px solid rgba(214,91,110,0.45);display:inline-block;"></span>
+            ช่วงที่ SPY หลุด macro top-2 <span style="opacity:.75">(แถบจางกว่า = ช่วงสั้นไม่ถึง 10 วัน)</span>
+          </span>
         </div>
         <div style="height: 320px; position: relative;">
           <canvas id="entrySpyChart"></canvas>
@@ -3846,9 +3858,37 @@ function renderEntrySpyChart() {
   const from = first === -1 ? 0 : first;
   const labels = S.dates.slice(from);
   const line = spy.slice(from).map(v => isFinite(v) ? Math.round(v * 100) / 100 : null);
-  const eSet = new Map();
-  entries.forEach(e => { if (e.i >= from) eSet.set(e.i - from, e.px); });
-  const dots = labels.map((d, i) => eSet.has(i) ? Math.round(eSet.get(i) * 100) / 100 : null);
+  // แยกจุดเข้าตามภาวะมหภาค ณ วันสัญญาณ (benign = SPY ติด top-2 / ไม่ benign = หลุด)
+  const bn = S.macroBenign;
+  const eBenign = new Map(), eDef = new Map();
+  entries.forEach(e => {
+    if (e.i < from) return;
+    const sigIdx = Math.max(e.i - 1, 0);                 // วันสัญญาณ = วันก่อนวันเข้า
+    ((bn && !bn[sigIdx]) ? eDef : eBenign).set(e.i - from, e.px);
+  });
+  const r2 = (v) => Math.round(v * 100) / 100;
+  const dots    = labels.map((d, i) => eBenign.has(i) ? r2(eBenign.get(i)) : null);
+  const dotsDef = labels.map((d, i) => eDef.has(i)    ? r2(eDef.get(i))    : null);
+
+  // ช่วงเวลาที่ SPY หลุด macro top-2 → ระบายพื้นหลังชมพูแดงอ่อน (index ในสเปซของ labels)
+  // regime นี้คิดรายวันจึงกระพริบได้ (59 ช่วงใน 11 ปี · 23 ช่วงยาวแค่ 1–2 วัน)
+  // → รวมช่วงที่ห่างกัน ≤3 วันเข้าด้วยกันเพื่อไม่ให้กราฟลายพร้อย แล้วทำแถบสั้นให้จางกว่าแถบยาว
+  let bands = [];
+  if (bn) {
+    let s0 = -1;
+    for (let i = 0; i < labels.length; i++) {
+      const off = bn[i + from] ? 1 : 0;
+      if (!off && s0 < 0) s0 = i;
+      if (off && s0 >= 0) { bands.push([s0, i - 1]); s0 = -1; }
+    }
+    if (s0 >= 0) bands.push([s0, labels.length - 1]);
+    const merged = [];
+    bands.forEach(b => {
+      const last = merged[merged.length - 1];
+      if (last && b[0] - last[1] <= 3) last[1] = b[1]; else merged.push([b[0], b[1]]);
+    });
+    bands = merged;
+  }
 
   if (charts.entrySpy) charts.entrySpy.destroy();
   charts.entrySpy = new Chart(cv.getContext('2d'), {
@@ -3858,10 +3898,29 @@ function renderEntrySpyChart() {
       datasets: [
         { label: 'SPY', data: line, borderColor: '#722F37', backgroundColor: 'rgba(114,47,55,0.06)',
           borderWidth: 1.4, pointRadius: 0, fill: true, tension: 0.1, spanGaps: true },
-        { label: 'วันเข้าซื้อ', data: dots, borderColor: 'rgba(46,159,95,0)',
-          backgroundColor: '#2E9F5F', pointRadius: 4.5, pointHoverRadius: 7, showLine: false }
+        { label: 'เข้าตอน SPY ติด top-2', data: dots, borderColor: 'rgba(46,159,95,0)',
+          backgroundColor: '#2E9F5F', pointRadius: 4.5, pointHoverRadius: 7, showLine: false },
+        { label: 'เข้าตอน SPY หลุด top-2', data: dotsDef, borderColor: 'rgba(232,145,43,0)',
+          backgroundColor: '#E8912B', pointBorderColor: '#8a4a05', pointBorderWidth: 1.5,
+          pointRadius: 5.5, pointHoverRadius: 8, showLine: false }
       ]
     },
+    plugins: [{
+      id: 'macroDefensiveBands',
+      beforeDatasetsDraw(chart) {
+        const { ctx, chartArea, scales } = chart;
+        if (!chartArea || !scales.x) return;
+        ctx.save();
+        bands.forEach(([a, b]) => {
+          const x0 = scales.x.getPixelForValue(a);
+          const x1 = scales.x.getPixelForValue(b);
+          const days = b - a + 1;
+          ctx.fillStyle = days >= 10 ? 'rgba(214,91,110,0.16)' : 'rgba(214,91,110,0.08)';
+          ctx.fillRect(x0, chartArea.top, Math.max(x1 - x0, 1.5), chartArea.bottom - chartArea.top);
+        });
+        ctx.restore();
+      }
+    }],
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
