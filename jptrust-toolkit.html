@@ -171,9 +171,12 @@ tr.lv-o td.num{color:var(--maroon)}
 .pbar i{display:block;height:100%;background:var(--gold);border-radius:3px}
 td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 .lad-note{font-size:11.5px;color:var(--muted);font-weight:300;margin-top:10px;line-height:1.65}
-.bd{margin-top:6px}
+.bd-head{display:flex;align-items:baseline;gap:8px;margin-top:14px;padding-top:12px;
+  border-top:1px solid rgba(212,175,55,.18);font-size:12.5px;font-weight:600;color:var(--maroon)}
+.bd-head span{font-size:11px;font-weight:400;color:var(--muted)}
+.bd{margin-top:8px}
 .bd-r{display:flex;align-items:center;gap:9px;margin-bottom:7px}
-.bd-t{font-size:12.5px;color:var(--muted);width:104px;flex-shrink:0}
+.bd-t{font-size:12.5px;color:var(--muted);width:112px;flex-shrink:0}
 .bd-bar{flex:1;height:7px;border-radius:4px;background:rgba(138,125,107,.15);overflow:hidden}
 .bd-bar i{display:block;height:100%;border-radius:4px}
 .bd-v{font-family:var(--f-n);font-size:14px;width:26px;text-align:right;color:var(--ink)}
@@ -763,9 +766,12 @@ function paintGauge(){
   c.fillText(SC.Tier||'',cx,cy+52);
 }
 function paintBreakdown(){
-  const P=[['ผลตอบแทน','D1_Return'],['ปริมาณซื้อขาย','D2_Volume'],['RSI','D3_RSI'],
+  /* ตัวเลขในบล็อกนี้คือ "คะแนน" ที่ระบบให้แต่ละด้าน เต็ม 100 ไม่ใช่ค่าตัวชี้วัดดิบ
+     เดิมแถวนี้ชื่อ RSI เฉยๆ เลยไปชนกับค่า RSI จริงบนการ์ดข้างบน (70 vs 74.0)
+     ลูกค้าเห็นสองค่าไม่เท่ากันในหน้าเดียวแล้วสับสน จึงใส่หัวข้อกำกับและเปลี่ยนชื่อแถว */
+  const P=[['ผลตอบแทน','D1_Return'],['ปริมาณซื้อขาย','D2_Volume'],['โมเมนตัม RSI','D3_RSI'],
            ['เส้นค่าเฉลี่ย','D4_MA'],['ทิศทาง + วอลุ่ม','D5_DirVol'],['ปัจจัยภายนอก','D6_External']];
-  let h='<div class="bd">';
+  let h='<div class="bd-head">คะแนนย่อย 6 ด้าน <span>เต็มด้านละ 100</span></div><div class="bd">';
   for(const [t,k] of P){
     const v=+SC[k]; if(!isFinite(v)) continue;
     const col=v>=70?'var(--up)':v>=45?'#C9A227':'var(--down)';
