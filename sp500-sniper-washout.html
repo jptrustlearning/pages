@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>S&P 500 · Washout Sniper · JP Trust Learning</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- pinch-zoom เฉพาะกราฟ ENTRY vs SPY — hammerjs จำเป็นสำหรับ gesture บนมือถือ -->
+<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.2.0/dist/chartjs-plugin-zoom.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./jp-settings.js?v=1761234567"></script>
 <script src="./jp-drawdown.js?v=1786540000"></script>
@@ -1939,6 +1942,14 @@
         </div>
         <div style="height: 320px; position: relative;">
           <canvas id="entrySpyChart"></canvas>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;flex-wrap:wrap;">
+          <span style="font-family:'Anuphan',sans-serif;font-size:0.74rem;color:var(--text-muted);">
+            หุบ/กางสองนิ้วเพื่อซูม · ซูมแล้วลากนิ้วเดียวเพื่อเลื่อน · บนคอมใช้ล้อเมาส์
+          </span>
+          <button id="entryZoomReset" onclick="resetEntryZoom()" style="display:none;font-family:'Anuphan',sans-serif;font-size:0.74rem;
+            padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:var(--bg-card);
+            color:var(--gold-deep);cursor:pointer;font-weight:600;">↺ รีเซ็ตซูม</button>
         </div>
 
         <div class="entry-stat-row" id="entryStatRow"></div>
@@ -3909,6 +3920,25 @@ function _entrySpySeries() {
   return { S, spy, entries };
 }
 
+// เปิด/ปิด pan + ปุ่มรีเซ็ต ตามระดับซูมปัจจุบัน
+function _syncEntryZoomUI(chart) {
+  const z = (typeof chart.getZoomLevel === 'function') ? chart.getZoomLevel() : 1;
+  const zoomed = z > 1.01;
+  if (chart.options.plugins.zoom && chart.options.plugins.zoom.pan) {
+    chart.options.plugins.zoom.pan.enabled = zoomed;   // ยังไม่ซูม = นิ้วเดียวเลื่อนหน้าจอได้ตามปกติ
+  }
+  const btn = document.getElementById('entryZoomReset');
+  if (btn) btn.style.display = zoomed ? 'inline-block' : 'none';
+}
+
+function resetEntryZoom() {
+  const ch = (typeof Chart !== 'undefined' && Chart.getChart)
+    ? Chart.getChart(document.getElementById('entrySpyChart')) : null;
+  if (!ch) return;
+  if (typeof ch.resetZoom === 'function') ch.resetZoom();
+  _syncEntryZoomUI(ch);
+}
+
 function renderEntrySpyChart() {
   const cv = document.getElementById('entrySpyChart');
   const D = _entrySpySeries();
@@ -3942,6 +3972,10 @@ function renderEntrySpyChart() {
     const e = t + 1;
     if (e >= from && e < S.n) cfMap.set(e - from, (S.conflReasons || [])[k] || '');
   });
+  // มือถือ: ย่อจุดลง ไม่งั้นข้าวหลามตัดทับกันจนอ่านไม่ออก
+  // ⚠️ ใช้ window.innerWidth ไม่ใช่ cv.clientWidth — ตอนวาดครั้งแรกแท็บยังซ่อนอยู่ canvas กว้าง 0
+  const narrow = (window.innerWidth || 800) < 620;
+  const rCF = narrow ? 6 : 10, rDef = narrow ? 3.5 : 5.5;
   const dotsCF   = labels.map((d, i) => (cfMap.has(i) && isFinite(spy[i + from])) ? r2(spy[i + from]) : null);
   const cfReason = labels.map((d, i) => cfMap.has(i) ? cfMap.get(i) : '');
   const cfCount  = cfMap.size;
@@ -3967,6 +4001,9 @@ function renderEntrySpyChart() {
   }
 
   if (charts.entrySpy) charts.entrySpy.destroy();
+  // plugin ถูก auto-register เมื่อโหลดผ่าน script tag แล้ว — เช็คไว้กันกรณี CDN โหลดไม่ทัน
+  const _hasZoom = (typeof Chart !== 'undefined' && Chart.registry &&
+                    Chart.registry.plugins && !!Chart.registry.plugins.get('zoom'));
   charts.entrySpy = new Chart(cv.getContext('2d'), {
     type: 'line',
     data: {
@@ -3977,11 +4014,11 @@ function renderEntrySpyChart() {
         { label: `จุดเข้าซื้อ (${cfCount})`, data: dotsCF,
           borderColor: '#1F3A5F', backgroundColor: 'rgba(31,58,95,0.10)',
           pointBorderColor: '#1F3A5F', pointBorderWidth: 2.5,
-          pointStyle: 'rectRot', pointRadius: 10, pointHoverRadius: 13, showLine: false,
+          pointStyle: 'rectRot', pointRadius: rCF, pointHoverRadius: rCF + 3, showLine: false,
           _reasons: cfReason },
         { label: 'ในนั้น: SPY หลุด macro top-2', data: dotsDef, borderColor: 'rgba(232,145,43,0)',
           backgroundColor: '#E8912B', pointBorderColor: '#8a4a05', pointBorderWidth: 1.5,
-          pointRadius: 5.5, pointHoverRadius: 8, showLine: false }
+          pointRadius: rDef, pointHoverRadius: rDef + 2.5, showLine: false }
       ]
     },
     plugins: [{
@@ -4009,7 +4046,19 @@ function renderEntrySpyChart() {
             const base = c.dataset.label + ': $' + (c.parsed.y || 0).toFixed(2);
             const rs = c.dataset._reasons && c.dataset._reasons[c.dataIndex];
             return rs ? base + ' — ' + rs : base;
-          } } }
+          } } },
+        // pinch/wheel ซูมแกนเวลา · pan ปิดไว้ก่อน เปิดอัตโนมัติเมื่อซูมเข้าไปแล้ว
+        // (ถ้าเปิด pan ตลอด นิ้วเดียวจะลากกราฟแทนที่จะเลื่อนหน้าจอ)
+        zoom: {
+          limits: { x: { minRange: 30 } },
+          pan: { enabled: false, mode: 'x' },
+          zoom: {
+            wheel: { enabled: true, speed: 0.08 },
+            pinch: { enabled: true },
+            mode: 'x',
+            onZoomComplete: ({ chart }) => _syncEntryZoomUI(chart)
+          }
+        }
       },
       scales: {
         x: { grid: { display: false },
@@ -4020,6 +4069,12 @@ function renderEntrySpyChart() {
       }
     }
   });
+
+  if (!_hasZoom) {
+    const hintBtn = document.getElementById('entryZoomReset');
+    if (hintBtn) hintBtn.style.display = 'none';
+  }
+  _syncEntryZoomUI(charts.entrySpy);
 
   // --- สถิติ: วันเข้าอยู่ตรงไหนเทียบพีค/ก้น 60 วันเทรดก่อนหน้า ---
   const W = 60;
