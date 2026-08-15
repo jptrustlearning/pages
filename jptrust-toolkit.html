@@ -315,6 +315,22 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
               </div>
               <div class="openhint" id="openHint"></div>
             </div>
+            <script>
+            /* ปุ่มนี้ต้องกดได้ทันทีที่เห็นบนจอ ไม่งั้นผู้ใช้บนมือถือเน็ตช้าจะแตะแล้วไม่มีอะไรเกิดขึ้น
+               แล้วสคริปต์หลักที่รันทีหลังจะตั้งกลับเป็นโหมดอัตโนมัติ ทับราคาที่พิมพ์ไว้ */
+            window.__openMode='auto';
+            (function(){
+              var el=document.getElementById('openMode');
+              if(!el) return;
+              el.addEventListener('click',function(e){
+                var b=e.target.closest('button'); if(!b) return;
+                Array.prototype.forEach.call(el.querySelectorAll('button'),function(x){x.classList.remove('on')});
+                b.classList.add('on');
+                window.__openMode=b.dataset.m;
+                if(window.__onOpenMode) window.__onOpenMode();
+              });
+            })();
+            </script>
             <div id="ladder"><div class="empty-slot"><div class="e-t">DAILY ZONES</div>
               <div class="e-d">พิมพ์ราคาเปิดแล้วกดคำนวณ ระบบจะกางแนวรับ–แนวต้านพร้อมโอกาสแตะในวันให้</div></div></div>
           </div>
@@ -677,7 +693,7 @@ function setStatus(state){
   el.innerHTML=`<span class="dotlive ${txt[0]}"></span>${txt[1]} · ปิดล่าสุด ${thDate(LAST.date)} ที่ $${f0(LAST.close)}`;
 }
 
-let PREV_OPEN=null, OPEN_MODE='auto';
+let PREV_OPEN=null, OPEN_MODE=(window.__openMode||'auto');
 
 /* โหมด auto = ใช้ราคาเปิดล่าสุดจากข้อมูล ช่องกรอกล็อกไว้ อัปเดตเองเมื่อข้อมูลสดมาถึง
    โหมด manual = ผู้ใช้พิมพ์เอง ระบบจะไม่แตะค่าในช่องอีกเลย */
@@ -698,14 +714,14 @@ function applyMode(){
   }
   PREV_OPEN=LAST.open;
 }
-document.getElementById('openMode').addEventListener('click',e=>{
-  const b=e.target.closest('button'); if(!b) return;
-  document.querySelectorAll('#openMode button').forEach(x=>x.classList.remove('on'));
-  b.classList.add('on'); OPEN_MODE=b.dataset.m;
+/* ตัวจัดการจริง — ตัวเล็กด้านบนจะเรียกอันนี้เมื่อสคริปต์หลักพร้อมแล้ว */
+window.__onOpenMode=function(){
+  OPEN_MODE=window.__openMode;
+  if(!LAST) return;                       // ข้อมูลยังไม่พร้อม เดี๋ยว renderAll จะจัดการให้เอง
   applyMode();
   if(OPEN_MODE==='auto') calc();
   else document.getElementById('openIn').focus();
-});
+};
 
 function boot(){
   /* 1) วาดทันทีจากข้อมูลในไฟล์ */
