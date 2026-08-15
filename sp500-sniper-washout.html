@@ -3034,7 +3034,7 @@ function renderHoldCompare() {
     const isCur = H === CONFIG.holdDays;
     const nExtH = [...r.closed, ...r.openLots].filter(t => (t.extendCount || 0) > 0).length;
     const nTxt = rets.length + (r.openLots.length ? '+' + r.openLots.length : '') +
-      (nExtH ? ' <span style="color:#722F37;font-size:0.72rem;">(ยืด ' + nExtH + ')</span>' : '');
+      (nExtH ? ' <span style="color:#9C2B2B;font-size:0.68rem;font-family:\'Cinzel\',\'Anuphan\',serif;letter-spacing:0.5px;">(EXTENDED ' + nExtH + ')</span>' : '');
     rows.push(`<tr style="${isCur ? 'background:rgba(212,175,55,0.10);font-weight:700;' : ''}">
       <td style="text-align:left;">${lbl[H] || H + 'd'}${isCur ? ' ★' : ''}</td>
       <td>${nTxt}</td>
@@ -3413,8 +3413,10 @@ function renderRoundsChart() {
     }
   });
   // Open lots — MTM vs initialCapital (still inside 6mo window)
-  const lastDate = state.sortedDates && state.sortedDates.length > 0
-    ? state.sortedDates[state.sortedDates.length - 1] : null;
+  // วันหุ้นล่าสุดจาก sliced space — sortedDates ตัวท้ายอาจเป็นวัน FX-only (jpy CSV อัพเดทก่อน sp500 บน R2)
+  const _Ssn = state._sniper;
+  const lastDate = _Ssn && _Ssn.n > 0 ? _Ssn.dates[_Ssn.n - 1]
+    : (state.sortedDates && state.sortedDates.length > 0 ? state.sortedDates[state.sortedDates.length - 1] : null);
   const lastDayData = lastDate ? (state.marketData[lastDate] || {}) : {};
   (state.lots || []).forEach(lot => {
     if (lot.initialCapital > 0) {
@@ -3481,8 +3483,10 @@ function renderDistChart() {
   (state.closedLots || []).forEach(cl => {
     if (cl.initialCapital > 0) rets.push((cl.returnPct || 0) * 100);
   });
-  const lastDate = state.sortedDates && state.sortedDates.length > 0
-    ? state.sortedDates[state.sortedDates.length - 1] : null;
+  // วันหุ้นล่าสุดจาก sliced space — sortedDates ตัวท้ายอาจเป็นวัน FX-only (jpy CSV อัพเดทก่อน sp500 บน R2)
+  const _Ssn = state._sniper;
+  const lastDate = _Ssn && _Ssn.n > 0 ? _Ssn.dates[_Ssn.n - 1]
+    : (state.sortedDates && state.sortedDates.length > 0 ? state.sortedDates[state.sortedDates.length - 1] : null);
   const lastDayData = lastDate ? (state.marketData[lastDate] || {}) : {};
   (state.lots || []).forEach(lot => {
     if (lot.initialCapital > 0) {
@@ -3698,7 +3702,10 @@ function renderTradeLog() {
     } else if (active) {
       // UNREALIZED — mark-to-market ที่ราคาปิดล่าสุด
       isOpen = true;
-      const latestDate = state.sortedDates[state.sortedDates.length - 1];
+      // วันหุ้นล่าสุด (sliced) — ห้ามใช้ merged tail: วัน FX-only ไม่มีราคาหุ้น → MTM เพี้ยนเป็น 0%
+      const _Ssn = state._sniper;
+      const latestDate = _Ssn && _Ssn.n > 0 ? _Ssn.dates[_Ssn.n - 1]
+        : state.sortedDates[state.sortedDates.length - 1];
       const ldd = state.marketData[latestDate] || {};
       exitDate = active.plannedExitDate;
       if (!exitDate) plannedNote = ' (ครบกำหนดหลังวันข้อมูลล่าสุด)';
@@ -3772,7 +3779,7 @@ function renderTradeLog() {
     const reinvestBadge = '';   // โหมดยิงทุกสัญญาณ — ทุกไม้ทุนใหม่ ไม่มี chain
 
     let header = `<div class="trade-header"><div>
-      <div class="trade-date"><span class="trade-date-tag">Entry</span>${_fmtTradeDate(r.date)}${r.exitDate ? '<span class="trade-date-arrow">→</span><span class="trade-date-tag">Exit</span><span class="exit-date">' + _fmtTradeDate(r.exitDate) + '</span>' : (r.plannedNote || '')}${r.isOpen ? ' <span class="open-badge">OPEN</span>' : ''}${r.extendCount > 0 ? ' <span class="open-badge" style="background:rgba(114,47,55,0.12);color:#722F37;border-color:rgba(114,47,55,0.35);">ยืด ×' + r.extendCount + '</span>' : ''}${reinvestBadge}</div>
+      <div class="trade-date"><span class="trade-date-tag">Entry</span>${_fmtTradeDate(r.date)}${r.exitDate ? '<span class="trade-date-arrow">→</span><span class="trade-date-tag">Exit</span><span class="exit-date">' + _fmtTradeDate(r.exitDate) + '</span>' : (r.plannedNote || '')}${r.isOpen ? ' <span class="open-badge">OPEN</span>' : ''}${r.extendCount > 0 ? ' <span style="display:inline-block;background:rgba(156,43,43,0.12);color:#9C2B2B;border:1px solid rgba(156,43,43,0.4);padding:1px 7px;border-radius:4px;font-family:\'Cinzel\',\'Anuphan\',serif;font-size:0.58rem;font-weight:700;letter-spacing:1.2px;margin-left:6px;" title="Lot maturity extended ' + r.extendCount + ' time(s) — SPY was out of macro top-2 at scheduled exit, so the same picks were held another hold period instead of being sold. Exit date shown is the updated maturity.">🔁 EXTENDED ' + r.extendCount + 'x</span>' : ''}${reinvestBadge}</div>
       <div style="font-family:'Cinzel','Anuphan',serif;font-size:0.68rem;font-weight:700;color:var(--gold-deep);letter-spacing:0.1em;text-transform:uppercase;margin-top:4px;opacity:0.85;">Signal · ${_fmtTradeDate(r.signalDate)}</div>
       <div class="trade-summary">ไม้นี้ <strong>${r.stocks.length} ตัว</strong> · ทุน <strong>$${Math.round(r.equity).toLocaleString()}</strong>`;
     if (!r.isOpen) {
