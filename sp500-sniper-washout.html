@@ -1637,11 +1637,11 @@
       </div>
       <div class="headline-text">
         <div class="headline-line-1">
-          ผลการทดสอบ หากลงทุนด้วยกลยุทธ์นี้<br>
-          ตั้งแต่ <strong id="headlineYears">—</strong> ปีที่แล้ว ผลตอบแทนเฉลี่ย
+          ผลการทดสอบ หากยิงตามสัญญาณทุกครั้ง<br>
+          ตลอด <strong id="headlineYears">—</strong> ปีที่ผ่านมา กำไรเฉลี่ย
         </div>
         <div class="headline-line-2">
-          ปีละ <span class="headline-cagr" id="headlineCagr">—</span> แบบทบต้น
+          ไม้ละ <span class="headline-cagr" id="headlineCagr">—</span> จาก <span id="headlineTrades">—</span> ไม้
         </div>
       </div>
     </div>
@@ -1665,24 +1665,24 @@
       <!-- 4 KPI pillars (Weekly format) -->
       <div class="rsc-metrics-grid">
         <div class="rsc-metric">
-          <div class="rsc-metric-label">Annualized Return</div>
+          <div class="rsc-metric-label">Avg / Trade</div>
           <div class="rsc-metric-value" id="rscAnnRoi">0.0%</div>
-          <div class="rsc-metric-desc">ผลตอบแทนเฉลี่ยต่อปีจากเงินลงทุน</div>
+          <div class="rsc-metric-desc">กำไรเฉลี่ยต่อไม้ หลังหักค่าธรรมเนียม</div>
         </div>
         <div class="rsc-metric">
-          <div class="rsc-metric-label">Sharpe Ratio</div>
+          <div class="rsc-metric-label">Win Rate</div>
           <div class="rsc-metric-value" id="rscSharpe">—</div>
-          <div class="rsc-metric-desc" id="rscSharpeDesc">กำไรต่อหน่วยความเสี่ยง — สูงกว่า 1 ถือว่าดี</div>
+          <div class="rsc-metric-desc" id="rscSharpeDesc">สัดส่วนไม้ที่ปิดกำไร</div>
         </div>
         <div class="rsc-metric">
-          <div class="rsc-metric-label">Alpha</div>
+          <div class="rsc-metric-label">ชนะ SPY / ไม้</div>
           <div class="rsc-metric-value" id="rscAlpha">—</div>
-          <div class="rsc-metric-desc" id="rscAlphaDesc">ผลตอบแทนส่วนที่เอาชนะตลาด หลังหักความเสี่ยง</div>
+          <div class="rsc-metric-desc" id="rscAlphaDesc">เทียบเอาเงินก้อนเดียวกันซื้อ SPY ช่วงเวลาเดียวกันทุกไม้</div>
         </div>
         <div class="rsc-metric">
-          <div class="rsc-metric-label">Max Drawdown</div>
+          <div class="rsc-metric-label">ไม้แย่สุด</div>
           <div class="rsc-metric-value" id="rscMaxDD" style="color:var(--red);">0.0%</div>
-          <div class="rsc-metric-desc">พอร์ตเคยลดจากจุดสูงสุดมากที่สุด — เอาไว้วัดความอดทนที่ต้องมี</div>
+          <div class="rsc-metric-desc">ขาดทุนหนักสุดในไม้เดียว — เอาไว้วัดความอดทนที่ต้องมี</div>
         </div>
       </div>
 
@@ -1716,33 +1716,33 @@
             <div class="rss-stat rss-compare-stat rss-strat">
               <div class="rss-compare-tag strat">กลยุทธ์</div>
               <div class="rss-stat-val" id="rssBenchStratReturn">—</div>
-              <div class="rss-stat-sub">Annualized Return</div>
-              <div class="rss-stat-th">ผลตอบแทนต่อปี</div>
+              <div class="rss-stat-sub">Avg / Trade</div>
+              <div class="rss-stat-th">กำไรเฉลี่ยต่อไม้</div>
             </div>
             <div class="rss-stat rss-compare-stat rss-mkt">
               <div class="rss-compare-tag mkt">ตลาด SP500</div>
               <div class="rss-stat-val" id="ma-return">—</div>
-              <div class="rss-stat-sub">Annualized Return</div>
-              <div class="rss-stat-th">ผลตอบแทนต่อปี</div>
+              <div class="rss-stat-sub">Avg / Trade</div>
+              <div class="rss-stat-th">SPY ไม้เดียวกัน เฉลี่ยต่อไม้</div>
             </div>
             <!-- Row 2: Volatility -->
             <div class="rss-stat rss-compare-stat rss-strat">
               <div class="rss-compare-tag strat">กลยุทธ์</div>
               <div class="rss-stat-val" id="rssBenchStratVol">—</div>
-              <div class="rss-stat-sub">Annualized Volatility</div>
-              <div class="rss-stat-th">ความผันผวนต่อปี</div>
+              <div class="rss-stat-sub">SD / Trade</div>
+              <div class="rss-stat-th">ความผันผวนต่อไม้</div>
             </div>
             <div class="rss-stat rss-compare-stat rss-mkt">
               <div class="rss-compare-tag mkt">ตลาด SP500</div>
               <div class="rss-stat-val" id="ma-vol">—</div>
-              <div class="rss-stat-sub">Annualized Volatility</div>
-              <div class="rss-stat-th">ความผันผวนต่อปี</div>
+              <div class="rss-stat-sub">SD / Trade</div>
+              <div class="rss-stat-th">SPY ไม้เดียวกัน ความผันผวนต่อไม้</div>
             </div>
           </div>
           <div class="ma-note rss-bench-note" id="ma-note" style="margin-top:12px;">—</div>
           <div class="rss-tab-narrative" id="rssBench">กำลังคำนวณ...</div>
           <!-- period slider -->
-          <div class="rss-bench-slider-wrap">
+          <div class="rss-bench-slider-wrap" style="display:none;" aria-hidden="true">
             <div class="rss-bench-slider-header">
               <span class="rss-bench-label">ปรับช่วงเวลา</span>
               <span class="rss-bench-val" id="slider-val-disp">10Y</span>
@@ -1756,24 +1756,24 @@
         <div id="rss-pane-profit" class="rss-tab-pane">
           <div class="rss-stat-grid">
             <div class="rss-stat">
-              <div class="rss-stat-label">Final Equity</div>
+              <div class="rss-stat-label">Total P&amp;L</div>
               <div class="rss-stat-val" id="stat-final-mirror">$-</div>
               <div class="rss-stat-sub">มูลค่าพอร์ตสุดท้าย</div>
             </div>
             <div class="rss-stat">
               <div class="rss-stat-label">Total Return</div>
               <div class="rss-stat-val" id="stat-total-return">+0.0%</div>
-              <div class="rss-stat-sub">ผลตอบแทนรวมสะสม</div>
+              <div class="rss-stat-sub">กำไร ÷ เงินที่ใส่ทั้งหมด</div>
             </div>
             <div class="rss-stat">
-              <div class="rss-stat-label">CAGR</div>
+              <div class="rss-stat-label">Avg / Trade</div>
               <div class="rss-stat-val" id="kpi-cagr">0.0%</div>
-              <div class="rss-stat-sub">ผลตอบแทนต่อปีทบต้น</div>
+              <div class="rss-stat-sub">กำไรเฉลี่ยต่อไม้</div>
             </div>
             <div class="rss-stat">
-              <div class="rss-stat-label">Avg Monthly</div>
+              <div class="rss-stat-label">SPY / Trade</div>
               <div class="rss-stat-val" id="kpi-avg">0.00%</div>
-              <div class="rss-stat-sub">ผลตอบแทนเฉลี่ย / เดือน</div>
+              <div class="rss-stat-sub">SPY ช่วงเวลาเดียวกัน เฉลี่ยต่อไม้</div>
             </div>
             <div class="rss-stat">
               <div class="rss-stat-label">Best Lot</div>
@@ -1803,9 +1803,9 @@
               <div class="rss-stat-sub">กำไรรวม ÷ ขาดทุนรวม</div>
             </div>
             <div class="rss-stat">
-              <div class="rss-stat-label">Total Months</div>
+              <div class="rss-stat-label">Beat SPY</div>
               <div class="rss-stat-val" id="kpi-rounds">0</div>
-              <div class="rss-stat-sub">จำนวนเดือนทั้งหมด</div>
+              <div class="rss-stat-sub">ไม้ที่ชนะ SPY หน้าต่างเดียวกัน</div>
             </div>
             <div class="rss-stat">
               <div class="rss-stat-label">Lots Entered</div>
@@ -1820,24 +1820,24 @@
         <div id="rss-pane-risk" class="rss-tab-pane">
           <div class="rss-stat-grid">
             <div class="rss-stat">
-              <div class="rss-stat-label">Strategy Vol</div>
+              <div class="rss-stat-label">SD / Trade</div>
               <div class="rss-stat-val" id="kpi-strat-vol">0.0%</div>
-              <div class="rss-stat-sub">ความผันผวนกลยุทธ์</div>
+              <div class="rss-stat-sub">ความผันผวนต่อไม้</div>
             </div>
             <div class="rss-stat">
-              <div class="rss-stat-label">Sharpe Ratio</div>
+              <div class="rss-stat-label">Consistency</div>
               <div class="rss-stat-val" id="kpi-sharpe">0.00</div>
-              <div class="rss-stat-sub">ผลตอบแทน ÷ ความเสี่ยง</div>
+              <div class="rss-stat-sub">เฉลี่ยต่อไม้ ÷ ความผันผวนต่อไม้</div>
             </div>
             <div class="rss-stat">
               <div class="rss-stat-label">Max Drawdown</div>
               <div class="rss-stat-val text-red" id="kpi-maxdd">0.0%</div>
-              <div class="rss-stat-sub">ขาดทุนหนักสุดจากยอดสูง</div>
+              <div class="rss-stat-sub">กำไรสะสมย่อหนักสุด (% ของเงินสดที่เตรียม)</div>
             </div>
             <div class="rss-stat">
-              <div class="rss-stat-label">Market Max DD</div>
+              <div class="rss-stat-label">SPY ไม้แย่สุด</div>
               <div class="rss-stat-val text-red" id="stat-ma-dd">0.0%</div>
-              <div class="rss-stat-sub">ขาดทุนหนักสุดของ SP500</div>
+              <div class="rss-stat-sub">SPY หน้าต่างเดียวกัน ไม้ที่แย่ที่สุด</div>
             </div>
           </div>
           <div class="rss-tab-narrative" id="rssRisk">กำลังคำนวณ...</div>
@@ -1866,7 +1866,7 @@
     <!-- CHART TABS -->
     <div class="card-base tabs-container" id="chart-tabs-container">
       <div class="tabs-header">
-        <button class="tab-btn active" onclick="openChartTab(event, 'chart-equity')">EQUITY CURVE</button>
+        <button class="tab-btn active" onclick="openChartTab(event, 'chart-equity')">PROFIT CURVE</button>
         <button class="tab-btn" onclick="openChartTab(event, 'chart-rounds')">ROUND RETURNS</button>
         <button class="tab-btn" onclick="openChartTab(event, 'chart-dist')">DISTRIBUTION</button>
         <button class="tab-btn" onclick="openChartTab(event, 'chart-dd')">DRAWDOWN</button>
@@ -1918,15 +1918,15 @@
               <th>ไม้</th>
               <th>Win</th>
               <th>เฉลี่ย/ไม้</th>
-              <th>CAGR</th>
-              <th>Max DD</th>
-              <th>เวลาอยู่ในตลาด</th>
+              <th>P&amp;L รวม</th>
+              <th>ไม้แย่สุด</th>
+              <th>ถือซ้อนสูงสุด</th>
             </tr></thead>
             <tbody id="holdCompareBody"><tr><td colspan="7" style="color:var(--text-muted);padding:30px;">กำลังคำนวณ...</td></tr></tbody>
           </table>
         </div>
         <div style="font-family:'Anuphan',sans-serif;font-size:0.78rem;color:var(--text-muted);margin-top:12px;line-height:1.7;">
-          บทบาทที่งานวิจัยของเราสรุป: <strong>ถือ 1–2 เดือน = กติกาเอาเงินสดที่นอนอยู่ลงช่วงจังหวะพิเศษ</strong> (ช่วงหลังตลาดล้าง SPY เองก็วิ่งแรงกว่าปกติ ~2.5 เท่าใน 1 เดือน แต่ผลนี้จางหมดภายใน ~6 เดือน) ·
+          โหมดนี้<strong>ยิงทุกสัญญาณด้วยทุนไม้ละเท่ากัน</strong> (ถือซ้อนกันได้ — คอลัมน์ขวาสุดบอกว่าต้องเตรียมเงินสดกี่ไม้) · บทบาทที่งานวิจัยของเราสรุป: <strong>ถือ 1–2 เดือน = กติกาเอาเงินสดที่นอนอยู่ลงช่วงจังหวะพิเศษ</strong> (ช่วงหลังตลาดล้าง SPY เองก็วิ่งแรงกว่าปกติ ~2.5 เท่าใน 1 เดือน แต่ผลนี้จางหมดภายใน ~6 เดือน) ·
           ส่วน <strong>ถือ 6 เดือน</strong> ตัวเลขจะสวยเป็นพิเศษเพราะแทบไม่ต่างจากถือ Momentum ยาวตลอด — ตัวเลขต่อปีของโหมดนี้อ่อนไหวกับวันเริ่มมาก (phase luck) อย่านำไปเทียบกับกลยุทธ์หลักตรงๆ
         </div>
       </div>
@@ -1979,19 +1979,19 @@
       <div id="tab-stats" class="tab-content">
         <div class="stats-grid">
           <div class="stat-box">
-            <div class="stat-label">Sharpe Ratio</div>
+            <div class="stat-label">Consistency</div>
             <div class="stat-val" id="stat-sharpe">0.00</div>
-            <div class="stat-sub">Risk Adjusted</div>
+            <div class="stat-sub">Avg ÷ SD ต่อไม้</div>
           </div>
           <div class="stat-box">
-            <div class="stat-label">Volatility</div>
+            <div class="stat-label">SD / Trade</div>
             <div class="stat-val" id="stat-vol">0.0%</div>
-            <div class="stat-sub">Annualized</div>
+            <div class="stat-sub">ความผันผวนต่อไม้</div>
           </div>
           <div class="stat-box">
             <div class="stat-label">Max Drawdown</div>
             <div class="stat-val text-red" id="stat-dd">0.0%</div>
-            <div class="stat-sub">Peak to Valley</div>
+            <div class="stat-sub">% ของเงินสดที่เตรียม</div>
           </div>
           <div class="stat-box">
             <div class="stat-label">Win Rate</div>
@@ -2007,11 +2007,11 @@
             <div class="stat-val text-red" id="stat-worst">0.0%</div>
           </div>
           <div class="stat-box">
-            <div class="stat-label">Avg Monthly</div>
+            <div class="stat-label">Avg / Trade</div>
             <div class="stat-val" id="stat-avg">0.0%</div>
           </div>
           <div class="stat-box">
-            <div class="stat-label">Rounds Completed</div>
+            <div class="stat-label">ไม้ทั้งหมดในสถิติ</div>
             <div class="stat-val" id="stat-count">0</div>
           </div>
         </div>
@@ -2086,12 +2086,12 @@
 
     <!-- 0. Initial Capital -->
     <div class="control-group">
-      <label>INITIAL CAPITAL — เงินลงทุนตั้งต้น</label>
+      <label>PER-TRADE CAPITAL — ทุนต่อไม้</label>
       <div class="top-n-wrapper" style="display:flex; align-items:center; gap:10px;">
         <span style="color:var(--gold-deep); font-weight:700; font-family:'DM Serif Display',serif; font-size:1.1rem;">$</span>
         <input type="number" id="initialCapitalInput" class="input-box" value="10000" step="500" min="100">
       </div>
-      <span class="hint">เงินก้อนเดียวที่รอสัญญาณ · เข้าทีละไม้ (ไม้ใหม่เข้าได้เมื่อไม้เก่าขายแล้วเท่านั้น) · กำไร/ขาดทุนทบต้นไปไม้ถัดไป · ระหว่างรอ = เงินสด (คิดผลตอบแทน 0%)</span>
+      <span class="hint">ทุกสัญญาณ = ยิงไม้ใหม่ด้วยเงินสดก้อนนี้ (ไม่ทบต้น · ไม่ต้องรอไม้เก่าขาย) · ถือซ้อนกันได้หลายไม้ช่วงสัญญาณถี่ — ดูตัวเลข "เงินสดสูงสุดที่ใช้พร้อมกัน" ในผลเพื่อเตรียมงบ</span>
     </div>
 
     <div class="control-group">
@@ -2176,7 +2176,7 @@
       </div>
     </div>
 
-    <p><strong>บทบาทที่ถูกต้องของกลยุทธ์นี้:</strong> ไม่ใช่กลยุทธ์หลักที่ใช้แทนพอร์ต Momentum ปกติ — สัญญาณเกิดเพียง ~2–4 ครั้งต่อปี เวลาส่วนใหญ่คือการถือเงินสดรอ · จุดแข็งคือเป็น<strong>กติกาชัดเจนสำหรับเอาเงินสดที่นอนอยู่เฉยๆ ลงทำงานในจังหวะพิเศษ</strong> แล้วออกตามกำหนดโดยไม่ต้องเดา</p>
+    <p><strong>บทบาทที่ถูกต้องของกลยุทธ์นี้:</strong> เป็น<strong>ตัวเสริม</strong> ไม่ใช่กลยุทธ์หลักที่ใช้แทนพอร์ต Momentum ปกติ — สัญญาณเกิดเพียง ~2–4 ครั้งต่อปี · กติกาคือ<strong>ยิงทุกสัญญาณด้วยเงินสดก้อนใหม่ไม้ละเท่ากัน</strong> ถือครบกำหนดแล้วขาย (ถือซ้อนกันได้ — ช่วงตลาดล้างหนัก สัญญาณจะมาติดกัน ยิ่งใส่มากขึ้นเองตามกติกา จึงควรเตรียมเงินสดเผื่อหลายไม้) · จุดแข็งคือเป็นกติกาชัดเจนสำหรับเอาเงินสดที่นอนอยู่เฉยๆ ลงทำงานในจังหวะพิเศษ แล้วออกตามกำหนดโดยไม่ต้องเดา</p>
 
     <p><strong>ข้อจำกัดที่ต้องรู้ก่อนใช้ (จากงานวิจัยของเราเอง):</strong> ① ผลจากการเลือกหุ้น (LB6) เป็นพลังที่มีอยู่ตลอดเวลา ไม่ได้แรงขึ้นเพราะจับจังหวะ — ตัวจับจังหวะช่วยเฉพาะฝั่ง "ตลาดโดยรวมฟื้นแรง" และจางหมดภายใน ~6 เดือน · ② โหมดถือ 6 เดือนให้ตัวเลขต่อปีสวยมาก แต่ส่วนใหญ่มาจาก<strong>โชคของวันเริ่ม</strong> (ทดสอบเลื่อนวันเริ่มแล้วผลแกว่งกว้างมาก) อย่าใช้ตัวเลขโหมดนี้ตัดสินใจ · ③ ข้อมูลทดสอบเป็นสมาชิก S&amp;P 500 ชุดปัจจุบัน (survivorship bias) — ตัวเลขทั้งหมดจึงเป็น<strong>เพดานบน</strong> ของจริงจะต่ำกว่านี้ · ④ ทุกการตัดสินใจใช้ข้อมูลถึงราคาปิดของวันสัญญาณเท่านั้น แล้วลงมือที่ราคาเปิดวันถัดไป (ไม่มี lookahead) · ค่าธรรมเนียม 0.05% ต่อข้างรวมอยู่ในผลแล้ว</p>
   </div>
@@ -2185,7 +2185,7 @@
 <script>
 // --- CONFIGURATION ---
 let CONFIG = {
-  initialCapital: 10000,       // เงินตั้งต้น (แก้ได้ใน settings)
+  perTradeCapital: 10000,      // ทุนต่อไม้ — ทุกสัญญาณยิงไม้ใหม่ด้วยเงินสดก้อนนี้ (แก้ได้ใน settings)
   topN: 10,                    // ซื้อ Top N ตาม LB6
   holdDays: 42,                // ระยะถือครอง (วันเทรด): 21 = 1M · 42 = 2M · 126 = 6M
   zWindow: 60,                 // หน้าต่าง SMA/STD ของ z-score
@@ -2203,7 +2203,7 @@ const BENCHMARK_TICKERS = new Set(['SPY', 'QQQ', 'DIA']);
 // --- Default backtest settings (for Reset button) ---
 const DEFAULT_SNIPER = {
   holdDays: 42,
-  initialCapital: 10000,
+  perTradeCapital: 10000,
   topN: 10,
   startYear: 2015
 };
@@ -2235,7 +2235,7 @@ function getSniperSettings() {
   const y = document.getElementById('startYearSelect');
   return {
     holdDays: h ? parseInt(h.value, 10) || DEFAULT_SNIPER.holdDays : DEFAULT_SNIPER.holdDays,
-    initialCapital: c ? parseFloat(c.value) || DEFAULT_SNIPER.initialCapital : DEFAULT_SNIPER.initialCapital,
+    perTradeCapital: c ? parseFloat(c.value) || DEFAULT_SNIPER.perTradeCapital : DEFAULT_SNIPER.perTradeCapital,
     topN: n ? parseInt(n.value, 10) || DEFAULT_SNIPER.topN : DEFAULT_SNIPER.topN,
     startYear: y ? parseInt(y.value, 10) || DEFAULT_SNIPER.startYear : DEFAULT_SNIPER.startYear
   };
@@ -2248,7 +2248,7 @@ function applySniperSettings(s) {
   const n = document.getElementById('topNInput');
   const y = document.getElementById('startYearSelect');
   if (h && s.holdDays != null) h.value = s.holdDays;
-  if (c && s.initialCapital != null) c.value = s.initialCapital;
+  if (c && s.perTradeCapital != null) c.value = s.perTradeCapital;
   if (n && s.topN != null) n.value = s.topN;
   if (y && s.startYear != null) y.value = s.startYear;
 }
@@ -2291,7 +2291,7 @@ let state = {
   tradeLog: [],                 // kept for optimization grid compatibility
   optResults: [],
   // --- Sniper-specific ---
-  lots: [],                     // ไม้ที่ยังเปิดอยู่ (สูงสุด 1 — one-at-a-time). Each: {chainId, signalDate, entryDate, entryIdx, plannedExitDate, initialCapital, stocks:{ticker:shares}, legs}
+  lots: [],                     // ไม้ที่ยังเปิดอยู่ (หลายไม้พร้อมกันได้ — ยิงทุกสัญญาณ). Each: {chainId, signalDate, entryDate, entryIdx, plannedExitDate, initialCapital, stocks:{ticker:shares}, legs}
   closedLots: [],               // ไม้ที่ปิดแล้วพร้อม P&L จริง (ราคาเปิดเข้า→ราคาเปิดออก หลังค่าธรรมเนียม)
   externalCapitalTimeline: [],
   _sniper: null,                // cached precompute (prices matrix / breadth / signals) — invalidated in processData()
@@ -2748,10 +2748,10 @@ window.downloadDetailsPdf = function(event, entryDate, exitDate, isPending) {
 // Trigger    : breadth ≥ 19% (arm) → ยิงสัญญาณวันแรกที่ breadth หด ≤ ครึ่งหนึ่งของพีค
 // Picks      : Top-N ตาม LB6 = ผลตอบแทน 126 วันเทรดล้วน ณ ราคาปิดวันสัญญาณ
 // Execution  : ซื้อราคาเปิดวันถัดไป · equal weight · ถือครบ H วันเทรด · ขายราคาเปิด
-// Portfolio  : ทีละไม้ (one-at-a-time) · สัญญาณวันสุดท้ายที่ถือ → เข้าไม้ใหม่ได้
-//              ที่ open เดียวกับที่ขายออก · เงินสดระหว่างรอ = 0% · fee 0.05%/ข้าง
+// Portfolio  : ยิงทุกสัญญาณ — ไม้ใหม่ทุนเท่ากัน (เงินสดภายนอกก้อนใหม่ทุกไม้)
+//              ถือซ้อนกันได้ · ไม่ทบต้น · fee 0.05%/ข้าง · Equity curve = กำไรสะสม (P&L)
 // NO LOOKAHEAD: การตัดสินใจทุกอย่างใช้ข้อมูลถึง close วัน t เท่านั้น → ลงมือ open t+1
-// JS = Python: ตรวจกับ sniper_ref3.py (43 สัญญาณ · 27/23/15 ไม้ · CAGR ตรงทุกหลัก)
+// JS = Python: ตรวจกับ sniper_ref4.py (43 สัญญาณ · 43 ไม้ทุกระยะถือ · P&L ตรงทุกหลัก)
 // ============================================================
 
 function holdLabelEN() { return ({21:'1M', 42:'2M', 126:'6M'})[CONFIG.holdDays] || (CONFIG.holdDays + 'd'); }
@@ -2845,20 +2845,19 @@ function sniperRankLB6(S, t, topN) {
   return cand.slice(0, topN);
 }
 
-// core run — pure (ไม่แตะ DOM/state นอกจาก cache) เพื่อให้ Hold Compare เรียกซ้ำได้
-function sniperRun(H, topN, capital, startIdx) {
+function sniperRun(H, topN, perTrade, startIdx) {
   const S = buildSniperSeries();
   const n = S.n, m = S.m, dates = S.dates, tickers = S.tickers;
   const closeA = S.closeA, openA = S.openA, signals = S.signals;
   const FEE = CONFIG.feeSide, LBn = CONFIG.lb;
   const t0 = Math.max(startIdx || 0, 0);
 
-  // 1) plan trades — one-at-a-time · สัญญาณที่ t = exit−1 เข้าไม้ใหม่ได้ที่ open เดียวกับที่ออก
+  // 1) plan — ทุกสัญญาณ = ไม้ใหม่ทุนก้อนละ perTrade (ถือซ้อนกันได้ ไม่มีเงื่อนไขรอ)
   const plan = [];
-  let busyUntil = -1, firePending = null;
+  let firePending = null;
   for (let s = 0; s < signals.length; s++) {
     const t = signals[s];
-    if (t < t0 || t < LBn || t <= busyUntil) continue;
+    if (t < t0 || t < LBn) continue;
     const ent = t + 1, ex = ent + H;
     if (ent >= n) { firePending = t; continue; }
     const picks = sniperRankLB6(S, t, topN);
@@ -2869,70 +2868,67 @@ function sniperRun(H, topN, capital, startIdx) {
       if (isFinite(po) && po > 0 && okExit) legs.push({ j: p.j, r: p.r, po: po });
     }
     if (legs.length === 0) continue;
-    plan.push({ sig: t, ent: ent, ex: ex, legs: legs });
-    busyUntil = ex - 2;
+    const base = perTrade * (1 - FEE);
+    const full = legs.map(lg => ({ j: lg.j, r: lg.r, po: lg.po, sh: (base / legs.length) / lg.po }));
+    plan.push({ sig: t, ent: ent, ex: ex, legs: full, isOpen: ex >= n });
   }
 
-  // 2) walk days — exit ก่อน แล้วค่อยเช็ค entry (รองรับ roll วันเดียวกัน)
+  // 2) walk — equity = กำไรสะสมรวมทุกไม้ (Σ มูลค่าไม้ − ทุนไม้) · exit ประมวลก่อน entry
   const equity = [], closed = [];
-  let openLot = null, cur = capital, k = 0, holding = null;
+  const active = [];
+  let closedPnl = 0, entered = 0, maxConcurrent = 0, k = 0;
   for (let i = t0; i < n; i++) {
-    if (holding && i === holding.ex) {
-      let val = 0;
-      for (const lg of holding.legs) val += lg.sh * openA[i * m + lg.j];
-      cur = val * (1 - FEE);
-      closed.push({
-        chainId: closed.length + 1,
-        signalDate: dates[holding.sig],
-        entryDate: dates[holding.enti],
-        exitDate: dates[i],
-        entryIdx: holding.enti, exitIdx: i,
-        initialCapital: holding.cap0,
-        exitValue: cur,
-        pl: cur - holding.cap0,
-        returnPct: holding.cap0 > 0 ? cur / holding.cap0 - 1 : 0,
-        stocks: holding.shares,
-        legs: holding.legs.map(lg => {
-          const px = openA[i * m + lg.j];
-          return { ticker: tickers[lg.j], lb6: lg.r, entryPrice: lg.po, exitPrice: px,
-                   ret: (px / lg.po) * (1 - FEE) * (1 - FEE) - 1 };
-        })
-      });
-      holding = null; k++;
-    }
-    if (!holding && k < plan.length && plan[k].ent === i) {
-      const tr = plan[k];
-      const base = cur * (1 - FEE);
-      const legs = tr.legs.map(lg => ({ j: lg.j, r: lg.r, po: lg.po, sh: (base / tr.legs.length) / lg.po }));
-      const shares = {};
-      for (const lg of legs) shares[tickers[lg.j]] = lg.sh;
-      holding = { sig: tr.sig, enti: i, ex: tr.ex, legs: legs, shares: shares, cap0: cur };
-    }
-    if (holding) {
-      let val = 0;
-      for (const lg of holding.legs) {
-        const c = closeA[i * m + lg.j];
-        val += lg.sh * (isFinite(c) ? c : openA[i * m + lg.j]);
+    for (let a = active.length - 1; a >= 0; a--) {
+      const tr = active[a];
+      if (!tr.isOpen && i === tr.ex) {
+        let val = 0;
+        for (const lg of tr.legs) val += lg.sh * openA[i * m + lg.j];
+        const exitVal = val * (1 - FEE);
+        closedPnl += exitVal - perTrade;
+        closed.push({
+          chainId: 0,
+          signalDate: dates[tr.sig], entryDate: dates[tr.ent], exitDate: dates[i],
+          entryIdx: tr.ent, exitIdx: i,
+          initialCapital: perTrade, exitValue: exitVal,
+          pl: exitVal - perTrade,
+          returnPct: exitVal / perTrade - 1,
+          stocks: Object.fromEntries(tr.legs.map(lg => [tickers[lg.j], lg.sh])),
+          legs: tr.legs.map(lg => {
+            const px = openA[i * m + lg.j];
+            return { ticker: tickers[lg.j], lb6: lg.r, entryPrice: lg.po, exitPrice: px,
+                     ret: (px / lg.po) * (1 - FEE) * (1 - FEE) - 1 };
+          })
+        });
+        active.splice(a, 1);
       }
-      equity.push({ date: dates[i], equity: val });
-    } else {
-      equity.push({ date: dates[i], equity: cur });
     }
+    while (k < plan.length && plan[k].ent === i) {
+      active.push(plan[k]); entered++;
+      if (active.length > maxConcurrent) maxConcurrent = active.length;
+      k++;
+    }
+    let mtm = 0;
+    for (const tr of active) {
+      for (const lg of tr.legs) {
+        const c = closeA[i * m + lg.j];
+        mtm += lg.sh * (isFinite(c) ? c : openA[i * m + lg.j]);
+      }
+    }
+    equity.push({ date: dates[i], equity: closedPnl + (mtm - active.length * perTrade) });
   }
-  if (holding) {
-    openLot = {
-      chainId: closed.length + 1,
-      signalDate: dates[holding.sig],
-      entryDate: dates[holding.enti],
-      entryIdx: holding.enti,
-      plannedExitIdx: holding.ex,
-      plannedExitDate: holding.ex < n ? dates[holding.ex] : null,
-      initialCapital: holding.cap0,
-      stocks: holding.shares,
-      legs: holding.legs.map(lg => ({ ticker: tickers[lg.j], lb6: lg.r, entryPrice: lg.po }))
-    };
-  }
-  return { equity: equity, closed: closed, openLot: openLot, firePending: firePending };
+  closed.sort((x, y) => (x.entryDate < y.entryDate ? -1 : 1));
+  closed.forEach((c, i2) => { c.chainId = i2 + 1; });
+  const openLots = active.map((tr, i2) => ({
+    chainId: closed.length + i2 + 1,
+    signalDate: dates[tr.sig], entryDate: dates[tr.ent], entryIdx: tr.ent,
+    plannedExitIdx: tr.ex, plannedExitDate: tr.ex < n ? dates[tr.ex] : null,
+    initialCapital: perTrade,
+    stocks: Object.fromEntries(tr.legs.map(lg => [tickers[lg.j], lg.sh])),
+    legs: tr.legs.map(lg => ({ ticker: tickers[lg.j], lb6: lg.r, entryPrice: lg.po }))
+  }));
+  return { equity: equity, closed: closed, openLots: openLots, firePending: firePending,
+           entered: entered, maxConcurrent: maxConcurrent,
+           deployedTotal: entered * perTrade };
 }
 
 // === HOLD COMPARE (แท็บ HOLD COMPARE) — สัญญาณชุดเดียวกัน ต่างกันแค่ระยะถือ ===
@@ -2943,41 +2939,35 @@ function renderHoldCompare() {
   let startIndex = _S.dates.findIndex(d => d.startsWith(String(CONFIG.startYear)));
   if (startIndex === -1) startIndex = 0;
   const lbl = { 21: '1 เดือน', 42: '2 เดือน', 126: '6 เดือน' };
+  const PT = CONFIG.perTradeCapital || 10000;
   const rows = [];
   for (const H of [21, 42, 126]) {
-    const r = sniperRun(H, CONFIG.topN, CONFIG.initialCapital, startIndex);
-    const eq = r.equity;
-    if (!eq.length) continue;
-    const start = eq[0].equity, end = eq[eq.length - 1].equity;
-    const days = (new Date(eq[eq.length - 1].date) - new Date(eq[0].date)) / 86400000;
-    const cagr = days > 0 && start > 0 ? Math.pow(end / start, 365.25 / days) - 1 : 0;
-    let peak = -Infinity, mdd = 0;
-    for (const e of eq) { if (e.equity > peak) peak = e.equity; const dd = e.equity / peak - 1; if (dd < mdd) mdd = dd; }
-    const wins = r.closed.filter(c => c.returnPct > 0).length;
-    const avg = r.closed.length ? r.closed.reduce((s, c) => s + c.returnPct, 0) / r.closed.length : 0;
-    let held = r.closed.reduce((s, c) => s + (c.exitIdx - c.entryIdx), 0);
-    if (r.openLot) held += (_S.n - 1) - r.openLot.entryIdx;
-    const inMkt = eq.length > 1 ? held / (eq.length - 1) : 0;
-    rows.push({ H, nAll: r.closed.length + (r.openLot ? 1 : 0), nClosed: r.closed.length, wins, avg, cagr, mdd, inMkt });
+    const r = sniperRun(H, CONFIG.topN, PT, startIndex);
+    const rets = r.closed.map(c => c.returnPct);
+    if (rets.length === 0) continue;
+    const wins = rets.filter(x => x > 0).length;
+    const avg = rets.reduce((a, b) => a + b, 0) / rets.length;
+    const worst = Math.min(...rets);
+    const pnl = r.equity.length ? r.equity[r.equity.length - 1].equity : 0;
+    const isCur = H === CONFIG.holdDays;
+    const nTxt = rets.length + (r.openLots.length ? '+' + r.openLots.length : '');
+    rows.push(`<tr style="${isCur ? 'background:rgba(212,175,55,0.10);font-weight:700;' : ''}">
+      <td style="text-align:left;">${lbl[H] || H + 'd'}${isCur ? ' ★' : ''}</td>
+      <td>${nTxt}</td>
+      <td>${(wins / rets.length * 100).toFixed(0)}%</td>
+      <td class="${avg >= 0 ? 'text-green' : 'text-red'}">${avg >= 0 ? '+' : ''}${(avg * 100).toFixed(1)}%</td>
+      <td class="${pnl >= 0 ? 'text-green' : 'text-red'}"><strong>${pnl >= 0 ? '+' : '-'}$${Math.abs(Math.round(pnl)).toLocaleString()}</strong></td>
+      <td class="text-red">${(worst * 100).toFixed(1)}%</td>
+      <td>${r.maxConcurrent} ไม้ ($${(r.maxConcurrent * PT).toLocaleString()})</td>
+    </tr>`);
   }
-  body.innerHTML = rows.map(r => {
-    const act = r.H === CONFIG.holdDays;
-    return '<tr style="' + (act ? 'background:rgba(212,175,55,0.12);font-weight:700;' : '') + '">' +
-      '<td style="text-align:left;' + (act ? 'color:var(--gold-deep);' : '') + '">' + lbl[r.H] + (act ? ' ★' : '') + '</td>' +
-      '<td>' + r.nAll + '</td>' +
-      '<td>' + (r.nClosed ? (r.wins / r.nClosed * 100).toFixed(0) + '%' : '—') + '</td>' +
-      '<td class="' + (r.avg >= 0 ? 'text-green' : 'text-red') + '">' + (r.avg >= 0 ? '+' : '') + (r.avg * 100).toFixed(2) + '%</td>' +
-      '<td class="' + (r.cagr >= 0 ? 'text-green' : 'text-red') + '">' + (r.cagr >= 0 ? '+' : '') + (r.cagr * 100).toFixed(1) + '%</td>' +
-      '<td class="text-red">' + (r.mdd * 100).toFixed(1) + '%</td>' +
-      '<td>' + (r.inMkt * 100).toFixed(0) + '%</td></tr>';
-  }).join('');
+  body.innerHTML = rows.length ? rows.join('') :
+    '<tr><td colspan="7" style="color:var(--text-muted);padding:30px;">ยังไม่มีไม้ — รอสัญญาณ Washout แรกหลังปีเริ่มต้น</td></tr>';
 }
-
-function runBacktest() { return runSniperBacktest(); }  // alias so existing callers work
 
 function runSniperBacktest() {
   CONFIG.topN = parseInt(el.inputTopN.value) || 10;
-  CONFIG.initialCapital = parseFloat(el.inputInitCap.value) || 10000;
+  CONFIG.perTradeCapital = parseFloat(el.inputInitCap.value) || 10000;
   CONFIG.holdDays = parseInt(el.inputHold.value) || 42;
   CONFIG.startYear = parseInt(el.inputStartYear.value) || 2015;
 
@@ -2985,67 +2975,103 @@ function runSniperBacktest() {
   let startIndex = _S.dates.findIndex(d => d.startsWith(String(CONFIG.startYear)));
   if (startIndex === -1) startIndex = 0;
 
-  // Build market benchmark series from REAL SPY (input_benchmark_daily.csv)
-  if (state.sortedDates.length > 0) {
-     if (state.universeDaily.length === 0) {
-        state.universeDaily = [];
-        for (const d of state.sortedDates) {
-            const spyRow = state.marketData[d] && state.marketData[d]['SPY'];
-            if (spyRow) state.universeDaily.push({ date: d, val: spyRow.c });
-        }
-     }
+  // SPY benchmark close series (real data from benchmark CSV)
+  if (state.sortedDates.length > 0 && state.universeDaily.length === 0) {
+    state.universeDaily = [];
+    for (const d of state.sortedDates) {
+      const spyRow = state.marketData[d] && state.marketData[d]['SPY'];
+      if (spyRow) state.universeDaily.push({ date: d, val: spyRow.c });
+    }
   }
 
-  const res = sniperRun(CONFIG.holdDays, CONFIG.topN, CONFIG.initialCapital, startIndex);
+  const PT = CONFIG.perTradeCapital, FEE = CONFIG.feeSide;
+  const res = sniperRun(CONFIG.holdDays, CONFIG.topN, PT, startIndex);
 
-  state.equityCurve = res.equity;
+  state.equityCurve = res.equity;              // = กำไรสะสม (P&L) — ไม่ใช่มูลค่าพอร์ต
   state.closedLots = res.closed;
-  state.lots = res.openLot ? [res.openLot] : [];
+  state.lots = res.openLots;
+  state.deployedTotal = res.deployedTotal;
+  state.maxConcurrent = res.maxConcurrent;
+  state.warChest = Math.max(res.maxConcurrent, 1) * PT;
+
+  // ── SPY shadow: ไม้เดียวกันทุกไม้ (วันเข้า–ออก + ทุนเท่ากัน) แต่ซื้อ SPY แทน ──
+  const spyPx = (d, pref) => {
+    const r = state.marketData[d] && state.marketData[d]['SPY'];
+    if (!r) return NaN;
+    const v = pref === 'o' ? r.o : r.c;
+    if (isFinite(v) && v > 0) return v;
+    return (isFinite(r.c) && r.c > 0) ? r.c : NaN;
+  };
+  const spyTrades = [];
+  for (const arr of [res.closed, res.openLots]) {
+    for (const t of arr) {
+      const entPx = spyPx(t.entryDate, 'o');
+      const sh = isFinite(entPx) ? (PT * (1 - FEE)) / entPx : 0;
+      let spyRet = null;
+      if (t.exitDate) {
+        const xp = spyPx(t.exitDate, 'o');
+        if (isFinite(xp) && sh > 0) spyRet = (sh * xp * (1 - FEE)) / PT - 1;
+      }
+      t.spyRet = spyRet;
+      spyTrades.push({ entryDate: t.entryDate, exitDate: t.exitDate || null, sh: sh });
+    }
+  }
+  spyTrades.sort((a, b) => (a.entryDate < b.entryDate ? -1 : 1));
+  const spyCurve = [];
+  {
+    let spyClosed = 0, idx = 0;
+    const live = [];
+    for (const pt of res.equity) {
+      const d = pt.date;
+      for (let a = live.length - 1; a >= 0; a--) {
+        if (live[a].exitDate === d) {
+          const xp = spyPx(d, 'o');
+          spyClosed += ((isFinite(xp) && live[a].sh > 0) ? live[a].sh * xp * (1 - FEE) : PT) - PT;
+          live.splice(a, 1);
+        }
+      }
+      while (idx < spyTrades.length && spyTrades[idx].entryDate === d) { live.push(spyTrades[idx]); idx++; }
+      let mtm = 0;
+      const cp = spyPx(d, 'c');
+      for (const tr of live) mtm += ((isFinite(cp) && tr.sh > 0) ? tr.sh * cp : PT) - PT;
+      spyCurve.push({ date: d, equity: spyClosed + mtm });
+    }
+  }
+  state.spyPnlCurve = spyCurve;
+
   state.tradeLog = [];
   for (const cl of res.closed) {
     state.tradeLog.push({ date: cl.entryDate, signalDate: cl.signalDate, equity: cl.initialCapital,
-      stocks: cl.legs.map(l => l.ticker), lotCapital: cl.initialCapital,
-      isReinvest: cl.chainId > 1, chainId: cl.chainId });
+      stocks: cl.legs.map(l => l.ticker), lotCapital: cl.initialCapital, isReinvest: false, chainId: cl.chainId });
   }
-  if (res.openLot) {
-    state.tradeLog.push({ date: res.openLot.entryDate, signalDate: res.openLot.signalDate,
-      equity: res.openLot.initialCapital, stocks: res.openLot.legs.map(l => l.ticker),
-      lotCapital: res.openLot.initialCapital, isReinvest: res.openLot.chainId > 1, chainId: res.openLot.chainId });
+  for (const ol of res.openLots) {
+    state.tradeLog.push({ date: ol.entryDate, signalDate: ol.signalDate, equity: ol.initialCapital,
+      stocks: ol.legs.map(l => l.ticker), lotCapital: ol.initialCapital, isReinvest: false, chainId: ol.chainId });
   }
-  state.externalCapitalTimeline = [{ date: _S.dates[startIndex] || '', cumulativeDeployed: CONFIG.initialCapital }];
+  state.tradeLog.sort((a, b) => (a.date < b.date ? -1 : 1));
+  state.externalCapitalTimeline = state.tradeLog.map((t, i) => ({ date: t.date, cumulativeDeployed: (i + 1) * PT }));
 
   // =========================================================
-  // PENDING STATUS — สถานะสัญญาณล่าสุด ณ วันข้อมูลสุดท้าย
-  //  'fired' = สัญญาณยิงวันข้อมูลสุดท้าย → เข้าซื้อที่ open วันทำการถัดไป
-  //  'armed' = breadth เคยเกิน 19% แล้วยังหดไม่ถึงครึ่งพีค → กำลังรอยิง
+  // PENDING STATUS — โหมดยิงทุกสัญญาณ: ไม่มีเงื่อนไขรอไม้เก่า
   // =========================================================
   state.pendingSignal = null;
   try {
-    const S = buildSniperSeries();
-    const lastIdx = S.n - 1;
-    const lastDate = S.dates[lastIdx];
-    const preview = (t) => sniperRankLB6(S, t, CONFIG.topN)
-      .map(p => ({ ticker: S.tickers[p.j], ret: p.r, score: p.r }));
-    const curEq = res.equity.length ? res.equity[res.equity.length - 1].equity : CONFIG.initialCapital;
+    const lastIdx = _S.n - 1;
+    const lastDate = _S.dates[lastIdx];
+    const preview = (t) => sniperRankLB6(_S, t, CONFIG.topN)
+      .map(p => ({ ticker: _S.tickers[p.j], ret: p.r, score: p.r }));
     if (res.firePending != null) {
       state.pendingSignal = {
-        mode: 'fired',
-        signalDate: S.dates[res.firePending],
-        breadthNow: S.breadth[lastIdx],
-        capital: curEq,
-        hasOpen: !!res.openLot,
-        picks: preview(res.firePending)
+        mode: 'fired', signalDate: _S.dates[res.firePending],
+        breadthNow: _S.breadth[lastIdx], capital: PT,
+        openCount: res.openLots.length, picks: preview(res.firePending)
       };
-    } else if (S.lastArmed) {
+    } else if (_S.lastArmed) {
       state.pendingSignal = {
-        mode: 'armed',
-        signalDate: lastDate,
-        peak: S.lastPeak,
-        fireLevel: S.lastPeak / 2,
-        breadthNow: S.breadth[lastIdx],
-        capital: curEq,
-        hasOpen: !!res.openLot,
-        picks: preview(lastIdx)
+        mode: 'armed', signalDate: lastDate,
+        peak: _S.lastPeak, fireLevel: _S.lastPeak / 2,
+        breadthNow: _S.breadth[lastIdx], capital: PT,
+        openCount: res.openLots.length, picks: preview(lastIdx)
       };
     }
   } catch (err) {
@@ -3057,252 +3083,213 @@ function runSniperBacktest() {
   renderAll();
 }
 
+function runBacktest() { return runSniperBacktest(); }
+
 function calculateStats() {
-  const curve = state.equityCurve;
-  if(curve.length === 0) return;
+  const curve = state.equityCurve;               // กำไรสะสม (P&L) รวมทุกไม้
+  if (curve.length === 0) return;
 
-  const start = curve[0].equity;
-  const end = curve[curve.length-1].equity;
-  const totalRet = (end - start) / start;
-  const days = (new Date(curve[curve.length-1].date) - new Date(curve[0].date)) / 86400000;
-  const cagr = days > 0 ? Math.pow(end/start, 1/(days/365.25)) - 1 : 0;
+  const PT = CONFIG.perTradeCapital || 1;
+  const totalPnl = curve[curve.length - 1].equity;
+  const deployed = state.deployedTotal || 0;
+  const warChest = state.warChest || PT;
+  const maxConc = state.maxConcurrent || 0;
+  const roiOnDeployed = deployed > 0 ? totalPnl / deployed : 0;
+  const days = (new Date(curve[curve.length - 1].date) - new Date(curve[0].date)) / 86400000;
+  const years = Math.max(days / 365.25, 0.1);
+  const yearsStr = years.toFixed(1);
 
-  document.getElementById('kpi-final').innerText = '$' + Math.round(end).toLocaleString();
-  const retEl = document.getElementById('kpi-return');
-  retEl.innerText = (totalRet>=0?'+':'') + (totalRet*100).toFixed(1) + '%';
-  retEl.className = 'kpi-sub ' + (totalRet>=0?'text-green':'text-red');
-  const cagrEl = document.getElementById('kpi-cagr');
-  cagrEl.innerText = (cagr*100).toFixed(1) + '%';
-  cagrEl.className = 'kpi-value ' + (cagr>=0?'text-green':'text-red');
-  
+  // ===== per-ไม้ (Option A: ไม้ day-0 ไม่เข้าสถิติ — A48) =====
+  const lastCurveDate = curve[curve.length - 1].date;
+  const lastDayData = state.marketData[lastCurveDate] || {};
+  const roundReturns = [];
+  const spyPairs = [];   // เฉพาะไม้ปิดแล้วที่มี SPY เข้า–ออกจริง
+  (state.closedLots || []).forEach(cl => {
+    roundReturns.push(cl.returnPct);
+    if (cl.spyRet != null && isFinite(cl.spyRet)) spyPairs.push({ r: cl.returnPct, spy: cl.spyRet });
+  });
+  (state.lots || []).forEach(lot => {
+    if (lot.entryDate === lastCurveDate) return;   // day-0 — ยังไม่มีข้อมูล
+    let mtm = 0;
+    for (const [t, shares] of Object.entries(lot.stocks)) {
+      const p = lastDayData[t] ? lastDayData[t].c : 0;
+      mtm += shares * (p || 0);
+    }
+    if (lot.initialCapital > 0) roundReturns.push((mtm - lot.initialCapital) / lot.initialCapital);
+  });
+  const nR = roundReturns.length;
+  const roundWins = roundReturns.filter(r => r > 0).length;
+  const winRate = nR ? roundWins / nR : 0;
+  const avgTrade = nR ? roundReturns.reduce((a, b) => a + b, 0) / nR : 0;
+  const sdTrade = nR > 1 ? Math.sqrt(roundReturns.reduce((s, r) => s + Math.pow(r - avgTrade, 2), 0) / nR) : 0;
+  const best = nR ? Math.max(...roundReturns) : 0;
+  const worst = nR ? Math.min(...roundReturns) : 0;
+  const grossWin = roundReturns.filter(r => r > 0).reduce((s, r) => s + r, 0);
+  const grossLoss = Math.abs(roundReturns.filter(r => r < 0).reduce((s, r) => s + r, 0));
+  const pf = grossLoss > 0 ? grossWin / grossLoss : (grossWin > 0 ? 999 : 0);
+  const totalTrades = (state.closedLots || []).length + (state.lots || []).length;
+
+  // ===== SPY หน้าต่างเดียวกัน (edge ต่อไม้) =====
+  const nSpy = spyPairs.length;
+  const avgSpy = nSpy ? spyPairs.reduce((s, p) => s + p.spy, 0) / nSpy : 0;
+  const sdSpy = nSpy > 1 ? (() => { const a = spyPairs.map(p => p.spy); const mu = avgSpy;
+    return Math.sqrt(a.reduce((s, v) => s + Math.pow(v - mu, 2), 0) / a.length); })() : 0;
+  const worstSpy = nSpy ? Math.min(...spyPairs.map(p => p.spy)) : 0;
+  const edge = nSpy ? spyPairs.reduce((s, p) => s + (p.r - p.spy), 0) / nSpy : 0;
+  const beatSpy = spyPairs.filter(p => p.r > p.spy).length;
+
+  // ===== รายเดือน (ฐาน = เงินสดสูงสุดที่ต้องเตรียม) — heatmap/vol ใช้ต่อ =====
   const monthlyData = {};
-  state.equityCurve.forEach(e => monthlyData[e.date.substring(0,7)] = e.equity);
+  curve.forEach(e => monthlyData[e.date.substring(0, 7)] = e.equity);
   const months = Object.keys(monthlyData).sort();
   state.monthlyReturns = [];
-  
-  for(let i=1; i<months.length; i++) {
-    const prev = monthlyData[months[i-1]];
-    const curr = monthlyData[months[i]];
-    state.monthlyReturns.push((curr - prev) / prev);
+  {
+    let prev = 0;
+    months.forEach(mo => { const p = monthlyData[mo]; state.monthlyReturns.push((p - prev) / warChest); prev = p; });
   }
-
   const mr = state.monthlyReturns;
-  if(mr.length > 0) {
-    const avgM = mr.reduce((a,b)=>a+b,0)/mr.length;
-    const stdM = Math.sqrt(mr.reduce((a,b)=>a+Math.pow(b-avgM,2),0)/mr.length);
-    const vol = stdM * Math.sqrt(12);
-    const sharpe = cagr / vol;
+  const avgM = mr.length ? mr.reduce((a, b) => a + b, 0) / mr.length : 0;
+  const stdM = mr.length ? Math.sqrt(mr.reduce((a, b) => a + Math.pow(b - avgM, 2), 0) / mr.length) : 0;
+  const chestVol = stdM * Math.sqrt(12);
+  const annOnChest = Math.pow(1 + totalPnl / warChest, 1 / years) - 1;
+  const consistency = sdTrade > 0 ? avgTrade / sdTrade : 0;
 
-    // === ROLLING LOT RETURNS — Win rate + best/worst measured PER 6-MONTH LOT ===
-    // Each lot holds 6 months → its return = (exitValue - initialCapital) / initialCapital.
-    // This matches what the user cares about: "in each of my 6-month investments, did I profit?"
-    // Unrealized lots (still active) count using mark-to-market vs their initialCapital.
-    const roundReturns = [];
-    const closed = state.closedLots || [];
-    closed.forEach(cl => {
-      if (cl.initialCapital > 0) roundReturns.push(cl.returnPct);
-    });
-    // Add unrealized open lots (mark-to-market)
-    // === Option A (Joon, Jul 2026): exclude "day-0" lots from stats ===
-    // A lot entered ON the last data day has MTM == initialCapital (return exactly 0%)
-    // because zero market days have elapsed. Counting it in the denominator made Win Rate
-    // show a phantom "losing" lot (e.g. 18/19 = 94.7% with no actual loss, PF = 999).
-    // Day-0 lots carry no information -> excluded from Win Rate / Best / Worst / Profit
-    // Factor / round count. The Round Returns & Distribution charts still display them
-    // (dimmed open-lot style) -- that divergence is intentional.
-    const lastCurveDate = state.equityCurve.length > 0 ? state.equityCurve[state.equityCurve.length - 1].date : null;
-    const lastDayData = lastCurveDate ? (state.marketData[lastCurveDate] || {}) : {};
-    (state.lots || []).forEach(lot => {
-      if (lot.entryDate === lastCurveDate) return; // day-0 lot -- no elapsed market days, skip stats
-      let mtm = 0;
-      for (const [t, shares] of Object.entries(lot.stocks)) {
-        const p = lastDayData[t] ? lastDayData[t].c : 0;
-        mtm += shares * (p || 0);
-      }
-      if (lot.initialCapital > 0) roundReturns.push((mtm - lot.initialCapital) / lot.initialCapital);
-    });
+  // ===== Max DD ของกำไรสะสม (% ของเงินสดที่เตรียม) =====
+  let peak = -Infinity, maxDDusd = 0;
+  curve.forEach(e => {
+    if (e.equity > peak) peak = e.equity;
+    const dd = e.equity - peak;
+    if (dd < maxDDusd) maxDDusd = dd;
+  });
+  const maxDD = warChest > 0 ? maxDDusd / warChest : 0;
 
-    const roundWins = roundReturns.filter(r => r > 0).length;
-    const winRate = roundReturns.length > 0 ? roundWins / roundReturns.length : 0;
-    const best = roundReturns.length > 0 ? Math.max(...roundReturns) : 0;
-    const worst = roundReturns.length > 0 ? Math.min(...roundReturns) : 0;
+  const fmt = (n, p = 1) => (n * 100).toFixed(p) + '%';
+  const usd = (n) => (n >= 0 ? '+' : '-') + '$' + Math.abs(Math.round(n)).toLocaleString();
+  const $id = (i) => document.getElementById(i);
+  const setTxt = (i, v) => { const e = $id(i); if (e) e.innerText = v; };
 
-    let peak = -Infinity;
-    let maxDD = 0;
-    state.equityCurve.forEach(e => {
-      if(e.equity > peak) peak = e.equity;
-      const dd = (e.equity - peak) / peak;
-      if(dd < maxDD) maxDD = dd;
-    });
+  // ── headline ──
+  setTxt('headlineYears', String(Math.max(1, Math.round(years))));
+  const hc = $id('headlineCagr');
+  if (hc) { hc.innerText = (avgTrade >= 0 ? '+' : '') + fmt(avgTrade); hc.classList.toggle('negative', avgTrade < 0); }
+  setTxt('headlineTrades', String(totalTrades));
 
-    const fmt = (n, p=1) => (n*100).toFixed(p)+'%';
-    document.getElementById('stat-sharpe').innerText = sharpe.toFixed(2);
-    document.getElementById('stat-vol').innerText = fmt(vol);
-    document.getElementById('stat-dd').innerText = fmt(maxDD);
-    document.getElementById('stat-win').innerText = fmt(winRate);
-    document.getElementById('stat-best').innerText = fmt(best);
-    document.getElementById('stat-worst').innerText = fmt(worst);
-    document.getElementById('stat-avg').innerText = fmt(avgM, 2);
-    document.getElementById('stat-count').innerText = roundReturns.length;
+  // ── summary card hero ──
+  const formatDateThai = (isoDate) => {
+    const d = new Date(isoDate);
+    const months_th = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    return `${d.getDate()} ${months_th[d.getMonth()]} ${d.getFullYear() + 543}`;
+  };
+  setTxt('rscPeriod', `${formatDateThai(curve[0].date)} → ${formatDateThai(lastCurveDate)} · ยิง ${totalTrades} ไม้ · ถือไม้ละ ${holdLabelTh()} · ${yearsStr} ปี`);
+  const heroPnl = $id('rscTotalPnl');
+  if (heroPnl) { heroPnl.innerText = usd(totalPnl); heroPnl.className = 'rsc-hero-value ' + (totalPnl >= 0 ? 'positive' : 'negative'); }
+  const rMA = $id('rscMonthlyAvg');
+  if (rMA) rMA.innerHTML = `จากทุนไม้ละ <strong>$${PT.toLocaleString()}</strong> × ${totalTrades} ไม้ (ใส่รวม $${deployed.toLocaleString()}) &middot; เงินสดสูงสุดที่ใช้พร้อมกัน <strong>$${warChest.toLocaleString()}</strong> (${maxConc} ไม้)`;
 
-    // === สถิติฝั่งขาลง (jp-drawdown.js) ===
-    // Max Drawdown บอกแค่จุดเดียว ชุดนี้บอกว่าปกติจมลึกแค่ไหนและบ่อยแค่ไหน
-    try {
-      if (window.JPDrawdown) {
-        window.JPDrawdown.render('jpDrawdownPanel', state.equityCurve, state.universeDaily);
-      }
-    } catch (e) { console.warn('[jp-drawdown]', e); }
-
-    // === Mirror to top-level KPI + stat IDs ===
-    document.getElementById('kpi-strat-vol').innerText = fmt(vol);
-    document.getElementById('kpi-strat-dd').innerText = fmt(maxDD);
-    document.getElementById('kpi-strat-sharpe').innerText = sharpe.toFixed(2);
-
-    // === Mirror to Summary card (4-tab) — kpi-* IDs ===
-    // (Statistics tab uses stat-* prefix; Summary tab uses kpi-* prefix to avoid duplicate IDs.
-    //  Pattern matches sp500-combined-strategy.html for consistency.)
-    document.getElementById('kpi-sharpe').innerText = sharpe.toFixed(2);
-    document.getElementById('kpi-maxdd').innerText = fmt(maxDD);
-    document.getElementById('kpi-win').innerText = fmt(winRate);
-    document.getElementById('kpi-rounds').innerText = roundReturns.length;
-    document.getElementById('kpi-avg').innerText = fmt(avgM, 2);
-    document.getElementById('kpi-best').innerText = fmt(best);
-    document.getElementById('kpi-worst').innerText = fmt(worst);
-
-    // === Phase 4: Strategy side of "เทียบตลาด" compare card ===
-    const benchCagr = document.getElementById('bench-strat-cagr');
-    if (benchCagr) {
-      benchCagr.innerText = fmt(cagr);
-      benchCagr.className = 'rss-compare-stat-val ' + (cagr >= 0 ? 'text-green' : 'text-red');
-    }
-    const benchVol = document.getElementById('bench-strat-vol');
-    if (benchVol) benchVol.innerText = fmt(vol);
-
-    // === Profit Factor from ROUND returns (not monthly) — consistent with win rate ===
-    const grossWin = roundReturns.filter(r => r > 0).reduce((s,r) => s + r, 0);
-    const grossLoss = Math.abs(roundReturns.filter(r => r < 0).reduce((s,r) => s + r, 0));
-    const pf = grossLoss > 0 ? grossWin / grossLoss : (grossWin > 0 ? 999 : 0);
-
-    // === NEW: Total Rebalances from tradeLog ===
-    const totalRebal = state.tradeLog ? state.tradeLog.length : 0;
-
-    // === Populate 4-tab summary stats ===
-    document.getElementById('kpi-pf').innerText = pf.toFixed(2);
-    document.getElementById('stat-pf').innerText = pf.toFixed(2);
-    document.getElementById('stat-rebal').innerText = totalRebal;
-    document.getElementById('stat-final-mirror').innerText = '$' + Math.round(end).toLocaleString();
-    document.getElementById('stat-total-return').innerText = (totalRet>=0?'+':'') + (totalRet*100).toFixed(1) + '%';
-    document.getElementById('stat-total-return').className = 'rss-stat-val ' + (totalRet>=0?'text-green':'text-red');
-    document.getElementById('stat-cagr-mirror').innerText = fmt(cagr);
-    document.getElementById('stat-cagr-mirror').className = 'rss-stat-val ' + (cagr>=0?'text-green':'text-red');
-
-    // === Weekly-style: populate top-card metrics ===
-    const years = (days / 365.25);
-    const yearsStr = years.toFixed(1);
-    const absPnl = end - start;
-    const monthlyAvgUsd = (end - start) / Math.max(months.length - 1, 1);
-    const pnlSign = absPnl >= 0 ? '+' : '-';
-    const pnlClass = absPnl >= 0 ? 'positive' : 'negative';
-
-    // Format Thai date
-    const formatDateThai = (isoDate) => {
-      const d = new Date(isoDate);
-      const months_th = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-      return `${d.getDate()} ${months_th[d.getMonth()]} ${d.getFullYear() + 543}`;
-    };
-    const startDateTh = formatDateThai(curve[0].date);
-    const endDateTh = formatDateThai(curve[curve.length-1].date);
-    const totalRebalCount = state.tradeLog ? state.tradeLog.length : 0;
-
-    document.getElementById('rscPeriod').innerText = `${startDateTh} → ${endDateTh} · ${totalRebalCount} ไม้ · ถือไม้ละ ${holdLabelTh()} · ${yearsStr} ปี`;
-
-    // === Backtest headline (pull-quote above summary card) ===
-    const headlineYearsNum = Math.max(1, Math.round(years));
-    const headlineYearsEl = document.getElementById('headlineYears');
-    if (headlineYearsEl) headlineYearsEl.innerText = headlineYearsNum;
-    const headlineCagrEl = document.getElementById('headlineCagr');
-    if (headlineCagrEl) {
-      headlineCagrEl.innerText = (cagr >= 0 ? '+' : '') + fmt(cagr);
-      headlineCagrEl.classList.toggle('negative', cagr < 0);
-    }
-
-    const heroPnl = document.getElementById('rscTotalPnl');
-    heroPnl.innerText = pnlSign + '$' + Math.abs(Math.round(absPnl)).toLocaleString();
-    heroPnl.className = 'rsc-hero-value ' + pnlClass;
-
-    const avgMonthSign = monthlyAvgUsd >= 0 ? '+' : '-';
-    document.getElementById('rscMonthlyAvg').innerHTML = 
-      `ตกเฉลี่ย <strong>${avgMonthSign}$${Math.abs(Math.round(monthlyAvgUsd)).toLocaleString()}</strong> / เดือน &middot; จากเงินตั้งต้นก้อนเดียว <strong>$${Math.round(start).toLocaleString()}</strong>`;
-
-    // === 4 top metrics ===
-    const annRoi = document.getElementById('rscAnnRoi');
-    annRoi.innerText = (cagr >= 0 ? '+' : '') + fmt(cagr);
-    annRoi.style.color = cagr >= 0 ? 'var(--green)' : 'var(--red)';
-
-    const rscSh = document.getElementById('rscSharpe');
-    rscSh.innerText = sharpe.toFixed(2);
-    const rscShDesc = document.getElementById('rscSharpeDesc');
-    if (sharpe >= 1.5) rscShDesc.innerText = 'ยอดเยี่ยม — กำไรคุ้มกับความเสี่ยงมาก';
-    else if (sharpe >= 1) rscShDesc.innerText = 'ดี — กำไรคุ้มเสี่ยงในระดับที่ยอมรับได้';
-    else if (sharpe >= 0.5) rscShDesc.innerText = 'พอใช้ — กำไรยังไม่ชัดกว่าเสี่ยงมาก';
-    else rscShDesc.innerText = 'ต่ำ — ความเสี่ยงสูงเมื่อเทียบกำไร';
-
-    document.getElementById('rscMaxDD').innerText = fmt(maxDD);
-
-    // === Mirror to other legacy IDs ===
-    document.getElementById('kpi-strat-vol').innerText = fmt(vol);
-    document.getElementById('kpi-strat-dd').innerText = fmt(maxDD);
-    document.getElementById('kpi-strat-sharpe').innerText = sharpe.toFixed(2);
-    document.getElementById('kpi-pf').innerText = pf.toFixed(2);
-    document.getElementById('stat-pf').innerText = pf.toFixed(2);
-    document.getElementById('stat-rebal').innerText = totalRebalCount;
-    document.getElementById('kpi-cagr').innerText = fmt(cagr);
-    document.getElementById('stat-final-mirror').innerText = '$' + Math.round(end).toLocaleString();
-    document.getElementById('stat-total-return').innerText = (totalRet>=0?'+':'') + (totalRet*100).toFixed(1) + '%';
-    document.getElementById('stat-total-return').className = 'rss-stat-val ' + (totalRet>=0?'text-green':'text-red');
-    document.getElementById('kpi-final').innerText = '$' + Math.round(end).toLocaleString();
-    document.getElementById('kpi-return').innerText = (totalRet>=0?'+':'') + (totalRet*100).toFixed(1) + '%';
-
-    // === Bench tab: strategy side ===
-    const benchStratRet = document.getElementById('rssBenchStratReturn');
-    if (benchStratRet) {
-      benchStratRet.innerText = (cagr >= 0 ? '+' : '') + fmt(cagr);
-      benchStratRet.className = 'rss-stat-val ' + (cagr >= 0 ? 'text-green' : 'text-red');
-    }
-    const benchStratVol = document.getElementById('rssBenchStratVol');
-    if (benchStratVol) benchStratVol.innerText = fmt(vol);
-
-    // === Tab narratives ===
-    const profitNarr = document.getElementById('rssProfit');
-    if (profitNarr) {
-      profitNarr.innerHTML = `<strong>กลยุทธ์ทำกำไรรวม ${(totalRet*100).toFixed(1)}%</strong> ในช่วง ${yearsStr} ปี ` +
-        `(เฉลี่ย ${fmt(cagr)}/ปี) &middot; ไม้ที่กำไรดีที่สุด <strong>${fmt(best)}</strong> &middot; ไม้ที่ขาดทุนมากที่สุด <strong>${fmt(worst)}</strong>`;
-    }
-    const accNarr = document.getElementById('rssAccuracy');
-    if (accNarr) {
-      accNarr.innerHTML = `Win Rate <strong>${fmt(winRate)}</strong> (${roundWins}/${roundReturns.length} ไม้กำไร) &middot; ` +
-        `Profit Factor <strong>${pf.toFixed(2)}</strong> — ทุก \$1 ที่ขาดทุน กลยุทธ์ทำเงินกลับมา \$${pf.toFixed(2)} &middot; ` +
-        `เข้าซื้อทั้งหมด <strong>${totalRebalCount}</strong> ไม้ (ถือไม้ละ ${holdLabelTh()} · เวลาที่เหลือถือเงินสดรอสัญญาณ)`;
-    }
-    const riskNarr = document.getElementById('rssRisk');
-    if (riskNarr) {
-      riskNarr.innerHTML = `ความผันผวนรายปี <strong>${fmt(vol)}</strong> (Sharpe ${sharpe.toFixed(2)}) &middot; ` +
-        `Max Drawdown <strong class="text-red">${fmt(maxDD)}</strong> — จุดที่พอร์ตเคยลดจากจุดสูงสุดมากที่สุด ` +
-        `ต้องเตรียมใจรับได้ถ้าจะเล่นกลยุทธ์นี้`;
-    }
-
-    // store for bench tab narrative (computed by updateMarketAnalyzer)
-    state._lastStratCagr = cagr;
-    state._lastStratVol = vol;
-    state._lastTotalRet = totalRet;
-    state._lastPnl = absPnl;
-    state._lastYears = years;
-
-    // Call updateMarketAnalyzer to refresh bench tab with current strategy metrics
-    if (typeof updateMarketAnalyzer === 'function' && state.universeDaily && state.universeDaily.length > 0) {
-      updateMarketAnalyzer();
-    }
+  // ── rsc 4 metrics ──
+  const annRoi = $id('rscAnnRoi');
+  if (annRoi) { annRoi.innerText = (avgTrade >= 0 ? '+' : '') + fmt(avgTrade); annRoi.style.color = avgTrade >= 0 ? 'var(--green)' : 'var(--red)'; }
+  setTxt('rscSharpe', fmt(winRate, 0));
+  const wrDesc = $id('rscSharpeDesc');
+  if (wrDesc) {
+    if (winRate >= 0.8) wrDesc.innerText = 'ชนะบ่อยมาก — ' + roundWins + ' จาก ' + nR + ' ไม้';
+    else if (winRate >= 0.65) wrDesc.innerText = 'ชนะเป็นส่วนใหญ่ — ' + roundWins + ' จาก ' + nR + ' ไม้';
+    else if (winRate >= 0.5) wrDesc.innerText = 'ชนะเกินครึ่ง — ' + roundWins + ' จาก ' + nR + ' ไม้';
+    else wrDesc.innerText = 'ชนะไม่ถึงครึ่ง — ' + roundWins + ' จาก ' + nR + ' ไม้';
   }
+  const rscAl = $id('rscAlpha');
+  if (rscAl) { rscAl.innerText = (edge >= 0 ? '+' : '') + (edge * 100).toFixed(1) + ' จุด'; rscAl.style.color = edge >= 0 ? 'var(--green)' : 'var(--red)'; }
+  const alDesc = $id('rscAlphaDesc');
+  if (alDesc) alDesc.innerText = `ชนะ SPY ${beatSpy}/${nSpy} ไม้ (หน้าต่างเวลาเดียวกัน)`;
+  setTxt('rscMaxDD', fmt(worst));
+
+  // ── bench pane (ต่อไม้ทั้งสองฝั่ง) ──
+  const bsr = $id('rssBenchStratReturn');
+  if (bsr) { bsr.innerText = (avgTrade >= 0 ? '+' : '') + fmt(avgTrade); bsr.className = 'rss-stat-val ' + (avgTrade >= 0 ? 'text-green' : 'text-red'); }
+  const mar = $id('ma-return');
+  if (mar) { mar.innerText = (avgSpy >= 0 ? '+' : '') + fmt(avgSpy); mar.style.color = avgSpy >= 0 ? 'var(--accent)' : 'var(--red)'; }
+  setTxt('rssBenchStratVol', fmt(sdTrade));
+  setTxt('ma-vol', fmt(sdSpy));
+  setTxt('ma-period', `ไม้เดียวกัน ${nSpy} ไม้ (ปิดแล้ว) · SPY ETF ราคาเปิดจริง`);
+  const maNote = $id('ma-note');
+  if (maNote) maNote.innerHTML = `Benchmark = ยิง SPY (SPDR S&amp;P 500 ETF) ด้วยทุน วันเข้า และวันขายชุดเดียวกันทุกไม้ — ราคาจริงจาก benchmark CSV`;
+  const rssBench = $id('rssBench');
+  if (rssBench) {
+    const verdict = edge >= 0.03 ? 'ชนะ SPY ชัดเจน' : edge >= 0.005 ? 'ชนะ SPY' : edge >= -0.005 ? 'สูสีกับ SPY' : 'แพ้ SPY';
+    rssBench.innerHTML = `เทียบแบบยุติธรรมที่สุด: เอาเงินก้อนเดียวกันเข้า <strong>SPY ในจังหวะเดียวกันทุกไม้</strong> — กลยุทธ์ได้เฉลี่ย <strong class="${avgTrade >= 0 ? 'text-green' : 'text-red'}">${(avgTrade >= 0 ? '+' : '') + fmt(avgTrade)}</strong>/ไม้ vs SPY <strong>${(avgSpy >= 0 ? '+' : '') + fmt(avgSpy)}</strong>/ไม้ → <strong>${verdict}</strong> ห่างเฉลี่ย <strong class="${edge >= 0 ? 'text-green' : 'text-red'}">${(edge >= 0 ? '+' : '') + (edge * 100).toFixed(1)} จุด/ไม้</strong> (ชนะ ${beatSpy}/${nSpy} ไม้) &middot; แลกกับความผันผวนต่อไม้ที่สูงกว่า (${fmt(sdTrade)} vs ${fmt(sdSpy)})`;
+  }
+
+  // ── profit pane ──
+  const sfm = $id('stat-final-mirror');
+  if (sfm) sfm.innerText = usd(totalPnl);
+  const str2 = $id('stat-total-return');
+  if (str2) { str2.innerText = (roiOnDeployed >= 0 ? '+' : '') + fmt(roiOnDeployed); str2.className = 'rss-stat-val ' + (roiOnDeployed >= 0 ? 'text-green' : 'text-red'); }
+  const kc = $id('kpi-cagr');
+  if (kc) { kc.innerText = (avgTrade >= 0 ? '+' : '') + fmt(avgTrade); kc.className = 'rss-stat-val ' + (avgTrade >= 0 ? 'text-green' : 'text-red'); }
+  setTxt('kpi-avg', (avgSpy >= 0 ? '+' : '') + fmt(avgSpy, 2));
+  setTxt('kpi-best', '+' + fmt(best));
+  setTxt('kpi-worst', fmt(worst));
+  const profitNarr = $id('rssProfit');
+  if (profitNarr) profitNarr.innerHTML = `ยิงทั้งหมด <strong>${totalTrades} ไม้</strong> ใน ${yearsStr} ปี ทำกำไรรวม <strong class="${totalPnl >= 0 ? 'text-green' : 'text-red'}">${usd(totalPnl)}</strong> (= ${(roiOnDeployed >= 0 ? '+' : '') + fmt(roiOnDeployed)} ของเงินที่ใส่ทั้งหมด $${deployed.toLocaleString()}) &middot; เฉลี่ย <strong>${(avgTrade >= 0 ? '+' : '') + fmt(avgTrade)}/ไม้</strong> &middot; ไม้ดีสุด <strong class="text-green">+${fmt(best)}</strong> &middot; ไม้แย่สุด <strong class="text-red">${fmt(worst)}</strong>`;
+
+  // ── accuracy pane ──
+  setTxt('kpi-win', fmt(winRate, 0));
+  setTxt('stat-pf', pf.toFixed(2));
+  setTxt('kpi-rounds', `${beatSpy}/${nSpy}`);
+  setTxt('stat-rebal', String(totalTrades));
+  const accNarr = $id('rssAccuracy');
+  if (accNarr) accNarr.innerHTML = `Win Rate <strong>${fmt(winRate, 0)}</strong> (${roundWins}/${nR} ไม้กำไร) &middot; Profit Factor <strong>${pf.toFixed(2)}</strong> — ทุก \$1 ที่ขาดทุน กลยุทธ์ทำเงินกลับมา \$${pf.toFixed(2)} &middot; ชนะ SPY หน้าต่างเดียวกัน <strong>${beatSpy}/${nSpy} ไม้</strong> (ห่างเฉลี่ย ${(edge >= 0 ? '+' : '') + (edge * 100).toFixed(1)} จุด/ไม้)`;
+
+  // ── risk pane ──
+  setTxt('kpi-strat-vol', fmt(sdTrade));
+  setTxt('kpi-sharpe', consistency.toFixed(2));
+  setTxt('kpi-maxdd', fmt(maxDD));
+  setTxt('stat-ma-dd', fmt(worstSpy));
+  const riskNarr = $id('rssRisk');
+  if (riskNarr) riskNarr.innerHTML = `ไม้แย่สุด <strong class="text-red">${fmt(worst)}</strong> (≈ ${usd(worst * PT)} ต่อไม้ $${PT.toLocaleString()}) &middot; กำไรสะสมเคยย่อจากพีคหนักสุด <strong class="text-red">${usd(maxDDusd)}</strong> (${fmt(maxDD)} ของเงินสดสูงสุด $${warChest.toLocaleString()} ที่ต้องเตรียมช่วงถือซ้อน ${maxConc} ไม้) — ต้องเตรียมใจรับได้ถ้าจะใช้กลยุทธ์นี้`;
+
+  // ── Statistics tab (stat-*) ──
+  setTxt('stat-sharpe', consistency.toFixed(2));
+  setTxt('stat-vol', fmt(sdTrade));
+  setTxt('stat-dd', fmt(maxDD));
+  setTxt('stat-win', fmt(winRate, 0));
+  setTxt('stat-best', '+' + fmt(best));
+  setTxt('stat-worst', fmt(worst));
+  setTxt('stat-avg', (avgTrade >= 0 ? '+' : '') + fmt(avgTrade, 2));
+  setTxt('stat-count', String(nR));
+
+  // ── hidden mirrors ──
+  setTxt('kpi-final', usd(totalPnl));
+  const kret = $id('kpi-return');
+  if (kret) { kret.innerText = (roiOnDeployed >= 0 ? '+' : '') + fmt(roiOnDeployed); kret.className = 'kpi-sub ' + (roiOnDeployed >= 0 ? 'text-green' : 'text-red'); }
+  setTxt('kpi-strat-dd', fmt(maxDD));
+  setTxt('kpi-strat-sharpe', consistency.toFixed(2));
+  setTxt('kpi-pf', pf.toFixed(2));
+  setTxt('bench-strat-cagr', fmt(avgTrade));
+  setTxt('bench-strat-vol', fmt(sdTrade));
+  setTxt('stat-cagr-mirror', fmt(annOnChest));   // JPCompare อ่านตัวนี้ (ต่อปีบนเงินสดที่เตรียม)
+
+  // ── สถิติฝั่งขาลง (jp-drawdown.js) — ป้อน curve ฐานเงินสดที่เตรียม ──
+  try {
+    if (window.JPDrawdown) {
+      const chestCurve = curve.map(e => ({ date: e.date, equity: warChest + e.equity }));
+      window.JPDrawdown.render('jpDrawdownPanel', chestCurve, state.universeDaily);
+    }
+  } catch (e) { console.warn('[jp-drawdown]', e); }
+
+  // ── narrative ล่างการ์ด ──
+  const rscNarrative = $id('rscNarrative');
+  if (rscNarrative) {
+    const startYr = $id('startYearSelect') ? $id('startYearSelect').value : CONFIG.startYear;
+    rscNarrative.innerHTML = `ด้วยการตั้งค่า <strong>Top ${CONFIG.topN} หุ้น (LB6 ล้วน)</strong> · ถือไม้ละ ${holdLabelTh()} · ตั้งแต่ปี ${startYr} <strong>ยิงตามสัญญาณทุกครั้ง ${totalTrades} ไม้</strong> ทำกำไรรวม <strong class="${totalPnl >= 0 ? 'text-green' : 'text-red'}">${usd(totalPnl)}</strong> (เฉลี่ย ${(avgTrade >= 0 ? '+' : '') + fmt(avgTrade)}/ไม้ · ชนะ ${fmt(winRate, 0)}) · ช่วงสัญญาณถี่ต้องเตรียมเงินสดสูงสุด <strong>$${warChest.toLocaleString()}</strong> (${maxConc} ไม้ซ้อนกัน)`;
+  }
+
+  // เก็บไว้ให้ส่วนอื่น
+  state._lastStratCagr = annOnChest;
+  state._lastStratVol = chestVol;
+  state._lastTotalRet = roiOnDeployed;
+  state._lastPnl = totalPnl;
+  state._lastYears = years;
 }
 
 let charts = {};
@@ -3564,8 +3551,8 @@ function renderTradeLog() {
       const line1 = isFired
         ? 'สัญญาณยิงแล้ว — เข้าซื้อที่<strong>ราคาเปิดวันทำการถัดไป</strong>'
         : 'ตลาดกำลังล้าง — Breadth พีค <strong>' + ps.peak.toFixed(1) + '%</strong> ตอนนี้ <strong>' + ps.breadthNow.toFixed(1) + '%</strong> · จะยิงเมื่อหดลง ≤ <strong>' + ps.fireLevel.toFixed(1) + '%</strong>';
-      const openNote = ps.hasOpen
-        ? '<div class="trade-summary" style="color:#B0413E;">⚠️ ยังมีไม้เปิดค้างอยู่ — กติกาทีละไม้: เข้าใหม่ได้เมื่อไม้เดิมขายแล้วเท่านั้น</div>'
+      const openNote = (ps.openCount > 0)
+        ? '<div class="trade-summary" style="color:var(--gold-deep);">ถืออยู่ ' + ps.openCount + ' ไม้ — โหมดยิงทุกสัญญาณ: ไม้ใหม่ใช้เงินสดก้อนใหม่ ไม่ต้องรอไม้เดิมขาย</div>'
         : '';
       const previewNote = isFired
         ? 'รายชื่อจากราคาปิดวันสัญญาณ (ตัดสินแล้ว)'
@@ -3689,9 +3676,7 @@ function renderTradeLog() {
     card.className = 'trade-card' + (isLatest && r.isOpen ? ' latest-signal' : '');
     const retCls = r.pnl >= 0 ? 'text-green' : 'text-red';
     const allocPerStock = r.stocks.length > 0 ? r.equity / r.stocks.length : 0;
-    const reinvestBadge = r.isReinvest
-      ? '<span style="display:inline-block;background:rgba(212,175,55,0.18);color:var(--gold-deep);border:1px solid rgba(212,175,55,0.4);padding:1px 7px;border-radius:4px;font-family:\'Cinzel\',\'Anuphan\',serif;font-size:0.58rem;font-weight:700;letter-spacing:1.2px;margin-left:6px;">COMPOUND</span>'
-      : '<span style="display:inline-block;background:rgba(114,47,55,0.12);color:#722F37;border:1px solid rgba(114,47,55,0.35);padding:1px 7px;border-radius:4px;font-family:\'Cinzel\',\'Anuphan\',serif;font-size:0.58rem;font-weight:700;letter-spacing:1.2px;margin-left:6px;">FIRST</span>';
+    const reinvestBadge = '';   // โหมดยิงทุกสัญญาณ — ทุกไม้ทุนใหม่ ไม่มี chain
 
     let header = `<div class="trade-header"><div>
       <div class="trade-date"><span class="trade-date-tag">Entry</span>${_fmtTradeDate(r.date)}${r.exitDate ? '<span class="trade-date-arrow">→</span><span class="trade-date-tag">Exit</span><span class="exit-date">' + _fmtTradeDate(r.exitDate) + '</span>' : (r.plannedNote || '')}${r.isOpen ? ' <span class="open-badge">OPEN</span>' : ''}${reinvestBadge}</div>
@@ -3779,7 +3764,7 @@ function renderEquityChart() {
     data: {
       labels: state.equityCurve.map(e => e.date),
       datasets: [{
-        label: 'Equity', data: state.equityCurve.map(e => e.equity), borderColor: '#D4AF37', backgroundColor: grad, borderWidth: 2, pointRadius: 0, fill: true, tension: 0.2
+        label: 'กำไรสะสม (P&L)', data: state.equityCurve.map(e => e.equity), borderColor: '#D4AF37', backgroundColor: grad, borderWidth: 2, pointRadius: 0, fill: true, tension: 0.2
       }]
     },
     options: {
@@ -3808,11 +3793,13 @@ function renderDDChart() {
   const ctx = document.getElementById('ddChart').getContext('2d');
   if(charts.dd) charts.dd.destroy();
   
-  // Calculate DD
+  // Calculate DD — ฐาน = เงินสดสูงสุดที่ต้องเตรียม (warChest) + กำไรสะสม
   let peak = -Infinity;
+  const chest = state.warChest || 1;
   const dds = state.equityCurve.map(e => {
-    if (e.equity > peak) peak = e.equity;
-    return ((e.equity - peak) / peak) * 100;
+    const v = chest + e.equity;
+    if (v > peak) peak = v;
+    return ((v - peak) / peak) * 100;
   });
 
   // Create Gradient
@@ -3884,277 +3871,103 @@ function renderDDChart() {
 }
 
 function renderVsChart() {
-  const dates = state.equityCurve.map(e => e.date);
-  const years = [...new Set(dates.map(d => d.substring(0,4)))].sort();
-  const strategyRets = [];
-  const marketRets = [];
-  let prevStrat = CONFIG.initialCapital;
-  
-  // Need to be careful about finding prevMarket when startYear changes
-  // Find index in universeDaily matching the first equityCurve date
-  let marketStartIndex = 0;
-  if (state.universeDaily.length > 0 && dates.length > 0) {
-     const startD = dates[0];
-     marketStartIndex = state.universeDaily.findIndex(u => u.date === startD);
-     if (marketStartIndex === -1) marketStartIndex = 0;
-  }
-  let prevMarket = state.universeDaily.length > 0 ? state.universeDaily[marketStartIndex].val : 0;
-  
+  const pnl = state.equityCurve || [];
+  const spy = state.spyPnlCurve || [];
+  if (pnl.length === 0) return;
+  const years = [...new Set(pnl.map(e => e.date.substring(0, 4)))].sort();
+  const lastOf = (arr, y) => {
+    const rel = arr.filter(e => e.date.startsWith(y));
+    return rel.length ? rel[rel.length - 1].equity : null;
+  };
+  const stratD = [], spyD = [];
+  let prevS = 0, prevM = 0;
   years.forEach(y => {
-    const stratRelevant = state.equityCurve.filter(e => e.date.startsWith(y));
-    if(stratRelevant.length === 0) return;
-    const endStrat = stratRelevant[stratRelevant.length-1].equity;
-    const retS = ((endStrat - prevStrat) / prevStrat) * 100;
-    strategyRets.push(retS);
-    prevStrat = endStrat;
-
-    const mktRelevant = state.universeDaily.filter(e => e.date.startsWith(y));
-    if(mktRelevant.length === 0) { marketRets.push(0); return; }
-    const endMarket = mktRelevant[mktRelevant.length-1].val;
-    
-    // For the first year, we must ensure startMarket aligns with strat start
-    let startMarket = prevMarket; 
-    if (y === years[0]) {
-       // If mid-year start, simple return logic:
-       // prevMarket was set to the val at START of simulation.
-       // So (end - start) / start is correct.
-       startMarket = prevMarket; 
-    } else {
-       startMarket = prevMarket;
-    }
-
-    const retM = ((endMarket - startMarket) / startMarket) * 100;
-    marketRets.push(retM);
-    prevMarket = endMarket;
+    const es = lastOf(pnl, y);
+    const em = lastOf(spy, y);
+    stratD.push(es === null ? 0 : es - prevS);
+    spyD.push(em === null ? 0 : em - prevM);
+    if (es !== null) prevS = es;
+    if (em !== null) prevM = em;
   });
-
   const ctx = document.getElementById('vsChart').getContext('2d');
-  if(charts.vs) charts.vs.destroy();
+  if (charts.vs) charts.vs.destroy();
+  const fmtUsd = (v) => (v >= 0 ? '+' : '-') + '$' + Math.abs(Math.round(v)).toLocaleString();
   charts.vs = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: years,
       datasets: [
-        { label: 'Strategy', data: strategyRets, backgroundColor: strategyRets.map(v => v>=0 ? '#5BC48E' : '#D95F5F'), borderRadius: 3 },
-        { label: 'S&P 500', data: marketRets, backgroundColor: '#722F37', borderRadius: 3 }
+        { label: 'กลยุทธ์ (P&L รายปี)', data: stratD, backgroundColor: 'rgba(212,175,55,0.85)', borderRadius: 4 },
+        { label: 'SPY ไม้เดียวกัน', data: spyD, backgroundColor: 'rgba(139,125,94,0.55)', borderRadius: 4 }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { 
-        legend: { position: 'top', labels: { color: '#C4B88A', font:{family:'Anuphan, Inter, sans-serif'} } },
-        tooltip: {
-            callbacks: {
-                label: function(context) {
-                    let label = context.dataset.label || '';
-                    if (label) {
-                        label += ': ';
-                    }
-                    if (context.parsed.y !== null) {
-                        label += context.parsed.y.toFixed(1) + '%';
-                    }
-                    return label;
-                }
-            }
-        }
+      plugins: {
+        legend: { display: true, labels: { color: '#5C5240', font: { family: 'Anuphan', size: 11 } } },
+        tooltip: { callbacks: { label: (c) => c.dataset.label + ': ' + fmtUsd(c.parsed.y) } }
       },
-      scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(212,175,55,0.2)' }, ticks: { callback: v => v+'%' } } }
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#8B7D5E', font: { size: 10 } } },
+        y: { grid: { color: 'rgba(139,125,94,0.12)' }, ticks: { color: '#8B7D5E', font: { size: 10 }, callback: (v) => '$' + v.toLocaleString() } }
+      }
     }
   });
 }
 
 function renderBarChart() {
-  const dates = state.equityCurve.map(e => e.date);
-  const years = [...new Set(dates.map(d => d.substring(0,4)))].sort();
-  const yearlyData = [];
-  let prevEnd = CONFIG.initialCapital;
+  const pnl = state.equityCurve || [];
+  if (pnl.length === 0) return;
+  const years = [...new Set(pnl.map(e => e.date.substring(0, 4)))].sort();
+  const data = [];
+  let prev = 0;
   years.forEach(y => {
-    const relevant = state.equityCurve.filter(e => e.date.startsWith(y));
-    if(relevant.length === 0) return;
-    const endVal = relevant[relevant.length-1].equity;
-    const ret = ((endVal - prevEnd) / prevEnd) * 100;
-    yearlyData.push({ year: y, ret: ret });
-    prevEnd = endVal;
+    const rel = pnl.filter(e => e.date.startsWith(y));
+    if (rel.length === 0) { data.push(0); return; }
+    const end = rel[rel.length - 1].equity;
+    data.push(end - prev);
+    prev = end;
   });
-
   const ctx = document.getElementById('barChart').getContext('2d');
-  if(charts.bar) charts.bar.destroy();
-
-  // Create Gradient for Green Bars (Deep Green Dimension)
-  const greenGradient = ctx.createLinearGradient(0, 0, 0, 400);
-  greenGradient.addColorStop(0, 'rgba(91,196,142, 1)');   // Top: Bright Green
-  greenGradient.addColorStop(0.6, 'rgba(34, 197, 94, 0.8)'); // Mid: Standard Green
-  greenGradient.addColorStop(1, 'rgba(20, 83, 45, 0.6)');    // Bottom: Deep Forest Green
-
-  // Custom Plugin for Data Labels
-  const dataLabelPlugin = {
-    id: 'dataLabel',
-    afterDatasetsDraw(chart, args, options) {
-      const { ctx } = chart;
-      ctx.save();
-      if(chart.data.datasets.length > 0) {
-        chart.data.datasets[0].data.forEach((datapoint, index) => {
-            const meta = chart.getDatasetMeta(0);
-            const bar = meta.data[index];
-            const value = datapoint;
-            
-            ctx.font = 'bold 11px Inter';
-            ctx.textAlign = 'center';
-            
-            if (value >= 0) {
-            ctx.fillStyle = '#5BC48E'; // Green text
-            ctx.fillText('+' + value.toFixed(1) + '%', bar.x, bar.y - 6);
-            } else {
-            ctx.fillStyle = '#D95F5F'; // Red text
-            ctx.fillText(value.toFixed(1) + '%', bar.x, bar.y + 14);
-            }
-        });
-      }
-      ctx.restore();
-    }
-  };
-
+  if (charts.bar) charts.bar.destroy();
+  const fmtUsd = (v) => (v >= 0 ? '+' : '-') + '$' + Math.abs(Math.round(v)).toLocaleString();
   charts.bar = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: yearlyData.map(d => d.year),
+      labels: years,
       datasets: [{
-        label: 'Strategy Return',
-        data: yearlyData.map(d => d.ret),
-        backgroundColor: yearlyData.map(d => d.ret >= 0 ? greenGradient : '#D95F5F'),
-        borderRadius: 4,
-        borderWidth: 0
+        label: 'P&L รายปี ($)',
+        data: data,
+        backgroundColor: data.map(v => v >= 0 ? 'rgba(46,159,95,0.8)' : 'rgba(185,28,28,0.75)'),
+        borderRadius: 4
       }]
     },
     options: {
-      responsive: true, maintainAspectRatio: false, 
-      plugins: { 
-        legend: { 
-            display: true,
-            labels: { color: '#C4B88A', font: { family: 'Anuphan, Inter, sans-serif', size: 11 } } 
-        },
-        tooltip: {
-            enabled: false // Disable tooltip since we have labels
-        }
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: (c) => fmtUsd(c.parsed.y) } }
       },
-      scales: { x: { grid: { display: false }, ticks: { color: '#C4B88A' } }, y: { grid: { color: 'rgba(212,175,55,0.2)' }, ticks: { color: '#8B7D5E', callback: v => v+'%' } } }
-    },
-    plugins: [dataLabelPlugin]
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#8B7D5E', font: { size: 10 } } },
+        y: { grid: { color: 'rgba(139,125,94,0.12)' }, ticks: { color: '#8B7D5E', font: { size: 10 }, callback: (v) => '$' + v.toLocaleString() } }
+      }
+    }
   });
 }
 
 function updateMarketAnalyzer() {
-  if (state.universeDaily.length === 0) return;
-  const val = parseInt(el.sliderMarket.value);
-  el.sliderValDisp.innerText = val + "Y";
-  const years = val;
-  const last = state.universeDaily[state.universeDaily.length-1];
-  const endDate = new Date(last.date);
-  let startIdx = 0;
-  for(let i=state.universeDaily.length-1; i>=0; i--) {
-    const d = new Date(state.universeDaily[i].date);
-    if ((endDate - d)/(365.25*86400000) >= years) { startIdx = i; break; }
-  }
-  const startVal = state.universeDaily[startIdx].val;
-  const endVal = last.val;
-  const cagr = Math.pow(endVal/startVal, 1/Math.max((endDate - new Date(state.universeDaily[startIdx].date)) / (365.25*86400000), 0.5)) - 1;
-  el.maReturn.innerText = (cagr >=0 ? '+' : '') + (cagr * 100).toFixed(1) + '%';
-  el.maReturn.style.color = cagr >= 0 ? 'var(--accent)' : 'var(--red)';
-
-  const periodData = state.universeDaily.slice(startIdx);
-  const rets = [];
-  let peak = -Infinity;
-  let maxDD = 0;
-  for(let i=1; i<periodData.length; i++) {
-    const r = (periodData[i].val - periodData[i-1].val) / periodData[i-1].val;
-    rets.push(r);
-    if (periodData[i].val > peak) peak = periodData[i].val;
-    const d = (periodData[i].val - peak) / peak;
-    if (d < maxDD) maxDD = d;
-  }
-  const avg = rets.reduce((a,b)=>a+b,0)/rets.length;
-  const std = Math.sqrt(rets.reduce((a,b)=>a+Math.pow(b-avg,2),0)/rets.length);
-  const vol = std * Math.sqrt(52);
-  el.maVol.innerText = (vol * 100).toFixed(1) + '%';
-  el.maDd.innerText = (maxDD * 100).toFixed(1) + '%';
-
-  // === PHASE 4.6: Bench tab enrichment ===
-  const statMaDd = document.getElementById('stat-ma-dd');
-  if (statMaDd) statMaDd.innerText = (maxDD * 100).toFixed(1) + '%';
-
-  // ma-period header
-  const maPeriod = document.getElementById('ma-period');
-  if (maPeriod) {
-    const endDate = new Date(state.universeDaily[state.universeDaily.length-1].date);
-    const startDate = new Date(state.universeDaily[startIdx].date);
-    const fmtMonthTh = (d) => {
-      const months_th = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-      return `${months_th[d.getMonth()]} ${d.getFullYear()+543}`;
-    };
-    maPeriod.innerText = `${fmtMonthTh(startDate)} → ${fmtMonthTh(endDate)} · ${years}Y · SPY ETF`;
-  }
-
-  // Alpha: strategy annual return − market annual return
-  const stratCagr = state._lastStratCagr || 0;
-  const alpha = stratCagr - cagr;
-  const rscAlpha = document.getElementById('rscAlpha');
-  if (rscAlpha) {
-    rscAlpha.innerText = (alpha >= 0 ? '+' : '') + (alpha * 100).toFixed(2) + '%';
-    rscAlpha.style.color = alpha >= 0 ? 'var(--green)' : 'var(--red)';
-  }
-  const rscAlphaDesc = document.getElementById('rscAlphaDesc');
-  if (rscAlphaDesc) {
-    if (alpha >= 0.1) rscAlphaDesc.innerText = 'เอาชนะตลาดได้ชัดเจน';
-    else if (alpha >= 0.02) rscAlphaDesc.innerText = 'ชนะตลาดได้เล็กน้อย';
-    else if (alpha >= -0.02) rscAlphaDesc.innerText = 'ใกล้เคียงกับตลาด';
-    else rscAlphaDesc.innerText = 'แพ้ตลาดช่วงนี้';
-  }
-
-  // Bench narrative (long Thai narrative about strategy vs market)
-  const stratVol = state._lastStratVol || 0;
-  const rssBench = document.getElementById('rssBench');
-  if (rssBench && state._lastYears) {
-    const yrsStr = state._lastYears.toFixed(1);
-    const volRatio = stratVol / Math.max(vol, 0.0001);
-    let verdict, volComment;
-    if (alpha >= 0.05) verdict = 'ชนะตลาดอย่างขาดลอย';
-    else if (alpha >= 0.01) verdict = 'ชนะตลาด';
-    else if (alpha >= -0.01) verdict = 'เสมอตลาด';
-    else verdict = 'แพ้ตลาด';
-    if (volRatio > 1.5) volComment = `แต่ <strong>ผันผวนสูงกว่าตลาดมาก</strong> (${(stratVol*100).toFixed(1)}% vs ${(vol*100).toFixed(1)}%) — ต้องใจแข็งพอรับได้`;
-    else if (volRatio > 1.2) volComment = `ผันผวนสูงกว่าตลาดพอสมควร (${(stratVol*100).toFixed(1)}% vs ${(vol*100).toFixed(1)}%)`;
-    else volComment = `ผันผวนใกล้เคียงตลาด (${(stratVol*100).toFixed(1)}% vs ${(vol*100).toFixed(1)}%)`;
-
-    rssBench.innerHTML = `ในช่วง <strong>${yrsStr} ปี</strong> ที่แบ็คเทส: <strong>${verdict}</strong> — ` +
-      `ผลตอบแทนต่อปีสูงกว่า SP500 ถึง <strong class="${alpha>=0?'text-green':'text-red'}">${alpha>=0?'+':''}${(alpha*100).toFixed(1)}%</strong> ` +
-      `${volComment}. <strong>สรุป:</strong> ${alpha>=0.05 ? 'ผลตอบแทนสูงกว่ามาก แต่ต้องแลกกับความผันผวนที่สูงขึ้น — ต้องประเมินว่ารับได้ไหม' : (alpha>=0 ? 'ทำผลได้ดีกว่าตลาดเล็กน้อย' : 'ทำผลได้ต่ำกว่าตลาด — อาจต้องปรับกลยุทธ์')}`;
-  }
-
-  // ma-note (short summary)
-  const maNote = document.getElementById('ma-note');
-  if (maNote) {
-    maNote.innerHTML = `Benchmark = SPY (SPDR S&P 500 ETF) — ราคาปิดรายวันจริงจาก benchmark CSV`;
-  }
-
-  // Global rscNarrative at bottom of card
-  const rscNarrative = document.getElementById('rscNarrative');
-  if (rscNarrative && state._lastPnl !== undefined) {
-    const pnl = state._lastPnl;
-    const yrs = state._lastYears.toFixed(1);
-    const startYr = document.getElementById('startYearSelect') ? document.getElementById('startYearSelect').value : CONFIG.startYear;
-    const topN = CONFIG.topN;
-    rscNarrative.innerHTML = `ด้วยการตั้งค่า <strong>Top ${topN} หุ้น (LB6 ล้วน)</strong> · ถือไม้ละ ${holdLabelTh()} · ` +
-      `ตั้งแต่ปี ${startYr} ทำกำไรรวม <strong class="${pnl>=0?'text-green':'text-red'}">${pnl>=0?'+':''}$${Math.abs(Math.round(pnl)).toLocaleString()}</strong> ` +
-      `คิดเป็น <strong>${stratCagr>=0?'+':''}${(stratCagr*100).toFixed(1)}% ต่อปี</strong> ตลอด ${yrs} ปี · ` +
-      `Max Drawdown <strong class="text-red">${(state.equityCurve.length > 0 ? '' : '')}</strong>`;
-  }
+  // โหมดยิงทุกสัญญาณ: แท็บเทียบตลาดเทียบ "ไม้เดียวกันเข้า SPY" (เติมโดย calculateStats)
+  // slider ถูกซ่อนใน HTML แล้ว — ฟังก์ชันนี้เหลือแค่กัน null สำหรับ event เดิม
+  if (el.sliderMarket && el.sliderValDisp) el.sliderValDisp.innerText = el.sliderMarket.value + 'Y';
 }
 
 function renderHeatmap() {
   const tbody = document.querySelector('#heatmapTable tbody');
   tbody.innerHTML = '';
   const years = [...new Set(state.equityCurve.map(e => e.date.substring(0,4)))].sort();
-  let prevYearEnd = CONFIG.initialCapital;
+  const hmBase = state.warChest || 1;   // % ของเงินสดสูงสุดที่ต้องเตรียม
+  let prevYearEnd = 0;                  // equityCurve = กำไรสะสม เริ่ม 0
   
   years.forEach(y => {
     const tr = document.createElement('tr');
@@ -4170,7 +3983,7 @@ function renderHeatmap() {
       
       if(matches.length > 0) {
         const monthEnd = matches[matches.length-1].equity;
-        const ret = ((monthEnd - currentVal)/currentVal)*100;
+        const ret = ((monthEnd - currentVal)/hmBase)*100;
         val = ret.toFixed(1);
         cls = ret >= 0 ? 'text-green' : 'text-red';
         
@@ -4198,7 +4011,7 @@ function renderHeatmap() {
       }
       tr.innerHTML += `<td style="${style}">${val}</td>`;
     }
-    const ytd = ((currentVal - yearStart)/yearStart)*100;
+    const ytd = ((currentVal - yearStart)/hmBase)*100;
     tr.innerHTML += `<td style="font-weight:700" class="${ytd>=0?'text-green':'text-red'}">${ytd.toFixed(1)}%</td>`;
     prevYearEnd = currentVal;
     tbody.appendChild(tr);
@@ -4282,13 +4095,13 @@ window.switchStatsTab = function(tab) {
     strategyKey: 'sp500-sniper-washout',
     strategyLabel: 'Washout Sniper',
     getCurrentResult: function(){
-      var ddEl = document.getElementById('rscMaxDD') || document.getElementById('kpi-maxdd');
       return {
-        cagr: parsePct(document.getElementById('kpi-cagr')),
-        maxDD: parsePct(ddEl),
+        cagr: parsePct(document.getElementById('stat-cagr-mirror')),
+        maxDD: parsePct(document.getElementById('kpi-maxdd')),
         summary: txt('rscPeriod'),
         config: {
-          'เงินตั้งต้น': '$' + (CONFIG.initialCapital || 0).toLocaleString(),
+          'โหมด': 'ยิงทุกสัญญาณ (ถือซ้อนกันได้)',
+          'ทุนต่อไม้': '$' + (CONFIG.perTradeCapital || 0).toLocaleString(),
           'จำนวนหุ้นต่อไม้': CONFIG.topN + ' ตัว',
           'ระยะถือครอง': (typeof holdLabelTh === 'function' ? holdLabelTh() : ''),
           'Trigger': 'Breadth ≥ 19% แล้วหด ≤ ครึ่งพีค',
