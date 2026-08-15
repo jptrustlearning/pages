@@ -1935,7 +1935,7 @@
               <strong>วงม่วง = สัญญาณทดลอง "หาก้นจาก Drawdown"</strong>
             </span>
             <span style="opacity:.85"> — หาก้นจาก <strong>SPY หลุดจากยอด 60 วัน ≥ 5%</strong> แทนการรอ breadth พุ่งถึง 19% ·
-            จด breadth ณ วันที่ DD ทำก้นลึกสุด แล้วยิงเมื่อ breadth ฟื้นลงเหลือครึ่งหนึ่งของค่านั้น ·
+            จากนั้นใช้กติกายิงเดิมทุกอย่าง — <strong>breadth ฟื้นลงเหลือครึ่งหนึ่งของพีครอบนั้น</strong> ·
             <strong>วงม่วงที่ไม่มีจุดเขียว/ส้มข้างใน = จังหวะที่กติกาปัจจุบันมองไม่เห็น</strong> ·
             ⚠️ ยังเป็นแค่ภาพเปรียบเทียบ <strong>ไม่ได้ยิงไม้จริง</strong> ตัวเลขทุกการ์ดยังมาจากกติกา breadth เดิม</span>
           </div>
@@ -3034,8 +3034,9 @@ function buildSniperSeries() {
   // ============================================================
   // สัญญาณทดลอง: หาก้นจาก Drawdown แทน peak ของ breadth (ไอเดีย Joon)
   // 1) dd[i] = ราคาปิด SPY ÷ ราคาปิดสูงสุดใน 60 วันล่าสุด − 1   (60 = zWindow ตัวเดียวกับ z-score)
-  // 2) arm เมื่อ dd ≤ ddArm · ระหว่าง armed ถ้า dd ทำก้นใหม่ ให้จด breadth ณ วันนั้นไว้ (bAtTrough)
-  // 3) ยิงเมื่อ breadth ฟื้นลงมาเหลือ ≤ ครึ่งหนึ่งของ bAtTrough
+  // 2) arm เมื่อ dd ≤ ddArm · ระหว่าง armed เก็บ "พีค breadth ของรอบนั้น" (peakB) แบบเดียวกับกติกา breadth เดิม
+  //    → ต่างจากกติกาเดิมแค่จุดเดียวคือใช้ DD เป็นตัวเปิด/ปิดรอบ แทน breadth ≥ 19% (เปลี่ยนทีละตัวแปร)
+  // 3) ยิงเมื่อ breadth ฟื้นลงมาเหลือ ≤ ครึ่งหนึ่งของพีครอบนั้น
   // 4) ยิงแล้วต้องรอ dd ฟื้นเหนือ ddClear ก่อน arm ใหม่ — ยกเว้น dd ทำก้นลึกกว่าก้นที่ยิงไป (ddEscalate)
   // ทุกอย่างใช้ข้อมูลถึงปิดวัน i เท่านั้น → ไม่มี look-ahead
   const ddSignals = [];
@@ -3058,7 +3059,8 @@ function buildSniperSeries() {
           (cleared || (CONFIG.ddEscalate && lastTrough < 0 && d < lastTrough));
         if (canArm) { armed = true; trough = d; bAt = breadth[i]; }
       } else {
-        if (d < trough) { trough = d; bAt = breadth[i]; }
+        if (breadth[i] > bAt) bAt = breadth[i];              // พีค breadth ของรอบ (เหมือนกติกาเดิม)
+        if (d < trough) { trough = d; }                      // DD ทำก้นใหม่ — วันนั้นยังไม่เช็คยิง
         else if (bAt > 0 && breadth[i] <= bAt / 2) {
           ddSignals.push(i); armed = false; cleared = false; lastTrough = trough;
         } else if (d >= CONFIG.ddClear) { armed = false; }
