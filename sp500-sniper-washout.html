@@ -2141,6 +2141,15 @@
     </div>
 
     <div class="control-group">
+      <label>MACRO FILTER — กรองสัญญาณด้วยภาวะตลาด</label>
+      <select id="macroFilterInput" class="input-box">
+        <option value="off" selected>ปิด — ยิงทุกสัญญาณ (ค่าเริ่มต้น)</option>
+        <option value="defensive">เฉพาะตอน SPY หลุด top-2 (จังหวะซ้อนสองชั้น)</option>
+      </select>
+      <span class="hint">ใช้สัญญาณมหภาคชุดเดียวกับ Defensive Extend — เทียบ Δ6 เดือนของ SPY / Yen / Oil / Gold ณ ปิดวันสัญญาณ · เปิดตัวกรองนี้ = ยิง<strong>เฉพาะไม้ที่ตลาดล้าง (breadth) พร้อมกับ SPY หลุด top-2 (มหภาคอ่อน)</strong> พร้อมกันทั้งสองอย่าง — ไม้น้อยลงมากแต่คัดเฉพาะจังหวะที่ทั้งสองสัญญาณตรงกัน · ⚠️ เหลือ 10 ไม้ใน 11 ปี กระจายแค่ 7 ปี — กลุ่มตัวอย่างเล็ก อย่าอ่านตัวเลขเป็นความจริงตายตัว</span>
+    </div>
+
+    <div class="control-group">
       <label>DEFENSIVE EXTEND — ยืดตอนหมี</label>
       <select id="defensiveExtendInput" class="input-box">
         <option value="on" selected>เปิด (ค่าแนะนำ)</option>
@@ -2267,6 +2276,7 @@ let CONFIG = {
   feeSide: 0.0005,             // ค่าธรรมเนียม 0.05% ต่อข้าง
   startYear: 2015,
   defensiveExtend: true,       // ยืดตอนหมี — ครบกำหนดตอน SPY หลุด macro top-2 → ไม่ขาย ยืดอีก 1 hold
+  macroFilter: 'off',          // 'off' = ยิงทุกสัญญาณ · 'defensive' = ยิงเฉพาะตอน SPY หลุด macro top-2 ณ วันสัญญาณ
   cloudCsvUrl: 'https://app.jptrustlearning.com/data/input_sp500_daily.csv',
   cloudBenchUrl: 'https://app.jptrustlearning.com/data/input_benchmark_daily.csv',
   // macro signal (แบบกลยุทธ์หลัก defensive): JPY spot + WTI/GOLD futures
@@ -2294,7 +2304,8 @@ const DEFAULT_SNIPER = {
   topN: 10,
   startYear: 2015,
   defensiveExtend: true,
-  weightRet: 100          // % — 100 = ผลตอบแทนล้วน (ตรงกับงานวิจัย A61)
+  weightRet: 100,         // % — 100 = ผลตอบแทนล้วน (ตรงกับงานวิจัย A61)
+  macroFilter: 'off'      // ยิงทุกสัญญาณ (ตรงกับงานวิจัย A61)
 };
 
 // Cache for saved settings (needed for dynamic year-dropdown populate)
@@ -2326,6 +2337,7 @@ function getSniperSettings() {
     holdDays: h ? parseInt(h.value, 10) || DEFAULT_SNIPER.holdDays : DEFAULT_SNIPER.holdDays,
     perTradeCapital: c ? parseFloat(c.value) || DEFAULT_SNIPER.perTradeCapital : DEFAULT_SNIPER.perTradeCapital,
     defensiveExtend: (document.getElementById('defensiveExtendInput') || { value: 'on' }).value === 'on',
+    macroFilter: (document.getElementById('macroFilterInput') || { value: 'off' }).value,
     topN: n ? parseInt(n.value, 10) || DEFAULT_SNIPER.topN : DEFAULT_SNIPER.topN,
     startYear: y ? parseInt(y.value, 10) || DEFAULT_SNIPER.startYear : DEFAULT_SNIPER.startYear,
     weightRet: (() => { const w = document.getElementById('weightSlider');
@@ -2343,6 +2355,8 @@ function applySniperSettings(s) {
   if (c && s.perTradeCapital != null) c.value = s.perTradeCapital;
   const dx = document.getElementById('defensiveExtendInput');
   if (dx && s.defensiveExtend != null) dx.value = s.defensiveExtend ? 'on' : 'off';
+  const mf = document.getElementById('macroFilterInput');
+  if (mf && s.macroFilter != null) mf.value = s.macroFilter;
   if (n && s.topN != null) n.value = s.topN;
   if (y && s.startYear != null) y.value = s.startYear;
   const w = document.getElementById('weightSlider');
@@ -2409,6 +2423,7 @@ const el = {
   inputTopN: document.getElementById('topNInput'),
   inputInitCap: document.getElementById('initialCapitalInput'),
   inputDefExt: document.getElementById('defensiveExtendInput'),
+  inputMacroFilter: document.getElementById('macroFilterInput'),
   inputStartYear: document.getElementById('startYearSelect'),
   sliderWeight: document.getElementById('weightSlider'),
   valRet: document.getElementById('val-ret'),
@@ -2506,6 +2521,7 @@ if (el.sliderWeight) {
 el.inputInitCap.addEventListener('change', runBacktest);
 if (el.inputDefExt) el.inputDefExt.addEventListener('change', runBacktest);
 el.inputStartYear.addEventListener('change', runBacktest);
+if (el.inputMacroFilter) el.inputMacroFilter.addEventListener('change', runBacktest);
 
 // --- RANKING WEIGHT SLIDER (โครงจาก sp500-rolling-6m-momentum) ---
 function updateWeightsUI() {
@@ -3035,9 +3051,13 @@ function sniperRun(H, topN, perTrade, startIdx) {
   // 1) plan — ทุกสัญญาณ = ไม้ใหม่ทุนก้อนละ perTrade (ถือซ้อนกันได้ ไม่มีเงื่อนไขรอ)
   const plan = [];
   let firePending = null;
+  const macroOnly = CONFIG.macroFilter === 'defensive';
+  const benignArr = S.macroBenign;
   for (let s = 0; s < signals.length; s++) {
     const t = signals[s];
     if (t < t0 || t < LBn) continue;
+    // ตัวกรองมหภาค: ยิงเฉพาะตอน SPY หลุด top-2 ณ ปิดวันสัญญาณ (ลงมือ open t+1 → ไม่มี look-ahead)
+    if (macroOnly && benignArr && benignArr[t]) continue;
     const ent = t + 1, ex = ent + H;
     if (ent >= n) { firePending = t; continue; }
     const picks = sniperRankLB6(S, t, topN);
@@ -3179,6 +3199,7 @@ function runSniperBacktest() {
   CONFIG.holdDays = parseInt(el.inputHold.value) || 42;
   CONFIG.startYear = parseInt(el.inputStartYear.value) || 2015;
   if (el.sliderWeight) CONFIG.weightRet = (parseInt(el.sliderWeight.value, 10) || 0) / 100;
+  CONFIG.macroFilter = el.inputMacroFilter ? el.inputMacroFilter.value : 'off';
 
   const _S = buildSniperSeries();
   let startIndex = _S.dates.findIndex(d => d.startsWith(String(CONFIG.startYear)));
@@ -4203,8 +4224,12 @@ function renderBreadthChart() {
   const S = state._sniper;
   const labels = S.dates;
   const bdata = Array.from(S.breadth).map(v => Math.round(v * 100) / 100);
+  // จุดเขียว = สัญญาณที่ยิงไม้จริง · จุดเทา = สัญญาณที่โดน Macro Filter ตัดทิ้ง
+  const firedDates = new Set([...(state.closedLots || []), ...(state.lots || [])].map(t => t.signalDate));
   const sigSet = new Set(S.signals);
-  const sigData = labels.map((d, i) => sigSet.has(i) ? bdata[i] : null);
+  const sigData     = labels.map((d, i) => (sigSet.has(i) && firedDates.has(d)) ? bdata[i] : null);
+  const skippedData = labels.map((d, i) => (sigSet.has(i) && !firedDates.has(d)) ? bdata[i] : null);
+  const hasSkipped  = skippedData.some(v => v !== null);
   const armLine = labels.map(() => CONFIG.breadthArm);
   charts.breadth = new Chart(ctx, {
     type: 'line',
@@ -4216,7 +4241,9 @@ function renderBreadthChart() {
         { label: 'เกณฑ์ arm 19%', data: armLine, borderColor: 'rgba(212,175,55,0.85)',
           borderDash: [6, 4], borderWidth: 1.2, pointRadius: 0, fill: false },
         { label: 'สัญญาณยิง', data: sigData, borderColor: 'rgba(46,159,95,0)',
-          backgroundColor: '#2E9F5F', pointRadius: 4, pointHoverRadius: 6, showLine: false }
+          backgroundColor: '#2E9F5F', pointRadius: 4, pointHoverRadius: 6, showLine: false },
+        ...(hasSkipped ? [{ label: 'โดน Macro Filter ตัด', data: skippedData, borderColor: 'rgba(139,125,94,0)',
+          backgroundColor: 'rgba(139,125,94,0.55)', pointRadius: 4, pointHoverRadius: 6, showLine: false }] : [])
       ]
     },
     options: {
