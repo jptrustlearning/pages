@@ -1941,8 +1941,8 @@
           </div>
           <div style="margin-top:8px;">
             <span style="display:inline-flex;align-items:center;gap:6px;">
-              <span style="width:12px;height:12px;background:#1F3A5F;border:1.5px solid #FAF6ED;display:inline-block;transform:rotate(45deg);"></span>
-              <strong>ข้าวหลามตัดกรมท่า = ผ่านตัวกรองซ้อนชั้น</strong>
+              <span style="width:13px;height:13px;background:rgba(31,58,95,0.10);border:2px solid #1F3A5F;display:inline-block;transform:rotate(45deg);"></span>
+              <strong>วงข้าวหลามตัดกรมท่า = ผ่านตัวกรองซ้อนชั้น</strong>
             </span>
             <span style="opacity:.85"> — เข้าเมื่อมี <strong>2 ใน 3 สัญญาณ</strong>ตรงกัน: breadth ยิง · drawdown ยิง · SPY หลุด macro top-2 ·
             นับย้อนหลังได้ไม่เกิน 5 วันเทรด (ห้ามมองอนาคต) · <strong>แตะที่จุดเพื่อดูว่าผ่านด้วยเงื่อนไขไหน</strong> ·
@@ -4011,9 +4011,10 @@ function renderEntrySpyChart() {
         { label: 'เข้าตอน SPY หลุด top-2', data: dotsDef, borderColor: 'rgba(232,145,43,0)',
           backgroundColor: '#E8912B', pointBorderColor: '#8a4a05', pointBorderWidth: 1.5,
           pointRadius: 5.5, pointHoverRadius: 8, showLine: false },
-        { label: `ผ่านตัวกรอง 2 ใน 3 (${cfCount})`, data: dotsCF, borderColor: 'rgba(31,58,95,0)',
-          backgroundColor: '#1F3A5F', pointBorderColor: '#FAF6ED', pointBorderWidth: 1.5,
-          pointStyle: 'rectRot', pointRadius: 4, pointHoverRadius: 7, showLine: false,
+        { label: `ผ่านตัวกรอง 2 ใน 3 (${cfCount})`, data: dotsCF,
+          borderColor: '#1F3A5F', backgroundColor: 'rgba(31,58,95,0.10)',
+          pointBorderColor: '#1F3A5F', pointBorderWidth: 2.5,
+          pointStyle: 'rectRot', pointRadius: 10, pointHoverRadius: 13, showLine: false,
           _reasons: cfReason }
       ]
     },
