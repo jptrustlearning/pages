@@ -1929,6 +1929,16 @@
             <span style="width:16px;height:11px;background:rgba(214,91,110,0.20);border:1px solid rgba(214,91,110,0.45);display:inline-block;"></span>
             ช่วงที่ SPY หลุด macro top-2 <span style="opacity:.75">(แถบจางกว่า = ช่วงสั้นไม่ถึง 10 วัน)</span>
           </span>
+          <div style="margin-top:10px;padding-top:9px;border-top:1px dashed var(--border);">
+            <span style="display:inline-flex;align-items:center;gap:6px;">
+              <span style="width:15px;height:15px;border-radius:50%;background:rgba(124,77,168,0.45);display:inline-block;"></span>
+              <strong>วงม่วง = สัญญาณทดลอง "หาก้นจาก Drawdown"</strong>
+            </span>
+            <span style="opacity:.85"> — หาก้นจาก <strong>SPY หลุดจากยอด 60 วัน ≥ 5%</strong> แทนการรอ breadth พุ่งถึง 19% ·
+            จด breadth ณ วันที่ DD ทำก้นลึกสุด แล้วยิงเมื่อ breadth ฟื้นลงเหลือครึ่งหนึ่งของค่านั้น ·
+            <strong>วงม่วงที่ไม่มีจุดเขียว/ส้มข้างใน = จังหวะที่กติกาปัจจุบันมองไม่เห็น</strong> ·
+            ⚠️ ยังเป็นแค่ภาพเปรียบเทียบ <strong>ไม่ได้ยิงไม้จริง</strong> ตัวเลขทุกการ์ดยังมาจากกติกา breadth เดิม</span>
+          </div>
         </div>
         <div style="height: 320px; position: relative;">
           <canvas id="entrySpyChart"></canvas>
@@ -2283,6 +2293,10 @@ let CONFIG = {
   breadthArm: 19.0,            // arm เมื่อ breadth ≥ 19% (p95 จากข้อมูลจริง — A61 ตรึงไว้ ไม่จูน)
   episodeReset: 21,            // จบ episode เมื่อ breadth < arm ติดกัน 21 วันเทรด → ลืมพีคเดิม (A65 ข้อ C)
   episodeEscalation: 1.15,     // พีคใหม่ต้อง ≥ 1.15 × พีคเดิม ถึงนับเป็นพายุลูกใหม่ (A65) — ดู ⚠️ เพดานใน buildSniperSeries
+  // --- สัญญาณทดลอง "หาก้นจาก Drawdown" (A65, โชว์เป็นจุดม่วงในแท็บ ENTRY vs SPY เท่านั้น ไม่ยิงไม้จริง) ---
+  ddArm: -0.05,                // เริ่มจับตาเมื่อ SPY หลุดจากยอด 60 วัน ≥ 5%
+  ddClear: -0.02,              // ถือว่าพายุจบเมื่อ DD ฟื้นกลับมาเหนือ −2%
+  ddEscalate: true,            // ยังไม่ฟื้นก็ arm ใหม่ได้ ถ้า DD ทำก้นลึกกว่าก้นที่ยิงไปแล้ว (กันพลาดก้น COVID)
   lb: 126,                     // LB6 = ผลตอบแทน 126 วันเทรด
   weightRet: 1.0,              // น้ำหนัก Return ในการจัดอันดับ (Volume = 1 − weightRet) · default 1.0 = ผลตอบแทนล้วน (A61)
   feeSide: 0.0005,             // ค่าธรรมเนียม 0.05% ต่อข้าง
@@ -3017,7 +3031,42 @@ function buildSniperSeries() {
     ranked.sort((x, y) => y.pct - x.pct);
     macroBenign[i] = (ranked[0].spy || ranked[1].spy) ? 1 : 0;
   }
-  state._sniper = { n, m, offset, dates, tickers, closeA, openA, volA, breadth, signals,
+  // ============================================================
+  // สัญญาณทดลอง: หาก้นจาก Drawdown แทน peak ของ breadth (ไอเดีย Joon)
+  // 1) dd[i] = ราคาปิด SPY ÷ ราคาปิดสูงสุดใน 60 วันล่าสุด − 1   (60 = zWindow ตัวเดียวกับ z-score)
+  // 2) arm เมื่อ dd ≤ ddArm · ระหว่าง armed ถ้า dd ทำก้นใหม่ ให้จด breadth ณ วันนั้นไว้ (bAtTrough)
+  // 3) ยิงเมื่อ breadth ฟื้นลงมาเหลือ ≤ ครึ่งหนึ่งของ bAtTrough
+  // 4) ยิงแล้วต้องรอ dd ฟื้นเหนือ ddClear ก่อน arm ใหม่ — ยกเว้น dd ทำก้นลึกกว่าก้นที่ยิงไป (ddEscalate)
+  // ทุกอย่างใช้ข้อมูลถึงปิดวัน i เท่านั้น → ไม่มี look-ahead
+  const ddSignals = [];
+  {
+    const spyC = new Float64Array(n).fill(NaN);
+    for (let i = 0; i < n; i++) {
+      const row = state.marketData[dates[i]] ? state.marketData[dates[i]]['SPY'] : null;
+      if (row && isFinite(row.c) && row.c > 0) spyC[i] = row.c;
+    }
+    const Wd = CONFIG.zWindow;
+    let armed = false, trough = 0, bAt = 0, cleared = true, lastTrough = 0;
+    for (let i = Wd - 1; i < n; i++) {
+      let mx = -Infinity;
+      for (let k = i - Wd + 1; k <= i; k++) if (isFinite(spyC[k]) && spyC[k] > mx) mx = spyC[k];
+      if (!(mx > 0) || !isFinite(spyC[i])) continue;
+      const d = spyC[i] / mx - 1;
+      if (d >= CONFIG.ddClear) { cleared = true; lastTrough = 0; }
+      if (!armed) {
+        const canArm = d <= CONFIG.ddArm &&
+          (cleared || (CONFIG.ddEscalate && lastTrough < 0 && d < lastTrough));
+        if (canArm) { armed = true; trough = d; bAt = breadth[i]; }
+      } else {
+        if (d < trough) { trough = d; bAt = breadth[i]; }
+        else if (bAt > 0 && breadth[i] <= bAt / 2) {
+          ddSignals.push(i); armed = false; cleared = false; lastTrough = trough;
+        } else if (d >= CONFIG.ddClear) { armed = false; }
+      }
+    }
+  }
+
+  state._sniper = { n, m, offset, dates, tickers, closeA, openA, volA, breadth, signals, ddSignals,
                     lastArmed: armed, lastPeak: peakB, lastRefPeak: refPeak, macroBenign };
   return state._sniper;
 }
@@ -3870,6 +3919,12 @@ function renderEntrySpyChart() {
   const dots    = labels.map((d, i) => eBenign.has(i) ? r2(eBenign.get(i)) : null);
   const dotsDef = labels.map((d, i) => eDef.has(i)    ? r2(eDef.get(i))    : null);
 
+  // จุดม่วง = สัญญาณทดลอง "หาก้นจาก Drawdown" (ยังไม่ยิงไม้จริง) · วาดที่วันเข้า = วันสัญญาณ + 1
+  const ddSet = new Set();
+  (S.ddSignals || []).forEach(t => { const e = t + 1; if (e >= from && e < S.n) ddSet.add(e - from); });
+  const dotsDD = labels.map((d, i) => (ddSet.has(i) && isFinite(spy[i + from])) ? r2(spy[i + from]) : null);
+  const ddCount = ddSet.size;
+
   // ช่วงเวลาที่ SPY หลุด macro top-2 → ระบายพื้นหลังชมพูแดงอ่อน (index ในสเปซของ labels)
   // regime นี้คิดรายวันจึงกระพริบได้ (59 ช่วงใน 11 ปี · 23 ช่วงยาวแค่ 1–2 วัน)
   // → รวมช่วงที่ห่างกัน ≤3 วันเข้าด้วยกันเพื่อไม่ให้กราฟลายพร้อย แล้วทำแถบสั้นให้จางกว่าแถบยาว
@@ -3898,6 +3953,8 @@ function renderEntrySpyChart() {
       datasets: [
         { label: 'SPY', data: line, borderColor: '#722F37', backgroundColor: 'rgba(114,47,55,0.06)',
           borderWidth: 1.4, pointRadius: 0, fill: true, tension: 0.1, spanGaps: true },
+        { label: `สัญญาณทดลอง Drawdown (${ddCount})`, data: dotsDD, borderColor: 'rgba(124,77,168,0)',
+          backgroundColor: 'rgba(124,77,168,0.45)', pointRadius: 8.5, pointHoverRadius: 10, showLine: false },
         { label: 'เข้าตอน SPY ติด top-2', data: dots, borderColor: 'rgba(46,159,95,0)',
           backgroundColor: '#2E9F5F', pointRadius: 4.5, pointHoverRadius: 7, showLine: false },
         { label: 'เข้าตอน SPY หลุด top-2', data: dotsDef, borderColor: 'rgba(232,145,43,0)',
