@@ -284,6 +284,17 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
         <button class="btn hide" id="btnBack">← หน้าแรก</button>
       </div>
     </header>
+    <script>
+    /* ปุ่มเมนูต้องกดได้ทันทีที่เห็น เช่นเดียวกับปุ่มสลับโหมดราคา
+       ใช้ onclick= (ไม่ใช่ addEventListener) เพื่อให้สคริปต์หลักเขียนทับตัวนี้ได้
+       ไม่งั้นจะมีตัวจัดการสองตัวแล้วเมนูเปิดปิดสลับกันเอง */
+    (function(){
+      var bg=document.getElementById('burger'), sb=document.getElementById('sb'), sc=document.getElementById('scrim');
+      if(!bg||!sb||!sc) return;
+      bg.onclick=function(){ sb.classList.toggle('open'); sc.classList.toggle('on'); };
+      sc.onclick=function(){ sb.classList.remove('open'); sc.classList.remove('on'); };
+    })();
+    </script>
 
     <div class="content">
 
