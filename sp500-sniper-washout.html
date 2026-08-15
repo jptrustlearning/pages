@@ -2149,6 +2149,20 @@
       <span class="hint">แบบกลยุทธ์หลัก: วันครบกำหนดขาย เช็ค SPY เทียบ Yen / Oil / Gold (Δ6 เดือน ณ ปิดวันก่อนหน้า) — ถ้า SPY หลุด top-2 (= ตลาดหมี) จะ<strong>ไม่ขาย ยืดถือต่ออีก 1 ระยะถือ</strong>แล้วเช็คใหม่ · ระยะถือจริงจึงอาจยาวกว่าที่ตั้ง และเงินสดที่ต้องเตรียมอาจซ้อนมากขึ้น</span>
     </div>
 
+    <!-- RANKING WEIGHT (ก็อปโครงจาก sp500-rolling-6m-momentum) -->
+    <div class="control-group">
+      <label>RANKING WEIGHT — น้ำหนักการจัดอันดับ</label>
+      <div class="weight-wrapper">
+        <div class="weight-val w-ret">Return <span id="val-ret">100</span>%</div>
+        <div class="range-track">
+          <div class="track-fill" id="track-fill" style="width: 100%;"></div>
+          <input type="range" id="weightSlider" class="weight-slider" min="0" max="100" value="100" step="10">
+        </div>
+        <div class="weight-val w-vol">Volume <span id="val-vol">0</span>%</div>
+      </div>
+      <span class="hint">ปรับสัดส่วนระหว่าง <strong>ผลตอบแทน 6 เดือน</strong> กับ <strong>Volume สะสมตลอด 126 วัน</strong> ในการจัดอันดับหุ้น · ซ้ายมากขึ้น = เน้นกำไรล้วนๆ · ขวามากขึ้น = เน้นหุ้นที่มีสภาพคล่องสูง · <strong>default = Return 100%</strong> (ตามงานวิจัย A61 ที่ตั้งใจไม่ผสม Volume) · ⚠️ เลื่อนแล้ว<strong>จำนวนไม้ไม่เปลี่ยน</strong> วันเข้า–ออกก็เท่าเดิม เปลี่ยนแค่ว่าไม้นั้นซื้อหุ้นตัวไหน</span>
+    </div>
+
     <div class="control-group">
       <label>PORTFOLIO SIZE — จำนวนหุ้นต่อรอบ</label>
       <div class="top-n-wrapper" style="display:flex; align-items:center; gap:10px;">
@@ -2156,7 +2170,7 @@
         <input type="number" id="topNInput" class="input-box" value="10" min="1" max="50" style="max-width:120px;">
         <span style="color:var(--text-muted); font-weight:600;">STOCKS</span>
       </div>
-      <span class="hint">ซื้อหุ้น <strong>Top N ตามผลตอบแทน 6 เดือน (LB6)</strong> ณ วันสัญญาณ · default = 10 (ตามงานวิจัย) · จัดอันดับด้วยผลตอบแทนล้วน ไม่ผสม Volume</span>
+      <span class="hint">ซื้อหุ้น <strong>Top N ตามอันดับที่ได้จาก Ranking Weight ด้านบน</strong> ณ วันสัญญาณ · default = 10 (ตามงานวิจัย) · เปลี่ยน N แล้วจำนวนไม้ไม่เปลี่ยนเช่นกัน</span>
     </div>
 
     <!-- 3. Start Year -->
@@ -2248,7 +2262,8 @@ let CONFIG = {
   breadthArm: 19.0,            // arm เมื่อ breadth ≥ 19% (p95 จากข้อมูลจริง — A61 ตรึงไว้ ไม่จูน)
   episodeReset: 21,            // จบ episode เมื่อ breadth < arm ติดกัน 21 วันเทรด → ลืมพีคเดิม (A65 ข้อ C)
   episodeEscalation: 1.15,     // พีคใหม่ต้อง ≥ 1.15 × พีคเดิม ถึงนับเป็นพายุลูกใหม่ (A65) — ดู ⚠️ เพดานใน buildSniperSeries
-  lb: 126,                     // LB6 = ผลตอบแทน 126 วันเทรดล้วน (ไม่ผสม volume)
+  lb: 126,                     // LB6 = ผลตอบแทน 126 วันเทรด
+  weightRet: 1.0,              // น้ำหนัก Return ในการจัดอันดับ (Volume = 1 − weightRet) · default 1.0 = ผลตอบแทนล้วน (A61)
   feeSide: 0.0005,             // ค่าธรรมเนียม 0.05% ต่อข้าง
   startYear: 2015,
   defensiveExtend: true,       // ยืดตอนหมี — ครบกำหนดตอน SPY หลุด macro top-2 → ไม่ขาย ยืดอีก 1 hold
@@ -2278,7 +2293,8 @@ const DEFAULT_SNIPER = {
   perTradeCapital: 10000,
   topN: 10,
   startYear: 2015,
-  defensiveExtend: true
+  defensiveExtend: true,
+  weightRet: 100          // % — 100 = ผลตอบแทนล้วน (ตรงกับงานวิจัย A61)
 };
 
 // Cache for saved settings (needed for dynamic year-dropdown populate)
@@ -2311,7 +2327,9 @@ function getSniperSettings() {
     perTradeCapital: c ? parseFloat(c.value) || DEFAULT_SNIPER.perTradeCapital : DEFAULT_SNIPER.perTradeCapital,
     defensiveExtend: (document.getElementById('defensiveExtendInput') || { value: 'on' }).value === 'on',
     topN: n ? parseInt(n.value, 10) || DEFAULT_SNIPER.topN : DEFAULT_SNIPER.topN,
-    startYear: y ? parseInt(y.value, 10) || DEFAULT_SNIPER.startYear : DEFAULT_SNIPER.startYear
+    startYear: y ? parseInt(y.value, 10) || DEFAULT_SNIPER.startYear : DEFAULT_SNIPER.startYear,
+    weightRet: (() => { const w = document.getElementById('weightSlider');
+      return w ? parseInt(w.value, 10) : DEFAULT_SNIPER.weightRet; })()
   };
 }
 
@@ -2327,6 +2345,8 @@ function applySniperSettings(s) {
   if (dx && s.defensiveExtend != null) dx.value = s.defensiveExtend ? 'on' : 'off';
   if (n && s.topN != null) n.value = s.topN;
   if (y && s.startYear != null) y.value = s.startYear;
+  const w = document.getElementById('weightSlider');
+  if (w && s.weightRet != null) { w.value = s.weightRet; if (typeof updateWeightsUI === 'function') updateWeightsUI(); }
 }
 
 async function loadSniperSettings() {
@@ -2390,6 +2410,10 @@ const el = {
   inputInitCap: document.getElementById('initialCapitalInput'),
   inputDefExt: document.getElementById('defensiveExtendInput'),
   inputStartYear: document.getElementById('startYearSelect'),
+  sliderWeight: document.getElementById('weightSlider'),
+  valRet: document.getElementById('val-ret'),
+  valVol: document.getElementById('val-vol'),
+  fillWeight: document.getElementById('track-fill'),
 
   // Market Analyzer
   maReturn: document.getElementById('ma-return'),
@@ -2475,9 +2499,24 @@ el.input.addEventListener('change', handleUpload);
 el.sliderMarket.addEventListener('input', updateMarketAnalyzer);
 el.inputHold.addEventListener('change', runBacktest);
 el.inputTopN.addEventListener('change', runBacktest);
+if (el.sliderWeight) {
+  el.sliderWeight.addEventListener('input', updateWeightsUI);          // ลากแล้วตัวเลข/แถบขยับทันที
+  el.sliderWeight.addEventListener('change', () => { updateWeightsUI(); runBacktest(); });
+}
 el.inputInitCap.addEventListener('change', runBacktest);
 if (el.inputDefExt) el.inputDefExt.addEventListener('change', runBacktest);
 el.inputStartYear.addEventListener('change', runBacktest);
+
+// --- RANKING WEIGHT SLIDER (โครงจาก sp500-rolling-6m-momentum) ---
+function updateWeightsUI() {
+  if (!el.sliderWeight) return;
+  const retPct = parseInt(el.sliderWeight.value, 10);
+  const volPct = 100 - retPct;
+  if (el.valRet) el.valRet.innerText = retPct;
+  if (el.valVol) el.valVol.innerText = volPct;
+  if (el.fillWeight) el.fillWeight.style.width = retPct + '%';
+  CONFIG.weightRet = retPct / 100;
+}
 
 // --- TAB LOGIC ---
 function switchTab(evt, containerId, tabId) {
@@ -2861,6 +2900,7 @@ function buildSniperSeries() {
   const tIdx = {}; tickers.forEach((t, j) => { tIdx[t] = j; });
   const closeA = new Float64Array(n * m).fill(NaN);
   const openA  = new Float64Array(n * m).fill(NaN);
+  const volA   = new Float64Array(n * m);          // 0 = ไม่มีข้อมูล (ไม่ใช่ NaN — จะได้บวกสะสมตรงๆ)
   for (let i = 0; i < n; i++) {
     const day = state.marketData[dates[i]];
     for (const t in day) {
@@ -2868,6 +2908,7 @@ function buildSniperSeries() {
       const r = day[t];
       if (r && isFinite(r.c)) closeA[i * m + j] = r.c;
       if (r && isFinite(r.o)) openA[i * m + j]  = r.o;
+      if (r && isFinite(r.v)) volA[i * m + j]   = r.v;
     }
   }
   // --- breadth (z-score รายตัว: หน้าต่าง 60 วัน ห้ามมีวันขาด — ตรงกับ pandas rolling default) ---
@@ -2948,20 +2989,39 @@ function buildSniperSeries() {
     ranked.sort((x, y) => y.pct - x.pct);
     macroBenign[i] = (ranked[0].spy || ranked[1].spy) ? 1 : 0;
   }
-  state._sniper = { n, m, offset, dates, tickers, closeA, openA, breadth, signals,
+  state._sniper = { n, m, offset, dates, tickers, closeA, openA, volA, breadth, signals,
                     lastArmed: armed, lastPeak: peakB, lastRefPeak: refPeak, macroBenign };
   return state._sniper;
 }
 
+// จัดอันดับ ณ ราคาปิดวันสัญญาณ t (ซื้อเปิดวันถัดไป — ไม่มี look-ahead)
+// สูตรผสม Volume ก็อปจาก sp500-rolling-6m-momentum ทุกขั้น:
+//   return = ราคาปิด t ÷ ราคาปิด t−126 − 1
+//   volume = ผลรวม volume รายวันทั้งช่วง [t−126 .. t] (บวกทุกวัน ไม่สุ่ม · วันสุดท้าย = วันเดียวกับราคา END)
+//   จัดอันดับแยกกันสองชุด แล้ว score = rankRet × wRet + rankVol × wVol  (น้อย = ดี)
+// wRet = 1 (default) → score = rankRet ล้วน = ผลลัพธ์เดิมของ A61 เป๊ะ จึงข้ามการบวก volume ไปเลยเพื่อความเร็ว
 function sniperRankLB6(S, t, topN) {
-  const m = S.m, closeA = S.closeA, LBn = CONFIG.lb;
+  const m = S.m, closeA = S.closeA, volA = S.volA, LBn = CONFIG.lb;
   if (t < LBn) return [];
+  const wRet = (typeof CONFIG.weightRet === 'number') ? CONFIG.weightRet : 1;
+  const wVol = 1 - wRet;
   const cand = [];
   for (let j = 0; j < m; j++) {
     const c0 = closeA[(t - LBn) * m + j], c1 = closeA[t * m + j];
-    if (isFinite(c0) && isFinite(c1) && c0 > 0) cand.push({ j, r: c1 / c0 - 1 });
+    if (!(isFinite(c0) && isFinite(c1) && c0 > 0)) continue;
+    let v = 0;
+    if (wVol > 0 && volA) {
+      for (let k = t - LBn; k <= t; k++) v += volA[k * m + j];
+    }
+    cand.push({ j, r: c1 / c0 - 1, v: v });
   }
+  if (wVol <= 0) { cand.sort((a, b) => b.r - a.r); return cand.slice(0, topN); }
   cand.sort((a, b) => b.r - a.r);
+  cand.forEach((c, i) => { c.rankRet = i; });
+  cand.sort((a, b) => b.v - a.v);
+  cand.forEach((c, i) => { c.rankVol = i; });
+  cand.forEach(c => { c.score = c.rankRet * wRet + c.rankVol * wVol; });
+  cand.sort((a, b) => a.score - b.score);
   return cand.slice(0, topN);
 }
 
@@ -3118,6 +3178,7 @@ function runSniperBacktest() {
   CONFIG.defensiveExtend = el.inputDefExt ? el.inputDefExt.value === 'on' : true;
   CONFIG.holdDays = parseInt(el.inputHold.value) || 42;
   CONFIG.startYear = parseInt(el.inputStartYear.value) || 2015;
+  if (el.sliderWeight) CONFIG.weightRet = (parseInt(el.sliderWeight.value, 10) || 0) / 100;
 
   const _S = buildSniperSeries();
   let startIndex = _S.dates.findIndex(d => d.startsWith(String(CONFIG.startYear)));
