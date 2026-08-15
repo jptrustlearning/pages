@@ -4539,46 +4539,61 @@ function renderDDChart() {
   });
 }
 
+// VS S&P500 — เทียบเป็น % รายปี 3 แท่ง (A65)
+//  ① กลยุทธ์      = กำไรปีนั้น ÷ เงินที่ต้องวางจริงปีนั้น (ไม้ซ้อนสูงสุด × ทุนไม้) — ฐานเดียวกับ YEARLY SUMMARY
+//  ② SPY ไม้เดียวกัน = เงาไม้ต่อไม้ (วันเข้า–ออกเดียวกัน ทุนเท่ากัน แต่ซื้อ SPY) ÷ ฐานเดียวกัน → เทียบตรงกับ ①
+//  ③ SPY ถือยาวทั้งปี = ซื้อต้นปีขายปลายปี (ราคาปิดวันทำการแรก → วันทำการสุดท้ายของปีนั้น)
 function renderVsChart() {
   const pnl = state.equityCurve || [];
   const spy = state.spyPnlCurve || [];
   if (pnl.length === 0) return;
+  const PT = CONFIG.perTradeCapital || 1;
+  const ymc = state.yearMaxConc || {};
   const years = [...new Set(pnl.map(e => e.date.substring(0, 4)))].sort();
   const lastOf = (arr, y) => {
     const rel = arr.filter(e => e.date.startsWith(y));
     return rel.length ? rel[rel.length - 1].equity : null;
   };
-  const stratD = [], spyD = [];
+  const stratD = [], spyD = [], bhD = [];
   let prevS = 0, prevM = 0;
+  const uni = state.universeDaily || [];
   years.forEach(y => {
+    const base = (ymc[y] || 0) * PT;
     const es = lastOf(pnl, y);
     const em = lastOf(spy, y);
-    stratD.push(es === null ? 0 : es - prevS);
-    spyD.push(em === null ? 0 : em - prevM);
+    const dS = es === null ? 0 : es - prevS;
+    const dM = em === null ? 0 : em - prevM;
+    stratD.push(base > 0 ? (dS / base) * 100 : null);
+    spyD.push(base > 0 ? (dM / base) * 100 : null);
     if (es !== null) prevS = es;
     if (em !== null) prevM = em;
+    // ③ SPY ถือยาว: ปิดวันทำการแรก → ปิดวันทำการสุดท้ายของปีนั้น
+    const rows = uni.filter(r => r.date.startsWith(y) && isFinite(r.val) && r.val > 0);
+    bhD.push(rows.length > 1 ? (rows[rows.length - 1].val / rows[0].val - 1) * 100 : null);
   });
   const ctx = document.getElementById('vsChart').getContext('2d');
   if (charts.vs) charts.vs.destroy();
-  const fmtUsd = (v) => (v >= 0 ? '+' : '-') + '$' + Math.abs(Math.round(v)).toLocaleString();
+  const fmtPct = (v) => (v === null || !isFinite(v)) ? '—' : (v >= 0 ? '+' : '') + v.toFixed(1) + '%';
   charts.vs = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: years,
       datasets: [
-        { label: 'กลยุทธ์ (P&L รายปี)', data: stratD, backgroundColor: 'rgba(212,175,55,0.85)', borderRadius: 4 },
-        { label: 'SPY ไม้เดียวกัน', data: spyD, backgroundColor: 'rgba(139,125,94,0.55)', borderRadius: 4 }
+        { label: 'กลยุทธ์ (% ของเงินที่ต้องวางปีนั้น)', data: stratD, backgroundColor: 'rgba(212,175,55,0.85)', borderRadius: 4 },
+        { label: 'SPY ไม้เดียวกัน (ฐานเดียวกัน)', data: spyD, backgroundColor: 'rgba(139,125,94,0.55)', borderRadius: 4 },
+        { label: 'SPY ถือยาวทั้งปี (ต้นปี→ปลายปี)', data: bhD, backgroundColor: 'rgba(114,47,55,0.55)', borderRadius: 4 }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: { display: true, labels: { color: '#5C5240', font: { family: 'Anuphan', size: 11 } } },
-        tooltip: { callbacks: { label: (c) => c.dataset.label + ': ' + fmtUsd(c.parsed.y) } }
+        legend: { display: true, labels: { color: '#5C5240', font: { family: 'Anuphan', size: 11 }, boxWidth: 14 } },
+        tooltip: { callbacks: { label: (c) => c.dataset.label + ': ' + fmtPct(c.parsed.y) } }
       },
       scales: {
         x: { grid: { display: false }, ticks: { color: '#8B7D5E', font: { size: 10 } } },
-        y: { grid: { color: 'rgba(139,125,94,0.12)' }, ticks: { color: '#8B7D5E', font: { size: 10 }, callback: (v) => '$' + v.toLocaleString() } }
+        y: { grid: { color: 'rgba(139,125,94,0.12)' },
+             ticks: { color: '#8B7D5E', font: { size: 10 }, callback: (v) => v + '%' } }
       }
     }
   });
