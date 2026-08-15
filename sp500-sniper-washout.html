@@ -2172,6 +2172,20 @@
     </div>
 
     <div class="control-group">
+      <label>MIN GAP — ระยะห่างขั้นต่ำระหว่างไม้</label>
+      <select id="minGapSelect" class="input-box">
+        <option value="0" selected>ไม่กำหนด — ยิงทุกสัญญาณที่ผ่านตัวกรอง</option>
+        <option value="30">1 เดือน (30 วัน)</option>
+        <option value="60">2 เดือน (60 วัน)</option>
+        <option value="90">3 เดือน (90 วัน)</option>
+        <option value="120">4 เดือน (120 วัน)</option>
+        <option value="150">5 เดือน (150 วัน)</option>
+        <option value="180">6 เดือน (180 วัน)</option>
+      </select>
+      <span class="hint">ถ้าสัญญาณใหม่มาเร็วกว่าที่กำหนด <strong>ข้ามไป ไม่เปิดไม้</strong> · นับเป็น<strong>วันปฏิทินรวมเสาร์–อาทิตย์</strong> (1 เดือน = 30 วัน) · ยิ่งห่างมาก = ไม้น้อยลง เงินที่ต้องเตรียมน้อยลง แต่พลาดจังหวะช่วงวิกฤตที่สัญญาณมาถี่ · นับจาก<strong>ไม้ที่เปิดจริงไม้ล่าสุด</strong> ไม่ใช่สัญญาณที่ถูกข้าม</span>
+    </div>
+
+    <div class="control-group">
       <label>PORTFOLIO SIZE — จำนวนหุ้นต่อรอบ</label>
       <div class="top-n-wrapper" style="display:flex; align-items:center; gap:10px;">
         <span style="color:var(--text-muted); font-weight:600;">TOP</span>
@@ -2278,6 +2292,7 @@ let CONFIG = {
   ddClear: -0.02,              // ถือว่าพายุจบเมื่อ DD ฟื้นกลับมาเหนือ −2%
   ddEscalate: true,            // ยังไม่ฟื้นก็ arm ใหม่ได้ ถ้า DD ทำก้นลึกกว่าก้นที่ยิงไปแล้ว (กันพลาดก้น COVID)
   conflWindow: 5,              // ตัวกรองซ้อนชั้น: นับสัญญาณอีกตัวที่เกิดภายในกี่วันเทรด "ย้อนหลัง" (ห้ามมองอนาคต)
+  minGapDays: 0,               // ระยะห่างขั้นต่ำระหว่างไม้ (วันปฏิทิน รวมเสาร์-อาทิตย์) · 0 = ไม่กำหนด
   lb: 126,                     // LB6 = ผลตอบแทน 126 วันเทรด
   weightRet: 1.0,              // น้ำหนัก Return ในการจัดอันดับ (Volume = 1 − weightRet) · default 1.0 = ผลตอบแทนล้วน (A61)
   feeSide: 0.0005,             // ค่าธรรมเนียม 0.05% ต่อข้าง
@@ -2309,6 +2324,7 @@ const DEFAULT_SNIPER = {
   perTradeCapital: 10000,
   topN: 10,
   startYear: 2015,
+  minGapDays: 0,          // ไม่กำหนดระยะห่างขั้นต่ำ (ตรงกับผลวิจัยเดิม)
   weightRet: 100          // % — 100 = ผลตอบแทนล้วน (ตรงกับงานวิจัย A61)
   // holdDays 126 · defensiveExtend true · macroFilter 'off' = ค่าตายตัวใน CONFIG ปรับไม่ได้แล้ว
 };
@@ -2342,6 +2358,8 @@ function getSniperSettings() {
     perTradeCapital: c ? parseFloat(c.value) || DEFAULT_SNIPER.perTradeCapital : DEFAULT_SNIPER.perTradeCapital,
     topN: n ? parseInt(n.value, 10) || DEFAULT_SNIPER.topN : DEFAULT_SNIPER.topN,
     startYear: y ? parseInt(y.value, 10) || DEFAULT_SNIPER.startYear : DEFAULT_SNIPER.startYear,
+    minGapDays: (() => { const g = document.getElementById('minGapSelect');
+      return g ? (parseInt(g.value, 10) || 0) : DEFAULT_SNIPER.minGapDays; })(),
     weightRet: (() => { const w = document.getElementById('weightSlider');
       return w ? parseInt(w.value, 10) : DEFAULT_SNIPER.weightRet; })()
   };
@@ -2355,6 +2373,8 @@ function applySniperSettings(s) {
   if (c && s.perTradeCapital != null) c.value = s.perTradeCapital;
   if (n && s.topN != null) n.value = s.topN;
   if (y && s.startYear != null) y.value = s.startYear;
+  const g = document.getElementById('minGapSelect');
+  if (g && s.minGapDays != null) g.value = s.minGapDays;
   const w = document.getElementById('weightSlider');
   if (w && s.weightRet != null) { w.value = s.weightRet; if (typeof updateWeightsUI === 'function') updateWeightsUI(); }
 }
@@ -2418,6 +2438,7 @@ const el = {
   inputTopN: document.getElementById('topNInput'),
   inputInitCap: document.getElementById('initialCapitalInput'),
   inputStartYear: document.getElementById('startYearSelect'),
+  inputMinGap: document.getElementById('minGapSelect'),
   sliderWeight: document.getElementById('weightSlider'),
   valRet: document.getElementById('val-ret'),
   valVol: document.getElementById('val-vol'),
@@ -2512,6 +2533,7 @@ if (el.sliderWeight) {
 }
 el.inputInitCap.addEventListener('change', runBacktest);
 el.inputStartYear.addEventListener('change', runBacktest);
+if (el.inputMinGap) el.inputMinGap.addEventListener('change', runBacktest);
 
 // --- RANKING WEIGHT SLIDER (โครงจาก sp500-rolling-6m-momentum) ---
 function updateWeightsUI() {
@@ -3100,7 +3122,21 @@ function sniperRun(H, topN, perTrade, startIdx) {
   const closeA = S.closeA, openA = S.openA;
   // สัญญาณที่ใช้ยิงจริง = ผ่านตัวกรองซ้อนชั้น 2 ใน 3 เท่านั้น (A65 · คำสั่ง Joon)
   // S.signals (breadth ล้วน) กับ S.ddSignals ยังคำนวณไว้เพื่อใช้ประกอบตัวกรองและวาดกราฟ BREADTH
-  const signals = S.conflSignals || S.signals;
+  let signals = S.conflSignals || S.signals;
+  // ระยะห่างขั้นต่ำระหว่างไม้ — นับ "วันปฏิทิน" รวมเสาร์อาทิตย์ (1 เดือน = 30 วัน)
+  // นับจากไม้ที่เปิดจริงไม้ล่าสุดเท่านั้น · กรองบนลิสต์เต็มก่อนตัดด้วยปีเริ่ม เพื่อให้เปลี่ยน Start Year
+  // แล้วชุดไม้ที่รอดไม่เปลี่ยนตาม · ดูย้อนหลังอย่างเดียว ไม่มี look-ahead
+  const _minGap = CONFIG.minGapDays | 0;
+  if (_minGap > 0) {
+    const kept = [];
+    let lastMs = -Infinity;
+    for (const t of signals) {
+      const ms = Date.parse(dates[t]);
+      if (!isFinite(ms)) continue;
+      if (kept.length === 0 || (ms - lastMs) / 86400000 >= _minGap) { kept.push(t); lastMs = ms; }
+    }
+    signals = kept;
+  }
   const FEE = CONFIG.feeSide, LBn = CONFIG.lb;
   const t0 = Math.max(startIdx || 0, 0);
 
@@ -3256,6 +3292,7 @@ function runSniperBacktest() {
   CONFIG.startYear = parseInt(el.inputStartYear.value) || 2015;
   if (el.sliderWeight) CONFIG.weightRet = (parseInt(el.sliderWeight.value, 10) || 0) / 100;
   CONFIG.macroFilter = 'off';      // ตายตัว
+  CONFIG.minGapDays = el.inputMinGap ? (parseInt(el.inputMinGap.value, 10) || 0) : 0;
 
   const _S = buildSniperSeries();
   let startIndex = _S.dates.findIndex(d => d.startsWith(String(CONFIG.startYear)));
