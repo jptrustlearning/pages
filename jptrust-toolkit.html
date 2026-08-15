@@ -318,11 +318,11 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
             </div>
             <div class="openbar">
               <div class="modeseg" id="openMode">
-                <button type="button" data-m="auto" class="on">ใช้ราคาเปิดปัจจุบัน</button>
+                <button type="button" data-m="auto" class="on">ใช้ราคาล่าสุด</button>
                 <button type="button" data-m="manual">พิมพ์เอง</button>
               </div>
               <div class="openrow">
-                <label for="openIn">ราคาเปิด (USD)</label>
+                <label for="openIn">ราคาตั้งต้น (USD)</label>
                 <input id="openIn" type="number" step="0.1" inputmode="decimal" placeholder="เช่น 4408.2">
                 <button class="btn gold" id="btnCalc">คำนวณโซน</button>
               </div>
@@ -711,14 +711,29 @@ let PREV_OPEN=null, OPEN_MODE=(window.__openMode||'auto');
 
 /* โหมด auto = ใช้ราคาเปิดล่าสุดจากข้อมูล ช่องกรอกล็อกไว้ อัปเดตเองเมื่อข้อมูลสดมาถึง
    โหมด manual = ผู้ใช้พิมพ์เอง ระบบจะไม่แตะค่าในช่องอีกเลย */
+/* ตลาดทองเปิด 24 ชม. จันทร์-ศุกร์ ไม่มีเวลาเปิดปิดตายตัวแบบหุ้น
+   จึงไม่เดาจากนาฬิกา แต่ดูจากข้อมูลว่ามีแถวของวันนี้แล้วหรือยัง
+     มีแล้ว  = ตลาดเดินอยู่ ใช้ราคาเปิดของวันนี้ (โซนคำนวณจากราคาเปิดตามหลักการ)
+     ยังไม่มี = เสาร์อาทิตย์หรือยังไม่เริ่มวัน ใช้ราคาปิดล่าสุดเป็นราคาตั้งต้นแทน
+                เพราะราคาเปิดของวันก่อนเป็นอดีตไปแล้ว ราคาปิดใกล้จุดที่จะเปิดใหม่มากกว่า */
+function autoBase(){
+  const bkkToday=new Date(Date.now()+7*3600e3).toISOString().slice(0,10);
+  if(LAST.date===bkkToday)
+    return {price:LAST.open, kind:'open',
+            note:`ราคาเปิดของวันนี้ ${thDate(LAST.date)}`};
+  return {price:LAST.close, kind:'close',
+          note:`ตลาดปิดอยู่ · ใช้ราคาปิดของ ${thDate(LAST.date)} เป็นราคาตั้งต้น`};
+}
+
 function applyMode(){
   const inp=document.getElementById('openIn');
   const btn=document.getElementById('btnCalc');
   const hint=document.getElementById('openHint');
   if(OPEN_MODE==='auto'){
-    inp.value=LAST.open; inp.readOnly=true; inp.classList.add('locked');
+    const base=autoBase();
+    inp.value=base.price; inp.readOnly=true; inp.classList.add('locked');
     btn.classList.add('hide');
-    hint.innerHTML=`ราคาเปิดของวันที่ ${thDate(LAST.date)} · อัปเดตให้อัตโนมัติเมื่อมีข้อมูลใหม่`;
+    hint.innerHTML=`${base.note} · อัปเดตให้อัตโนมัติเมื่อมีข้อมูลใหม่`;
   }else{
     inp.readOnly=false; inp.classList.remove('locked');
     btn.classList.remove('hide');
@@ -828,7 +843,7 @@ function calc(){
   /* โหมดอัตโนมัติต้องยึดราคาจากข้อมูลเสมอ ไม่อ่านจากช่องกรอก
      ถ้าช่องกรอกค้างค่าที่ผู้ใช้เคยพิมพ์ไว้ด้วยเหตุใดก็ตาม โซนจะได้ไม่ผิดตาม */
   const inp=document.getElementById('openIn');
-  if(OPEN_MODE==='auto' && LAST && isFinite(LAST.open)) inp.value=LAST.open;
+  if(OPEN_MODE==='auto' && LAST) inp.value=autoBase().price;
   const open=+inp.value;
   if(!isFinite(open)||open<=0){
     document.getElementById('ladder').innerHTML=
@@ -852,7 +867,7 @@ function calc(){
     const hot=bd<=TOL;
     const cls=r.side==='O'?'lv-o':r.side==='R'?'lv-r':'lv-s';
     const rank=KS.indexOf(r.k)+1;
-    const name=r.side==='O'?'ราคาเปิด':(r.side==='R'?'โซนต้าน ':'โซนรับ ')+rank;
+    const name=r.side==='O'?'ราคาตั้งต้น':(r.side==='R'?'โซนต้าน ':'โซนรับ ')+rank;
     h+=`<tr class="${cls}"><td>${name}</td>
         <td class="num">$${f0(r.px)}</td>
         <td>${r.prob==null?'—':`<span class="pbar"><i style="width:${r.prob}%"></i></span><b>${r.prob.toFixed(1)}%</b>`}</td>
