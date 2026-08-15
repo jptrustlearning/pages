@@ -3271,6 +3271,32 @@ function runSniperBacktest() {
   state.extendedCount = [...res.closed, ...res.openLots].filter(t => (t.extendCount || 0) > 0).length;
   state.warChest = Math.max(res.maxConcurrent, 1) * PT;
 
+  // ===== ฐานของ Drawdown (A65 · คำสั่ง Joon) =====
+  // ไม่ใช้ war chest (ซ้อนสูงสุดตลอดกาล) แต่ใช้ "เงินที่วางอยู่บนโต๊ะจริง ณ วันที่กำไรสะสมย่อลึกที่สุด"
+  // หาโดยดู drawdown เป็น "ดอลลาร์" ก่อน (ไม่ต้องมีฐาน ไม่มีทางบิดเบือน) แล้วค่อยไปนับไม้ที่เปิดอยู่วันนั้น
+  // ผลลัพธ์เป็นค่าคงที่ค่าเดียวใช้ตลอดเส้น → ไม่มีปัญหาฐานกระโดดกลางกราฟ
+  {
+    const _iv = [...res.closed.map(t => [t.entryIdx, t.exitIdx]),
+                 ...res.openLots.map(t => [t.entryIdx, _S.n])];
+    const _idxOf = {};
+    _S.dates.forEach((d, i) => { _idxOf[d] = i; });
+    let _pk = -Infinity, _mx = 0, _trDate = null;
+    res.equity.forEach(e => {
+      if (e.equity > _pk) _pk = e.equity;
+      const d = e.equity - _pk;
+      if (d < _mx) { _mx = d; _trDate = e.date; }
+    });
+    let lotsAtTrough = 0;
+    if (_trDate != null) {
+      const ti = _idxOf[_trDate];
+      lotsAtTrough = _iv.filter(([a, b]) => ti >= a && ti < b).length;
+    }
+    state.ddTroughDate = _trDate;
+    state.ddLots = lotsAtTrough;
+    state.ddUsdWorst = _mx;
+    state.ddBase = (lotsAtTrough > 0 ? lotsAtTrough : Math.max(res.maxConcurrent, 1)) * PT;
+  }
+
   // ── SPY shadow: ไม้เดียวกันทุกไม้ (วันเข้า–ออก + ทุนเท่ากัน) แต่ซื้อ SPY แทน ──
   const spyPx = (d, pref) => {
     const r = state.marketData[d] && state.marketData[d]['SPY'];
@@ -3467,11 +3493,12 @@ function calculateStats() {
   const annOnChest = Math.pow(1 + totalPnl / warChest, 1 / years) - 1;
   const consistency = sdTrade > 0 ? avgTrade / sdTrade : 0;
 
-  // ===== Max DD — แบบ Weekly (computeEquityDDPct): peak-to-trough ของ curve มูลค่า
-  //       curve มูลค่า = งบตั้งต้น (war chest) + กำไรสะสม — ตรงกับ DD chart =====
+  // ===== Max DD — peak-to-trough ของ curve มูลค่า
+  //       curve มูลค่า = เงินบนโต๊ะจริง ณ วันที่ DD ลึกสุด (ddBase) + กำไรสะสม — ตรงกับ DD chart =====
+  const ddBase = state.ddBase || warChest;
   let peak = -Infinity, maxDD = 0, maxDDusd = 0, peakUsd = 0;
   curve.forEach(e => {
-    const v = warChest + e.equity;
+    const v = ddBase + e.equity;
     if (v > peak) peak = v;
     const dd = (v - peak) / peak;
     if (dd < maxDD) { maxDD = dd; maxDDusd = v - peak; }
@@ -3606,7 +3633,7 @@ function calculateStats() {
   setTxt('kpi-maxdd', fmt(maxDD));
   setTxt('stat-ma-dd', fmt(worstSpy));
   const riskNarr = $id('rssRisk');
-  if (riskNarr) riskNarr.innerHTML = `ไม้แย่สุด <strong class="text-red">${fmt(worst)}</strong> (≈ ${usd(worst * PT)} ต่อไม้ $${PT.toLocaleString()}) &middot; กำไรสะสมเคยย่อจากพีคหนักสุด <strong class="text-red">${usd(maxDDusd)}</strong> (${fmt(maxDD)} ของเงินสดสูงสุด $${warChest.toLocaleString()} ที่ต้องเตรียมช่วงถือซ้อน ${maxConc} ไม้) — ต้องเตรียมใจรับได้ถ้าจะใช้กลยุทธ์นี้`;
+  if (riskNarr) riskNarr.innerHTML = `ไม้แย่สุด <strong class="text-red">${fmt(worst)}</strong> (≈ ${usd(worst * PT)} ต่อไม้ $${PT.toLocaleString()}) &middot; กำไรสะสมเคยย่อจากพีคหนักสุด <strong class="text-red">${usd(maxDDusd)}</strong> = <strong class="text-red">${fmt(maxDD)}</strong> ของมูลค่าพอร์ต ณ จุดสูงสุด &middot; คิดบนเงินที่วางอยู่จริง <strong>$${ddBase.toLocaleString()}</strong> (${state.ddLots || 0} ไม้บนโต๊ะ ณ ${state.ddTroughDate || '—'}) &middot; ช่วงสัญญาณถี่สุดต้องเตรียม $${warChest.toLocaleString()} (${maxConc} ไม้) — ต้องเตรียมใจรับได้ถ้าจะใช้กลยุทธ์นี้`;
 
   // ── Statistics tab (stat-*) ──
   setTxt('stat-sharpe', consistency.toFixed(2));
@@ -4414,9 +4441,9 @@ function renderDDChart() {
   const ctx = document.getElementById('ddChart').getContext('2d');
   if(charts.dd) charts.dd.destroy();
   
-  // Calculate DD — ฐาน = เงินสดสูงสุดที่ต้องเตรียม (warChest) + กำไรสะสม
+  // Calculate DD — ฐาน = เงินบนโต๊ะจริง ณ วันที่ DD ลึกสุด (state.ddBase) + กำไรสะสม
   let peak = -Infinity;
-  const chest = state.warChest || 1;
+  const chest = state.ddBase || state.warChest || 1;
   const dds = state.equityCurve.map(e => {
     const v = chest + e.equity;
     if (v > peak) peak = v;
