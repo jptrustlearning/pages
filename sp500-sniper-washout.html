@@ -3026,6 +3026,9 @@ function buildSniperSeries() {
   // 4) ยิงแล้วต้องรอ dd ฟื้นเหนือ ddClear ก่อน arm ใหม่ — ยกเว้น dd ทำก้นลึกกว่าก้นที่ยิงไป (ddEscalate)
   // ทุกอย่างใช้ข้อมูลถึงปิดวัน i เท่านั้น → ไม่มี look-ahead
   const ddSignals = [];
+  // เก็บ dd รายวัน + สถานะ machine ณ วันสุดท้าย ไว้ให้การ์ด SNIPER STATUS อ่าน (A66)
+  const ddArr = new Float64Array(n).fill(NaN);
+  let ddLastArmed = false, ddLastPeakB = 0, ddLastTrough = 0;
   {
     const spyC = new Float64Array(n).fill(NaN);
     for (let i = 0; i < n; i++) {
@@ -3039,6 +3042,7 @@ function buildSniperSeries() {
       for (let k = i - Wd + 1; k <= i; k++) if (isFinite(spyC[k]) && spyC[k] > mx) mx = spyC[k];
       if (!(mx > 0) || !isFinite(spyC[i])) continue;
       const d = spyC[i] / mx - 1;
+      ddArr[i] = d;
       if (d >= CONFIG.ddClear) { cleared = true; lastTrough = 0; }
       if (!armed) {
         const canArm = d <= CONFIG.ddArm &&
@@ -3052,6 +3056,7 @@ function buildSniperSeries() {
         } else if (d >= CONFIG.ddClear) { armed = false; }
       }
     }
+    ddLastArmed = armed; ddLastPeakB = bAt; ddLastTrough = trough;
   }
 
   // ============================================================
@@ -3080,8 +3085,9 @@ function buildSniperSeries() {
   }
 
   state._sniper = { n, m, offset, dates, tickers, closeA, openA, volA, breadth, signals, ddSignals,
-                    conflSignals, conflReasons,
-                    lastArmed: armed, lastPeak: peakB, lastRefPeak: refPeak, macroBenign };
+                    conflSignals, conflReasons, ddArr,
+                    lastArmed: armed, lastPeak: peakB, lastRefPeak: refPeak, macroBenign,
+                    ddLastArmed: ddLastArmed, ddLastPeakB: ddLastPeakB, ddLastTrough: ddLastTrough };
   return state._sniper;
 }
 
@@ -3405,31 +3411,65 @@ function runSniperBacktest() {
   state.externalCapitalTimeline = state.tradeLog.map((t, i) => ({ date: t.date, cumulativeDeployed: (i + 1) * PT }));
 
   // =========================================================
-  // PENDING STATUS — โหมดยิงทุกสัญญาณ: ไม่มีเงื่อนไขรอไม้เก่า
+  // SNIPER STATUS (A66) — การ์ดสถานะโชว์ตลอด ไม่ใช่โชว์เฉพาะตอนมีสัญญาณ
+  //   'fired' = สัญญาณยิงแล้ว รอเข้าที่ราคาเปิดวันถัดไป (เขียว)
+  //   'watch' = armed จาก breadth ≥ 19% **หรือ** DD ≤ ddArm — กำลังวัดความหนักของรอบ (แดง · โชว์รายชื่อตั้งแต่ armed)
+  //   'calm'  = No Shock — ยังไม่มีพายุ โชว์สถิติ 3 เงื่อนไข + MIN GAP
+  // ทุกค่าอ่านจาก "วันข้อมูลล่าสุด" เท่านั้น — ไม่มี look-ahead
+  // ⚠️ armed ≠ จะได้เข้าไม้ · การเข้าจริงต้องผ่านตัวกรอง 2 ใน 3 ณ วันสัญญาณ + MIN GAP
   // =========================================================
   state.pendingSignal = null;
+  state.sniperStatus = null;
   try {
     const lastIdx = _S.n - 1;
     const lastDate = _S.dates[lastIdx];
     const preview = (t) => sniperRankLB6(_S, t, CONFIG.topN)
       .map(p => ({ ticker: _S.tickers[p.j], ret: p.r, score: p.r }));
+
+    // ระยะห่างจากไม้ที่เปิดจริงล่าสุด (วันปฏิทิน) เทียบ MIN GAP — ไม่ใช่จากสัญญาณที่ถูกข้าม
+    let lastEntryDate = null;
+    for (const l of [...res.closed, ...res.openLots]) {
+      if (l && l.entryDate && (!lastEntryDate || l.entryDate > lastEntryDate)) lastEntryDate = l.entryDate;
+    }
+    const gapDays = lastEntryDate ? Math.round((Date.parse(lastDate) - Date.parse(lastEntryDate)) / 86400000) : null;
+    const minGap = CONFIG.minGapDays | 0;
+    const gapLeft = (minGap > 0 && gapDays != null) ? Math.max(0, minGap - gapDays) : 0;
+
+    const bArmed = !!_S.lastArmed, dArmed = !!_S.ddLastArmed;
+    const ddNow = (_S.ddArr && isFinite(_S.ddArr[lastIdx])) ? _S.ddArr[lastIdx] : null;
+
     if (res.firePending != null) {
       state.pendingSignal = {
         mode: 'fired', signalDate: _S.dates[res.firePending],
         breadthNow: _S.breadth[lastIdx], capital: PT,
         openCount: res.openLots.length, picks: preview(res.firePending)
       };
-    } else if (_S.lastArmed) {
+    } else if (bArmed || dArmed) {
+      // พีคของรอบ: ใช้ breadth machine ก่อน (เส้นยิงชัดที่สุด) · ถ้า armed จาก DD อย่างเดียวใช้พีค breadth ของรอบ DD
+      const peak = bArmed ? _S.lastPeak : (_S.ddLastPeakB || 0);
       state.pendingSignal = {
         mode: 'armed', signalDate: lastDate,
-        peak: _S.lastPeak, fireLevel: _S.lastPeak / 2,
+        peak: peak, fireLevel: peak / 2,
         breadthNow: _S.breadth[lastIdx], capital: PT,
         openCount: res.openLots.length, picks: preview(lastIdx)
       };
     }
+
+    state.sniperStatus = {
+      mode: (res.firePending != null) ? 'fired' : ((bArmed || dArmed) ? 'watch' : 'calm'),
+      asOf: lastDate,
+      breadthNow: _S.breadth[lastIdx], breadthArm: CONFIG.breadthArm, breadthArmed: bArmed,
+      ddNow: ddNow, ddArm: CONFIG.ddArm, ddArmed: dArmed, ddTrough: _S.ddLastTrough || 0,
+      macroBenign: !!(_S.macroBenign && _S.macroBenign[lastIdx]),
+      peak: state.pendingSignal ? state.pendingSignal.peak : 0,
+      fireLevel: state.pendingSignal ? state.pendingSignal.fireLevel : 0,
+      lastEntryDate: lastEntryDate, gapDays: gapDays, minGap: minGap, gapLeft: gapLeft,
+      openCount: res.openLots.length, capital: PT
+    };
   } catch (err) {
-    console.warn('Pending status computation failed:', err);
+    console.warn('Sniper status computation failed:', err);
     state.pendingSignal = null;
+    state.sniperStatus = null;
   }
 
   calculateStats();
@@ -4269,59 +4309,120 @@ function renderTradeLog() {
 
   const logs = [...state.tradeLog];  // in entry order
 
-  // ===== Pending signal card (สถานะ armed / fired ณ วันข้อมูลล่าสุด) =====
+  // ===== SNIPER STATUS card (A66) — โชว์ตลอด 3 โหมด: calm / watch / fired =====
+  // calm  = No Shock ยังไม่มีพายุ (ครีม-ทอง) · watch = armed กำลังวัดรอบขาลง (แดง · มีรายชื่อ)
+  // fired = สัญญาณยิงแล้ว รอเข้าเปิดวันถัดไป (เขียว)
+  // ⚠️ armed ไม่ได้แปลว่าจะเข้าไม้ — ต้องผ่านตัวกรอง 2 ใน 3 ณ วันสัญญาณ + MIN GAP ด้วย
   try {
-    if (state.pendingSignal && (!window._tradeLogPage || window._tradeLogPage === 1)) {
+    const st = state.sniperStatus;
+    if (st && (!window._tradeLogPage || window._tradeLogPage === 1)) {
       const ps = state.pendingSignal;
+      const isFired = st.mode === 'fired';
+      const isWatch = st.mode === 'watch';
+      const TH = {
+        fired: { c: '#2E9F5F', b: 'rgba(46,159,95,0.5)',  bg: 'rgba(46,159,95,0.10)',  glow: '0 0 24px rgba(91,196,142,0.18)', grad: 'linear-gradient(135deg, rgba(91,196,142,0.08), rgba(255,254,248,1))', badge: 'SIGNAL FIRED' },
+        watch: { c: '#C14545', b: 'rgba(193,69,69,0.55)', bg: 'rgba(193,69,69,0.10)',  glow: '0 0 24px rgba(193,69,69,0.20)',  grad: 'linear-gradient(135deg, rgba(193,69,69,0.10), rgba(255,254,248,1))', badge: 'WATCH' },
+        calm:  { c: '#8B6914', b: 'rgba(212,175,55,0.45)', bg: 'rgba(212,175,55,0.10)', glow: 'none',                            grad: 'linear-gradient(135deg, rgba(212,175,55,0.07), rgba(255,254,248,1))', badge: 'NO SHOCK' }
+      }[st.mode] || {};
+
       const card = document.createElement('div');
       card.className = 'trade-card';
-      card.style.borderColor = 'rgba(46,159,95,0.5)';
-      card.style.background = 'linear-gradient(135deg, rgba(91,196,142,0.08), rgba(255,254,248,1))';
-      card.style.boxShadow = '0 0 24px rgba(91,196,142,0.18)';
+      card.style.borderColor = TH.b;
+      card.style.background = TH.grad;
+      card.style.boxShadow = TH.glow;
 
-      const picks = ps.picks || [];
-      const perStock = picks.length > 0 ? ps.capital / picks.length : 0;
-      const isFired = ps.mode === 'fired';
-      const badgeTxt = isFired ? 'SIGNAL FIRED' : 'ARMED';
-      const line1 = isFired
-        ? 'สัญญาณยิงแล้ว — เข้าซื้อที่<strong>ราคาเปิดวันทำการถัดไป</strong>'
-        : 'ตลาดกำลังล้าง — Breadth พีค <strong>' + ps.peak.toFixed(1) + '%</strong> ตอนนี้ <strong>' + ps.breadthNow.toFixed(1) + '%</strong> · จะยิงเมื่อหดลง ≤ <strong>' + ps.fireLevel.toFixed(1) + '%</strong>';
-      const openNote = (ps.openCount > 0)
-        ? '<div class="trade-summary" style="color:var(--gold-deep);">ถืออยู่ ' + ps.openCount + ' ไม้ — โหมดยิงทุกสัญญาณ: ไม้ใหม่ใช้เงินสดก้อนใหม่ ไม่ต้องรอไม้เดิมขาย</div>'
-        : '';
-      const previewNote = isFired
-        ? 'รายชื่อจากราคาปิดวันสัญญาณ (ตัดสินแล้ว)'
-        : 'รายชื่อเต็ง ณ ราคาปิดล่าสุด — รายชื่อจริงจะตัดสินที่ close ของวันสัญญาณ';
+      const pct = (v, d) => (v == null || !isFinite(v)) ? '—' : (v >= 0 ? '' : '−') + Math.abs(v).toFixed(d === undefined ? 1 : d) + '%';
 
-      const headerHtml = '<div class="trade-header"><div>' +
-        '<div class="trade-date" style="color:#2E9F5F;">SNIPER STATUS — ' + _fmtTradeDate(ps.signalDate) +
-        '<span style="display:inline-block;background:rgba(46,159,95,0.15);color:#2E9F5F;border:1px solid rgba(46,159,95,0.4);padding:2px 10px;border-radius:5px;font-family:\'Cinzel\',\'Anuphan\',serif;font-size:0.62rem;font-weight:700;letter-spacing:1.5px;margin-left:6px;">' + badgeTxt + '</span>' +
-        '</div>' +
-        '<div class="trade-summary">' + line1 + '</div>' +
-        openNote +
-        '</div>' +
-        '<button class="trade-details-btn" onclick="downloadDetailsPdf(event, null, null, true)" title="ดาวน์โหลดรายละเอียดเป็น PDF">' +
-          '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>Details PDF' +
-        '</button>' +
+      // --- แถวเงื่อนไข 3 ข้อ (ตัวกรอง 2 ใน 3) ---
+      const chip = (num, name, valTxt, thrTxt, on) =>
+        '<div style="flex:1 1 148px;min-width:132px;border:1px solid ' + (on ? TH.b : 'var(--border)') + ';background:' + (on ? TH.bg : 'rgba(255,254,248,0.55)') + ';border-radius:9px;padding:8px 10px;">' +
+          '<div style="font-family:\'Cinzel\',\'Anuphan\',serif;font-size:.58rem;letter-spacing:1.1px;font-weight:700;color:' + (on ? TH.c : 'var(--text-label)') + ';">' + num + ' ' + name + (on ? ' ✓' : '') + '</div>' +
+          '<div style="font-family:\'DM Serif Display\',serif;font-size:1.02rem;line-height:1.3;color:' + (on ? TH.c : 'var(--text-main)') + ';">' + valTxt + '</div>' +
+          '<div style="font-size:.64rem;color:var(--text-muted);line-height:1.35;">' + thrTxt + '</div>' +
         '</div>';
 
-      const badges = picks.map(p => {
-        const retPct = (p.ret * 100).toFixed(1);
-        return '<span class="stock-badge" style="border-color:rgba(212,175,55,0.4);color:var(--gold-deep);background:rgba(212,175,55,0.08);">' +
-          p.ticker + ' ' + retPct + '%</span>';
-      }).join('');
+      const chipsHtml = '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">' +
+        chip('①', 'BREADTH', pct(st.breadthNow), 'เข้าโซนเมื่อ ≥ ' + st.breadthArm.toFixed(1) + '%', st.breadthArmed) +
+        chip('②', 'DRAWDOWN', pct(st.ddNow == null ? null : st.ddNow * 100), 'เข้าโซนเมื่อ ≤ ' + pct(st.ddArm * 100), st.ddArmed) +
+        chip('③', 'MACRO', st.macroBenign ? 'SPY ติด top-2' : 'SPY หลุด top-2', st.macroBenign ? 'ตลาดยังปกติ' : 'นับเป็นสัญญาณสมทบ', !st.macroBenign) +
+      '</div>';
 
-      const sectionHtml = '<div class="trade-section">' +
-        '<div class="trade-section-label mom">TOP ' + picks.length + ' ตาม LB6 ' +
-        '<span class="alloc-info">· งบ $' + Math.round(ps.capital).toLocaleString() + ' · ~$' + perStock.toFixed(0) + '/ตัว · ' + previewNote + '</span>' +
-        '</div><div>' + badges + '</div></div>';
+      // --- แถบความคืบหน้าสู่เส้นยิง (เฉพาะโหมด watch) ---
+      let barHtml = '';
+      if (isWatch && st.peak > 0) {
+        const span = st.peak - st.fireLevel;
+        const prog = span > 0 ? Math.max(0, Math.min(100, ((st.peak - st.breadthNow) / span) * 100)) : 0;
+        barHtml = '<div style="margin-top:12px;">' +
+          '<div style="display:flex;justify-content:space-between;font-size:.66rem;color:var(--text-muted);margin-bottom:5px;">' +
+            '<span>พีครอบนี้ <strong style="color:' + TH.c + ';">' + st.peak.toFixed(1) + '%</strong></span>' +
+            '<span>ตอนนี้ <strong style="color:' + TH.c + ';">' + st.breadthNow.toFixed(1) + '%</strong></span>' +
+            '<span>เส้นยิง ≤ <strong style="color:' + TH.c + ';">' + st.fireLevel.toFixed(1) + '%</strong></span>' +
+          '</div>' +
+          '<div style="height:7px;border-radius:4px;background:rgba(193,69,69,0.14);overflow:hidden;">' +
+            '<div style="height:100%;width:' + prog.toFixed(1) + '%;background:linear-gradient(90deg,#C14545,#D4AF37);"></div>' +
+          '</div>' +
+          '<div style="font-size:.64rem;color:var(--text-muted);margin-top:5px;">ฟื้นจากพีคมาแล้ว <strong>' + prog.toFixed(0) + '%</strong> ของระยะทางสู่เส้นยิง</div>' +
+        '</div>';
+      }
 
-      card.innerHTML = headerHtml + sectionHtml;
+      // --- MIN GAP ---
+      let gapTxt;
+      if (!st.minGap) {
+        gapTxt = 'MIN GAP ไม่กำหนด — ยิงได้ทุกสัญญาณที่ผ่านตัวกรอง';
+      } else if (st.lastEntryDate == null) {
+        gapTxt = 'MIN GAP ' + st.minGap + ' วัน · ยังไม่มีไม้ในช่วงที่เลือก';
+      } else if (st.gapLeft > 0) {
+        gapTxt = 'ไม้ล่าสุด ' + _fmtTradeDate(st.lastEntryDate) + ' · ผ่านมา ' + st.gapDays + ' วัน · MIN GAP ' + st.minGap + ' วัน — <strong style="color:var(--red);">ต้องรออีก ' + st.gapLeft + ' วัน</strong>';
+      } else {
+        gapTxt = 'ไม้ล่าสุด ' + _fmtTradeDate(st.lastEntryDate) + ' · ผ่านมา ' + st.gapDays + ' วัน · MIN GAP ' + st.minGap + ' วัน — <strong style="color:var(--green);">พ้นแล้ว</strong>';
+      }
+      const openTxt = st.openCount > 0 ? 'ถืออยู่ ' + st.openCount + ' ไม้ · ' : '';
+      const footHtml = '<div style="margin-top:10px;font-size:.68rem;color:var(--text-muted);line-height:1.6;border-top:1px dashed var(--border);padding-top:8px;">' +
+        openTxt + gapTxt + '<br>เข้าไม้จริงต้องเข้าเงื่อนไข <strong>2 ใน 3</strong> ณ วันสัญญาณ · วันเข้าถูกกำหนดโดยตลาด ไม่ใช่ปฏิทิน' +
+      '</div>';
+
+      // --- หัวการ์ด ---
+      const line1 = isFired
+        ? 'สัญญาณยิงแล้ว — เข้าซื้อที่<strong>ราคาเปิดวันทำการถัดไป</strong>'
+        : (isWatch
+            ? 'ตลาดเข้าโซนล้างพอร์ตแล้ว — กำลังวัดความหนักของรอบ (' +
+              [st.breadthArmed ? 'breadth' : null, st.ddArmed ? 'drawdown' : null].filter(Boolean).join(' + ') + ')'
+            : 'ยังไม่มีพายุ — ตลาดยังไม่เข้าโซนที่กลยุทธ์นี้รอ จึงยังไม่มีวันเข้าไม้ล่วงหน้าให้บอก');
+
+      const pdfBtn = ps ? ('<button class="trade-details-btn" onclick="downloadDetailsPdf(event, null, null, true)" title="ดาวน์โหลดรายละเอียดเป็น PDF">' +
+          '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>Details PDF' +
+        '</button>') : '';
+
+      const headerHtml = '<div class="trade-header"><div>' +
+        '<div class="trade-date" style="color:' + TH.c + ';">SNIPER STATUS — ' + _fmtTradeDate(st.asOf) +
+        '<span style="display:inline-block;background:' + TH.bg + ';color:' + TH.c + ';border:1px solid ' + TH.b + ';padding:2px 10px;border-radius:5px;font-family:\'Cinzel\',\'Anuphan\',serif;font-size:0.62rem;font-weight:700;letter-spacing:1.5px;margin-left:6px;">' + TH.badge + '</span>' +
+        '</div>' +
+        '<div class="trade-summary">' + line1 + '</div>' +
+        '</div>' + pdfBtn + '</div>';
+
+      // --- รายชื่อหุ้น (โหมด watch + fired · คำสั่ง Joon: โชว์ตั้งแต่ armed) ---
+      let sectionHtml = '';
+      const picks = (ps && ps.picks) ? ps.picks : [];
+      if (picks.length > 0) {
+        const perStock = st.capital / picks.length;
+        const previewNote = isFired
+          ? 'รายชื่อจากราคาปิดวันสัญญาณ (ตัดสินแล้ว)'
+          : 'รายชื่อเต็ง ณ ราคาปิดล่าสุด — รายชื่อจริงจะตัดสินที่ close ของวันสัญญาณ ยังเปลี่ยนได้';
+        const badges = picks.map(p => '<span class="stock-badge" style="border-color:rgba(212,175,55,0.4);color:var(--gold-deep);background:rgba(212,175,55,0.08);">' +
+          p.ticker + ' ' + (p.ret * 100).toFixed(1) + '%</span>').join('');
+        sectionHtml = '<div class="trade-section">' +
+          '<div class="trade-section-label mom">TOP ' + picks.length + ' ตาม LB6 ' +
+          '<span class="alloc-info">· งบ $' + Math.round(st.capital).toLocaleString() + ' · ~$' + perStock.toFixed(0) + '/ตัว · ' + previewNote + '</span>' +
+          '</div><div>' + badges + '</div></div>';
+      }
+
+      card.innerHTML = headerHtml + chipsHtml + barHtml + footHtml + sectionHtml;
       container.appendChild(card);
     }
   } catch (err) {
-    console.warn('Pending card render failed:', err);
+    console.warn('Sniper status card render failed:', err);
   }
+
 
   const records = logs.map((log) => {
     const closed = (state.closedLots || []).find(cl => cl.entryDate === log.date);
