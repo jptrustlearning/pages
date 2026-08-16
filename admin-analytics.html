@@ -91,6 +91,11 @@ select{font-family:var(--f-b);font-size:12.5px;padding:5px 9px;border-radius:9px
 .sbar{flex:1;height:6px;border-radius:3px;background:rgba(212,175,55,.15);overflow:hidden;max-width:150px}
 .sbar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-d))}
 .foot{font-size:11.5px;color:var(--muted);font-weight:300;padding:6px 0 30px;line-height:1.7}
+.tabs{display:flex;gap:8px;margin:22px 0 2px;flex-wrap:wrap}
+.tabs button{border:1px solid var(--line);background:var(--card);color:var(--muted);
+  font-family:var(--f-b);font-size:13.5px;font-weight:600;padding:9px 18px;border-radius:12px;cursor:pointer;transition:.16s}
+.tabs button.on{background:linear-gradient(135deg,var(--maroon),var(--maroon2));color:var(--gold-l);border-color:transparent}
+.panel{display:none}.panel.on{display:block}
 
 @media(max-width:1000px){.kpis{grid-template-columns:repeat(3,1fr)}.row2{grid-template-columns:1fr}}
 @media(max-width:560px){.kpis{grid-template-columns:repeat(2,1fr)}.kpi .v{font-size:25px}.rng{margin-left:0;width:100%}.rng button{flex:1}}
@@ -127,6 +132,12 @@ select{font-family:var(--f-b);font-size:12.5px;padding:5px 9px;border-radius:9px
   </div>
 
   <div class="wrap">
+    <div class="tabs" id="tabs">
+      <button data-t="pub" class="on">หน้าสาธารณะ · Tool &amp; Kit</button>
+      <button data-t="mem">สมาชิก · ในแอพ</button>
+    </div>
+
+  <div class="panel on" id="panel-pub">
     <div class="kpis" id="kpis"></div>
 
     <div class="card">
@@ -166,6 +177,49 @@ select{font-family:var(--f-b);font-size:12.5px;padding:5px 9px;border-radius:9px
       เวลาเฉลี่ย = เวลาที่แท็บเปิดอยู่จริง (สลับไปแท็บอื่นทิ้งไว้ไม่นับ) · คนไม่ซ้ำนับจาก visitor_id ใน localStorage ของเครื่องนั้น
       เคลียร์เบราว์เซอร์แล้วจะนับเป็นคนใหม่ · วันที่อิงเวลาไทย
     </div>
+  </div><!-- /panel-pub -->
+
+  <div class="panel" id="panel-mem">
+    <div class="kpis" id="kpisMem"></div>
+
+    <div class="card">
+      <div class="ch"><h2>สมาชิกที่เปิดแอพรายวัน</h2><span class="note" id="dNoteMem"></span></div>
+      <div class="plot"><canvas id="cvMem"></canvas></div>
+    </div>
+
+    <div class="row2">
+      <div class="card">
+        <div class="ch"><h2>แท็บที่เข้า</h2><span class="note">bottom nav</span></div>
+        <div class="tw"><table style="min-width:320px">
+          <thead><tr><th>แท็บ</th><th class="r">ครั้ง</th><th class="r">คน</th><th class="r">อยู่นาน</th></tr></thead>
+          <tbody id="tbScreen"><tr><td colspan="4" class="loading">กำลังโหลด…</td></tr></tbody>
+        </table></div>
+      </div>
+      <div class="card">
+        <div class="ch"><h2>เครื่องมือที่เปิด</h2><span class="note">หน้าใน iframe</span></div>
+        <div class="tw"><table style="min-width:340px">
+          <thead><tr><th>หน้า</th><th class="r">ครั้ง</th><th class="r">คน</th><th class="r">อยู่นาน</th></tr></thead>
+          <tbody id="tbTool"><tr><td colspan="4" class="loading">กำลังโหลด…</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><h2>เหตุการณ์อื่น</h2><span class="note">ต่ออายุ · แจ้งเตือน · ล็อกแอพ</span></div>
+      <div class="tw"><table style="min-width:320px">
+        <thead><tr><th>เหตุการณ์</th><th class="r">ครั้ง</th><th class="r">คน</th></tr></thead>
+        <tbody id="tbEvent"><tr><td colspan="3" class="loading">กำลังโหลด…</td></tr></tbody>
+      </table></div>
+    </div>
+
+    <div class="foot">
+      ข้อมูลจากตาราง <b>user_events</b> ที่ฝังใน member-dashboard ตั้งแต่ A6 — ผูกกับ user_id จริง
+      · <b>"อยู่นาน" เป็นค่าประมาณ ไม่ใช่ค่าวัด</b>: user_events ไม่ได้เก็บเวลา จึงคำนวณจากมัธยฐานของช่วงห่างถึง
+      event ถัดไปของคนเดียวกัน และตัดช่วงที่ห่างเกิน 15 นาทีทิ้ง (ถือว่าวางเครื่องไป) — หน้าสุดท้ายก่อนปิดแอพจะไม่ถูกนับ
+      ตัวเลขจึงเอนไปทางต่ำกว่าความจริง
+    </div>
+  </div><!-- /panel-mem -->
+
   </div>
 </div>
 
@@ -173,7 +227,7 @@ select{font-family:var(--f-b);font-size:12.5px;padding:5px 9px;border-radius:9px
 const SB  = 'https://rcdukwwcbyryauhqlzmx.supabase.co';
 const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZHVrd3djYnlyeWF1aHFsem14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MTY0MDAsImV4cCI6MjA4NTQ5MjQwMH0.rprPmudJYyb6dyhXb9Z9GrtQWEeIX99A2Wrj55PvS54';
 
-let DAYS = 30, TOKEN = '', chart = null;
+let DAYS = 30, TOKEN = '', chart = null, chartMem = null, TAB = 'pub';
 
 const $  = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
@@ -227,7 +281,80 @@ $('rng').addEventListener('click', e => {
 });
 
 /* ---------- loaders ---------- */
-function loadAll(){ loadOverview(); loadDaily(); loadPages(); loadClicks(); loadSources(); }
+function loadAll(){
+  if (TAB === 'pub'){ loadOverview(); loadDaily(); loadPages(); loadClicks(); loadSources(); }
+  else { loadMemOverview(); loadMemDaily(); loadMemBreakdown(); }
+}
+
+document.getElementById('tabs').addEventListener('click', e => {
+  const b = e.target.closest('button[data-t]'); if (!b) return;
+  Array.prototype.forEach.call(document.getElementById('tabs').children, x => x.classList.remove('on'));
+  b.classList.add('on'); TAB = b.dataset.t;
+  document.getElementById('panel-pub').classList.toggle('on', TAB === 'pub');
+  document.getElementById('panel-mem').classList.toggle('on', TAB === 'mem');
+  loadAll();
+});
+
+/* ---------- ฝั่งสมาชิก ---------- */
+async function loadMemOverview(){
+  try{
+    const r = (await rpc('analytics_members_overview', { p_token: TOKEN, p_days: DAYS }))[0] || {};
+    $('kpisMem').innerHTML =
+      kpi('k1','MEMBERS',   nf(r.members),      'คนที่เข้าใช้') +
+      kpi('k2','APP OPENS', nf(r.app_opens),    'เปิดแอพ') +
+      kpi('k3','SCREENS',   nf(r.screen_views), 'เปลี่ยนแท็บ') +
+      kpi('k4','TOOLS',     nf(r.tool_opens),   'เปิดเครื่องมือ') +
+      kpi('k6','EVENTS',    nf(r.events),       'รวมทุกเหตุการณ์');
+  }catch(e){ $('kpisMem').innerHTML = '<div class="empty">โหลดไม่สำเร็จ: '+esc(e.message)+'</div>'; }
+}
+
+async function loadMemDaily(){
+  try{
+    const rows = await rpc('analytics_members_daily', { p_token: TOKEN, p_days: DAYS });
+    $('dNoteMem').textContent = rows.length ? (rows.length + ' วันที่มีข้อมูล') : 'ยังไม่มีข้อมูล';
+    if (chartMem){ chartMem.destroy(); chartMem = null; }
+    if (!rows.length) return;
+    if (typeof Chart === 'undefined'){ $('dNoteMem').textContent = 'โหลดกราฟไม่ได้ (chart.js)'; return; }
+    chartMem = new Chart($('cvMem'), {
+      type:'line',
+      data:{ labels: rows.map(r => r.d.slice(5)),
+        datasets:[
+          { label:'เปิดแอพ', data: rows.map(r => r.opens), borderColor:'#D4AF37',
+            backgroundColor:'rgba(212,175,55,.16)', fill:true, tension:.3, borderWidth:2, pointRadius:0 },
+          { label:'สมาชิกไม่ซ้ำ', data: rows.map(r => r.members), borderColor:'#722F37',
+            backgroundColor:'transparent', tension:.3, borderWidth:2, pointRadius:0 }
+        ]},
+      options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
+        plugins:{ legend:{ labels:{ font:{family:'Anuphan'}, boxWidth:12 } } },
+        scales:{ x:{ grid:{display:false}, ticks:{ font:{family:'Anuphan',size:10}, maxTicksLimit:12 } },
+                 y:{ beginAtZero:true, grid:{color:'rgba(212,175,55,.14)'},
+                     ticks:{ font:{family:'Anuphan',size:10}, precision:0 } } } }
+    });
+  }catch(e){ $('dNoteMem').textContent = 'โหลดไม่สำเร็จ'; }
+}
+
+const SCR = { home:'หน้าแรก', lab:'Lab', more:'More', news:'ข่าว', roadmap:'Roadmap', iframe:'เปิดเครื่องมือ' };
+
+async function loadMemBreakdown(){
+  const set = (id, html) => { $(id).innerHTML = html; };
+  try{
+    const rows = await rpc('analytics_members_breakdown', { p_token: TOKEN, p_days: DAYS });
+    const pick = k => rows.filter(r => r.kind === k);
+
+    const rowsHtml = (g, cols) => g.length ? g.map(r => `<tr>
+        <td>${esc(SCR[r.name] || r.name)}</td>
+        <td class="r">${nf(r.n)}</td><td class="r">${nf(r.members)}</td>
+        ${cols === 4 ? `<td class="r">${dur(r.median_sec)}</td>` : ''}</tr>`).join('')
+      : `<tr><td colspan="${cols}" class="empty">ยังไม่มีข้อมูลในช่วงนี้</td></tr>`;
+
+    set('tbScreen', rowsHtml(pick('screen'), 4));
+    set('tbTool',   rowsHtml(pick('tool'),   4));
+    set('tbEvent',  rowsHtml(pick('event'),  3));
+  }catch(e){
+    ['tbScreen','tbTool','tbEvent'].forEach(id =>
+      set(id, '<tr><td colspan="4" class="empty">โหลดไม่สำเร็จ: '+esc(e.message)+'</td></tr>'));
+  }
+}
 
 async function loadOverview(){
   try{
@@ -246,9 +373,10 @@ const kpi = (c,k,v,s) => `<div class="kpi ${c}"><div class="k">${k}</div><div cl
 async function loadDaily(){
   try{
     const rows = await rpc('analytics_daily', { p_token: TOKEN, p_days: DAYS });
-    $('dNote').textContent = rows.length ? (rows.length + ' วันที่มีข้อมูล') : '';
+    $('dNote').textContent = rows.length ? (rows.length + ' วันที่มีข้อมูล') : 'ยังไม่มีข้อมูล';
     if (chart){ chart.destroy(); chart = null; }
     if (!rows.length) return;
+    if (typeof Chart === 'undefined'){ $('dNote').textContent = 'โหลดกราฟไม่ได้ (chart.js)'; return; }
     chart = new Chart($('cv'), {
       type:'line',
       data:{ labels: rows.map(r => r.d.slice(5)),

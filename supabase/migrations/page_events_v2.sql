@@ -278,12 +278,100 @@ BEGIN
    ORDER BY 1, 3 DESC;
 END $$;
 
+-- ---------- 6.6 ฝั่งสมาชิกในแอพ (ตาราง user_events จาก A6) ----------
+-- user_events มี RLS "อ่านได้เฉพาะแถวตัวเอง" → แอดมินอ่านภาพรวมไม่ได้
+-- ฟังก์ชันพวกนี้เป็น SECURITY DEFINER จึงข้าม RLS ได้ แต่ล็อกด้วย token เดียวกัน
+-- ถ้ายังไม่มีตาราง user_events จะคืนค่าว่างเฉยๆ ไม่ error
+
+CREATE OR REPLACE FUNCTION public.analytics_members_overview(p_token TEXT, p_days INT DEFAULT 30)
+RETURNS TABLE(members BIGINT, app_opens BIGINT, screen_views BIGINT,
+              tool_opens BIGINT, events BIGINT)
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $fn$
+DECLARE v_from TIMESTAMPTZ;
+BEGIN
+  IF NOT public._analytics_ok(p_token) THEN RETURN; END IF;
+  IF to_regclass('public.user_events') IS NULL THEN RETURN; END IF;
+  v_from := NOW() - (GREATEST(LEAST(p_days, 3650), 1) || ' days')::INTERVAL;
+
+  RETURN QUERY
+  WITH e AS (SELECT * FROM public.user_events WHERE created_at >= v_from)
+  SELECT (SELECT COUNT(DISTINCT user_id) FROM e),
+         (SELECT COUNT(*) FROM e WHERE event_type = 'app_open'),
+         (SELECT COUNT(*) FROM e WHERE event_type = 'screen_view'),
+         (SELECT COUNT(*) FROM e WHERE event_type = 'page_view'),
+         (SELECT COUNT(*) FROM e);
+END $fn$;
+
+CREATE OR REPLACE FUNCTION public.analytics_members_daily(p_token TEXT, p_days INT DEFAULT 30)
+RETURNS TABLE(d DATE, opens BIGINT, members BIGINT)
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $fn$
+DECLARE v_from TIMESTAMPTZ;
+BEGIN
+  IF NOT public._analytics_ok(p_token) THEN RETURN; END IF;
+  IF to_regclass('public.user_events') IS NULL THEN RETURN; END IF;
+  v_from := NOW() - (GREATEST(LEAST(p_days, 3650), 1) || ' days')::INTERVAL;
+
+  RETURN QUERY
+  SELECT (created_at AT TIME ZONE 'Asia/Bangkok')::DATE,
+         COUNT(*) FILTER (WHERE event_type = 'app_open'),
+         COUNT(DISTINCT user_id)
+    FROM public.user_events
+   WHERE created_at >= v_from
+   GROUP BY 1 ORDER BY 1;
+END $fn$;
+
+-- kind = 'screen' แท็บล่าง | 'tool' หน้าที่เปิดใน iframe | 'event' เหตุการณ์อื่น
+-- median_sec = เวลาที่อยู่หน้านั้นโดยประมาณ = มัธยฐานของช่วงห่างถึง event ถัดไป
+--              ของ user คนเดียวกัน · ตัดช่วงห่าง > 15 นาทีทิ้ง (ถือว่าวางเครื่องไป)
+--              user_events ไม่มี dwell จริง นี่เป็นค่าประมาณ ไม่ใช่ค่าวัด
+CREATE OR REPLACE FUNCTION public.analytics_members_breakdown(p_token TEXT, p_days INT DEFAULT 30)
+RETURNS TABLE(kind TEXT, name TEXT, n BIGINT, members BIGINT, median_sec NUMERIC)
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $fn$
+DECLARE v_from TIMESTAMPTZ;
+BEGIN
+  IF NOT public._analytics_ok(p_token) THEN RETURN; END IF;
+  IF to_regclass('public.user_events') IS NULL THEN RETURN; END IF;
+  v_from := NOW() - (GREATEST(LEAST(p_days, 3650), 1) || ' days')::INTERVAL;
+
+  RETURN QUERY
+  WITH e AS (
+    SELECT user_id, event_type, screen, url, created_at,
+           LEAD(created_at) OVER (PARTITION BY user_id ORDER BY created_at) AS nxt
+      FROM public.user_events
+     WHERE created_at >= v_from
+  ),
+  g AS (
+    SELECT *,
+           CASE WHEN nxt IS NOT NULL
+                 AND EXTRACT(EPOCH FROM (nxt - created_at)) <= 900
+                THEN EXTRACT(EPOCH FROM (nxt - created_at)) END AS gap
+      FROM e
+  )
+  SELECT 'screen'::TEXT, COALESCE(screen,'(ไม่ระบุ)')::TEXT, COUNT(*),
+         COUNT(DISTINCT user_id),
+         ROUND(percentile_cont(0.5) WITHIN GROUP (ORDER BY gap)::NUMERIC, 0)
+    FROM g WHERE event_type = 'screen_view' GROUP BY 2
+  UNION ALL
+  SELECT 'tool'::TEXT,
+         regexp_replace(COALESCE(url,'(ไม่ระบุ)'), '^\.?/', '')::TEXT, COUNT(*),
+         COUNT(DISTINCT user_id),
+         ROUND(percentile_cont(0.5) WITHIN GROUP (ORDER BY gap)::NUMERIC, 0)
+    FROM g WHERE event_type = 'page_view' GROUP BY 2
+  UNION ALL
+  SELECT 'event'::TEXT, event_type::TEXT, COUNT(*), COUNT(DISTINCT user_id), NULL::NUMERIC
+    FROM g WHERE event_type NOT IN ('screen_view','page_view') GROUP BY 2
+   ORDER BY 1, 3 DESC;
+END $fn$;
+
+
 DO $$
 DECLARE f TEXT;
 BEGIN
   FOR f IN SELECT unnest(ARRAY[
     'analytics_overview(TEXT,INT)','analytics_by_page(TEXT,INT)','analytics_daily(TEXT,INT)',
-    'analytics_top_clicks(TEXT,INT,TEXT,INT)','analytics_sources(TEXT,INT)'])
+    'analytics_top_clicks(TEXT,INT,TEXT,INT)','analytics_sources(TEXT,INT)',
+    'analytics_members_overview(TEXT,INT)','analytics_members_daily(TEXT,INT)',
+    'analytics_members_breakdown(TEXT,INT)'])
   LOOP
     EXECUTE format('REVOKE ALL ON FUNCTION public.%s FROM PUBLIC', f);
     EXECUTE format('GRANT EXECUTE ON FUNCTION public.%s TO anon, authenticated', f);
