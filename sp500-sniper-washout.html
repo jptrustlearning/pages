@@ -3997,17 +3997,22 @@ function renderEntrySpyChart() {
   const dots    = labels.map((d, i) => eBenign.has(i) ? r2(eBenign.get(i)) : null);
   const dotsDef = labels.map((d, i) => eDef.has(i)    ? r2(eDef.get(i))    : null);
 
-  // จุดม่วง = สัญญาณทดลอง "หาก้นจาก Drawdown" (ยังไม่ยิงไม้จริง) · วาดที่วันเข้า = วันสัญญาณ + 1
-  const ddSet = new Set();
-  (S.ddSignals || []).forEach(t => { const e = t + 1; if (e >= from && e < S.n) ddSet.add(e - from); });
-  const dotsDD = labels.map((d, i) => (ddSet.has(i) && isFinite(spy[i + from])) ? r2(spy[i + from]) : null);
-  const ddCount = ddSet.size;
-
-  // ข้าวหลามตัดกรมท่า = ผ่านตัวกรองซ้อนชั้น (2 ใน 3 สัญญาณ) · วาดที่วันเข้า = วันสัญญาณ + 1
-  const cfMap = new Map();
+  // ข้าวหลามตัดกรมท่า = "ไม้ที่เปิดจริง" ทุกไม้
+  // ⚠️ ต้องสร้างจาก entries (= state.closedLots + state.lots) เท่านั้น ห้ามอ่าน S.conflSignals ตรงๆ
+  //    เพราะ conflSignals เป็นลิสต์สัญญาณดิบที่ยังไม่ผ่าน MIN GAP / ปีเริ่ม / เงื่อนไขอื่นใน sniperRun
+  //    (บั๊กที่เคยเกิด: เปลี่ยน MIN GAP แล้วจุดบนกราฟไม่ขยับ — A65)
+  const reasonBySigDate = new Map();
   (S.conflSignals || []).forEach((t, k) => {
-    const e = t + 1;
-    if (e >= from && e < S.n) cfMap.set(e - from, (S.conflReasons || [])[k] || '');
+    reasonBySigDate.set(S.dates[t], (S.conflReasons || [])[k] || '');
+  });
+  const sigDateByEntry = new Map();
+  [...(state.closedLots || []), ...(state.lots || [])].forEach(L => {
+    if (L && L.entryDate) sigDateByEntry.set(L.entryDate, L.signalDate);
+  });
+  const cfMap = new Map();
+  entries.forEach(e => {
+    if (e.i < from) return;
+    cfMap.set(e.i - from, reasonBySigDate.get(sigDateByEntry.get(e.date)) || '');
   });
   // มือถือ: ย่อจุดลง ไม่งั้นข้าวหลามตัดทับกันจนอ่านไม่ออก
   // ⚠️ ใช้ window.innerWidth ไม่ใช่ cv.clientWidth — ตอนวาดครั้งแรกแท็บยังซ่อนอยู่ canvas กว้าง 0
