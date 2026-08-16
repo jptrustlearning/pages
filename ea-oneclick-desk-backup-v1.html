@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JPT OneClick Desk — ดาวน์โหลดฟรี | JP Trust Learning</title>
+<meta name="description" content="แผงส่งคำสั่งสำหรับ MetaTrader 5 จาก JP Trust Learning — ดาวน์โหลดฟรี ไม่ต้องเป็นสมาชิก">
+<meta name="theme-color" content="#1a0a0e">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@200;300;400;500;600;700&family=Cinzel:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FAF6ED; --card:#FFFEF8; --line:rgba(212,175,55,.22);
+  --maroon:#3a1520; --maroon2:#2d1018; --maroon3:#1a0a0e;
+  --gold:#D4AF37; --gold-d:#B8860B; --gold-l:#F4E4BA; --gold-soft:rgba(212,175,55,.12);
+  --ink:#3D3228; --muted:#8a7d6b;
+  --f-d:'Cinzel',serif; --f-b:'Anuphan',sans-serif; --f-n:'DM Serif Display',Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--cream);color:var(--ink);font-family:var(--f-b);line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:1000px;margin:0 auto;padding:0 22px}
+
+/* ---------- top bar ---------- */
+.tb{background:var(--maroon3);border-bottom:1px solid rgba(212,175,55,.2);position:sticky;top:0;z-index:20}
+.tb-in{max-width:1000px;margin:0 auto;padding:11px 22px;display:flex;align-items:center;gap:12px}
+.tb img{width:32px;height:32px;border-radius:8px;flex-shrink:0}
+.tb-n{font-family:var(--f-d);font-size:13px;letter-spacing:1.6px;color:var(--gold-l);font-weight:600;line-height:1.2}
+.tb-n span{display:block;font-family:var(--f-b);font-size:10.5px;letter-spacing:.3px;color:rgba(244,228,186,.5);font-weight:300}
+.tb-back{margin-left:auto;font-size:13px;color:rgba(244,228,186,.72);text-decoration:none;border:1px solid rgba(212,175,55,.3);
+  border-radius:9px;padding:6px 13px;white-space:nowrap;transition:.18s}
+.tb-back:hover{background:rgba(212,175,55,.12);color:var(--gold-l)}
+
+/* ---------- hero ---------- */
+.hero{position:relative;background:linear-gradient(155deg,var(--maroon3) 0%,var(--maroon2) 48%,var(--maroon) 100%);overflow:hidden}
+.hero::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(900px 320px at 78% 12%,rgba(212,175,55,.16),transparent 62%)}
+.hero-in{position:relative;z-index:2;max-width:1000px;margin:0 auto;padding:52px 22px 46px;
+  display:grid;grid-template-columns:1fr 300px;gap:40px;align-items:center}
+.eyebrow{font-family:var(--f-d);font-size:11.5px;letter-spacing:3.4px;color:var(--gold);font-weight:600;margin-bottom:14px}
+.hero h1{font-size:clamp(30px,5.2vw,46px);font-weight:600;color:#fff;line-height:1.2;letter-spacing:-.3px}
+.hero h1 b{font-family:var(--f-d);font-weight:700;color:var(--gold-l);display:block;letter-spacing:.5px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 15px}
+.chip{font-size:11.5px;font-weight:600;letter-spacing:.4px;border-radius:20px;padding:4px 12px;
+  background:rgba(244,228,186,.09);border:1px solid rgba(212,175,55,.32);color:var(--gold-l)}
+.chip.free{background:linear-gradient(135deg,var(--gold),var(--gold-d));border-color:transparent;color:#231016}
+.hero p{font-size:15.5px;color:rgba(244,228,186,.68);font-weight:300;max-width:520px}
+
+/* ---------- download panel ---------- */
+.dl{background:rgba(244,228,186,.06);border:1px solid rgba(212,175,55,.3);border-radius:18px;padding:22px 20px;text-align:center;
+  backdrop-filter:blur(2px)}
+.dl-ic{width:52px;height:52px;margin:0 auto 12px;border-radius:14px;display:grid;place-items:center;
+  background:linear-gradient(135deg,rgba(212,175,55,.9),rgba(184,134,11,.75));color:#231016}
+.dl-ic svg{width:26px;height:26px}
+.dl-lab{font-family:var(--f-d);font-size:10.5px;letter-spacing:2.4px;color:rgba(244,228,186,.55);font-weight:600}
+.dl-file{font-size:13px;color:var(--gold-l);font-weight:600;margin:3px 0 16px;word-break:break-all}
+.btn-dl{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;
+  background:linear-gradient(135deg,var(--gold),var(--gold-d));color:#231016;
+  font-family:var(--f-b);font-size:16px;font-weight:700;letter-spacing:.2px;
+  border:0;border-radius:12px;padding:14px 18px;cursor:pointer;text-decoration:none;
+  box-shadow:0 8px 22px rgba(212,175,55,.26);transition:.18s}
+.btn-dl:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(212,175,55,.34)}
+.btn-dl svg{width:19px;height:19px}
+.dl-note{font-size:11.5px;color:rgba(244,228,186,.45);font-weight:300;margin-top:11px;line-height:1.55}
+
+/* ---------- spec strip ---------- */
+.spec{background:var(--maroon3);border-top:1px solid rgba(212,175,55,.16);padding:2px 0}
+.spec-in{max-width:1000px;margin:0 auto;padding:20px 22px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.sp{text-align:center;padding:6px 4px;border-right:1px solid rgba(212,175,55,.15)}
+.sp:last-child{border-right:0}
+.sp-k{font-family:var(--f-d);font-size:9.5px;letter-spacing:2px;color:rgba(244,228,186,.42);font-weight:600}
+.sp-v{font-family:var(--f-n);font-size:22px;color:var(--gold-l);line-height:1.25;margin-top:2px}
+.sp-v.th{font-family:var(--f-b);font-size:16px;font-weight:600}
+
+/* ---------- sections ---------- */
+section.body{padding:52px 0 10px}
+.slab{font-family:var(--f-d);font-size:11px;letter-spacing:3px;color:var(--gold-d);font-weight:600;margin-bottom:9px}
+h2{font-size:clamp(22px,3.4vw,29px);font-weight:600;color:var(--maroon);line-height:1.35;margin-bottom:10px}
+h2::after{content:'';display:block;width:44px;height:3px;background:var(--gold);border-radius:2px;margin-top:12px}
+.lead{font-size:16px;margin:16px 0 0;max-width:720px}
+
+/* steps */
+.steps{display:grid;gap:14px;margin-top:26px}
+.st{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:18px 20px;
+  display:grid;grid-template-columns:44px 1fr;gap:16px;align-items:start;
+  box-shadow:0 2px 10px rgba(58,21,32,.05)}
+.st-n{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--maroon),var(--maroon2));color:var(--gold-l);
+  font-family:var(--f-n);font-size:20px}
+.st h3{font-size:16px;font-weight:700;color:var(--maroon);margin-bottom:3px}
+.st p{font-size:14.5px;color:var(--ink);font-weight:400}
+.st code{background:var(--gold-soft);border:1px solid var(--line);border-radius:6px;
+  padding:1px 6px;font-size:13px;font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--maroon)}
+
+/* notes */
+.notes{background:linear-gradient(150deg,var(--maroon),var(--maroon2));border-radius:18px;padding:26px 26px 24px;margin:34px 0 0;
+  border:1px solid rgba(212,175,55,.24)}
+.notes .slab{color:var(--gold);margin-bottom:12px}
+.notes h3{font-size:18px;font-weight:600;color:#fff;margin-bottom:14px}
+.notes ul{list-style:none;display:grid;gap:11px}
+.notes li{font-size:14.5px;color:rgba(244,228,186,.74);font-weight:300;padding-left:24px;position:relative;line-height:1.65}
+.notes li::before{content:'';position:absolute;left:6px;top:10px;width:6px;height:6px;border-radius:50%;background:var(--gold)}
+.notes li b{color:var(--gold-l);font-weight:600}
+
+/* bottom cta */
+.bcta{text-align:center;padding:46px 0 8px}
+.bcta .btn-dl{display:inline-flex;width:auto;padding:15px 34px}
+.bcta p{font-size:13px;color:var(--muted);font-weight:300;margin-top:13px}
+
+/* footer */
+footer{margin-top:52px;background:var(--maroon3);border-top:1px solid rgba(212,175,55,.2);padding:26px 0 30px}
+.ft{max-width:1000px;margin:0 auto;padding:0 22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.ft-b{font-family:var(--f-d);font-size:12.5px;letter-spacing:1.8px;color:var(--gold-l);font-weight:600}
+.ft-c{font-size:12px;color:rgba(244,228,186,.42);font-weight:300;margin-left:auto}
+.ft a{color:rgba(244,228,186,.6);text-decoration:none;font-size:12.5px}
+.ft a:hover{color:var(--gold-l)}
+
+/* responsive */
+@media(max-width:860px){
+  .hero-in{grid-template-columns:1fr;gap:28px;padding:38px 22px 38px}
+  .spec-in{grid-template-columns:repeat(2,1fr);gap:6px}
+  .sp:nth-child(2){border-right:0}
+  .sp:nth-child(1),.sp:nth-child(2){border-bottom:1px solid rgba(212,175,55,.15);padding-bottom:12px}
+  .ft-c{margin-left:0;width:100%}
+}
+@media(max-width:480px){
+  .st{grid-template-columns:1fr;gap:10px}
+  .st-n{width:38px;height:38px;font-size:17px}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<div class="tb">
+  <div class="tb-in">
+    <img src="data:image/webp;base64,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" alt="JP Trust Learning" width="32" height="32">
+    <div class="tb-n">TOOL &amp; KIT<span>Justify Power Trust</span></div>
+    <a class="tb-back" href="./jptrust-toolkit.html">← กลับหน้าเครื่องมือ</a>
+  </div>
+</div>
+
+<!-- ============ HERO ============ -->
+<div class="hero">
+  <div class="hero-in">
+    <div>
+      <div class="eyebrow">FREE DOWNLOAD</div>
+      <h1>แผงส่งคำสั่งสำหรับ MetaTrader 5<b>JPT OneClick Desk</b></h1>
+      <div class="chips">
+        <span class="chip free">แจกฟรี · ไม่ต้องเป็นสมาชิก</span>
+        <span class="chip">MetaTrader 5</span>
+        <span class="chip">เวอร์ชัน 3.03</span>
+      </div>
+      <p>เครื่องมือช่วยส่งคำสั่งซื้อขายบน MetaTrader 5 ให้จัดการออเดอร์ได้จากแผงเดียวบนหน้ากราฟ
+         ไม่ต้องเปิดหน้าต่างคำสั่งใหม่ทุกครั้ง — พัฒนาโดยทีม JP Trust Learning</p>
+    </div>
+
+    <div class="dl">
+      <div class="dl-ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+      </div>
+      <div class="dl-lab">FILE</div>
+      <div class="dl-file">JPT_OneClick_Desk_v303.ex5</div>
+      <a class="btn-dl" id="btnDl" href="./downloads/JPT_OneClick_Desk_v303.ex5" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+        ดาวน์โหลดฟรี
+      </a>
+      <div class="dl-note">ขนาดไฟล์ 109 KB · กดแล้วดาวน์โหลดทันที<br>ไม่ต้องกรอกอีเมล ไม่ต้องเข้าสู่ระบบ</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SPEC STRIP ============ -->
+<div class="spec">
+  <div class="spec-in">
+    <div class="sp"><div class="sp-k">PLATFORM</div><div class="sp-v">MT5</div></div>
+    <div class="sp"><div class="sp-k">VERSION</div><div class="sp-v">3.03</div></div>
+    <div class="sp"><div class="sp-k">FILE SIZE</div><div class="sp-v">109 <span style="font-size:14px">KB</span></div></div>
+    <div class="sp"><div class="sp-k">PRICE</div><div class="sp-v th">ฟรี</div></div>
+  </div>
+</div>
+
+<!-- ============ INSTALL ============ -->
+<section class="body">
+  <div class="wrap">
+    <div class="slab">HOW TO INSTALL</div>
+    <h2>วิธีติดตั้งบน MetaTrader 5</h2>
+    <p class="lead">ทำครั้งเดียว ใช้เวลาไม่เกิน 2 นาที — ขั้นตอนเหมือนกันทุกโบรกเกอร์</p>
+
+    <div class="steps">
+      <div class="st">
+        <div class="st-n">1</div>
+        <div>
+          <h3>ดาวน์โหลดไฟล์</h3>
+          <p>กดปุ่มด้านบนเพื่อโหลดไฟล์ <code>JPT_OneClick_Desk_v303.ex5</code> เก็บไว้ในเครื่อง</p>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-n">2</div>
+        <div>
+          <h3>เปิดโฟลเดอร์ของ MetaTrader 5</h3>
+          <p>เปิดโปรแกรม MT5 → เมนู <code>File</code> → <code>Open Data Folder</code> → เข้าโฟลเดอร์ <code>MQL5</code> → <code>Experts</code></p>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-n">3</div>
+        <div>
+          <h3>วางไฟล์แล้วรีเฟรช</h3>
+          <p>คัดลอกไฟล์ <code>.ex5</code> ไปวางในโฟลเดอร์ <code>Experts</code> จากนั้นกลับไปที่ MT5 คลิกขวาที่หน้าต่าง Navigator แล้วเลือก <code>Refresh</code></p>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-n">4</div>
+        <div>
+          <h3>ลากลงกราฟ แล้วเปิด AutoTrading</h3>
+          <p>ใน Navigator → <code>Expert Advisors</code> จะเห็นชื่อ JPT OneClick Desk ให้ลากลงบนกราฟที่ต้องการ แล้วกดปุ่ม <code>AutoTrading</code> (ปุ่มด้านบนของ MT5) ให้เป็นสีเขียว — ถ้าเห็นหน้ายิ้มมุมขวาบนของกราฟ แปลว่าใช้งานได้แล้ว</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- notes -->
+    <div class="notes">
+      <div class="slab">BEFORE YOU START</div>
+      <h3>สิ่งที่ควรรู้ก่อนใช้งาน</h3>
+      <ul>
+        <li>ไฟล์นี้เป็นเวอร์ชันสำหรับ <b>MetaTrader 5 เท่านั้น</b> ใช้กับ MetaTrader 4 ไม่ได้</li>
+        <li><b>ทดลองบนบัญชีเดโมก่อนเสมอ</b> ให้คุ้นกับปุ่มและพฤติกรรมของแผง ก่อนนำไปใช้กับบัญชีจริง</li>
+        <li>เครื่องมือนี้ช่วย<b>ส่งคำสั่ง</b> ไม่ได้ทำนายทิศทางราคา และไม่รับประกันผลกำไร — การตัดสินใจซื้อขายยังเป็นของผู้ใช้ทั้งหมด</li>
+        <li>ชื่อไฟล์และเงื่อนไขของแต่ละโบรกเกอร์ต่างกัน ถ้าส่งคำสั่งไม่ผ่าน ให้ตรวจ <b>ขนาดล็อตขั้นต่ำ</b> และ <b>ระยะ Stop Level</b> ของโบรกเกอร์ก่อน</li>
+        <li>แจกฟรีเพื่อการศึกษา ห้ามนำไปจำหน่ายต่อ</li>
+      </ul>
+    </div>
+
+    <div class="bcta">
+      <a class="btn-dl" id="btnDl2" href="./downloads/JPT_OneClick_Desk_v303.ex5" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+        ดาวน์โหลด JPT OneClick Desk v3.03
+      </a>
+      <p>มีคำถามเรื่องการติดตั้ง ทักหาทีมงานได้ที่หน้าหลัก JP Trust Learning</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="ft">
+    <div class="ft-b">JP TRUST LEARNING</div>
+    <a href="./jptrust-toolkit.html">เครื่องมือทั้งหมด</a>
+    <a href="https://jptrustlearning.com" target="_blank" rel="noopener">หน้าหลัก ↗</a>
+    <div class="ft-c">© 2026 JP Trust Learning · แจกฟรีเพื่อการศึกษา</div>
+  </div>
+</footer>
+
+<!-- ===== JPT analytics — page_events v1 (หน้าสาธารณะ) ===== -->
+<script>
+(function(){
+  var SB='https://rcdukwwcbyryauhqlzmx.supabase.co';
+  var KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZHVrd3djYnlyeWF1aHFsem14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MTY0MDAsImV4cCI6MjA4NTQ5MjQwMH0.rprPmudJYyb6dyhXb9Z9GrtQWEeIX99A2Wrj55PvS54';
+  var PAGE='ea-oneclick-desk';
+  function uuid(){
+    try{ if(crypto&&crypto.randomUUID) return crypto.randomUUID(); }catch(e){}
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){
+      var r=Math.random()*16|0,v=(c==='x')?r:((r&0x3)|0x8); return v.toString(16);
+    });
+  }
+  var vid,sid;
+  try{
+    vid=localStorage.getItem('jpt_vid'); if(!vid){vid=uuid();localStorage.setItem('jpt_vid',vid);}
+    sid=sessionStorage.getItem('jpt_sid'); if(!sid){sid=uuid();sessionStorage.setItem('jpt_sid',sid);}
+  }catch(e){ return; }
+  var ua=navigator.userAgent||'';
+  var device=/iPad|Tablet/i.test(ua)?'tablet':(/Mobi|Android|iPhone|iPod/i.test(ua)?'mobile':'desktop');
+  var refHost='direct';
+  try{ if(document.referrer){ var rh=new URL(document.referrer).hostname; if(rh&&rh!==location.hostname) refHost=rh; } }catch(e){}
+  var utm=null;
+  try{ utm=new URLSearchParams(location.search).get('utm_source')||null; }catch(e){}
+
+  function send(type,detail,dwell,keep){
+    try{
+      fetch(SB+'/rest/v1/rpc/track_page_event',{
+        method:'POST', keepalive:!!keep, mode:'cors',
+        headers:{'Content-Type':'application/json','apikey':KEY,'Authorization':'Bearer '+KEY},
+        body:JSON.stringify({
+          p_page:PAGE,p_visitor:vid,p_session:sid,p_type:type,
+          p_detail:detail||null,p_referrer_host:refHost,p_utm_source:utm,
+          p_device:device,p_dwell_sec:(dwell||null)
+        })
+      }).catch(function(){});
+    }catch(e){}
+  }
+  send('page_view');
+
+  /* นับยอดกดดาวน์โหลด — ปุ่มบนสุดและปุ่มท้ายหน้า แยก detail กันได้ */
+  ['btnDl','btnDl2'].forEach(function(id){
+    var b=document.getElementById(id);
+    if(b) b.addEventListener('click',function(){ send('download','oneclick_desk_v303_'+id,null,true); });
+  });
+})();
+</script>
+
+</body>
+</html>

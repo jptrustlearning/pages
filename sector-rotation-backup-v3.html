@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JPT Sector & Theme Rotation — จับจังหวะเงินหมุนกลุ่ม | JP Trust Learning</title>
+<meta name="description" content="แดชบอร์ดติดตามการหมุนของเงินลงทุนระหว่างกลุ่มอุตสาหกรรมและธีมในตลาดหุ้นสหรัฐฯ แสดงกลุ่มที่นำตลาด กำลังฟื้น เริ่มแผ่ว และอ่อนแรง คำนวณจากราคาปิดรายวันของหุ้นใน S&amp;P 500 แบบถ่วงน้ำหนักเท่ากัน พร้อม Breadth และมูลค่าซื้อขาย 5D/20D">
+<meta name="theme-color" content="#1a0a0e">
+<meta property="og:type" content="website">
+<meta property="og:title" content="US Sector &amp; Theme Rotation — จับจังหวะเงินหมุนกลุ่ม">
+<meta property="og:description" content="กลุ่มไหนกำลังนำตลาด กลุ่มไหนเริ่มแผ่ว — คำนวณจากราคาปิดรายวันของหุ้นใน S&amp;P 500 อัปเดตทุกวันทำการ">
+<meta property="og:site_name" content="JP Trust Learning">
+<meta property="og:url" content="https://app.jptrustlearning.com/sector-rotation.html">
+<meta property="og:image" content="https://public.jptrustlearning.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://public.jptrustlearning.com/og-image.png">
+<link rel="canonical" href="https://app.jptrustlearning.com/sector-rotation.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FAF6ED; --cream-light:#FFFEF8; --cream-warm:#F5EFE0; --cream-card:#F8F2E4; --cream-deep:#EDE4D0;
+  --maroon-darkest:#1a0a0e; --maroon-mid:#2d1018; --maroon:#722F37;
+  --gold:#D4AF37; --gold-dark:#B8860B; --gold-deep:#8B6914;
+  --tx:#3D3228; --tx2:#5A3D20; --tx-mute:#7A6F62;
+  --lead:#2E7D4F; --improv:#2C6E9E; --weak:#B07A00; --lag:#A83232;
+  --lead-bg:rgba(46,125,79,.10); --improv-bg:rgba(44,110,158,.10); --weak-bg:rgba(176,122,0,.12); --lag-bg:rgba(168,50,50,.10);
+  --border:rgba(139,105,20,.18);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Anuphan',sans-serif;background:var(--cream);color:var(--tx);line-height:1.7;-webkit-font-smoothing:antialiased}
+
+/* ===== Header ===== */
+.hdr{background:linear-gradient(135deg,var(--maroon-darkest) 0%,var(--maroon-mid) 60%,#3a1520 100%);color:#E8E4DC;padding:26px 20px 22px;border-bottom:3px solid var(--gold)}
+.hdr-in{max-width:1280px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px;justify-content:space-between}
+.hdr .eyebrow{font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;color:var(--gold);margin-bottom:6px}
+.hdr h1{font-size:clamp(21px,3.4vw,30px);font-weight:600;color:#F4E4BA;line-height:1.3}
+.hdr .sub{font-size:14px;color:#A09B92;margin-top:2px}
+.hdr-right{text-align:right}
+.asof{font-size:12.5px;color:#A09B92}
+.asof b{color:#E8E4DC;font-weight:600}
+.spychips{display:flex;gap:8px;margin-top:7px;justify-content:flex-end;flex-wrap:wrap}
+.chip{font-size:12px;padding:3px 10px;border-radius:20px;border:1px solid rgba(212,175,55,.4);background:rgba(212,175,55,.08);color:#F4E4BA;white-space:nowrap}
+.chip b{font-family:'DM Serif Display',serif;font-weight:400;font-size:13px}
+.chip .up{color:#7FCB9B}.chip .dn{color:#E89090}
+
+.wrap{max-width:1280px;margin:0 auto;padding:26px 20px 60px}
+.sec-label{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2.5px;color:var(--gold-deep);margin-bottom:4px}
+.sec-title{font-size:clamp(18px,2.6vw,23px);font-weight:600;color:var(--tx2);margin-bottom:14px}
+section{margin-bottom:44px}
+
+/* ===== Summary cards ===== */
+.sumgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.sumcard{background:var(--cream-light);border:1px solid var(--border);border-radius:14px;padding:16px 18px;border-top:3px solid var(--gold)}
+.sumcard h3{font-size:15px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.sumcard.lead h3{color:var(--lead)} .sumcard.improv h3{color:var(--improv)} .sumcard.warn h3{color:var(--lag)}
+.sumcard .hint{font-size:12.5px;color:var(--tx-mute);margin-bottom:10px;line-height:1.55}
+.tchip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:4px 11px;border-radius:20px;margin:0 6px 7px 0;cursor:pointer;border:1px solid transparent;transition:transform .12s}
+.tchip:hover{transform:translateY(-1px)}
+.tchip small{font-weight:500;opacity:.85}
+.tchip.lead{background:var(--lead-bg);color:var(--lead);border-color:rgba(46,125,79,.25)}
+.tchip.improv{background:var(--improv-bg);color:var(--improv);border-color:rgba(44,110,158,.25)}
+.tchip.weak{background:var(--weak-bg);color:var(--weak);border-color:rgba(176,122,0,.3)}
+.tchip.lag{background:var(--lag-bg);color:var(--lag);border-color:rgba(168,50,50,.25)}
+
+/* ===== Explainer ===== */
+details.howto{background:var(--cream-warm);border:1px solid var(--border);border-radius:14px;padding:0;overflow:hidden}
+details.howto summary{cursor:pointer;padding:14px 18px;font-weight:600;color:var(--tx2);font-size:15px;list-style:none;display:flex;align-items:center;gap:8px}
+details.howto summary::-webkit-details-marker{display:none}
+details.howto summary::after{content:'▾';margin-left:auto;color:var(--gold-deep);transition:transform .2s}
+details.howto[open] summary::after{transform:rotate(180deg)}
+.howto-body{padding:4px 18px 18px;font-size:14px;color:var(--tx);line-height:1.85}
+.howto-body .qgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:12px 0}
+.qcard{border-radius:10px;padding:10px 14px;font-size:13.5px;line-height:1.6}
+.qcard b{display:block;font-size:14px;margin-bottom:2px}
+.qcard.lead{background:var(--lead-bg);color:var(--lead)} .qcard.improv{background:var(--improv-bg);color:var(--improv)}
+.qcard.weak{background:var(--weak-bg);color:var(--weak)} .qcard.lag{background:var(--lag-bg);color:var(--lag)}
+
+/* ===== RRG ===== */
+.rrg-flex{display:flex;gap:18px;align-items:stretch}
+.rrg-canvas-box{flex:1.5;min-width:0;background:var(--cream-light);border:1px solid var(--border);border-radius:14px;padding:14px;position:relative}
+#rrgCanvas{width:100%;display:block;border-radius:8px;cursor:crosshair}
+.rrg-list{flex:1;background:var(--cream-light);border:1px solid var(--border);border-radius:14px;padding:12px;max-height:640px;overflow-y:auto}
+.rrg-controls{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.btn{font-family:'Anuphan',sans-serif;font-size:13px;font-weight:600;padding:6px 14px;border-radius:20px;border:1px solid var(--gold-dark);background:transparent;color:var(--gold-deep);cursor:pointer;transition:all .15s}
+.btn:hover{background:rgba(212,175,55,.12)}
+.btn.on{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#fff;border-color:transparent}
+.rrow{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:9px;cursor:pointer;font-size:13.5px;transition:background .12s}
+.rrow:hover{background:var(--cream-warm)}
+.rrow.pinned{background:rgba(212,175,55,.16);outline:1px solid rgba(212,175,55,.5)}
+.rrow .dot{width:11px;height:11px;border-radius:50%;flex:none;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
+.rrow .nm{font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rrow .pill{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:12px;white-space:nowrap}
+.rrow .vs{font-family:'DM Serif Display',serif;font-size:13px;width:56px;text-align:right;flex:none}
+.pill.lead{background:var(--lead-bg);color:var(--lead)} .pill.improv{background:var(--improv-bg);color:var(--improv)}
+.pill.weak{background:var(--weak-bg);color:var(--weak)} .pill.lag{background:var(--lag-bg);color:var(--lag)}
+.rrg-note{font-size:12.5px;color:var(--tx-mute);margin-top:10px;line-height:1.6}
+.rrg-tip{position:absolute;pointer-events:none;background:var(--maroon-darkest);color:#F4E4BA;font-size:12.5px;padding:7px 12px;border-radius:9px;opacity:0;transition:opacity .1s;white-space:nowrap;z-index:5;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+
+/* ===== Heatmap table ===== */
+.tbl-scroll{overflow-x:auto;background:var(--cream-light);border:1px solid var(--border);border-radius:14px}
+table.hm{width:100%;border-collapse:collapse;font-size:13.5px;min-width:760px}
+table.hm th{font-size:12px;font-weight:700;color:var(--tx2);text-align:right;padding:11px 12px;border-bottom:2px solid var(--gold);cursor:pointer;user-select:none;white-space:nowrap;position:sticky;top:0;background:var(--cream-light)}
+table.hm th:first-child{text-align:left}
+table.hm th.sorted{color:var(--gold-deep)}
+table.hm td{padding:8px 12px;text-align:right;border-bottom:1px solid rgba(139,105,20,.09);font-family:'DM Serif Display',serif;font-size:13.5px;white-space:nowrap}
+table.hm td.nm{text-align:left;font-family:'Anuphan',sans-serif;font-weight:600;cursor:pointer}
+table.hm td.nm:hover{color:var(--gold-deep)}
+table.hm td.st{text-align:center;font-family:'Anuphan',sans-serif}
+table.hm tr.ref td{color:var(--tx-mute);background:var(--cream-warm)}
+table.hm tr.ref td.nm{font-weight:500}
+.bcell{display:flex;align-items:center;gap:7px;justify-content:flex-end}
+.bbar{width:52px;height:6px;border-radius:4px;background:rgba(139,105,20,.14);overflow:hidden;flex:none}
+.bbar i{display:block;height:100%;border-radius:4px}
+
+/* ===== Playbook ===== */
+.pbgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));gap:14px}
+.pbcard{background:var(--cream-light);border:1px solid var(--border);border-radius:14px;padding:16px 18px}
+.pbcard h3{font-size:15.5px;font-weight:700;margin-bottom:3px}
+.pbcard .en{font-family:'Cinzel',serif;font-size:10.5px;letter-spacing:2px;margin-bottom:8px}
+.pbcard p{font-size:13px;color:var(--tx-mute);line-height:1.7;margin-bottom:11px}
+.pbcard.lead{border-top:3px solid var(--lead)} .pbcard.lead h3,.pbcard.lead .en{color:var(--lead)}
+.pbcard.improv{border-top:3px solid var(--improv)} .pbcard.improv h3,.pbcard.improv .en{color:var(--improv)}
+.pbcard.weak{border-top:3px solid var(--weak)} .pbcard.weak h3,.pbcard.weak .en{color:var(--weak)}
+.pbcard.lag{border-top:3px solid var(--lag)} .pbcard.lag h3,.pbcard.lag .en{color:var(--lag)}
+.pbempty{font-size:13px;color:var(--tx-mute);font-style:italic}
+
+/* ===== Breadth ===== */
+.brd-box{background:var(--cream-light);border:1px solid var(--border);border-radius:14px;padding:18px}
+.brow{display:flex;align-items:center;gap:12px;padding:5.5px 0;font-size:13.5px}
+.brow .nm{width:190px;flex:none;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.brow .nm:hover{color:var(--gold-deep)}
+.brow .track{flex:1;height:9px;border-radius:5px;background:rgba(139,105,20,.12);overflow:hidden}
+.brow .track i{display:block;height:100%;border-radius:5px}
+.brow .pct{width:48px;text-align:right;font-family:'DM Serif Display',serif;flex:none}
+.brow .dv{width:64px;text-align:right;font-family:'DM Serif Display',serif;color:var(--tx-mute);flex:none;font-size:13px}
+.brow .dv.hot{color:var(--gold-deep);font-weight:600}
+.brd-legend{font-size:12.5px;color:var(--tx-mute);margin-top:12px;line-height:1.65}
+
+/* ===== Appendix ===== */
+.apxgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:13px}
+.apxcard{background:var(--cream-light);border:1px solid var(--border);border-radius:12px;padding:13px 16px}
+.apxcard h4{font-size:14px;font-weight:700;color:var(--tx2);margin-bottom:5px;display:flex;justify-content:space-between;align-items:baseline}
+.apxcard h4 .pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px}
+.apxcard .tk{font-size:12.5px;color:var(--tx);line-height:1.8;font-family:'Anuphan',sans-serif}
+.apxcard .etf{font-size:11.5px;color:var(--tx-mute);margin-top:5px}
+.apxcard .etf b{color:var(--gold-deep);font-weight:600}
+
+/* ===== Footer/notes ===== */
+.notes{background:var(--cream-deep);border-radius:14px;padding:18px 20px;font-size:13px;color:var(--tx-mute);line-height:1.85}
+.notes b{color:var(--tx2)}
+.foot{margin-top:22px;text-align:center;font-size:12.5px;color:var(--tx-mute)}
+.foot .brand{font-family:'Cinzel',serif;letter-spacing:2px;color:var(--gold-deep);font-size:11px}
+
+/* ===== Loading ===== */
+#loader{max-width:1280px;margin:0 auto;padding:70px 20px;text-align:center}
+.spin{width:40px;height:40px;border:3px solid rgba(212,175,55,.25);border-top-color:var(--gold);border-radius:50%;margin:0 auto 16px;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+#loader p{color:var(--tx-mute);font-size:14px}
+#app{display:none}
+
+@media(max-width:900px){
+  .rrg-flex{flex-direction:column}
+  .rrg-list{max-height:340px}
+  .hdr-right{text-align:left}
+  .spychips{justify-content:flex-start}
+  .brow .nm{width:132px;font-size:12.5px}
+  .brow .dv{width:52px}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-in">
+    <div>
+      <div class="eyebrow">JP TRUST LEARNING</div>
+      <h1>US Sector & Theme Rotation</h1>
+      <div class="sub">แดชบอร์ดจับจังหวะ "เงินหมุนกลุ่ม" ในตลาดหุ้นสหรัฐฯ — คำนวณจากราคาปิดรายวัน</div>
+    </div>
+    <div class="hdr-right">
+      <div class="asof">ข้อมูล ณ <b id="asofDate">—</b> (ราคาปิด)</div>
+      <div class="spychips" id="spyChips"></div>
+    </div>
+  </div>
+</header>
+
+<div id="loader"><div class="spin"></div><p id="loadMsg">กำลังโหลดข้อมูลราคา ~4 MB…</p></div>
+
+<main class="wrap" id="app">
+
+  <!-- สรุปวันนี้ -->
+  <section>
+    <div class="sec-label">TODAY'S PICTURE</div>
+    <div class="sec-title">สรุปภาพรวมวันนี้</div>
+    <div class="sumgrid">
+      <div class="sumcard lead">
+        <h3>🟢 กลุ่มนำตลาด</h3>
+        <div class="hint">แข็งกว่าตลาดและยังมีแรงส่ง — เหมาะกับการ "ถือต่อ" มากกว่าเพิ่งเข้าไล่ราคา</div>
+        <div id="sumLead"></div>
+      </div>
+      <div class="sumcard improv">
+        <h3>🔵 กำลังกลับตัวขึ้น</h3>
+        <div class="hint">ยังอ่อนกว่าตลาดแต่โมเมนตัมพลิกเป็นบวก — โซนที่คน "หาจุดเข้า" ชอบจับตาที่สุด</div>
+        <div id="sumImprov"></div>
+      </div>
+      <div class="sumcard warn">
+        <h3>🟠 เริ่มแผ่ว / ระวัง</h3>
+        <div class="hint">ผลตอบแทนสะสมยังสวยแต่แรงส่งกำลังหมด — ไม่ใช่จุดเพิ่มไม้</div>
+        <div id="sumWarn"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- วิธีอ่าน -->
+  <section>
+    <details class="howto">
+      <summary>📖 วิธีอ่านแดชบอร์ดนี้ (กด 1 นาทีจบ)</summary>
+      <div class="howto-body">
+        เงินในตลาดหุ้นไม่เคยอยู่นิ่ง — มัน "หมุน" จากกลุ่มหนึ่งไปอีกกลุ่มหนึ่งเสมอ แดชบอร์ดนี้เทียบทุกกลุ่มกับดัชนี S&P 500 (SPY) ด้วย 2 คำถามง่ายๆ คือ <b>ตอนนี้แข็งกว่าตลาดไหม</b> (แกนนอน) และ <b>แรงกำลังมาหรือกำลังหมด</b> (แกนตั้ง) คำตอบ 2 ข้อนี้แบ่งทุกกลุ่มออกเป็น 4 โซน:
+        <div class="qgrid">
+          <div class="qcard lead"><b>🟢 นำตลาด (Leading)</b>แข็งกว่าตลาด + แรงยังมา → ถือต่อ / เล่นตามโมเมนตัม</div>
+          <div class="qcard improv"><b>🔵 กำลังฟื้น (Improving)</b>ยังอ่อนกว่าตลาดแต่เริ่มมีแรงซื้อกลับ → โซนหาจุดเข้าที่ risk/reward ดีสุด</div>
+          <div class="qcard weak"><b>🟠 เริ่มแผ่ว (Weakening)</b>ยังแข็งแต่แรงเริ่มหมด → ทยอยลดพอร์ต ห้ามเพิ่มไม้</div>
+          <div class="qcard lag"><b>🔴 อ่อนแรง (Lagging)</b>อ่อนกว่าตลาดและยังไม่ฟื้น → ข้ามไปก่อน รอจนขยับขึ้นโซนฟื้น</div>
+        </div>
+        วงจรปกติจะหมุนตามเข็มนาฬิกา: <b>ฟื้น → นำตลาด → แผ่ว → อ่อนแรง → กลับมาฟื้นใหม่</b> ตัวเลขทุกกลุ่มคำนวณแบบถ่วงน้ำหนักเท่ากัน (equal-weight) จากหุ้นสมาชิกใน S&P 500 เท่านั้น จึงอาจต่างจาก ETF ของกลุ่มนั้นที่ถ่วงตามขนาดบริษัท
+      </div>
+    </details>
+  </section>
+
+  <!-- RRG -->
+  <section>
+    <div class="sec-label">ROTATION MAP</div>
+    <div class="sec-title">แผนที่การหมุนของเงิน (เทียบ SPY, เส้นทางย้อนหลัง 8 สัปดาห์)</div>
+    <div class="rrg-flex">
+      <div class="rrg-canvas-box">
+        <div class="rrg-controls">
+          <button class="btn on" id="btnTails">เส้นทางทุกกลุ่ม</button>
+          <button class="btn" id="btnFocus">เฉพาะที่เลือก</button>
+          <button class="btn" id="btnClear">ล้างที่เลือก</button>
+        </div>
+        <canvas id="rrgCanvas"></canvas>
+        <div class="rrg-tip" id="rrgTip"></div>
+        <div class="rrg-note">จุดใหญ่ = สัปดาห์ล่าสุด · เอาเมาส์ชี้ / แตะจุด หรือกดชื่อกลุ่มด้านขวาเพื่อไฮไลท์เส้นทาง · กดซ้ำเพื่อเลิกเลือก</div>
+      </div>
+      <div class="rrg-list" id="rrgList"></div>
+    </div>
+  </section>
+
+  <!-- Heatmap -->
+  <section>
+    <div class="sec-label">PERFORMANCE HEATMAP</div>
+    <div class="sec-title">ผลตอบแทนรายกลุ่ม (equal-weight, กดหัวตารางเพื่อเรียงใหม่)</div>
+    <div class="tbl-scroll">
+      <table class="hm" id="hmTable">
+        <thead><tr>
+          <th data-k="name">กลุ่ม / ธีม</th>
+          <th data-k="quad" style="text-align:center">สถานะ</th>
+          <th data-k="r1d">1D%</th>
+          <th data-k="r1w">1W%</th>
+          <th data-k="r1m">1M%</th>
+          <th data-k="r3m">3M%</th>
+          <th data-k="vs" class="sorted">1M เทียบ SPY ▾</th>
+          <th data-k="breadth">Breadth</th>
+        </tr></thead>
+        <tbody id="hmBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Playbook -->
+  <section>
+    <div class="sec-label">MOMENTUM PLAYBOOK</div>
+    <div class="sec-title">แต่ละโซน…ทำอะไรได้บ้าง</div>
+    <div class="pbgrid">
+      <div class="pbcard lead"><div class="en">LEADING</div><h3>🟢 นำตลาด — ถือต่อ</h3>
+        <p>กลุ่มที่แข็งกว่าตลาดและแรงยังมา เหมาะสุดสำหรับคนที่ถืออยู่แล้ว ถ้าจะเข้าใหม่ให้รู้ว่ากำลังจ่าย "ราคาของความชัวร์" — จุดที่ควรเฝ้าคือเมื่อไหร่ที่แรงเริ่มโค้งลง (ขยับไปโซนส้ม) ให้เตรียมแผนออก</p>
+        <div id="pbLead"></div></div>
+      <div class="pbcard improv"><div class="en">IMPROVING</div><h3>🔵 กำลังฟื้น — โซนหาจุดเข้า</h3>
+        <p>ยังอ่อนกว่าตลาดแต่เงินเริ่มไหลกลับ จุดยืนยันที่ช่วยกรองของปลอมคือ ราคายืนต่อเนื่อง 2–3 สัปดาห์ + Breadth (สัดส่วนหุ้นในกลุ่มที่ยืนเหนือเส้นแนวโน้ม) เริ่มฟื้นตาม — ธีมที่ Breadth ยังต่ำให้รอก่อน</p>
+        <div id="pbImprov"></div></div>
+      <div class="pbcard weak"><div class="en">WEAKENING</div><h3>🟠 เริ่มแผ่ว — ทยอยลด ห้ามเพิ่ม</h3>
+        <p>ผลตอบแทนสะสมมักยังดูสวยที่สุดตอนนี้แหละ เพราะเป็นโซนที่คนเพิ่งวิ่งเข้ามาทีหลัง แต่แรงส่งกำลังหมด — ถ้าถืออยู่คือโอกาสทยอยขายทำกำไร ไม่ใช่จุดเพิ่มไม้</p>
+        <div id="pbWeak"></div></div>
+      <div class="pbcard lag"><div class="en">LAGGING</div><h3>🔴 อ่อนแรง — ห้ามรีบช้อน</h3>
+        <p>อ่อนกว่าตลาดและแรงยังไม่กลับ การเด้งสั้นๆ ในโซนนี้ส่วนใหญ่เป็นการเด้งชั่วคราว จะน่าสนใจอีกครั้งก็ต่อเมื่อขยับขึ้นไปโซนฟื้น (สีฟ้า) พร้อม Breadth ที่ดีขึ้นจริง</p>
+        <div id="pbLag"></div></div>
+    </div>
+  </section>
+
+  <!-- Breadth & Volume -->
+  <section>
+    <div class="sec-label">BREADTH & VOLUME</div>
+    <div class="sec-title">สุขภาพภายในกลุ่ม — สัญญาณเตือนที่มาก่อนราคา</div>
+    <div class="brd-box" id="brdBox"></div>
+    <div class="brd-legend" style="padding:0 4px">
+      <b>Breadth</b> = สัดส่วนหุ้นในกลุ่มที่ราคายืนเหนือเส้นค่าเฉลี่ย 20 วัน — ถ้ากลุ่มขึ้นแต่ Breadth ต่ำ แปลว่าขึ้นด้วยหุ้นไม่กี่ตัว เปราะกว่าที่เห็น ·
+      <b>เงินซื้อขาย 5D/20D</b> = มูลค่าซื้อขายเฉลี่ย 5 วันล่าสุดเทียบค่าเฉลี่ย 20 วัน — เกิน 1.10× (ตัวหนา) คือเงินกำลังวิ่งเข้ามาเล่นกลุ่มนี้หนาแน่นกว่าปกติ
+    </div>
+  </section>
+
+  <!-- Appendix -->
+  <section>
+    <div class="sec-label">APPENDIX</div>
+    <div class="sec-title">แต่ละกลุ่มมีหุ้นอะไรบ้าง + ETF อ้างอิง</div>
+    <div class="apxgrid" id="apxGrid"></div>
+  </section>
+
+  <!-- Notes -->
+  <section>
+    <div class="notes">
+      <b>หมายเหตุวิธีคำนวณ:</b> ทุกกลุ่มสร้างจากหุ้นสมาชิก S&P 500 แบบถ่วงน้ำหนักเท่ากัน (equal-weight) จากราคาปิดรายวัน · แกนแผนที่การหมุน: แกนนอน = ความแข็งเทียบ SPY (เฉลี่ย 14 สัปดาห์), แกนตั้ง = โมเมนตัมของความแข็งนั้น (เฉลี่ย 8 สัปดาห์) จุดตัดที่ 100 · หุ้นที่เพิ่งเข้าดัชนีและประวัติราคายังสั้นจะถูกข้ามอัตโนมัติจนกว่าข้อมูลครบ · กลุ่มธีมบางกลุ่มของตลาด (เช่น Quantum, China Tech, Solar) ไม่มีหุ้นตัวแทนเพียงพอใน S&P 500 จึงไม่แสดงในแดชบอร์ดนี้ · ทองคำและน้ำมัน WTI เป็นราคา spot แสดงไว้เทียบเคียงเท่านั้น<br><br>
+      แดชบอร์ดนี้เป็นกรอบวิเคราะห์เพื่อการศึกษา ไม่ใช่คำแนะนำซื้อขายหลักทรัพย์ ผลตอบแทนในอดีตไม่ได้ยืนยันผลตอบแทนในอนาคต
+    </div>
+    <div class="foot">
+      <div class="brand">JP TRUST LEARNING</div>
+      อัพเดตอัตโนมัติทุกวันทำการหลังตลาดสหรัฐฯ ปิด
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* ============================================================
+   JPT Sector & Theme Rotation Tracker
+   data: mini_sp500_rotation.csv (Ticker,Date,Close,Volume)
+   ============================================================ */
+const CSV_URL = 'https://app.jptrustlearning.com/data/mini_sp500_rotation.csv';
+
+const THEMES = [
+ {name:'Mag 7',              tk:'AAPL MSFT NVDA AMZN GOOGL META TSLA', etf:'MAGS'},
+ {name:'Semiconductors',     tk:'NVDA AMD AVGO QCOM TXN INTC MRVL ADI NXPI ON MCHP', etf:'SMH · SOXX'},
+ {name:'Semi Equip & Memory',tk:'MU AMAT LRCX KLAC WDC STX SNDK TER', etf:'SMH (น้ำหนัก equip สูง)'},
+ {name:'Software',           tk:'MSFT ORCL CRM ADBE NOW PLTR INTU SNPS CDNS ADSK WDAY IBM', etf:'IGV · XSW'},
+ {name:'Cybersecurity',      tk:'CRWD PANW FTNT GEN', etf:'CIBR · HACK · BUG'},
+ {name:'AI Infra & Data Center', tk:'VRT ANET SMCI DELL ETN GEV CIEN', etf:'AIQ · DTCR · GRID'},
+ {name:'Fintech & Payments', tk:'V MA PYPL AXP COF FISV GPN FIS', etf:'IPAY · FINX'},
+ {name:'Crypto-linked',      tk:'COIN HOOD XYZ', etf:'IBIT · DAPP'},
+ {name:'Banks & Brokers',    tk:'JPM BAC WFC C GS MS SCHW PNC USB TFC BK', etf:'KBWB · KBE · IAI'},
+ {name:'Defense',            tk:'LMT RTX NOC GD LHX HWM AXON HII TDG', etf:'ITA · XAR · PPA'},
+ {name:'Homebuilders',       tk:'DHI LEN PHM NVR MAS BLDR', etf:'ITB · XHB'},
+ {name:'Travel & Airlines',  tk:'BKNG ABNB MAR HLT DAL UAL LUV RCL CCL NCLH EXPE', etf:'JETS · PEJ'},
+ {name:'Pharma & Managed Care', tk:'LLY JNJ MRK ABBV PFE BMY UNH CVS CI ELV HUM CNC MOH ZTS', etf:'IHE · XLV'},
+ {name:'Biotech Large',      tk:'AMGN GILD VRTX REGN BIIB MRNA INCY', etf:'IBB · XBI'},
+ {name:'MedTech',            tk:'ISRG SYK MDT BSX EW GEHC ABT DHR TMO IDXX', etf:'IHI'},
+ {name:'Energy',             tk:'XOM CVX COP SLB EOG PSX MPC VLO OXY HAL BKR FANG', etf:'XLE · XOP · OIH'},
+ {name:'Utilities & Power',  tk:'NEE DUK SO VST CEG D AEP EXC SRE PEG NRG', etf:'XLU · GRID'},
+ {name:'Staples',            tk:'PG KO PEP COST WMT PM MO CL KMB GIS KHC MDLZ', etf:'XLP'},
+ {name:'REITs',              tk:'PLD AMT EQIX WELL SPG O PSA CCI DLR VICI', etf:'XLRE · VNQ'},
+ {name:'Materials',          tk:'LIN SHW APD ECL FCX NUE DOW DD ALB NEM', etf:'XLB'},
+ {name:'Industrials',        tk:'CAT DE HON GE EMR PH UNP UPS CSX NSC ITW MMM', etf:'XLI'},
+ {name:'Media & Telecom',    tk:'NFLX DIS CMCSA TMUS VZ T CHTR TTD', etf:'XLC'},
+ {name:'Consumer & Retail',  tk:'HD LOW NKE MCD SBUX TJX ORLY AZO CMG ROST TGT LULU', etf:'XLY · XRT'},
+ {name:'Insurance',          tk:'PGR CB TRV AIG ALL MET PRU AFL', etf:'IAK · KIE'},
+];
+const REFS = [ {name:'SPY (S&P 500)', tk:'SPY'}, {name:'ทองคำ Spot', tk:'GOLD'}, {name:'น้ำมัน WTI', tk:'WTI'} ];
+
+const QUAD = {
+  lead:   {key:'lead',   th:'นำตลาด',  color:'#2E7D4F'},
+  improv: {key:'improv', th:'กำลังฟื้น', color:'#2C6E9E'},
+  weak:   {key:'weak',   th:'เริ่มแผ่ว', color:'#B07A00'},
+  lag:    {key:'lag',    th:'อ่อนแรง',  color:'#A83232'},
+};
+
+const W_RS = 14, W_MOM = 8, TAIL = 8;
+const state = { themes:[], refs:[], pinned:new Set(), hover:null, mode:'all', sortK:'vs', sortDir:-1, weekDates:[] };
+
+/* ---------- load & parse ---------- */
+async function loadCSV(){
+  const dayKey = new Date().toISOString().slice(0,10);
+  const res = await fetch(CSV_URL + '?v=' + dayKey);
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+  return res.text();
+}
+
+function parseCSV(text){
+  const lines = text.split('\n');
+  const dateSet = new Set();
+  const rows = [];
+  for(let i=1;i<lines.length;i++){
+    const L = lines[i]; if(!L) continue;
+    const p = L.split(',');
+    if(p.length < 4) continue;
+    rows.push(p);
+    dateSet.add(p[1]);
+  }
+  const dates = Array.from(dateSet).sort();
+  const dIdx = new Map(dates.map((d,i)=>[d,i]));
+  const N = dates.length;
+  const series = new Map(); // ticker -> {c:Float64Array, v:Float64Array}
+  for(const p of rows){
+    const t = p[0];
+    let s = series.get(t);
+    if(!s){ s = {c:new Float64Array(N).fill(NaN), v:new Float64Array(N).fill(0)}; series.set(t,s); }
+    const i = dIdx.get(p[1]);
+    s.c[i] = +p[2]; s.v[i] = +p[3];
+  }
+  return {dates, series};
+}
+
+/* compacted valid series (skip NaN) */
+function compact(s){
+  const idx=[], c=[], v=[];
+  for(let i=0;i<s.c.length;i++){ if(!Number.isNaN(s.c[i])){ idx.push(i); c.push(s.c[i]); v.push(s.v[i]); } }
+  return {idx,c,v};
+}
+function retN(cp, n){ const L=cp.c.length; if(L<=n) return null; return (cp.c[L-1]/cp.c[L-1-n]-1)*100; }
+function above20(cp){ const L=cp.c.length; if(L<21) return null; let m=0; for(let i=L-20;i<L;i++) m+=cp.c[i]; return cp.c[L-1] > m/20; }
+function dollarVolRatio(cp){ const L=cp.c.length; if(L<20) return null;
+  let s5=0,s20=0; for(let i=L-5;i<L;i++) s5+=cp.c[i]*cp.v[i]; for(let i=L-20;i<L;i++) s20+=cp.c[i]*cp.v[i];
+  const a5=s5/5, a20=s20/20; return a20>0 ? a5/a20 : null; }
+
+/* weekly boundaries: last global-date index of each ISO week */
+function weekBoundaries(dates){
+  const b=[]; let prevKey=null;
+  for(let i=0;i<dates.length;i++){
+    const d = new Date(dates[i]+'T00:00:00Z');
+    // ISO week key
+    const dt = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+    const dayNum = (dt.getUTCDay()+6)%7; dt.setUTCDate(dt.getUTCDate()-dayNum+3);
+    const key = dt.getUTCFullYear() + '-' + Math.ceil((((dt - Date.UTC(dt.getUTCFullYear(),0,1))/86400000)+1)/7);
+    if(key!==prevKey && prevKey!==null) b[b.length-1] = i-1;
+    if(key!==prevKey){ b.push(i); prevKey=key; }
+    else b[b.length-1] = i;
+  }
+  return b; // indices into dates
+}
+
+function sma(arr, w, i){ if(i+1<w) return NaN; let s=0; for(let k=i-w+1;k<=i;k++){ if(Number.isNaN(arr[k])) return NaN; s+=arr[k]; } return s/w; }
+
+/* ---------- compute ---------- */
+function compute(dates, series){
+  const bIdx = weekBoundaries(dates);
+  const W = bIdx.length;
+  // forward-filled weekly close per ticker
+  function weeklyOf(t){
+    const s = series.get(t); if(!s) return null;
+    const out = new Float64Array(W).fill(NaN);
+    let last = NaN, bi=0;
+    for(let i=0;i<s.c.length;i++){
+      if(!Number.isNaN(s.c[i])) last = s.c[i];
+      if(i===bIdx[bi]){ out[bi]=last; bi++; if(bi>=W) break; }
+    }
+    return out;
+  }
+  const spyW = weeklyOf('SPY');
+
+  const themes = THEMES.map(T=>{
+    const members = T.tk.split(' ');
+    const cps = members.map(t=>{ const s=series.get(t); return s?{t,cp:compact(s)}:null; }).filter(Boolean);
+    // returns (equal-weight avg of member returns)
+    const R = {};
+    [['r1d',1],['r1w',5],['r1m',21],['r3m',63]].forEach(([k,n])=>{
+      const vs = cps.map(o=>retN(o.cp,n)).filter(v=>v!==null);
+      R[k] = vs.length? vs.reduce((a,b)=>a+b,0)/vs.length : null;
+    });
+    // breadth & $vol
+    const ab = cps.map(o=>above20(o.cp)).filter(v=>v!==null);
+    const breadth = ab.length? ab.filter(Boolean).length/ab.length*100 : null;
+    const dvs = cps.map(o=>dollarVolRatio(o.cp)).filter(v=>v!==null);
+    const dvol = dvs.length? dvs.reduce((a,b)=>a+b,0)/dvs.length : null;
+    // weekly equal-weight index (members with near-full coverage)
+    const wcs = members.map(t=>weeklyOf(t)).filter(w=>{
+      if(!w || Number.isNaN(w[0])) return false;
+      let nan=0; for(let i=0;i<w.length;i++) if(Number.isNaN(w[i])) nan++;
+      return nan<=2;
+    });
+    let tail=null, quad='lag';
+    if(wcs.length>=2 && spyW){
+      const idx = new Float64Array(W);
+      for(let i=0;i<W;i++){ let s=0,n=0; for(const w of wcs){ if(!Number.isNaN(w[i])&&!Number.isNaN(w[0])){ s+=w[i]/w[0]; n++; } } idx[i]= n? s/n : NaN; }
+      const rs = new Float64Array(W);
+      for(let i=0;i<W;i++) rs[i] = 100*idx[i]/spyW[i]*spyW[0];
+      const rr = new Float64Array(W), rm = new Float64Array(W);
+      for(let i=0;i<W;i++){ const m=sma(rs,W_RS,i); rr[i]= Number.isNaN(m)?NaN:100*rs[i]/m; }
+      for(let i=0;i<W;i++){ const m=sma(rr,W_MOM,i); rm[i]= Number.isNaN(m)?NaN:100*rr[i]/m; }
+      const pts=[];
+      for(let i=0;i<W;i++) if(!Number.isNaN(rr[i])&&!Number.isNaN(rm[i])) pts.push({x:rr[i],y:rm[i],w:i});
+      if(pts.length>=2){
+        tail = pts.slice(-TAIL);
+        const h = tail[tail.length-1];
+        quad = h.x>=100 ? (h.y>=100?'lead':'weak') : (h.y>=100?'improv':'lag');
+      }
+    }
+    return {...T, members, memberCount:cps.length, ...R, vs:(R.r1m!==null&&spyR1m!==null)? R.r1m-spyR1m : null,
+            breadth, dvol, tail, quad};
+  });
+
+  return themes;
+}
+
+let spyR1m = null;
+
+/* ---------- format helpers ---------- */
+const f2 = v => v===null||Number.isNaN(v) ? '—' : (v>=0?'+':'')+v.toFixed(2);
+const f1 = v => v===null||Number.isNaN(v) ? '—' : (v>=0?'+':'')+v.toFixed(1);
+function cellBG(v, scale){
+  if(v===null||Number.isNaN(v)) return '';
+  const a = Math.min(Math.abs(v)/scale, 1);
+  return v>=0 ? `background:rgba(46,125,79,${(a*0.35).toFixed(3)})` : `background:rgba(168,50,50,${(a*0.30).toFixed(3)})`;
+}
+function thDate(iso){
+  const m=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const [y,mo,d]=iso.split('-');
+  return (+d)+' '+m[+mo-1]+' '+(+y+543);
+}
+
+/* ---------- render: summary ---------- */
+function renderSummary(){
+  const T = state.themes;
+  const lead = T.filter(t=>t.quad==='lead' && t.vs!==null).sort((a,b)=>b.vs-a.vs).slice(0,4);
+  const improv = T.filter(t=>t.quad==='improv').sort((a,b)=>(b.breadth||0)-(a.breadth||0)).slice(0,4);
+  let warn = T.filter(t=>t.quad==='weak').sort((a,b)=>(a.r1w||0)-(b.r1w||0)).slice(0,4);
+  const chip = (t,cls,val)=>`<span class="tchip ${cls}" data-nm="${t.name}">${t.name}<small>${val}</small></span>`;
+  document.getElementById('sumLead').innerHTML = lead.length? lead.map(t=>chip(t,'lead','+'+t.vs.toFixed(1)+'% vs SPY')).join('') : '<span class="pbempty">— วันนี้ไม่มีกลุ่มในโซนนี้ —</span>';
+  document.getElementById('sumImprov').innerHTML = improv.length? improv.map(t=>chip(t,'improv','B '+(t.breadth===null?'—':t.breadth.toFixed(0)+'%'))).join('') : '<span class="pbempty">— วันนี้ไม่มีกลุ่มในโซนนี้ —</span>';
+  document.getElementById('sumWarn').innerHTML = warn.length? warn.map(t=>chip(t,'weak',f1(t.r1w)+'% สัปดาห์นี้')).join('') : '<span class="pbempty">— วันนี้ไม่มีกลุ่มในโซนนี้ —</span>';
+  document.querySelectorAll('.tchip').forEach(el=>el.addEventListener('click',()=>{ togglePin(el.dataset.nm, true); document.getElementById('rrgCanvas').scrollIntoView({behavior:'smooth',block:'center'}); }));
+}
+
+/* ---------- render: RRG ---------- */
+const cv = document.getElementById('rrgCanvas');
+const ctx = cv.getContext('2d');
+let plot = null;
+
+function drawRRG(){
+  const box = cv.parentElement;
+  const wCSS = box.clientWidth - 28;
+  const hCSS = Math.max(380, Math.min(560, wCSS*0.72));
+  const dpr = window.devicePixelRatio||1;
+  cv.width = wCSS*dpr; cv.height = hCSS*dpr; cv.style.height=hCSS+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+
+  const T = state.themes.filter(t=>t.tail);
+  let xmin=99,xmax=101,ymin=99,ymax=101;
+  T.forEach(t=>t.tail.forEach(p=>{ xmin=Math.min(xmin,p.x);xmax=Math.max(xmax,p.x);ymin=Math.min(ymin,p.y);ymax=Math.max(ymax,p.y); }));
+  const padX=(xmax-xmin)*0.10+0.5, padY=(ymax-ymin)*0.10+0.4;
+  xmin-=padX;xmax+=padX;ymin-=padY;ymax+=padY;
+  const ML=44, MR=12, MT=26, MB=34;
+  const pw = wCSS-ML-MR, ph = hCSS-MT-MB;
+  const X = v => ML + (v-xmin)/(xmax-xmin)*pw;
+  const Y = v => MT + (ymax-v)/(ymax-ymin)*ph;
+  plot = {X,Y,xmin,xmax,ymin,ymax,ML,MT,pw,ph};
+
+  ctx.clearRect(0,0,wCSS,hCSS);
+  // quadrant tints
+  const cx=X(100), cy=Y(100);
+  ctx.fillStyle='rgba(46,125,79,0.055)';  ctx.fillRect(cx,MT,ML+pw-cx,cy-MT);              // leading TR
+  ctx.fillStyle='rgba(44,110,158,0.055)'; ctx.fillRect(ML,MT,cx-ML,cy-MT);                 // improving TL
+  ctx.fillStyle='rgba(176,122,0,0.06)';   ctx.fillRect(cx,cy,ML+pw-cx,MT+ph-cy);           // weakening BR
+  ctx.fillStyle='rgba(168,50,50,0.05)';   ctx.fillRect(ML,cy,cx-ML,MT+ph-cy);              // lagging BL
+
+  // grid
+  ctx.strokeStyle='rgba(139,105,20,0.13)'; ctx.lineWidth=1;
+  ctx.font='11px Anuphan'; ctx.fillStyle='#7A6F62';
+  const xstep = niceStep((xmax-xmin)/6), ystep = niceStep((ymax-ymin)/6);
+  for(let v=Math.ceil(xmin/xstep)*xstep; v<=xmax; v+=xstep){
+    ctx.beginPath();ctx.moveTo(X(v),MT);ctx.lineTo(X(v),MT+ph);ctx.stroke();
+    ctx.textAlign='center'; ctx.fillText(v.toFixed(0), X(v), MT+ph+16);
+  }
+  for(let v=Math.ceil(ymin/ystep)*ystep; v<=ymax; v+=ystep){
+    ctx.beginPath();ctx.moveTo(ML,Y(v));ctx.lineTo(ML+pw,Y(v));ctx.stroke();
+    ctx.textAlign='right'; ctx.fillText(v.toFixed(0), ML-7, Y(v)+4);
+  }
+  // center cross (gold dashed)
+  ctx.strokeStyle='rgba(184,134,11,0.6)'; ctx.setLineDash([5,4]); ctx.lineWidth=1.2;
+  ctx.beginPath();ctx.moveTo(cx,MT);ctx.lineTo(cx,MT+ph);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(ML,cy);ctx.lineTo(ML+pw,cy);ctx.stroke();
+  ctx.setLineDash([]);
+  // quadrant labels
+  ctx.font='700 11.5px Anuphan';
+  ctx.fillStyle='rgba(44,110,158,0.75)'; ctx.textAlign='left';  ctx.fillText('🔵 กำลังฟื้น', ML+8, MT+16);
+  ctx.fillStyle='rgba(46,125,79,0.8)';   ctx.textAlign='right'; ctx.fillText('นำตลาด 🟢', ML+pw-8, MT+16);
+  ctx.fillStyle='rgba(168,50,50,0.75)';  ctx.textAlign='left';  ctx.fillText('🔴 อ่อนแรง', ML+8, MT+ph-8);
+  ctx.fillStyle='rgba(176,122,0,0.85)';  ctx.textAlign='right'; ctx.fillText('เริ่มแผ่ว 🟠', ML+pw-8, MT+ph-8);
+  // axis titles
+  ctx.fillStyle='#7A6F62'; ctx.font='11px Anuphan'; ctx.textAlign='center';
+  ctx.fillText('← อ่อนกว่าตลาด · ความแข็งเทียบ SPY · แข็งกว่าตลาด →', ML+pw/2, hCSS-6);
+  ctx.save(); ctx.translate(12, MT+ph/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText('← แรงกำลังหมด · โมเมนตัม · แรงกำลังมา →', 0, 0); ctx.restore();
+
+  // tails
+  const anyPin = state.pinned.size>0;
+  const focusMode = state.mode==='focus';
+  const drawOne = (t, hi)=>{
+    const col = QUAD[t.quad].color;
+    const pts = t.tail.map(p=>({x:X(p.x),y:Y(p.y)}));
+    ctx.strokeStyle = col; ctx.globalAlpha = hi?0.95:(focusMode?0.07:0.22);
+    ctx.lineWidth = hi?2.6:1.3;
+    ctx.beginPath();
+    pts.forEach((p,i)=> i? ctx.lineTo(p.x,p.y) : ctx.moveTo(p.x,p.y));
+    ctx.stroke();
+    // small dots along tail
+    ctx.fillStyle=col;
+    for(let i=0;i<pts.length-1;i++){ ctx.globalAlpha=hi?0.85:(focusMode?0.06:0.2); ctx.beginPath();ctx.arc(pts[i].x,pts[i].y,hi?2.6:1.8,0,7);ctx.fill(); }
+    // head
+    const h=pts[pts.length-1];
+    ctx.globalAlpha= hi?1:(focusMode&&!hi?0.18:0.92);
+    ctx.beginPath();ctx.arc(h.x,h.y,hi?8:6,0,7);ctx.fill();
+    ctx.globalAlpha=1; ctx.strokeStyle='#FFFEF8'; ctx.lineWidth=1.6;
+    ctx.beginPath();ctx.arc(h.x,h.y,hi?8:6,0,7);ctx.stroke();
+    t._hx=h.x; t._hy=h.y;
+  };
+  const hiSet = new Set(state.pinned);
+  if(state.hover) hiSet.add(state.hover);
+  // label top-3 by |vs| when nothing selected
+  const labelSet = new Set(hiSet);
+  if(!anyPin && !state.hover){
+    state.themes.filter(t=>t.tail&&t.vs!==null).sort((a,b)=>Math.abs(b.vs)-Math.abs(a.vs)).slice(0,3).forEach(t=>labelSet.add(t.name));
+  }
+  T.filter(t=>!hiSet.has(t.name)).forEach(t=>drawOne(t,false));
+  T.filter(t=> hiSet.has(t.name)).forEach(t=>drawOne(t,true));
+  // labels
+  ctx.font='700 12px Anuphan'; ctx.textAlign='left'; ctx.globalAlpha=1;
+  T.filter(t=>labelSet.has(t.name)).forEach(t=>{
+    const col=QUAD[t.quad].color;
+    const tx = Math.min(t._hx+11, ML+pw-70);
+    ctx.fillStyle='rgba(250,246,237,0.82)';
+    const w = ctx.measureText(t.name).width;
+    ctx.fillRect(tx-3, t._hy-16, w+6, 16);
+    ctx.fillStyle=col; ctx.fillText(t.name, tx, t._hy-4);
+  });
+}
+function niceStep(raw){ const p=Math.pow(10,Math.floor(Math.log10(raw))); const n=raw/p; return (n<1.5?1:n<3.5?2:n<7.5?5:10)*p; }
+
+/* hover / click on canvas */
+const tip = document.getElementById('rrgTip');
+cv.addEventListener('mousemove', e=>{
+  const r=cv.getBoundingClientRect(); const mx=e.clientX-r.left, my=e.clientY-r.top;
+  let best=null, bd=15;
+  state.themes.forEach(t=>{ if(t._hx===undefined)return; const d=Math.hypot(t._hx-mx,t._hy-my); if(d<bd){bd=d;best=t;} });
+  const nm = best? best.name : null;
+  if(nm!==state.hover){ state.hover=nm; drawRRG(); syncListHi(); }
+  if(best){
+    tip.style.opacity=1;
+    tip.style.left=Math.min(best._hx+14, r.width-190)+'px'; tip.style.top=(best._hy+2)+'px';
+    tip.innerHTML=`<b>${best.name}</b> · ${QUAD[best.quad].th}<br>1M ${f2(best.r1m)}% · เทียบ SPY ${f2(best.vs)}%`;
+    cv.style.cursor='pointer';
+  } else { tip.style.opacity=0; cv.style.cursor='crosshair'; }
+});
+cv.addEventListener('mouseleave', ()=>{ state.hover=null; tip.style.opacity=0; drawRRG(); syncListHi(); });
+cv.addEventListener('click', e=>{
+  const r=cv.getBoundingClientRect(); const mx=e.clientX-r.left, my=e.clientY-r.top;
+  let best=null,bd=15;
+  state.themes.forEach(t=>{ if(t._hx===undefined)return; const d=Math.hypot(t._hx-mx,t._hy-my); if(d<bd){bd=d;best=t;} });
+  if(best) togglePin(best.name);
+});
+
+function togglePin(nm, forceOn){
+  if(state.pinned.has(nm) && !forceOn) state.pinned.delete(nm); else state.pinned.add(nm);
+  drawRRG(); renderRRGList();
+}
+function syncListHi(){
+  document.querySelectorAll('.rrow').forEach(el=>{
+    el.style.background = (el.dataset.nm===state.hover)? 'var(--cream-warm)' : '';
+    if(state.pinned.has(el.dataset.nm)) el.classList.add('pinned'); else el.classList.remove('pinned');
+  });
+}
+
+function renderRRGList(){
+  const order={lead:0,improv:1,weak:2,lag:3};
+  const T=[...state.themes].sort((a,b)=> order[a.quad]-order[b.quad] || (b.vs||-99)-(a.vs||-99));
+  document.getElementById('rrgList').innerHTML = T.map(t=>`
+    <div class="rrow ${state.pinned.has(t.name)?'pinned':''}" data-nm="${t.name}">
+      <span class="dot" style="background:${QUAD[t.quad].color}"></span>
+      <span class="nm">${t.name}</span>
+      <span class="pill ${t.quad}">${QUAD[t.quad].th}</span>
+      <span class="vs" style="color:${(t.vs||0)>=0?'var(--lead)':'var(--lag)'}">${f1(t.vs)}</span>
+    </div>`).join('');
+  document.querySelectorAll('.rrow').forEach(el=>{
+    el.addEventListener('click', ()=>togglePin(el.dataset.nm));
+    el.addEventListener('mouseenter', ()=>{ state.hover=el.dataset.nm; drawRRG(); });
+    el.addEventListener('mouseleave', ()=>{ state.hover=null; drawRRG(); });
+  });
+}
+
+document.getElementById('btnTails').addEventListener('click', function(){ state.mode='all'; this.classList.add('on'); document.getElementById('btnFocus').classList.remove('on'); drawRRG(); });
+document.getElementById('btnFocus').addEventListener('click', function(){ state.mode='focus'; this.classList.add('on'); document.getElementById('btnTails').classList.remove('on'); drawRRG(); });
+document.getElementById('btnClear').addEventListener('click', ()=>{ state.pinned.clear(); drawRRG(); renderRRGList(); });
+
+/* ---------- render: heatmap ---------- */
+function renderHeatmap(){
+  const k=state.sortK, dir=state.sortDir;
+  const T=[...state.themes].sort((a,b)=>{
+    if(k==='name') return dir*a.name.localeCompare(b.name);
+    if(k==='quad'){ const o={lead:0,improv:1,weak:2,lag:3}; return dir*(o[a.quad]-o[b.quad]); }
+    const av=a[k]===null||Number.isNaN(a[k])?-1e9:a[k], bv=b[k]===null||Number.isNaN(b[k])?-1e9:b[k];
+    return dir===-1 ? bv-av : av-bv;
+  });
+  const rows = T.map(t=>`
+    <tr>
+      <td class="nm" data-nm="${t.name}">${t.name}</td>
+      <td class="st"><span class="pill ${t.quad}">${QUAD[t.quad].th}</span></td>
+      <td style="${cellBG(t.r1d,3)}">${f2(t.r1d)}</td>
+      <td style="${cellBG(t.r1w,6)}">${f2(t.r1w)}</td>
+      <td style="${cellBG(t.r1m,12)}">${f2(t.r1m)}</td>
+      <td style="${cellBG(t.r3m,35)}">${f2(t.r3m)}</td>
+      <td style="${cellBG(t.vs,12)};font-weight:600">${f2(t.vs)}</td>
+      <td><div class="bcell"><span class="bbar"><i style="width:${t.breadth===null?0:t.breadth}%;background:${t.breadth>=50?'var(--lead)':t.breadth>=30?'var(--weak)':'var(--lag)'}"></i></span>${t.breadth===null?'—':t.breadth.toFixed(0)+'%'}</div></td>
+    </tr>`).join('');
+  const refRows = state.refs.map(r=>`
+    <tr class="ref">
+      <td class="nm" style="cursor:default">${r.name} <span style="font-size:10.5px;color:var(--gold-deep)">อ้างอิง</span></td>
+      <td class="st">—</td>
+      <td>${f2(r.r1d)}</td><td>${f2(r.r1w)}</td><td>${f2(r.r1m)}</td><td>${f2(r.r3m)}</td>
+      <td>${r.tk==='SPY'?'0.00':f2(r.vs)}</td><td>—</td>
+    </tr>`).join('');
+  document.getElementById('hmBody').innerHTML = rows + refRows;
+  document.querySelectorAll('#hmBody td.nm[data-nm]').forEach(el=>el.addEventListener('click',()=>{ togglePin(el.dataset.nm,true); cv.scrollIntoView({behavior:'smooth',block:'center'}); }));
+}
+document.querySelectorAll('#hmTable th').forEach(th=>{
+  th.addEventListener('click', ()=>{
+    const k=th.dataset.k;
+    if(state.sortK===k) state.sortDir*=-1; else { state.sortK=k; state.sortDir = (k==='name'||k==='quad')?1:-1; }
+    document.querySelectorAll('#hmTable th').forEach(h=>{ h.classList.remove('sorted'); h.textContent=h.textContent.replace(/ [▾▴]$/,''); });
+    th.classList.add('sorted'); th.textContent += state.sortDir===-1?' ▾':' ▴';
+    renderHeatmap();
+  });
+});
+
+/* ---------- render: playbook ---------- */
+function renderPlaybook(){
+  const byQ = q => state.themes.filter(t=>t.quad===q).sort((a,b)=>(b.vs||-99)-(a.vs||-99));
+  const chip = t => `<span class="tchip ${t.quad}" data-nm="${t.name}">${t.name}<small>${f1(t.vs)}% · B ${t.breadth===null?'—':t.breadth.toFixed(0)+'%'}</small></span>`;
+  const fill=(id,q)=>{ const arr=byQ(q); document.getElementById(id).innerHTML = arr.length? arr.map(chip).join('') : '<span class="pbempty">— ไม่มีกลุ่มในโซนนี้ตอนนี้ —</span>'; };
+  fill('pbLead','lead'); fill('pbImprov','improv'); fill('pbWeak','weak'); fill('pbLag','lag');
+  document.querySelectorAll('.pbcard .tchip').forEach(el=>el.addEventListener('click',()=>{ togglePin(el.dataset.nm,true); cv.scrollIntoView({behavior:'smooth',block:'center'}); }));
+}
+
+/* ---------- render: breadth ---------- */
+function renderBreadth(){
+  const T=[...state.themes].filter(t=>t.breadth!==null).sort((a,b)=>b.breadth-a.breadth);
+  document.getElementById('brdBox').innerHTML =
+    `<div class="brow" style="font-size:11.5px;color:var(--tx-mute);font-weight:600"><span class="nm" style="cursor:default">กลุ่ม</span><span class="track" style="background:none"></span><span class="pct">%>20DMA</span><span class="dv">เงิน 5D/20D</span></div>` +
+    T.map(t=>{
+      const col = t.breadth>=50?'var(--lead)':t.breadth>=30?'var(--weak)':'var(--lag)';
+      const hot = t.dvol!==null && t.dvol>=1.10;
+      return `<div class="brow"><span class="nm" data-nm="${t.name}">${t.name}</span>
+        <span class="track"><i style="width:${t.breadth}%;background:${col}"></i></span>
+        <span class="pct" style="color:${col}">${t.breadth.toFixed(0)}%</span>
+        <span class="dv ${hot?'hot':''}">${t.dvol===null?'—':t.dvol.toFixed(2)+'×'}</span></div>`;
+    }).join('');
+  document.querySelectorAll('.brow .nm[data-nm]').forEach(el=>el.addEventListener('click',()=>{ togglePin(el.dataset.nm,true); cv.scrollIntoView({behavior:'smooth',block:'center'}); }));
+}
+
+/* ---------- render: appendix ---------- */
+function renderAppendix(){
+  document.getElementById('apxGrid').innerHTML = state.themes.map(t=>`
+    <div class="apxcard">
+      <h4>${t.name} <span class="pill ${t.quad}">${QUAD[t.quad].th}</span></h4>
+      <div class="tk">${t.members.join(' · ')}</div>
+      <div class="etf">ETF อ้างอิงของกลุ่มนี้ในตลาด: <b>${t.etf}</b></div>
+    </div>`).join('');
+}
+
+/* ---------- boot ---------- */
+async function boot(){
+  try{
+    const text = await loadCSV();
+    document.getElementById('loadMsg').textContent = 'กำลังคำนวณ…';
+    await new Promise(r=>setTimeout(r,30));
+    const {dates, series} = parseCSV(text);
+
+    // SPY header chips + spyR1m
+    const spyCp = compact(series.get('SPY'));
+    spyR1m = retN(spyCp,21);
+    const chips = [['1D',retN(spyCp,1)],['1M',spyR1m],['3M',retN(spyCp,63)]];
+    document.getElementById('spyChips').innerHTML = chips.map(([l,v])=>
+      `<span class="chip">SPY ${l} <b class="${v>=0?'up':'dn'}">${f2(v)}%</b></span>`).join('');
+    document.getElementById('asofDate').textContent = thDate(dates[dates.length-1]);
+
+    state.themes = compute(dates, series);
+    state.refs = REFS.map(r=>{
+      const s=series.get(r.tk); if(!s) return {...r,r1d:null,r1w:null,r1m:null,r3m:null,vs:null};
+      const cp=compact(s);
+      const r1m=retN(cp,21);
+      return {...r, r1d:retN(cp,1), r1w:retN(cp,5), r1m, r3m:retN(cp,63), vs:(r1m!==null&&spyR1m!==null)?r1m-spyR1m:null};
+    });
+
+    document.getElementById('loader').style.display='none';
+    document.getElementById('app').style.display='block';
+    renderSummary(); renderRRGList(); drawRRG(); renderHeatmap(); renderPlaybook(); renderBreadth(); renderAppendix();
+    window.addEventListener('resize', ()=>drawRRG());
+  }catch(err){
+    document.getElementById('loadMsg').innerHTML = 'โหลดข้อมูลไม่สำเร็จ ('+err.message+')<br><button class="btn" onclick="location.reload()" style="margin-top:12px">ลองใหม่</button>';
+    document.querySelector('.spin').style.display='none';
+  }
+}
+boot();
+</script>
+</body>
+</html>

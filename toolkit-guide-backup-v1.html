@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>คู่มือ JP Trust Tool &amp; Kit</title>
+<meta name="description" content="คู่มือการใช้งาน JP Trust Tool &amp; Kit — Sentiment ทองคำรายวัน โซนแนวรับแนวต้าน และการเปรียบเทียบกลยุทธ์ทองคำ">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;600&family=Cinzel:wght@500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FAF6ED; --card:#FFFEF8; --line:rgba(212,175,55,.24);
+  --maroon:#3a1520; --maroon2:#2d1018; --maroon3:#1a0a0e;
+  --gold:#D4AF37; --gold-l:#F4E4BA; --gold-soft:rgba(212,175,55,.12); --gold-deep:#9a7d1e;
+  --ink:#3D3228; --muted:#8a7d6b;
+  --up:#2E9E5B; --down:#C6472E;
+  --f-d:'Cinzel',serif; --f-b:'Anuphan',sans-serif; --f-n:'DM Serif Display',Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--cream);color:var(--ink);font-family:var(--f-b);line-height:1.75;font-weight:400;-webkit-font-smoothing:antialiased}
+.wrap{max-width:840px;margin:0 auto;padding:0 18px 80px}
+
+/* hero */
+.hero{background:linear-gradient(150deg,var(--maroon3) 0%,var(--maroon2) 50%,var(--maroon) 100%);
+  color:var(--gold-l);position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 85% 20%,rgba(212,175,55,.16),transparent 55%);pointer-events:none}
+.hero-in{max-width:840px;margin:0 auto;padding:40px 18px 34px;position:relative;z-index:1}
+.eyebrow{font-family:var(--f-d);font-size:10.5px;letter-spacing:3.2px;color:var(--gold);font-weight:600}
+.hero h1{font-size:clamp(24px,5.6vw,36px);font-weight:600;line-height:1.28;margin:10px 0 8px;color:#fff}
+.hero p{font-size:14.5px;color:rgba(244,228,186,.72);font-weight:300;max-width:600px}
+.hero-meta{margin-top:16px;font-size:12px;color:rgba(244,228,186,.5);font-weight:300}
+
+/* table of contents */
+.toc{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--gold);
+  border-radius:0 14px 14px 0;padding:18px 20px;margin:-24px 0 30px;position:relative;z-index:2;
+  box-shadow:0 8px 30px rgba(58,21,32,.10)}
+.toc-t{font-family:var(--f-d);font-size:10.5px;letter-spacing:2.4px;color:var(--gold);font-weight:600;margin-bottom:11px}
+.toc ol{list-style:none;counter-reset:toc}
+.toc li{counter-increment:toc;margin-bottom:5px}
+.toc a{display:flex;gap:10px;text-decoration:none;color:var(--ink);font-size:14px;padding:3px 0}
+.toc a::before{content:counter(toc,decimal-leading-zero);font-family:var(--f-d);font-size:11px;
+  color:var(--gold-deep);font-weight:600;min-width:20px;padding-top:3px}
+.toc a:hover{color:var(--maroon)}
+.toc a:hover::before{color:var(--gold)}
+
+/* sections */
+section{margin-top:44px;scroll-margin-top:16px}
+h2{font-size:20px;font-weight:600;color:var(--maroon);display:flex;align-items:center;gap:11px;margin-bottom:6px}
+h2 .n{font-family:var(--f-d);font-size:11px;letter-spacing:2px;color:var(--gold);font-weight:600}
+.lead{font-size:14px;color:var(--muted);font-weight:300;margin-bottom:18px}
+h3{font-size:15.5px;font-weight:600;color:var(--maroon);margin:24px 0 8px}
+h4{font-size:14px;font-weight:600;color:var(--ink);margin:16px 0 6px}
+p{font-size:14.5px;margin-bottom:12px}
+ul,ol{margin:0 0 12px 20px;font-size:14.5px}
+li{margin-bottom:6px}
+strong{font-weight:600;color:var(--maroon)}
+code{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;background:var(--gold-soft);
+  padding:2px 6px;border-radius:5px;color:var(--maroon)}
+
+/* cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:16px 18px;margin:14px 0}
+.card h4:first-child{margin-top:0}
+.note{background:var(--gold-soft);border:1px solid var(--line);border-radius:11px;
+  padding:13px 16px;margin:14px 0;font-size:13.5px;font-weight:300;line-height:1.72}
+.note b{font-weight:600;color:var(--maroon)}
+.warn{background:rgba(198,71,46,.07);border:1px solid rgba(198,71,46,.26);border-radius:11px;
+  padding:13px 16px;margin:14px 0;font-size:13.5px;font-weight:300;line-height:1.72;color:#8d3423}
+.warn b{font-weight:600;color:#7a2c1d}
+
+/* tables */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:14px 0;
+  border:1px solid var(--line);border-radius:12px;background:var(--card)}
+table{border-collapse:collapse;width:100%;min-width:440px}
+th,td{padding:10px 13px;text-align:left;font-size:13.5px;vertical-align:top}
+thead th{background:linear-gradient(180deg,var(--maroon),var(--maroon2));color:var(--gold-l);
+  font-weight:600;font-size:12.5px;white-space:nowrap}
+tbody tr{border-top:1px solid rgba(212,175,55,.16)}
+td.num{font-family:var(--f-n);font-size:15px;white-space:nowrap}
+.up{color:var(--up)} .down{color:var(--down)}
+
+/* steps */
+.steps{counter-reset:st;list-style:none;margin-left:0}
+.steps li{counter-increment:st;position:relative;padding-left:38px;margin-bottom:12px}
+.steps li::before{content:counter(st);position:absolute;left:0;top:1px;width:26px;height:26px;
+  border-radius:50%;background:linear-gradient(135deg,var(--gold),#b8901f);color:#231016;
+  font-family:var(--f-d);font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center}
+
+/* faq */
+details{background:var(--card);border:1px solid var(--line);border-radius:11px;
+  padding:0;margin-bottom:9px;overflow:hidden}
+summary{padding:13px 16px;cursor:pointer;font-size:14.5px;font-weight:600;color:var(--maroon);
+  list-style:none;display:flex;align-items:center;gap:10px}
+summary::-webkit-details-marker{display:none}
+summary::before{content:'+';font-family:var(--f-n);font-size:17px;color:var(--gold-deep);line-height:1}
+details[open] summary::before{content:'−'}
+details .body{padding:0 16px 15px 42px;font-size:14px;font-weight:300;line-height:1.75;color:var(--ink)}
+
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 14px}
+.chip{font-size:12px;font-weight:500;padding:4px 11px;border-radius:20px;
+  border:1px solid var(--line);background:var(--card);color:var(--gold-deep)}
+.chip.lock::before{content:'🔒 ';font-size:10px}
+
+.foot{text-align:center;margin-top:50px;padding-top:24px;border-top:1px solid var(--line)}
+.foot .b{font-family:var(--f-d);font-size:11px;letter-spacing:2.4px;color:var(--gold);font-weight:600}
+.foot p{font-size:12px;color:var(--muted);font-weight:300;margin-top:8px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-in">
+    <div class="eyebrow">USER GUIDE</div>
+    <h1>คู่มือการใช้งาน<br>JP Trust Tool &amp; Kit</h1>
+    <p>อธิบายทุกหน้าจอ ทุกปุ่ม และที่มาของตัวเลขทุกตัว เพื่อให้อ่านค่าที่เห็นได้อย่างมั่นใจ และรู้ว่าตัวเลขไหนบอกอะไรได้ ตัวเลขไหนบอกไม่ได้</p>
+    <div class="hero-meta">ครอบคลุม: คอนโซลรวมเครื่องมือ · Sentiment ทองคำรายวัน · โซนแนวรับแนวต้าน · การเปรียบเทียบกลยุทธ์ทองคำ</div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <nav class="toc">
+    <div class="toc-t">สารบัญ</div>
+    <ol>
+      <li><a href="#s1">ภาพรวมคอนโซลและการใช้เมนู</a></li>
+      <li><a href="#s2">หน้าแรก — Sentiment ทองคำรายวัน</a></li>
+      <li><a href="#s3">โซนแนวรับ–แนวต้านของวันนี้</a></li>
+      <li><a href="#s4">กราฟราคาทอง 60 วัน</a></li>
+      <li><a href="#s5">เปรียบเทียบกลยุทธ์ทองคำ</a></li>
+      <li><a href="#s6">เครื่องมืออื่นในเมนู</a></li>
+      <li><a href="#s7">คำถามที่พบบ่อย</a></li>
+      <li><a href="#s8">ข้อจำกัดที่ควรรู้</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ 1 ============ -->
+  <section id="s1">
+    <h2><span class="n">01</span>ภาพรวมคอนโซลและการใช้เมนู</h2>
+    <p class="lead">คอนโซลคือหน้ารวมเครื่องมือทั้งหมดไว้ในที่เดียว ไม่ต้องจำลิงก์แยกทีละอัน</p>
+
+    <h3>การเปิดเครื่องมือ</h3>
+    <p>เมนูฝั่งซ้ายแบ่งเป็นสามหมวด — <strong>ภาพรวม</strong> · <strong>ทองคำ</strong> · <strong>เครื่องมือ</strong> เมื่อกดชื่อเครื่องมือ ระบบจะเปิดเครื่องมือนั้นในกรอบด้านขวาทันที โดยที่เมนูยังอยู่ ไม่ต้องกดย้อนกลับไปมา</p>
+    <ul>
+      <li>แถบด้านบนจะเปลี่ยนเป็นชื่อเครื่องมือที่กำลังเปิดอยู่</li>
+      <li>ปุ่ม <strong>เปิดในแท็บใหม่</strong> สำหรับกรณีที่อยากดูเต็มจอ หรือเครื่องมือนั้นแสดงผลในกรอบไม่สะดวก</li>
+      <li>ปุ่ม <strong>← หน้าแรก</strong> กลับมาที่หน้า Sentiment</li>
+    </ul>
+
+    <h3>การส่งลิงก์ตรงไปยังเครื่องมือ</h3>
+    <p>ที่อยู่เว็บจะเปลี่ยนตามเครื่องมือที่เปิดอยู่ เช่น ลงท้ายด้วย <code>#gold-golden-cross.html</code> คัดลอกที่อยู่นั้นส่งต่อได้เลย ผู้รับจะเข้ามาที่เครื่องมือนั้นโดยตรง และถ้ารีเฟรชหน้าก็ยังอยู่ที่เดิม ไม่เด้งกลับหน้าแรก</p>
+
+    <h3>บนมือถือ</h3>
+    <p>เมนูจะยุบเป็นลิ้นชัก กดปุ่มขีดสามขีดมุมซ้ายบนเพื่อเปิด แตะนอกเมนูเพื่อปิด เมื่อเลือกเครื่องมือแล้วเมนูจะปิดให้เอง</p>
+
+    <h3>สัญลักษณ์แม่กุญแจ</h3>
+    <p>รายการที่มีแม่กุญแจกำกับคือเนื้อหาเฉพาะสมาชิก ป้าย <strong>สมาชิก</strong> ที่หัวหมวดหมายความว่าทั้งหมวดนั้นเป็นของสมาชิก ส่วนป้าย <strong>เช่า</strong> คือผลิตภัณฑ์ที่คิดค่าบริการแยกจากค่าสมาชิกหลัก</p>
+
+    <div class="note">
+      <b>วิธีเช็คว่าได้เวอร์ชันล่าสุดแล้วหรือยัง</b><br>
+      เปิดเมนูซ้ายแล้วเลื่อนลงล่างสุด จะมีบรรทัดเล็กบอกรุ่นและวันเวลา ถ้าสงสัยว่าหน้าจอไม่อัปเดตตามที่ควรจะเป็น ให้ดูบรรทัดนี้ก่อน แล้วลองรีเฟรชหน้า
+    </div>
+  </section>
+
+  <!-- ============ 2 ============ -->
+  <section id="s2">
+    <h2><span class="n">02</span>หน้าแรก — Sentiment ทองคำรายวัน</h2>
+    <p class="lead">สรุปสภาพตลาดทองคำของวันล่าสุดในหน้าเดียว ทั้งคะแนนรวม องค์ประกอบที่ทำให้ได้คะแนนนั้น และสัญญาณเตือน</p>
+
+    <h3>ป้ายสถานะข้อมูล</h3>
+    <p>มุมขวาบนของหัวข้อจะมีจุดสีบอกที่มาของตัวเลขที่กำลังแสดงอยู่</p>
+    <div class="tw"><table>
+      <thead><tr><th>ป้าย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td><strong>กำลังอัปเดตข้อมูลล่าสุด</strong></td><td>หน้ากำลังดึงข้อมูลใหม่อยู่เบื้องหลัง ตัวเลขที่เห็นตอนนี้มาจากข้อมูลที่ฝังมากับหน้า ใช้อ่านได้แต่อาจไม่ใช่ล่าสุด</td></tr>
+        <tr><td><strong>ข้อมูลสด</strong> (จุดเขียว)</td><td>ดึงข้อมูลใหม่สำเร็จแล้ว ตัวเลขทั้งหมดเป็นของวันล่าสุดที่ระบบมี</td></tr>
+        <tr><td><strong>ข้อมูลสำรอง</strong> (จุดทอง)</td><td>ดึงข้อมูลใหม่ไม่สำเร็จ กำลังใช้ข้อมูลที่ฝังมากับหน้า ทุกอย่างยังคำนวณได้ครบแต่วันที่อาจเก่ากว่าปัจจุบัน</td></tr>
+      </tbody>
+    </table></div>
+    <p>ถัดจากป้ายจะบอกวันที่และราคาปิดล่าสุดเสมอ ให้ยึดวันที่ตรงนี้เป็นหลักว่ากำลังดูข้อมูลของวันไหน</p>
+
+    <h3>การ์ดสรุปสี่ใบ</h3>
+    <div class="tw"><table>
+      <thead><tr><th>การ์ด</th><th>คืออะไร</th><th>อ่านอย่างไร</th></tr></thead>
+      <tbody>
+        <tr><td><strong>คะแนน Sentiment</strong></td><td>คะแนนรวมสภาพตลาดทองคำ เต็ม 100</td><td>ยิ่งสูงยิ่งแสดงว่าองค์ประกอบต่างๆ เอื้อต่อฝั่งขึ้น ใต้ตัวเลขคือระดับที่ระบบจัดให้</td></tr>
+        <tr><td><strong>ราคาปิดล่าสุด</strong></td><td>ราคาปิดของวันทำการล่าสุด</td><td>บรรทัดล่างคือการเปลี่ยนแปลงเทียบวันก่อนหน้า</td></tr>
+        <tr><td><strong>ความผันผวน</strong></td><td>ระดับการแกว่งของราคาช่วงนี้</td><td>ยิ่งสูงแปลว่าราคาเหวี่ยงแรง ควรเผื่อระยะให้กว้างขึ้น</td></tr>
+        <tr><td><strong>RSI / โซน Z</strong></td><td>ค่า RSI จริงของตัวชี้วัด และโซนที่ราคาอยู่เทียบค่าเฉลี่ย 50 วัน</td><td>โซน Extended หมายถึงราคาห่างจากค่าเฉลี่ยมากผิดปกติ</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>เกจคะแนนและระดับ</h3>
+    <p>เกจครึ่งวงกลมแบ่งเป็นสี่โซนสี เข็มชี้ตามคะแนนรวม</p>
+    <div class="tw"><table>
+      <thead><tr><th>ช่วงคะแนน</th><th>สี</th><th>ความหมายคร่าวๆ</th></tr></thead>
+      <tbody>
+        <tr><td class="num">0 – 40</td><td>แดง</td><td>องค์ประกอบส่วนใหญ่ไม่เอื้อ</td></tr>
+        <tr><td class="num">40 – 60</td><td>ส้ม</td><td>ยังไม่ชัด ก้ำกึ่ง</td></tr>
+        <tr><td class="num">60 – 75</td><td>เหลือง</td><td>เริ่มเอียงไปทางบวก</td></tr>
+        <tr><td class="num">75 – 100</td><td>เขียว</td><td>องค์ประกอบส่วนใหญ่เอื้อ</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>คะแนนย่อย 6 ด้าน</h3>
+    <p>คะแนนรวมมาจากการถ่วงน้ำหนักหกด้านนี้ แต่ละด้านให้คะแนนเต็ม 100 แยกกัน แถบสีช่วยให้กวาดตาเร็ว — เขียวคือตั้งแต่ 70 ขึ้นไป เหลืองคือ 45 ถึง 69 แดงคือต่ำกว่า 45</p>
+    <div class="tw"><table>
+      <thead><tr><th>ด้าน</th><th>ดูอะไร</th></tr></thead>
+      <tbody>
+        <tr><td><strong>ผลตอบแทน</strong></td><td>ผลตอบแทนของราคาในช่วงที่ผ่านมาเทียบกับเกณฑ์</td></tr>
+        <tr><td><strong>ปริมาณซื้อขาย</strong></td><td>ปริมาณการซื้อขายเทียบกับค่าปกติของช่วงนั้น</td></tr>
+        <tr><td><strong>โมเมนตัม RSI</strong></td><td>คะแนนที่แปลงมาจากค่า RSI</td></tr>
+        <tr><td><strong>เส้นค่าเฉลี่ย</strong></td><td>ตำแหน่งราคาเทียบกับเส้นค่าเฉลี่ยหลายเส้น</td></tr>
+        <tr><td><strong>ทิศทาง + วอลุ่ม</strong></td><td>ทิศทางของราคาที่มีปริมาณซื้อขายสนับสนุนหรือไม่</td></tr>
+        <tr><td><strong>ปัจจัยภายนอก</strong></td><td>ตัวแปรนอกตลาดทอง เช่น ค่าเงินดอลลาร์ พันธบัตร ราคาน้ำมัน</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="note">
+      <b>ทำไม RSI มีสองค่าไม่เท่ากัน</b><br>
+      การ์ดด้านบนแสดง <b>ค่า RSI จริง</b> ของตัวชี้วัด ส่วนแถบ “โมเมนตัม RSI” ในบล็อกคะแนนย่อยคือ <b>คะแนนที่ระบบให้ด้านนั้น</b> จากเต็ม 100 คนละหน่วยกัน จึงไม่เท่ากันเป็นเรื่องปกติ
+    </div>
+
+    <h3>ธงเตือน</h3>
+    <p>กล่องสีแดงใต้คะแนนย่อยจะขึ้นเมื่อพบเงื่อนไขที่ควรระวัง เช่น <strong>Death Cross</strong> คือภาวะที่เส้นค่าเฉลี่ยระยะสั้นตัดลงใต้เส้นระยะยาว ถ้าไม่มีเงื่อนไขใดเลย กล่องนี้จะไม่ปรากฏ</p>
+
+    <h3>ผลตอบแทนย้อนหลัง</h3>
+    <p>สามช่องล่างสุดคือผลตอบแทนของราคาทองย้อนหลัง 1 สัปดาห์ 1 เดือน และ 3 เดือน เขียวคือบวก แดงคือลบ ใช้ดูว่าภาพระยะสั้นกับระยะกลางไปทางเดียวกันหรือสวนกัน</p>
+
+    <div class="warn">
+      <b>ข้อควรระวัง</b> คะแนนย่อยกับผลตอบแทนย้อนหลังอาจดูขัดกันได้ เช่น ด้านผลตอบแทนขึ้นแถบแดงทั้งที่ผลตอบแทน 1 เดือนเป็นบวก เพราะคะแนนคือค่าที่ผ่านการเทียบเกณฑ์แล้ว ไม่ใช่ตัวผลตอบแทนดิบ
+    </div>
+  </section>
+
+  <!-- ============ 3 ============ -->
+  <section id="s3">
+    <h2><span class="n">03</span>โซนแนวรับ–แนวต้านของวันนี้</h2>
+    <p class="lead">กางระดับราคาที่น่าจับตาสำหรับวันนั้น พร้อมบอกว่าในอดีตราคาเคยวิ่งไปถึงแต่ละระดับบ่อยแค่ไหน</p>
+
+    <h3>เลือกราคาตั้งต้น</h3>
+    <p>ทุกระดับคำนวณจากราคาตั้งต้นเพียงตัวเดียว เลือกได้สองแบบ</p>
+    <div class="tw"><table>
+      <thead><tr><th>โหมด</th><th>ทำอะไร</th></tr></thead>
+      <tbody>
+        <tr><td><strong>ใช้ราคาล่าสุด</strong></td><td>ระบบเลือกให้เอง ช่องกรอกจะถูกล็อกไว้และอัปเดตอัตโนมัติเมื่อมีข้อมูลใหม่</td></tr>
+        <tr><td><strong>พิมพ์เอง</strong></td><td>ปลดล็อกช่องให้ใส่ราคาเปิดจริงที่เห็นในโปรแกรมเทรด แล้วกดคำนวณโซน</td></tr>
+      </tbody>
+    </table></div>
+
+    <h4>ระบบเลือกราคาตั้งต้นอย่างไรในโหมดอัตโนมัติ</h4>
+    <ul>
+      <li><strong>ถ้ามีข้อมูลของวันนี้แล้ว</strong> — ใช้ราคาเปิดของวันนี้ ซึ่งเป็นราคาที่ถูกต้องตามหลักการคำนวณโซน</li>
+      <li><strong>ถ้ายังไม่มีข้อมูลของวันนี้</strong> เช่น วันเสาร์อาทิตย์ หรือช่วงที่ยังไม่เริ่มวันทำการ — ใช้ราคาปิดล่าสุดแทน พร้อมข้อความกำกับว่า “ตลาดปิดอยู่” เพราะราคาเปิดของวันก่อนหน้าเป็นอดีตไปแล้ว ส่วนราคาปิดใกล้เคียงกับจุดที่ตลาดจะเปิดใหม่มากกว่า</li>
+    </ul>
+    <p>ตลาดทองเปิดตลอด 24 ชั่วโมงวันจันทร์ถึงศุกร์ ไม่มีเวลาเปิดปิดตายตัวแบบตลาดหุ้น ระบบจึงไม่ตัดสินจากนาฬิกา แต่ดูจากว่ามีข้อมูลของวันนั้นเข้ามาแล้วหรือยัง</p>
+
+    <h3>อ่านตารางระดับ</h3>
+    <p>ตารางเรียงจากบนลงล่าง โซนต้านอยู่เหนือราคาตั้งต้น โซนรับอยู่ใต้ราคาตั้งต้น ระดับ 1 ใกล้ที่สุด ระดับ 5 ไกลที่สุด</p>
+    <div class="tw"><table>
+      <thead><tr><th>คอลัมน์</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td><strong>ระดับ</strong></td><td>ชื่อโซนและลำดับความห่างจากราคาตั้งต้น</td></tr>
+        <tr><td><strong>ราคา</strong></td><td>ราคาของโซนนั้น</td></tr>
+        <tr><td><strong>โอกาสแตะในวัน</strong></td><td>สัดส่วนของวันในอดีตที่ราคาเคยวิ่งไปแตะระดับนั้นภายในวันเดียว</td></tr>
+        <tr><td><strong>โซนหนา</strong></td><td>ติดดาวเมื่อระดับนั้นซ้อนกับแนวพิวอตรายวันพอดี</td></tr>
+      </tbody>
+    </table></div>
+
+    <h4>ตัวเลข “โอกาสแตะในวัน” มาจากไหน</h4>
+    <p>ไม่ใช่การพยากรณ์ แต่เป็นสถิติที่นับจากราคาทองจริงย้อนหลังกว่าสามพันวันทำการ โดยดูว่าราคาสูงสุดและต่ำสุดของแต่ละวันวิ่งห่างจากราคาเปิดไปเท่าไร เทียบกับกรอบการแกว่งปกติของช่วงนั้น</p>
+    <p>ประเด็นสำคัญคือกรอบการแกว่งที่ใช้เป็นตัวเทียบมาจาก<strong>ข้อมูลถึงเมื่อวาน</strong>เท่านั้น ไม่ใช่ของวันนั้นเอง เพราะถ้าใช้ของวันนั้นก็เท่ากับรู้อนาคตแล้ว สถิติที่ได้จะดูดีเกินจริงและใช้ตัดสินใจตอนเช้าไม่ได้</p>
+
+    <div class="note">
+      <b>ใช้ตัวเลขนี้อย่างไรให้เกิดประโยชน์</b><br>
+      โซนที่ตัวเลขสูงคือระดับที่ราคามักไปถึงได้ในวันเดียว เหมาะกับการตั้งเป้าหมายระยะสั้น ส่วนโซนที่ตัวเลขต่ำคือระดับที่นานๆ ถึงที ถ้าตั้งเป้าไว้ไกลขนาดนั้นก็ต้องยอมรับว่าโอกาสไปถึงในวันเดียวมีไม่มาก
+    </div>
+
+    <h4>โซนหนาคืออะไร</h4>
+    <p>แนวพิวอตรายวันเป็นแนวรับแนวต้านที่คำนวณจากราคาสูงสุด ต่ำสุด และราคาปิดของวันก่อนหน้า เมื่อระดับจากการคำนวณของเรามาซ้อนกับแนวพิวอตพอดี แปลว่ามีสองวิธีคิดที่ต่างกันชี้มาที่ราคาเดียวกัน จึงมีน้ำหนักมากกว่าระดับที่มาจากวิธีเดียว</p>
+    <p><strong>บางวันไม่มีโซนหนาเลยถือเป็นเรื่องปกติ</strong> ถ้าเกณฑ์หลวมเกินไปจนติดดาวเกือบทุกแถว ดาวก็จะไม่มีความหมาย</p>
+
+    <h3>แถบแนวพิวอตรายวัน</h3>
+    <p>ใต้ตารางมีแถบแสดงแนวพิวอตทั้งเจ็ดระดับ ตั้งแต่ S3 ถึง R3 โดย PP คือจุดกึ่งกลาง ใช้ดูประกอบเพื่อให้เห็นว่าแนวจากทั้งสองวิธีเรียงตัวกันอย่างไร</p>
+  </section>
+
+  <!-- ============ 4 ============ -->
+  <section id="s4">
+    <h2><span class="n">04</span>กราฟราคาทอง 60 วัน</h2>
+    <p class="lead">ดูบริบทว่าราคาปัจจุบันอยู่ตรงไหนของช่วงสองเดือนที่ผ่านมา</p>
+    <ul>
+      <li>เส้นทองคือราคาปิดรายวัน 60 วันล่าสุด</li>
+      <li>เส้นประสี่เส้นคือโซนของวันนี้ที่ระดับ 2 และระดับ 4 ทั้งฝั่งรับและฝั่งต้าน ช่วยให้เห็นว่าโซนที่คำนวณได้อยู่สูงหรือต่ำเมื่อเทียบกับที่ราคาเคยวิ่งมา</li>
+      <li>ปุ่มมุมขวาบนสลับระหว่างกราฟเส้นกับกราฟแท่ง</li>
+      <li>แตะบนกราฟเพื่อดูราคาของวันนั้น</li>
+    </ul>
+    <p>เมื่อเปลี่ยนราคาตั้งต้น เส้นประจะขยับตามทันที</p>
+  </section>
+
+  <!-- ============ 5 ============ -->
+  <section id="s5">
+    <h2><span class="n">05</span>เปรียบเทียบกลยุทธ์ทองคำ</h2>
+    <p class="lead">คำถามเดียวที่หน้านี้ตอบ — การพยายามจับจังหวะเข้าออก ให้ผลดีกว่าการซื้อแล้วถือยาวจริงหรือไม่</p>
+
+    <h3>กลยุทธ์ที่นำมาเทียบ</h3>
+    <div class="tw"><table>
+      <thead><tr><th>กลยุทธ์</th><th>กติกา</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Golden Cross</strong></td><td>ถือทองเมื่อเส้นค่าเฉลี่ย 50 วันอยู่เหนือเส้น 200 วัน นอกนั้นถือเงินสด</td></tr>
+        <tr><td><strong>โมเมนตัม 6 เดือน</strong></td><td>สิ้นเดือนดูว่าราคาสูงกว่าเมื่อ 6 เดือนก่อนหรือไม่ ถ้าใช่ถือต่อในเดือนถัดไป</td></tr>
+        <tr><td><strong>Zone Trading</strong></td><td>ดูตำแหน่งราคาเทียบแนวพิวอตร่วมกับคะแนนโมเมนตัม แล้วแปลงเป็นสัญญาณซื้อ ถือ หรือขาย</td></tr>
+        <tr><td><strong>ถือยาว</strong></td><td>ซื้อวันแรกแล้วไม่ทำอะไรอีกเลย ใช้เป็นเส้นมาตรฐานที่ทุกกลยุทธ์ต้องเอาชนะให้ได้</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>กติกาที่ทำให้เทียบกันได้จริง</h3>
+    <p>การเปรียบเทียบกลยุทธ์ผิดพลาดได้ง่ายมากถ้าไม่ระวังสี่ข้อนี้ หน้านี้จึงบังคับทั้งสี่ข้อกับทุกกลยุทธ์เท่ากัน</p>
+    <ol class="steps">
+      <li><strong>วันเริ่มเดียวกัน</strong> — ทุกกลยุทธ์เริ่มนับผลวันเดียวกันหมด ไม่มีใครได้เปรียบจากการเริ่มในจังหวะที่ดีกว่า</li>
+      <li><strong>ไม่มองอนาคต</strong> — สถานะของวันนี้มาจากข้อมูลถึงเมื่อวานเท่านั้น สัญญาณที่เห็นตอนปิดตลาดจะลงมือได้วันถัดไป</li>
+      <li><strong>ค่าธรรมเนียมเท่ากัน</strong> — คิดทุกครั้งที่สลับเข้าออก ในอัตราเดียวกันทั้งสามกลยุทธ์</li>
+      <li><strong>ตอนถือเงินสดได้ผลตอบแทน 0%</strong> — ไม่สมมติว่าเอาไปฝากหรือลงทุนอย่างอื่นต่อ</li>
+    </ol>
+
+    <h3>ปุ่มปรับสามตัว</h3>
+    <div class="tw"><table>
+      <thead><tr><th>ปุ่ม</th><th>ใช้ทำอะไร</th></tr></thead>
+      <tbody>
+        <tr><td><strong>ช่วงเวลาที่ใช้วัดผล</strong></td><td>เลื่อนวันเริ่มให้สั้นลง เพื่อดูว่าข้อสรุปเปลี่ยนไปตามช่วงเวลาหรือไม่</td></tr>
+        <tr><td><strong>ค่าธรรมเนียม</strong></td><td>ปรับต้นทุนต่อการสลับสถานะ กลยุทธ์ที่สลับบ่อยจะโดนกระทบมากกว่า</td></tr>
+        <tr><td><strong>จังหวะลงมือ</strong></td><td>สลับระหว่างลงมือวันถัดไปกับลงมือวันเดียวกัน</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="warn">
+      <b>โหมด “วันเดียวกัน” ทำจริงไม่ได้</b> เพราะใช้ราคาปิดของวันนั้นตัดสินใจแล้วกินผลตอบแทนของวันเดียวกัน ซึ่งเท่ากับรู้ผลก่อนแล้วค่อยเลือก ตัวเลขจะดูดีขึ้นทุกกลยุทธ์ มีไว้เพื่อให้เห็นว่าการมองอนาคตทำให้ผลลัพธ์บิดเบือนไปมากแค่ไหน ไม่ได้มีไว้ใช้ตัดสินใจ
+    </div>
+
+    <h3>อ่านผลอย่างไร</h3>
+    <ul>
+      <li><strong>ผลลัพธ์เทียบกันตรงๆ</strong> — แถบทองคือค่าที่ดีที่สุดของแต่ละแถว ดูทั้งผลตอบแทนและการขาดทุนหนักสุดควบคู่กัน กลยุทธ์ที่ได้ผลตอบแทนน้อยกว่าแต่ขาดทุนตื้นกว่าก็อาจเหมาะกับบางคนมากกว่า</li>
+      <li><strong>เงินต้น ฿100 เดินทางอย่างไร</strong> — เห็นว่าแต่ละกลยุทธ์ทิ้งห่างหรือตามหลังกันตอนไหน</li>
+      <li><strong>แต่ละกลยุทธ์อยู่ในตลาดตอนไหน</strong> — แถบสว่างคือช่วงที่ถือทอง แถบมืดคือถือเงินสด อ่านเทียบกับเส้นราคาด้านบนจะเห็นทันทีว่ากลยุทธ์ไหนพลาดขาขึ้นรอบใหญ่ไป</li>
+      <li><strong>ผลตอบแทนรายปี</strong> — ปีไหนที่กลยุทธ์ทำได้ดีกว่าถือยาวจะถูกไฮไลต์ ใช้ดูว่าชนะได้สม่ำเสมอหรือชนะเพราะปีใดปีหนึ่ง</li>
+      <li><strong>สัญญาณล่าสุด</strong> — สถานะที่แต่ละกลยุทธ์จะถืออยู่ในวันทำการถัดไป</li>
+    </ul>
+
+    <div class="note">
+      <b>สิ่งที่ควรได้จากหน้านี้</b><br>
+      ไม่ใช่การหากลยุทธ์ที่ดีที่สุดไปใช้ แต่คือการเห็นด้วยตาตัวเองว่ากฎการจับจังหวะแบบต่างๆ ให้ผลอย่างไรเมื่อทดสอบด้วยกติกาที่ยุติธรรม และเข้าใจว่าทำไมการถือยาวถึงเป็นคู่แข่งที่เอาชนะยากกว่าที่คิด
+    </div>
+  </section>
+
+  <!-- ============ 6 ============ -->
+  <section id="s6">
+    <h2><span class="n">06</span>เครื่องมืออื่นในเมนู</h2>
+    <p class="lead">รายการทั้งหมดที่เปิดได้จากคอนโซล</p>
+
+    <h3>หมวดทองคำ</h3>
+    <div class="tw"><table>
+      <thead><tr><th>เครื่องมือ</th><th>ใช้ทำอะไร</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Gold Momentum Dashboard</strong></td><td>แดชบอร์ดคะแนนโมเมนตัมทองคำแบบเต็ม พร้อมรายละเอียดองค์ประกอบทุกด้าน</td></tr>
+        <tr><td><strong>เปรียบเทียบกลยุทธ์ทองคำ</strong></td><td>เทียบสามกลยุทธ์กับการถือยาวบนกติกาเดียวกัน (ดูหัวข้อ 05)</td></tr>
+        <tr><td><strong>Golden Cross</strong></td><td>ทดสอบย้อนหลังกลยุทธ์เส้นค่าเฉลี่ยตัดกัน ปรับคู่เส้นและช่วงเวลาได้</td></tr>
+        <tr><td><strong>โมเมนตัม 6 เดือน</strong></td><td>ทดสอบย้อนหลังกลยุทธ์โมเมนตัมรายเดือน</td></tr>
+        <tr><td><strong>Zone Trading · Backtest</strong></td><td>ทดสอบย้อนหลังระบบแนวพิวอตร่วมกับคะแนนโมเมนตัม</td></tr>
+        <tr><td><strong>Zone Trading · กติกา</strong></td><td>อธิบายกติกาของระบบ Zone Trading ว่าตัดสินใจอย่างไรในแต่ละสถานการณ์</td></tr>
+        <tr><td><strong>ซื้อครั้งเดียว vs ออมทอง</strong></td><td>เทียบการลงเงินก้อนเดียวกับการทยอยซื้อรายเดือน</td></tr>
+        <tr><td><strong>H1 Swing · Sensitivity</strong></td><td>รายงานทดสอบความไวของพารามิเตอร์สำหรับระบบรายชั่วโมง</td></tr>
+        <tr><td><strong>SMC Patient Hunter</strong></td><td>รายงานระบบเทรดแนว Smart Money Concept</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>หมวดเครื่องมือ</h3>
+    <div class="tw"><table>
+      <thead><tr><th>เครื่องมือ</th><th>ใช้ทำอะไร</th></tr></thead>
+      <tbody>
+        <tr><td><strong>S&amp;P 500 Scanner</strong></td><td>คัดกรองหุ้นในดัชนี S&amp;P 500 ตามเงื่อนไขที่กำหนด</td></tr>
+        <tr><td><strong>Sector Rotation</strong></td><td>ดูการหมุนของกลุ่มอุตสาหกรรมว่าเงินไหลไปทางไหน</td></tr>
+        <tr><td><strong>Port Recorder</strong></td><td>บันทึกการซื้อขาย คำนวณกำไรขาดทุนแยกรายไม้</td></tr>
+        <tr><td><strong>My Portfolio</strong></td><td>ภาพรวมพอร์ตการลงทุน</td></tr>
+        <tr><td><strong>วางแผนพอร์ตการลงทุน</strong></td><td>จัดสรรสัดส่วนการลงทุนให้ตรงเป้าหมายและระดับความเสี่ยง</td></tr>
+        <tr><td><strong>วางแผนการเงินส่วนบุคคล</strong></td><td>วางแผนการเงินระยะยาว</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>แพ็กเกจเสริม EA</h3>
+    <p>ระบบเทรดอัตโนมัติที่ให้เช่าใช้งานรายเดือน คิดค่าบริการแยกจากค่าสมาชิกหลัก ประกอบด้วย EA Sniper · EA Grid · EA Recovery · EA Breakout เปิดใช้งานให้หลังยืนยันการเช่า</p>
+    <div class="chips">
+      <span class="chip lock">EA Sniper</span>
+      <span class="chip lock">EA Grid</span>
+      <span class="chip lock">EA Recovery</span>
+      <span class="chip lock">EA Breakout</span>
+    </div>
+  </section>
+
+  <!-- ============ 7 ============ -->
+  <section id="s7">
+    <h2><span class="n">07</span>คำถามที่พบบ่อย</h2>
+
+    <details>
+      <summary>วันเสาร์อาทิตย์ทำไมตัวเลขไม่ขยับเลย</summary>
+      <div class="body">ตลาดทองปิดวันเสาร์และอาทิตย์ จึงไม่มีราคาใหม่เข้ามา ทุกอย่างจะค้างอยู่ที่ข้อมูลของวันศุกร์จนกว่าจะถึงวันจันทร์ ตรวจได้จากวันที่ที่แสดงข้างป้ายสถานะข้อมูล ถ้าเป็นวันทำการล่าสุดก็แปลว่าถูกต้องแล้ว</div>
+    </details>
+
+    <details>
+      <summary>ราคาตั้งต้นในโหมดอัตโนมัติ บางทีเป็นราคาเปิด บางทีเป็นราคาปิด ทำไมไม่เหมือนกัน</summary>
+      <div class="body">เป็นความตั้งใจ ถ้ามีข้อมูลของวันนี้แล้วจะใช้ราคาเปิดของวันนี้ตามหลักการคำนวณโซน แต่ถ้ายังไม่มีข้อมูลของวันนี้ เช่นวันหยุดหรือก่อนเริ่มวันทำการ ราคาเปิดของวันก่อนหน้าถือเป็นอดีตไปแล้ว ระบบจึงใช้ราคาปิดล่าสุดแทนซึ่งใกล้เคียงกับจุดที่ตลาดจะเปิดใหม่มากกว่า ข้อความใต้ช่องกรอกจะบอกเสมอว่ากำลังใช้อะไรอยู่</div>
+    </details>
+
+    <details>
+      <summary>ป้ายขึ้นว่าข้อมูลสำรอง ใช้งานได้ไหม</summary>
+      <div class="body">ใช้ได้ ทุกอย่างในหน้ายังคำนวณครบถ้วน เพียงแต่ข้อมูลอาจไม่ใช่ล่าสุด ให้ดูวันที่ข้างป้ายประกอบ สาเหตุมักเกิดจากสัญญาณอินเทอร์เน็ตไม่เสถียร ลองรีเฟรชหน้าอีกครั้งเมื่อสัญญาณดีขึ้น</div>
+    </details>
+
+    <details>
+      <summary>ทำไมค่า RSI สองที่ไม่ตรงกัน</summary>
+      <div class="body">การ์ดด้านบนคือค่า RSI จริงของตัวชี้วัด ส่วนแถบโมเมนตัม RSI ในบล็อกคะแนนย่อยคือคะแนนที่ระบบให้ด้านนั้นจากเต็ม 100 เป็นคนละหน่วยกัน จึงไม่เท่ากันเป็นปกติ</div>
+    </details>
+
+    <details>
+      <summary>วันนี้ไม่มีโซนหนาติดดาวเลย ผิดปกติหรือเปล่า</summary>
+      <div class="body">ไม่ผิดปกติ ดาวจะขึ้นเฉพาะวันที่ระดับจากการคำนวณของเราซ้อนกับแนวพิวอตรายวันพอดีเท่านั้น ซึ่งไม่ได้เกิดทุกวัน ถ้าตั้งเกณฑ์ให้หลวมจนติดดาวเกือบทุกแถว ดาวก็จะหมดความหมาย</div>
+    </details>
+
+    <details>
+      <summary>ตัวเลขโอกาสแตะ บอกได้ไหมว่าวันนี้ราคาจะไปถึงจริง</summary>
+      <div class="body">บอกไม่ได้ ตัวเลขนี้คือความถี่ที่เคยเกิดขึ้นในอดีตกว่าสามพันวัน ไม่ใช่การพยากรณ์วันนี้ ใช้เพื่อประเมินว่าเป้าหมายที่ตั้งไว้สมเหตุสมผลแค่ไหนเมื่อเทียบกับพฤติกรรมปกติของราคา</div>
+    </details>
+
+    <details>
+      <summary>เปิดเครื่องมือแล้วหน้าว่างเปล่า</summary>
+      <div class="body">เครื่องมือบางตัวต้องเข้าสู่ระบบก่อน ให้กดปุ่มเปิดในแท็บใหม่ที่แถบด้านบน แล้วเข้าสู่ระบบในแท็บนั้น จากนั้นกลับมาที่คอนโซลอีกครั้ง</div>
+    </details>
+
+    <details>
+      <summary>แก้ไขหน้าจอแล้วแต่ยังเห็นของเดิม</summary>
+      <div class="body">เปิดเมนูซ้ายเลื่อนลงล่างสุดเพื่อดูรุ่นที่เครื่องกำลังใช้อยู่ ถ้าไม่ใช่รุ่นล่าสุดให้รีเฟรชหน้า หรือเติม <code>?v=2</code> ต่อท้ายที่อยู่เว็บเพื่อบังคับโหลดใหม่</div>
+    </details>
+  </section>
+
+  <!-- ============ 8 ============ -->
+  <section id="s8">
+    <h2><span class="n">08</span>ข้อจำกัดที่ควรรู้</h2>
+    <ul>
+      <li><strong>ผลในอดีตไม่ได้รับประกันผลในอนาคต</strong> ผลการทดสอบย้อนหลังทุกตัวในระบบนี้คำนวณจากข้อมูลที่เกิดขึ้นแล้ว สภาพตลาดข้างหน้าอาจต่างออกไปโดยสิ้นเชิง</li>
+      <li><strong>สถิติคือความถี่ ไม่ใช่คำทำนาย</strong> ตัวเลขโอกาสแตะบอกว่าอดีตเคยเป็นอย่างไร ไม่ได้บอกว่าวันนี้จะเป็นอย่างไร</li>
+      <li><strong>ค่าธรรมเนียมจริงอาจต่างจากที่ใช้คำนวณ</strong> ขึ้นกับผู้ให้บริการ ขนาดคำสั่ง และสภาพคล่องในขณะนั้น รวมถึงส่วนต่างราคาซื้อขายที่อาจกว้างขึ้นในช่วงตลาดผันผวน</li>
+      <li><strong>ข้อมูลอาจล่าช้าหรือขาดหายได้</strong> ระบบดึงข้อมูลอัตโนมัติวันละหลายรอบ หากแหล่งข้อมูลมีปัญหา หน้าจะสลับไปใช้ข้อมูลสำรองและแจ้งให้ทราบด้วยป้ายสถานะ</li>
+      <li><strong>คะแนน Sentiment เป็นเครื่องมือช่วยอ่านสภาพตลาด</strong> ไม่ใช่สัญญาณซื้อขาย และไม่ควรใช้เป็นเหตุผลเดียวในการตัดสินใจ</li>
+    </ul>
+    <div class="warn">
+      เนื้อหาและเครื่องมือทั้งหมดจัดทำเพื่อการศึกษาและใช้ประกอบการตัดสินใจของผู้ลงทุนเท่านั้น ไม่ใช่คำแนะนำการลงทุน ไม่ใช่การชักชวนให้ซื้อหรือขายสินทรัพย์ใด ผู้ลงทุนควรศึกษาข้อมูลเพิ่มเติมและประเมินความเสี่ยงที่ตนเองรับได้ก่อนตัดสินใจทุกครั้ง
+    </div>
+  </section>
+
+  <div class="foot">
+    <div class="b">JP TRUST LEARNING</div>
+    <p>คู่มือนี้จะปรับปรุงเมื่อมีการเพิ่มหรือเปลี่ยนแปลงฟังก์ชัน</p>
+  </div>
+</div>
+
+</body>
+</html>

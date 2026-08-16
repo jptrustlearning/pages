@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Zone Trading — Multi-TF Pivot &amp; Confluence · Gold Strategy</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Anuphan:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#FAF6ED;--cream2:#F5EFE0;--cream3:#EDE4D0;--ink:#3D3228;--ink2:#5A3D20;--ink3:#7A6F62;--maroon:#722F37;--maroon2:#8B2252;--forest:#2d5a3d;--gold:#D4AF37;--gold-deep:#B8860B;--blue:#2a4a7a;--mono:'JetBrains Mono',monospace;--serif:'Cormorant Garamond',Georgia,serif;--sans:'Anuphan',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height:100vh;line-height:1.7}
+.page{max-width:900px;margin:0 auto;padding:40px 24px 60px}
+
+/* Header */
+.hero{text-align:center;padding:50px 0 40px;border-bottom:2px solid var(--ink);margin-bottom:40px}
+.hero h1{font-family:var(--serif);font-size:2.6rem;font-weight:700;letter-spacing:-1px;margin-bottom:8px;color:var(--maroon)}
+.hero .sub{font-size:1rem;color:var(--ink2);font-weight:300;letter-spacing:2px;text-transform:uppercase}
+.hero .period{display:inline-block;margin-top:16px;padding:6px 20px;border:1px solid var(--ink3);border-radius:20px;font-family:var(--mono);font-size:.82rem;color:var(--ink2)}
+
+/* Section */
+.section{margin-bottom:48px}
+.section h2{font-family:var(--serif);font-size:1.8rem;font-weight:700;color:var(--maroon);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--cream3)}
+.section h3{font-family:var(--serif);font-size:1.3rem;font-weight:600;color:var(--ink);margin:24px 0 12px}
+.section p{margin-bottom:12px;font-size:.95rem;color:var(--ink)}
+
+/* KPI Grid */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:20px 0}
+.kpi{background:var(--cream2);border:1px solid var(--cream3);border-radius:10px;padding:16px;text-align:center}
+.kpi .val{font-family:var(--mono);font-size:1.5rem;font-weight:700;margin:4px 0}
+.kpi .lbl{font-size:.72rem;color:var(--ink3);text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.kpi.green .val{color:var(--forest)}
+.kpi.red .val{color:var(--maroon)}
+.kpi.gold .val{color:var(--gold-deep)}
+.kpi.blue .val{color:var(--blue)}
+
+/* Step cards */
+.step{background:var(--cream2);border-left:4px solid var(--maroon);border-radius:0 10px 10px 0;padding:20px 24px;margin:16px 0}
+.step .num{display:inline-block;width:32px;height:32px;line-height:32px;text-align:center;background:var(--maroon);color:#fff;border-radius:50%;font-family:var(--mono);font-size:.85rem;font-weight:700;margin-right:10px;vertical-align:middle}
+.step .title{font-family:var(--serif);font-size:1.15rem;font-weight:600;display:inline;vertical-align:middle}
+.step p{margin-top:10px;color:var(--ink2);font-size:.92rem}
+.step .formula{background:var(--cream);border:1px solid var(--cream3);border-radius:6px;padding:10px 14px;margin-top:10px;font-family:var(--mono);font-size:.8rem;color:var(--ink2);line-height:1.8;overflow-x:auto}
+
+/* Rule table */
+.rule-table{width:100%;border-collapse:collapse;font-size:.85rem;margin:16px 0}
+.rule-table th{background:var(--cream3);color:var(--ink2);padding:10px 8px;text-align:left;font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.5px}
+.rule-table td{padding:9px 8px;border-bottom:1px solid var(--cream3);font-size:.85rem;vertical-align:top}
+.rule-table tr:hover{background:var(--cream2)}
+.rule-table td.mono{font-family:var(--mono);font-size:.78rem;white-space:nowrap}
+.badge{display:inline-block;padding:2px 10px;border-radius:4px;font-size:.7rem;font-weight:700;letter-spacing:.5px}
+.badge-buy{background:#d4edda;color:#155724}
+.badge-hold{background:#fff3cd;color:#7a5c00}
+.badge-sell{background:#f8d7da;color:#721c24}
+
+/* Zone cards */
+.zone-card{border:1.5px solid var(--cream3);border-left:4px solid;border-radius:0 10px 10px 0;padding:16px 20px;margin:12px 0;background:var(--cream2)}
+.zone-card.res{border-left-color:#C14545}
+.zone-card.sup{border-left-color:#2E9F5F}
+.zone-card.mix{border-left-color:#8B6914}
+.zone-card .z-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:4px}
+.zone-card.res .z-label{color:#C14545}
+.zone-card.sup .z-label{color:#2E9F5F}
+.zone-card.mix .z-label{color:#8B6914}
+.zone-card .z-body{font-size:.88rem;color:var(--ink2)}
+
+/* Callout */
+.callout{background:linear-gradient(135deg,#fdf2f2,#fef5ed);border:1px solid #e8c9b8;border-radius:10px;padding:18px 22px;margin:20px 0;font-size:.9rem;color:var(--ink2)}
+.callout b{color:var(--maroon)}
+.callout.green{background:linear-gradient(135deg,#f0faf3,#edf7ed);border-color:#b8d4c0}
+.callout.green b{color:var(--forest)}
+
+/* Flow diagram */
+.flow{display:flex;align-items:center;gap:0;flex-wrap:wrap;justify-content:center;margin:20px 0}
+.flow-item{background:var(--cream2);border:1px solid var(--cream3);border-radius:8px;padding:10px 16px;text-align:center;font-size:.82rem;min-width:120px}
+.flow-item .fl{font-family:var(--serif);font-weight:700;font-size:1rem;color:var(--maroon);margin-bottom:2px}
+.flow-arrow{font-size:1.4rem;color:var(--ink3);padding:0 4px}
+
+/* TF chips */
+.tf-chips{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.tf-chip{background:var(--cream2);border:1px solid var(--gold);border-radius:10px;padding:12px 16px;flex:1;min-width:180px}
+.tf-chip .t{font-family:var(--mono);font-weight:700;color:var(--gold-deep);font-size:.9rem;margin-bottom:4px}
+.tf-chip .d{font-size:.82rem;color:var(--ink2)}
+
+/* Footer */
+.footer{text-align:center;padding:30px 0;border-top:1px solid var(--cream3);margin-top:40px;color:var(--ink3);font-size:.78rem}
+
+@media(max-width:768px){
+  .hero h1{font-size:1.9rem}
+  .page{padding:20px 16px 40px}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .flow{flex-direction:column;gap:4px}
+  .flow-arrow{transform:rotate(90deg)}
+  .rule-table{display:block;overflow-x:auto;white-space:nowrap}
+}
+</style>
+  <!-- JP Trust hard auth-gate (redirect to login if no session) -->
+  <script src="./jp-gate.js?v=1783134367"></script>
+</head>
+<body>
+<div class="page">
+
+<!-- ═══════════ HERO ═══════════ -->
+<div class="hero">
+  <h1>Zone Trading</h1>
+  <div class="sub">Gold XAUUSD — Multi-TF Pivot &amp; Confluence</div>
+  <div class="period">D1 · W1 · MN Classic Pivots · Live ใน Gold Dashboard</div>
+</div>
+
+<!-- ═══════════ OVERVIEW ═══════════ -->
+<div class="section">
+  <h2>กลยุทธ์นี้คืออะไร</h2>
+  <p>Zone Trading คือกลยุทธ์เทรดทองที่ใช้ <b>Pivot Point (จุดหมุนราคา — ระดับแนวรับแนวต้านที่คำนวณจากราคา High/Low/Close ของช่วงก่อนหน้า)</b> จาก 3 Timeframe พร้อมกัน แล้วมองหาจุดที่ระดับเหล่านั้น "ซ้อนทับกัน" — เราเรียกจุดซ้อนทับนี้ว่า <b>Confluence Zone (โซนบรรจบ — บริเวณที่แนวรับ/แนวต้านจากหลายกรอบเวลามาเจอกัน)</b></p>
+  <p>หลักคิดง่ายๆ: แนวรับที่มีเพียง Timeframe เดียวมองเห็น อาจถูกทะลุได้ง่าย แต่แนวรับที่ทั้งกราฟรายวัน รายสัปดาห์ และรายเดือน "เห็นตรงกัน" คือจุดที่เทรดเดอร์จำนวนมากทั่วโลกจับตาอยู่พร้อมกัน — โอกาสที่ราคาจะตอบสนองต่อโซนนั้นจึงสูงกว่ามาก</p>
+  <div class="kpi-grid">
+    <div class="kpi gold"><div class="lbl">Timeframes</div><div class="val">3</div></div>
+    <div class="kpi blue"><div class="lbl">ระดับต่อ TF</div><div class="val">7</div></div>
+    <div class="kpi green"><div class="lbl">เกณฑ์ Confluence</div><div class="val">≤20 จุด</div></div>
+    <div class="kpi"><div class="lbl">อัพเดท</div><div class="val">รายวัน</div></div>
+  </div>
+</div>
+
+<!-- ═══════════ PIVOT FOUNDATION ═══════════ -->
+<div class="section">
+  <h2>1 · รากฐาน — Classic Pivot Points</h2>
+  <p>ทุก Timeframe คำนวณ 7 ระดับจากแท่งราคา<b>ของช่วงก่อนหน้า</b> (H = High, L = Low, C = Close) ด้วยสูตรมาตรฐานที่ห้องค้าทั่วโลกใช้กันมาหลายสิบปี:</p>
+  <div class="step">
+    <span class="num">ƒ</span><span class="title">สูตร Classic Pivot</span>
+    <div class="formula">
+PP  = (H + L + C) / 3<br>
+R1  = 2×PP − L &nbsp;&nbsp;·&nbsp;&nbsp; S1 = 2×PP − H<br>
+R2  = PP + (H − L) &nbsp;&nbsp;·&nbsp;&nbsp; S2 = PP − (H − L)<br>
+R3  = H + 2×(PP − L) &nbsp;&nbsp;·&nbsp;&nbsp; S3 = L − 2×(H − PP)
+    </div>
+    <p>PP คือ "จุดสมดุล" ของช่วงก่อนหน้า · R1–R3 คือแนวต้านชั้นที่ 1–3 · S1–S3 คือแนวรับชั้นที่ 1–3</p>
+  </div>
+
+  <h3>3 Timeframe ที่ใช้</h3>
+  <div class="tf-chips">
+    <div class="tf-chip"><div class="t">D1 — Daily</div><div class="d">คำนวณจากแท่ง<b>วันก่อนหน้า</b> · เปลี่ยนทุกวัน · ใช้หาจังหวะเข้า-ออกระยะสั้น</div></div>
+    <div class="tf-chip"><div class="t">W1 — Weekly</div><div class="d">คำนวณจากแท่ง<b>สัปดาห์ก่อน</b> · เปลี่ยนทุกสัปดาห์ · กรอบ swing หลัก</div></div>
+    <div class="tf-chip"><div class="t">MN — Monthly</div><div class="d">คำนวณจากแท่ง<b>เดือนก่อน</b> · เปลี่ยนทุกเดือน · โครงสร้างใหญ่ที่กองทุนใช้อ้างอิง</div></div>
+  </div>
+</div>
+
+<!-- ═══════════ CONFLUENCE ═══════════ -->
+<div class="section">
+  <h2>2 · หัวใจกลยุทธ์ — Confluence Zone</h2>
+  <p>รวม 21 ระดับ (7 ระดับ × 3 Timeframe) มาเรียงบนแกนราคาเดียวกัน แล้วจับกลุ่มระดับที่อยู่ห่างกัน<b>ไม่เกิน 20 จุด</b> ให้เป็นโซนเดียว — ยิ่งมีหลาย Timeframe มาบรรจบ โซนนั้นยิ่ง "หนา":</p>
+
+  <div class="zone-card sup">
+    <div class="z-label">Support Confluence — แนวรับบรรจบ</div>
+    <div class="z-body">Pivot Support ของหลาย TF ซ้อนกัน → โอกาสรองรับราคาสูงเป็นพิเศษ เป็นจุดพิจารณา<b>ทยอยเข้าซื้อ</b> โดยตั้ง Stop-Loss (จุดตัดขาดทุน) ใต้โซน</div>
+  </div>
+  <div class="zone-card res">
+    <div class="z-label">Resistance Confluence — แนวต้านบรรจบ</div>
+    <div class="z-body">Pivot Resistance ของหลาย TF ซ้อนกัน → โอกาสต้านราคาสูงเป็นพิเศษ เป็นจุดพิจารณา<b>ทำกำไรบางส่วน</b> — แต่ถ้าราคา Breakout (ทะลุแนวต้าน) ผ่านได้ด้วย volume หนาแน่น โซนเดิมจะกลายเป็นแนวรับใหม่</div>
+  </div>
+  <div class="zone-card mix">
+    <div class="z-label">Mixed Zone — โซนผสม</div>
+    <div class="z-body">แนวรับกับแนวต้านจากคนละ TF มาเจอกัน → เป็น "จุดตัดสินทิศทาง" ไม่ควรเปิดสถานะกลางโซนนี้ ให้รอราคา break ออกข้างใดข้างหนึ่งก่อน</div>
+  </div>
+
+  <p style="margin-top:16px">นอกจากนี้ระบบยังสรุปทุกระดับเป็น <b>Unified Price Zones</b> — แผนที่โซนราคารวมพร้อมจำนวน Confluence และระยะห่างจากราคาปัจจุบัน เพื่อให้เห็นภาพเดียวว่า "เหนือหัว-ใต้เท้า" มีด่านอะไรรออยู่บ้าง</p>
+</div>
+
+<!-- ═══════════ SIGNAL RULES ═══════════ -->
+<div class="section">
+  <h2>3 · กติกาสัญญาณ — ตำแหน่งราคา × Momentum</h2>
+  <p>โซนบอก "ที่ไหน" แต่ยังไม่บอก "เมื่อไหร่" — ระบบจึงผสมตำแหน่งราคาเทียบ Pivot D1 เข้ากับ <b>Momentum Score (คะแนนแรงส่งราคา 0–100 จากหลายมิติของ Gold Dashboard)</b> และทิศทางการเปลี่ยนแปลงของคะแนน (Delta) เป็นกติกาชุดเดียวกับที่การ์ด Bias Signal ในแอพใช้จริง:</p>
+
+  <table class="rule-table">
+    <thead><tr><th>ตำแหน่งราคา</th><th>Momentum</th><th>สัญญาณ</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">≥ R1</td><td>แข็งแรง (≥75) + กำลังขึ้น</td><td>Bullish Breakout — เปิดทางสู่ R2/R3</td><td><span class="badge badge-buy">BUY</span></td></tr>
+      <tr><td class="mono">≥ R1</td><td>แข็งแรง แต่ Delta ลบ</td><td>Bullish but Cooling — แรงส่งเริ่มแผ่ว พิจารณาทำกำไรบางส่วน</td><td><span class="badge badge-hold">HOLD</span></td></tr>
+      <tr><td class="mono">PP – R1</td><td>แข็งแรง (≥75)</td><td>Bullish Accumulation — สะสมพลังรอทะลุ R1</td><td><span class="badge badge-buy">BUY</span></td></tr>
+      <tr><td class="mono">≥ PP</td><td>ปานกลาง (60–74)</td><td>Cautious Bullish — บวกแต่ยังไม่ยืนยัน R1 คือบททดสอบ</td><td><span class="badge badge-hold">HOLD</span></td></tr>
+      <tr><td class="mono">S1 – PP</td><td>แข็งแรง (≥75)</td><td>Support Bounce — ย่อทดสอบแนวรับก่อนไปต่อ</td><td><span class="badge badge-buy">BUY</span></td></tr>
+      <tr><td class="mono">S1 – PP</td><td>ปานกลาง (60–74)</td><td>Neutral Range — แกว่งในกรอบ รอความชัดเจน</td><td><span class="badge badge-hold">HOLD</span></td></tr>
+      <tr><td class="mono">&lt; S1</td><td>แข็งแรง (≥75)</td><td>Oversold Recovery — ราคาหลุดแต่แรงส่งยังดี อาจฟื้นกลับหา PP</td><td><span class="badge badge-buy">BUY</span></td></tr>
+      <tr><td class="mono">≥ R1</td><td>อ่อนแรง (&lt;60)</td><td>Rejection Risk — เสี่ยงโดนตบกลับลงหา PP</td><td><span class="badge badge-sell">SELL</span></td></tr>
+      <tr><td class="mono">&lt; S1</td><td>อ่อนแรง (&lt;60)</td><td>Bearish Breakdown — เสี่ยงไหลต่อสู่ S2/S3</td><td><span class="badge badge-sell">SELL</span></td></tr>
+      <tr><td class="mono">&lt; PP</td><td>อ่อนแรง + Delta ลบ</td><td>Bearish Trend — โมเมนตัมขาลงต่อเนื่อง</td><td><span class="badge badge-sell">SELL</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout green"><b>หลักจำง่าย:</b> โซน Confluence คือ "สนามรบ" · Momentum คือ "กำลังพล" — เข้าซื้อเมื่อราคาอยู่ใกล้แนวรับบรรจบ<b>และ</b>กำลังพลยังแข็งแรง ไม่ใช่แค่เพราะราคาถึงโซนอย่างเดียว</div>
+</div>
+
+<!-- ═══════════ WORKFLOW ═══════════ -->
+<div class="section">
+  <h2>4 · ขั้นตอนใช้งานจริง</h2>
+
+  <div class="flow">
+    <div class="flow-item"><div class="fl">Dashboard</div>เปิด Gold Dashboard</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-item"><div class="fl">Zones</div>ดู Confluence + UPZ</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-item"><div class="fl">Signal</div>เช็ค Bias Signal</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-item"><div class="fl">Plan</div>วาง Entry / SL / TP</div>
+  </div>
+
+  <div class="step">
+    <span class="num">1</span><span class="title">เปิดแผนที่โซน</span>
+    <p>เข้า Gold Dashboard → หัวข้อ <b>Zone Analysis — Multi-TF Pivot &amp; Confluence</b> → แท็บ Chart จะเห็นราคาปัจจุบันเทียบกับทุกโซน · แท็บ Confluence อธิบายแต่ละโซนเป็นภาษาไทยพร้อมระยะห่างจากราคา</p>
+  </div>
+  <div class="step">
+    <span class="num">2</span><span class="title">เลือกโซนที่จะเล่น</span>
+    <p>ให้น้ำหนักโซนที่มี Confluence ตั้งแต่ <b>2 Timeframe ขึ้นไป</b> ก่อนเสมอ — โซนที่มี W1 หรือ MN ร่วมด้วยแข็งแรงกว่าโซนที่มีแต่ D1 เพราะระดับใหญ่ไม่เปลี่ยนรายวัน</p>
+  </div>
+  <div class="step">
+    <span class="num">3</span><span class="title">รอราคาเข้าโซน + เช็ค Momentum</span>
+    <p>อย่าไล่ราคากลางทาง — รอให้ราคาย่อเข้าใกล้แนวรับบรรจบ แล้วเช็คว่า Bias Signal ยังอยู่ฝั่ง BUY/HOLD และ Momentum Score ไม่หลุดต่ำกว่า 60</p>
+  </div>
+  <div class="step">
+    <span class="num">4</span><span class="title">วางแผนก่อนกด</span>
+    <p><b>Entry:</b> ทยอยเข้าในโซนแนวรับบรรจบ · <b>Stop-Loss:</b> ใต้ขอบล่างของโซน (เผื่อระยะพ้น 20 จุดของโซน) · <b>Take-Profit:</b> แนวต้านบรรจบถัดไป — ทำกำไรบางส่วนที่ด่านแรก ที่เหลือเลื่อน SL ตาม</p>
+  </div>
+</div>
+
+<!-- ═══════════ RISK ═══════════ -->
+<div class="section">
+  <h2>5 · ข้อจำกัดที่ต้องรู้</h2>
+  <p><b>Pivot เป็นระดับเชิงกลไก</b> — คำนวณจากราคาในอดีตล้วนๆ ไม่รู้จักข่าว Fed, ตัวเลขเงินเฟ้อ หรือเหตุการณ์ภูมิรัฐศาสตร์ วันที่มีข่าวใหญ่ราคาสามารถทะลุทุกโซนได้ในไม่กี่นาที ควรหลีกเลี่ยงการเปิดสถานะใหม่ก่อนข่าวสำคัญ</p>
+  <p><b>ระดับ D1 เปลี่ยนทุกวัน</b> — โซน Confluence ของวันนี้อาจไม่ใช่โซนของพรุ่งนี้ ต้องเช็คแผนที่ใหม่ทุกครั้งก่อนเทรด ไม่ใช้ตัวเลขจำจากเมื่อวาน</p>
+  <p><b>โซนคือ "บริเวณ" ไม่ใช่เส้นเป๊ะ</b> — ราคามักแกว่งทะลุขอบโซนเล็กน้อยก่อนกลับตัว การตั้ง Stop-Loss ชิดขอบเกินไปจะโดนสะบัดออกบ่อย</p>
+  <div class="callout"><b>ข้อควรทราบ:</b> เนื้อหานี้จัดทำเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน ผลลัพธ์ในอดีตไม่รับประกันผลลัพธ์ในอนาคต ผู้ลงทุนควรศึกษาและบริหารความเสี่ยงด้วยตนเองก่อนตัดสินใจทุกครั้ง</div>
+</div>
+
+<div class="footer">สรุปโดย JP Trust Learning · Zone Trading — Multi-TF Pivot &amp; Confluence</div>
+
+</div>
+</body>
+</html>

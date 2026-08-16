@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SMC Patient Hunter — Strategy Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Anuphan:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#FAF6ED;--cream2:#F5EFE0;--cream3:#EDE4D0;--ink:#3D3228;--ink2:#5A3D20;--ink3:#7A6F62;--maroon:#722F37;--maroon2:#8B2252;--forest:#2d5a3d;--gold:#D4AF37;--gold-deep:#B8860B;--blue:#2a4a7a;--mono:'JetBrains Mono',monospace;--serif:'Cormorant Garamond',Georgia,serif;--sans:'Anuphan',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height:100vh;line-height:1.7}
+.page{max-width:900px;margin:0 auto;padding:40px 24px 60px}
+
+/* Header */
+.hero{text-align:center;padding:50px 0 40px;border-bottom:2px solid var(--ink);margin-bottom:40px}
+.hero h1{font-family:var(--serif);font-size:2.8rem;font-weight:700;letter-spacing:-1px;margin-bottom:8px;color:var(--maroon)}
+.hero .sub{font-size:1rem;color:var(--ink2);font-weight:300;letter-spacing:2px;text-transform:uppercase}
+.hero .period{display:inline-block;margin-top:16px;padding:6px 20px;border:1px solid var(--ink3);border-radius:20px;font-family:var(--mono);font-size:.82rem;color:var(--ink2)}
+
+/* Section */
+.section{margin-bottom:48px}
+.section h2{font-family:var(--serif);font-size:1.8rem;font-weight:700;color:var(--maroon);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--cream3)}
+.section h3{font-family:var(--serif);font-size:1.3rem;font-weight:600;color:var(--ink);margin:24px 0 12px}
+
+/* KPI Grid */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:20px 0}
+.kpi{background:var(--cream2);border:1px solid var(--cream3);border-radius:10px;padding:16px;text-align:center}
+.kpi .val{font-family:var(--mono);font-size:1.6rem;font-weight:700;margin:4px 0}
+.kpi .lbl{font-size:.72rem;color:var(--ink3);text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.kpi.green .val{color:var(--forest)}
+.kpi.red .val{color:var(--maroon)}
+.kpi.gold .val{color:var(--gold)}
+.kpi.blue .val{color:var(--blue)}
+
+/* Step cards */
+.step{background:var(--cream2);border-left:4px solid var(--maroon);border-radius:0 10px 10px 0;padding:20px 24px;margin:16px 0}
+.step .num{display:inline-block;width:32px;height:32px;line-height:32px;text-align:center;background:var(--maroon);color:#fff;border-radius:50%;font-family:var(--mono);font-size:.85rem;font-weight:700;margin-right:10px;vertical-align:middle}
+.step .title{font-family:var(--serif);font-size:1.15rem;font-weight:600;display:inline;vertical-align:middle}
+.step p{margin-top:10px;color:var(--ink2);font-size:.92rem}
+.step .formula{background:var(--cream);border:1px solid var(--cream3);border-radius:6px;padding:10px 14px;margin-top:10px;font-family:var(--mono);font-size:.8rem;color:var(--ink2);line-height:1.8;overflow-x:auto}
+
+/* Trade table */
+.trade-table{width:100%;border-collapse:collapse;font-size:.82rem;margin:16px 0}
+.trade-table th{background:var(--cream3);color:var(--ink2);padding:10px 8px;text-align:left;font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.5px}
+.trade-table td{padding:8px;border-bottom:1px solid var(--cream3);font-family:var(--mono);font-size:.8rem}
+.trade-table tr:hover{background:var(--cream2)}
+.win{color:var(--forest);font-weight:600}
+.loss{color:var(--maroon);font-weight:600}
+.badge{display:inline-block;padding:2px 10px;border-radius:4px;font-size:.7rem;font-weight:600}
+.badge-buy{background:#d4edda;color:#155724}
+.badge-tp{background:#d4edda;color:#155724}
+.badge-sl{background:#f8d7da;color:#721c24}
+
+/* Lot table */
+.lot-table{width:100%;border-collapse:collapse;margin:16px 0}
+.lot-table th,.lot-table td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--cream3);font-size:.85rem}
+.lot-table th{background:var(--cream3);color:var(--ink2);font-weight:600;text-transform:uppercase;font-size:.72rem;letter-spacing:.5px}
+.lot-table td:first-child{text-align:left;font-family:var(--mono);font-weight:600}
+.lot-table .highlight{background:rgba(45,90,61,.06);font-weight:700}
+
+/* Callout */
+.callout{background:linear-gradient(135deg,#fdf2f2,#fef5ed);border:1px solid #e8c9b8;border-radius:10px;padding:18px 22px;margin:20px 0;font-size:.9rem;color:var(--ink2)}
+.callout b{color:var(--maroon)}
+.callout.green{background:linear-gradient(135deg,#f0faf3,#edf7ed);border-color:#b8d4c0}
+.callout.green b{color:var(--forest)}
+
+/* Diagram */
+.flow{display:flex;align-items:center;gap:0;flex-wrap:wrap;justify-content:center;margin:20px 0}
+.flow-item{background:var(--cream2);border:1px solid var(--cream3);border-radius:8px;padding:10px 16px;text-align:center;font-size:.82rem;min-width:120px}
+.flow-item .fl{font-family:var(--serif);font-weight:700;font-size:1rem;color:var(--maroon);margin-bottom:2px}
+.flow-arrow{font-size:1.4rem;color:var(--ink3);padding:0 4px}
+
+/* Footer */
+.footer{text-align:center;padding:30px 0;border-top:1px solid var(--cream3);margin-top:40px;color:var(--ink3);font-size:.78rem}
+
+@media(max-width:768px){
+  .hero h1{font-size:2rem}
+  .page{padding:20px 16px 40px}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .flow{flex-direction:column;gap:4px}
+  .flow-arrow{transform:rotate(90deg)}
+}
+</style>
+  <!-- JP Trust hard auth-gate (redirect to login if no session) -->
+  <script src="./jp-gate.js?v=1783134367"></script>
+</head>
+<body>
+<div class="page">
+
+<!-- ═══════════ HERO ═══════════ -->
+<div class="hero">
+  <h1>SMC Patient Hunter</h1>
+  <div class="sub">Gold XAUUSD — Strategy Report & Backtest</div>
+  <div class="period">Oct 2023 → Apr 2026 · H1 + H4 · 17 Trades</div>
+</div>
+
+<!-- ═══════════ RESULTS ═══════════ -->
+<div class="section">
+  <h2>ผลลัพธ์ Backtest</h2>
+  <p>Entry ที่ <b>open ของ bar ถัดไป</b> ทุก trade — ไม่มี look-ahead bias</p>
+  
+  <div class="kpi-grid">
+    <div class="kpi green"><div class="lbl">Win Rate</div><div class="val">59%</div></div>
+    <div class="kpi green"><div class="lbl">Profit Factor</div><div class="val">7.61</div></div>
+    <div class="kpi blue"><div class="lbl">Trades</div><div class="val">17</div></div>
+    <div class="kpi gold"><div class="lbl">Expectancy</div><div class="val">2,987 pts</div></div>
+    <div class="kpi green"><div class="lbl">Avg Win</div><div class="val">5,847 pts</div></div>
+    <div class="kpi red"><div class="lbl">Avg Loss</div><div class="val">-1,098 pts</div></div>
+    <div class="kpi"><div class="lbl">TP / SL</div><div class="val">10 / 7</div></div>
+    <div class="kpi"><div class="lbl">R:R</div><div class="val">1 : 3</div></div>
+  </div>
+
+  <h3>Lot Scaling — ทุน $10,000</h3>
+  <table class="lot-table">
+    <thead><tr><th>Lot</th><th>Final Equity</th><th>Total Return</th><th>ต่อปี</th><th>ต่อเดือน</th><th>Max DD</th></tr></thead>
+    <tbody>
+      <tr><td>0.10</td><td>$15,078</td><td>50.8%</td><td>17.9%</td><td>1.7%</td><td>2.8%</td></tr>
+      <tr><td>0.20</td><td>$20,157</td><td>101.6%</td><td>32.4%</td><td>3.4%</td><td>5.2%</td></tr>
+      <tr><td>0.50</td><td>$35,392</td><td>253.9%</td><td>65.8%</td><td>8.5%</td><td>10.6%</td></tr>
+      <tr class="highlight"><td>1.00 ⭐</td><td>$60,784</td><td>507.8%</td><td>105.8%</td><td>16.9%</td><td>16.1%</td></tr>
+      <tr><td>2.00</td><td>$111,568</td><td>1,015.7%</td><td>162.4%</td><td>33.9%</td><td>21.8%</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout green">
+    <b>⭐ Sweet Spot: Lot 1.00</b> — ผลตอบแทน ~17%/เดือน กับ Max DD 16% ตรงเป้า 10-20%/เดือน
+    ที่ DD ยอมรับได้ Lot 0.50 conservative กว่า (8.5%/mo, DD 10.6%)
+  </div>
+</div>
+
+<!-- ═══════════ HOW IT WORKS (ภาษาคน) ═══════════ -->
+<div class="section">
+  <h2>วิธีเทรด — ภาษาคนเข้าใจง่าย</h2>
+  
+  <div class="flow">
+    <div class="flow-item"><div class="fl">D1 Bias</div>Dashboard บอก<br>BUY / SELL / HOLD</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item"><div class="fl">H1/H4 Trend</div>Swing structure<br>ขาขึ้น/ขาลง?</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item"><div class="fl">Sweep</div>ราคากวาด<br>swing low/high</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item"><div class="fl">OB Zone</div>ราคากลับเข้า<br>Order Block</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item"><div class="fl">Entry</div>เข้าที่ open<br>bar ถัดไป</div>
+  </div>
+
+  <div class="step">
+    <span class="num">1</span><span class="title">เปิด Dashboard เช้า — ดู D1 Bias</span>
+    <p>ถ้า Dashboard บอก <b>BUY</b> (Bullish) → วันนี้ดูแต่จังหวะ BUY อย่างเดียว<br>
+    ถ้า Dashboard บอก <b>SELL</b> (Bearish) → ดูแต่ SELL<br>
+    ถ้า <b>HOLD</b> → <b>ไม่เทรด</b> วันนี้ ปิดหน้าจอไปเลย</p>
+    <p>เพิ่มเติม: Buy Score ต้อง ≥55 (สำหรับ BUY) หรือ Sell Score ≥55 (สำหรับ SELL) ถ้าต่ำกว่านี้ = สัญญาณไม่แข็งพอ ข้ามไป</p>
+  </div>
+
+  <div class="step">
+    <span class="num">2</span><span class="title">เปิด Chart H1 หรือ H4 — ดู Swing Structure</span>
+    <p>ดูว่าโครงสร้างราคาเป็น <b>ขาขึ้น</b> (Higher High + Higher Low) หรือ <b>ขาลง</b> (Lower High + Lower Low)<br>
+    ถ้า bias BUY แต่โครงสร้าง H1 เป็นขาลง → <b>ไม่เข้า</b> (ขัดแย้งกัน)<br>
+    ราคาต้องอยู่เหนือ EMA50 (สำหรับ BUY) หรือต่ำกว่า (สำหรับ SELL)</p>
+    <p><b>H1 ใช้ swing period 24</b> (≈1 วัน) เพื่อจับโครงสร้างใหญ่<br>
+    <b>H4 ใช้ swing period 12</b> (≈2 วัน) เพื่อจับโครงสร้างใหญ่<br>
+    <b>Internal period 5</b> (H1≈5ชม., H4≈20ชม.) เพื่อจับจุดเปลี่ยนเล็ก</p>
+  </div>
+
+  <div class="step">
+    <span class="num">3</span><span class="title">รอ Liquidity Sweep — ราคากวาด Stop Loss คนอื่น</span>
+    <p>นี่คือกุญแจสำคัญ! รอให้ราคา <b>"แกล้งหลุด"</b> ต่ำกว่า swing low (สำหรับ BUY) แล้ว <b>ปิดกลับมาเหนือ</b><br>
+    = Smart Money กวาด stop loss ของคนที่ตั้ง SL ใต้ swing low แล้วดีดกลับ</p>
+    <p><b>เช็คความ "สวย" ของ sweep:</b><br>
+    — ไส้เทียน (wick) ต้องยาวกว่าตัวเทียน (body) อย่างน้อย 50% = rejection ชัดเจน<br>
+    — bar ถัดจาก sweep ต้องเป็น <b>bullish candle</b> (confirm) สำหรับ BUY</p>
+  </div>
+
+  <div class="step">
+    <span class="num">4</span><span class="title">หา Order Block (OB) — โซนเข้าจังหวะ</span>
+    <p>OB = <b>แท่งเทียนสวนทางสุดท้ายก่อนที่ราคาจะวิ่งแรง</b><br>
+    สำหรับ BUY: หา <b>แท่งแดง (bearish) ก่อนที่ราคาจะพุ่งขึ้น</b> ← นี่คือ OB<br>
+    แท่ง OB ต้อง <b>body ≥ 0.4 ATR</b> (แท่งใหญ่ = impulsive = OB ที่แข็งแรง)</p>
+    <p>รอให้ราคา <b>ย้อนกลับมาแตะ OB zone</b> (ราคาอยู่ระหว่าง OB high กับ OB low)<br>
+    ต้องไม่อยู่ใกล้ swing high (resistance) เกินไป → ถ้าใกล้ภายใน 0.5% ข้ามไป</p>
+  </div>
+
+  <div class="step">
+    <span class="num">5</span><span class="title">เข้า Entry — ที่ Open ของ Bar ถัดไป</span>
+    <p>เมื่อครบทุกเงื่อนไข → <b>ไม่เข้าทันที</b> รอ bar ถัดไป open แล้วค่อยเข้า<br>
+    ทำให้ไม่มี look-ahead bias — เราเห็น setup แล้ว ให้ราคา confirm ก่อน</p>
+  </div>
+
+  <div class="step">
+    <span class="num">6</span><span class="title">ตั้ง SL / TP</span>
+    <p><b>SL:</b> วางใต้ OB Low (สำหรับ BUY) ลบ buffer 0.3 × ATR<br>
+    <b>TP:</b> SL distance × 3 (R:R = 1:3)<br>
+    <b>SL distance ต้องอยู่ในช่วง 0.5-2.0 × ATR</b> ถ้านอกช่วงนี้ ข้ามไป</p>
+    <p>ตัวอย่าง: ATR = $12 (1,200 pts), OB Low = $3,370<br>
+    Entry = $3,377 → SL = $3,370 - $3.6 = $3,366.4 (1,060 pts)<br>
+    TP = $3,377 + $10.6 × 3 = $3,408.8 → ได้ +3,180 pts ถ้า win</p>
+  </div>
+
+  <div class="step">
+    <span class="num">7</span><span class="title">กฎเพิ่มเติม — ไม่รีบ</span>
+    <p><b>Cooldown:</b> H1 ต้องห่างกัน 12 bars (≈12 ชม.) / H4 ห่าง 4 bars (≈16 ชม.)<br>
+    <b>Max positions:</b> ถือพร้อมกันได้ไม่เกิน 2 ไม้<br>
+    <b>Patient = ทำเฉพาะ setup ที่สวยเท่านั้น</b></p>
+  </div>
+</div>
+
+<!-- ═══════════ FORMULA ═══════════ -->
+<div class="section">
+  <h2>สูตรคำนวณ — Technical Detail</h2>
+
+  <h3>1. Swing Detection (โครงสร้างราคา)</h3>
+  <div class="step">
+    <p>หา Swing High/Low โดยเทียบ bar กลางกับ N bar ซ้าย-ขวา</p>
+    <div class="formula">
+Swing High at bar[i]: bar[i].High == MAX(bar[i-N:i+N+1].High)<br>
+Swing Low at bar[i]:  bar[i].Low  == MIN(bar[i-N:i+N+1].Low)<br>
+<br>
+H1: Swing N=24 (≈1 day), Internal N=5 (≈5 hours)<br>
+H4: Swing N=12 (≈2 days), Internal N=3 (≈12 hours)<br>
+<br>
+Trend UP:   last_swing_high > prev_swing_high AND last_swing_low > prev_swing_low<br>
+Trend DOWN: last_swing_high < prev_swing_high AND last_swing_low < prev_swing_low
+    </div>
+  </div>
+
+  <h3>2. Liquidity Sweep Detection</h3>
+  <div class="step">
+    <p>ราคาหลุดต่ำกว่า swing low แล้วปิดกลับเหนือ = กวาด liquidity</p>
+    <div class="formula">
+For BUY — scan internal swing lows within last 20 bars (H1) / 10 bars (H4):<br>
+<br>
+  sweep_candle: bar[j].Low < swing_low_price AND bar[j].Close > swing_low_price<br>
+<br>
+Quality check (rejection):<br>
+  lower_wick = MIN(bar[j].Open, bar[j].Close) - bar[j].Low<br>
+  body = ABS(bar[j].Close - bar[j].Open)<br>
+  REQUIRE: lower_wick > body × 0.5<br>
+<br>
+Confirmation:<br>
+  bar[j+1].Close > bar[j+1].Open  (bullish candle after sweep)<br>
+<br>
+For SELL — mirror: sweep above swing high, upper wick rejection, bearish confirm
+    </div>
+  </div>
+
+  <h3>3. Order Block (OB) Detection</h3>
+  <div class="step">
+    <p>OB = แท่งสวนทางก่อน impulse move, ราคากลับมาแตะ zone</p>
+    <div class="formula">
+Scan last 12 bars before current bar[i]:<br>
+<br>
+For BUY OB:<br>
+  Find bar[j] where: bar[j].Close < bar[j].Open (bearish candle)<br>
+  AND: ABS(bar[j].Close - bar[j].Open) >= ATR × 0.4  (strong/impulsive)<br>
+<br>
+  OB Zone = [bar[j].Low, bar[j].High]<br>
+<br>
+Price must be IN zone:<br>
+  bar[i].Low <= OB.High AND bar[i].Close >= OB.Low<br>
+<br>
+NOT near resistance:<br>
+  recent_swing_highs = max(swing_highs in last 50 bars)<br>
+  REJECT if: bar[i].Close > recent_swing_high × 0.995
+    </div>
+  </div>
+
+  <h3>4. Entry / SL / TP Calculation</h3>
+  <div class="step">
+    <div class="formula">
+ATR = 100-period Average True Range (H1) or 100-period (H4)<br>
+ATR_pts = ATR × 100  (convert USD to points, XAUUSD digits=2)<br>
+<br>
+Entry = bar[i+1].Open × 100  (next bar open — NO look-ahead)<br>
+<br>
+For BUY:<br>
+  SL = OB.Low × 100 - ATR_pts × 0.3  (buffer below OB)<br>
+  SL_distance = Entry - SL<br>
+  TP = Entry + SL_distance × 3.0  (R:R = 1:3)<br>
+<br>
+For SELL:<br>
+  SL = OB.High × 100 + ATR_pts × 0.3<br>
+  SL_distance = SL - Entry<br>
+  TP = Entry - SL_distance × 3.0<br>
+<br>
+FILTER: 0.5 × ATR_pts <= SL_distance <= 2.0 × ATR_pts<br>
+  Too tight = noise stop out, Too wide = risk too high
+    </div>
+  </div>
+
+  <h3>5. P&L Calculation</h3>
+  <div class="step">
+    <div class="formula">
+XAUUSD Contract: 1 lot = 100 oz, Digits = 2, 1 point = $0.01<br>
+<br>
+PnL (points) = exit_price_pts - entry_price_pts  (BUY)<br>
+PnL (points) = entry_price_pts - exit_price_pts  (SELL)<br>
+<br>
+PnL (USD) = PnL_points × lot_size<br>
+  Lot 0.10: 1,000 pts win = $100<br>
+  Lot 1.00: 1,000 pts win = $1,000<br>
+<br>
+Return% = PnL_USD / Capital × 100
+    </div>
+  </div>
+
+  <h3>6. Quality Filters Summary</h3>
+  <div class="step">
+    <div class="formula">
+✅ D1 Bias = BUY/SELL (ไม่ใช่ HOLD) — from Dashboard (previous day)<br>
+✅ D1 Score conviction: Buy_Score ≥ 55 (for BUY) or Sell_Score ≥ 55 (for SELL)<br>
+✅ H1/H4 Swing Trend aligned: UP for BUY, DOWN for SELL<br>
+✅ Price vs EMA50: above for BUY, below for SELL<br>
+✅ Liquidity Sweep found: wick > body×0.5 + bullish/bearish confirm<br>
+✅ OB body ≥ 0.4 ATR (strong/impulsive)<br>
+✅ Price returned to OB zone<br>
+✅ Not near swing resistance/support (within 0.5%)<br>
+✅ SL distance within 0.5-2.0 ATR<br>
+✅ Cooldown respected: H1=12 bars, H4=4 bars<br>
+✅ Max 2 positions open
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ TRADE LOG ═══════════ -->
+<div class="section">
+  <h2>Trade Log — ทุก Trade ย้อนหลัง</h2>
+  <table class="trade-table">
+    <thead><tr><th>#</th><th>TF</th><th>Entry Date</th><th>Entry $</th><th>SL (pts)</th><th>TP $</th><th>Result</th><th>PnL (pts)</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>H1</td><td>2024-03-27</td><td>2,177.0</td><td>334</td><td>2,187.0</td><td><span class="badge badge-tp">TP</span></td><td class="win">+1,001</td></tr>
+      <tr><td>2</td><td>H1</td><td>2024-04-19</td><td>2,413.0</td><td>851</td><td>2,438.5</td><td><span class="badge badge-sl">SL</span></td><td class="loss">-851</td></tr>
+      <tr><td>3</td><td>H1</td><td>2024-07-01</td><td>2,335.6</td><td>379</td><td>2,346.9</td><td><span class="badge badge-tp">TP</span></td><td class="win">+1,137</td></tr>
+      <tr><td>4</td><td>H4</td><td>2024-07-09</td><td>2,371.5</td><td>968</td><td>2,400.5</td><td><span class="badge badge-tp">TP</span></td><td class="win">+2,904</td></tr>
+      <tr><td>5</td><td>H4</td><td>2024-08-14</td><td>2,485.6</td><td>1,021</td><td>2,516.2</td><td><span class="badge badge-sl">SL</span></td><td class="loss">-1,021</td></tr>
+      <tr><td>6</td><td>H4</td><td>2025-01-14</td><td>2,689.2</td><td>1,315</td><td>2,728.7</td><td><span class="badge badge-tp">TP</span></td><td class="win">+3,944</td></tr>
+      <tr><td>7</td><td>H1</td><td>2025-01-21</td><td>2,760.6</td><td>719</td><td>2,782.2</td><td><span class="badge badge-sl">SL</span></td><td class="loss">-719</td></tr>
+      <tr><td>8</td><td>H1</td><td>2025-02-12</td><td>2,924.7</td><td>904</td><td>2,951.8</td><td><span class="badge badge-tp">TP</span></td><td class="win">+2,712</td></tr>
+      <tr><td>9</td><td>H4</td><td>2025-02-12</td><td>2,924.7</td><td>2,228</td><td>2,991.5</td><td><span class="badge badge-sl">SL</span></td><td class="loss">-2,228</td></tr>
+      <tr><td>10</td><td>H1</td><td>2025-03-14</td><td>2,999.8</td><td>843</td><td>3,025.1</td><td><span class="badge badge-sl">SL</span></td><td class="loss">-843</td></tr>
+      <tr><td>11</td><td>H1</td><td>2025-03-16</td><td>2,997.7</td><td>653</td><td>3,017.3</td><td><span class="badge badge-tp">TP</span></td><td class="win">+1,960</td></tr>
+      <tr><td>12</td><td>H1</td><td>2025-06-04</td><td>3,376.9</td><td>1,038</td><td>3,408.0</td><td><span class="badge badge-tp">TP</span></td><td class="win">+3,113</td></tr>
+      <tr><td>13</td><td>H1</td><td>2025-06-04</td><td>3,399.3</td><td>866</td><td>3,425.3</td><td><span class="badge badge-sl">SL</span></td><td class="loss">-866</td></tr>
+      <tr><td>14</td><td>H1</td><td>2025-09-08</td><td>3,638.2</td><td>1,549</td><td>3,684.7</td><td><span class="badge badge-tp">TP</span></td><td class="win">+4,648</td></tr>
+      <tr><td>15</td><td>H1</td><td>2025-10-02</td><td>3,889.3</td><td>1,158</td><td>3,924.0</td><td><span class="badge badge-sl">SL</span></td><td class="loss">-1,158</td></tr>
+      <tr><td>16</td><td>H1</td><td>2025-12-02</td><td>4,241.6</td><td>7,304</td><td>4,460.7</td><td><span class="badge badge-tp">TP</span></td><td class="win">+21,913</td></tr>
+      <tr><td>17</td><td>H4</td><td>2026-02-27</td><td>5,195.4</td><td>5,046</td><td>5,346.8</td><td><span class="badge badge-tp">TP</span></td><td class="win">+15,138</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════ WARNINGS ═══════════ -->
+<div class="section">
+  <h2>ข้อควรระวัง</h2>
+  
+  <div class="callout">
+    <b>1. Sample Size เล็ก:</b> 17 trades ใน 2.5 ปี ยังเป็น sample ไม่มากพอจะสรุปทางสถิติ<br>
+    <b>2. Survivorship Bias:</b> ช่วง 2024-2026 ทองขึ้นแรงมาก — BUY ล้วน ไม่มี SELL trade เลย<br>
+    <b>3. ไม่รวม Spread/Swap:</b> ผลจริงจะต่ำกว่านี้ โดยเฉพาะ trade ที่ถือนาน<br>
+    <b>4. Trade #16 ผิดปกติ:</b> PnL +21,913 pts เป็น outlier ใหญ่ (SL 7,304 pts กว้างมาก)<br>
+    <b>5. H1 data มีแค่ตั้งแต่ ต.ค. 2023:</b> ยังไม่ได้ทดสอบช่วงทองขาลง (2022) หรือ sideway (2021)
+  </div>
+  
+  <div class="callout green">
+    <b>จุดแข็งจริงๆ ของกลยุทธ์นี้:</b><br>
+    — <b>Patient:</b> เทรดแค่ 7 ครั้ง/ปี → ไม่ต้องนั่งเฝ้าจอทั้งวัน<br>
+    — <b>Quality over Quantity:</b> Filter 10 ข้อ ตัด trade แย่ๆ ออกหมด<br>
+    — <b>R:R 1:3:</b> แพ้ 7 ชนะ 10 ก็กำไร เพราะ win ใหญ่กว่า loss 5 เท่า<br>
+    — <b>D1 Dashboard เป็นเข็มทิศ:</b> ไม่ต้องคิดเองว่าจะ BUY หรือ SELL
+  </div>
+</div>
+
+<div class="footer">
+  JP Trust Learning · SMC Patient Hunter Strategy Report<br>
+  Generated from score_history_net.csv + gold_prices_h1.csv · Zero look-ahead bias
+</div>
+
+</div>
+</body>
+</html>
