@@ -70,12 +70,18 @@ body{background:var(--cream);color:var(--ink);font-family:var(--f-b);line-height
 
 /* table */
 .tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
-table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:340px}
 thead th{background:linear-gradient(180deg,var(--maroon),var(--maroon2));color:var(--gold-l);
   font-weight:600;font-size:12px;text-align:left;padding:9px 11px;white-space:nowrap;position:sticky;top:0}
 thead th.r{text-align:right}
 tbody td{padding:8px 11px;border-bottom:1px solid rgba(212,175,55,.14);vertical-align:top}
 tbody td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+/* คอลัมน์ตัวเลขบีบพอดีเนื้อหา ปล่อยให้คอลัมน์ชื่อยืดแล้วตัดบรรทัดเอง
+   ไม่งั้น URL ยาวๆ จะดันตัวเลขหลุดขอบขวาบนมือถือ */
+th.r,td.r{width:1%}
+.nm{font-weight:600;color:var(--maroon);overflow-wrap:anywhere;line-height:1.35}
+.nm small{display:block;font-weight:300;color:var(--muted);font-size:10.5px;
+  overflow-wrap:anywhere;letter-spacing:.1px}
 tbody tr:hover{background:var(--gold-soft)}
 .pg{font-weight:600;color:var(--maroon)}
 .pg small{display:block;font-weight:300;color:var(--muted);font-size:11px}
@@ -161,7 +167,7 @@ select{font-family:var(--f-b);font-size:12.5px;padding:5px 9px;border-radius:9px
         <div class="ch"><h2>คลิกมากสุด</h2>
           <select id="selPage" class="note" style="margin-left:auto"><option value="">ทุกหน้า</option></select>
         </div>
-        <div class="tw"><table style="min-width:340px">
+        <div class="tw"><table style="min-width:0">
           <thead><tr><th>ปุ่ม / ลิงก์</th><th class="r">ครั้ง</th></tr></thead>
           <tbody id="tbClick"><tr><td colspan="2" class="loading">กำลังโหลด…</td></tr></tbody>
         </table></div>
@@ -190,14 +196,14 @@ select{font-family:var(--f-b);font-size:12.5px;padding:5px 9px;border-radius:9px
     <div class="row2">
       <div class="card">
         <div class="ch"><h2>แท็บที่เข้า</h2><span class="note">bottom nav</span></div>
-        <div class="tw"><table style="min-width:320px">
+        <div class="tw"><table style="min-width:0">
           <thead><tr><th>แท็บ</th><th class="r">ครั้ง</th><th class="r">คน</th><th class="r">อยู่นาน</th></tr></thead>
           <tbody id="tbScreen"><tr><td colspan="4" class="loading">กำลังโหลด…</td></tr></tbody>
         </table></div>
       </div>
       <div class="card">
         <div class="ch"><h2>เครื่องมือที่เปิด</h2><span class="note">หน้าใน iframe</span></div>
-        <div class="tw"><table style="min-width:340px">
+        <div class="tw"><table style="min-width:0">
           <thead><tr><th>หน้า</th><th class="r">ครั้ง</th><th class="r">คน</th><th class="r">อยู่นาน</th></tr></thead>
           <tbody id="tbTool"><tr><td colspan="4" class="loading">กำลังโหลด…</td></tr></tbody>
         </table></div>
@@ -206,7 +212,7 @@ select{font-family:var(--f-b);font-size:12.5px;padding:5px 9px;border-radius:9px
 
     <div class="card">
       <div class="ch"><h2>เหตุการณ์อื่น</h2><span class="note">ต่ออายุ · แจ้งเตือน · ล็อกแอพ</span></div>
-      <div class="tw"><table style="min-width:320px">
+      <div class="tw"><table style="min-width:0">
         <thead><tr><th>เหตุการณ์</th><th class="r">ครั้ง</th><th class="r">คน</th></tr></thead>
         <tbody id="tbEvent"><tr><td colspan="3" class="loading">กำลังโหลด…</td></tr></tbody>
       </table></div>
@@ -341,8 +347,15 @@ async function loadMemBreakdown(){
     const rows = await rpc('analytics_members_breakdown', { p_token: TOKEN, p_days: DAYS });
     const pick = k => rows.filter(r => r.kind === k);
 
+    /* ชื่อยาวๆ แยกเป็น 2 บรรทัด: ไฟล์ตัวหนา / พารามิเตอร์ตัวเล็ก อ่านง่ายกว่าบรรทัดเดียว */
+    const nameHtml = raw => {
+      const t = SCR[raw] || raw;
+      const i = t.indexOf('?');
+      return i < 0 ? `<div class="nm">${esc(t)}</div>`
+                   : `<div class="nm">${esc(t.slice(0, i))}<small>${esc(t.slice(i + 1))}</small></div>`;
+    };
     const rowsHtml = (g, cols) => g.length ? g.map(r => `<tr>
-        <td>${esc(SCR[r.name] || r.name)}</td>
+        <td>${nameHtml(r.name)}</td>
         <td class="r">${nf(r.n)}</td><td class="r">${nf(r.members)}</td>
         ${cols === 4 ? `<td class="r">${dur(r.median_sec)}</td>` : ''}</tr>`).join('')
       : `<tr><td colspan="${cols}" class="empty">ยังไม่มีข้อมูลในช่วงนี้</td></tr>`;
@@ -421,7 +434,7 @@ async function loadClicks(){
     const rows = await rpc('analytics_top_clicks', { p_token: TOKEN, p_days: DAYS, p_page: p, p_limit: 30 });
     if (!rows.length){ tb.innerHTML = '<tr><td colspan="2" class="empty">ยังไม่มีคลิกในช่วงนี้</td></tr>'; return; }
     tb.innerHTML = rows.map(r => `<tr>
-      <td>${esc(r.detail)}${p ? '' : `<small style="display:block;color:var(--muted);font-size:11px">${esc(r.page)}</small>`}</td>
+      <td><div class="nm" style="font-weight:400">${esc(r.detail)}${p ? '' : `<small>${esc(r.page)}</small>`}</div></td>
       <td class="r">${nf(r.n)}</td></tr>`).join('');
   }catch(e){ tb.innerHTML = '<tr><td colspan="2" class="empty">โหลดไม่สำเร็จ</td></tr>'; }
 }

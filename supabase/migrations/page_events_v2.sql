@@ -353,7 +353,13 @@ BEGIN
     FROM g WHERE event_type = 'screen_view' GROUP BY 2
   UNION ALL
   SELECT 'tool'::TEXT,
-         regexp_replace(COALESCE(url,'(ไม่ระบุ)'), '^\.?/', '')::TEXT, COUNT(*),
+         -- ตัด cache-bust ?v=/&v= ออกก่อนจัดกลุ่ม ไม่งั้นหน้าเดียวกันแตกเป็นหลายแถวทุกครั้งที่ deploy
+         -- (member-dashboard ตัดได้เฉพาะตอน v เป็นพารามิเตอร์ตัวแรก)
+         regexp_replace(
+           regexp_replace(
+             regexp_replace(COALESCE(url,'(ไม่ระบุ)'), '([?&])v=\d+&', '\1', 'g'),
+           '[?&]v=\d+$', '', 'g'),
+         '^\.?/', '')::TEXT, COUNT(*),
          COUNT(DISTINCT user_id),
          ROUND(percentile_cont(0.5) WITHIN GROUP (ORDER BY gap)::NUMERIC, 0)
     FROM g WHERE event_type = 'page_view' GROUP BY 2
