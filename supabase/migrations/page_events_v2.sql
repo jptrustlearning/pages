@@ -174,8 +174,8 @@ BEGIN
        d AS (SELECT ev.page AS pg, ev.session_id, MAX(ev.dwell_sec) mx FROM e ev
               WHERE ev.event_type = 'session_end' AND ev.dwell_sec > 0
               GROUP BY ev.page, ev.session_id)
-  SELECT e.page,
-         COALESCE(p.label, e.page),
+  SELECT e.page::TEXT,
+         COALESCE(p.label, e.page)::TEXT,
          COUNT(*) FILTER (WHERE e.event_type = 'page_view'),
          COUNT(DISTINCT e.visitor_id),
          COUNT(*) FILTER (WHERE e.event_type = 'click'),
@@ -214,7 +214,7 @@ BEGIN
   v_from := NOW() - (GREATEST(LEAST(p_days, 3650), 1) || ' days')::INTERVAL;
 
   RETURN QUERY
-  SELECT e.page, e.detail, COUNT(*)
+  SELECT e.page::TEXT, e.detail::TEXT, COUNT(*)
     FROM public.page_events e
    WHERE e.created_at >= v_from
      AND e.event_type IN ('click','download','tool_open','link_click')
@@ -239,11 +239,11 @@ BEGIN
                FROM public.page_events
               WHERE created_at >= v_from
               ORDER BY session_id, created_at)
-  SELECT 'referrer', COALESCE(referrer_host,'direct'), COUNT(*) FROM s GROUP BY 2
+  SELECT 'referrer'::TEXT, COALESCE(referrer_host,'direct')::TEXT, COUNT(*) FROM s GROUP BY 2
   UNION ALL
-  SELECT 'device',   COALESCE(device,'unknown'),       COUNT(*) FROM s GROUP BY 2
+  SELECT 'device'::TEXT,   COALESCE(device,'unknown')::TEXT,       COUNT(*) FROM s GROUP BY 2
   UNION ALL
-  SELECT 'utm',      utm_source,                       COUNT(*) FROM s
+  SELECT 'utm'::TEXT,      utm_source::TEXT,                       COUNT(*) FROM s
    WHERE utm_source IS NOT NULL GROUP BY 2
    ORDER BY 1, 3 DESC;
 END $$;
