@@ -15,6 +15,36 @@
 -- ============================================================================
 
 
+-- ---------- 0) ตารางฐาน page_events (ถ้ายังไม่มี — v1 อาจไม่เคยรัน) ----------
+CREATE TABLE IF NOT EXISTS public.page_events (
+  id             BIGSERIAL PRIMARY KEY,
+  page           TEXT        NOT NULL,
+  visitor_id     UUID        NOT NULL,
+  session_id     UUID        NOT NULL,
+  event_type     TEXT        NOT NULL,
+  detail         TEXT,
+  referrer_host  TEXT,
+  utm_source     TEXT,
+  device         TEXT,
+  dwell_sec      INT,
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_page_events_page_time ON public.page_events(page, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_page_events_session   ON public.page_events(session_id);
+CREATE INDEX IF NOT EXISTS idx_page_events_visitor   ON public.page_events(visitor_id);
+
+ALTER TABLE public.page_events ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.page_events FROM anon, authenticated;
+
+DROP POLICY IF EXISTS "admin reads page_events" ON public.page_events;
+CREATE POLICY "admin reads page_events" ON public.page_events
+  FOR SELECT TO authenticated
+  USING ( lower(auth.jwt() ->> 'email') = 'jptrustlearning@gmail.com' );
+
+GRANT SELECT ON public.page_events TO authenticated;
+
+
 -- ---------- 1) ตารางรายชื่อหน้าที่อนุญาต ----------
 CREATE TABLE IF NOT EXISTS public.page_events_pages (
   page       TEXT PRIMARY KEY,
