@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>สถิติการเข้าใช้ · Tool &amp; Kit · JP Trust Learning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;600&family=Cinzel:wght@500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --cream:#FAF6ED; --card:#FFFEF8; --line:rgba(212,175,55,.22);
+  --maroon:#3a1520; --maroon2:#2d1018; --maroon3:#1a0a0e;
+  --gold:#D4AF37; --gold-l:#F4E4BA;
+  --ink:#3D3228; --muted:#8a7d6b;
+  --up:#2E9E5B; --down:#C6472E;
+  --f-d:'Cinzel',serif; --f-b:'Anuphan',sans-serif; --f-n:'DM Serif Display',Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--cream);color:var(--ink);font-family:var(--f-b);line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+
+/* ---------- header ---------- */
+.hd{background:linear-gradient(135deg,var(--maroon3),var(--maroon));color:var(--gold-l);padding:22px 0 26px;border-bottom:2px solid rgba(212,175,55,.35)}
+.hd .eye{font-family:var(--f-d);font-size:11px;letter-spacing:.22em;color:var(--gold);opacity:.9}
+.hd h1{font-family:var(--f-d);font-size:24px;font-weight:600;color:var(--gold-l);margin-top:4px;line-height:1.25}
+.hd .sub{font-size:13px;color:rgba(244,228,186,.66);margin-top:4px}
+
+/* ---------- login ---------- */
+.gate{max-width:390px;margin:70px auto;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px}
+.gate h2{font-family:var(--f-d);font-size:19px;color:var(--maroon);margin-bottom:6px}
+.gate p{font-size:13px;color:var(--muted);margin-bottom:16px}
+.gate input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-family:var(--f-b);font-size:15px;background:#fff;color:var(--ink);margin-bottom:10px}
+.gate input:focus{outline:none;border-color:var(--gold)}
+.btn{width:100%;padding:12px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--maroon),var(--maroon2));color:var(--gold-l);font-family:var(--f-b);font-weight:600;font-size:15px;cursor:pointer}
+.btn:disabled{opacity:.55;cursor:default}
+.err{font-size:13px;color:var(--down);margin-top:8px;min-height:18px}
+
+/* ---------- ranges ---------- */
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:20px 0 4px}
+.chip{padding:7px 15px;border:1px solid var(--line);border-radius:999px;background:var(--card);font-size:13px;color:var(--muted);cursor:pointer;font-family:var(--f-b)}
+.chip.on{background:var(--maroon);border-color:var(--maroon);color:var(--gold-l);font-weight:600}
+.bar .sp{flex:1}
+.bar .who{font-size:12px;color:var(--muted)}
+.bar .who a{color:var(--muted)}
+
+/* ---------- kpi ---------- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px;margin:16px 0 6px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.kpi .lb{font-size:12px;color:var(--muted);letter-spacing:.02em}
+.kpi .vl{font-family:var(--f-n);font-size:30px;color:var(--maroon);line-height:1.15;margin-top:2px}
+.kpi .dl{font-size:12px;margin-top:2px;font-weight:600}
+.kpi .dl.u{color:var(--up)} .kpi .dl.d{color:var(--down)} .kpi .dl.f{color:var(--muted);font-weight:400}
+.kpi .note{font-size:11px;color:var(--muted);margin-top:1px}
+
+/* ---------- cards ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;margin:14px 0 34px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.card.full{grid-column:1/-1}
+.card h3{font-family:var(--f-d);font-size:14px;letter-spacing:.06em;color:var(--maroon);margin-bottom:2px}
+.card .cs{font-size:12px;color:var(--muted);margin-bottom:12px}
+.cw{position:relative;height:250px}
+.cw.sm{height:210px}
+.empty{padding:34px 10px;text-align:center;color:var(--muted);font-size:13px}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;font-weight:600;color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--line)}
+.tbl td{padding:8px;border-bottom:1px solid rgba(212,175,55,.1)}
+.tbl td.n{text-align:right;font-family:var(--f-n);font-size:15px;color:var(--maroon)}
+.tbl tr:last-child td{border-bottom:none}
+.foot{font-size:12px;color:var(--muted);padding:0 0 40px;line-height:1.8}
+.hide{display:none!important}
+@media(max-width:600px){ .hd h1{font-size:20px} .kpi .vl{font-size:26px} .cw{height:220px} }
+</style>
+</head>
+<body>
+
+<div class="hd">
+  <div class="wrap">
+    <div class="eye">JP TRUST · ANALYTICS</div>
+    <h1>สถิติการเข้าใช้ · Tool &amp; Kit</h1>
+    <div class="sub">jptrust-toolkit.html — หน้าสาธารณะ</div>
+  </div>
+</div>
+
+<!-- login -->
+<div id="gate" class="gate hide">
+  <h2>เข้าสู่ระบบผู้ดูแล</h2>
+  <p>หน้านี้ดูได้เฉพาะบัญชีผู้ดูแลระบบ</p>
+  <div id="stepEmail">
+    <input id="inEmail" type="email" placeholder="อีเมลผู้ดูแล" autocomplete="email">
+    <button id="btnEmail" class="btn">ขอรหัส OTP</button>
+  </div>
+  <div id="stepOtp" class="hide">
+    <input id="inOtp" type="text" inputmode="numeric" maxlength="6" placeholder="รหัส 6 หลักจากอีเมล">
+    <button id="btnOtp" class="btn">ยืนยัน</button>
+  </div>
+  <div id="gateErr" class="err"></div>
+</div>
+
+<!-- app -->
+<div id="app" class="wrap hide">
+  <div class="bar">
+    <div class="chip on" data-days="7">7 วัน</div>
+    <div class="chip" data-days="30">30 วัน</div>
+    <div class="chip" data-days="90">90 วัน</div>
+    <div class="sp"></div>
+    <div class="who" id="who"></div>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid">
+    <div class="card full">
+      <h3>ยอดวิว &amp; ผู้เข้าไม่ซ้ำ</h3>
+      <div class="cs" id="csTrend">รายวัน</div>
+      <div class="cw"><canvas id="chTrend"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h3>เครื่องมือที่ถูกเปิด</h3>
+      <div class="cs">นับจากการกดเมนูเครื่องมือ</div>
+      <div class="cw sm"><canvas id="chTools"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h3>ที่มาของผู้เข้า</h3>
+      <div class="cs">referrer + utm_source</div>
+      <div class="cw sm"><canvas id="chSrc"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h3>อุปกรณ์</h3>
+      <div class="cs">สัดส่วน session</div>
+      <div class="cw sm"><canvas id="chDev"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h3>ลิงก์ที่ถูกกด</h3>
+      <div class="cs">ปลายทางที่ผู้เข้ากดออกไป</div>
+      <div id="tblLinks"></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    • <b>Engagement</b> = สัดส่วน session ที่ทำอย่างน้อย 1 อย่าง: เปิดเครื่องมือ · กดลิงก์ · เลื่อนเกินครึ่งหน้า · หรืออยู่ในหน้า ≥ 30 วินาที<br>
+    • <b>เวลาในหน้า</b> ใช้ค่ากลาง (median) ไม่ใช่ค่าเฉลี่ย — ค่าเฉลี่ยโดนแท็บที่เปิดค้างลากจนเพี้ยน และนับเฉพาะตอนที่แท็บเปิดอยู่จริง<br>
+    • <b>% เพิ่ม/ลด</b> เทียบกับช่วงเวลาเท่ากันก่อนหน้า<br>
+    • นับเฉพาะเบราว์เซอร์ที่รัน JavaScript และไม่บล็อกสคริปต์ → ตัวเลขจริงมักสูงกว่านี้เล็กน้อย<br>
+    • อยากแยกที่มาให้ชัด ให้แชร์ลิงก์แบบ <code>?utm_source=line</code> / <code>?utm_source=fb</code>
+  </div>
+</div>
+
+<script>
+/* ================= config ================= */
+var SB_URL='https://rcdukwwcbyryauhqlzmx.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZHVrd3djYnlyeWF1aHFsem14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MTY0MDAsImV4cCI6MjA4NTQ5MjQwMH0.rprPmudJYyb6dyhXb9Z9GrtQWEeIX99A2Wrj55PvS54';
+var PAGE='jptrust-toolkit';
+var sb=null;
+try{ sb=window.supabase.createClient(SB_URL,SB_KEY); }catch(e){ console.error('supabase init failed'); }
+
+var $=function(id){return document.getElementById(id)};
+var charts={};
+
+/* ================= auth ================= */
+async function init(){
+  if(!sb){ $('gate').classList.remove('hide'); $('gateErr').textContent='โหลด Supabase ไม่สำเร็จ'; return; }
+  var u=null;
+  try{ var r=await sb.auth.getUser(); u=r.data?r.data.user:null; }catch(e){}
+  if(u){ start(u); } else { $('gate').classList.remove('hide'); }
+}
+$('btnEmail').addEventListener('click',async function(){
+  var e=($('inEmail').value||'').trim().toLowerCase();
+  if(!e){ $('gateErr').textContent='กรอกอีเมลก่อน'; return; }
+  this.disabled=true; this.textContent='กำลังส่ง...'; $('gateErr').textContent='';
+  var res=await sb.auth.signInWithOtp({email:e,options:{shouldCreateUser:false}});
+  if(res.error){ $('gateErr').textContent='ส่งรหัสไม่สำเร็จ: '+res.error.message; this.disabled=false; this.textContent='ขอรหัส OTP'; return; }
+  window.__em=e;
+  $('stepEmail').classList.add('hide'); $('stepOtp').classList.remove('hide'); $('inOtp').focus();
+});
+$('btnOtp').addEventListener('click',async function(){
+  var o=($('inOtp').value||'').trim();
+  if(o.length<6){ $('gateErr').textContent='กรอกรหัส 6 หลัก'; return; }
+  this.disabled=true; this.textContent='กำลังตรวจสอบ...'; $('gateErr').textContent='';
+  var res=await sb.auth.verifyOtp({email:window.__em,token:o,type:'email'});
+  if(res.error){ $('gateErr').textContent='รหัสไม่ถูกต้องหรือหมดอายุ'; this.disabled=false; this.textContent='ยืนยัน'; $('inOtp').value=''; return; }
+  $('gate').classList.add('hide');
+  start(res.data.user);
+});
+
+function start(user){
+  $('gate').classList.add('hide');
+  $('app').classList.remove('hide');
+  $('who').textContent=(user.email||'')+' · ';
+  var out=document.createElement('a'); out.href='#'; out.textContent='ออกจากระบบ';
+  out.onclick=async function(ev){ ev.preventDefault(); await sb.auth.signOut(); location.reload(); };
+  $('who').appendChild(out);
+  document.querySelectorAll('.chip[data-days]').forEach(function(c){
+    c.addEventListener('click',function(){
+      document.querySelectorAll('.chip[data-days]').forEach(function(x){x.classList.remove('on')});
+      c.classList.add('on'); load(parseInt(c.dataset.days,10));
+    });
+  });
+  load(7);
+}
+
+/* ================= data ================= */
+async function load(days){
+  var now=new Date();
+  var start=new Date(now.getTime()-days*864e5);
+  var prevStart=new Date(now.getTime()-days*2*864e5);
+  $('csTrend').textContent='รายวัน · '+fmtD(start)+' – '+fmtD(now);
+
+  var res=await sb.from('page_events').select('visitor_id,session_id,event_type,detail,referrer_host,utm_source,device,dwell_sec,created_at')
+    .eq('page',PAGE).gte('created_at',prevStart.toISOString())
+    .order('created_at',{ascending:true}).limit(50000);
+
+  if(res.error){ renderError(res.error.message); return; }
+  var rows=res.data||[];
+  var cur=rows.filter(function(r){return new Date(r.created_at)>=start});
+  var prv=rows.filter(function(r){return new Date(r.created_at)<start});
+  render(cur,prv,days,start,now);
+}
+
+function renderError(msg){
+  $('kpis').innerHTML='<div class="kpi"><div class="lb">อ่านข้อมูลไม่ได้</div><div class="note">'+esc(msg)+'</div></div>';
+}
+
+/* ---- aggregation helpers ---- */
+function summarize(rows){
+  var s={views:0,visitors:{},sessions:{},links:0};
+  rows.forEach(function(r){
+    if(r.event_type==='page_view') s.views++;
+    s.visitors[r.visitor_id]=1;
+    var ss=s.sessions[r.session_id]||(s.sessions[r.session_id]={eng:false,dwell:0});
+    if(r.event_type==='tool_open'||r.event_type==='link_click'||r.event_type==='scroll_50') ss.eng=true;
+    if(r.event_type==='session_end'&&r.dwell_sec>ss.dwell) ss.dwell=r.dwell_sec;
+    if(r.event_type==='link_click') s.links++;
+  });
+  var sk=Object.keys(s.sessions), eng=0, dw=[];
+  sk.forEach(function(k){
+    var ss=s.sessions[k];
+    if(ss.eng||ss.dwell>=30) eng++;
+    dw.push(ss.dwell);
+  });
+  return {
+    views:s.views,
+    visitors:Object.keys(s.visitors).length,
+    sessions:sk.length,
+    engRate:sk.length?eng/sk.length*100:0,
+    medDwell:median(dw),
+    links:s.links
+  };
+}
+function median(a){ if(!a.length) return 0; var b=a.slice().sort(function(x,y){return x-y}); var m=Math.floor(b.length/2); return b.length%2?b[m]:Math.round((b[m-1]+b[m])/2); }
+function pct(c,p){ if(!p) return c?null:0; return (c-p)/p*100; }
+function esc(s){ return String(s).replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]}); }
+function fmtD(d){ return d.getDate()+'/'+(d.getMonth()+1); }
+function fmtSec(s){ return s>=60?(Math.floor(s/60)+' นาที '+(s%60)+' วิ'):(s+' วิ'); }
+
+function render(cur,prv,days,start,now){
+  var c=summarize(cur), p=summarize(prv);
+
+  /* ---- KPI ---- */
+  var kp=[
+    {lb:'ยอดวิว',       v:c.views,    d:pct(c.views,p.views)},
+    {lb:'ผู้เข้าไม่ซ้ำ', v:c.visitors, d:pct(c.visitors,p.visitors)},
+    {lb:'ครั้งที่เข้า (session)', v:c.sessions, d:pct(c.sessions,p.sessions)},
+    {lb:'Engagement', v:c.engRate.toFixed(0)+'%', d:pct(c.engRate,p.engRate), note:'ของ '+c.sessions+' session'},
+    {lb:'เวลาในหน้า (median)', v:fmtSec(c.medDwell), d:pct(c.medDwell,p.medDwell)},
+    {lb:'คลิกลิงก์', v:c.links, d:pct(c.links,p.links)}
+  ];
+  $('kpis').innerHTML=kp.map(function(k){
+    var cls='f', txt='– เทียบช่วงก่อน';
+    if(k.d!==null&&k.d!==undefined&&isFinite(k.d)){
+      cls=k.d>0.5?'u':(k.d<-0.5?'d':'f');
+      txt=(k.d>0?'▲ +':(k.d<0?'▼ ':''))+k.d.toFixed(0)+'% เทียบช่วงก่อน';
+    }else if(k.d===null){ cls='u'; txt='▲ ใหม่ในช่วงนี้'; }
+    return '<div class="kpi"><div class="lb">'+k.lb+'</div><div class="vl">'+k.v+'</div>'+
+           '<div class="dl '+cls+'">'+txt+'</div>'+(k.note?'<div class="note">'+k.note+'</div>':'')+'</div>';
+  }).join('');
+
+  if(!cur.length){
+    emptyState(true);
+    $('tblLinks').innerHTML='<div class="empty">ยังไม่มีข้อมูล</div>';
+    return;
+  }
+  emptyState(false);
+
+  /* ---- daily trend ---- */
+  var labels=[],vk=[];
+  for(var i=days-1;i>=0;i--){ var d=new Date(now.getTime()-i*864e5); vk.push(d.toISOString().slice(0,10)); labels.push(fmtD(d)); }
+  var vmap={},umap={};
+  vk.forEach(function(k){vmap[k]=0;umap[k]={}});
+  cur.forEach(function(r){
+    var k=new Date(r.created_at).toISOString().slice(0,10);
+    if(!(k in vmap)) return;
+    if(r.event_type==='page_view') vmap[k]++;
+    umap[k][r.visitor_id]=1;
+  });
+  drawLine('chTrend',labels,
+    vk.map(function(k){return vmap[k]}),
+    vk.map(function(k){return Object.keys(umap[k]).length}));
+
+  /* ---- tools ---- */
+  drawBar('chTools', countBy(cur,'tool_open','detail'), '#8E2C3F');
+
+  /* ---- sources ---- */
+  var src={};
+  var seen={};
+  cur.forEach(function(r){
+    if(seen[r.session_id]) return; seen[r.session_id]=1;
+    var k=r.utm_source||r.referrer_host||'direct';
+    if(k==='direct') k='เข้าตรง / ไม่ระบุ';
+    src[k]=(src[k]||0)+1;
+  });
+  drawBar('chSrc',topN(src,7),'#D4AF37');
+
+  /* ---- device ---- */
+  var dev={}; var seen2={};
+  cur.forEach(function(r){
+    if(seen2[r.session_id]||!r.device) return; seen2[r.session_id]=1;
+    dev[r.device]=(dev[r.device]||0)+1;
+  });
+  drawDonut('chDev',dev);
+
+  /* ---- links ---- */
+  var lk=countBy(cur,'link_click','detail');
+  if(!lk.length){ $('tblLinks').innerHTML='<div class="empty">ยังไม่มีการกดลิงก์ออกในช่วงนี้</div>'; }
+  else{
+    $('tblLinks').innerHTML='<table class="tbl"><thead><tr><th>ปลายทาง</th><th style="text-align:right">ครั้ง</th></tr></thead><tbody>'+
+      lk.map(function(x){return '<tr><td>'+esc(x[0])+'</td><td class="n">'+x[1]+'</td></tr>'}).join('')+'</tbody></table>';
+  }
+}
+
+function emptyState(on){
+  ['chTrend','chTools','chSrc','chDev'].forEach(function(id){
+    var cv=$(id); if(!cv) return;
+    var w=cv.closest('.cw'); if(!w) return;
+    cv.style.display=on?'none':'block';
+    var e=w.querySelector('.empty');
+    if(on){
+      if(charts[id]){charts[id].destroy();delete charts[id];}
+      if(!e){ e=document.createElement('div'); e.className='empty'; e.textContent='ยังไม่มีข้อมูลในช่วงนี้'; w.appendChild(e); }
+    }else if(e){ e.parentNode.removeChild(e); }
+  });
+}
+function countBy(rows,type,field){
+  var m={};
+  rows.forEach(function(r){ if(r.event_type===type&&r[field]) m[r[field]]=(m[r[field]]||0)+1; });
+  return topN(m,8);
+}
+function topN(m,n){
+  return Object.keys(m).map(function(k){return [k,m[k]]}).sort(function(a,b){return b[1]-a[1]}).slice(0,n);
+}
+
+/* ================= charts ================= */
+function fresh(id){ if(charts[id]){charts[id].destroy();} return $(id).getContext('2d'); }
+var GRID={color:'rgba(212,175,55,.14)'}, TICK={color:'#8a7d6b',font:{family:'Anuphan',size:11}};
+
+function drawLine(id,labels,views,uniq){
+  charts[id]=new Chart(fresh(id),{
+    type:'line',
+    data:{labels:labels,datasets:[
+      {label:'ยอดวิว',data:views,borderColor:'#8E2C3F',backgroundColor:'rgba(142,44,63,.10)',fill:true,tension:.32,borderWidth:2,pointRadius:2},
+      {label:'ผู้เข้าไม่ซ้ำ',data:uniq,borderColor:'#D4AF37',backgroundColor:'rgba(212,175,55,.10)',fill:true,tension:.32,borderWidth:2,pointRadius:2}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{font:{family:'Anuphan',size:12},color:'#3D3228',boxWidth:12}}},
+      scales:{x:{grid:{display:false},ticks:TICK},y:{beginAtZero:true,grid:GRID,ticks:Object.assign({precision:0},TICK)}}}
+  });
+}
+function drawBar(id,pairs,color){
+  charts[id]=new Chart(fresh(id),{
+    type:'bar',
+    data:{labels:pairs.map(function(p){return p[0].length>26?p[0].slice(0,25)+'…':p[0]}),
+          datasets:[{data:pairs.map(function(p){return p[1]}),backgroundColor:color,borderRadius:5,barThickness:16}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{x:{beginAtZero:true,grid:GRID,ticks:Object.assign({precision:0},TICK)},y:{grid:{display:false},ticks:TICK}}}
+  });
+}
+function drawDonut(id,map){
+  var k=Object.keys(map), label={mobile:'มือถือ',tablet:'แท็บเล็ต',desktop:'คอมพิวเตอร์'};
+  charts[id]=new Chart(fresh(id),{
+    type:'doughnut',
+    data:{labels:k.map(function(x){return label[x]||x}),
+          datasets:[{data:k.map(function(x){return map[x]}),backgroundColor:['#8E2C3F','#D4AF37','#3a1520','#8a7d6b'],borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',
+      plugins:{legend:{position:'bottom',labels:{font:{family:'Anuphan',size:12},color:'#3D3228',boxWidth:12,padding:14}}}}
+  });
+}
+
+init();
+</script>
+</body>
+</html>
