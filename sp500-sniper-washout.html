@@ -2182,7 +2182,7 @@
         <option value="150">5 เดือน (150 วัน)</option>
         <option value="180">6 เดือน (180 วัน)</option>
       </select>
-      <span class="hint">ถ้าสัญญาณใหม่มาเร็วกว่าที่กำหนด <strong>ข้ามไปเลย ไม่เปิดไม้ และไม่ยกไปยิงย้อนหลังตอนพ้น MIN GAP</strong> · นับเป็น<strong>วันปฏิทินรวมเสาร์–อาทิตย์</strong> (1 เดือน = 30 วัน) · ยิ่งห่างมาก = ไม้น้อยลง เงินที่ต้องเตรียมน้อยลง แต่พลาดจังหวะช่วงวิกฤตที่สัญญาณมาถี่ · นับจาก<strong>ไม้ที่เปิดจริงไม้ล่าสุด</strong> ไม่ใช่สัญญาณที่ถูกข้าม · ⚠️ <strong>ข้อยกเว้น:</strong> สัญญาณที่เข้าเงื่อนไขครบ <strong>3 ใน 3</strong> (breadth + drawdown + SPY หลุด top-2) ยิงได้ทันทีแม้ยังไม่พ้น MIN GAP — พายุใหญ่มักทำก้นซ้ำภายในไม่กี่สัปดาห์</span>
+      <span class="hint">ถ้าสัญญาณใหม่มาเร็วกว่าที่กำหนด <strong>ข้ามไปเลย ไม่เปิดไม้ และไม่ยกไปยิงย้อนหลังตอนพ้น MIN GAP</strong> · นับเป็น<strong>วันปฏิทินรวมเสาร์–อาทิตย์</strong> (1 เดือน = 30 วัน) · ยิ่งห่างมาก = ไม้น้อยลง เงินที่ต้องเตรียมน้อยลง แต่พลาดจังหวะช่วงวิกฤตที่สัญญาณมาถี่ · นับจาก<strong>ไม้ที่เปิดจริงไม้ล่าสุด</strong> ไม่ใช่สัญญาณที่ถูกข้าม · ⚠️ <strong>ข้อยกเว้น (เข้ม):</strong> ยิงได้ทันทีแม้ยังไม่พ้น MIN GAP เฉพาะสัญญาณที่เข้าเงื่อนไขครบ <strong>3 ใน 3</strong> (breadth + drawdown + SPY หลุด top-2) <strong>และ</strong>ราคาทำก้นลึกกว่าวันสัญญาณของไม้ก่อนหน้า = พายุแย่ลงจริง ไม่ใช่คลื่นลูกเดิม</span>
     </div>
 
     <div class="control-group">
@@ -3134,28 +3134,33 @@ function sniperRun(H, topN, perTrade, startIdx) {
   // แล้วชุดไม้ที่รอดไม่เปลี่ยนตาม · ดูย้อนหลังอย่างเดียว ไม่มี look-ahead
   // ⚠️ สัญญาณที่ติด MIN GAP ถูก "ทิ้ง" ไม่ใช่ "เข้าคิว" — พอพ้น MIN GAP แล้วไม่ยิงย้อนหลัง
   //    (ราคาวันที่พ้น gap ไม่ใช่ราคาที่สัญญาณเดิมชี้ให้ซื้อแล้ว) · ต้องรอสัญญาณลูกใหม่เท่านั้น
-  // A66 ข้อ C — ข้อยกเว้น: สัญญาณที่เข้าเงื่อนไขครบ 3/3 (breadth + drawdown + SPY หลุด top-2)
-  //    ข้าม MIN GAP ได้ เพราะพายุใหญ่มักทำก้นซ้ำภายในไม่กี่สัปดาห์ (ก้น COVID 2020-03-24 ห่างไม้ก่อน 20 วัน
-  //    · 2025-04-09 ห่าง 26 วัน — สองใบนี้ทำ +65.5% / +76.5% แต่เดิมถูก MIN GAP 120 ตัดทิ้งทั้งคู่)
-  // ❌ ที่ไม่ทำ: "หรือ DD ทำก้นลึกกว่าไม้ก่อนหน้า" — เงื่อนไขนั้นจริงกับสัญญาณที่ถูกข้ามทุกใบ
-  //    ผลคือ MIN GAP กลายเป็นไม่มีผลเลย (26 ไม้ = เท่ากับปิด MIN GAP)
+  // A66 ข้อ C — ข้อยกเว้น (แบบเข้ม · Joon เคาะ): ข้าม MIN GAP ได้ต่อเมื่อเข้า **ทั้งสองข้อ**
+  //    ① เข้าเงื่อนไขครบ 3/3 (breadth + drawdown + SPY หลุด top-2)  **และ**
+  //    ② DD ณ วันสัญญาณ ลึกกว่า DD ณ วันสัญญาณของไม้ที่เปิดจริงล่าสุด = พายุแย่ลงจริง ไม่ใช่คลื่นลูกเดิม
+  //    → กู้ก้น COVID (2020-03-24 · DD −27.7% vs −7.5%) และ 2025-04-09 (−10.2% vs −8.2%) กลับมาได้
+  // ⚠️ ห้ามใช้ "3/3 **หรือ** ก้นลึกกว่าเดิม" — ข้อ ② จริงกับสัญญาณที่ถูกข้ามแทบทุกใบ (พายุที่ยิงซ้ำ
+  //    คือพายุที่ลงลึกกว่าเดิมอยู่แล้ว) ผลคือ MIN GAP ไม่มีผลเลย = 26 ไม้ เท่ากับปิด MIN GAP ทิ้ง
   const _minGap = CONFIG.minGapDays | 0;
   const skippedByGap = [];
   if (_minGap > 0) {
     const kept = [];
-    let lastMs = -Infinity;
+    let lastMs = -Infinity, lastDd = 0;
     const reasonAt = new Map();
     (S.conflSignals || []).forEach((t, k) => reasonAt.set(t, (S.conflReasons || [])[k] || ''));
+    const ddOf = (i) => (S.ddArr && isFinite(S.ddArr[i])) ? S.ddArr[i] : 0;
     for (const t of signals) {
       const ms = Date.parse(dates[t]);
       if (!isFinite(ms)) continue;
       const reason = reasonAt.get(t) || '';
-      const isFull = reason.indexOf('3/3') >= 0;          // สัญญาณแรง = ครบทั้ง 3 เงื่อนไข
+      const isFull = reason.indexOf('3/3') >= 0;
+      const dd = ddOf(t);
+      const isDeeper = dd < lastDd;
       const gapOk = kept.length === 0 || (ms - lastMs) / 86400000 >= _minGap;
-      if (gapOk || isFull) {
-        kept.push(t); lastMs = ms;
+      if (gapOk || (isFull && isDeeper)) {
+        kept.push(t); lastMs = ms; lastDd = dd;
       } else {
-        skippedByGap.push({ date: dates[t], daysSince: Math.round((ms - lastMs) / 86400000), reason: reason });
+        skippedByGap.push({ date: dates[t], daysSince: Math.round((ms - lastMs) / 86400000),
+                            reason: reason, isFull: isFull, dd: dd, prevDd: lastDd });
       }
     }
     signals = kept;
@@ -4406,13 +4411,16 @@ function renderTradeLog() {
       // A66 ข้อ A — บอกให้ชัดว่ามีสัญญาณเกิดขึ้นแล้วถูกข้าม ไม่ใช่การ์ดกลับไปเงียบเฉยๆ
       const skipHtml = st.lastSkipped
         ? '<div style="margin-top:10px;border:1px dashed rgba(193,69,69,0.45);background:rgba(193,69,69,0.06);border-radius:8px;padding:8px 10px;font-size:.7rem;color:var(--text-main);line-height:1.6;">' +
-            '<strong style="color:var(--red);">⚠️ สัญญาณ ' + _fmtTradeDate(st.lastSkipped.date) + ' ถูกข้าม</strong> — ห่างจากไม้ก่อนหน้าแค่ ' + st.lastSkipped.daysSince + ' วัน (MIN GAP ' + st.minGap + ' วัน) และเข้าเงื่อนไขไม่ครบ 3/3' +
+            '<strong style="color:var(--red);">⚠️ สัญญาณ ' + _fmtTradeDate(st.lastSkipped.date) + ' ถูกข้าม</strong> — ห่างจากไม้ก่อนหน้าแค่ ' + st.lastSkipped.daysSince + ' วัน (MIN GAP ' + st.minGap + ' วัน) และไม่เข้าข้อยกเว้น: ' +
+            (st.lastSkipped.isFull
+              ? 'ครบ 3/3 แต่ก้นยัง<strong>ไม่ลึกกว่าไม้ก่อนหน้า</strong> (' + pct(st.lastSkipped.dd * 100) + ' เทียบ ' + pct(st.lastSkipped.prevDd * 100) + ')'
+              : 'เข้าเงื่อนไข<strong>ไม่ครบ 3/3</strong>') +
             '<br><span style="color:var(--text-muted);">สัญญาณที่ถูกข้าม<strong>ไม่ยกไปยิงย้อนหลัง</strong>เมื่อพ้น MIN GAP — ต้องรอสัญญาณลูกใหม่</span>' +
           '</div>'
         : '';
       const footHtml = '<div style="margin-top:10px;font-size:.68rem;color:var(--text-muted);line-height:1.6;border-top:1px dashed var(--border);padding-top:8px;">' +
         openTxt + gapTxt + '<br>เข้าไม้จริงต้องเข้าเงื่อนไข <strong>2 ใน 3</strong> ณ วันสัญญาณ · วันเข้าถูกกำหนดโดยตลาด ไม่ใช่ปฏิทิน' +
-        (st.minGap ? '<br>สัญญาณที่เข้าครบ <strong>3 ใน 3</strong> ยิงได้ทันทีแม้ยังไม่พ้น MIN GAP' : '') +
+        (st.minGap ? '<br>ข้ามช่วง MIN GAP ได้เฉพาะสัญญาณที่เข้าครบ <strong>3 ใน 3</strong> <strong>และ</strong>ทำก้นลึกกว่าไม้ก่อนหน้า' : '') +
       '</div>';
 
       // --- หัวการ์ด ---
