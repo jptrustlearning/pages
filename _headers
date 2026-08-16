@@ -9,3 +9,7 @@
   Cache-Control: no-cache
 /manifest.json
   Cache-Control: no-cache
+
+# ตัวเก็บสถิติกลาง — แก้ทีเดียวมีผลทุกหน้า จึงให้ CDN ถือได้แค่ 5 นาที
+/lib/jpt-track.js
+  Cache-Control: public, max-age=300

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>สถิติการใช้งาน · JP Trust Learning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Cinzel:wght@500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --cream:#FAF6ED; --card:#FFFEF8; --line:rgba(212,175,55,.22);
+  --maroon:#3a1520; --maroon2:#2d1018; --maroon3:#1a0a0e;
+  --gold:#D4AF37; --gold-d:#B8860B; --gold-l:#F4E4BA; --gold-soft:rgba(212,175,55,.12);
+  --ink:#3D3228; --muted:#8a7d6b; --up:#2E9E5B; --down:#C6472E;
+  --f-d:'Cinzel',serif; --f-b:'Anuphan',sans-serif; --f-n:'DM Serif Display',Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--cream);color:var(--ink);font-family:var(--f-b);line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+
+/* gate */
+#gate{position:fixed;inset:0;background:linear-gradient(155deg,var(--maroon3),var(--maroon));
+  display:flex;align-items:center;justify-content:center;padding:22px;z-index:60}
+.gbox{background:rgba(244,228,186,.06);border:1px solid rgba(212,175,55,.32);border-radius:18px;
+  padding:30px 26px;max-width:390px;width:100%;text-align:center}
+.gbox .lab{font-family:var(--f-d);font-size:11px;letter-spacing:3px;color:var(--gold);font-weight:600}
+.gbox h1{font-size:21px;font-weight:600;color:#fff;margin:8px 0 6px}
+.gbox p{font-size:13px;color:rgba(244,228,186,.55);font-weight:300;margin-bottom:18px}
+.gbox input{width:100%;padding:12px 14px;border-radius:11px;border:1px solid rgba(212,175,55,.35);
+  background:rgba(0,0,0,.25);color:var(--gold-l);font-family:var(--f-b);font-size:15px;text-align:center}
+.gbox input:focus{outline:none;border-color:var(--gold)}
+.gerr{color:#f0a08e;font-size:12.5px;min-height:19px;margin-top:9px}
+
+/* top */
+.top{background:var(--maroon3);border-bottom:1px solid rgba(212,175,55,.2)}
+.top-in{max-width:1180px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{font-family:var(--f-d);font-size:14px;letter-spacing:1.8px;color:var(--gold-l);font-weight:600;line-height:1.15}
+.brand span{display:block;font-family:var(--f-b);font-size:10.5px;letter-spacing:.3px;color:rgba(244,228,186,.5);font-weight:300}
+.rng{margin-left:auto;display:flex;gap:0;background:rgba(0,0,0,.28);border:1px solid rgba(212,175,55,.25);border-radius:11px;overflow:hidden}
+.rng button{border:0;background:transparent;color:rgba(244,228,186,.6);font-family:var(--f-b);font-size:12.5px;
+  font-weight:500;padding:7px 13px;cursor:pointer;transition:.15s}
+.rng button.on{background:linear-gradient(135deg,var(--gold),var(--gold-d));color:#231016;font-weight:700}
+.tbtn{border:1px solid rgba(212,175,55,.3);background:transparent;color:rgba(244,228,186,.7);
+  border-radius:9px;padding:7px 12px;font-family:var(--f-b);font-size:12.5px;cursor:pointer}
+.tbtn:hover{background:rgba(212,175,55,.12);color:var(--gold-l)}
+
+/* kpi */
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:24px 0 20px}
+.kpi{border-radius:14px;padding:15px 16px;color:#fff;min-width:0}
+.kpi .k{font-family:var(--f-d);font-size:9.5px;letter-spacing:1.8px;opacity:.75;font-weight:600}
+.kpi .v{font-family:var(--f-n);font-size:29px;line-height:1.15;margin-top:3px}
+.kpi .s{font-size:11px;opacity:.7;font-weight:300}
+.k1{background:linear-gradient(135deg,#722F37,#8B2252)}
+.k2{background:linear-gradient(135deg,#2a4a7a,#1c3557)}
+.k3{background:linear-gradient(135deg,#2E9E5B,#1e7a44)}
+.k4{background:linear-gradient(135deg,#C79A24,#9a7413)}
+.k5{background:linear-gradient(135deg,#8B5E3C,#5f3d25)}
+.k6{background:linear-gradient(135deg,#3a1520,#1a0a0e);border:1px solid rgba(212,175,55,.35)}
+
+/* card */
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:18px;min-width:0}
+.ch{display:flex;align-items:center;gap:11px;flex-wrap:wrap;margin-bottom:13px}
+.ch h2{font-size:15.5px;font-weight:600;color:var(--maroon);display:flex;align-items:center;gap:9px}
+.ch h2::before{content:'';width:3px;height:16px;background:var(--gold);border-radius:2px}
+.ch .note{font-size:11.5px;color:var(--muted);font-weight:300;margin-left:auto}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+
+/* table */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+thead th{background:linear-gradient(180deg,var(--maroon),var(--maroon2));color:var(--gold-l);
+  font-weight:600;font-size:12px;text-align:left;padding:9px 11px;white-space:nowrap;position:sticky;top:0}
+thead th.r{text-align:right}
+tbody td{padding:8px 11px;border-bottom:1px solid rgba(212,175,55,.14);vertical-align:top}
+tbody td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tbody tr:hover{background:var(--gold-soft)}
+.pg{font-weight:600;color:var(--maroon)}
+.pg small{display:block;font-weight:300;color:var(--muted);font-size:11px}
+.bar{height:5px;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--gold-d));margin-top:4px}
+.empty,.loading{padding:24px;text-align:center;color:var(--muted);font-size:13px;font-weight:300}
+select{font-family:var(--f-b);font-size:12.5px;padding:5px 9px;border-radius:9px;
+  border:1px solid var(--line);background:var(--cream);color:var(--ink)}
+.plot{height:250px;position:relative}
+.src-grp{margin-bottom:14px}
+.src-grp h3{font-family:var(--f-d);font-size:10px;letter-spacing:2px;color:var(--gold-d);font-weight:600;margin-bottom:7px}
+.srow{display:flex;align-items:center;gap:9px;font-size:12.5px;padding:3px 0}
+.srow b{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:600}
+.sbar{flex:1;height:6px;border-radius:3px;background:rgba(212,175,55,.15);overflow:hidden;max-width:150px}
+.sbar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-d))}
+.foot{font-size:11.5px;color:var(--muted);font-weight:300;padding:6px 0 30px;line-height:1.7}
+
+@media(max-width:1000px){.kpis{grid-template-columns:repeat(3,1fr)}.row2{grid-template-columns:1fr}}
+@media(max-width:560px){.kpis{grid-template-columns:repeat(2,1fr)}.kpi .v{font-size:25px}.rng{margin-left:0;width:100%}.rng button{flex:1}}
+</style>
+</head>
+<body>
+
+<!-- ============ GATE ============ -->
+<div id="gate">
+  <div class="gbox">
+    <div class="lab">ANALYTICS</div>
+    <h1>สถิติการใช้งาน</h1>
+    <p>ใส่รหัสผู้ดูแลเพื่อเข้าดูข้อมูล</p>
+    <input id="tok" type="password" placeholder="รหัสผู้ดูแล" autocomplete="off">
+    <div class="gerr" id="gerr"></div>
+    <button class="tbtn" id="btnEnter" style="width:100%;padding:11px;background:linear-gradient(135deg,var(--gold),var(--gold-d));color:#231016;font-weight:700;border:0;font-size:15px">เข้าดูข้อมูล</button>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app" style="display:none">
+  <div class="top">
+    <div class="top-in">
+      <div class="brand">JP TRUST LEARNING<span>สถิติการใช้งาน Tool &amp; Kit</span></div>
+      <div class="rng" id="rng">
+        <button data-d="7">7 วัน</button>
+        <button data-d="30" class="on">30 วัน</button>
+        <button data-d="90">90 วัน</button>
+        <button data-d="365">1 ปี</button>
+        <button data-d="3650">ทั้งหมด</button>
+      </div>
+      <button class="tbtn" id="btnOut">ออก</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="kpis" id="kpis"></div>
+
+    <div class="card">
+      <div class="ch"><h2>ผู้เข้าชมรายวัน</h2><span class="note" id="dNote"></span></div>
+      <div class="plot"><canvas id="cv"></canvas></div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><h2>แยกรายหน้า</h2><span class="note">เรียงตามจำนวนครั้งที่เปิด</span></div>
+      <div class="tw"><table>
+        <thead><tr>
+          <th>หน้า</th><th class="r">เปิด</th><th class="r">คนไม่ซ้ำ</th>
+          <th class="r">คลิก</th><th class="r">เวลาเฉลี่ย</th>
+        </tr></thead>
+        <tbody id="tbPage"><tr><td colspan="5" class="loading">กำลังโหลด…</td></tr></tbody>
+      </table></div>
+    </div>
+
+    <div class="row2">
+      <div class="card">
+        <div class="ch"><h2>คลิกมากสุด</h2>
+          <select id="selPage" class="note" style="margin-left:auto"><option value="">ทุกหน้า</option></select>
+        </div>
+        <div class="tw"><table style="min-width:340px">
+          <thead><tr><th>ปุ่ม / ลิงก์</th><th class="r">ครั้ง</th></tr></thead>
+          <tbody id="tbClick"><tr><td colspan="2" class="loading">กำลังโหลด…</td></tr></tbody>
+        </table></div>
+      </div>
+
+      <div class="card">
+        <div class="ch"><h2>มาจากไหน · อุปกรณ์</h2><span class="note">นับตาม session</span></div>
+        <div id="src"><div class="loading">กำลังโหลด…</div></div>
+      </div>
+    </div>
+
+    <div class="foot">
+      เวลาเฉลี่ย = เวลาที่แท็บเปิดอยู่จริง (สลับไปแท็บอื่นทิ้งไว้ไม่นับ) · คนไม่ซ้ำนับจาก visitor_id ใน localStorage ของเครื่องนั้น
+      เคลียร์เบราว์เซอร์แล้วจะนับเป็นคนใหม่ · วันที่อิงเวลาไทย
+    </div>
+  </div>
+</div>
+
+<script>
+const SB  = 'https://rcdukwwcbyryauhqlzmx.supabase.co';
+const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZHVrd3djYnlyeWF1aHFsem14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MTY0MDAsImV4cCI6MjA4NTQ5MjQwMH0.rprPmudJYyb6dyhXb9Z9GrtQWEeIX99A2Wrj55PvS54';
+
+let DAYS = 30, TOKEN = '', chart = null;
+
+const $  = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nf = n => (n == null ? '—' : Number(n).toLocaleString('th-TH'));
+
+function dur(sec){
+  if (sec == null) return '—';
+  sec = Math.round(sec);
+  if (sec < 60) return sec + ' วิ';
+  const m = Math.floor(sec/60), s = sec % 60;
+  return m + ':' + String(s).padStart(2,'0') + ' น.';
+}
+
+async function rpc(fn, args){
+  const r = await fetch(SB + '/rest/v1/rpc/' + fn, {
+    method:'POST',
+    headers:{'Content-Type':'application/json','apikey':KEY,'Authorization':'Bearer '+KEY},
+    body: JSON.stringify(args)
+  });
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+
+/* ---------- gate ---------- */
+function enter(){
+  const v = ($('tok').value || '').trim();
+  if (!v){ $('gerr').textContent = 'กรุณาใส่รหัส'; return; }
+  $('gerr').textContent = 'กำลังตรวจสอบ…';
+  TOKEN = v;
+  rpc('analytics_overview', { p_token: TOKEN, p_days: 30 }).then(rows => {
+    if (!rows || !rows.length){ $('gerr').textContent = 'รหัสไม่ถูกต้อง'; TOKEN=''; return; }
+    try { sessionStorage.setItem('jpt_an_tok', TOKEN); } catch(e){}
+    $('gate').style.display = 'none';
+    $('app').style.display  = 'block';
+    loadAll();
+  }).catch(e => { $('gerr').textContent = 'เชื่อมต่อไม่ได้: ' + e.message; TOKEN=''; });
+}
+$('btnEnter').onclick = enter;
+$('tok').addEventListener('keydown', e => { if (e.key === 'Enter') enter(); });
+$('btnOut').onclick = () => {
+  try { sessionStorage.removeItem('jpt_an_tok'); } catch(e){}
+  TOKEN=''; $('app').style.display='none'; $('gate').style.display='flex'; $('tok').value='';
+};
+
+/* ---------- range ---------- */
+$('rng').addEventListener('click', e => {
+  const b = e.target.closest('button[data-d]'); if (!b) return;
+  Array.prototype.forEach.call($('rng').children, x => x.classList.remove('on'));
+  b.classList.add('on'); DAYS = +b.dataset.d; loadAll();
+});
+
+/* ---------- loaders ---------- */
+function loadAll(){ loadOverview(); loadDaily(); loadPages(); loadClicks(); loadSources(); }
+
+async function loadOverview(){
+  try{
+    const r = (await rpc('analytics_overview', { p_token: TOKEN, p_days: DAYS }))[0] || {};
+    $('kpis').innerHTML =
+      kpi('k1','VISITORS', nf(r.visitors), 'คนไม่ซ้ำ') +
+      kpi('k2','SESSIONS', nf(r.sessions), 'รอบการเข้า') +
+      kpi('k3','PAGE VIEWS', nf(r.views), 'ครั้งที่เปิดหน้า') +
+      kpi('k4','CLICKS', nf(r.clicks), 'ปุ่ม + ลิงก์') +
+      kpi('k5','DOWNLOADS', nf(r.downloads), 'กดโหลดไฟล์') +
+      kpi('k6','AVG TIME', dur(r.avg_dwell), 'ต่อหน้า');
+  }catch(e){ $('kpis').innerHTML = '<div class="empty">โหลดไม่สำเร็จ: '+esc(e.message)+'</div>'; }
+}
+const kpi = (c,k,v,s) => `<div class="kpi ${c}"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
+
+async function loadDaily(){
+  try{
+    const rows = await rpc('analytics_daily', { p_token: TOKEN, p_days: DAYS });
+    $('dNote').textContent = rows.length ? (rows.length + ' วันที่มีข้อมูล') : '';
+    if (chart){ chart.destroy(); chart = null; }
+    if (!rows.length) return;
+    chart = new Chart($('cv'), {
+      type:'line',
+      data:{ labels: rows.map(r => r.d.slice(5)),
+        datasets:[
+          { label:'เปิดหน้า', data: rows.map(r => r.views), borderColor:'#D4AF37',
+            backgroundColor:'rgba(212,175,55,.16)', fill:true, tension:.3, borderWidth:2, pointRadius:0 },
+          { label:'คนไม่ซ้ำ', data: rows.map(r => r.visitors), borderColor:'#722F37',
+            backgroundColor:'transparent', tension:.3, borderWidth:2, pointRadius:0 }
+        ]},
+      options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
+        plugins:{ legend:{ labels:{ font:{family:'Anuphan'}, boxWidth:12 } } },
+        scales:{ x:{ grid:{display:false}, ticks:{ font:{family:'Anuphan',size:10}, maxTicksLimit:12 } },
+                 y:{ beginAtZero:true, grid:{color:'rgba(212,175,55,.14)'},
+                     ticks:{ font:{family:'Anuphan',size:10}, precision:0 } } } }
+    });
+  }catch(e){ $('dNote').textContent = 'โหลดไม่สำเร็จ'; }
+}
+
+async function loadPages(){
+  const tb = $('tbPage');
+  try{
+    const rows = await rpc('analytics_by_page', { p_token: TOKEN, p_days: DAYS });
+    if (!rows.length){ tb.innerHTML = '<tr><td colspan="5" class="empty">ยังไม่มีข้อมูลในช่วงนี้</td></tr>'; return; }
+    const max = Math.max.apply(null, rows.map(r => +r.views || 0)) || 1;
+    tb.innerHTML = rows.map(r => `<tr>
+      <td><div class="pg">${esc(r.label)}<small>${esc(r.page)}</small></div>
+          <div class="bar" style="width:${Math.max(4, Math.round((r.views/max)*100))}%"></div></td>
+      <td class="r">${nf(r.views)}</td><td class="r">${nf(r.visitors)}</td>
+      <td class="r">${nf(r.clicks)}</td><td class="r">${dur(r.avg_dwell)}</td></tr>`).join('');
+
+    const sel = $('selPage'), cur = sel.value;
+    sel.innerHTML = '<option value="">ทุกหน้า</option>' +
+      rows.map(r => `<option value="${esc(r.page)}">${esc(r.label)}</option>`).join('');
+    sel.value = cur;
+  }catch(e){ tb.innerHTML = '<tr><td colspan="5" class="empty">โหลดไม่สำเร็จ: '+esc(e.message)+'</td></tr>'; }
+}
+
+async function loadClicks(){
+  const tb = $('tbClick');
+  try{
+    const p = $('selPage').value || null;
+    const rows = await rpc('analytics_top_clicks', { p_token: TOKEN, p_days: DAYS, p_page: p, p_limit: 30 });
+    if (!rows.length){ tb.innerHTML = '<tr><td colspan="2" class="empty">ยังไม่มีคลิกในช่วงนี้</td></tr>'; return; }
+    tb.innerHTML = rows.map(r => `<tr>
+      <td>${esc(r.detail)}${p ? '' : `<small style="display:block;color:var(--muted);font-size:11px">${esc(r.page)}</small>`}</td>
+      <td class="r">${nf(r.n)}</td></tr>`).join('');
+  }catch(e){ tb.innerHTML = '<tr><td colspan="2" class="empty">โหลดไม่สำเร็จ</td></tr>'; }
+}
+$('selPage').addEventListener('change', loadClicks);
+
+async function loadSources(){
+  const box = $('src');
+  try{
+    const rows = await rpc('analytics_sources', { p_token: TOKEN, p_days: DAYS });
+    if (!rows.length){ box.innerHTML = '<div class="empty">ยังไม่มีข้อมูล</div>'; return; }
+    const T = { referrer:'มาจาก', device:'อุปกรณ์', utm:'UTM SOURCE' };
+    let out = '';
+    ['referrer','device','utm'].forEach(k => {
+      const g = rows.filter(r => r.kind === k).slice(0, 8);
+      if (!g.length) return;
+      const mx = Math.max.apply(null, g.map(r => +r.n)) || 1;
+      out += `<div class="src-grp"><h3>${T[k]}</h3>` + g.map(r => `<div class="srow">
+        <span style="min-width:90px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.name)}</span>
+        <span class="sbar"><i style="width:${Math.round((r.n/mx)*100)}%"></i></span>
+        <b>${nf(r.n)}</b></div>`).join('') + '</div>';
+    });
+    box.innerHTML = out || '<div class="empty">ยังไม่มีข้อมูล</div>';
+  }catch(e){ box.innerHTML = '<div class="empty">โหลดไม่สำเร็จ</div>'; }
+}
+
+/* ---------- จำรหัสไว้ในแท็บนี้ ---------- */
+(function(){
+  let t = '';
+  try { t = sessionStorage.getItem('jpt_an_tok') || ''; } catch(e){}
+  if (t){ $('tok').value = t; enter(); }
+})();
+</script>
+</body>
+</html>

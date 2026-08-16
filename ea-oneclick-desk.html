@@ -255,52 +255,8 @@ footer{margin-top:52px;background:var(--maroon3);border-top:1px solid rgba(212,1
   </div>
 </footer>
 
-<!-- ===== JPT analytics — page_events v1 (หน้าสาธารณะ) ===== -->
-<script>
-(function(){
-  var SB='https://rcdukwwcbyryauhqlzmx.supabase.co';
-  var KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZHVrd3djYnlyeWF1aHFsem14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MTY0MDAsImV4cCI6MjA4NTQ5MjQwMH0.rprPmudJYyb6dyhXb9Z9GrtQWEeIX99A2Wrj55PvS54';
-  var PAGE='ea-oneclick-desk';
-  function uuid(){
-    try{ if(crypto&&crypto.randomUUID) return crypto.randomUUID(); }catch(e){}
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){
-      var r=Math.random()*16|0,v=(c==='x')?r:((r&0x3)|0x8); return v.toString(16);
-    });
-  }
-  var vid,sid;
-  try{
-    vid=localStorage.getItem('jpt_vid'); if(!vid){vid=uuid();localStorage.setItem('jpt_vid',vid);}
-    sid=sessionStorage.getItem('jpt_sid'); if(!sid){sid=uuid();sessionStorage.setItem('jpt_sid',sid);}
-  }catch(e){ return; }
-  var ua=navigator.userAgent||'';
-  var device=/iPad|Tablet/i.test(ua)?'tablet':(/Mobi|Android|iPhone|iPod/i.test(ua)?'mobile':'desktop');
-  var refHost='direct';
-  try{ if(document.referrer){ var rh=new URL(document.referrer).hostname; if(rh&&rh!==location.hostname) refHost=rh; } }catch(e){}
-  var utm=null;
-  try{ utm=new URLSearchParams(location.search).get('utm_source')||null; }catch(e){}
 
-  function send(type,detail,dwell,keep){
-    try{
-      fetch(SB+'/rest/v1/rpc/track_page_event',{
-        method:'POST', keepalive:!!keep, mode:'cors',
-        headers:{'Content-Type':'application/json','apikey':KEY,'Authorization':'Bearer '+KEY},
-        body:JSON.stringify({
-          p_page:PAGE,p_visitor:vid,p_session:sid,p_type:type,
-          p_detail:detail||null,p_referrer_host:refHost,p_utm_source:utm,
-          p_device:device,p_dwell_sec:(dwell||null)
-        })
-      }).catch(function(){});
-    }catch(e){}
-  }
-  send('page_view');
 
-  /* นับยอดกดดาวน์โหลด — ปุ่มบนสุดและปุ่มท้ายหน้า แยก detail กันได้ */
-  ['btnDl','btnDl2'].forEach(function(id){
-    var b=document.getElementById(id);
-    if(b) b.addEventListener('click',function(){ send('download','oneclick_desk_v303_'+id,null,true); });
-  });
-})();
-</script>
-
+<script defer src="/lib/jpt-track.js" data-page="ea-oneclick-desk"></script>
 </body>
 </html>
