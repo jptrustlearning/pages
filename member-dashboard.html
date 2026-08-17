@@ -2020,7 +2020,12 @@ async function enforceSubscription(){
     let expired=false;
     if(status==='revoked'||status==='expired') expired=true;
     if(exp){const t=Date.parse(exp);if(!isNaN(t)&&Date.now()>t)expired=true;}
-    if(expired){showExpiredGate(meta,user.email);try{logEvent('subscription_blocked');}catch(e){}return false;}
+    if(expired){
+      if(meta.jpt_hold===true||meta.jpt_hold==='true'){
+        showPendingGate(meta,user.email);try{logEvent('subscription_pending');}catch(e){}return false;
+      }
+      showExpiredGate(meta,user.email);try{logEvent('subscription_blocked');}catch(e){}return false;
+    }
     try{await maybeShowRenewalNotice(user.email,meta);}catch(e){}
     try{maybeShowExpiryReminder(user.email,meta);}catch(e){}
     try{refreshNotifNews();}catch(e){}
@@ -2046,6 +2051,41 @@ function forceReauth(reason){
   document.getElementById('stepEmail').classList.add('active');
   document.getElementById('loginTitle').textContent='Member Access';
   document.getElementById('loginSubtitle').textContent='เข้าสู่ระบบด้วยอีเมลสมาชิก';
+}
+
+function showPendingGate(meta,email){
+  try{document.getElementById('mainApp').classList.remove('active');}catch(e){}
+  try{document.getElementById('loginScreen').classList.add('hidden');}catch(e){}
+  if(document.getElementById('jptPendingGate'))return;
+  const planLabel=meta&&meta.plan==='yearly'?'\u0e23\u0e32\u0e22\u0e1b\u0e35':meta&&meta.plan==='monthly'?'\u0e23\u0e32\u0e22\u0e40\u0e14\u0e37\u0e2d\u0e19':'\u2014';
+  const amt=meta&&meta.amount_due?(String(meta.amount_due)+' \u0e1a\u0e32\u0e17'):'\u2014';
+  const em=email||'';
+  const o=document.createElement('div');
+  o.id='jptPendingGate';
+  o.style.cssText='position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(160deg,#1a0a0e,#2d1018 45%,#3a1520 65%,#1a0a0e);font-family:Sarabun,Anuphan,sans-serif;overflow-y:auto;';
+  o.innerHTML=''+
+    '<div style="max-width:420px;width:100%;background:#FFFEF8;border:1.5px solid rgba(212,175,55,0.4);border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5);">'+
+      '<div style="height:4px;background:linear-gradient(90deg,#E8D48B,#D4AF37,#B8860B,#D4AF37,#E8D48B);"></div>'+
+      '<div style="padding:34px 26px 26px;text-align:center;">'+
+        '<div style="width:68px;height:68px;margin:0 auto 18px;border-radius:50%;background:linear-gradient(135deg,#B8860B,#8B6914);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(184,134,11,0.32);">'+
+          '<svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#FFFEF8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>'+
+        '</div>'+
+        '<div style="font-family:Cinzel,serif;font-size:11px;letter-spacing:3px;color:#8B6914;text-transform:uppercase;font-weight:600;margin-bottom:8px;">Payment Under Review</div>'+
+        '<h2 style="font-family:\'DM Serif Display\',serif;font-size:23px;color:#722F37;margin:0 0 10px;">\u0e01\u0e33\u0e25\u0e31\u0e07\u0e15\u0e23\u0e27\u0e08\u0e2a\u0e2d\u0e1a\u0e01\u0e32\u0e23\u0e0a\u0e33\u0e23\u0e30\u0e40\u0e07\u0e34\u0e19</h2>'+
+        '<p style="font-size:13.5px;color:#5A3D20;line-height:1.65;margin:0 0 14px;">\u0e40\u0e23\u0e32\u0e44\u0e14\u0e49\u0e23\u0e31\u0e1a\u0e43\u0e1a\u0e2a\u0e21\u0e31\u0e04\u0e23\u0e41\u0e25\u0e30\u0e2a\u0e25\u0e34\u0e1b\u0e02\u0e2d\u0e07\u0e04\u0e38\u0e13\u0e40\u0e23\u0e35\u0e22\u0e1a\u0e23\u0e49\u0e2d\u0e22\u0e41\u0e25\u0e49\u0e27 \u0e17\u0e35\u0e21\u0e07\u0e32\u0e19\u0e01\u0e33\u0e25\u0e31\u0e07\u0e15\u0e23\u0e27\u0e08\u0e2a\u0e2d\u0e1a\u0e01\u0e32\u0e23\u0e0a\u0e33\u0e23\u0e30\u0e40\u0e07\u0e34\u0e19 \u0e42\u0e14\u0e22\u0e1b\u0e01\u0e15\u0e34\u0e43\u0e0a\u0e49\u0e40\u0e27\u0e25\u0e32\u0e44\u0e21\u0e48\u0e40\u0e01\u0e34\u0e19 24 \u0e0a\u0e31\u0e48\u0e27\u0e42\u0e21\u0e07</p>'+
+        '<div style="background:linear-gradient(180deg,#FFFEF8,#F5EDD8);border:1px solid rgba(212,175,55,0.35);border-radius:12px;padding:14px 16px;margin:0 0 16px;text-align:left;">'+
+          '<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:13px;"><span style="color:#7A6F62;">\u0e41\u0e1e\u0e47\u0e01\u0e40\u0e01\u0e08</span><span style="color:#3D3228;font-weight:600;">'+planLabel+'</span></div>'+
+          '<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:13px;border-top:1px solid rgba(212,175,55,0.18);"><span style="color:#7A6F62;">\u0e22\u0e2d\u0e14\u0e0a\u0e33\u0e23\u0e30</span><span style="color:#3D3228;font-weight:600;">'+amt+'</span></div>'+
+        '</div>'+
+        '<p style="font-size:12.5px;color:#7A6F62;line-height:1.6;margin:0 0 18px;">\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e2d\u0e19\u0e38\u0e21\u0e31\u0e15\u0e34\u0e41\u0e25\u0e49\u0e27\u0e04\u0e38\u0e13\u0e08\u0e30\u0e40\u0e02\u0e49\u0e32\u0e43\u0e0a\u0e49\u0e07\u0e32\u0e19\u0e44\u0e14\u0e49\u0e17\u0e31\u0e19\u0e17\u0e35 \u0e44\u0e21\u0e48\u0e15\u0e49\u0e2d\u0e07\u0e2a\u0e21\u0e31\u0e04\u0e23\u0e43\u0e2b\u0e21\u0e48\u0e41\u0e25\u0e30\u0e44\u0e21\u0e48\u0e15\u0e49\u0e2d\u0e07\u0e0a\u0e33\u0e23\u0e30\u0e40\u0e07\u0e34\u0e19\u0e0b\u0e49\u0e33</p>'+
+        '<button id="jptPendRecheck" style="width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#D4AF37,#B8860B);color:#1a0a0e;font-family:Sarabun,sans-serif;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 6px 22px rgba(212,175,55,0.35);">\u0e15\u0e23\u0e27\u0e08\u0e2a\u0e2d\u0e1a\u0e2a\u0e16\u0e32\u0e19\u0e30\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07</button>'+
+        '<button id="jptPendLogout" style="width:100%;margin-top:10px;padding:12px;border:1px solid rgba(212,175,55,0.3);border-radius:12px;background:#F5EDD8;color:#5A3D20;font-family:Sarabun,sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;">\u0e2d\u0e2d\u0e01\u0e08\u0e32\u0e01\u0e23\u0e30\u0e1a\u0e1a</button>'+
+        '<p style="font-size:11.5px;color:#7A6F62;margin:16px 0 0;line-height:1.5;">\u0e2a\u0e21\u0e31\u0e04\u0e23\u0e44\u0e27\u0e49\u0e19\u0e32\u0e19\u0e41\u0e25\u0e49\u0e27\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e44\u0e14\u0e49\u0e23\u0e31\u0e1a\u0e2a\u0e34\u0e17\u0e18\u0e34\u0e4c? \u0e15\u0e34\u0e14\u0e15\u0e48\u0e2d <strong>jptrustlearning@gmail.com</strong></p>'+
+      '</div>'+
+    '</div>';
+  document.body.appendChild(o);
+  document.getElementById('jptPendRecheck').onclick=function(){location.reload();};
+  document.getElementById('jptPendLogout').onclick=async function(){try{await supabaseClient.auth.signOut();}catch(e){}try{localStorage.removeItem('jpt_pin');localStorage.removeItem('jpt_logged_in');sessionStorage.removeItem('jpt_session_active');}catch(e){}location.reload();};
 }
 
 function showExpiredGate(meta,email){
