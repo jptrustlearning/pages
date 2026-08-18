@@ -109,6 +109,18 @@ body{background:var(--cream);color:var(--ink);font-family:var(--f-b);line-height
 .kpi .k-l{font-size:12.5px;font-weight:500;opacity:.9}
 .kpi .k-v{font-family:var(--f-n);font-size:29px;line-height:1.1;margin:6px 0 2px}
 .kpi .k-d{font-size:11.5px;opacity:.88;display:flex;align-items:center;gap:5px}
+/* ป้ายบอกว่าตัวเลขในการ์ดนั้น "สด" หรือ "ค้างที่วันปิดล่าสุด" — กันลูกค้าเข้าใจผิดว่าทุกการ์ดอัปเดตพร้อมกัน */
+.kpi .k-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;
+  padding:2px 7px;border-radius:999px;margin-left:7px;vertical-align:2px;letter-spacing:.02em}
+.kpi .k-tag.live{background:rgba(255,255,255,.22)}
+.kpi .k-tag.asof{background:rgba(0,0,0,.20)}
+.kpi .k-tag .dt{width:5px;height:5px;border-radius:50%;background:#fff;
+  animation:kpiPulse 1.8s ease-in-out infinite}
+@keyframes kpiPulse{0%,100%{opacity:1}50%{opacity:.25}}
+.kpi-note{grid-column:1/-1;font-size:11.5px;line-height:1.7;color:var(--muted);
+  background:rgba(212,175,55,.07);border:1px solid rgba(212,175,55,.22);
+  border-radius:10px;padding:9px 12px;margin-top:-2px}
+@media(prefers-reduced-motion:reduce){.kpi .k-tag .dt{animation:none}}
 .kpi .k-art{position:absolute;right:-6px;bottom:-8px;width:74px;height:74px;opacity:.22}
 .kpi .k-art svg{width:100%;height:100%}
 .kpi.empty{background:var(--card);color:var(--muted);border:1px dashed rgba(212,175,55,.45)}
@@ -845,20 +857,29 @@ function boot(){
 }
 
 /* ---------- KPI ---------- */
+/* ราคาทองเป็นค่าสด แต่คะแนน/ความผันผวน/RSI คำนวณจากราคาปิดของวันล่าสุดในฐานข้อมูล
+   ถ้าไม่ติดป้ายแยกกัน ลูกค้าจะเห็น "อัปเดต 21:49 น." แล้วเข้าใจว่าทั้งแถวเป็นค่าสด
+   ป้าย = จุดเดียวที่บอกความจริงว่าตัวไหนขยับทุกนาที ตัวไหนขยับวันละครั้ง */
 function paintKPIs(){
   const score=+SC.Net_Score, rsi=+SC.RSI, z=+SC.Z_Score_50d;
   const chg=(LAST.close/PX.c[PX.c.length-2]-1)*100;
+  const asof=`<span class="k-tag asof">ณ ${thDate(LAST.date)}</span>`;
+  const live=`<span class="k-tag live"><i class="dt"></i>สด</span>`;
   const cards=[
-    {l:'คะแนน Sentiment',v:f2(score),d:(SC.Tier||'—')+' · เต็ม 100'},
+    {l:'คะแนน Sentiment'+asof,v:f2(score),d:(SC.Tier||'—')+' · เต็ม 100'},
     SPOT
-      ? {l:'ราคาทองสด',v:'$'+f0(SPOT.price),d:'XAU/USD · อัปเดต '+spotTime()+' น.'}
-      : {l:'ราคาปิดล่าสุด',v:'$'+f0(LAST.close),d:(chg>=0?'▲ ':'▼ ')+Math.abs(chg).toFixed(2)+'% จากวันก่อน'},
-    {l:'ความผันผวน',v:(+SC.Volatility_Pct).toFixed(1)+'%',d:'ระดับการแกว่งของราคาช่วงนี้'},
-    {l:'RSI / โซน Z',v:rsi.toFixed(1),d:(SC.Z_Zone||'—')+' · Z = '+z.toFixed(2)}
+      ? {l:'ราคาทองสด'+live,v:'$'+f0(SPOT.price),d:'XAU/USD · อัปเดต '+spotTime()+' น.'}
+      : {l:'ราคาปิดล่าสุด'+asof,v:'$'+f0(LAST.close),d:(chg>=0?'▲ ':'▼ ')+Math.abs(chg).toFixed(2)+'% จากวันก่อน'},
+    {l:'ความผันผวน'+asof,v:(+SC.Volatility_Pct).toFixed(1)+'%',d:'ระดับการแกว่งของราคาช่วงนี้'},
+    {l:'RSI / โซน Z'+asof,v:rsi.toFixed(1),d:(SC.Z_Zone||'—')+' · Z = '+z.toFixed(2)}
   ];
-  document.getElementById('kpis').innerHTML=cards.map((k,i)=>
+  let html=cards.map((k,i)=>
     `<div class="kpi c${i+1}"><div><div class="k-l">${k.l}</div><div class="k-v">${k.v}</div></div>
      <div class="k-d">${k.d}</div><div class="k-art">${svg(IC.chart)}</div></div>`).join('');
+  if(SPOT) html+=`<div class="kpi-note"><b>อ่านการ์ดให้ถูก:</b> เฉพาะ<b>ราคาทองสด</b>ที่อัปเดตตลอดเวลา (XAU/USD)
+    ส่วน<b>คะแนน Sentiment · ความผันผวน · RSI/โซน Z</b> คำนวณจากราคาปิดของ ${thDate(LAST.date)}
+    จึงเปลี่ยนวันละครั้งหลังตลาดปิด — ตัวเลขเดิมค้างระหว่างวันเป็นเรื่องปกติ ไม่ใช่ข้อมูลค้าง</div>`;
+  document.getElementById('kpis').innerHTML=html;
 }
 
 /* ---------- gauge + breakdown ---------- */
