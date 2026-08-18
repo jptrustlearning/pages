@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JP Trust Tool &amp; Kit — Sentiment ทองคำรายวัน</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;600&family=Cinzel:wght@500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --cream:#FAF6ED; --card:#FFFEF8; --line:rgba(212,175,55,.22);
+  --maroon:#3a1520; --maroon2:#2d1018; --maroon3:#1a0a0e;
+  --gold:#D4AF37; --gold-l:#F4E4BA; --gold-soft:rgba(212,175,55,.12);
+  --ink:#3D3228; --muted:#8a7d6b;
+  --up:#2E9E5B; --down:#C6472E;
+  --sb:268px;
+  --f-d:'Cinzel',serif; --f-b:'Anuphan',sans-serif; --f-n:'DM Serif Display',Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--cream);color:var(--ink);font-family:var(--f-b);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+/* ================= shell ================= */
+.app{display:flex;min-height:100vh}
+
+/* ---- sidebar ---- */
+.sb{width:var(--sb);flex-shrink:0;background:linear-gradient(180deg,var(--maroon3) 0%,var(--maroon2) 55%,var(--maroon) 100%);
+  color:rgba(244,228,186,.82);display:flex;flex-direction:column;position:fixed;inset:0 auto 0 0;z-index:40;
+  border-right:1px solid rgba(212,175,55,.18)}
+.sb-brand{padding:20px 20px 16px;border-bottom:1px solid rgba(212,175,55,.16);display:flex;align-items:center;gap:11px}
+.sb-mark{width:40px;height:40px;flex-shrink:0;display:block;object-fit:contain;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,.45))}
+.sb-name{font-family:var(--f-d);font-size:13.5px;letter-spacing:1.4px;color:var(--gold-l);font-weight:600;line-height:1.25}
+.sb-name span{display:block;font-family:var(--f-b);font-size:10.5px;letter-spacing:.4px;color:rgba(244,228,186,.5);font-weight:300}
+.sb-scroll{flex:1;overflow-y:auto;padding:10px 0 26px;scrollbar-width:thin}
+.sb-scroll::-webkit-scrollbar{width:5px}
+.sb-scroll::-webkit-scrollbar-thumb{background:rgba(212,175,55,.28);border-radius:3px}
+.sb-cap{font-family:var(--f-d);font-size:9.5px;letter-spacing:2.2px;color:rgba(212,175,55,.62);
+  padding:16px 20px 7px;font-weight:600}
+.nav-i{display:flex;align-items:center;gap:11px;padding:9px 20px;font-size:13.5px;font-weight:400;
+  color:rgba(244,228,186,.78);cursor:pointer;text-decoration:none;border-left:3px solid transparent;transition:background .15s,color .15s}
+.nav-i:hover{background:rgba(212,175,55,.09);color:var(--gold-l)}
+.nav-i.on{background:linear-gradient(90deg,rgba(212,175,55,.22),rgba(212,175,55,.04));
+  border-left-color:var(--gold);color:#fff;font-weight:500}
+.nav-i svg{width:17px;height:17px;flex-shrink:0;opacity:.85}
+.nav-i .chev{margin-left:auto;width:13px;height:13px;opacity:.55;transition:transform .2s;flex-shrink:0}
+.grp.open>.nav-i .chev{transform:rotate(90deg)}
+.grp-body{max-height:0;overflow:hidden;transition:max-height .26s ease}
+.grp.open .grp-body{max-height:640px}
+.nav-s{display:block;padding:7px 20px 7px 48px;font-size:12.5px;color:rgba(244,228,186,.62);
+  text-decoration:none;border-left:3px solid transparent;transition:background .15s,color .15s}
+.nav-s:hover{background:rgba(212,175,55,.08);color:var(--gold-l)}
+.nav-s.on{background:rgba(212,175,55,.16);border-left-color:var(--gold);color:#fff;font-weight:500}
+.nav-s{display:flex;align-items:center;gap:0}
+.nav-s .tick{width:4px;height:4px;border-radius:50%;background:rgba(212,175,55,.5);margin-right:9px;flex-shrink:0}
+.nav-s .ns-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav-s .lk{width:13px;height:13px;flex-shrink:0;margin-left:8px;color:rgba(212,175,55,.7)}
+.nav-s:hover .lk,.nav-s.on .lk{color:var(--gold)}
+.sb-build{margin:8px 20px 0;font-family:ui-monospace,Menlo,monospace;font-size:9.5px;
+  letter-spacing:.3px;color:rgba(244,228,186,.32)}
+.sb-legend{display:flex;align-items:center;gap:7px;margin:22px 20px 0;padding-top:13px;
+  border-top:1px solid rgba(212,175,55,.16);font-size:11px;color:rgba(244,228,186,.5);font-weight:300}
+.sb-legend .lk{width:12px;height:12px;color:rgba(212,175,55,.7);flex-shrink:0}
+.mchip{margin-left:auto;font-family:var(--f-b);font-size:9.5px;font-weight:600;letter-spacing:.3px;
+  color:#231016;background:linear-gradient(135deg,var(--gold),#c2971f);border-radius:20px;padding:2px 8px;flex-shrink:0}
+.grp>.nav-i .chev{margin-left:8px}
+.nav-s.on .tick{background:var(--gold)}
+
+/* ---- main ---- */
+.main{flex:1;margin-left:var(--sb);display:flex;flex-direction:column;min-width:0}
+.top{background:var(--card);border-bottom:1px solid var(--line);padding:0 22px;height:60px;
+  display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:30}
+.burger{display:none;background:none;border:1px solid var(--line);border-radius:8px;padding:7px 9px;cursor:pointer;color:var(--maroon)}
+.burger svg{width:18px;height:18px;display:block}
+.crumb{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);min-width:0}
+.crumb b{color:var(--maroon);font-weight:600}
+.crumb .sep{color:var(--line)}
+.crumb .cur{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top-act{margin-left:auto;display:flex;align-items:center;gap:9px}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:9px;padding:7px 13px;
+  font-family:var(--f-b);font-size:12.5px;font-weight:500;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{border-color:var(--gold);background:var(--gold-soft)}
+.btn.gold{background:linear-gradient(135deg,var(--gold),#b8901f);border-color:transparent;color:#231016;font-weight:600}
+.btn.hide{display:none}
+
+.content{flex:1;padding:22px;min-width:0}
+.view{display:none}
+.view.on{display:block}
+
+/* ---- section head + segmented ---- */
+.sec-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.sec-head h2{font-size:16.5px;font-weight:600;color:var(--maroon);display:flex;align-items:center;gap:9px}
+.sec-head h2::before{content:'';width:3px;height:17px;background:var(--gold);border-radius:2px}
+.seg{margin-left:auto;display:flex;background:var(--card);border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.seg button{border:none;background:none;padding:7px 14px;font-family:var(--f-b);font-size:12.5px;color:var(--muted);cursor:pointer;font-weight:500}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button.on{background:linear-gradient(135deg,var(--maroon),var(--maroon2));color:var(--gold-l)}
+
+/* ---- KPI ---- */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.kpi{border-radius:14px;padding:16px 17px;color:#fff;position:relative;overflow:hidden;min-height:112px;
+  display:flex;flex-direction:column;justify-content:space-between}
+.kpi.c1{background:linear-gradient(135deg,#722F37,#8B2252)}
+.kpi.c2{background:linear-gradient(135deg,#2E9E5B,#1e7a44)}
+.kpi.c3{background:linear-gradient(135deg,#C79A24,#9a7413)}
+.kpi.c4{background:linear-gradient(135deg,#2a4a7a,#1c3557)}
+.kpi .k-l{font-size:12.5px;font-weight:500;opacity:.9}
+.kpi .k-v{font-family:var(--f-n);font-size:29px;line-height:1.1;margin:6px 0 2px}
+.kpi .k-d{font-size:11.5px;opacity:.88;display:flex;align-items:center;gap:5px}
+/* ป้ายบอกว่าตัวเลขในการ์ดนั้น "สด" หรือ "ค้างที่วันปิดล่าสุด" — กันลูกค้าเข้าใจผิดว่าทุกการ์ดอัปเดตพร้อมกัน */
+.kpi .k-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;
+  padding:2px 7px;border-radius:999px;margin-left:7px;vertical-align:2px;letter-spacing:.02em}
+.kpi .k-tag.live{background:rgba(255,255,255,.22)}
+.kpi .k-tag.asof{background:rgba(0,0,0,.20)}
+.kpi .k-tag .dt{width:5px;height:5px;border-radius:50%;background:#fff;
+  animation:kpiPulse 1.8s ease-in-out infinite}
+@keyframes kpiPulse{0%,100%{opacity:1}50%{opacity:.25}}
+.kpi-note{grid-column:1/-1;font-size:11.5px;line-height:1.7;color:var(--muted);
+  background:rgba(212,175,55,.07);border:1px solid rgba(212,175,55,.22);
+  border-radius:10px;padding:9px 12px;margin-top:-2px}
+@media(prefers-reduced-motion:reduce){.kpi .k-tag .dt{animation:none}}
+.kpi .k-art{position:absolute;right:-6px;bottom:-8px;width:74px;height:74px;opacity:.22}
+.kpi .k-art svg{width:100%;height:100%}
+.kpi.empty{background:var(--card);color:var(--muted);border:1px dashed rgba(212,175,55,.45)}
+.kpi.empty .k-v{color:rgba(138,125,107,.5)}
+
+/* ---- cards ---- */
+.row{display:grid;gap:14px;margin-bottom:20px}
+.row.two{grid-template-columns:1.9fr 1fr}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 17px;min-width:0}
+.card-h{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.card-h h3{font-size:14.5px;font-weight:600;color:var(--maroon)}
+.card-h .tools{margin-left:auto;display:flex;gap:6px}
+.tg{border:1px solid var(--line);background:var(--card);border-radius:7px;padding:5px 8px;cursor:pointer;color:var(--muted);line-height:0}
+.tg svg{width:15px;height:15px}
+.tg.on{background:linear-gradient(135deg,var(--maroon),var(--maroon2));border-color:transparent;color:var(--gold-l)}
+.plot{position:relative;height:290px}
+.plot.sm{height:230px}
+
+/* ---- empty state ---- */
+.empty-slot{height:100%;min-height:150px;border:1px dashed rgba(212,175,55,.45);border-radius:11px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center;padding:18px}
+.empty-slot .e-t{font-family:var(--f-d);font-size:10px;letter-spacing:2px;color:var(--gold);font-weight:600}
+.empty-slot .e-d{font-size:12.5px;color:var(--muted);font-weight:300;max-width:330px}
+.empty-slot code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--maroon);
+  background:var(--gold-soft);padding:2px 6px;border-radius:5px}
+
+/* ---- table slot ---- */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;min-width:520px}
+th,td{padding:10px 12px;text-align:right;font-size:13px;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+thead th{background:linear-gradient(180deg,var(--maroon),var(--maroon2));color:var(--gold-l);font-weight:600;font-size:12.5px}
+tbody tr{border-top:1px solid rgba(212,175,55,.14)}
+
+/* ---- gold sentiment home ---- */
+.asof{margin-left:auto;font-size:12px;color:var(--muted);font-weight:300;display:flex;align-items:center;gap:7px}
+.dotlive{width:7px;height:7px;border-radius:50%;background:var(--up);display:inline-block}
+.dotlive.fb{background:var(--gold)}
+.atr-chip{margin-left:auto;font-size:11.5px;font-weight:500;color:#9a7d1e;background:var(--gold-soft);
+  border:1px solid var(--line);border-radius:20px;padding:4px 11px;white-space:nowrap}
+.openbar{background:rgba(58,21,32,.04);border:1px solid var(--line);border-radius:11px;padding:11px 13px;margin-bottom:14px}
+.modeseg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-bottom:10px}
+.modeseg button{flex:1;border:none;background:none;padding:9px 10px;font-family:var(--f-b);font-size:13px;
+  color:var(--muted);cursor:pointer;font-weight:500}
+.modeseg button+button{border-left:1px solid var(--line)}
+.modeseg button.on{background:linear-gradient(135deg,var(--maroon),var(--maroon2));color:var(--gold-l);font-weight:600}
+.openrow{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+.openbar label{font-size:12.5px;color:var(--muted);font-weight:600}
+.openbar input{flex:1;min-width:130px;padding:9px 12px;border:1px solid var(--line);border-radius:9px;
+  background:var(--card);color:var(--ink);font-family:var(--f-n);font-size:18px}
+.openbar input:focus{outline:2px solid var(--gold);outline-offset:1px}
+.openbar input.locked{background:rgba(58,21,32,.05);color:var(--maroon);cursor:default}
+#btnCalc.hide{display:none}
+table.lad td,table.lad th{padding:8px 11px}
+table.lad td.num{font-family:var(--f-n);font-size:16px}
+tr.lv-r td{color:#9c3a2a}
+tr.lv-s td{color:#20693f}
+tr.lv-o td{background:linear-gradient(90deg,var(--gold-soft),rgba(212,175,55,.04));font-weight:600;color:var(--maroon)}
+tr.lv-o td.num{color:var(--maroon)}
+.pbar{display:inline-block;width:56px;height:6px;border-radius:3px;background:rgba(138,125,107,.18);
+  vertical-align:middle;margin-right:7px;overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--gold);border-radius:3px}
+td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
+.lad-note{font-size:11.5px;color:var(--muted);font-weight:300;margin-top:10px;line-height:1.65}
+.bd-head{display:flex;align-items:baseline;gap:8px;margin-top:14px;padding-top:12px;
+  border-top:1px solid rgba(212,175,55,.18);font-size:12.5px;font-weight:600;color:var(--maroon)}
+.bd-head span{font-size:11px;font-weight:400;color:var(--muted)}
+.bd{margin-top:8px}
+.bd-r{display:flex;align-items:center;gap:9px;margin-bottom:7px}
+.bd-t{font-size:12.5px;color:var(--muted);width:112px;flex-shrink:0}
+.bd-bar{flex:1;height:7px;border-radius:4px;background:rgba(138,125,107,.15);overflow:hidden}
+.bd-bar i{display:block;height:100%;border-radius:4px}
+.bd-v{font-family:var(--f-n);font-size:14px;width:26px;text-align:right;color:var(--ink)}
+.retstrip{display:flex;gap:8px;margin-top:12px}
+.rs{flex:1;text-align:center;border:1px solid var(--line);border-radius:10px;padding:8px 4px;background:rgba(58,21,32,.03)}
+.rs em{display:block;font-style:normal;font-size:11px;color:var(--muted);font-weight:500}
+.rs b{font-family:var(--f-n);font-size:16px;font-weight:400}
+.rs b.up{color:var(--up)} .rs b.down{color:var(--down)}
+.flags{margin-top:11px;font-size:12px;color:var(--down);background:rgba(198,71,46,.08);
+  border:1px solid rgba(198,71,46,.25);border-radius:9px;padding:8px 11px}
+
+.openhint{flex-basis:100%;font-size:11.5px;color:var(--muted);font-weight:300}
+.openhint a{color:#9a7d1e;font-weight:500}
+.pivstrip{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:12px}
+.ps-t{font-size:11.5px;color:var(--muted);font-weight:600;margin-right:3px}
+.ps-c{font-size:11.5px;font-weight:500;padding:3px 9px;border-radius:20px;border:1px solid var(--line)}
+.ps-c.r{color:#9c3a2a;background:rgba(198,71,46,.07)}
+.ps-c.s{color:#20693f;background:rgba(46,158,91,.08)}
+.ps-c.pp{color:var(--maroon);background:var(--gold-soft);font-weight:600}
+
+/* ---- product package ---- */
+.card.prod{margin-top:20px;background:linear-gradient(150deg,var(--maroon3),var(--maroon));
+  border-color:rgba(212,175,55,.4);color:var(--gold-l)}
+.card.prod.pulse{animation:prodPulse 1.5s ease 1}
+@keyframes prodPulse{0%,100%{box-shadow:0 0 0 0 rgba(212,175,55,0)}30%{box-shadow:0 0 0 5px rgba(212,175,55,.30)}}
+.prod-head{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:15px}
+.prod-eyebrow{font-family:var(--f-d);font-size:9.5px;letter-spacing:2.2px;color:var(--gold);font-weight:600}
+.prod-head h3{font-size:17px;font-weight:600;color:#fff;margin:4px 0 3px}
+.prod-head p{font-size:12.5px;color:rgba(244,228,186,.6);font-weight:300;max-width:420px}
+.prod-price{margin-left:auto;text-align:right;white-space:nowrap}
+.prod-price b{font-family:var(--f-n);font-size:31px;color:var(--gold);font-weight:400;line-height:1}
+.prod-price span{font-size:12px;color:rgba(244,228,186,.6);margin-left:4px}
+.prod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.ea{background:rgba(244,228,186,.07);border:1px solid rgba(212,175,55,.28);border-radius:11px;
+  padding:13px 14px;display:flex;flex-direction:column;gap:3px;position:relative}
+.ea .lk{position:absolute;top:11px;right:11px;width:13px;height:13px;color:rgba(212,175,55,.7)}
+.ea-n{font-family:var(--f-d);font-size:13px;letter-spacing:.8px;color:var(--gold-l);font-weight:600}
+.ea-d{font-size:11.5px;color:rgba(244,228,186,.42);font-weight:300}
+.prod-foot{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:15px;
+  padding-top:13px;border-top:1px solid rgba(212,175,55,.2)}
+.prod-note{font-size:11.5px;color:rgba(244,228,186,.55);font-weight:300}
+.prod-foot .btn{margin-left:auto}
+@media(max-width:860px){.prod-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:460px){.prod-grid{grid-template-columns:1fr}.prod-price{margin-left:0}}
+.mchip.alt{background:linear-gradient(135deg,#8B2252,#722F37);color:var(--gold-l)}
+.mchip.free{background:linear-gradient(135deg,var(--gold),#b8901f);color:#231016}
+
+/* ---- free download card ---- */
+.card.freedl{margin-top:20px;background:linear-gradient(150deg,#FFFDF4,#FBF3DE);
+  border-color:rgba(212,175,55,.55);box-shadow:0 3px 16px rgba(212,175,55,.15);
+  display:flex;align-items:center;gap:17px;flex-wrap:wrap;padding:18px 20px}
+.fd-ic{width:52px;height:52px;border-radius:14px;flex-shrink:0;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--gold),#b8901f);color:#231016}
+.fd-ic svg{width:26px;height:26px}
+.fd-t{min-width:210px;flex:1}
+.fd-eyebrow{font-family:var(--f-d);font-size:9.5px;letter-spacing:2.2px;color:#B8860B;font-weight:600}
+.fd-t h3{font-size:17px;font-weight:600;color:var(--maroon);margin:3px 0 2px}
+.fd-t p{font-size:12.5px;color:var(--muted);font-weight:300}
+.fd-cta{margin-left:auto;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+@media(max-width:600px){.fd-cta{margin-left:0;width:100%}.fd-cta .btn{flex:1;justify-content:center;text-align:center}}
+
+/* ---- tool view ---- */
+.frame-wrap{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card);height:calc(100vh - 128px);min-height:460px}
+.frame-wrap iframe{width:100%;height:100%;border:0;display:block;background:var(--cream)}
+.frame-note{font-size:11.5px;color:var(--muted);margin-top:9px;font-weight:300}
+
+/* ---- overlay ---- */
+.scrim{display:none;position:fixed;inset:0;background:rgba(26,10,14,.5);z-index:35}
+.scrim.on{display:block}
+
+/* ---- responsive ---- */
+@media(max-width:1080px){.kpis{grid-template-columns:repeat(2,1fr)}.row.two{grid-template-columns:1fr}}
+@media(max-width:860px){
+  .sb{transform:translateX(-100%);transition:transform .25s ease}
+  .sb.open{transform:none}
+  .main{margin-left:0}
+  .burger{display:block}
+  .content{padding:16px}
+  .frame-wrap{height:calc(100vh - 150px)}
+}
+@media(max-width:640px){
+  .card-h{flex-wrap:wrap}
+  .atr-chip{margin-left:0;flex-basis:100%;text-align:center}
+  .openbar input{min-width:100%}
+  .openbar .btn{flex:1;justify-content:center}
+  .tw{position:relative}
+  .lad-scroll{display:block}
+}
+@media(max-width:520px){.kpis{grid-template-columns:1fr}.kpi{min-height:96px}}
+.lad-scroll{display:none;font-size:11.5px;color:var(--muted);font-weight:300;text-align:right;margin-top:7px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="scrim" id="scrim"></div>
+
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sb" id="sb">
+    <div class="sb-brand">
+      <img class="sb-mark" src="data:image/webp;base64,UklGRuYbAABXRUJQVlA4WAoAAAAQAAAAfwAAfwAAQUxQSH8CAAABkBzbtupG5777AzC7NWyY0VBR2DFY9avJlIOmdhCWE2lmjIJpRiq9++4ZiKv+bYaImABML5UAkFZ7c2v7akNub222WwJAKsHcRQGcqY+efTA2qn14dlSfAaAyJwWWLl7rc9hLgzqH+9cuLgE6jwSsdV+QNCvOhvViRvJFdw1IM1Ok/dekmbOh3Yx8vZ+gM1JcuEtmZ6N7Ju9egM5CEupPNGfju/FTjSRTScIBaQzRyAMkmUISeszOID2zhyQTieKYAwY64DFUJqlwyAFDHfAQ1QSKDjODzexAxySc/Vw8Gi+fzyKNENWHNIZrfKgqQ4pdZgacuQsFkGTlXSkRlfJuRRJQocvMkDO7qCBYeOMlpuJvFiAVLtIYtPEiqoSbHpffRMLJPj0qZ/8kUNMYtrEGesxxZfagz1niKnyurY/0uJwfW21j6NbeoEfm3OiwRFbY2Y5u+2p0V//777//fgXajm67E11ngx6Zc6NtDN3arY/0uJwfW/qcJa7C54oec1yZPaCmxWWsgZN9elTO/kkk3HSLyvwmUoWLjIsXUQkW3niJqfibBQgqdJljyuyiApKsvCslolLerUgCoNhljihzFwoAovqQFo/xoaoMIeHs5+LRePl8FgmjFR3maDI7UIyvcMhBLAMeosKEojjmIJIBj6EyCSShx+xReGYPSTC5JByQFoORB0iCaSWh/kTz5nPjpxpJMEPFhbtk9mbzTN69AMVsFWn/NWnmTeVm5Ov9BMWsE7DWfUHSrHjTeDEj+aK7BiTMUYGli9f6HPbSoM7h/rWLS4BivqIAztRHzz4YG9U+PDuqzwBQwdylEgDSam9ubV9tyO2tzXZLAEglmB4AVlA4IEAZAAAQVACdASqAAIAAPiUOhUIhhh89swYAkS2AFJZnIST4D8e/yd+UCq/1b+zfpn+5ftp8ku1jory/uV/9Z/cvyR+b3+b/0nso/Q/+u9wD9YP+B/UP717W/qk/c31Cf0v/Efsh7yf+7/aP3Tf2T/I+wB/R/8V/8ewh/wn/W9g/9g///65H7jfB5/Wf9L+3nwD/rV/4fz/+QD0AOd3iB5/fjf5//jvzv9b/JD+x/+b1kOeZ9EP4v9p/uH9X/Zn+5ft17U/j78Rv7P8bPgF/Ef5F/dv69+yX91/aXnFNM/uH+39Qv16+jf5r+3/th/jf3Q9pTVK76/6T3Af5t/SP8p+V/+F/+31T/vf8V4yXlP+i+2b7AP5r/Tv9T/hP22/xH0t/wf+4/xn5Ve0383/s/+w/v/+f/8P+c///4C/yH+ff43+0/5L/n/4T///8j7hvXx+v3shfq3994rbThnzDKFppb6I1AtJKSCQMY0XHvyxrk+WrY5IN3LRp+r59re8CpeDLhSuH3/UNv+qyX5pOCtxFRUXDPajn4dPNAr3cjP03xFevsztY+g3h1jD0JI5wjIEtCVElSp0KJmGHnHOr3v/37vA+WnZEUduZEGh10op80na8Jal/o+lamBzmxcMoveZYywj1Hv5RFypsN1v0SkM6LZBGZQIDGWqJIoufEQgTRwZorYxPmGu8domgkh2k1jm+h/82NV6Tem/lgttr5tW7KKr+IC4dgRdpkWJ1Li3YO97ZPcrhfMH67T0K1cU65Y31nuMeJ+yUi7GP18Lub0aOWdWCEYvYzop3ZID88HHE9OR5Qvgwn/me+KfOB7OL6C1U3SFAm2V1A6vgkeaZ1JD/qbfJ8bgbMbJMkpHPXIXf8HPPW3XbSwDCmvaRlDpJDsSzoDcTM/taob317UAA/v84M3xvQz/6uO2JQt4QQbNrSn+F1Y3b3s2OOIoqY0bP7Pt8l1SWfkH8sMiNhdC76nkBT3f/YqALXvVgjHj9NuE4IKqaJkiFF5zBLYwCf1xhWfv0kjN7mr/cdK5/TVJei7eWuqvDv876j/9mEhIJVb2VOzTdWNnRVSK0S55EdN+V5D6l+7d+u1OZzUpNW/dqOS/6RXsxYTxtZV+BuA+uRQD1njlRP3Mv9v0nO0C/ucTlhYrXjr9QODtgDoINcJ/NYea3+RJRUlWjquuDL/PTz1hTzLr0FywtpdrMzLV1kveN2I66Rez/MA1EskhskBlxK+4JwM8P6mtkbde10Pz76DmHj8Ytf6PIoEoeSDJSt7Jb76tsrNvYlUggdMFHOgiMln+iD/Lmq0Y8s3HOn0mXTOMHMu/2J1x4sWfQZy8XqoY9+dthqw583J8gK4k5E6poRNTV7jRhqAOupii+otCI6QBlQjrHNFn9Fs/Ho5CoMAvuUKaInHFoO7otneqepCmJL/0E8UgYcIKp0kRFOdzzpktC6jm9oAhWqgly1TkWA5puw0cH/OfXmLU/wj6T6cN/Q3KXeR4tJRvpbt0kZ6UErph3s8Uxepe14zwHlW2awWJe4OTX7uoCKVToaSdyMKMnaCvMrjH/kicTJTLjvOIARTlfA8QJsRopcs3v9Bx6f9lQhPQtTOEvzeGQqYsEcJb1XElvUZ0KfEeqKzFp5Jh5y/rYwActT4+Eme5AEEnGwW5oD5BJ5yXzmSsfZss3dGRee4vzxzm331uPj1F8p0UjNs2ImdBf67/dJqflU+Sd50TZ8pkOJ/VI0KyN5qsjGqG1sdW+lePbB1l48erMe+rCWgaOB4dyzywNzETt6jMUvrn3wF/U2jZMpvg5gamGynlwd9jAlMrxgagpJ9Wn/5GDoxpuTUlswmfPQr4D5GcGK6Owr0wg52cidDSl08bJ0EThZzQcOgBCmFjeMOEPop3UCUtnPd4/vQUAPsTZM6m9LkcEHnPAgcv0iKApyZ/9ynO5GPn8oymCjD0qXDVLem1iO8d0Atx1UmzBPAxPmAb8Kq+/Wfm6eZvqnLkesKDSOrcEKS8W59wDtP0C7ovLqUQ9CUDwMy4UFe4jNJjN8ujB4RnuVTITfcBTc6z2SKROSZ6GBUjoERnAbwQe6z99tc73avrWziUpP3Z86Fe5SkGuIyzHYrv8MXBKDm6Ivj8p5e2DY8XVUqKKrDu6wyzyN0vUqUArVYxE72/BeXJXk17Lc/eguX2vQrkTgnxp6Uj8435WMC/SN15xH49LLCCiZvtJDTqPxqoLIg5XZH5IvJkD67aabJyjYW2HdhQgrNpkPosofFGFg3b5hV7CNjL6e3fq4qWxIzUnWmmvRv1SU2/vifa5yWJbV2d53JaOHAuZkMQXY8cZIqUQfW68ozJcYrgKo/6sarNCAx8bDqR0EJ1mR7ddHHQisecyI4u2ww/3j4DUyaY9Wdfc7rKLoms3YDZwpZHpRtr26bRtp4MlKF/xLAISLZ4gZA2865GWd4WyXmr6FzE1ZakiGGcsEWRp1urcOmkLRFYR+xCCq+6EUrO0EVGu0NDhMYoLcekAYHhBRE3B6RZ+59IyTpOI3XjX38aVj0gQ4i+lcCoR+1lo/2kOYOpQpM92nISQHswwORNf8mGUkBK/T3vFdV7S0CFYZP1RF+1IdIY9xSHe7gh1/z656RE5M/oeVN14njFw0+WDMdHsfmym7LaGUmhf7m8tfe8DTnUrVWRPCD1n5gjNiLp9t874yo0XIiT2/cMmZZLx0ylh76nklI8USzVOrQItwVrBYuZiafzaBCgmRyJSGEWYYwaphqiPNkGMVcHSMA0kn+1BIn9DOeuNetxIbt6Ht5PzkjOuZwNbzjkEB6K7wy6z2XZIP8Mnf8fN6iVjh7gi0PplqS9+7kGDufYJQpLzaHPlwYpkP7lPqJVGZtOz0nIKib/r3akMkMXI8inju109GUXX2Ojiv2AOe1jAifDF9h4o4pi0jbd/o0/crYN1jJ235+PTFzDC9c6timp2UIFk8ObbHYjpbuMFF5ppPJzasFz2TE8iRTCfhg9i18KVcr4XtXij9vRPgnKZ4P/+EHG1MdplqnB8Xa+D788DoYZhuc8cbb4eEbKBo+XjLN3F0aBgHX+dHIN/nbqGmZYkvNzHLxlzf15oiCKeQrt0xIBcTd9AvbHZRjjGqhuCNqwgc4BcUiF2SBg8wDEOdP5w1Tfrgtr8mzWpMINY9ZN5HRicTZ3WuBskjU8iCrpE/9EIEN9Ov9Awg79QDw53Vdmm4WJR9aj5NKhYhqe/FN8NU9XSsmU/EgVCHgJy4aRdn2be6bk8DiR0P0ywq+68zEKFcbrdX5e5PjhaHsKiTavL3AD9EYuNDB8yNrwWX0zzZdcT2vz11XsSPgnaDKxfg4Qvn3xFDNF4Cpc61awPJLA5OuxrMFQ94m29UpzWiAkSVBIjmWH7zGcxXENU4dp78Ad4gzaU/I9fmy3DGQiEyUc4oB2nOvn4n1BVSPsoLNA/iKz++hwCurzH0QrUYRRs/7NSJYmMMFwWfPcAPyoRLyiQYiCgXcZbNocifJq4VRJxayDCncKFegA/jCXJRncoy1Q+1q/5K1Atst7JB8hzp3+DwjtVE/f3dvNE+O+/TaCqoPPoQ5TCcvRUTwYbrDbEE27+2bduMNOepTgAMJHlOVVIQYfFLDsCfw+wOSlVPqLes/hvRsOybj/+a3Rsz6wyjbsMjDUVlEqCzQ9MsIWMyDdC38xNapLmsst3CvreYgRZIoRFDrjx6zPKQhiyYMbv/A/M7nQCsqxoJoXRu9mqCs6B9aAr8x6TzqXAFGir9poBwkaADyJrVtjLw6J5Bi/PqARAG37DPw0RA8nACcy2PgPOkhwZnouucXJA6bra+axU8Rd+9TZ7GgJdX4hRO3O+48rly0b9tFILufXQ5l9DD/R+3EfnXn2A821eRbW4WlYu1w1NpuGQrtZuBI4dObOueW/FIacZ24CWE/d0edc6AQVd5xJRWZwmCyUjdt04H6smKRvsub6/sFvlX10Xq2gGb4lFBhDcMn/ihsVRUfJ//S19e2RObzNEd1MiGoRKQM/K5ymxvRqQZlz0VzDoUkyAa8lmyaoX0eC5J/4qwWfolTpqBl7fqDxbBva/UyCJh1yAxaU6beXsGC8wHBnsXRLDi0fNNlgtc7BEo6zzMjTP3PlOxIi54hZke+81z5xdFnxNlTh7C1quAoljafpm+KZHGya57BUVn5L3x7Ec01xW9j41+5SHa5vyjSI7iPUsBEiKV7YNWgkKsjWtthnmUSBzaIsR/bnX5FdMh8tkaxuWantGbYNKi4DBeMfcYlCiB96R95NQsX4Vft5bHq4wThLjn3ABj7KPCsJ3TOjjoqZETcWMuFT/ze7ZpizA3/1BVuloHPrxQOnwaK73EImu+Y8TuXuEcFIV/iiR8Mr758ALClDHRE/Z62kj/iv4CL2Z8Ir58p/NybPpHchONiZ+08ZIabb5+t0zqt9kwVluJNefSeT385vMKtPMtYP85kJnPyOFI8FXHCL3TpuCy73qUw19pgJV/p40sTylcLZxW/hsvyVeBkNXPsD78aXjQtl5RcrW2SWJAduaAHHeKuwTXv8YbSXB3uhD8tQaWVjLtR2+7V5JKDJc4lNmu/jbg2iy1/A3quZPYg0Oa2S0HzdlLiKj//la+QK9E4hvt+Ijn2kj3gmn/40S/w0jcI5kcFW6xOeEKPb0MkT1mn+o0mB0SDv2yNjzpiK6cRC2lcmVXRmBVKzIIA7FcWDhnu/5SkIBJaktm19ldbg2iIBGRaLEZ9Ja4Tf5daqo9jVwfxguX7q/wGa40K3UQLtbPP4KJGMd/hngRKf2GJvSgfCFePohVk4bfFou4kIi3PJG+JepCFdzvRNB+R1QKFzMQye0wgI1AOnlyNmNU3ZpfFYvedaRDsT0xHYj+Zy04ZG7dCn4w73MP1QSYIaFKE202g97xOQneHhkfayCHL2AMmaggpAsLGxMmdq4H090cDaINFg7ppR5DSBsHpvYQEVzM2APv/2mbxTTdMrnhD832zo42aafLw/t7oD5wzhQCVTxmco9faw2e57qNhhWgAUyfXTP+pftgjsw/Wok/65lYGmVRvTIvSpdqAGKIv8hiSaUzsQ1lB0P/nigzO20E616zOAiUMekwjHucEq/QKCgKU4yiCsOOFZErg4U8x6ev6RiuEJsnFcOOD+72EnBcOqw7+97snTcSB9ON9ob5D7xirBkZ+Db6ot1oSmyLVfgOMkTINZjUKlYJvv+e9atv3N8/hYLa/8b8uvkRfVIhTc5RGCs4DQX+HYyO264gjjF4ISsU2xnz8YONmhhGh6V0voYalISnIwLxSsHyfluWbyxaj4wRRx6X9yVv8N/RUCprdh9Lr5pyU8/0vxex656uYHYypb9Xi8kC37ZznYEcPJgGzxGeqMleslRCjINzroRDU9B84UuG3FYCXx/I3rUPqiFBN9QJSVEAEYXLvyuwh299I+X7bvZpjyPjzxj6aph9RUlPuRPAOuyx/haX5WISNnY+PD3Cs8vI8te0MZbUcLTdhVBU8mffWLQI6ZDldEMqA+49vEjIK5iWReN3cAcwM0EF87/XgANOoGEbwSlK2QTo68NcucIulRMY9qNWuFJPQA+/6g7haFZX5SiexjP1RB48jgN7YRzYvlJbcPweIrqkcf9VbYJjBnyWMkEHP1XmJ3Go6FnmlHAnoccrjKoeRzJ2IBjEdZDJ25fXGHhtA+9GQsO/IOQZxhzX2K+VnWqwpiIoV2xrkeRfVAY9SYGpXYGqL+AHrrakAiPV2If/Ra+TI6H4nnxVwYo+pKI8cloLlwrvUJ6orymeUWg6QDqTVubov57qLYKleMlpiyukgegzXVo+SAE+DKHF97c7NEtI2+ZPXMRwAA86qlGWPxhWyNHWybt2+jal655/XlnlM8UhEUwLoaAXUshnl1uLRmEFiVXcNIrn+SB7eLNN2z7FA2QTBjVqw6X4xRfGC1tgP0NffxvqgIMThG6R8IvC8vm/nlP2MkVM5e9FhCQVEFUQT4iCuTMhA4O4+ZpAQrUTxrQDG4yejbEtO3c8HINehfLEn0HBANcO2FDLkdM7Llz+T7cNoEL1Nyomriw2xic6ZGSHq7YZXhi8+Vp0v8R3icWrWre+/1QXjJraZj9oEQmQXCVpQU58CQYrLqG0b8K7Qrr6C7m1n0VIsxNBlCKKzAajIFGzcL42dCQxjzJc79OCXDiSYM8HPDY5umb1iAS2AVP3q5LGc6wW6fztCjmDpg8/inzV3IaYJDNNYfeouIiW74xaqAfY6/rVDdylCU+N6AI2O4mZ1grYIsCk6rldalrHAA4DzuPQ83Kb059zHz8fOSehqeBQauQACjr7F0eM91+oLOXKbRJC3LKk4tUq8Y8sBy66n870Qv0f58BEPic7IDT5hlB1KJZmlijalsCsIBo0z37aTokhDPDFXRilV40utqJwIrQ5wO5dTvZEl5smvXSnkJnHGHg5Zv5R/OlVQFT2WrNv94NujFim8dHEVNV4JL1fN1M3BJiwpaYPO2W9uLqIAbittX8rhokHKnxejRefFMpU+WKx4TuqD4rdqNGZCJjCmnnf9mp/HDAMjdksyVdMLja0bS07eYULJq4b010GlvRNHkPoOor40Zdi1UMuYHd69kTicPJsyueXQ1ZgEqZ0qEaP87TRblNffLa4HF8VO+q2zoKwzEzurd1J/9PqapGBURPC5QzN+yztdB6nVAnvfGpx3vC0rZsAMU+5pQQnr+PdApRmMso1r5/VjhLr7XJfDQN/200wkRH3GBFPeu6ARyttAgt7WuWnFoo6IxcpY4kkMvEtnpuuX1C5fmf3BGwH3WvggMO5BubargcjGPvF9UNiv4gJys20LzHID7T5OQfhcAymzwY0l5LK04LQ8Fe5HM/8K5E4PZXv0ravk8ZxIzfZOPW1D4MmL7+vCABj1YWXmA7do5gMu26G9mSzFiilxzEtkyYc0FPn320FlUf9PpLCXLZdRYtp/UZS6l1e7k5zKplDfCWGfZUYfyBrJ8hQlsIphU9iyCZL+1PcrXt9OqanjcmWlk/7qaOQmmrSc2+D8jtwxaaC0n6vS+qKclHjaK9ZE6lDbssLrCaxWj66DoWKOsjceyEt52l7rMxDfVKl3ZT4BCTiLlmKps39mtJbUezkYS6zi1IxGUgooK3gkq+n/ITaXH9dK/BW2STcrb4PQv4BeHnmLXz7M3RgwOffXMO/YQwLWtXhxbql5Wb6lj2nHFopAJd1gLEAxQTHpmlfbyMSsy+G2Y+nzAjnr5ohHC8WoontnLiLPqRmqOuLbJsJaUvzyB6HxpN2cUhrTkf1ozZwVturtLqNM2Q37PZIharpNTOgxWQvsKfJhIQITwxDjCeQsYxUuxuGcgQ41KPm2mu5/H+v/aApnEmlzqzL9ZlEIQlKSOCBGluJb1+1bnTDA4flnwAZuLxce8lJz6t4rph2YCqn2eDKYny0qPrEaRehdppFxEXAaRz8dqB2draxPiWf9DKrDuqAbo1TOaY/+aJKj2GlMzgFnKhdbTIuAYsO76KwzskRufXut+7spK9kJAy9cm1leedPHS1xqbMGZwtQYZnbKVBcLDApEGmd6e/HU9whvJnjxl36P603VvnH2arcCuCT6541GoMVbF9omEMsz9VpW6BO6ROYO75QtqvAiybsBo9/UYFq+GM5td2uvHsjyWiTKVOkMvpjf7VbXWm/aCL6BtjrjCWq0shdkKrAaOBCvurrxeHLhPLyyPo2fqM/AeC7kwVInJv2a4E5jca73uHf+s6IgK4NGLh3h4tdIERxp+xQ4nXzZpjdvREzvcNTqgFeHgz5AlYR7dB1Bu9PG484Han7STWFwLQzI5yubF9H1e2ih1nmYaAGWnET46eos/XZ6/CU/9cRU3grV6Rb2YO98vehK61Rxd8ATmGtdFiHJMbXDMbw9j/tcpST+utbYplwlJEwehogmOYF6cKagqBGHtaznUiMff/uAxtb6n0+ZfYdhk5EEYTy6LBL08KnalR61B5oux9fmPw3xifCMRZIJgVOo0HN/K9PLnPJ0g16A0GrWAL7QAL3OdOJ2v3i1R/gXB9IlK0wACrYdP9AaWN2u6g2WWFcZ8OxzuKL8wTm5g9SaRZcB/VDP/jf9HFpNwfBrxVACf7tETFjFtW5cySUedO+oorFQFfBsMv3thDsBmsgbCq2IMvjMxGHsNz5F6KXBIw4buL+QqGp6MQrPQchenhyezVSSiLM58uAyUkuRZvR7ejHaJ+w1uZP46RyD39sjIv3SUeKwahWuk2UrAFG7k34uhP4DYtE88a3BeFLDIUPgrURUo7s+12/ElWx91uWQu48QWYSlYUpJ8nXOXEvpfN3BA3f0pJKzJkYmVLcBTZQuxOSrU8kJArKZSLIiSA6bUok0V+XuanN3BwQ2VDikBsbr6pdJeUWjQ6ZMKtzBO//mUg4WPwpJen3I2EeIhwAzujXtIxeBIk9eW4rLJrldmFf2ipr9q9MlRt9ZPPeFTG6zYBhVM/wUpAcCwMyANOLzNyIOwGOlwbRaKyL+0LiQKT+piSVOJmGwLxyECITpaHihVn0h1MEdcgdK4vo+sueIGZz6epgMpemPiLswc9k2mZJX06Bon+9a36I80SJDNOzeyj82RcYlJkZyUgAA==" alt="Justify Power Trust" width="40" height="40">
+      <div class="sb-name">TOOL &amp; KIT<span>Justify Power Trust</span></div>
+    </div>
+    <nav class="sb-scroll" id="nav"></nav>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <header class="top">
+      <button class="burger" id="burger" aria-label="เปิดเมนู">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <div class="crumb">
+        <b>หน้าหลัก</b><span class="sep">/</span><span class="cur" id="crumb">Sentiment ทองคำรายวัน</span>
+      </div>
+      <div class="top-act">
+        <a class="btn hide" id="btnOpen" target="_blank" rel="noopener">เปิดในแท็บใหม่ ↗</a>
+        <button class="btn hide" id="btnBack">← หน้าแรก</button>
+      </div>
+    </header>
+    <script>
+    /* ปุ่มเมนูต้องกดได้ทันทีที่เห็น เช่นเดียวกับปุ่มสลับโหมดราคา
+       ใช้ onclick= (ไม่ใช่ addEventListener) เพื่อให้สคริปต์หลักเขียนทับตัวนี้ได้
+       ไม่งั้นจะมีตัวจัดการสองตัวแล้วเมนูเปิดปิดสลับกันเอง */
+    (function(){
+      var bg=document.getElementById('burger'), sb=document.getElementById('sb'), sc=document.getElementById('scrim');
+      if(!bg||!sb||!sc) return;
+      bg.onclick=function(){ sb.classList.toggle('open'); sc.classList.toggle('on'); };
+      sc.onclick=function(){ sb.classList.remove('open'); sc.classList.remove('on'); };
+    })();
+    </script>
+
+    <div class="content">
+
+      <!-- ---------- VIEW: gold sentiment + ATR zones ---------- -->
+      <section class="view on" id="viewDash">
+
+        <div class="sec-head">
+          <h2 id="ovTitle">โซนแนวรับ–แนวต้านทองคำ</h2>
+          <span class="asof" id="asOf">กำลังโหลด…</span>
+        </div>
+
+        <div class="kpis" id="kpis"></div>
+
+        <div class="row">
+
+          <div class="card">
+            <div class="card-h">
+              <h3>โซนแนวรับ–แนวต้านของวันนี้</h3>
+            </div>
+            <div class="openbar">
+              <div class="modeseg" id="openMode">
+                <button type="button" data-m="auto" class="on">ใช้ราคาล่าสุด</button>
+                <button type="button" data-m="manual">พิมพ์เอง</button>
+              </div>
+              <div class="openrow">
+                <label for="openIn">ราคาตั้งต้น (USD)</label>
+                <input id="openIn" type="number" step="0.1" inputmode="decimal" placeholder="เช่น 4408.2">
+                <button class="btn gold" id="btnCalc">คำนวณโซน</button>
+              </div>
+              <div class="openhint" id="openHint"></div>
+            </div>
+            <script>
+            /* ปุ่มนี้ต้องกดได้ทันทีที่เห็นบนจอ ไม่งั้นผู้ใช้บนมือถือเน็ตช้าจะแตะแล้วไม่มีอะไรเกิดขึ้น
+               แล้วสคริปต์หลักที่รันทีหลังจะตั้งกลับเป็นโหมดอัตโนมัติ ทับราคาที่พิมพ์ไว้ */
+            window.__openMode='auto';
+            (function(){
+              var el=document.getElementById('openMode');
+              if(!el) return;
+              el.addEventListener('click',function(e){
+                var b=e.target.closest('button'); if(!b) return;
+                Array.prototype.forEach.call(el.querySelectorAll('button'),function(x){x.classList.remove('on')});
+                b.classList.add('on');
+                window.__openMode=b.dataset.m;
+                if(window.__onOpenMode) window.__onOpenMode();
+              });
+            })();
+            </script>
+            <div id="ladder"><div class="empty-slot"><div class="e-t">DAILY ZONES</div>
+              <div class="e-d">พิมพ์ราคาเปิดแล้วกดคำนวณ ระบบจะกางแนวรับ–แนวต้านพร้อมโอกาสแตะในวันให้</div></div></div>
+          </div>
+
+        </div>
+
+        <div class="card">
+          <div class="card-h">
+            <h3 id="chartTitle">ราคาทอง 60 วันล่าสุด + โซนวันนี้</h3>
+            <div class="tools" id="chartTools">
+              <button class="tg on" data-t="line" title="กราฟเส้น">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-6 4 4 6-8"/></svg>
+              </button>
+              <button class="tg" data-t="bar" title="กราฟแท่ง">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="plot" id="chartSlot"></div>
+        </div>
+
+        <div class="card freedl" id="freeDlCard">
+          <div class="fd-ic">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+          </div>
+          <div class="fd-t">
+            <div class="fd-eyebrow">FREE DOWNLOAD</div>
+            <h3>JPT OneClick Desk <span class="mchip free" style="margin-left:4px">ฟรี</span></h3>
+            <p>แผงส่งคำสั่งสำหรับ MetaTrader 5 · เวอร์ชัน 3.03 · โหลดได้เลย ไม่ต้องเป็นสมาชิก</p>
+          </div>
+          <div class="fd-cta">
+            <a class="btn" href="./ea-oneclick-desk.html" target="_blank" rel="noopener">วิธีติดตั้ง ↗</a>
+            <a class="btn gold" href="./downloads/JPT_OneClick_Desk_v303.ex5" download>ดาวน์โหลดฟรี</a>
+          </div>
+        </div>
+
+        <div class="card prod" id="prodCard">
+          <div class="prod-head">
+            <div>
+              <div class="prod-eyebrow">ADD-ON PACKAGE</div>
+              <h3>แพ็กเกจเสริม · EA</h3>
+              <p>ระบบเทรดอัตโนมัติ ให้เช่าใช้งานรายเดือน แยกจากค่าสมาชิกหลัก</p>
+            </div>
+            <div class="prod-price"><b>฿150</b><span>/ เดือน</span></div>
+          </div>
+          <div class="prod-grid">
+            <div class="ea"><span class="ea-n">EA Sniper</span><span data-lock></span><span class="ea-d">รอใส่รายละเอียด</span></div>
+            <div class="ea"><span class="ea-n">EA Grid</span><span data-lock></span><span class="ea-d">รอใส่รายละเอียด</span></div>
+            <div class="ea"><span class="ea-n">EA Recovery</span><span data-lock></span><span class="ea-d">รอใส่รายละเอียด</span></div>
+            <div class="ea"><span class="ea-n">EA Breakout</span><span data-lock></span><span class="ea-d">รอใส่รายละเอียด</span></div>
+          </div>
+          <div class="prod-foot">
+            <span class="prod-note">เปิดใช้งานให้หลังยืนยันการเช่า</span>
+            <a class="btn gold" id="prodCta" href="https://jptrustlearning.com" target="_blank" rel="noopener">สอบถามรายละเอียด</a>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ---------- VIEW: embedded tool ---------- -->
+      <section class="view" id="viewTool">
+        <div class="frame-wrap"><iframe id="frame" title="เครื่องมือ"></iframe></div>
+        <div class="frame-note">ถ้าหน้าไม่ขึ้น ให้กด “เปิดในแท็บใหม่” ด้านบน — บางเครื่องมือต้องเข้าสู่ระบบก่อน</div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   JP TRUST TOOL & KIT — คอนโซล
+   ---------------------------------------------------------------------
+   หน้าแรก  : Sentiment ทองคำรายวัน + คำนวณโซน ATR จากราคาเปิด
+   เมนูซ้าย : เปิดเครื่องมือจริงในกรอบคอนโซล (deep link ผ่าน #ชื่อไฟล์.html)
+   ข้อมูล   : gold_prices.csv + score_history.csv (repo jptrustlearning/gold)
+              ถ้าดึงไม่ได้ จะใช้ข้อมูลสำรองที่ฝังไว้ 70 วันล่าสุด
+   ===================================================================== */
+
+/* ---------- menu: real tools ---------- */
+const IC={
+  home:'<path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/>',
+  grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+  chart:'<path d="M4 19h16M7 16V9M12 16V5M17 16v-4"/>',
+  flask:'<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4A2 2 0 0 0 19 18l-5-9V3"/>',
+  coin:'<circle cx="12" cy="12" r="8"/><path d="M12 8v8M9.5 10h5M9.5 14h5"/>',
+  tools:'<path d="M14.5 6.5a3.5 3.5 0 0 1 4.8 4.4l-8.4 8.4a2 2 0 0 1-2.8-2.8l8.4-8.4"/><circle cx="6.5" cy="17.5" r="2.5"/>',
+  news:'<rect x="3" y="5" width="14" height="14" rx="2"/><path d="M17 9h3v8a2 2 0 0 1-2 2M6.5 9h7M6.5 12.5h7M6.5 16h4"/>',
+  book:'<path d="M5 4h9a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M17 7h2v13H8"/>',
+  map:'<path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5z"/><path d="M9 4v13M15 6.5v13"/>',
+  bot:'<rect x="4" y="8" width="16" height="11" rx="3"/><path d="M12 4.5V8M9 13h.01M15 13h.01M9.5 16h5"/><circle cx="12" cy="3.6" r="1.1"/>',
+  dl:'<path d="M12 3v11m0 0 4-4M12 14l-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>'
+};
+const svg=p=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const LOCK='<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+
+  '<rect x="5" y="10.5" width="14" height="10" rx="2.2"/><path d="M8.2 10.5V7.8a3.8 3.8 0 0 1 7.6 0v2.7"/></svg>';
+
+const MENU=[
+  {cap:'ภาพรวม',items:[
+    {t:'Sentiment ทองคำรายวัน',ic:'grid',dash:true},
+    {t:'หน้าหลักสมาชิก',ic:'home',url:'https://jptrustlearning.com',ext:true}
+  ]},
+  {cap:'ทองคำ',items:[
+    {t:'Gold Dashboard',ic:'coin',open:true,member:true,sub:[
+      {t:'Gold Momentum Dashboard',url:'./gold-momentum-app.html',lock:1},
+      {t:'เปรียบเทียบกลยุทธ์ทองคำ',url:'./gold-strategy-compare.html',lock:1},
+      {t:'Golden Cross',url:'./gold-golden-cross.html',lock:1},
+      {t:'โมเมนตัม 6 เดือน',url:'./gold-momentum-6m.html',lock:1},
+      {t:'Zone Trading · Backtest',url:'./gold-zone-backtest.html',lock:1},
+      {t:'Zone Trading · กติกา',url:'./gold-zone-strategy.html',lock:1},
+      {t:'ซื้อครั้งเดียว vs ออมทอง',url:'./gold-buyhold-dca.html',lock:1},
+      {t:'H1 Swing · Sensitivity',url:'./gold-swing-h1-sensitivity.html',lock:1},
+      {t:'SMC Patient Hunter',url:'./smc-patient-hunter-report.html',lock:1}
+    ]}
+  ]},
+  {cap:'เครื่องมือ',items:[
+    {t:'เครื่องมือลงทุน',ic:'tools',member:true,sub:[
+      {t:'S&P 500 Scanner',url:'./Free_scannerSP500%20(6).html',lock:1},
+      {t:'Sector Rotation',url:'./sector-rotation.html',lock:1},
+      {t:'Port Recorder',url:'./port-recorder.html',lock:1},
+      {t:'My Portfolio',url:'./my-portfolio.html',lock:1},
+      {t:'วางแผนพอร์ตการลงทุน',url:'./portfolio-planner.html',lock:1},
+      {t:'วางแผนการเงินส่วนบุคคล',url:'./finance-planner.html',lock:1}
+    ]},
+    {t:'คู่มือการใช้งาน',ic:'book',url:'./toolkit-guide.html'},
+    {t:'Roadmap',ic:'map',url:'./roadmap.html'}
+  ]},
+  {cap:'ผลิตภัณฑ์',items:[
+    {t:'JPT OneClick Desk',ic:'dl',url:'./ea-oneclick-desk.html',ext:true,chip:'ฟรี',chipCls:'free'},
+    {t:'แพ็กเกจเสริม · EA',ic:'bot',open:true,chip:'เช่า',sub:[
+      {t:'EA Sniper',prod:1,lock:1},
+      {t:'EA Grid',prod:1,lock:1},
+      {t:'EA Recovery',prod:1,lock:1},
+      {t:'EA Breakout',prod:1,lock:1}
+    ]}
+  ]}
+];
+
+/* ---------- build nav ---------- */
+const nav=document.getElementById('nav');
+let html='';
+MENU.forEach((g,gi)=>{
+  html+=`<div class="sb-cap">${g.cap}</div>`;
+  g.items.forEach((it,ii)=>{
+    if(it.sub){
+      html+=`<div class="grp${it.open?' open':''}" id="g${gi}_${ii}">
+        <div class="nav-i" data-grp="g${gi}_${ii}">${svg(IC[it.ic])}<span>${it.t}</span>
+          ${it.member?'<span class="mchip">สมาชิก</span>':''}${it.chip?`<span class="mchip alt">${it.chip}</span>`:''}
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+        </div><div class="grp-body">`;
+      it.sub.forEach(s=>{
+        const attr = s.prod
+          ? `href="#" data-prod="1" title="แพ็กเกจเสริม"`
+          : `href="${s.url}" data-tool="${s.url}" data-title="${s.t}"${s.lock?' title="เฉพาะสมาชิก"':''}`;
+        html+=`<a class="nav-s" ${attr}><span class="tick"></span><span class="ns-t">${s.t}</span>${s.lock?LOCK:''}</a>`;
+      });
+      html+='</div></div>';
+    }else if(it.dash){
+      html+=`<a class="nav-i on" href="#" data-dash="1">${svg(IC[it.ic])}<span>${it.t}</span></a>`;
+    }else{
+      html+=`<a class="nav-i" href="${it.url}"${it.ext?' target="_blank" rel="noopener"':` data-tool="${it.url}" data-title="${it.t}"`}>${svg(IC[it.ic])}<span>${it.t}</span>${it.chip?`<span class="mchip ${it.chipCls||'alt'}">${it.chip}</span>`:''}</a>`;
+    }
+  });
+});
+nav.innerHTML=html+'<div class="sb-legend">'+LOCK+' เนื้อหาเฉพาะสมาชิก</div>'
+  +'<div class="sb-build">รุ่น a2f46dc · 15/08/2026 21:23</div>';
+document.querySelectorAll('[data-lock]').forEach(el=>el.outerHTML=LOCK);
+/* favicon reuses the sidebar mark — no duplicate payload */
+{const l=document.createElement('link');l.rel='icon';l.href=document.querySelector('.sb-mark').src;document.head.appendChild(l);}
+
+/* ---------- routing ---------- */
+const sb=document.getElementById('sb'), scrim=document.getElementById('scrim');
+const viewDash=document.getElementById('viewDash'), viewTool=document.getElementById('viewTool');
+const frame=document.getElementById('frame'), crumb=document.getElementById('crumb');
+const btnOpen=document.getElementById('btnOpen'), btnBack=document.getElementById('btnBack');
+const closeSb=()=>{sb.classList.remove('open');scrim.classList.remove('on')};
+
+document.getElementById('burger').onclick=()=>{sb.classList.toggle('open');scrim.classList.toggle('on')};
+scrim.onclick=closeSb;
+
+nav.addEventListener('click',e=>{
+  const g=e.target.closest('[data-grp]');
+  if(g){ document.getElementById(g.dataset.grp).classList.toggle('open'); return; }
+  const t=e.target.closest('[data-tool]');
+  if(t){ e.preventDefault(); openTool(t.dataset.tool,t.dataset.title); return; }
+  const pr=e.target.closest('[data-prod]');
+  if(pr){ e.preventDefault(); showDash();
+    const el=document.getElementById('prodCard');
+    el.scrollIntoView({behavior:'smooth',block:'center'});
+    el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse');
+    return; }
+  const d=e.target.closest('[data-dash]');
+  if(d){ e.preventDefault(); showDash(); }
+});
+
+function markActive(sel){
+  nav.querySelectorAll('.nav-i,.nav-s').forEach(n=>n.classList.remove('on'));
+  if(sel) sel.classList.add('on');
+}
+function openTool(url,title){
+  frame.src=url;
+  crumb.textContent=title;
+  viewDash.classList.remove('on'); viewTool.classList.add('on');
+  btnOpen.href=url; btnOpen.classList.remove('hide'); btnBack.classList.remove('hide');
+  markActive(nav.querySelector(`[data-tool="${CSS.escape(url)}"]`));
+  const grp=nav.querySelector(`[data-tool="${CSS.escape(url)}"]`)?.closest('.grp');
+  if(grp) grp.classList.add('open');
+  history.replaceState(null,'','#'+url.replace(/^\.\//,''));
+  closeSb(); window.scrollTo({top:0});
+}
+function showDash(){
+  frame.src='about:blank';
+  crumb.textContent='Sentiment ทองคำรายวัน';
+  viewTool.classList.remove('on'); viewDash.classList.add('on');
+  btnOpen.classList.add('hide'); btnBack.classList.add('hide');
+  markActive(nav.querySelector('[data-dash]'));
+  history.replaceState(null,'','#');
+  closeSb();
+}
+btnBack.onclick=showDash;
+
+/* ---------- chart type toggle ---------- */
+let chartType='line', chart=null;
+document.getElementById('chartTools').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  document.querySelectorAll('#chartTools .tg').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); chartType=b.dataset.t; drawChart();
+});
+
+/* =====================================================================
+   GOLD DAILY SENTIMENT + ATR ZONES
+   ===================================================================== */
+const PX_URL='https://raw.githubusercontent.com/jptrustlearning/gold/main/gold_prices.csv';
+/* ราคาทอง spot สด — gold_prices.csv เป็นฟิวเจอร์ส COMEX ซึ่งสูงกว่า spot ราว 1%
+   ตัวเลขที่สมาชิกเอาไปใช้จริงต้องเป็น spot จึงดึงสดจาก API ที่เปิด CORS ให้เรียกตรงได้
+   ถ้าดึงไม่ได้จะถอยกลับไปใช้ราคาปิดจาก CSV แบบเดิมทั้งหน้า ไม่พัง */
+const SPOT_URL='https://api.gold-api.com/price/XAU';
+const FB_PX=`2026-05-26,4507.4,4528.1,4498.9,4519.5
+2026-05-27,4488,4502,4471,4472.3
+2026-05-28,4527.6,4551.2,4519.5,4547.7
+2026-05-29,4527.6,4627.1,4519.5,4593
+2026-05-31,4575.2,4577.3,4545.5,4559.4
+2026-06-01,4515.8,4526.8,4501,4504.3
+2026-06-02,4520,4525.1,4490.5,4502.5
+2026-06-03,4462.6,4500.8,4450.1,4491.9
+2026-06-04,4503,4508.7,4475.8,4480.9
+2026-06-05,4503,4508.7,4336.6,4365.3
+2026-06-07,4354,4377.5,4323.6,4326.4
+2026-06-08,4354.7,4358.6,4336,4352
+2026-06-09,4276.1,4281.1,4210.7,4224.5
+2026-06-10,4094.4,4138.5,4046.2,4127.6
+2026-06-11,4234.9,4267.8,4192.9,4210.1
+2026-06-12,4234.9,4267.8,4191.1,4238.8
+2026-06-14,4289.4,4340.7,4283.4,4337
+2026-06-15,4331.3,4346.8,4326.7,4333.6
+2026-06-16,4352.6,4369.8,4348.2,4359.2
+2026-06-17,4275.1,4348.9,4273.3,4338.5
+2026-06-18,4231.2,4231.4,4197.7,4201.9
+2026-06-19,4231.2,4231.4,4138.7,4172.9
+2026-06-21,4163.9,4238.1,4138.7,4211.2
+2026-06-22,4210.8,4216,4188.1,4188.4
+2026-06-23,4130,4132.4,4086,4107.5
+2026-06-24,4019,4033.9,3994.2,4011.9
+2026-06-25,4044.4,4051.6,4026.3,4034
+2026-06-26,4044.4,4111.5,3998.1,4096.3
+2026-06-28,4101.1,4102.9,4062.6,4079.5
+2026-06-29,4032.5,4036.7,3955.4,3987.1
+2026-06-30,4025,4032,3988.6,3999.8
+2026-07-01,4049.2,4080.5,4042.8,4068.1
+2026-07-02,4138,4165.8,4133.8,4161.5
+2026-07-03,4138,4208.3,4133.8,4187.3
+2026-07-05,4187.5,4214.1,4133.8,4196.1
+2026-07-06,4176.4,4179.5,4151.9,4158
+2026-07-07,4106.5,4137.1,4104,4132.1
+2026-07-08,4087.6,4099.1,4079.2,4083.3
+2026-07-09,4135.4,4137.8,4123.5,4136.6
+2026-07-10,4135.4,4144.6,4081.7,4113.7
+2026-07-12,4106.6,4111.6,4069.4,4081.5
+2026-07-13,4005.9,4015.5,3990.4,4007.8
+2026-07-14,4059.8,4062.4,4052.7,4061.2
+2026-07-15,4068.9,4071.9,4059.6,4063.4
+2026-07-16,3980.1,3994.3,3976.8,3991.2
+2026-07-17,4087.7,4105.1,4086.6,4018.8
+2026-07-19,4005.6,4034.2,3986.5,4026.6
+2026-07-20,4013.4,4029,4003.3,4027.1
+2026-07-21,4084.7,4107.5,4081,4097.2
+2026-07-22,4126,4138,4074.6,4128.7
+2026-07-23,4053.4,4053.8,4043.2,4051.9
+2026-07-24,4053.4,4085.2,4024,4070.8
+2026-07-26,4097.5,4119.3,4085.8,4106.7
+2026-07-27,4083,4085.7,4059.6,4065.6
+2026-07-28,4020.9,4034,4013.2,4023.2
+2026-07-29,4126.7,4158,4121.1,4123.3
+2026-07-30,4163.9,4170.7,4129.7,4133.5
+2026-07-31,4163.9,4170.7,4076.4,4107
+2026-08-02,4135.2,4145.5,4102.7,4120
+2026-08-03,4109.6,4125.1,4104.6,4112.8
+2026-08-04,4133.8,4142.1,4121.6,4134.3
+2026-08-05,4307,4350.3,4304.9,4347
+2026-08-06,4298.3,4311.8,4288,4307.6
+2026-08-07,4298.3,4432.3,4288,4399.7
+2026-08-09,4400,4411.5,4373.9,4388.3
+2026-08-10,4446.9,4461.6,4443.2,4456.7
+2026-08-11,4430,4437.8,4421.4,4429.8
+2026-08-12,4468.8,4471,4456.5,4470.6
+2026-08-13,4408.2,4419.4,4405.1,4414.5
+2026-08-14,4408.2,4454.6,4365.5,4432`;
+
+/* ตารางความถี่ที่ใช้ในคอลัมน์ "โอกาสแตะในวัน" — ค่าคงที่ (hardcode ตามที่ตกลง)
+   ที่มา + สคริปต์คำนวณ: jptrustdocs/handoff (A65) · sample 3,433 วัน · ปรับปรุงล่าสุด ส.ค. 2569
+   รีเฟรชปีละครั้งก็พอ — แก้เฉพาะตัวเลขข้างล่างนี้ */
+const HIT={0.25:{up:51.6,dn:50.3},0.5:{up:32.8,dn:31.3},0.75:{up:20.4,dn:19.7},1:{up:11.9,dn:11.5},1.5:{up:4.2,dn:4.3}};
+const KS=[0.25,0.5,0.75,1,1.5];
+let TOL=7;                          // ระยะที่ถือว่าโซน ATR ชนแนวพิวอต — ผูกกับ ATR (0.10×ATR)
+
+let PX=null, ATR=null, PIV=null, LAST=null;
+let SPOT=null;          // {price, at} ราคา spot สดที่ดึงได้ — null = ใช้ CSV ล้วนแบบเดิม
+
+function parsePX(t){
+  const L=t.trim().split('\n'), d=[],o=[],hi=[],lo=[],c=[];
+  for(const line of L){
+    const a=line.split(',');
+    if(a.length<5) continue;
+    const dt=a[0].trim().replace(/^\uFEFF/,'');
+    if(!/^\d{4}-\d{2}-\d{2}/.test(dt)) continue;
+    const O=+a[1],H=+a[2],LO=+a[3],C=+a[4];
+    if(![O,H,LO,C].every(isFinite)) continue;
+    d.push(dt.slice(0,10)); o.push(O); hi.push(H); lo.push(LO); c.push(C);
+  }
+  return {d,o,h:hi,l:lo,c};
+}
+function wilderATR(P,n=14){
+  const N=P.c.length, TR=new Array(N).fill(null);
+  for(let i=1;i<N;i++) TR[i]=Math.max(P.h[i]-P.l[i],Math.abs(P.h[i]-P.c[i-1]),Math.abs(P.l[i]-P.c[i-1]));
+  if(N<n+1) return null;
+  let s=0; for(let i=1;i<=n;i++) s+=TR[i];
+  let a=s/n;
+  for(let i=n+1;i<N;i++) a=(a*(n-1)+TR[i])/n;
+  return a;
+}
+function pivots(P){                 // classic daily pivot from the last completed day
+  const i=P.c.length-1, H=P.h[i], L=P.l[i], C=P.c[i];
+  const PP=(H+L+C)/3;
+  return {PP,R1:2*PP-L,S1:2*PP-H,R2:PP+(H-L),S2:PP-(H-L),R3:H+2*(PP-L),S3:L-2*(H-PP)};
+}
+
+const f0=x=>Math.round(x).toLocaleString();
+const f2=x=>x.toFixed(2);
+const thDate=s=>{const m=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const p=s.split('-'); return (+p[2])+' '+m[+p[1]-1]+' '+(+p[0]+543).toString().slice(2);};
+
+/* หน้าเดิมรอโหลด CSV 611 KB ก่อนจะวาดอะไรเลย บนมือถือจึงค้างขาวหลายวินาที
+   ตอนนี้วาดจากข้อมูลสำรองที่ฝังในไฟล์ทันที (0 ไบต์ ไม่ต้องรอเน็ต)
+   แล้วค่อยดึงของสดมาทับเงียบๆ เบื้องหลัง — ผู้ใช้เห็นเนื้อหาทันทีเสมอ */
+/* ปรับทั้งชุดราคาให้อยู่ระนาบ spot ก่อนคำนวณอะไรทั้งสิ้น
+   เลื่อนด้วยค่าคงที่ค่าเดียว -> ATR/ผลตอบแทน/รูปทรงกราฟไม่เปลี่ยน
+   แต่แนวพิวอต เส้นโซนบนกราฟ และตารางโซน มาอยู่ระนาบเดียวกันหมด
+   ถ้าไม่ทำ เส้นโซนจะลอยต่ำกว่าเส้นราคาราว $50 และดาวซ้อนแนวจะไม่มีวันติด */
+function applySpotBasis(){
+  if(!SPOT||!PX||!PX.c.length) return;
+  const b=SPOT.price-PX.c[PX.c.length-1];
+  if(!isFinite(b)||Math.abs(b)>300) return;   // ห่างผิดปกติ = ข้อมูลเพี้ยน ไม่แตะดีกว่า
+  for(const k of ['o','h','l','c']) PX[k]=PX[k].map(v=>+(v+b).toFixed(1));
+}
+
+function fetchSpot(){
+  const ac=new AbortController(); const t=setTimeout(()=>ac.abort(),6000);
+  return fetch(SPOT_URL,{cache:'no-store',signal:ac.signal})
+    .then(r=>r.ok?r.json():Promise.reject())
+    .then(j=>{
+      const p=+j.price;
+      if(!isFinite(p)||p<500||p>20000) return null;
+      return {price:+p.toFixed(1), at:j.updatedAt?new Date(j.updatedAt):new Date()};
+    })
+    .catch(()=>null)
+    .finally(()=>clearTimeout(t));
+}
+
+function spotTime(){
+  if(!SPOT||!SPOT.at) return '';
+  return SPOT.at.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+}
+
+function renderAll(){
+  ATR=wilderATR(PX); PIV=pivots(PX); TOL=Math.max(4,0.10*ATR);
+  LAST={date:PX.d[PX.d.length-1],open:PX.o[PX.o.length-1],close:PX.c[PX.c.length-1]};
+  applyMode();
+  paintKPIs(); calc(); drawChart();
+}
+function setStatus(state){
+  const el=document.getElementById('asOf');
+  const txt={
+    loading:['','กำลังอัปเดตข้อมูลล่าสุด…'],
+    live:   ['','ข้อมูลสด'],
+    stale:  ['fb','ข้อมูลสำรอง']
+  }[state];
+  /* เมื่อปรับฐานเป็น spot แล้ว LAST.close จะเท่ากับราคาสด ห้ามเรียกว่า "ปิดล่าสุด" */
+  const tail = SPOT
+    ? `ราคาสด $${f0(SPOT.price)} · ข้อมูลย้อนหลังถึง ${thDate(LAST.date)}`
+    : `ปิดล่าสุด ${thDate(LAST.date)} ที่ $${f0(LAST.close)}`;
+  el.innerHTML=`<span class="dotlive ${txt[0]}"></span>${txt[1]} · ${tail}`;
+}
+
+let PREV_OPEN=null, OPEN_MODE=(window.__openMode||'auto');
+
+/* โหมด auto = ใช้ราคาเปิดล่าสุดจากข้อมูล ช่องกรอกล็อกไว้ อัปเดตเองเมื่อข้อมูลสดมาถึง
+   โหมด manual = ผู้ใช้พิมพ์เอง ระบบจะไม่แตะค่าในช่องอีกเลย */
+/* ตลาดทองเปิด 24 ชม. จันทร์-ศุกร์ ไม่มีเวลาเปิดปิดตายตัวแบบหุ้น
+   จึงไม่เดาจากนาฬิกา แต่ดูจากข้อมูลว่ามีแถวของวันนี้แล้วหรือยัง
+     มีแล้ว  = ตลาดเดินอยู่ ใช้ราคาเปิดของวันนี้ (โซนคำนวณจากราคาเปิดตามหลักการ)
+     ยังไม่มี = เสาร์อาทิตย์หรือยังไม่เริ่มวัน ใช้ราคาปิดล่าสุดเป็นราคาตั้งต้นแทน
+                เพราะราคาเปิดของวันก่อนเป็นอดีตไปแล้ว ราคาปิดใกล้จุดที่จะเปิดใหม่มากกว่า */
+function autoBase(){
+  if(SPOT) return {price:SPOT.price, kind:'spot',
+                   note:`ราคาทองสด XAU/USD · อัปเดต ${spotTime()} น.`};
+  const bkkToday=new Date(Date.now()+7*3600e3).toISOString().slice(0,10);
+  if(LAST.date===bkkToday)
+    return {price:LAST.open, kind:'open',
+            note:`ราคาเปิดของวันนี้ ${thDate(LAST.date)}`};
+  return {price:LAST.close, kind:'close',
+          note:`ตลาดปิดอยู่ · ใช้ราคาปิดของ ${thDate(LAST.date)} เป็นราคาตั้งต้น`};
+}
+
+function applyMode(){
+  const inp=document.getElementById('openIn');
+  const btn=document.getElementById('btnCalc');
+  const hint=document.getElementById('openHint');
+  if(OPEN_MODE==='auto'){
+    const base=autoBase();
+    inp.value=base.price; inp.readOnly=true; inp.classList.add('locked');
+    btn.classList.add('hide');
+    hint.innerHTML=`${base.note} · อัปเดตให้อัตโนมัติเมื่อมีข้อมูลใหม่`;
+  }else{
+    inp.readOnly=false; inp.classList.remove('locked');
+    btn.classList.remove('hide');
+    hint.innerHTML=`พิมพ์ราคาเปิดของวันนี้แล้วกดคำนวณ · ยังไม่รู้ราคาเปิด? <a href="#" id="useClose">ใช้ราคาปิดล่าสุด $${f0(LAST.close)}</a> ได้`;
+    const uc=document.getElementById('useClose');
+    if(uc) uc.onclick=e=>{e.preventDefault(); inp.value=LAST.close; calc();};
+  }
+  PREV_OPEN=LAST.open;
+}
+/* ตัวจัดการจริง — ตัวเล็กด้านบนจะเรียกอันนี้เมื่อสคริปต์หลักพร้อมแล้ว */
+window.__onOpenMode=function(){
+  OPEN_MODE=window.__openMode;
+  if(!LAST) return;                       // ข้อมูลยังไม่พร้อม เดี๋ยว renderAll จะจัดการให้เอง
+  applyMode();
+  if(OPEN_MODE==='auto') calc();
+  else document.getElementById('openIn').focus();
+};
+
+function boot(){
+  /* 1) วาดทันทีจากข้อมูลในไฟล์ */
+  PX=parsePX(FB_PX);
+  renderAll(); setStatus('loading');
+
+  /* 2) ดึงของสดเบื้องหลัง ถ้าได้ค่อยวาดทับ */
+  Promise.all([
+    fetch(PX_URL,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject()),
+    fetchSpot()                                  // ตัวนี้ไม่มีวัน reject คืน null ถ้าล้ม
+  ]).then(([pxT,spot])=>{
+    if(pxT.length<3000) throw new Error('สั้นผิดปกติ');
+    const px=parsePX(pxT);
+    if(!px.c.length) throw new Error('อ่านไม่ออก');
+    if(px.d[px.d.length-1] < LAST.date) throw new Error('เก่ากว่าที่มีอยู่');
+    PX=px; SPOT=spot; applySpotBasis(); renderAll(); setStatus('live');
+  }).catch(()=>{ setStatus('stale'); });
+}
+
+/* ---------- KPI ---------- */
+/* ราคาทองเป็นค่าสด แต่คะแนน/ความผันผวน/RSI คำนวณจากราคาปิดของวันล่าสุดในฐานข้อมูล
+   ถ้าไม่ติดป้ายแยกกัน ลูกค้าจะเห็น "อัปเดต 21:49 น." แล้วเข้าใจว่าทั้งแถวเป็นค่าสด
+   ป้าย = จุดเดียวที่บอกความจริงว่าตัวไหนขยับทุกนาที ตัวไหนขยับวันละครั้ง */
+function paintKPIs(){
+  /* หน้านี้เหลือสองอย่างเท่านั้น: ราคา กับ โซน
+     การ์ดคะแนน Sentiment / ความผันผวน / RSI ถอดออกแล้ว (คำสั่ง Joon 18 ส.ค. 69)
+     เพราะมาจาก score_history.csv ซึ่งไม่ได้ผูกกับ API ราคาสด */
+  const chg=(LAST.close/PX.c[PX.c.length-2]-1)*100;
+  const live=`<span class="k-tag live"><i class="dt"></i>สด</span>`;
+  const k = SPOT
+    ? {l:'ราคาทองสด'+live,v:'$'+f0(SPOT.price),d:'XAU/USD · อัปเดต '+spotTime()+' น.'}
+    : {l:'ราคาปิดล่าสุด',v:'$'+f0(LAST.close),d:(chg>=0?'▲ ':'▼ ')+Math.abs(chg).toFixed(2)+'% จากวันก่อน'};
+  document.getElementById('kpis').innerHTML=
+    `<div class="kpi c2"><div><div class="k-l">${k.l}</div><div class="k-v">${k.v}</div></div>
+     <div class="k-d">${k.d}</div><div class="k-art">${svg(IC.chart)}</div></div>`;
+}
+
+
+/* ---------- ATR zone ladder ---------- */
+let ZONES=null;
+function calc(){
+  /* โหมดอัตโนมัติต้องยึดราคาจากข้อมูลเสมอ ไม่อ่านจากช่องกรอก
+     ถ้าช่องกรอกค้างค่าที่ผู้ใช้เคยพิมพ์ไว้ด้วยเหตุใดก็ตาม โซนจะได้ไม่ผิดตาม */
+  const inp=document.getElementById('openIn');
+  if(OPEN_MODE==='auto' && LAST) inp.value=autoBase().price;
+  const open=+inp.value;
+  if(!isFinite(open)||open<=0){
+    document.getElementById('ladder').innerHTML=
+      '<div class="empty-slot"><div class="e-t">DAILY ZONES</div><div class="e-d">ใส่ราคาเปิดเป็นตัวเลขก่อนครับ</div></div>';
+    ZONES=null; return;
+  }
+  const rows=[];
+  for(let i=KS.length-1;i>=0;i--){
+    const k=KS[i];
+    rows.push({side:'R',k,px:open+k*ATR,prob:HIT[k].up});
+  }
+  rows.push({side:'O',k:0,px:open,prob:null});
+  for(const k of KS) rows.push({side:'S',k,px:open-k*ATR,prob:HIT[k].dn});
+
+  const pv=Object.entries(PIV);
+  let h='<div class="tw"><table class="lad"><thead><tr>'+
+        '<th>ระดับ</th><th>ราคา</th><th>โอกาสแตะในวัน</th><th>โซนหนา</th></tr></thead><tbody>';
+  for(const r of rows){
+    let bn='',bd=Infinity;
+    for(const [nm,v] of pv){ const d=Math.abs(v-r.px); if(d<bd){bd=d;bn=nm;} }
+    const hot=bd<=TOL;
+    const cls=r.side==='O'?'lv-o':r.side==='R'?'lv-r':'lv-s';
+    const rank=KS.indexOf(r.k)+1;
+    const name=r.side==='O'?'ราคาตั้งต้น':(r.side==='R'?'โซนต้าน ':'โซนรับ ')+rank;
+    h+=`<tr class="${cls}"><td>${name}</td>
+        <td class="num">$${f0(r.px)}</td>
+        <td>${r.prob==null?'—':`<span class="pbar"><i style="width:${r.prob}%"></i></span><b>${r.prob.toFixed(1)}%</b>`}</td>
+        <td class="${hot?'hot':''}">${hot?'★ ซ้อนแนว '+bn:'—'}</td></tr>`;
+  }
+  h+='</tbody></table></div><div class="lad-scroll">เลื่อนตารางไปทางขวาเพื่อดูแนวพิวอต →</div>';
+  h+='<div class="pivstrip"><span class="ps-t">แนวพิวอตรายวัน</span>'+
+     ['R3','R2','R1','PP','S1','S2','S3'].map(k=>
+       `<span class="ps-c ${k==='PP'?'pp':k[0]==='R'?'r':'s'}">${k} $${f0(PIV[k])}</span>`).join('')+'</div>';
+  h+=`<div class="lad-note">โอกาสแตะ = สถิติจริงจากราคาทองย้อนหลัง 3,433 วัน (2556–2569 · ปรับปรุง ส.ค. 69) — เป็นความถี่ที่เคยเกิดขึ้น ไม่ใช่การพยากรณ์<br>
+      ★ โซนหนา = ระดับนี้ซ้อนกับแนวพิวอตรายวันพอดี น้ำหนักมากกว่าระดับเดี่ยว · บางวันไม่มีเลยถือเป็นเรื่องปกติ</div>`;
+  if(SPOT) h+=`<div class="lad-note">ราคาตั้งต้นเป็นราคาทองสด (XAU/USD) · กราฟและแนวพิวอตปรับฐานมาที่ระนาบเดียวกันแล้ว</div>`;
+  document.getElementById('ladder').innerHTML=h;
+  ZONES={open,levels:rows};
+  drawChart();
+}
+document.getElementById('btnCalc').onclick=calc;
+document.getElementById('openIn').addEventListener('keydown',e=>{if(e.key==='Enter')calc()});
+
+/* ---------- 60-day chart with today's zones ---------- */
+function drawChart(){
+  const slot=document.getElementById('chartSlot');
+  if(typeof Chart==='undefined'){
+    slot.innerHTML='<div class="empty-slot"><div class="e-t">CHART</div><div class="e-d">กำลังโหลดกราฟ…</div></div>';
+    window.addEventListener('load',()=>{
+      if(typeof Chart!=='undefined') drawChart();
+      else slot.innerHTML='<div class="empty-slot"><div class="e-t">CHART</div><div class="e-d">กราฟโหลดไม่สำเร็จ — ตัวเลขในหน้านี้ยังถูกต้องครบ</div></div>';
+    },{once:true});
+    return;
+  }
+  if(!slot.querySelector('canvas')) slot.innerHTML='<canvas id="mainCv"></canvas>';
+  if(chart) chart.destroy();
+  const n=PX.c.length, s=Math.max(0,n-60);
+  const labels=PX.d.slice(s), close=PX.c.slice(s);
+  const ds=[{label:'ราคาปิด',data:close,borderColor:'#D4AF37',backgroundColor:chartType==='bar'?'#D4AF37':'rgba(212,175,55,.10)',
+             borderWidth:2.2,fill:chartType==='line',pointRadius:0,pointHitRadius:12,tension:.12}];
+  if(ZONES){
+    const pick=[[0.5,'#C6472E','โซนต้าน 2'],[-0.5,'#2E9E5B','โซนรับ 2'],
+                [1,'#8B2252','โซนต้าน 4'],[-1,'#1e7a44','โซนรับ 4']];
+    for(const [k,col,name] of pick){
+      ds.push({label:name,data:labels.map(()=>ZONES.open+k*ATR),borderColor:col,borderWidth:1.2,
+               borderDash:[5,4],pointRadius:0,fill:false,type:'line',tension:0});
+    }
+  }
+  chart=new Chart(document.getElementById('mainCv'),{
+    type:chartType,
+    data:{labels,datasets:ds},
+    options:{responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{position:'bottom',labels:{boxWidth:14,boxHeight:3,font:{family:'Anuphan',size:11.5},color:'#8a7d6b',padding:12}},
+        tooltip:{backgroundColor:'#2d1018',titleFont:{family:'Anuphan',size:12},bodyFont:{family:'Anuphan',size:12},
+          padding:10,borderColor:'rgba(212,175,55,.4)',borderWidth:1,
+          callbacks:{title:it=>thDate(it[0].label),label:c=>' '+c.dataset.label+': $'+f0(c.parsed.y)}}},
+      scales:{x:{ticks:{maxTicksLimit:7,font:{family:'Anuphan',size:11},color:'#8a7d6b',
+                   callback:function(v){const d=this.getLabelForValue(v);return d.slice(8)+'/'+d.slice(5,7)}},grid:{display:false}},
+              y:{ticks:{font:{family:'Anuphan',size:11},color:'#8a7d6b',callback:v=>'$'+f0(v)},
+                 grid:{color:'rgba(212,175,55,.12)'}}}}
+  });
+}
+
+/* ---------- boot ---------- */
+boot();
+let rt=null;
+window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(PX)drawChart();},220)});
+const h0=location.hash.slice(1);
+if(h0){
+  const u='./'+h0.replace(/^\.\//,'');
+  const a=nav.querySelector(`[data-tool="${CSS.escape(u)}"]`);
+  if(a) openTool(u,a.dataset.title);
+}
+</script>
+
+
+<script defer src="/lib/jpt-track.js" data-page="jptrust-toolkit"></script>
+</body>
+</html>
