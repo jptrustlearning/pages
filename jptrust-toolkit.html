@@ -770,7 +770,7 @@ function setStatus(state){
   }[state];
   /* เมื่อปรับฐานเป็น spot แล้ว LAST.close จะเท่ากับราคาสด ห้ามเรียกว่า "ปิดล่าสุด" */
   const tail = SPOT
-    ? `ราคาสด $${f0(SPOT.price)} · ข้อมูลย้อนหลังถึง ${thDate(LAST.date)}`
+    ? `ราคาสด $${f0(SPOT.price)}`
     : `ปิดล่าสุด ${thDate(LAST.date)} ที่ $${f0(LAST.close)}`;
   el.innerHTML=`<span class="dotlive ${txt[0]}"></span>${txt[1]} · ${tail}`;
 }
