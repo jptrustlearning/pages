@@ -331,13 +331,13 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
       <section class="view on" id="viewDash">
 
         <div class="sec-head">
-          <h2 id="ovTitle">Sentiment ทองคำรายวัน</h2>
+          <h2 id="ovTitle">โซนแนวรับ–แนวต้านทองคำ</h2>
           <span class="asof" id="asOf">กำลังโหลด…</span>
         </div>
 
         <div class="kpis" id="kpis"></div>
 
-        <div class="row two">
+        <div class="row">
 
           <div class="card">
             <div class="card-h">
@@ -373,12 +373,6 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
             </script>
             <div id="ladder"><div class="empty-slot"><div class="e-t">DAILY ZONES</div>
               <div class="e-d">พิมพ์ราคาเปิดแล้วกดคำนวณ ระบบจะกางแนวรับ–แนวต้านพร้อมโอกาสแตะในวันให้</div></div></div>
-          </div>
-
-          <div class="card">
-            <div class="card-h"><h3 id="gaugeTitle">คะแนน Sentiment</h3></div>
-            <div class="plot sm" id="gaugeSlot"></div>
-            <div id="breakdown"></div>
           </div>
 
         </div>
@@ -611,7 +605,6 @@ document.getElementById('chartTools').addEventListener('click',e=>{
    GOLD DAILY SENTIMENT + ATR ZONES
    ===================================================================== */
 const PX_URL='https://raw.githubusercontent.com/jptrustlearning/gold/main/gold_prices.csv';
-const SC_URL='https://raw.githubusercontent.com/jptrustlearning/gold/main/score_history.csv';
 /* ราคาทอง spot สด — gold_prices.csv เป็นฟิวเจอร์ส COMEX ซึ่งสูงกว่า spot ราว 1%
    ตัวเลขที่สมาชิกเอาไปใช้จริงต้องเป็น spot จึงดึงสดจาก API ที่เปิด CORS ให้เรียกตรงได้
    ถ้าดึงไม่ได้จะถอยกลับไปใช้ราคาปิดจาก CSV แบบเดิมทั้งหน้า ไม่พัง */
@@ -686,7 +679,6 @@ const FB_PX=`2026-05-26,4507.4,4528.1,4498.9,4519.5
 2026-08-12,4468.8,4471,4456.5,4470.6
 2026-08-13,4408.2,4419.4,4405.1,4414.5
 2026-08-14,4408.2,4454.6,4365.5,4432`;
-const FB_SC={"Date": "2026-08-14", "Price": "4432.0", "Net_Score": "60.38", "Gross_Score": "64.92", "D1_Return": "31.81", "D2_Volume": "87.73", "D3_RSI": "70", "D4_MA": "35", "D5_DirVol": "100", "D6_External": "65.0", "Vol_Ratio": "0.351", "RSI": "73.98", "Volatility_Pct": "24.65", "Penalty_Scaled": "-4.55", "Ret_1W": "1.0", "Ret_1M": "8.17", "Ret_3M": "-1.57", "Golden_Cross": "False", "Z_Score_50d": "2.093", "Z_Zone": "Extended", "Z_Delta_5d": "-0.143", "Warning_Flags": "💀 Death Cross", "Tier": "Moderate ↑", "As_Of_Running": "15/08/2026 03:09 UTC", "Exhaust_Scenario": "None"};
 
 /* ตารางความถี่ที่ใช้ในคอลัมน์ "โอกาสแตะในวัน" — ค่าคงที่ (hardcode ตามที่ตกลง)
    ที่มา + สคริปต์คำนวณ: jptrustdocs/handoff (A65) · sample 3,433 วัน · ปรับปรุงล่าสุด ส.ค. 2569
@@ -695,7 +687,7 @@ const HIT={0.25:{up:51.6,dn:50.3},0.5:{up:32.8,dn:31.3},0.75:{up:20.4,dn:19.7},1
 const KS=[0.25,0.5,0.75,1,1.5];
 let TOL=7;                          // ระยะที่ถือว่าโซน ATR ชนแนวพิวอต — ผูกกับ ATR (0.10×ATR)
 
-let PX=null, SC=null, ATR=null, PIV=null, LAST=null;
+let PX=null, ATR=null, PIV=null, LAST=null;
 let SPOT=null;          // {price, at} ราคา spot สดที่ดึงได้ — null = ใช้ CSV ล้วนแบบเดิม
 
 function parsePX(t){
@@ -710,13 +702,6 @@ function parsePX(t){
     d.push(dt.slice(0,10)); o.push(O); hi.push(H); lo.push(LO); c.push(C);
   }
   return {d,o,h:hi,l:lo,c};
-}
-function parseSCLast(t){
-  const L=t.trim().split('\n');
-  const hdr=L[0].replace(/^\uFEFF/,'').split(',');
-  const row=L[L.length-1].split(',');
-  const m={}; hdr.forEach((k,i)=>m[k.trim()]=(row[i]||'').trim());
-  return m;
 }
 function wilderATR(P,n=14){
   const N=P.c.length, TR=new Array(N).fill(null);
@@ -774,7 +759,7 @@ function renderAll(){
   ATR=wilderATR(PX); PIV=pivots(PX); TOL=Math.max(4,0.10*ATR);
   LAST={date:PX.d[PX.d.length-1],open:PX.o[PX.o.length-1],close:PX.c[PX.c.length-1]};
   applyMode();
-  paintKPIs(); paintGauge(); paintBreakdown(); calc(); drawChart();
+  paintKPIs(); calc(); drawChart();
 }
 function setStatus(state){
   const el=document.getElementById('asOf');
@@ -839,20 +824,19 @@ window.__onOpenMode=function(){
 
 function boot(){
   /* 1) วาดทันทีจากข้อมูลในไฟล์ */
-  PX=parsePX(FB_PX); SC=FB_SC;
+  PX=parsePX(FB_PX);
   renderAll(); setStatus('loading');
 
   /* 2) ดึงของสดเบื้องหลัง ถ้าได้ค่อยวาดทับ */
   Promise.all([
     fetch(PX_URL,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject()),
-    fetch(SC_URL,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject()),
     fetchSpot()                                  // ตัวนี้ไม่มีวัน reject คืน null ถ้าล้ม
-  ]).then(([pxT,scT,spot])=>{
+  ]).then(([pxT,spot])=>{
     if(pxT.length<3000) throw new Error('สั้นผิดปกติ');
-    const px=parsePX(pxT), sc=parseSCLast(scT);
-    if(!px.c.length||!isFinite(+sc.Net_Score)) throw new Error('อ่านไม่ออก');
+    const px=parsePX(pxT);
+    if(!px.c.length) throw new Error('อ่านไม่ออก');
     if(px.d[px.d.length-1] < LAST.date) throw new Error('เก่ากว่าที่มีอยู่');
-    PX=px; SC=sc; SPOT=spot; applySpotBasis(); renderAll(); setStatus('live');
+    PX=px; SPOT=spot; applySpotBasis(); renderAll(); setStatus('live');
   }).catch(()=>{ setStatus('stale'); });
 }
 
@@ -861,78 +845,19 @@ function boot(){
    ถ้าไม่ติดป้ายแยกกัน ลูกค้าจะเห็น "อัปเดต 21:49 น." แล้วเข้าใจว่าทั้งแถวเป็นค่าสด
    ป้าย = จุดเดียวที่บอกความจริงว่าตัวไหนขยับทุกนาที ตัวไหนขยับวันละครั้ง */
 function paintKPIs(){
-  const score=+SC.Net_Score, rsi=+SC.RSI, z=+SC.Z_Score_50d;
+  /* หน้านี้เหลือสองอย่างเท่านั้น: ราคา กับ โซน
+     การ์ดคะแนน Sentiment / ความผันผวน / RSI ถอดออกแล้ว (คำสั่ง Joon 18 ส.ค. 69)
+     เพราะมาจาก score_history.csv ซึ่งไม่ได้ผูกกับ API ราคาสด */
   const chg=(LAST.close/PX.c[PX.c.length-2]-1)*100;
-  const asof=`<span class="k-tag asof">ณ ${thDate(LAST.date)}</span>`;
   const live=`<span class="k-tag live"><i class="dt"></i>สด</span>`;
-  const cards=[
-    {l:'คะแนน Sentiment'+asof,v:f2(score),d:(SC.Tier||'—')+' · เต็ม 100'},
-    SPOT
-      ? {l:'ราคาทองสด'+live,v:'$'+f0(SPOT.price),d:'XAU/USD · อัปเดต '+spotTime()+' น.'}
-      : {l:'ราคาปิดล่าสุด'+asof,v:'$'+f0(LAST.close),d:(chg>=0?'▲ ':'▼ ')+Math.abs(chg).toFixed(2)+'% จากวันก่อน'},
-    {l:'ความผันผวน'+asof,v:(+SC.Volatility_Pct).toFixed(1)+'%',d:'ระดับการแกว่งของราคาช่วงนี้'},
-    {l:'RSI / โซน Z'+asof,v:rsi.toFixed(1),d:(SC.Z_Zone||'—')+' · Z = '+z.toFixed(2)}
-  ];
-  let html=cards.map((k,i)=>
-    `<div class="kpi c${i+1}"><div><div class="k-l">${k.l}</div><div class="k-v">${k.v}</div></div>
-     <div class="k-d">${k.d}</div><div class="k-art">${svg(IC.chart)}</div></div>`).join('');
-  if(SPOT) html+=`<div class="kpi-note"><b>อ่านการ์ดให้ถูก:</b> เฉพาะ<b>ราคาทองสด</b>ที่อัปเดตตลอดเวลา (XAU/USD)
-    ส่วน<b>คะแนน Sentiment · ความผันผวน · RSI/โซน Z</b> คำนวณจากราคาปิดของ ${thDate(LAST.date)}
-    จึงเปลี่ยนวันละครั้งหลังตลาดปิด — ตัวเลขเดิมค้างระหว่างวันเป็นเรื่องปกติ ไม่ใช่ข้อมูลค้าง</div>`;
-  document.getElementById('kpis').innerHTML=html;
+  const k = SPOT
+    ? {l:'ราคาทองสด'+live,v:'$'+f0(SPOT.price),d:'XAU/USD · อัปเดต '+spotTime()+' น.'}
+    : {l:'ราคาปิดล่าสุด',v:'$'+f0(LAST.close),d:(chg>=0?'▲ ':'▼ ')+Math.abs(chg).toFixed(2)+'% จากวันก่อน'};
+  document.getElementById('kpis').innerHTML=
+    `<div class="kpi c2"><div><div class="k-l">${k.l}</div><div class="k-v">${k.v}</div></div>
+     <div class="k-d">${k.d}</div><div class="k-art">${svg(IC.chart)}</div></div>`;
 }
 
-/* ---------- gauge + breakdown ---------- */
-function paintGauge(){
-  const s=document.getElementById('gaugeSlot');
-  s.innerHTML='<canvas id="gaugeCv"></canvas>';
-  const cv=s.querySelector('canvas'), dpr=window.devicePixelRatio||1;
-  const w=s.clientWidth,h=s.clientHeight;
-  cv.width=w*dpr;cv.height=h*dpr;cv.style.width=w+'px';cv.style.height=h+'px';
-  const c=cv.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0);
-  const cx=w/2, cy=h*.74, r=Math.min(w*.40,h*.58);
-  const segs=[['#C6472E',0,.4],['#E08A2E',.4,.6],['#C9B03A',.6,.75],['#2E9E5B',.75,1]];
-  c.lineWidth=Math.max(13,r*.24); c.lineCap='butt';
-  for(const [col,a,b] of segs){
-    c.beginPath(); c.strokeStyle=col;
-    c.arc(cx,cy,r,Math.PI+Math.PI*a,Math.PI+Math.PI*b); c.stroke();
-  }
-  const frac=Math.max(0,Math.min(1,(+SC.Net_Score)/100)), ang=Math.PI+Math.PI*frac;
-  c.beginPath(); c.moveTo(cx,cy); c.lineTo(cx+Math.cos(ang)*r*.86,cy+Math.sin(ang)*r*.86);
-  c.strokeStyle='#3a1520'; c.lineWidth=3.2; c.lineCap='round'; c.stroke();
-  c.beginPath(); c.arc(cx,cy,5.5,0,7); c.fillStyle='#3a1520'; c.fill();
-  c.textAlign='center';
-  c.font='27px "DM Serif Display",Georgia,serif'; c.fillStyle='#3a1520';
-  c.fillText(f2(+SC.Net_Score),cx,cy+33);
-  c.font='400 12px Anuphan,sans-serif'; c.fillStyle='#8a7d6b';
-  c.fillText(SC.Tier||'',cx,cy+52);
-}
-function paintBreakdown(){
-  /* ตัวเลขในบล็อกนี้คือ "คะแนน" ที่ระบบให้แต่ละด้าน เต็ม 100 ไม่ใช่ค่าตัวชี้วัดดิบ
-     เดิมแถวนี้ชื่อ RSI เฉยๆ เลยไปชนกับค่า RSI จริงบนการ์ดข้างบน (70 vs 74.0)
-     ลูกค้าเห็นสองค่าไม่เท่ากันในหน้าเดียวแล้วสับสน จึงใส่หัวข้อกำกับและเปลี่ยนชื่อแถว */
-  const P=[['ผลตอบแทน','D1_Return'],['ปริมาณซื้อขาย','D2_Volume'],['โมเมนตัม RSI','D3_RSI'],
-           ['เส้นค่าเฉลี่ย','D4_MA'],['ทิศทาง + วอลุ่ม','D5_DirVol'],['ปัจจัยภายนอก','D6_External']];
-  let h='<div class="bd-head">คะแนนย่อย 6 ด้าน <span>เต็มด้านละ 100</span></div><div class="bd">';
-  for(const [t,k] of P){
-    const v=+SC[k]; if(!isFinite(v)) continue;
-    const col=v>=70?'var(--up)':v>=45?'#C9A227':'var(--down)';
-    h+=`<div class="bd-r"><span class="bd-t">${t}</span>
-        <span class="bd-bar"><i style="width:${Math.max(2,Math.min(100,v))}%;background:${col}"></i></span>
-        <span class="bd-v">${v.toFixed(0)}</span></div>`;
-  }
-  h+='</div>';
-  const flags=(SC.Warning_Flags||'').trim();
-  if(flags && flags!=='—') h+=`<div class="flags">${flags}</div>`;
-  const R=[['1 สัปดาห์','Ret_1W'],['1 เดือน','Ret_1M'],['3 เดือน','Ret_3M']];
-  h+='<div class="retstrip">';
-  for(const [t,k] of R){
-    const v=+SC[k]; if(!isFinite(v)) continue;
-    h+=`<span class="rs"><em>${t}</em><b class="${v>=0?'up':'down'}">${(v>=0?'+':'')+v.toFixed(2)}%</b></span>`;
-  }
-  h+='</div>';
-  document.getElementById('breakdown').innerHTML=h;
-}
 
 /* ---------- ATR zone ladder ---------- */
 let ZONES=null;
@@ -1028,7 +953,7 @@ function drawChart(){
 /* ---------- boot ---------- */
 boot();
 let rt=null;
-window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(SC){paintGauge();drawChart();}},220)});
+window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(PX)drawChart();},220)});
 const h0=location.hash.slice(1);
 if(h0){
   const u='./'+h0.replace(/^\.\//,'');
