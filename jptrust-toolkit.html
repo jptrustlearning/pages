@@ -600,6 +600,10 @@ document.getElementById('chartTools').addEventListener('click',e=>{
    ===================================================================== */
 const PX_URL='https://raw.githubusercontent.com/jptrustlearning/gold/main/gold_prices.csv';
 const SC_URL='https://raw.githubusercontent.com/jptrustlearning/gold/main/score_history.csv';
+/* ราคาทอง spot สด — gold_prices.csv เป็นฟิวเจอร์ส COMEX ซึ่งสูงกว่า spot ราว 1%
+   ตัวเลขที่สมาชิกเอาไปใช้จริงต้องเป็น spot จึงดึงสดจาก API ที่เปิด CORS ให้เรียกตรงได้
+   ถ้าดึงไม่ได้จะถอยกลับไปใช้ราคาปิดจาก CSV แบบเดิมทั้งหน้า ไม่พัง */
+const SPOT_URL='https://api.gold-api.com/price/XAU';
 const FB_PX=`2026-05-26,4507.4,4528.1,4498.9,4519.5
 2026-05-27,4488,4502,4471,4472.3
 2026-05-28,4527.6,4551.2,4519.5,4547.7
@@ -680,6 +684,7 @@ const KS=[0.25,0.5,0.75,1,1.5];
 let TOL=7;                          // ระยะที่ถือว่าโซน ATR ชนแนวพิวอต — ผูกกับ ATR (0.10×ATR)
 
 let PX=null, SC=null, ATR=null, PIV=null, LAST=null;
+let SPOT=null;          // {price, at} ราคา spot สดที่ดึงได้ — null = ใช้ CSV ล้วนแบบเดิม
 
 function parsePX(t){
   const L=t.trim().split('\n'), d=[],o=[],hi=[],lo=[],c=[];
@@ -724,6 +729,35 @@ const thDate=s=>{const m=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ
 /* หน้าเดิมรอโหลด CSV 611 KB ก่อนจะวาดอะไรเลย บนมือถือจึงค้างขาวหลายวินาที
    ตอนนี้วาดจากข้อมูลสำรองที่ฝังในไฟล์ทันที (0 ไบต์ ไม่ต้องรอเน็ต)
    แล้วค่อยดึงของสดมาทับเงียบๆ เบื้องหลัง — ผู้ใช้เห็นเนื้อหาทันทีเสมอ */
+/* ปรับทั้งชุดราคาให้อยู่ระนาบ spot ก่อนคำนวณอะไรทั้งสิ้น
+   เลื่อนด้วยค่าคงที่ค่าเดียว -> ATR/ผลตอบแทน/รูปทรงกราฟไม่เปลี่ยน
+   แต่แนวพิวอต เส้นโซนบนกราฟ และตารางโซน มาอยู่ระนาบเดียวกันหมด
+   ถ้าไม่ทำ เส้นโซนจะลอยต่ำกว่าเส้นราคาราว $50 และดาวซ้อนแนวจะไม่มีวันติด */
+function applySpotBasis(){
+  if(!SPOT||!PX||!PX.c.length) return;
+  const b=SPOT.price-PX.c[PX.c.length-1];
+  if(!isFinite(b)||Math.abs(b)>300) return;   // ห่างผิดปกติ = ข้อมูลเพี้ยน ไม่แตะดีกว่า
+  for(const k of ['o','h','l','c']) PX[k]=PX[k].map(v=>+(v+b).toFixed(1));
+}
+
+function fetchSpot(){
+  const ac=new AbortController(); const t=setTimeout(()=>ac.abort(),6000);
+  return fetch(SPOT_URL,{cache:'no-store',signal:ac.signal})
+    .then(r=>r.ok?r.json():Promise.reject())
+    .then(j=>{
+      const p=+j.price;
+      if(!isFinite(p)||p<500||p>20000) return null;
+      return {price:+p.toFixed(1), at:j.updatedAt?new Date(j.updatedAt):new Date()};
+    })
+    .catch(()=>null)
+    .finally(()=>clearTimeout(t));
+}
+
+function spotTime(){
+  if(!SPOT||!SPOT.at) return '';
+  return SPOT.at.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+}
+
 function renderAll(){
   ATR=wilderATR(PX); PIV=pivots(PX); TOL=Math.max(4,0.10*ATR);
   LAST={date:PX.d[PX.d.length-1],open:PX.o[PX.o.length-1],close:PX.c[PX.c.length-1]};
@@ -750,6 +784,8 @@ let PREV_OPEN=null, OPEN_MODE=(window.__openMode||'auto');
      ยังไม่มี = เสาร์อาทิตย์หรือยังไม่เริ่มวัน ใช้ราคาปิดล่าสุดเป็นราคาตั้งต้นแทน
                 เพราะราคาเปิดของวันก่อนเป็นอดีตไปแล้ว ราคาปิดใกล้จุดที่จะเปิดใหม่มากกว่า */
 function autoBase(){
+  if(SPOT) return {price:SPOT.price, kind:'spot',
+                   note:`ราคาทองสด XAU/USD · อัปเดต ${spotTime()} น.`};
   const bkkToday=new Date(Date.now()+7*3600e3).toISOString().slice(0,10);
   if(LAST.date===bkkToday)
     return {price:LAST.open, kind:'open',
@@ -793,13 +829,14 @@ function boot(){
   /* 2) ดึงของสดเบื้องหลัง ถ้าได้ค่อยวาดทับ */
   Promise.all([
     fetch(PX_URL,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject()),
-    fetch(SC_URL,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject())
-  ]).then(([pxT,scT])=>{
+    fetch(SC_URL,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject()),
+    fetchSpot()                                  // ตัวนี้ไม่มีวัน reject คืน null ถ้าล้ม
+  ]).then(([pxT,scT,spot])=>{
     if(pxT.length<3000) throw new Error('สั้นผิดปกติ');
     const px=parsePX(pxT), sc=parseSCLast(scT);
     if(!px.c.length||!isFinite(+sc.Net_Score)) throw new Error('อ่านไม่ออก');
     if(px.d[px.d.length-1] < LAST.date) throw new Error('เก่ากว่าที่มีอยู่');
-    PX=px; SC=sc; renderAll(); setStatus('live');
+    PX=px; SC=sc; SPOT=spot; applySpotBasis(); renderAll(); setStatus('live');
   }).catch(()=>{ setStatus('stale'); });
 }
 
@@ -809,7 +846,9 @@ function paintKPIs(){
   const chg=(LAST.close/PX.c[PX.c.length-2]-1)*100;
   const cards=[
     {l:'คะแนน Sentiment',v:f2(score),d:(SC.Tier||'—')+' · เต็ม 100'},
-    {l:'ราคาปิดล่าสุด',v:'$'+f0(LAST.close),d:(chg>=0?'▲ ':'▼ ')+Math.abs(chg).toFixed(2)+'% จากวันก่อน'},
+    SPOT
+      ? {l:'ราคาทองสด',v:'$'+f0(SPOT.price),d:'XAU/USD · อัปเดต '+spotTime()+' น.'}
+      : {l:'ราคาปิดล่าสุด',v:'$'+f0(LAST.close),d:(chg>=0?'▲ ':'▼ ')+Math.abs(chg).toFixed(2)+'% จากวันก่อน'},
     {l:'ความผันผวน',v:(+SC.Volatility_Pct).toFixed(1)+'%',d:'ระดับการแกว่งของราคาช่วงนี้'},
     {l:'RSI / โซน Z',v:rsi.toFixed(1),d:(SC.Z_Zone||'—')+' · Z = '+z.toFixed(2)}
   ];
@@ -912,6 +951,7 @@ function calc(){
        `<span class="ps-c ${k==='PP'?'pp':k[0]==='R'?'r':'s'}">${k} $${f0(PIV[k])}</span>`).join('')+'</div>';
   h+=`<div class="lad-note">โอกาสแตะ = สถิติจริงจากราคาทองย้อนหลัง 3,433 วัน (2556–2569 · ปรับปรุง ส.ค. 69) — เป็นความถี่ที่เคยเกิดขึ้น ไม่ใช่การพยากรณ์<br>
       ★ โซนหนา = ระดับนี้ซ้อนกับแนวพิวอตรายวันพอดี น้ำหนักมากกว่าระดับเดี่ยว · บางวันไม่มีเลยถือเป็นเรื่องปกติ</div>`;
+  if(SPOT) h+=`<div class="lad-note">ราคาตั้งต้นเป็นราคาทองสด (XAU/USD) · กราฟและแนวพิวอตปรับฐานมาที่ระนาบเดียวกันแล้ว</div>`;
   document.getElementById('ladder').innerHTML=h;
   ZONES={open,levels:rows};
   drawChart();
