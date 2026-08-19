@@ -4392,13 +4392,20 @@ function renderTradeLog() {
       '</div>';
 
       // --- หัวการ์ด ---
+      const gateToday = st.dipToday || st.fearToday;   // เข้าประตูวันนี้แล้ว — ถ้าไม่ fired แปลว่าติด MIN GAP
       const line1 = isFired
         ? 'สัญญาณยิงแล้ว (' + (st.firedKind === 'dip' ? 'ประตู 1 · ย่อสะอาด' : 'ประตู 2 · พีคกลัว') + ') — เข้าซื้อที่<strong>ราคาเปิดวันทำการถัดไป</strong>'
-        : (isWatch
-            ? 'ตลาดเข้าใกล้ประตูเข้า — ' +
-              [st.fearWatch ? 'breadth ≥ ' + st.fearBd + '% แล้ว รอวันที่หักลง (ประตู 2)' : null,
-               st.dipWatch ? 'SPY ลบวันแรกเหนือ SMA50 — ลบอีกวัน = ครบประตู 1' : null].filter(Boolean).join(' · ')
-            : 'ยังไม่เข้าเงื่อนไข — รอตลาดย่อแบบสะอาด หรือรอคลื่นความกลัวผ่านพีค จึงยังไม่มีวันเข้าไม้ล่วงหน้าให้บอก');
+        : (gateToday
+            ? 'วันนี้เข้า' + (st.dipToday ? '<strong>ประตู 1 · ย่อสะอาด</strong>' : '<strong>ประตู 2 · พีคกลัว</strong>') + 'แล้ว แต่<strong style="color:var(--red);">ติด MIN GAP</strong> — สัญญาณถูกข้าม ไม่เปิดไม้ (รายละเอียดด้านล่าง)'
+            : (isWatch
+                ? 'ตลาดเข้าใกล้ประตูเข้า — ' +
+                  [st.fearWatch ? 'breadth ≥ ' + st.fearBd + '% แล้ว รอวันที่หักลง (ประตู 2)' : null,
+                   st.dipWatch ? 'SPY ลบวันแรกเหนือ SMA50 — ลบอีกวัน = ครบประตู 1' : null].filter(Boolean).join(' · ')
+                : 'ยังไม่เข้าเงื่อนไข — รอตลาดย่อแบบสะอาด หรือรอคลื่นความกลัวผ่านพีค จึงยังไม่มีวันเข้าไม้ล่วงหน้าให้บอก'));
+
+      const pdfBtn = ps ? ('<button class="trade-details-btn" onclick="downloadDetailsPdf(event, null, null, true)" title="ดาวน์โหลดรายละเอียดเป็น PDF">' +
+          '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>Details PDF' +
+        '</button>') : '';
 
       const headerHtml = '<div class="trade-header"><div>' +
         '<div class="trade-date" style="color:' + TH.c + ';">HARVESTER STATUS — ' + _fmtTradeDate(st.asOf) +
