@@ -1980,8 +1980,8 @@
       <!-- Tab 0: Hold-period comparison (A61 Exp 6) -->
       <div id="tab-opt" class="tab-content">
         <div style="font-family:'Anuphan',sans-serif;font-size:0.82rem;color:var(--text-muted);margin:6px 2px 14px;line-height:1.7;">
-          เทียบผลของ <strong>ระยะถือครอง</strong> ทั้ง 3 แบบ ด้วยการตั้งค่าปัจจุบัน (Top N · ทุน · ปีเริ่ม เดียวกัน) —
-          สัญญาณเข้าเหมือนกันทุกแถว ต่างกันแค่ถือนานเท่าไร · <strong>กลยุทธ์นี้ใช้ 21 วันเทรดตายตัว (แถบทอง)</strong> อีกสองแถวไว้ดูเทียบเฉยๆ ปรับไม่ได้
+          เทียบผลของ <strong>ระยะถือครอง 1–6 เดือนปฏิทิน</strong> ด้วยการตั้งค่าปัจจุบัน (Top N · ทุน · ปีเริ่ม เดียวกัน) —
+          สัญญาณเข้าเหมือนกันทุกแถว ต่างกันแค่ถือนานเท่าไร · <strong>แถบทอง ★ = ระยะถือที่เลือกอยู่ในตั้งค่า</strong> (ปรับได้ในแผงตั้งค่า)
         </div>
         <div class="heatmap-wrapper">
           <table class="simple-table">
@@ -1999,7 +1999,7 @@
         </div>
         <div style="font-family:'Anuphan',sans-serif;font-size:0.78rem;color:var(--text-muted);margin-top:12px;line-height:1.7;">
           โหมดนี้<strong>ยิงทุกสัญญาณด้วยทุนไม้ละเท่ากัน</strong> (ถือซ้อนกันได้ — คอลัมน์ขวาสุดบอกว่าต้องเตรียมเงินสดกี่ไม้) · ตารางใช้<strong>ค่าที่ตั้งอยู่ปัจจุบัน</strong>ทุกตัว (รวมยืดตอนหมี/เพดานไม้ ถ้าเปิด) ·
-          กลยุทธ์นี้เก็บกำไรคำเล็กจากจังหวะ<strong>ย่อระหว่างทางของตลาดที่ยังแข็งแรง</strong>และจังหวะ<strong>คลื่นความกลัวผ่านพีค</strong> — ถือสั้น 21 วันเทรดเพราะ edge ของการเก็บย่อจางเร็ว &middot; <strong>วันเข้าถูกกำหนดโดยตลาดไม่ใช่ปฏิทิน</strong> ควรใช้เป็นตัวเสริมพอร์ต ไม่ใช่ตัวหลักตัวเดียว
+          กลยุทธ์นี้เก็บกำไรคำเล็กจากจังหวะ<strong>ย่อระหว่างทางของตลาดที่ยังแข็งแรง</strong>และจังหวะ<strong>คลื่นความกลัวผ่านพีค</strong> — ค่าโรงงานถือสั้น 1 เดือนเพราะ edge ของการเก็บย่อจางเร็ว &middot; <strong>วันเข้าถูกกำหนดโดยตลาดไม่ใช่ปฏิทิน</strong> ควรใช้เป็นตัวเสริมพอร์ต ไม่ใช่ตัวหลักตัวเดียว
         </div>
       </div>
 
@@ -2172,6 +2172,19 @@
     </div>
 
     <div class="control-group">
+      <label>HOLD PERIOD — ระยะถือครอง (เดือนปฏิทิน)</label>
+      <select id="holdMonthsSelect" class="input-box">
+        <option value="1" selected>1 เดือน (ค่าโรงงาน)</option>
+        <option value="2">2 เดือน</option>
+        <option value="3">3 เดือน</option>
+        <option value="4">4 เดือน</option>
+        <option value="5">5 เดือน</option>
+        <option value="6">6 เดือน</option>
+      </select>
+      <span class="hint">นับเป็น<strong>เดือนปฏิทิน</strong> (รวมเสาร์–อาทิตย์/วันหยุด) จาก<strong>วันที่เข้าซื้อ</strong> — ครบกำหนดแล้วขายที่<strong>ราคาปิดของวันทำการแรกที่ถึง/เลยวันครบกำหนด</strong> · ค่าโรงงาน 1 เดือน ใกล้เคียง reference B6 ที่ถือ 21 วันเทรด แต่ไม่เป๊ะวันต่อวัน (ตัวเลขต่างจาก 142 ไม้เดิมเล็กน้อย) · edge ของการเก็บย่อจางเร็ว — ถือยาวขึ้นไม้ซ้อนมากขึ้น ใช้เงินสดมากขึ้น ดูแท็บ <strong>HOLD COMPARE</strong> ประกอบ</span>
+    </div>
+
+    <div class="control-group">
       <label>MIN GAP — ระยะห่างขั้นต่ำระหว่างสัญญาณ (วันเทรด)</label>
       <select id="minGapSelect" class="input-box">
         <option value="0">ไม่กำหนด — ยิงทุกสัญญาณ</option>
@@ -2187,10 +2200,10 @@
     <div class="control-group">
       <label>MAX CONCURRENT — เพดานไม้ซ้อนสูงสุด</label>
       <div class="top-n-wrapper" style="display:flex; align-items:center; gap:10px;">
-        <input type="number" id="maxConcInput" class="input-box" value="0" min="0" max="30" style="max-width:120px;">
-        <span style="color:var(--text-muted); font-weight:600;">ไม้ (0 = ไม่จำกัด)</span>
+        <input type="number" id="maxConcInput" class="input-box" value="2" min="1" max="30" style="max-width:120px;">
+        <span style="color:var(--text-muted); font-weight:600;">ไม้ (ขั้นต่ำ 1)</span>
       </div>
-      <span class="hint"><strong>ค่าโรงงาน = ไม่จำกัด</strong> (ตรง reference — GAP 10 วันเทรดคุมให้ซ้อนสูงสุด ~2 ไม้เองอยู่แล้ว) · ถ้ากำหนดเพดานแล้วสัญญาณมาตอนไม้เต็ม สัญญาณนั้นถูก<strong>ข้าม ไม่เข้าคิว</strong> · เพดานนี้ไม่กระทบการนับ MIN GAP</span>
+      <span class="hint"><strong>ค่าโรงงาน = 2 ไม้</strong> — ที่ค่าโรงงาน (ระยะถือ 1 เดือน · GAP 10 วันเทรด) ไม้ซ้อนสูงสุดตามธรรมชาติคือ 2 อยู่แล้ว เพดานนี้จึงไม่ตัดไม้ใดทิ้ง · ถ้าสัญญาณมาตอนไม้เต็มเพดาน สัญญาณนั้นถูก<strong>ข้าม ไม่เข้าคิว</strong> · เพดานนี้ไม่กระทบการนับ MIN GAP · ถือยาวขึ้น/GAP สั้นลง = ชนเพดานบ่อยขึ้น</span>
     </div>
 
     <div class="control-group">
@@ -2199,7 +2212,7 @@
         <input type="checkbox" id="extendToggle" style="width:20px;height:20px;accent-color:var(--gold-deep);cursor:pointer;">
         <span style="font-family:'Anuphan',sans-serif;font-size:0.85rem;color:var(--text-main);font-weight:600;">เปิดใช้ยืดตอนหมี (ค่าโรงงาน: ปิด)</span>
       </label>
-      <span class="hint">วันครบกำหนดขาย ถ้า <strong>SPY หลุด top-2 ของ macro</strong> (เทียบ Δ6 เดือนของ Yen / SPY / Oil / Gold ณ ราคาปิดวันก่อนหน้า — กติกาเดียวกับกลยุทธ์หลักและ Sniper) = ตลาดยังอันตราย → <strong>ไม่ขาย ถือต่ออีก 21 วันเทรด</strong>แล้วเช็คใหม่ ยืดซ้ำได้ · <strong>ค่าโรงงานปิด</strong>เพื่อให้ตัวเลขตรง reference ที่พิสูจน์แล้ว (142 ไม้) · เปิดแล้วไม้ช่วงตลาดหมีจะถือยาวขึ้นและซ้อนกันมากขึ้น — เตรียมเงินสดเผื่อหลายไม้</span>
+      <span class="hint">วันครบกำหนดขาย ถ้า <strong>SPY หลุด top-2 ของ macro</strong> (เทียบ Δ6 เดือนของ Yen / SPY / Oil / Gold ณ ราคาปิดวันก่อนหน้า — กติกาเดียวกับกลยุทธ์หลักและ Sniper) = ตลาดยังอันตราย → <strong>ไม่ขาย ถือต่ออีกเต็ม 1 ระยะถือ</strong> (ตามเดือนปฏิทินที่ตั้งไว้) แล้วเช็คใหม่ ยืดซ้ำได้ · <strong>ค่าโรงงานปิด</strong>เพื่อให้ตัวเลขตรง reference ที่พิสูจน์แล้ว (142 ไม้) · เปิดแล้วไม้ช่วงตลาดหมีจะถือยาวขึ้นและซ้อนกันมากขึ้น — เตรียมเงินสดเผื่อหลายไม้</span>
     </div>
 
     <div class="control-group">
@@ -2255,14 +2268,14 @@
   <div class="about-modal-content">
     <button class="panel-close" onclick="closeAboutModal()" aria-label="ปิด">✕</button>
     <h2>🌾 Pullback Harvester</h2>
-    <div class="about-sub">กลยุทธ์เก็บย่อสองประตู — เข้าเมื่อตลาดย่อแบบสุขภาพดี หรือเมื่อคลื่นความกลัวเพิ่งผ่านจุดพีค · ถือสั้น 21 วันเทรด แล้วขายตามกำหนด</div>
+    <div class="about-sub">กลยุทธ์เก็บย่อสองประตู — เข้าเมื่อตลาดย่อแบบสุขภาพดี หรือเมื่อคลื่นความกลัวเพิ่งผ่านจุดพีค · ถือสั้นตามระยะที่ตั้งไว้ (ค่าโรงงาน 1 เดือนปฏิทิน) แล้วขายตามกำหนด</div>
 
     <div class="about-philosophy">
       <div class="philosophy-label">Trading Philosophy</div>
       <div class="philosophy-text">
-        <strong>เก็บของถูกตอนตลาดใหญ่ยังแข็งแรง</strong> · เราวัด "ความกว้างของการเทขาย" (Breadth) = สัดส่วนหุ้นใน S&amp;P 500 ที่ราคาหลุดต่ำกว่าค่าเฉลี่ย 60 วันแบบรุนแรง (z-score &lt; −2) แล้วเปิดประตูเข้าไว้สองบาน · <strong>ประตู 1 "ย่อสะอาด" (Clean Dip)</strong>: SPY ติดลบ 2 วันติด แต่ยังยืนเหนือเส้นค่าเฉลี่ย 50 วัน และ Breadth ≤ <strong>3%</strong> — เป็นการย่อแบบไม่มีใครแตกตื่น ตลาดใหญ่ยังปกติ · <strong>ประตู 2 "พีคกลัว" (Fear Peak)</strong>: Breadth พุ่ง ≥ <strong>10%</strong> แล้ววันถัดมาเริ่มหักลง — แรงเทระลอกนั้นผ่านจุดพีคแล้ว · เข้าประตูไหนก็ได้ → ซื้อหุ้น Top 10 ตามอันดับโมเมนตัม 6 เดือนผสม Volume (70/30) ที่ราคาเปิดวันถัดไป ถือ <strong>21 วันเทรด</strong> แล้วขายที่ราคาปิด · สัญญาณต้องห่างกันอย่างน้อย <strong>10 วันเทรด</strong> (MIN GAP)
+        <strong>เก็บของถูกตอนตลาดใหญ่ยังแข็งแรง</strong> · เราวัด "ความกว้างของการเทขาย" (Breadth) = สัดส่วนหุ้นใน S&amp;P 500 ที่ราคาหลุดต่ำกว่าค่าเฉลี่ย 60 วันแบบรุนแรง (z-score &lt; −2) แล้วเปิดประตูเข้าไว้สองบาน · <strong>ประตู 1 "ย่อสะอาด" (Clean Dip)</strong>: SPY ติดลบ 2 วันติด แต่ยังยืนเหนือเส้นค่าเฉลี่ย 50 วัน และ Breadth ≤ <strong>3%</strong> — เป็นการย่อแบบไม่มีใครแตกตื่น ตลาดใหญ่ยังปกติ · <strong>ประตู 2 "พีคกลัว" (Fear Peak)</strong>: Breadth พุ่ง ≥ <strong>10%</strong> แล้ววันถัดมาเริ่มหักลง — แรงเทระลอกนั้นผ่านจุดพีคแล้ว · เข้าประตูไหนก็ได้ → ซื้อหุ้น Top 10 ตามอันดับโมเมนตัม 6 เดือนผสม Volume (70/30) ที่ราคาเปิดวันถัดไป ถือตาม<strong>ระยะที่ตั้งไว้ 1–6 เดือนปฏิทิน (ค่าโรงงาน 1 เดือน)</strong> แล้วขายที่ราคาปิดของวันครบกำหนด · สัญญาณต้องห่างกันอย่างน้อย <strong>10 วันเทรด</strong> (MIN GAP)
       </div>
-      <div class="philosophy-signature">Two-Gate Pullback Trigger · Rank 70/30 Picks · 21-Day Harvest</div>
+      <div class="philosophy-signature">Two-Gate Pullback Trigger · Rank 70/30 Picks · Calendar-Month Harvest</div>
     </div>
 
     <div class="about-pillars">
@@ -2279,14 +2292,14 @@
           <span class="pillar-icon">🌾</span>
           <span class="pillar-title">PICKS</span>
         </div>
-        <div class="pillar-subtitle">Rank 70/30 · ถือ 21 วันเทรด</div>
-        <div class="pillar-desc">จัดอันดับด้วย<strong>ผลตอบแทน 126 วันเทรด (70%) ผสม Volume สะสม (30%)</strong> — สูตรเดียวกับกลยุทธ์หลัก · ซื้อ Top 10 งบเท่ากันทุกตัว · ถือ 21 วันเทรดแล้วขายที่ราคาปิด ไม่เดา ไม่ยื้อ</div>
+        <div class="pillar-subtitle">Rank 70/30 · ถือ 1–6 เดือนปฏิทิน</div>
+        <div class="pillar-desc">จัดอันดับด้วย<strong>ผลตอบแทน 126 วันเทรด (70%) ผสม Volume สะสม (30%)</strong> — สูตรเดียวกับกลยุทธ์หลัก · ซื้อ Top 10 งบเท่ากันทุกตัว · ถือครบกำหนดตามระยะที่ตั้ง (ค่าโรงงาน 1 เดือน) แล้วขายที่ราคาปิด ไม่เดา ไม่ยื้อ</div>
       </div>
     </div>
 
-    <p><strong>บทบาทที่ถูกต้องของกลยุทธ์นี้:</strong> เก็บ<strong>กำไรคำเล็กแต่สม่ำเสมอ</strong>จากจังหวะย่อระหว่างทาง — reference 142 ไม้ ชนะ 71% เฉลี่ย ~+$420/ไม้ (ทุนไม้ $10,000) และ<strong>ผลรวมเป็นบวกทั้ง 12 ปี</strong> รวมปีหมี · ถือแค่ 21 วันเทรดเพราะ edge ของการเก็บย่อจางเร็ว ยื้อต่อไม่ได้อะไรเพิ่ม · MIN GAP 10 วันเทรดคุมให้ถือซ้อนสูงสุดเพียง ~2 ไม้เองตามธรรมชาติ ใช้เงินสดน้อย · <strong>วันเข้าถูกกำหนดโดยตลาดไม่ใช่ปฏิทิน</strong> ควรใช้เป็นตัวเสริมพอร์ต ไม่ใช่ตัวหลักตัวเดียว · เสริม<strong>ยืดตอนหมี</strong>ได้เป็นสวิตช์ (ค่าโรงงานปิด): วันครบกำหนด ถ้า SPY หลุด top-2 ของ macro (เทียบ Yen / Oil / Gold Δ6 เดือน) = ตลาดยังอันตราย → ไม่ขาย ถือต่ออีก 21 วันเทรดแล้วเช็คใหม่</p>
+    <p><strong>บทบาทที่ถูกต้องของกลยุทธ์นี้:</strong> เก็บ<strong>กำไรคำเล็กแต่สม่ำเสมอ</strong>จากจังหวะย่อระหว่างทาง — ที่ค่าโรงงาน (ถือ 1 เดือนปฏิทิน) ~142 ไม้ ชนะ ~70% เฉลี่ย ~+$420/ไม้ (ทุนไม้ $10,000) และ<strong>ผลรวมเป็นบวกทั้ง 12 ปี</strong> รวมปีหมี · ค่าโรงงานถือสั้นเพียง 1 เดือนเพราะ edge ของการเก็บย่อจางเร็ว ยื้อต่อไม่ได้อะไรเพิ่ม (ปรับได้ 1–6 เดือน — ดูแท็บ HOLD COMPARE) · MIN GAP 10 วันเทรดคุมให้ถือซ้อนสูงสุดเพียง ~2 ไม้เองตามธรรมชาติ ใช้เงินสดน้อย · <strong>วันเข้าถูกกำหนดโดยตลาดไม่ใช่ปฏิทิน</strong> ควรใช้เป็นตัวเสริมพอร์ต ไม่ใช่ตัวหลักตัวเดียว · เสริม<strong>ยืดตอนหมี</strong>ได้เป็นสวิตช์ (ค่าโรงงานปิด): วันครบกำหนด ถ้า SPY หลุด top-2 ของ macro (เทียบ Yen / Oil / Gold Δ6 เดือน) = ตลาดยังอันตราย → ไม่ขาย ถือต่ออีกเต็ม 1 ระยะถือแล้วเช็คใหม่</p>
 
-    <p><strong>ข้อจำกัดที่ต้องรู้ก่อนใช้ (จากงานวิจัยของเราเอง):</strong> ① ข้อมูลทดสอบเป็นสมาชิก S&amp;P 500 ชุดปัจจุบัน (survivorship bias) — ตัวเลขทั้งหมดจึงเป็น<strong>เพดานบน</strong> ของจริงจะต่ำกว่านี้ · ② ปี 2022 เป็นบวกได้เพราะอันดับโมเมนตัมพาไปเข้า<strong>หุ้นพลังงาน</strong>เป็นหลัก — อย่าคาดหวังให้ประวัติศาสตร์ซ้ำแบบเดิม · ③ กำไรต่อไม้มีขนาดเล็ก (~+0.4% ของทุนไม้) — <strong>ความลื่นไถลของราคาจริง (slippage) กัดสัดส่วนแรงกว่ากลยุทธ์ถือยาว</strong> ผลจริงจะบางลงอีก · ④ ทุกการตัดสินใจใช้ข้อมูลถึงราคาปิดของวันสัญญาณเท่านั้น แล้วลงมือที่ราคาเปิดวันถัดไป (ไม่มี lookahead) · ค่าธรรมเนียม <strong>0.15% ต่อข้าง</strong> รวมอยู่ในผลแล้ว</p>
+    <p><strong>ข้อจำกัดที่ต้องรู้ก่อนใช้ (จากงานวิจัยของเราเอง):</strong> ① ข้อมูลทดสอบเป็นสมาชิก S&amp;P 500 ชุดปัจจุบัน (survivorship bias) — ตัวเลขทั้งหมดจึงเป็น<strong>เพดานบน</strong> ของจริงจะต่ำกว่านี้ · ② ปี 2022 เป็นบวกได้เพราะอันดับโมเมนตัมพาไปเข้า<strong>หุ้นพลังงาน</strong>เป็นหลัก — อย่าคาดหวังให้ประวัติศาสตร์ซ้ำแบบเดิม · ③ กำไรต่อไม้มีขนาดเล็ก (~+4% ของทุนไม้) — <strong>ความลื่นไถลของราคาจริง (slippage) กัดสัดส่วนแรงกว่ากลยุทธ์ถือยาว</strong> ผลจริงจะบางลงอีก · ④ ทุกการตัดสินใจใช้ข้อมูลถึงราคาปิดของวันสัญญาณเท่านั้น แล้วลงมือที่ราคาเปิดวันถัดไป (ไม่มี lookahead) · ค่าธรรมเนียม <strong>0.15% ต่อข้าง</strong> รวมอยู่ในผลแล้ว</p>
   </div>
 </div>
 
@@ -2295,14 +2308,14 @@
 let CONFIG = {
   perTradeCapital: 10000,      // ทุนต่อไม้ — ทุกสัญญาณยิงไม้ใหม่ด้วยเงินสดก้อนนี้ (แก้ได้ใน settings)
   topN: 10,                    // ซื้อ Top N ตามอันดับ Ranking Weight
-  holdDays: 21,                // ระยะถือครอง = 21 วันเทรด (~1 เดือน) ตายตัว — สเปก B6
+  holdMonths: 1,               // ระยะถือครอง = เดือนปฏิทิน 1–6 (ค่าโรงงาน 1) — ขาย close ของวันทำการแรกที่ถึงวันครบกำหนด
   zWindow: 60,                 // หน้าต่าง SMA/STD ของ z-score (breadth)
   zThresh: -2,                 // นับหุ้นเป็น "โดนเทแรง" เมื่อ z < −2
   dipBd: 3,                    // ประตู 1 (ย่อสะอาด): breadth ต้อง ≤ 3%
   fearBd: 10,                  // ประตู 2 (พีคกลัว): breadth เมื่อวาน ≥ 10% แล้ววันนี้หักลง
   smaLen: 50,                  // ประตู 1: SPY ต้องยืนเหนือ SMA50
   minGapTd: 10,                // MIN GAP — ระยะห่างขั้นต่ำระหว่างสัญญาณ นับ "วันเทรด" (สเปกเรา · ค่าโรงงาน 10)
-  maxConcurrent: 0,            // เพดานไม้ซ้อนสูงสุด · 0 = ไม่จำกัด (ค่าโรงงาน — GAP 10 คุมให้เหลือ ~2 เองตามธรรมชาติ)
+  maxConcurrent: 2,            // เพดานไม้ซ้อนสูงสุด (ขั้นต่ำ 1 · ค่าโรงงาน 2 — ที่ค่าโรงงาน GAP 10 คุม maxCC=2 เองอยู่แล้ว เพดานจึงไม่ตัดไม้ใด)
   defensiveExtend: false,      // ยืดตอนหมี — สวิตช์ใน settings · ค่าโรงงาน "ปิด" ให้ตรง reference ที่พิสูจน์แล้ว
   lb: 126,                     // lookback จัดอันดับ = ผลตอบแทน 126 วันเทรด (LB6)
   weightRet: 0.7,              // น้ำหนัก Return ในการจัดอันดับ (Volume = 1 − weightRet) · สเปก B6 = 0.7
@@ -2335,9 +2348,9 @@ const DEFAULT_SNIPER = {
   startYear: 2015,
   minGapTd: 10,           // วันเทรด (สเปก B6)
   weightRet: 70,          // % — Return 70 / Volume 30 (สเปก B6)
-  maxConcurrent: 0,       // 0 = ไม่จำกัด (ค่าโรงงาน)
-  defensiveExtend: false  // ค่าโรงงานปิด — ให้ตรง reference 142 ไม้
-  // holdDays 21 = ค่าตายตัวใน CONFIG ปรับไม่ได้
+  maxConcurrent: 2,       // ขั้นต่ำ 1 · ค่าโรงงาน 2 (ไม่มีตัวเลือก "ไม่จำกัด" แล้ว)
+  defensiveExtend: false, // ค่าโรงงานปิด — ให้ใกล้ reference 142 ไม้
+  holdMonths: 1           // เดือนปฏิทิน 1–6 (ค่าโรงงาน 1)
 };
 
 // Cache for saved settings (needed for dynamic year-dropdown populate)
@@ -2360,7 +2373,8 @@ function jptToast(msg) {
   t._hideTimer = setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// A65: holdDays / defensiveExtend / macroFilter ถูกถอดออกจากหน้าตั้งค่าแล้ว — บังคับค่าตายตัว ไม่บันทึก ไม่อ่านคืน
+// A65: macroFilter ถูกถอดออกจากหน้าตั้งค่า — บังคับค่าตายตัว ไม่บันทึก ไม่อ่านคืน
+// รอบนี้: holdMonths กลับเข้าหน้าตั้งค่า (เดือนปฏิทิน 1–6) · maxConcurrent ขั้นต่ำ 1 (ค่าเก่า 0 ใน Supabase = จับเป็นค่าโรงงาน 2)
 function getSniperSettings() {
   const c = document.getElementById('initialCapitalInput');
   const n = document.getElementById('topNInput');
@@ -2374,7 +2388,11 @@ function getSniperSettings() {
     weightRet: (() => { const w = document.getElementById('weightSlider');
       return w ? parseInt(w.value, 10) : DEFAULT_SNIPER.weightRet; })(),
     maxConcurrent: (() => { const x = document.getElementById('maxConcInput');
-      return x ? (parseInt(x.value, 10) || 0) : DEFAULT_SNIPER.maxConcurrent; })(),
+      const v = x ? parseInt(x.value, 10) : NaN;
+      return (isFinite(v) && v >= 1) ? Math.min(v, 30) : DEFAULT_SNIPER.maxConcurrent; })(),
+    holdMonths: (() => { const h = document.getElementById('holdMonthsSelect');
+      const v = h ? parseInt(h.value, 10) : NaN;
+      return (v >= 1 && v <= 6) ? v : DEFAULT_SNIPER.holdMonths; })(),
     defensiveExtend: (() => { const t = document.getElementById('extendToggle');
       return t ? !!t.checked : DEFAULT_SNIPER.defensiveExtend; })()
   };
@@ -2393,7 +2411,10 @@ function applySniperSettings(s) {
   const w = document.getElementById('weightSlider');
   if (w && s.weightRet != null) { w.value = s.weightRet; if (typeof updateWeightsUI === 'function') updateWeightsUI(); }
   const x = document.getElementById('maxConcInput');
-  if (x && s.maxConcurrent != null) x.value = s.maxConcurrent;
+  // ค่าเก่าใน Supabase อาจเป็น 0 (= "ไม่จำกัด" เดิม ถอดออกแล้ว) → จับเป็นค่าโรงงาน 2
+  if (x && s.maxConcurrent != null) x.value = (s.maxConcurrent >= 1) ? Math.min(s.maxConcurrent, 30) : DEFAULT_SNIPER.maxConcurrent;
+  const hm = document.getElementById('holdMonthsSelect');
+  if (hm && s.holdMonths != null && s.holdMonths >= 1 && s.holdMonths <= 6) hm.value = s.holdMonths;
   const t = document.getElementById('extendToggle');
   if (t && s.defensiveExtend != null) t.checked = !!s.defensiveExtend;
 }
@@ -2458,6 +2479,7 @@ const el = {
   inputInitCap: document.getElementById('initialCapitalInput'),
   inputStartYear: document.getElementById('startYearSelect'),
   inputMinGap: document.getElementById('minGapSelect'),
+  inputHoldMonths: document.getElementById('holdMonthsSelect'),
   inputMaxConc: document.getElementById('maxConcInput'),
   toggleExtend: document.getElementById('extendToggle'),
   sliderWeight: document.getElementById('weightSlider'),
@@ -2916,15 +2938,30 @@ window.downloadDetailsPdf = function(event, entryDate, exitDate, isPending) {
 // Breadth    : % ของหุ้น (ไม่รวม benchmark) ที่ z < −2 · ⚠️ sd=0 ไม่นับใน denominator (ตรง phBreadth)
 // Trigger    : สองประตู — ย่อสะอาด (SPY ลบ 2 วันติด · เหนือ SMA50 · bd ≤ 3%) / พีคกลัว (bd[t−1] ≥ 10% แล้ว bd[t] หักลง)
 // Picks      : Top-N ตาม rank 70/30 (Return 126 วันเทรด + Volume สะสม) ณ ราคาปิดวันสัญญาณ
-// Execution  : ซื้อราคาเปิดวันถัดไป · งบต่อช่อง = ทุนไม้/N ตายตัว · ถือ H=21 วันเทรด · ขาย "ราคาปิด"
+// Execution  : ซื้อราคาเปิดวันถัดไป · งบต่อช่อง = ทุนไม้/N ตายตัว · ถือ N เดือนปฏิทิน (settings 1–6) · ขาย "ราคาปิด"
 // Portfolio  : ยิงทุกสัญญาณที่พ้น MIN GAP (วันเทรด) — ไม้ใหม่ทุนเท่ากัน ไม่ทบต้น
 //              fee 0.15%/ข้าง · Equity curve = กำไรสะสม (P&L) · เพดานไม้ซ้อน/ยืดตอนหมี = settings
 // NO LOOKAHEAD: การตัดสินใจทุกอย่างใช้ข้อมูลถึง close วัน t เท่านั้น → ลงมือ open t+1
-// JS = reference: parity 142/142 กับ engine หน้า live เดิม (สเปก B6) ที่ค่าโรงงาน
+// JS = reference: สัญญาณ/ranking/entry parity 142/142 กับ engine B6 · exit เปลี่ยนเป็นเดือนปฏิทิน (พิสูจน์ด้วย recompute อิสระใน Python)
 // ============================================================
 
-function holdLabelEN() { return ({21:'1M', 42:'2M', 63:'3M', 126:'6M'})[CONFIG.holdDays] || (CONFIG.holdDays + 'd'); }
-function holdLabelTh() { return ({21:'1 เดือน', 42:'2 เดือน', 63:'3 เดือน', 126:'6 เดือน'})[CONFIG.holdDays] || (CONFIG.holdDays + ' วันเทรด'); }
+function holdLabelEN() { return (CONFIG.holdMonths || 1) + 'M'; }
+function holdLabelTh() { return (CONFIG.holdMonths || 1) + ' เดือน'; }
+
+// --- เดือนปฏิทิน: บวก k เดือนจากวันที่ ISO (เดือนปลายทางสั้นกว่า → หนีบเป็นวันสุดท้ายของเดือน) ---
+function addCalMonths(iso, k) {
+  const y = +iso.slice(0, 4), mo = +iso.slice(5, 7), d = +iso.slice(8, 10);
+  const t = mo - 1 + k, ty = y + Math.floor(t / 12), tm = ((t % 12) + 12) % 12;
+  const lastDay = new Date(Date.UTC(ty, tm + 1, 0)).getUTCDate();
+  const td = Math.min(d, lastDay);
+  return ty + '-' + String(tm + 1).padStart(2, '0') + '-' + String(td).padStart(2, '0');
+}
+// --- index ของวันเทรดแรกที่ dates[i] >= targetIso · binary search บน sliced space เท่านั้น (กฎ A64) · ไม่พบ = dates.length ---
+function calDueIdx(dates, lo, targetIso) {
+  let a = Math.max(lo, 0), b = dates.length;
+  while (a < b) { const mid = (a + b) >> 1; if (dates[mid] < targetIso) a = mid + 1; else b = mid; }
+  return a;
+}
 
 function buildSniperSeries() {
   if (state._sniper) return state._sniper;
@@ -3088,15 +3125,17 @@ function sniperRankLB6(S, t, topN) {
   return cand.slice(0, topN);
 }
 
-function sniperRun(H, topN, perTrade, startIdx) {
+function sniperRun(holdM, topN, perTrade, startIdx) {
   // ============================================================
-  // PULLBACK HARVESTER — portfolio walk (สเปก B6 + settings ใหม่)
-  //   Trade math = reference เป๊ะ: เข้า open วันถัดไป · ขาย close วันที่ sig+H
+  // PULLBACK HARVESTER — portfolio walk (สเปก B6 + hold เดือนปฏิทิน)
+  //   สัญญาณ/ranking/entry = reference เป๊ะ: เข้า open วันถัดไป
+  //   Exit = "เดือนปฏิทิน": ครบกำหนด = วันที่เข้า + holdM เดือน (หนีบสิ้นเดือน)
+  //          ขายที่ close ของวันเทรดแรกที่ถึง/เลยวันครบกำหนด (binary search บน sliced dates — A64)
   //   งบต่อช่อง = perTrade/topN ตายตัว (ช่องที่ไม่มีราคาเปิด = เงินสดนอนเฉย)
   //   fee 0.15%/ข้าง คูณสองขา: g = (exit/entry)·(1−fee)² · P&L ไม้ = Σ ช่อง·(g−1)
   //   ราคาขายหาย (delist): ไม้ปกติ → ใช้ราคาเข้า (0% ตรง reference nan_to_num)
   //                          ไม้ที่ถูกยืด → ใช้ close ล่าสุดที่มีจริง (reference ไม่นิยามกรณีนี้)
-  //   ไม้ที่ขายไม่ทัน (sig+H ≥ วันสุดท้าย−0) = open lot — reference ต้องมี ≥1 วันหลังวันขาย (i+H+1<n)
+  //   ไม้ที่ขายไม่ทัน (due ≥ วันสุดท้าย−0) = open lot — คงกติกา reference: ex ≥ n−1 = open
   // ============================================================
   const S = buildSniperSeries();
   const n = S.n, m = S.m, dates = S.dates, tickers = S.tickers;
@@ -3127,8 +3166,9 @@ function sniperRun(H, topN, perTrade, startIdx) {
   for (let s = 0; s < fired.length; s++) {
     const t = fired[s];
     if (t < t0) continue;
-    const ent = t + 1, ex = t + H;
+    const ent = t + 1;
     if (ent >= n) { firePending = t; continue; }
+    const ex = calDueIdx(dates, ent + 1, addCalMonths(dates[ent], holdM));
     const picks = sniperRankLB6(S, t, topN);
     const B = perTrade / topN;
     const legs = [];
@@ -3148,7 +3188,7 @@ function sniperRun(H, topN, perTrade, startIdx) {
   const active = [];
   let closedPnl = 0, entered = 0, maxConcurrent = 0, k = 0;
   const yearMaxConc = {};
-  const capMax = CONFIG.maxConcurrent | 0;          // 0 = ไม่จำกัด
+  const capMax = CONFIG.maxConcurrent | 0;          // ขั้นต่ำ 1 (ไม่มีโหมดไม่จำกัดแล้ว — guard >0 คงไว้กันค่าพัง)
   const useExtend = CONFIG.defensiveExtend === true; // ค่าโรงงานปิด
   const benign = S.macroBenign;
   const skippedByCap = [];
@@ -3166,7 +3206,8 @@ function sniperRun(H, topN, perTrade, startIdx) {
       const tr = active[a];
       if (!tr.isOpen && i === tr.ex) {
         if (useExtend && benign && !benign[i - 1]) {
-          tr.ex += H;
+          // ยืดอีกเต็ม 1 ระยะถือ นับเดือนปฏิทินจากวันครบกำหนดเดิม (= วันนี้)
+          tr.ex = calDueIdx(dates, i + 1, addCalMonths(dates[i], holdM));
           tr.extends += 1;
           if (tr.ex >= n - 1) tr.isOpen = true;
         } else {
@@ -3244,23 +3285,22 @@ function renderHoldCompare() {
   const _S = state._sniper;
   let startIndex = _S.dates.findIndex(d => d.startsWith(String(CONFIG.startYear)));
   if (startIndex === -1) startIndex = 0;
-  const lbl = { 21: '21 วันเทรด (~1 เดือน)', 42: '42 วันเทรด (~2 เดือน)', 63: '63 วันเทรด (~3 เดือน)' };
   const PT = CONFIG.perTradeCapital || 10000;
   const rows = [];
-  for (const H of [21, 42, 63]) {
-    const r = sniperRun(H, CONFIG.topN, PT, startIndex);
+  for (const M of [1, 2, 3, 4, 5, 6]) {
+    const r = sniperRun(M, CONFIG.topN, PT, startIndex);
     const rets = r.closed.map(c => c.returnPct);
     if (rets.length === 0) continue;
     const wins = rets.filter(x => x > 0).length;
     const avg = rets.reduce((a, b) => a + b, 0) / rets.length;
     const worst = Math.min(...rets);
     const pnl = r.equity.length ? r.equity[r.equity.length - 1].equity : 0;
-    const isCur = H === CONFIG.holdDays;
+    const isCur = M === (CONFIG.holdMonths || 1);
     const nExtH = [...r.closed, ...r.openLots].filter(t => (t.extendCount || 0) > 0).length;
     const nTxt = rets.length + (r.openLots.length ? '+' + r.openLots.length : '') +
       (nExtH ? ' <span style="color:#9C2B2B;font-size:0.68rem;font-family:\'Cinzel\',\'Anuphan\',serif;letter-spacing:0.5px;">(EXTENDED ' + nExtH + ')</span>' : '');
     rows.push(`<tr style="${isCur ? 'background:rgba(212,175,55,0.10);font-weight:700;' : ''}">
-      <td style="text-align:left;">${lbl[H] || H + 'd'}${isCur ? ' ★' : ''}</td>
+      <td style="text-align:left;">${M} เดือน (ปฏิทิน)${isCur ? ' ★' : ''}</td>
       <td>${nTxt}</td>
       <td>${(wins / rets.length * 100).toFixed(0)}%</td>
       <td class="${avg >= 0 ? 'text-green' : 'text-red'}">${avg >= 0 ? '+' : ''}${(avg * 100).toFixed(1)}%</td>
@@ -3276,9 +3316,11 @@ function renderHoldCompare() {
 function runSniperBacktest() {
   CONFIG.topN = parseInt(el.inputTopN.value) || 10;
   CONFIG.perTradeCapital = parseFloat(el.inputInitCap.value) || 10000;
-  CONFIG.holdDays = 21;            // ตายตัว 21 วันเทรด (สเปก B6)
+  CONFIG.holdMonths = (() => { const h = document.getElementById('holdMonthsSelect');
+    const v = h ? parseInt(h.value, 10) : NaN; return (v >= 1 && v <= 6) ? v : 1; })();
   CONFIG.defensiveExtend = (() => { const t = document.getElementById('extendToggle'); return t ? !!t.checked : false; })();
-  CONFIG.maxConcurrent = (() => { const x = document.getElementById('maxConcInput'); return x ? (parseInt(x.value, 10) || 0) : 0; })();
+  CONFIG.maxConcurrent = (() => { const x = document.getElementById('maxConcInput');
+    const v = x ? parseInt(x.value, 10) : NaN; return (isFinite(v) && v >= 1) ? Math.min(v, 30) : 2; })();
   CONFIG.startYear = parseInt(el.inputStartYear.value) || 2015;
   if (el.sliderWeight) CONFIG.weightRet = (parseInt(el.sliderWeight.value, 10) || 0) / 100;
   CONFIG.minGapTd = el.inputMinGap ? (parseInt(el.inputMinGap.value, 10) || 0) : 10;
@@ -3297,7 +3339,7 @@ function runSniperBacktest() {
   }
 
   const PT = CONFIG.perTradeCapital, FEE = CONFIG.feeSide;
-  const res = sniperRun(CONFIG.holdDays, CONFIG.topN, PT, startIndex);
+  const res = sniperRun(CONFIG.holdMonths, CONFIG.topN, PT, startIndex);
 
   state.equityCurve = res.equity;              // = กำไรสะสม (P&L) — ไม่ใช่มูลค่าพอร์ต
   state.closedLots = res.closed;
@@ -3631,7 +3673,7 @@ function calculateStats() {
   if (annRoi) { annRoi.innerText = (annualizedRoi >= 0 ? '+' : '') + annualizedRoi.toFixed(1) + '%'; annRoi.style.color = annualizedRoi >= 0 ? 'var(--green)' : 'var(--red)'; }
 
   // Sharpe: per-ไม้ returns · periodsPerYear = 252/H · Rf = 0 (house standard)
-  const ppy = 252 / Math.max(CONFIG.holdDays, 1);
+  const ppy = 12 / Math.max(CONFIG.holdMonths || 1, 1);   // ไม้/ปีตามระยะถือ (เดือนปฏิทิน)
   const rsSharpe = $id('rscSharpe'), rsSharpeDesc = $id('rscSharpeDesc');
   let sharpeW = null;
   if (nR >= 10) {
@@ -4201,7 +4243,7 @@ function renderEntryEventChart() {
   const D = _entrySpySeries();
   if (!cv || !D) return;
   const { spy, entries } = D;
-  const POST = Math.max(CONFIG.holdDays || 42, 21);
+  const POST = Math.max((CONFIG.holdMonths || 1) * 21, 21);   // ~21 วันเทรด/เดือน สำหรับหน้าต่าง event study
   const offsets = [];
   for (let k = -ENTRY_EVENT_PRE; k <= POST; k++) offsets.push(k);
 
@@ -4384,7 +4426,7 @@ function renderTradeLog() {
           '</div>'
         : '';
       const extTxt = st.extendOn
-        ? 'ยืดตอนหมี <strong style="color:var(--gold-deep);">เปิด</strong> — วันครบกำหนด ถ้า SPY หลุด macro top-2 จะถือต่ออีก 21 วันเทรด'
+        ? 'ยืดตอนหมี <strong style="color:var(--gold-deep);">เปิด</strong> — วันครบกำหนด ถ้า SPY หลุด macro top-2 จะถือต่ออีกเต็ม 1 ระยะถือ (' + holdLabelTh() + ')'
         : 'ยืดตอนหมี <strong>ปิด</strong> (ค่าโรงงาน — ตรง reference)';
       const footHtml = '<div style="margin-top:10px;font-size:.68rem;color:var(--text-muted);line-height:1.6;border-top:1px dashed var(--border);padding-top:8px;">' +
         openTxt + gapTxt + '<br>เข้าไม้เมื่อเข้า<strong>ประตูใดประตูหนึ่ง</strong> (ย่อสะอาด / พีคกลัว) ณ ราคาปิดวันสัญญาณ · ' + extTxt +
@@ -5124,7 +5166,7 @@ window.switchStatsTab = function(tab) {
   }
 
   /* apply a captured map to the live inputs (used by both modes).
-     CRITICAL: engines sync derived CONFIG values (e.g. holdDays from the
+     CRITICAL: engines sync derived CONFIG values (e.g. holdMonths from the
      hold-period select) through input/change listeners — setting .value silently
      leaves CONFIG at factory. So every write must fire both events, with a
      reentrancy guard because 'change' listeners call runBacktest.          */
