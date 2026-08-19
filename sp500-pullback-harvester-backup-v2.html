@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pullback Harvester — S&P 500 | JP Trust Learning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Cinzel:wght@500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<script src="./jp-gate.js"></script>
+<style>
+:root{--maroon1:#1a0a0e;--maroon2:#2d1018;--maroon3:#3a1520;--gold:#D4AF37;--gold2:#B8860B;--cream:#FAF6ED;--ink:#2a1a10;--up:#1e8449;--dn:#b03a2e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Anuphan',sans-serif;background:var(--cream);color:var(--ink);-webkit-font-smoothing:antialiased}
+.hero{background:linear-gradient(160deg,var(--maroon1),var(--maroon2) 55%,var(--maroon3));color:#f5ead0;padding:34px 18px 26px;border-bottom:3px solid var(--gold2)}
+.hero .kicker{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.22em;color:var(--gold);text-transform:uppercase}
+.hero h1{font-family:'DM Serif Display',serif;font-size:30px;margin:6px 0 4px;color:#fff}
+.hero .sub{font-size:13.5px;color:#e8d9b8;line-height:1.55;max-width:720px}
+.badge{display:inline-block;margin-top:10px;padding:3px 12px;border:1px solid var(--gold2);border-radius:999px;font-size:11px;color:var(--gold);letter-spacing:.06em}
+.wrap{max-width:860px;margin:0 auto;padding:0 14px 60px}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:-18px auto 0;max-width:860px;padding:0 14px;position:relative}
+.stat{background:#fff;border:1px solid #e8ddc8;border-radius:14px;padding:13px 14px;box-shadow:0 3px 14px rgba(26,10,14,.08)}
+.stat .lb{font-size:11px;color:#8a7a5e;letter-spacing:.04em}
+.stat .vl{font-family:'DM Serif Display',serif;font-size:23px;margin-top:2px;color:var(--maroon2)}
+.stat .vl.up{color:var(--up)} .stat .vl.dn{color:var(--dn)}
+section{margin-top:26px}
+h2{font-family:'DM Serif Display',serif;font-size:21px;color:var(--maroon2);margin-bottom:10px}
+.card{background:#fff;border:1px solid #e8ddc8;border-radius:16px;padding:18px 16px;box-shadow:0 2px 10px rgba(26,10,14,.05)}
+.gate{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:640px){.gate{grid-template-columns:1fr 1fr}}
+.gate .g{border:1px solid #eadfc9;border-radius:13px;padding:14px;background:linear-gradient(180deg,#fffdf7,#faf5e8)}
+.gate .g h3{font-size:15px;color:var(--maroon2);margin-bottom:6px}
+.gate .g p{font-size:13px;line-height:1.65;color:#4a3a28}
+.rule{font-size:13px;line-height:1.75;color:#4a3a28;margin-top:12px}
+.rule b{color:var(--maroon2)}
+canvas{width:100%;height:auto;display:block;border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;text-align:left;color:#8a7a5e;padding:8px 6px;border-bottom:2px solid #e2d6bd;text-transform:uppercase}
+td{padding:8px 6px;border-bottom:1px solid #f0e8d6;vertical-align:top}
+tr.trow{cursor:pointer} tr.trow:hover{background:#faf4e4}
+.pnl-up{color:var(--up);font-weight:600}.pnl-dn{color:var(--dn);font-weight:600}
+.kd{display:inline-block;padding:1px 8px;border-radius:999px;font-size:10.5px;font-weight:600}
+.kd.dip{background:#e8f3ea;color:#1e8449}.kd.fear{background:#eee7f5;color:#6c3483}
+.legs{display:none;background:#fbf7ec}
+.legs.open{display:table-row}
+.legs .lg{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:6px;padding:10px 4px}
+.legs .li{background:#fff;border:1px solid #ece2cc;border-radius:9px;padding:6px 8px;font-size:11.5px}
+.legs .li b{font-size:12px}
+.note{font-size:12.5px;line-height:1.7;color:#6a5a42}
+.note li{margin:6px 0 6px 16px}
+.foot{margin-top:34px;text-align:center;font-size:11px;color:#9a8a6c;font-family:'Cinzel',serif;letter-spacing:.12em}
+.yr-up{color:var(--up)}.yr-dn{color:var(--dn)}
+.pill-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.pill{font-size:11.5px;padding:3px 10px;border-radius:999px;background:#f4ecd9;border:1px solid #e6d9ba;color:#6a5a3a}
+.showmore{margin:12px auto 0;display:block;background:none;border:1px solid var(--gold2);color:var(--gold2);border-radius:999px;padding:7px 22px;font-family:'Anuphan',sans-serif;font-size:13px;cursor:pointer}
+.showmore:hover{background:#f7efdc}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="kicker">JP Trust Learning · Lab Experiment</div>
+  <h1>Pullback Harvester</h1>
+  <div class="sub"><strong>เก็บเกี่ยวจังหวะย่อของ S&P 500 ด้วยสองประตูเข้า</strong> — ตลาดปกติเก็บ "ย่อสะอาด" · ตลาดพังรอ "พีคความกลัวเพิ่งผ่าน" แล้วค่อยรับ · ทุกไม้ซื้อหุ้น Top 10 โมเมนตัม 6 เดือน ถือ 21 วันเทรดเท่ากันหมด</div>
+  <span class="badge">EXPERIMENT · LIVE COMPUTE · ข้อมูลถึง <span id="lastDate">—</span></span>
+</div>
+<div class="stat-grid" id="statGrid"></div>
+<div class="wrap" id="loadWrap" style="padding-top:18px">
+  <div class="card" id="loadCard">
+    <div style="font-size:13px;color:#6a5a42;margin-bottom:8px" id="loadMsg">กำลังโหลดราคาหุ้น S&amp;P 500 ทั้งตลาด (~64MB) แล้วคำนวณสดในเครื่องคุณ…</div>
+    <div style="height:8px;background:#f0e8d6;border-radius:99px;overflow:hidden"><div id="loadBar" style="height:100%;width:0%;background:linear-gradient(90deg,#B8860B,#D4AF37);transition:width .3s"></div></div>
+  </div>
+</div>
+<div class="wrap">
+
+<section>
+  <h2>กติกาทั้งใบ</h2>
+  <div class="card">
+    <div class="gate">
+      <div class="g"><h3>🚪 ประตู 1 — ย่อสะอาด</h3>
+        <p>SPY ลบติดกัน 2 วัน · ยังปิดเหนือเส้นเฉลี่ย 50 วัน · และหุ้นที่หลุด −2SD (จากค่าเฉลี่ย 60 วันของตัวเอง) มี<b>ไม่เกิน 3%</b> ของตลาด = ดัชนีพักตัวแบบข้างในไม่มีใครพัง</p></div>
+      <div class="g"><h3>🚪 ประตู 2 — พีคความกลัวเพิ่งผ่าน</h3>
+        <p>เมื่อวานหุ้นที่หลุด −2SD มี<b>อย่างน้อย 10%</b> ของตลาด (ล้างครั้งใหญ่) แล้ววันนี้ตัวเลขหักหัวลงเป็นวันแรก = แรงเทเพิ่งผ่านจุดสูงสุด</p></div>
+    </div>
+    <div class="rule">
+      เจอประตูไหนก่อน → รุ่งขึ้นซื้อที่ราคาเปิด <b>ไม้ละ $10,000</b> กระจายเท่ากันใน <b>หุ้น Top 10</b> ที่จัดอันดับแบบเดียวกับ Washout Sniper (ผลตอบแทน 6 เดือน 70% + ปริมาณซื้อขาย 30%) → <b>ถือ 21 วันเทรด (~1 เดือน) แล้วขายที่ราคาปิด</b> ไม่มีเงื่อนไขออกอื่น · เว้นระยะไม้ใหม่อย่างน้อย 10 วันเทรด · ซ้อนกันได้สูงสุด 2 ไม้ → เตรียมทุน $20,000 · ค่าธรรมเนียม 0.15% ต่อข้างหักแล้วทุกตัวเลขในหน้านี้
+    </div>
+    <div class="pill-row"><span class="pill">ถือ 21 วันเทรดตายตัว</span><span class="pill">MIN GAP 10 วันเทรด</span><span class="pill">ซ้อนสูงสุด 2 ไม้</span><span class="pill">Rank 70/30 แบบ Sniper</span><span class="pill">Fee 0.15%/ข้าง</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>กำไรสะสม (ไม้ละ $10k คงที่ · ไม่ทบต้น)</h2>
+  <div class="card"><canvas id="eqChart" width="820" height="360"></canvas></div>
+</section>
+
+<section>
+  <h2>ผลรายปี</h2>
+  <div class="card" style="overflow-x:auto"><table id="yrTable"><thead><tr><th>ปี</th><th>กำไร ($)</th><th>ไม้</th><th>Win</th></tr></thead><tbody></tbody></table></div>
+</section>
+
+<section>
+  <h2>Trade Log — ครบทั้ง 142 ไม้ <span style="font-size:12px;color:#8a7a5e;font-family:'Anuphan';font-weight:400">(แตะไม้เพื่อดูหุ้นทั้ง 10 ตัว)</span></h2>
+  <div class="card" style="overflow-x:auto">
+    <table id="logTable"><thead><tr><th>#</th><th>เข้า</th><th>ประตู</th><th>ออก</th><th>P&L ($)</th><th>%</th></tr></thead><tbody></tbody></table>
+    <button class="showmore" id="moreBtn" onclick="showMore()">แสดงไม้เก่ากว่านี้</button>
+  </div>
+</section>
+
+<section>
+  <h2>อ่านก่อนใช้</h2>
+  <div class="card note"><ul>
+    <li><b>นี่คือผลทดลองย้อนหลัง (snapshot ณ 19 ส.ค. 2026)</b> ไม่อัปเดตอัตโนมัติ และไม่ใช่คำแนะนำการลงทุน — ผลในอดีตไม่การันตีอนาคต</li>
+    <li>จักรวาลหุ้นคือสมาชิก S&P 500 ชุดปัจจุบัน (เหมือนเครื่องมือทุกตัวใน Lab) — หุ้นที่ถูกถอดออกไประหว่างทางไม่อยู่ในการทดสอบ ผลจริงจึงมีแนวโน้มต่ำกว่านี้</li>
+    <li>ค่าพารามิเตอร์ (3% / 10% / 21 วัน / เว้น 10 วัน) เลือกจากข้อมูลชุดนี้เอง ผ่านการทดสอบความไวรอบข้างแล้วว่าไม่ใช่เลขโดดเดี่ยว แต่ยังไม่เคยเจอข้อมูลนอกตัวอย่าง</li>
+    <li>ความเสี่ยงรายหุ้นสูงกว่าซื้อดัชนีมาก — ขาเดี่ยวเคยลบลึกสุด −62% ในไม้เดียว (WBD รอบ มี.ค. 2021) · ไม้แย่สุด −$1,808 (ต้น COVID) · ประตู 2 คือไม้รับมีดโดยธรรมชาติ</li>
+    <li>ปี 2022 ที่เป็นบวกเกิดจาก ranking หมุนเข้าหุ้นพลังงานพอดี — เป็นกลไกจริงของสูตร แต่อย่าคาดหวังให้ปีหมีรอบหน้าใจดีแบบเดียวกัน</li>
+  </ul></div>
+</section>
+
+<div class="foot">สรุปโดย JP TRUST LEARNING</div>
+</div>
+<script>
+// Pullback Harvester — compute engine (ใช้ได้ทั้ง browser และ node เพื่อพิสูจน์ parity กับ Python)
+// สเปก B6: dip(ลบ2วัน+SMA50+bd<=3) | fear(bd[t-1]>=10 && bd[t]<bd[t-1]) · GAP>10 · Top10 rank 70/30 lb126 · hold 21 · fee 0.15%/ข้าง
+'use strict';
+const PH_EXCL = new Set(['SPY','QQQ','DIA','USDJPY','WTI','GOLD','FXY','USL','USO','GLD','SGOV','BIL','SHY']);
+const PH = { Z:60, LB:126, H:21, GAP:10, FEE:0.0015, TOPN:10, WRET:0.7, CAP:10000, PER:1000 };
+
+function phParseCsv(text, wantVol){
+  // Ticker,Date,Open,High,Low,Close,Volume — เร็วพอสำหรับ 64MB (indexOf ทีละบรรทัด)
+  const out = {}; // ticker -> {d:[],o:[],c:[],v:[]}
+  let p = text.indexOf('\n') + 1; const N = text.length;
+  while (p < N){
+    let q = text.indexOf('\n', p); if (q === -1) q = N;
+    const line = text.slice(p, q); p = q + 1;
+    if (!line) continue;
+    const a = line.split(',');
+    if (a.length < 7) continue;
+    const t = a[0];
+    let rec = out[t]; if (!rec){ rec = out[t] = {d:[],o:[],c:[],v:[]}; }
+    rec.d.push(a[1]); rec.o.push(+a[2]); rec.c.push(+a[5]); rec.v.push(wantVol ? +a[6] : 0);
+  }
+  return out;
+}
+
+function phBuild(spText, benchText){
+  const raw = phParseCsv(spText, true);
+  // วันที่: เฉพาะวันที่มีหุ้นนอก EXCL อย่างน้อย 1 ตัว (ตรง pandas: px[px.notna().any(axis=1)])
+  const dset = new Set();
+  const tickers = [];
+  for (const t in raw){ if (PH_EXCL.has(t)) continue; tickers.push(t); for (const d of raw[t].d) dset.add(d); }
+  tickers.sort();
+  const dates = [...dset].sort();
+  const n = dates.length, m = tickers.length;
+  const di = new Map(); dates.forEach((d,i)=>di.set(d,i));
+  const closeA = new Float64Array(n*m).fill(NaN);
+  const openA  = new Float64Array(n*m).fill(NaN);
+  const volA   = new Float64Array(n*m).fill(NaN);
+  tickers.forEach((t,j)=>{ const r = raw[t];
+    for (let k=0;k<r.d.length;k++){ const i = di.get(r.d[k]); if (i===undefined) continue;
+      closeA[i*m+j]=r.c[k]; openA[i*m+j]=r.o[k]; volA[i*m+j]=r.v[k]; } });
+  // SPY จาก benchmark CSV → align + ffill บนแกนวันหุ้น (ตรง reindex().ffill())
+  const braw = phParseCsv(benchText, false);
+  const spy = braw['SPY'] || {d:[],o:[],c:[]};
+  const smap = new Map(); spy.d.forEach((d,k)=>smap.set(d,k));
+  const spyC = new Float64Array(n).fill(NaN), spyO = new Float64Array(n).fill(NaN);
+  { const sd = spy.d; let k = 0, lastC = NaN, lastO = NaN;
+    for (let i=0;i<n;i++){ while (k<sd.length && sd[k]<=dates[i]){ lastC=spy.c[k]; lastO=spy.o[k]; k++; }
+      spyC[i]=lastC; spyO[i]=lastO; } }
+  return { dates, tickers, n, m, closeA, openA, volA, spyC, spyO };
+}
+
+function phBreadth(S){
+  const {n,m,closeA} = S, W = PH.Z;
+  const bd = new Float64Array(n).fill(NaN);
+  for (let i=W-1;i<n;i++){
+    let num=0, den=0;
+    for (let j=0;j<m;j++){
+      let s=0, s2=0, bad=false;
+      for (let k=i-W+1;k<=i;k++){ const c=closeA[k*m+j]; if (!isFinite(c)){ bad=true; break; } s+=c; s2+=c*c; }
+      if (bad) continue;
+      const mean = s/W; let varr = s2/W - mean*mean; if (varr < 0) varr = 0;
+      const sd = Math.sqrt(varr); if (!(sd > 0)) continue;
+      den++;
+      if ((closeA[i*m+j]-mean)/sd < -2) num++;
+    }
+    if (den > 0) bd[i] = num/den*100;
+  }
+  return bd;
+}
+
+function phRankTop(S, t){
+  const {m, closeA, volA} = S, LB = PH.LB;
+  const cand = [];
+  for (let j=0;j<m;j++){
+    const c0 = closeA[(t-LB)*m+j], c1 = closeA[t*m+j];
+    if (!(isFinite(c0) && isFinite(c1) && c0 > 0)) continue;
+    let v = 0;
+    for (let k=t-LB;k<=t;k++){ const x = volA[k*m+j]; if (isFinite(x)) v += x; }
+    cand.push({ j, r: c1/c0-1, v });
+  }
+  cand.sort((a,b)=>(b.r-a.r)||(a.j-b.j)); cand.forEach((c,i)=>c.rr=i);
+  cand.sort((a,b)=>(b.v-a.v)||(a.j-b.j)); cand.forEach((c,i)=>c.rv=i);
+  cand.forEach(c=>c.score=c.rr*PH.WRET + c.rv*(1-PH.WRET));
+  cand.sort((a,b)=>(a.score-b.score)||(a.j-b.j));
+  return cand.slice(0, PH.TOPN).map(c=>c.j);
+}
+
+function phRun(S){
+  const {n, dates, tickers, closeA, openA, spyC, spyO} = S;
+  const bd = phBreadth(S);
+  // SMA50 + daily return ของ SPY บนแกนวันหุ้น
+  const sma50 = new Float64Array(n).fill(NaN);
+  { let s=0; for (let i=0;i<n;i++){ s+=spyC[i]; if (i>=50) s-=spyC[i-50]; if (i>=49) sma50[i]=s/50; } }
+  const sret = new Float64Array(n).fill(NaN);
+  for (let i=1;i<n;i++) sret[i] = (spyC[i]/spyC[i-1]-1)*100;
+  const {LB,H,GAP,FEE,TOPN,PER,CAP} = PH;
+  const trades = []; let last = -999;
+  for (let i=0;i<n;i++){
+    if (i < LB || i+H+1 >= n) continue;
+    const dip = (sret[i]<0) && (sret[i-1]<0) && (spyC[i]>sma50[i]) && (bd[i]<=3);
+    const fear = (bd[i-1]>=10) && (bd[i]<bd[i-1]);
+    if (!(dip || fear)) continue;
+    if (i - last <= GAP) continue;
+    const js = phRankTop(S, i);
+    const legs = []; let pnl = 0;
+    for (const j of js){
+      const e = openA[(i+1)*S.m+j]; let x = closeA[(i+H)*S.m+j];
+      if (!(isFinite(e) && isFinite(x) && e>0)) { if (!isFinite(x)) x = e; }  // ตรง np.nan_to_num(x, nan=e)
+      const g = (x/e)*(1-FEE)*(1-FEE);
+      legs.push({ t: tickers[j], e: Math.round(e*100)/100, x: Math.round(x*100)/100, r: Math.round((g-1)*10000)/100 });
+      pnl += PER*(g-1);
+    }
+    trades.push({ sig: dates[i], in: dates[i+1], out: dates[i+H], kind: dip?'dip':'fear',
+                  pnl: Math.round(pnl), ret: Math.round(pnl/CAP*10000)/100, legs, i0: i+1, i1: i+H });
+    last = i;
+  }
+  // สรุปสถิติ (โครงเดียวกับ bundle เดิม)
+  const yrs = (Date.parse(dates[n-1]) - Date.parse(dates[60])) / 86400000 / 365.25;
+  let total=0, wins=0, best=-1e18, worst=1e18, ndip=0;
+  const yearly = new Map(); const equity = []; let cum=0, peak=0, dd=0;
+  const occ = new Int16Array(n);
+  for (const t of trades){
+    total += t.pnl; if (t.pnl>0) wins++; if (t.pnl>best) best=t.pnl; if (t.pnl<worst) worst=t.pnl;
+    if (t.kind==='dip') ndip++;
+    const y = +t.in.slice(0,4);
+    if (!yearly.has(y)) yearly.set(y,{y,pnl:0,n:0,w:0});
+    const Y = yearly.get(y); Y.pnl += t.pnl; Y.n++; if (t.pnl>0) Y.w++;
+    cum += t.pnl; if (cum>peak) peak=cum; if (cum-peak<dd) dd=cum-peak;
+    equity.push({ d: t.out, v: Math.round(cum) });
+    for (let k=t.i0;k<=t.i1;k++) occ[k]++;
+  }
+  let maxcc=0; for (let k=0;k<n;k++) if (occ[k]>maxcc) maxcc=occ[k];
+  return {
+    stats: { n: trades.length, win: Math.round(wins/trades.length*100), avg: Math.round(total/trades.length),
+      total: Math.round(total), peryr: Math.round(total/yrs), dd: Math.round(dd), maxcc, cap: maxcc*CAP,
+      best: Math.round(best), worst: Math.round(worst), ndip, nfear: trades.length-ndip, lastDate: dates[n-1] },
+    yearly: [...yearly.values()].map(Y=>({ y:Y.y, pnl:Math.round(Y.pnl), n:Y.n, win:Math.round(Y.w/Y.n*100) })),
+    equity,
+    trades: trades.map(t=>({ sig:t.sig, in:t.in, out:t.out, kind:t.kind, pnl:t.pnl, ret:t.ret, legs:t.legs }))
+  };
+}
+
+
+
+// ---------- render ----------
+const fm=n=>n.toLocaleString('en-US');
+function renderAll(DATA){
+ document.getElementById('loadWrap').style.display='none';
+ document.getElementById('lastDate').textContent=DATA.stats.lastDate;
+ const S=DATA.stats;
+ const stats=[
+  ['ไม้ทั้งหมด (2015–ปัจจุบัน)',fm(S.n),''],
+  ['อัตราชนะ',S.win+'%',''],
+  ['กำไรเฉลี่ย/ไม้','+$'+fm(S.avg),'up'],
+  ['กำไรรวม','+$'+fm(S.total),'up'],
+  ['เฉลี่ยต่อปี','~$'+fm(S.peryr),'up'],
+  ['ทุนที่ใช้ (ซ้อนสูงสุด '+S.maxcc+' ไม้)','$'+fm(S.cap),''],
+  ['DD ลึกสุดของกำไรสะสม','−$'+fm(Math.abs(S.dd)),'dn'],
+  ['สัดส่วนประตู 1 : ประตู 2',S.ndip+' : '+S.nfear,'']
+ ];
+ document.getElementById('statGrid').innerHTML=stats.map(s=>`<div class="stat"><div class="lb">${s[0]}</div><div class="vl ${s[2]}">${s[1]}</div></div>`).join('');
+ (function(){
+  const cv=document.getElementById('eqChart'),ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height,P={l:64,r:14,t:16,b:34};
+  const eq=DATA.equity, vs=eq.map(p=>p.v);
+  const ymin=Math.min(0,...vs), ymax=Math.max(...vs)*1.05;
+  const x=i=>P.l+(W-P.l-P.r)*i/(eq.length-1);
+  const y=v=>P.t+(H-P.t-P.b)*(1-(v-ymin)/(ymax-ymin));
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='#efe6d2';ctx.fillStyle='#9a8a6c';ctx.font='11px Anuphan';ctx.lineWidth=1;
+  for(let g=0;g<=5;g++){const v=ymin+(ymax-ymin)*g/5;ctx.beginPath();ctx.moveTo(P.l,y(v));ctx.lineTo(W-P.r,y(v));ctx.stroke();ctx.fillText('$'+Math.round(v/1000)+'k',10,y(v)+4);}
+  let lastYr='';
+  eq.forEach((p,i)=>{const yr=p.d.slice(0,4);if(yr!==lastYr){lastYr=yr;ctx.strokeStyle='#f3ecd9';ctx.beginPath();ctx.moveTo(x(i),P.t);ctx.lineTo(x(i),H-P.b);ctx.stroke();ctx.fillText(yr,x(i)+2,H-14);}});
+  const grad=ctx.createLinearGradient(0,P.t,0,H-P.b);grad.addColorStop(0,'rgba(184,134,11,.28)');grad.addColorStop(1,'rgba(184,134,11,0)');
+  ctx.beginPath();ctx.moveTo(x(0),y(0));eq.forEach((p,i)=>ctx.lineTo(x(i),y(p.v)));ctx.lineTo(x(eq.length-1),y(0));ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+  ctx.beginPath();eq.forEach((p,i)=>{i?ctx.lineTo(x(i),y(p.v)):ctx.moveTo(x(i),y(p.v))});
+  ctx.strokeStyle='#B8860B';ctx.lineWidth=2.2;ctx.lineJoin='round';ctx.stroke();
+ })();
+ document.querySelector('#yrTable tbody').innerHTML=DATA.yearly.map(r=>
+  `<tr><td>${r.y}</td><td class="${r.pnl>=0?'yr-up':'yr-dn'}">${r.pnl>=0?'+':'−'}$${fm(Math.abs(r.pnl))}</td><td>${r.n}</td><td>${r.win}%</td></tr>`).join('');
+ const trades=[...DATA.trades].reverse();let shown=0;const STEP=30;
+ window.tg=ix=>document.getElementById('lg'+ix).classList.toggle('open');
+ function rowHtml(t,ix){
+  const cls=t.pnl>=0?'pnl-up':'pnl-dn',sign=t.pnl>=0?'+':'−';
+  const kd=t.kind==='dip'?'<span class="kd dip">ย่อสะอาด</span>':'<span class="kd fear">พีคกลัว</span>';
+  const legs=t.legs.map(l=>`<div class="li"><b>${l.t}</b> <span class="${l.r>=0?'pnl-up':'pnl-dn'}">${l.r>=0?'+':''}${l.r}%</span><br>${l.e} → ${l.x}</div>`).join('');
+  return `<tr class="trow" onclick="tg(${ix})"><td>${DATA.trades.length-ix}</td><td>${t.in}</td><td>${kd}</td><td>${t.out}</td><td class="${cls}">${sign}$${fm(Math.abs(t.pnl))}</td><td class="${cls}">${t.ret>=0?'+':''}${t.ret}%</td></tr>
+  <tr class="legs" id="lg${ix}"><td colspan="6"><div class="lg">${legs}</div></td></tr>`;
+ }
+ window.showMore=function(){
+  const tb=document.querySelector('#logTable tbody');
+  tb.insertAdjacentHTML('beforeend',trades.slice(shown,shown+STEP).map((t,k)=>rowHtml(t,shown+k)).join(''));
+  shown+=STEP;
+  if(shown>=trades.length)document.getElementById('moreBtn').style.display='none';
+ };
+ document.querySelector('#logTable tbody').innerHTML='';
+ showMore();
+ const hd=document.querySelector('h2 span');
+ document.querySelectorAll('h2').forEach(h=>{if(h.textContent.includes('Trade Log'))h.firstChild.textContent='Trade Log — ครบทั้ง '+DATA.stats.n+' ไม้ ';});
+}
+// ---------- loader ----------
+const PH_URLS={sp:'https://app.jptrustlearning.com/data/input_sp500_daily.csv',
+               bench:'https://app.jptrustlearning.com/data/input_benchmark_daily.csv'};
+async function phFetch(url,onPct,w0,w1){
+ const res=await fetch(url,{cache:'reload'});
+ if(!res.ok) throw new Error('โหลดไม่สำเร็จ: '+url);
+ const total=+res.headers.get('content-length')||0;
+ const reader=res.body.getReader();const chunks=[];let got=0;
+ for(;;){const {done,value}=await reader.read();if(done)break;chunks.push(value);got+=value.length;
+   if(total)onPct(w0+(w1-w0)*got/total);}
+ const buf=new Uint8Array(got);let off=0;for(const c of chunks){buf.set(c,off);off+=c.length;}
+ return new TextDecoder().decode(buf);
+}
+document.addEventListener('DOMContentLoaded',async()=>{
+ const bar=document.getElementById('loadBar'),msg=document.getElementById('loadMsg');
+ const pct=p=>bar.style.width=Math.min(p,100)+'%';
+ try{
+  const [sp,bn]=await Promise.all([phFetch(PH_URLS.sp,pct,0,78),phFetch(PH_URLS.bench,pct,78,82)]);
+  msg.textContent='กำลังคำนวณ breadth + สัญญาณ + จัดอันดับ 142+ ไม้…';pct(86);
+  await new Promise(r=>setTimeout(r,30));
+  const S=phBuild(sp,bn);pct(93);
+  await new Promise(r=>setTimeout(r,30));
+  const DATA=phRun(S);pct(100);
+  renderAll(DATA);
+ }catch(e){
+  msg.textContent='โหลดข้อมูลไม่สำเร็จ — ลองรีเฟรชหน้า ('+e.message+')';
+  bar.style.background='#b03a2e';pct(100);
+ }
+});
+</script>
+</body>
+</html>
