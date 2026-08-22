@@ -1999,7 +1999,7 @@
         </div>
         <div style="font-family:'Anuphan',sans-serif;font-size:0.78rem;color:var(--text-muted);margin-top:12px;line-height:1.7;">
           โหมดนี้<strong>เงินหมุนทบต้นในช่องตามจำนวน MONEY SLOTS</strong> (ไม้ปิดแล้วต้นทุน+กำไรกลับเข้าช่อง รอสัญญาณใหม่ลงทั้งก้อน) · ตารางใช้<strong>ค่าที่ตั้งอยู่ปัจจุบัน</strong>ทุกตัว (รวมยืดตอนหมี/จำนวนช่อง ถ้าปรับ) ·
-          กลยุทธ์นี้เก็บกำไรคำเล็กจากจังหวะ<strong>ย่อระหว่างทางของตลาดที่ยังแข็งแรง</strong>และจังหวะ<strong>คลื่นความกลัวผ่านพีค</strong> — ค่าโรงงานถือสั้น 1 เดือนเพราะ edge ของการเก็บย่อจางเร็ว &middot; <strong>วันเข้าถูกกำหนดโดยตลาดไม่ใช่ปฏิทิน</strong> ควรใช้เป็นตัวเสริมพอร์ต ไม่ใช่ตัวหลักตัวเดียว
+          กลยุทธ์นี้เก็บกำไรคำเล็กจากจังหวะ<strong>ย่อระหว่างทางของตลาดที่ยังแข็งแรง</strong>และจังหวะ<strong>คลื่นความกลัวผ่านพีค</strong> — ค่าโรงงานถือ 6 เดือนเพราะผลต่อไม้เด่นขึ้นเมื่อให้เวลาราคาฟื้นเต็มรอบ &middot; <strong>วันเข้าถูกกำหนดโดยตลาดไม่ใช่ปฏิทิน</strong> ควรใช้เป็นตัวเสริมพอร์ต ไม่ใช่ตัวหลักตัวเดียว
         </div>
       </div>
 
@@ -2174,14 +2174,14 @@
     <div class="control-group">
       <label>HOLD PERIOD — ระยะถือครอง (เดือนปฏิทิน)</label>
       <select id="holdMonthsSelect" class="input-box">
-        <option value="1" selected>1 เดือน (ค่าโรงงาน)</option>
+        <option value="1">1 เดือน</option>
         <option value="2">2 เดือน</option>
         <option value="3">3 เดือน</option>
         <option value="4">4 เดือน</option>
         <option value="5">5 เดือน</option>
-        <option value="6">6 เดือน</option>
+        <option value="6" selected>6 เดือน (ค่าโรงงาน)</option>
       </select>
-      <span class="hint">นับเป็น<strong>เดือนปฏิทิน</strong> (รวมเสาร์–อาทิตย์/วันหยุด) จาก<strong>วันที่เข้าซื้อ</strong> — ครบกำหนดแล้วขายที่<strong>ราคาปิดของวันทำการแรกที่ถึง/เลยวันครบกำหนด</strong> · ค่าโรงงาน 1 เดือน ใกล้เคียง reference B6 ที่ถือ 21 วันเทรด แต่ไม่เป๊ะวันต่อวัน (ตัวเลขต่างจาก 142 ไม้เดิมเล็กน้อย) · edge ของการเก็บย่อจางเร็ว — ถือยาวขึ้นไม้ซ้อนมากขึ้น ใช้เงินสดมากขึ้น ดูแท็บ <strong>HOLD COMPARE</strong> ประกอบ</span>
+      <span class="hint">นับเป็น<strong>เดือนปฏิทิน</strong> (รวมเสาร์–อาทิตย์/วันหยุด) จาก<strong>วันที่เข้าซื้อ</strong> — ครบกำหนดแล้วขายที่<strong>ราคาปิดของวันทำการแรกที่ถึง/เลยวันครบกำหนด</strong> · <strong>ค่าโรงงาน 6 เดือน</strong> — จากการทดสอบของเรา ผลต่อไม้เด่นขึ้นเมื่อถือยาว แต่ไม้ซ้อนมากขึ้นและช่องเงินถูกจองนานขึ้น (ต้องมีช่องพอ) · ถือสั้น 1 เดือน = เก็บย่อถี่ กำไรต่อไม้เล็ก ดูแท็บ <strong>HOLD COMPARE</strong> ประกอบ</span>
     </div>
 
     <div class="control-group">
@@ -2200,19 +2200,19 @@
     <div class="control-group">
       <label>MONEY SLOTS — จำนวนช่องเงิน (ไม้ซ้อนสูงสุด)</label>
       <div class="top-n-wrapper" style="display:flex; align-items:center; gap:10px;">
-        <input type="number" id="maxConcInput" class="input-box" value="2" min="1" max="30" style="max-width:120px;">
+        <input type="number" id="maxConcInput" class="input-box" value="6" min="1" max="30" style="max-width:120px;">
         <span style="color:var(--text-muted); font-weight:600;">ช่อง (ขั้นต่ำ 1)</span>
       </div>
-      <span class="hint"><strong>ค่าโรงงาน = 2 ช่อง</strong> — แต่ละช่องถือได้ทีละ 1 ไม้ ช่องจึงเท่ากับเพดานไม้ซ้อนสูงสุดไปในตัว · สัญญาณใหม่ใช้เงินของ<strong>ช่องที่ว่างมานานที่สุดก่อน</strong> (FIFO) · ตอนเริ่มยังไม่มีช่องไหนเคยลง สัญญาณแรกๆ จะเติมช่องเปล่าไปเรื่อยๆ จนครบ · ถ้าสัญญาณมาตอนทุกช่องมีไม้อยู่ สัญญาณนั้นถูก<strong>ข้าม ไม่เข้าคิว</strong> · ไม่กระทบการนับ MIN GAP</span>
+      <span class="hint"><strong>ค่าโรงงาน = 6 ช่อง</strong> — แต่ละช่องถือได้ทีละ 1 ไม้ ช่องจึงเท่ากับเพดานไม้ซ้อนสูงสุดไปในตัว · สัญญาณใหม่ใช้เงินของ<strong>ช่องที่ว่างมานานที่สุดก่อน</strong> (FIFO) · ตอนเริ่มยังไม่มีช่องไหนเคยลง สัญญาณแรกๆ จะเติมช่องเปล่าไปเรื่อยๆ จนครบ · ถ้าสัญญาณมาตอนทุกช่องมีไม้อยู่ สัญญาณนั้นถูก<strong>ข้าม ไม่เข้าคิว</strong> · ไม่กระทบการนับ MIN GAP</span>
     </div>
 
     <div class="control-group">
       <label>DEFENSIVE EXTEND — ยืดตอนหมี</label>
       <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;padding:4px 0;">
-        <input type="checkbox" id="extendToggle" style="width:20px;height:20px;accent-color:var(--gold-deep);cursor:pointer;">
-        <span style="font-family:'Anuphan',sans-serif;font-size:0.85rem;color:var(--text-main);font-weight:600;">เปิดใช้ยืดตอนหมี (ค่าโรงงาน: ปิด)</span>
+        <input type="checkbox" id="extendToggle" checked style="width:20px;height:20px;accent-color:var(--gold-deep);cursor:pointer;">
+        <span style="font-family:'Anuphan',sans-serif;font-size:0.85rem;color:var(--text-main);font-weight:600;">เปิดใช้ยืดตอนหมี (ค่าโรงงาน: เปิด)</span>
       </label>
-      <span class="hint">วันครบกำหนดขาย ถ้า <strong>SPY หลุด top-2 ของ macro</strong> (เทียบ Δ6 เดือนของ Yen / SPY / Oil / Gold ณ ราคาปิดวันก่อนหน้า — กติกาเดียวกับกลยุทธ์หลักและ Sniper) = ตลาดยังอันตราย → <strong>ไม่ขาย ถือต่ออีกเต็ม 1 ระยะถือ</strong> (ตามเดือนปฏิทินที่ตั้งไว้) แล้วเช็คใหม่ ยืดซ้ำได้ · <strong>ค่าโรงงานปิด</strong>เพื่อให้ตัวเลขตรง reference ที่พิสูจน์แล้ว (142 ไม้) · เปิดแล้วไม้ช่วงตลาดหมีถือยาวขึ้น <strong>ช่องเงินถูกจองนานขึ้น</strong> — สัญญาณช่วงหมีอาจถูกข้ามมากขึ้นเพราะไม่มีช่องว่าง</span>
+      <span class="hint">วันครบกำหนดขาย ถ้า <strong>SPY หลุด top-2 ของ macro</strong> (เทียบ Δ6 เดือนของ Yen / SPY / Oil / Gold ณ ราคาปิดวันก่อนหน้า — กติกาเดียวกับกลยุทธ์หลักและ Sniper) = ตลาดยังอันตราย → <strong>ไม่ขาย ถือต่ออีกเต็ม 1 ระยะถือ</strong> (ตามเดือนปฏิทินที่ตั้งไว้) แล้วเช็คใหม่ ยืดซ้ำได้ · <strong>ค่าโรงงานเปิด</strong> · เปิดแล้วไม้ช่วงตลาดหมีถือยาวขึ้น <strong>ช่องเงินถูกจองนานขึ้น</strong> — สัญญาณช่วงหมีอาจถูกข้ามมากขึ้นเพราะไม่มีช่องว่าง</span>
     </div>
 
     <div class="control-group">
@@ -2273,7 +2273,7 @@
     <div class="about-philosophy">
       <div class="philosophy-label">Trading Philosophy</div>
       <div class="philosophy-text">
-        <strong>เก็บของถูกตอนตลาดใหญ่ยังแข็งแรง</strong> · เราวัด "ความกว้างของการเทขาย" (Breadth) = สัดส่วนหุ้นใน S&amp;P 500 ที่ราคาหลุดต่ำกว่าค่าเฉลี่ย 60 วันแบบรุนแรง (z-score &lt; −2) แล้วเปิดประตูเข้าไว้สองบาน · <strong>ประตู 1 · The Dip Gate</strong>: Breadth ก่อระลอกเล็ก — ไต่ขึ้นแตะ ≥ <strong>2%</strong> โดยพีคของระลอกไม่เกิน <strong>3%</strong> แล้ว<strong>วันแรกที่ Breadth หักหัวลง</strong> = เข้าเลย — คลื่นขายเล็กๆ เพิ่งจบโดยไม่ลุกลาม (ถ้าระลอกลามเกิน 3% ระลอกนั้นถูกทิ้งทั้งระลอก ไม่ยิง — เป็นตัวกรองพายุในตัว) · <strong>ประตู 2 · Recovery Gate</strong>: Breadth พุ่ง ≥ <strong>10%</strong> แล้ววันถัดมาเริ่มหักลง — แรงเทระลอกนั้นผ่านจุดพีคแล้ว · เข้าประตูไหนก็ได้ → หยิบ<strong>เงินก้อนของช่องที่ว่างมานานที่สุด</strong> (FIFO) ซื้อหุ้น Top 10 ตามอันดับโมเมนตัม 6 เดือนผสม Volume (70/30) ที่ราคาเปิดวันถัดไป ถือตาม<strong>ระยะที่ตั้งไว้ 1–6 เดือนปฏิทิน (ค่าโรงงาน 1 เดือน)</strong> แล้วขายที่ราคาปิดของวันครบกำหนด — เงินที่ขายได้ทั้งก้อนกลับเข้าช่องเดิม รอสัญญาณถัดไป · สัญญาณต้องห่างกันอย่างน้อย <strong>10 วันเทรด</strong> (MIN GAP) · ทุกช่องมีไม้อยู่ = สัญญาณถูกข้าม
+        <strong>เก็บของถูกตอนตลาดใหญ่ยังแข็งแรง</strong> · เราวัด "ความกว้างของการเทขาย" (Breadth) = สัดส่วนหุ้นใน S&amp;P 500 ที่ราคาหลุดต่ำกว่าค่าเฉลี่ย 60 วันแบบรุนแรง (z-score &lt; −2) แล้วเปิดประตูเข้าไว้สองบาน · <strong>ประตู 1 · The Dip Gate</strong>: Breadth ก่อระลอกเล็ก — ไต่ขึ้นแตะ ≥ <strong>2%</strong> โดยพีคของระลอกไม่เกิน <strong>3%</strong> แล้ว<strong>วันแรกที่ Breadth หักหัวลง</strong> = เข้าเลย — คลื่นขายเล็กๆ เพิ่งจบโดยไม่ลุกลาม (ถ้าระลอกลามเกิน 3% ระลอกนั้นถูกทิ้งทั้งระลอก ไม่ยิง — เป็นตัวกรองพายุในตัว) · <strong>ประตู 2 · Recovery Gate</strong>: Breadth พุ่ง ≥ <strong>10%</strong> แล้ววันถัดมาเริ่มหักลง — แรงเทระลอกนั้นผ่านจุดพีคแล้ว · เข้าประตูไหนก็ได้ → หยิบ<strong>เงินก้อนของช่องที่ว่างมานานที่สุด</strong> (FIFO) ซื้อหุ้น Top 10 ตามอันดับโมเมนตัม 6 เดือนผสม Volume (70/30) ที่ราคาเปิดวันถัดไป ถือตาม<strong>ระยะที่ตั้งไว้ 1–6 เดือนปฏิทิน (ค่าโรงงาน 6 เดือน)</strong> แล้วขายที่ราคาปิดของวันครบกำหนด — เงินที่ขายได้ทั้งก้อนกลับเข้าช่องเดิม รอสัญญาณถัดไป · สัญญาณต้องห่างกันอย่างน้อย <strong>10 วันเทรด</strong> (MIN GAP) · ทุกช่องมีไม้อยู่ = สัญญาณถูกข้าม
       </div>
       <div class="philosophy-signature">Two-Gate Dip Trigger · Rank 70/30 Picks · Compounding FIFO Slots</div>
     </div>
@@ -2285,7 +2285,7 @@
           <span class="pillar-title">TRIGGER</span>
         </div>
         <div class="pillar-subtitle">สองประตูเข้า</div>
-        <div class="pillar-desc"><strong>The Dip Gate</strong>: Breadth แตะ 2–3% แล้วหักลงครั้งแรก — คลื่นขายเล็กเพิ่งจบโดยไม่ลุกลาม · <strong>Recovery Gate</strong>: Breadth ≥ 10% แล้วหักลง — คลื่นเทขายเพิ่งพ้นจุดแรงสุด · ที่ค่าโรงงานยิงจริงเฉลี่ย ~10 ไม้/ปีหลังกรอง GAP</div>
+        <div class="pillar-desc"><strong>The Dip Gate</strong>: Breadth แตะ 2–3% แล้วหักลงครั้งแรก — คลื่นขายเล็กเพิ่งจบโดยไม่ลุกลาม · <strong>Recovery Gate</strong>: Breadth ≥ 10% แล้วหักลง — คลื่นเทขายเพิ่งพ้นจุดแรงสุด · ที่ค่าโรงงานยิงจริงเฉลี่ย ~8 ไม้/ปีหลังกรอง GAP และช่องเงิน</div>
       </div>
       <div class="about-pillar vol">
         <div class="pillar-header">
@@ -2293,11 +2293,11 @@
           <span class="pillar-title">PICKS</span>
         </div>
         <div class="pillar-subtitle">Rank 70/30 · ถือ 1–6 เดือนปฏิทิน</div>
-        <div class="pillar-desc">จัดอันดับด้วย<strong>ผลตอบแทน 126 วันเทรด (70%) ผสม Volume สะสม (30%)</strong> — สูตรเดียวกับกลยุทธ์หลัก · ซื้อ Top 10 งบเท่ากันทุกตัว · ถือครบกำหนดตามระยะที่ตั้ง (ค่าโรงงาน 1 เดือน) แล้วขายที่ราคาปิด ไม่เดา ไม่ยื้อ</div>
+        <div class="pillar-desc">จัดอันดับด้วย<strong>ผลตอบแทน 126 วันเทรด (70%) ผสม Volume สะสม (30%)</strong> — สูตรเดียวกับกลยุทธ์หลัก · ซื้อ Top 10 งบเท่ากันทุกตัว · ถือครบกำหนดตามระยะที่ตั้ง (ค่าโรงงาน 6 เดือน) แล้วขายที่ราคาปิด ไม่เดา ไม่ยื้อ</div>
       </div>
     </div>
 
-    <p><strong>บทบาทที่ถูกต้องของกลยุทธ์นี้:</strong> เอา<strong>กำไรคำเล็กที่สม่ำเสมอมาทบต้น</strong> — ที่ค่าโรงงาน (ถือ 1 เดือนปฏิทิน · 2 ช่อง × $10,000) ~115 ไม้ ชนะ ~66% เฉลี่ย ~+4%/ไม้ · เงินตั้งต้น $20,000 โตเป็น ~$159,000 ใน ~11 ปีครึ่ง (<strong>~+19.5% ต่อปีแบบทบต้น</strong>) และ<strong>เป็นบวกทุกปีเต็มทั้ง 11 ปี</strong> รวมปีหมี 2022 · ราคาของการทบต้นคือ <strong>Drawdown ~−21% ของมูลค่าพอร์ต</strong> เพราะยิ่งพอร์ตโต เงินต่อไม้ยิ่งใหญ่ · ค่าโรงงานถือ 1 เดือน (ปรับได้ 1–6 เดือน — จากการทดสอบของเรา The Dip Gate ให้ผลต่อไม้เด่นขึ้นเมื่อถือยาว ดูแท็บ HOLD COMPARE) · <strong>วันเข้าถูกกำหนดโดยตลาดไม่ใช่ปฏิทิน</strong> ควรใช้เป็นตัวเสริมพอร์ต ไม่ใช่ตัวหลักตัวเดียว · เสริม<strong>ยืดตอนหมี</strong>ได้เป็นสวิตช์ (ค่าโรงงานปิด): วันครบกำหนด ถ้า SPY หลุด top-2 ของ macro (เทียบ Yen / Oil / Gold Δ6 เดือน) = ตลาดยังอันตราย → ไม่ขาย ถือต่ออีกเต็ม 1 ระยะถือแล้วเช็คใหม่ — ช่องถูกจองนานขึ้น สัญญาณช่วงหมีจะถูกข้ามมากขึ้น</p>
+    <p><strong>บทบาทที่ถูกต้องของกลยุทธ์นี้:</strong> เอา<strong>กำไรคำเล็กที่สม่ำเสมอมาทบต้น</strong> — ที่ค่าโรงงาน (ถือ 6 เดือนปฏิทิน · 6 ช่อง × $10,000 · ยืดตอนหมีเปิด) ~88 ไม้ ชนะ ~93% เฉลี่ย ~+34%/ไม้ · เงินตั้งต้น $60,000 โตเป็น ~$3.0 ล้าน ใน ~11 ปีครึ่ง (<strong>~+40% ต่อปีแบบทบต้น</strong>) และ<strong>เป็นบวกทุกปีเต็มทั้ง 11 ปี</strong> — แต่ปีหมี 2022 บวกแค่ ~+0.5% · ราคาของการทบต้นคือ <strong>Drawdown ~−38% ของมูลค่าพอร์ต</strong> เพราะยิ่งพอร์ตโต เงินต่อไม้ยิ่งใหญ่ และถือ 6 เดือนทำให้ไม้ซ้อนเต็ม 6 ช่องเกือบตลอด · ค่าโรงงานถือ 6 เดือน (ปรับได้ 1–6 เดือน — จากการทดสอบของเรา The Dip Gate ให้ผลต่อไม้เด่นขึ้นเมื่อถือยาว ถือสั้น 1 เดือนได้ ~+4%/ไม้ ดูแท็บ HOLD COMPARE) · <strong>วันเข้าถูกกำหนดโดยตลาดไม่ใช่ปฏิทิน</strong> ควรใช้เป็นตัวเสริมพอร์ต ไม่ใช่ตัวหลักตัวเดียว · เสริม<strong>ยืดตอนหมี</strong>ได้เป็นสวิตช์ (ค่าโรงงานเปิด): วันครบกำหนด ถ้า SPY หลุด top-2 ของ macro (เทียบ Yen / Oil / Gold Δ6 เดือน) = ตลาดยังอันตราย → ไม่ขาย ถือต่ออีกเต็ม 1 ระยะถือแล้วเช็คใหม่ — ช่องถูกจองนานขึ้น สัญญาณช่วงหมีจะถูกข้ามมากขึ้น</p>
 
     <p><strong>ข้อจำกัดที่ต้องรู้ก่อนใช้ (จากงานวิจัยของเราเอง):</strong> ① ข้อมูลทดสอบเป็นสมาชิก S&amp;P 500 ชุดปัจจุบัน (survivorship bias) — ตัวเลขทั้งหมดจึงเป็น<strong>เพดานบน</strong> ของจริงจะต่ำกว่านี้ · ② ปี 2022 เป็นบวกได้เพราะอันดับโมเมนตัมพาไปเข้า<strong>หุ้นพลังงาน</strong>เป็นหลัก — อย่าคาดหวังให้ประวัติศาสตร์ซ้ำแบบเดิม · ③ กำไรต่อไม้มีขนาดเล็ก (~+4% ของเงินก้อนไม้นั้น) — <strong>ความลื่นไถลของราคาจริง (slippage) กัดสัดส่วนแรงกว่ากลยุทธ์ถือยาว</strong> และผลทบต้นจะขยายความคลาดเคลื่อนนี้สะสมขึ้นเรื่อยๆ ผลจริงจะบางลงกว่าตัวเลขนี้ · ⓪ ยิ่งเทรดท้ายๆ เงินต่อไม้ยิ่งใหญ่ — ตลาดจริงมี market impact ที่แบ็คเทสไม่เห็น · ④ ทุกการตัดสินใจใช้ข้อมูลถึงราคาปิดของวันสัญญาณเท่านั้น แล้วลงมือที่ราคาเปิดวันถัดไป (ไม่มี lookahead) · ค่าธรรมเนียม <strong>0.15% ต่อข้าง</strong> รวมอยู่ในผลแล้ว</p>
   </div>
@@ -2308,7 +2308,7 @@
 let CONFIG = {
   perTradeCapital: 10000,      // ทุนตั้งต้นต่อช่อง — compound: เงินหมุนทบต้นในช่อง ไม่เติมใหม่ (แก้ได้ใน settings)
   topN: 10,                    // ซื้อ Top N ตามอันดับ Ranking Weight
-  holdMonths: 1,               // ระยะถือครอง = เดือนปฏิทิน 1–6 (ค่าโรงงาน 1) — ขาย close ของวันทำการแรกที่ถึงวันครบกำหนด
+  holdMonths: 6,               // ระยะถือครอง = เดือนปฏิทิน 1–6 (ค่าโรงงาน 6 — B12.5 ตามคำสั่ง Joon) — ขาย close ของวันทำการแรกที่ถึงวันครบกำหนด
   zWindow: 60,                 // หน้าต่าง SMA/STD ของ z-score (breadth)
   zThresh: -2,                 // นับหุ้นเป็น "โดนเทแรง" เมื่อ z < −2
   dipArm: 2,                   // ประตู 1 (ระลอกฟื้น): ระลอกเริ่มเมื่อ breadth ไต่ขึ้นแตะ ≥ ค่านี้ (%)
@@ -2316,8 +2316,8 @@ let CONFIG = {
   fearBd: 10,                  // ประตู 2 (พีคกลัว): breadth เมื่อวาน ≥ 10% แล้ววันนี้หักลง
   smaLen: 50,                  // ประตู 1: SPY ต้องยืนเหนือ SMA50
   minGapTd: 10,                // MIN GAP — ระยะห่างขั้นต่ำระหว่างสัญญาณ นับ "วันเทรด" (สเปกเรา · ค่าโรงงาน 10)
-  maxConcurrent: 2,            // จำนวนช่องเงิน = เพดานไม้ซ้อน (ขั้นต่ำ 1 · ค่าโรงงาน 2) — เงินตั้งต้น = ช่อง × ทุนช่องละ
-  defensiveExtend: false,      // ยืดตอนหมี — สวิตช์ใน settings · ค่าโรงงาน "ปิด" ให้ตรง reference ที่พิสูจน์แล้ว
+  maxConcurrent: 6,            // จำนวนช่องเงิน = เพดานไม้ซ้อน (ขั้นต่ำ 1 · ค่าโรงงาน 6 — B12.5) — เงินตั้งต้น = ช่อง × ทุนช่องละ
+  defensiveExtend: true,       // ยืดตอนหมี — สวิตช์ใน settings · ค่าโรงงาน "เปิด" (B12.5 — reference 142 ไม้ ของ B6 อยู่ที่ 1M·2ช่อง·ปิด)
   lb: 126,                     // lookback จัดอันดับ = ผลตอบแทน 126 วันเทรด (LB6)
   weightRet: 0.7,              // น้ำหนัก Return ในการจัดอันดับ (Volume = 1 − weightRet) · สเปก B6 = 0.7
   feeSide: 0.0015,             // ค่าธรรมเนียม 0.15% ต่อข้าง (สเปก B6 — หนากว่า Sniper ที่ 0.05%)
@@ -2349,9 +2349,9 @@ const DEFAULT_SNIPER = {
   startYear: 2015,
   minGapTd: 10,           // วันเทรด (สเปก B6)
   weightRet: 70,          // % — Return 70 / Volume 30 (สเปก B6)
-  maxConcurrent: 2,       // ขั้นต่ำ 1 · ค่าโรงงาน 2 (ไม่มีตัวเลือก "ไม่จำกัด" แล้ว)
-  defensiveExtend: false, // ค่าโรงงานปิด — ให้ใกล้ reference 142 ไม้
-  holdMonths: 1           // เดือนปฏิทิน 1–6 (ค่าโรงงาน 1)
+  maxConcurrent: 6,       // ขั้นต่ำ 1 · ค่าโรงงาน 6 (B12.5)
+  defensiveExtend: true,  // ค่าโรงงานเปิด (B12.5)
+  holdMonths: 6           // เดือนปฏิทิน 1–6 (ค่าโรงงาน 6 — B12.5)
 };
 
 // Cache for saved settings (needed for dynamic year-dropdown populate)
@@ -3392,10 +3392,10 @@ function runSniperBacktest() {
   CONFIG.topN = parseInt(el.inputTopN.value) || 10;
   CONFIG.perTradeCapital = parseFloat(el.inputInitCap.value) || 10000;
   CONFIG.holdMonths = (() => { const h = document.getElementById('holdMonthsSelect');
-    const v = h ? parseInt(h.value, 10) : NaN; return (v >= 1 && v <= 6) ? v : 1; })();
-  CONFIG.defensiveExtend = (() => { const t = document.getElementById('extendToggle'); return t ? !!t.checked : false; })();
+    const v = h ? parseInt(h.value, 10) : NaN; return (v >= 1 && v <= 6) ? v : 6; })();
+  CONFIG.defensiveExtend = (() => { const t = document.getElementById('extendToggle'); return t ? !!t.checked : true; })();
   CONFIG.maxConcurrent = (() => { const x = document.getElementById('maxConcInput');
-    const v = x ? parseInt(x.value, 10) : NaN; return (isFinite(v) && v >= 1) ? Math.min(v, 30) : 2; })();
+    const v = x ? parseInt(x.value, 10) : NaN; return (isFinite(v) && v >= 1) ? Math.min(v, 30) : 6; })();
   CONFIG.startYear = parseInt(el.inputStartYear.value) || 2015;
   if (el.sliderWeight) CONFIG.weightRet = (parseInt(el.sliderWeight.value, 10) || 0) / 100;
   CONFIG.minGapTd = el.inputMinGap ? (parseInt(el.inputMinGap.value, 10) || 0) : 10;
