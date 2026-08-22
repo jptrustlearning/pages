@@ -1933,8 +1933,8 @@
             ช่วงที่ SPY หลุด macro top-2 <span style="opacity:.75">(แถบจางกว่า = ช่วงสั้นไม่ถึง 10 วัน)</span>
           </span>
           <div style="margin-top:10px;padding-top:9px;border-top:1px dashed var(--border);opacity:.9">
-            <strong>กติกาเข้า = เข้าประตูใดประตูหนึ่ง</strong> ① <strong>ระลอกฟื้น</strong> (% หุ้นที่ z &lt; −2 ไต่ขึ้นแตะ ≥ 2% โดยพีคของระลอกไม่เกิน 3% แล้ววันแรกที่หักลง = สัญญาณ)
-            ② <strong>พีคกลัว</strong> (% หุ้นที่ z &lt; −2 พุ่ง ≥ 10% แล้ววันถัดมาหักลง) ·
+            <strong>กติกาเข้า = เข้าประตูใดประตูหนึ่ง</strong> ① <strong>The Dip Gate</strong> (% หุ้นที่ z &lt; −2 ไต่ขึ้นแตะ ≥ 2% โดยพีคของระลอกไม่เกิน 3% แล้ววันแรกที่หักลง = สัญญาณ)
+            ② <strong>Recovery Gate</strong> (% หุ้นที่ z &lt; −2 พุ่ง ≥ 10% แล้ววันถัดมาหักลง) ·
             สัญญาณต้องห่างกัน &gt; 10 วันเทรด (MIN GAP) ·
             ทุกเงื่อนไขใช้ข้อมูลถึงราคาปิดวันสัญญาณ <strong>ห้ามมองอนาคต</strong> ลงมือที่ราคาเปิดวันถัดไป ·
             <strong>แตะที่ข้าวหลามตัดเพื่อดูว่าไม้นั้นเข้าด้วยประตูไหน</strong>
@@ -2268,12 +2268,12 @@
   <div class="about-modal-content">
     <button class="panel-close" onclick="closeAboutModal()" aria-label="ปิด">✕</button>
     <h2>🌾 Ripple Harvester · ทบต้น</h2>
-    <div class="about-sub">กลยุทธ์สองประตูแบบ<strong>เงินทบต้น</strong> — โครงเดียวกับ Pullback Harvester ทบต้นทุกชั้น (ranking / เงินช่อง FIFO / วันเข้า–ออก) ต่างที่<strong>ประตู 1 เท่านั้น</strong>: เปลี่ยนจาก "ย่อสะอาด" เป็น <strong>"ระลอกฟื้น"</strong> — Breadth ก่อระลอกเล็ก 2–3% แล้วหักลงครั้งแรก = เข้าเลย</div>
+    <div class="about-sub">กลยุทธ์สองประตูแบบ<strong>เงินทบต้น</strong> — โครงเดียวกับ Pullback Harvester ทบต้นทุกชั้น (ranking / เงินช่อง FIFO / วันเข้า–ออก) ต่างที่<strong>ประตู 1 เท่านั้น</strong>: เปลี่ยนจาก "ย่อสะอาด" เป็น <strong>The Dip Gate</strong> — Breadth ก่อระลอกเล็ก 2–3% แล้วหักลงครั้งแรก = เข้าเลย</div>
 
     <div class="about-philosophy">
       <div class="philosophy-label">Trading Philosophy</div>
       <div class="philosophy-text">
-        <strong>เก็บของถูกตอนตลาดใหญ่ยังแข็งแรง</strong> · เราวัด "ความกว้างของการเทขาย" (Breadth) = สัดส่วนหุ้นใน S&amp;P 500 ที่ราคาหลุดต่ำกว่าค่าเฉลี่ย 60 วันแบบรุนแรง (z-score &lt; −2) แล้วเปิดประตูเข้าไว้สองบาน · <strong>ประตู 1 "ระลอกฟื้น" (Ripple Turn)</strong>: Breadth ก่อระลอกเล็ก — ไต่ขึ้นแตะ ≥ <strong>2%</strong> โดยพีคของระลอกไม่เกิน <strong>3%</strong> แล้ว<strong>วันแรกที่ Breadth หักหัวลง</strong> = เข้าเลย — คลื่นขายเล็กๆ เพิ่งจบโดยไม่ลุกลาม (ถ้าระลอกลามเกิน 3% ระลอกนั้นถูกทิ้งทั้งระลอก ไม่ยิง — เป็นตัวกรองพายุในตัว) · <strong>ประตู 2 "พีคกลัว" (Fear Peak)</strong>: Breadth พุ่ง ≥ <strong>10%</strong> แล้ววันถัดมาเริ่มหักลง — แรงเทระลอกนั้นผ่านจุดพีคแล้ว · เข้าประตูไหนก็ได้ → หยิบ<strong>เงินก้อนของช่องที่ว่างมานานที่สุด</strong> (FIFO) ซื้อหุ้น Top 10 ตามอันดับโมเมนตัม 6 เดือนผสม Volume (70/30) ที่ราคาเปิดวันถัดไป ถือตาม<strong>ระยะที่ตั้งไว้ 1–6 เดือนปฏิทิน (ค่าโรงงาน 1 เดือน)</strong> แล้วขายที่ราคาปิดของวันครบกำหนด — เงินที่ขายได้ทั้งก้อนกลับเข้าช่องเดิม รอสัญญาณถัดไป · สัญญาณต้องห่างกันอย่างน้อย <strong>10 วันเทรด</strong> (MIN GAP) · ทุกช่องมีไม้อยู่ = สัญญาณถูกข้าม
+        <strong>เก็บของถูกตอนตลาดใหญ่ยังแข็งแรง</strong> · เราวัด "ความกว้างของการเทขาย" (Breadth) = สัดส่วนหุ้นใน S&amp;P 500 ที่ราคาหลุดต่ำกว่าค่าเฉลี่ย 60 วันแบบรุนแรง (z-score &lt; −2) แล้วเปิดประตูเข้าไว้สองบาน · <strong>ประตู 1 · The Dip Gate</strong>: Breadth ก่อระลอกเล็ก — ไต่ขึ้นแตะ ≥ <strong>2%</strong> โดยพีคของระลอกไม่เกิน <strong>3%</strong> แล้ว<strong>วันแรกที่ Breadth หักหัวลง</strong> = เข้าเลย — คลื่นขายเล็กๆ เพิ่งจบโดยไม่ลุกลาม (ถ้าระลอกลามเกิน 3% ระลอกนั้นถูกทิ้งทั้งระลอก ไม่ยิง — เป็นตัวกรองพายุในตัว) · <strong>ประตู 2 · Recovery Gate</strong>: Breadth พุ่ง ≥ <strong>10%</strong> แล้ววันถัดมาเริ่มหักลง — แรงเทระลอกนั้นผ่านจุดพีคแล้ว · เข้าประตูไหนก็ได้ → หยิบ<strong>เงินก้อนของช่องที่ว่างมานานที่สุด</strong> (FIFO) ซื้อหุ้น Top 10 ตามอันดับโมเมนตัม 6 เดือนผสม Volume (70/30) ที่ราคาเปิดวันถัดไป ถือตาม<strong>ระยะที่ตั้งไว้ 1–6 เดือนปฏิทิน (ค่าโรงงาน 1 เดือน)</strong> แล้วขายที่ราคาปิดของวันครบกำหนด — เงินที่ขายได้ทั้งก้อนกลับเข้าช่องเดิม รอสัญญาณถัดไป · สัญญาณต้องห่างกันอย่างน้อย <strong>10 วันเทรด</strong> (MIN GAP) · ทุกช่องมีไม้อยู่ = สัญญาณถูกข้าม
       </div>
       <div class="philosophy-signature">Two-Gate Pullback Trigger · Rank 70/30 Picks · Compounding FIFO Slots</div>
     </div>
@@ -2285,7 +2285,7 @@
           <span class="pillar-title">TRIGGER</span>
         </div>
         <div class="pillar-subtitle">สองประตูเข้า</div>
-        <div class="pillar-desc"><strong>ระลอกฟื้น</strong>: Breadth แตะ 2–3% แล้วหักลงครั้งแรก — คลื่นขายเล็กเพิ่งจบโดยไม่ลุกลาม · <strong>พีคกลัว</strong>: Breadth ≥ 10% แล้วหักลง — คลื่นเทขายเพิ่งพ้นจุดแรงสุด · ที่ค่าโรงงานยิงจริงเฉลี่ย ~10 ไม้/ปีหลังกรอง GAP</div>
+        <div class="pillar-desc"><strong>The Dip Gate</strong>: Breadth แตะ 2–3% แล้วหักลงครั้งแรก — คลื่นขายเล็กเพิ่งจบโดยไม่ลุกลาม · <strong>Recovery Gate</strong>: Breadth ≥ 10% แล้วหักลง — คลื่นเทขายเพิ่งพ้นจุดแรงสุด · ที่ค่าโรงงานยิงจริงเฉลี่ย ~10 ไม้/ปีหลังกรอง GAP</div>
       </div>
       <div class="about-pillar vol">
         <div class="pillar-header">
@@ -2297,7 +2297,7 @@
       </div>
     </div>
 
-    <p><strong>บทบาทที่ถูกต้องของกลยุทธ์นี้:</strong> เอา<strong>กำไรคำเล็กที่สม่ำเสมอมาทบต้น</strong> — ที่ค่าโรงงาน (ถือ 1 เดือนปฏิทิน · 2 ช่อง × $10,000) ~115 ไม้ ชนะ ~66% เฉลี่ย ~+4%/ไม้ · เงินตั้งต้น $20,000 โตเป็น ~$159,000 ใน ~11 ปีครึ่ง (<strong>~+19.5% ต่อปีแบบทบต้น</strong>) และ<strong>เป็นบวกทุกปีเต็มทั้ง 11 ปี</strong> รวมปีหมี 2022 · ราคาของการทบต้นคือ <strong>Drawdown ~−21% ของมูลค่าพอร์ต</strong> เพราะยิ่งพอร์ตโต เงินต่อไม้ยิ่งใหญ่ · ค่าโรงงานถือ 1 เดือนตามโครงเดิม (ปรับได้ 1–6 เดือน — จากการทดสอบของเรา ประตูระลอกฟื้นให้ผลต่อไม้เด่นขึ้นเมื่อถือยาว ดูแท็บ HOLD COMPARE) · <strong>วันเข้าถูกกำหนดโดยตลาดไม่ใช่ปฏิทิน</strong> ควรใช้เป็นตัวเสริมพอร์ต ไม่ใช่ตัวหลักตัวเดียว · เสริม<strong>ยืดตอนหมี</strong>ได้เป็นสวิตช์ (ค่าโรงงานปิด): วันครบกำหนด ถ้า SPY หลุด top-2 ของ macro (เทียบ Yen / Oil / Gold Δ6 เดือน) = ตลาดยังอันตราย → ไม่ขาย ถือต่ออีกเต็ม 1 ระยะถือแล้วเช็คใหม่ — ช่องถูกจองนานขึ้น สัญญาณช่วงหมีจะถูกข้ามมากขึ้น</p>
+    <p><strong>บทบาทที่ถูกต้องของกลยุทธ์นี้:</strong> เอา<strong>กำไรคำเล็กที่สม่ำเสมอมาทบต้น</strong> — ที่ค่าโรงงาน (ถือ 1 เดือนปฏิทิน · 2 ช่อง × $10,000) ~115 ไม้ ชนะ ~66% เฉลี่ย ~+4%/ไม้ · เงินตั้งต้น $20,000 โตเป็น ~$159,000 ใน ~11 ปีครึ่ง (<strong>~+19.5% ต่อปีแบบทบต้น</strong>) และ<strong>เป็นบวกทุกปีเต็มทั้ง 11 ปี</strong> รวมปีหมี 2022 · ราคาของการทบต้นคือ <strong>Drawdown ~−21% ของมูลค่าพอร์ต</strong> เพราะยิ่งพอร์ตโต เงินต่อไม้ยิ่งใหญ่ · ค่าโรงงานถือ 1 เดือนตามโครงเดิม (ปรับได้ 1–6 เดือน — จากการทดสอบของเรา The Dip Gate ให้ผลต่อไม้เด่นขึ้นเมื่อถือยาว ดูแท็บ HOLD COMPARE) · <strong>วันเข้าถูกกำหนดโดยตลาดไม่ใช่ปฏิทิน</strong> ควรใช้เป็นตัวเสริมพอร์ต ไม่ใช่ตัวหลักตัวเดียว · เสริม<strong>ยืดตอนหมี</strong>ได้เป็นสวิตช์ (ค่าโรงงานปิด): วันครบกำหนด ถ้า SPY หลุด top-2 ของ macro (เทียบ Yen / Oil / Gold Δ6 เดือน) = ตลาดยังอันตราย → ไม่ขาย ถือต่ออีกเต็ม 1 ระยะถือแล้วเช็คใหม่ — ช่องถูกจองนานขึ้น สัญญาณช่วงหมีจะถูกข้ามมากขึ้น</p>
 
     <p><strong>ข้อจำกัดที่ต้องรู้ก่อนใช้ (จากงานวิจัยของเราเอง):</strong> ① ข้อมูลทดสอบเป็นสมาชิก S&amp;P 500 ชุดปัจจุบัน (survivorship bias) — ตัวเลขทั้งหมดจึงเป็น<strong>เพดานบน</strong> ของจริงจะต่ำกว่านี้ · ② ปี 2022 เป็นบวกได้เพราะอันดับโมเมนตัมพาไปเข้า<strong>หุ้นพลังงาน</strong>เป็นหลัก — อย่าคาดหวังให้ประวัติศาสตร์ซ้ำแบบเดิม · ③ กำไรต่อไม้มีขนาดเล็ก (~+4% ของเงินก้อนไม้นั้น) — <strong>ความลื่นไถลของราคาจริง (slippage) กัดสัดส่วนแรงกว่ากลยุทธ์ถือยาว</strong> และผลทบต้นจะขยายความคลาดเคลื่อนนี้สะสมขึ้นเรื่อยๆ ผลจริงจะบางลงกว่าตัวเลขนี้ · ⓪ ยิ่งเทรดท้ายๆ เงินต่อไม้ยิ่งใหญ่ — ตลาดจริงมี market impact ที่แบ็คเทสไม่เห็น · ④ ทุกการตัดสินใจใช้ข้อมูลถึงราคาปิดของวันสัญญาณเท่านั้น แล้วลงมือที่ราคาเปิดวันถัดไป (ไม่มี lookahead) · ค่าธรรมเนียม <strong>0.15% ต่อข้าง</strong> รวมอยู่ในผลแล้ว</p>
   </div>
@@ -3133,7 +3133,7 @@ function buildSniperSeries() {
   state._sniper = { n, m, offset, dates, tickers, closeA, openA, volA, breadth,
                     signals, sigKinds,
                     conflSignals: signals,
-                    conflReasons: sigKinds.map(k => k === 'dip' ? 'The Dip Gate (Ripple Turn)' : 'Recovery Gate (Fear Peak)'),
+                    conflReasons: sigKinds.map(k => k === 'dip' ? 'The Dip Gate' : 'Recovery Gate'),
                     spyC, spyO, sma50, sret, dipArr, fearArr, dipState, dipPeak, macroBenign };
   return state._sniper;
 }
@@ -4473,8 +4473,8 @@ function renderTradeLog() {
         : 'MIN GAP ไม่กำหนด';
 
       const chipsHtml = '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">' +
-        chip('①', 'RIPPLE TURN', pct(st.bdNow), dipDetail, st.dipToday || st.dipWatch) +
-        chip('②', 'FEAR PEAK', pct(st.bdNow), fearDetail, st.fearToday || st.fearWatch) +
+        chip('①', 'THE DIP GATE', pct(st.bdNow), dipDetail, st.dipToday || st.dipWatch) +
+        chip('②', 'RECOVERY GATE', pct(st.bdNow), fearDetail, st.fearToday || st.fearWatch) +
         chip('③', 'MIN GAP', gapVal, gapDetail, !st.minGap || st.gapLeft === 0) +
       '</div>';
 
@@ -5132,7 +5132,7 @@ window.switchStatsTab = function(tab) {
           'ทุนต่อไม้': '$' + (CONFIG.perTradeCapital || 0).toLocaleString(),
           'จำนวนหุ้นต่อไม้': CONFIG.topN + ' ตัว',
           'ระยะถือครอง': (typeof holdLabelTh === 'function' ? holdLabelTh() : ''),
-          'Trigger': 'สองประตู: ระลอกฟื้น (breadth แตะ 2–3% แล้วหักลงครั้งแรก) / พีคกลัว (breadth ≥ 10% แล้วหักลง)',
+          'Trigger': 'สองประตู: The Dip Gate (breadth แตะ 2–3% แล้วหักลงครั้งแรก) / Recovery Gate (breadth ≥ 10% แล้วหักลง)',
           'Ranking': 'Rank 70/30 (Return 126 วันเทรด + Volume)',
           'ปีเริ่มต้น': CONFIG.startYear
         }
