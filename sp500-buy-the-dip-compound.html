@@ -2424,9 +2424,15 @@ async function loadSniperSettings() {
   if (!window.JPSettings) return;
   try {
     const data = await window.JPSettings.load();
-    if (data && data.ripple_harvester_compound) {
-      _savedSniperCache = data.ripple_harvester_compound;
-      applySniperSettings(data.ripple_harvester_compound);
+    // key ใหม่ buy_the_dip_compound · ย้ายจาก key เดิม ripple_harvester_compound ครั้งเดียว (เปลี่ยนชื่อกลยุทธ์ B12.4)
+    let saved = data && data.buy_the_dip_compound;
+    if (!saved && data && data.ripple_harvester_compound) {
+      saved = data.ripple_harvester_compound;
+      try { await window.JPSettings.patch({ buy_the_dip_compound: saved }); console.log('[sniper] migrated settings ripple_harvester_compound → buy_the_dip_compound'); } catch (_) {}
+    }
+    if (saved) {
+      _savedSniperCache = saved;
+      applySniperSettings(saved);
       console.log('[sniper] loaded saved settings from cloud');
     }
   } catch (e) {
@@ -2438,7 +2444,7 @@ async function saveSniperSettings() {
   if (!window.JPSettings) { jptToast('ระบบยังไม่พร้อม — กรุณาลองใหม่'); return; }
   const user = await window.JPSettings.getUser();
   if (!user) { jptToast('กรุณา login ก่อนบันทึกการตั้งค่า'); return; }
-  const ok = await window.JPSettings.patch({ ripple_harvester_compound: getSniperSettings() });
+  const ok = await window.JPSettings.patch({ buy_the_dip_compound: getSniperSettings() });
   jptToast(ok ? 'บันทึกการตั้งค่าเรียบร้อย' : 'บันทึกไม่สำเร็จ — กรุณาลองใหม่');
 }
 
