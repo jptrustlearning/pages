@@ -2957,11 +2957,32 @@ function addCalMonths(iso, k) {
   const td = Math.min(d, lastDay);
   return ty + '-' + String(tm + 1).padStart(2, '0') + '-' + String(td).padStart(2, '0');
 }
-// --- เลื่อนวันปฏิทินที่ตรงเสาร์/อาทิตย์ไปวันจันทร์ (ใช้แสดงวันครบกำหนดในอนาคตที่ยังไม่มีข้อมูล) ---
+// --- วันหยุดตลาดสหรัฐ (ก็อปจาก rolling v7 `isUSMarketClosed` ทุกตัวอักษร — ไม่มี Good Friday เหมือนต้นฉบับ) ---
+function isUSMarketClosed(d) {
+  const y=d.getUTCFullYear(), m=d.getUTCMonth(), dd=d.getUTCDate(), wd=d.getUTCDay();
+  if(wd === 0 || wd === 6) return true; // weekend
+  if(wd === 1) {
+    if(m === 0 && dd >= 15 && dd <= 21) return true; // MLK Day (3rd Mon Jan)
+    if(m === 1 && dd >= 15 && dd <= 21) return true; // Presidents Day (3rd Mon Feb)
+    if(m === 4 && dd >= 25 && dd <= 31) return true; // Memorial Day (last Mon May)
+    if(m === 8 && dd >= 1 && dd <= 7)   return true; // Labor Day (1st Mon Sep)
+  }
+  if(wd === 4 && m === 10 && dd >= 22 && dd <= 28) return true; // Thanksgiving
+  const fixed = [[0,1],[5,19],[6,4],[11,25]]; // NewYear, Juneteenth, Independence, Christmas
+  for(const [fm, fd] of fixed) {
+    const real = new Date(Date.UTC(y, fm, fd));
+    let obsM = fm, obsD = fd;
+    if(real.getUTCDay() === 6) { obsD = fd - 1; }
+    else if(real.getUTCDay() === 0) { obsD = fd + 1; }
+    if(m === obsM && dd === obsD) return true;
+  }
+  return false;
+}
+// --- วันเทรดแรก >= iso บนปฏิทินจริง (เสาร์/อาทิตย์ + วันหยุดตลาด) — ใช้แสดงวันครบกำหนดในอนาคตที่ยังไม่มีข้อมูล · ตรงกติกา rolling ---
 function nextBizIso(iso) {
   if (!iso) return null;
-  const d = new Date(iso + 'T00:00:00Z'); const wd = d.getUTCDay();
-  if (wd === 6) d.setUTCDate(d.getUTCDate() + 2); else if (wd === 0) d.setUTCDate(d.getUTCDate() + 1);
+  const d = new Date(iso + 'T00:00:00Z');
+  while (isUSMarketClosed(d)) d.setUTCDate(d.getUTCDate() + 1);
   return d.toISOString().slice(0, 10);
 }
 // --- index ของวันเทรดแรกที่ dates[i] >= targetIso · binary search บน sliced space เท่านั้น (กฎ A64) · ไม่พบ = dates.length ---
