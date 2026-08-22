@@ -3133,7 +3133,7 @@ function buildSniperSeries() {
   state._sniper = { n, m, offset, dates, tickers, closeA, openA, volA, breadth,
                     signals, sigKinds,
                     conflSignals: signals,
-                    conflReasons: sigKinds.map(k => k === 'dip' ? 'ประตู 1 · ระลอกฟื้น (Ripple Turn)' : 'ประตู 2 · พีคกลัว (Fear Peak)'),
+                    conflReasons: sigKinds.map(k => k === 'dip' ? 'The Dip Gate (Ripple Turn)' : 'Recovery Gate (Fear Peak)'),
                     spyC, spyO, sma50, sret, dipArr, fearArr, dipState, dipPeak, macroBenign };
   return state._sniper;
 }
@@ -3571,16 +3571,17 @@ function runSniperBacktest() {
       maxConc: CONFIG.maxConcurrent | 0,
       lastEntryDate: lastEntryDate, gapTd: gapTd, minGap: minGap, gapLeft: gapLeft,
       watchPicks: (res.firePending == null && (fearWatch || dipWatch)) ? preview(lastIdx) : [],
+      // กล่อง "สัญญาณถูกข้าม" กล่องเดียว: เอาสัญญาณล่าสุดจากทั้งสองเหตุผล (MIN GAP / ติดเพดาน)
+      // และต้องใหม่กว่าสัญญาณของไม้ที่เข้าจริงล่าสุดเท่านั้น — สัญญาณเก่าก่อนไม้ล่าสุดไม่บอกอะไรเกี่ยวกับวันนี้
       lastSkipped: (() => {
-        const sk = res.skippedByGap || [];
         const lastSigDate = lastSigIdx >= 0 ? _S.dates[lastSigIdx] : '';
-        for (let i = sk.length - 1; i >= 0; i--) {
-          if (sk[i].date > lastSigDate) return sk[i];
-        }
-        return null;
+        const cands = [];
+        for (const s of (res.skippedByGap || [])) if (s.date > lastSigDate) cands.push({ ...s, why: 'gap' });
+        for (const s of (res.skippedByCap || [])) if (s.date > lastSigDate) cands.push({ ...s, why: 'cap' });
+        if (!cands.length) return null;
+        cands.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+        return cands[cands.length - 1];
       })(),
-      lastSkippedCap: (res.skippedByCap && res.skippedByCap.length)
-        ? res.skippedByCap[res.skippedByCap.length - 1] : null,
       openCount: res.openLots.length, capital: (res.nextSlotBal != null ? res.nextSlotBal : null),
       nextSlotBal: res.nextSlotBal
     };
@@ -4492,38 +4493,38 @@ function renderTradeLog() {
       }
       const openTxt = st.openCount > 0 ? 'ถืออยู่ ' + st.openCount + ' ไม้ · ' : '';
       // สัญญาณที่เพิ่งถูกข้าม — บอกชัดว่าเกิดสัญญาณแต่ไม่ได้ยิง (ไม่ใช่การ์ดเงียบเฉยๆ)
-      const skipHtml = st.lastSkipped
-        ? '<div style="margin-top:10px;border:1px dashed rgba(193,69,69,0.45);background:rgba(193,69,69,0.06);border-radius:8px;padding:8px 10px;font-size:.7rem;color:var(--text-main);line-height:1.6;">' +
-            '<strong style="color:var(--red);">⚠️ สัญญาณ ' + _fmtTradeDate(st.lastSkipped.date) + ' ถูกข้าม</strong> — ห่างจากสัญญาณของไม้ก่อนหน้าแค่ ' + st.lastSkipped.daysSince + ' วันเทรด (MIN GAP ' + st.minGap + ') · กติกานี้<strong>ไม่มีข้อยกเว้น</strong>' +
-            '<br><span style="color:var(--text-muted);">สัญญาณที่ถูกข้าม<strong>ไม่ยกไปยิงย้อนหลัง</strong>เมื่อพ้น MIN GAP — ต้องรอสัญญาณลูกใหม่</span>' +
-          '</div>'
+      // กล่องเดียว (คำสั่ง Joon): สัญญาณล่าสุดที่ถูกข้ามหลังไม้ที่เข้าจริงล่าสุด — ไม่ว่าจะด้วย MIN GAP หรือติดเพดาน
+      const sk = st.lastSkipped;
+      const skipHtml = sk
+        ? (sk.why === 'cap'
+          ? '<div style="margin-top:10px;border:1px dashed rgba(139,105,20,0.45);background:rgba(212,175,55,0.06);border-radius:8px;padding:8px 10px;font-size:.7rem;color:var(--text-main);line-height:1.6;">' +
+              '<strong style="color:var(--gold-deep);">สัญญาณ ' + _fmtTradeDate(sk.date) + ' ติดเพดานไม้ซ้อน</strong> — ตอนนั้นถืออยู่ ' + sk.openCount + ' ไม้ (เพดาน ' + st.maxConc + ') จึงไม่เปิดไม้ใหม่' +
+              '<br><span style="color:var(--text-muted);">สัญญาณที่ถูกข้าม<strong>ไม่ยกไปยิงย้อนหลัง</strong>เมื่อช่องว่าง — ต้องรอสัญญาณลูกใหม่</span>' +
+            '</div>'
+          : '<div style="margin-top:10px;border:1px dashed rgba(193,69,69,0.45);background:rgba(193,69,69,0.06);border-radius:8px;padding:8px 10px;font-size:.7rem;color:var(--text-main);line-height:1.6;">' +
+              '<strong style="color:var(--red);">⚠️ สัญญาณ ' + _fmtTradeDate(sk.date) + ' ถูกข้าม</strong> — ห่างจากสัญญาณของไม้ก่อนหน้าแค่ ' + sk.daysSince + ' วันเทรด (MIN GAP ' + st.minGap + ') · กติกานี้<strong>ไม่มีข้อยกเว้น</strong>' +
+              '<br><span style="color:var(--text-muted);">สัญญาณที่ถูกข้าม<strong>ไม่ยกไปยิงย้อนหลัง</strong>เมื่อพ้น MIN GAP — ต้องรอสัญญาณลูกใหม่</span>' +
+            '</div>')
         : '';
-      const capHtml = st.lastSkippedCap
-        ? '<div style="margin-top:8px;border:1px dashed rgba(139,105,20,0.45);background:rgba(212,175,55,0.06);border-radius:8px;padding:8px 10px;font-size:.7rem;color:var(--text-main);line-height:1.6;">' +
-            '<strong style="color:var(--gold-deep);">สัญญาณ ' + _fmtTradeDate(st.lastSkippedCap.date) + ' ติดเพดานไม้ซ้อน</strong> — ตอนนั้นถืออยู่ ' + st.lastSkippedCap.openCount + ' ไม้ (เพดาน ' + st.maxConc + ') จึงไม่เปิดไม้ใหม่' +
-          '</div>'
-        : '';
-      const extTxt = st.extendOn
-        ? 'ยืดตอนหมี <strong style="color:var(--gold-deep);">เปิด</strong> — วันครบกำหนด ถ้า SPY หลุด macro top-2 จะถือต่ออีกเต็ม 1 ระยะถือ (' + holdLabelTh() + ')'
-        : 'ยืดตอนหมี <strong>ปิด</strong> (ค่าโรงงาน — ตรง reference)';
+      const capHtml = '';
+      // foot: เหลือแค่บรรทัดสถานะไม้/MIN GAP — ตัดคำอธิบายกติกาออกตามคำสั่ง Joon
       const footHtml = '<div style="margin-top:10px;font-size:.68rem;color:var(--text-muted);line-height:1.6;border-top:1px dashed var(--border);padding-top:8px;">' +
-        openTxt + gapTxt + '<br>เข้าไม้เมื่อเข้า<strong>ประตูใดประตูหนึ่ง</strong> (ระลอกฟื้น / พีคกลัว) ณ ราคาปิดวันสัญญาณ · ' + extTxt +
-        '<br>วันเข้าถูกกำหนดโดยตลาด ไม่ใช่ปฏิทิน' +
+        openTxt + gapTxt +
       '</div>';
 
       // --- หัวการ์ด ---
       const gateToday = st.dipToday || st.fearToday;   // เข้าประตูวันนี้แล้ว — ถ้าไม่ fired แปลว่าติด MIN GAP
-      const gateName = (st.firedKind === 'dip' ? 'ประตู 1 · ระลอกฟื้น' : 'ประตู 2 · พีคกลัว');
+      const gateName = (st.firedKind === 'dip' ? 'The Dip Gate' : 'Recovery Gate');
       const line1 = isFired
         ? 'สัญญาณยิงแล้ว (' + gateName + ') — เข้าซื้อที่<strong>ราคาเปิดวันทำการถัดไป</strong>'
         : (isCapped
         ? 'สัญญาณยิงแล้ว (' + gateName + ') แต่<strong style="color:var(--red);">ทุกช่องมีไม้</strong> (ถืออยู่ ' + st.openCount + '/' + st.maxConc + ') — กติกา<strong>ไม่เปิดไม้ใหม่</strong> สัญญาณนี้ถูกข้าม ไม่ยกไปยิงย้อนหลังเมื่อช่องว่าง'
         : (gateToday
-            ? 'วันนี้เข้า' + (st.dipToday ? '<strong>ประตู 1 · ระลอกฟื้น</strong>' : '<strong>ประตู 2 · พีคกลัว</strong>') + 'แล้ว แต่<strong style="color:var(--red);">ติด MIN GAP</strong> — สัญญาณถูกข้าม ไม่เปิดไม้ (รายละเอียดด้านล่าง)'
+            ? 'วันนี้เข้า' + (st.dipToday ? '<strong>The Dip Gate</strong>' : '<strong>Recovery Gate</strong>') + 'แล้ว แต่<strong style="color:var(--red);">ติด MIN GAP</strong> — สัญญาณถูกข้าม ไม่เปิดไม้ (รายละเอียดด้านล่าง)'
             : (isWatch
                 ? 'ตลาดเข้าใกล้ประตูเข้า — ' +
-                  [st.fearWatch ? 'breadth ≥ ' + st.fearBd + '% แล้ว รอวันที่หักลง (ประตู 2)' : null,
-                   st.dipWatch ? 'SPY ลบวันแรกเหนือ SMA50 — ลบอีกวัน = ครบประตู 1' : null].filter(Boolean).join(' · ')
+                  [st.fearWatch ? 'breadth ≥ ' + st.fearBd + '% แล้ว รอวันที่หักลง (Recovery Gate)' : null,
+                   st.dipWatch ? 'breadth อยู่ในระลอก ' + st.dipArm + '–' + st.dipMax + '% — วันแรกที่หักลง = ครบ The Dip Gate' : null].filter(Boolean).join(' · ')
                 : 'ยังไม่เข้าเงื่อนไข — รอตลาดย่อแบบสะอาด หรือรอคลื่นความกลัวผ่านพีค จึงยังไม่มีวันเข้าไม้ล่วงหน้าให้บอก')));
 
       const pdfBtn = (ps && !isCapped) ? ('<button class="trade-details-btn" onclick="downloadDetailsPdf(event, null, null, true)" title="ดาวน์โหลดรายละเอียดเป็น PDF">' +
@@ -4665,7 +4666,7 @@ function renderTradeLog() {
 
     let header = `<div class="trade-header"><div>
       <div class="trade-date"><span class="trade-date-tag">Entry</span>${_fmtTradeDate(r.date)}${r.exitDate ? '<span class="trade-date-arrow">→</span><span class="trade-date-tag">Exit</span><span class="exit-date">' + _fmtTradeDate(r.exitDate) + '</span>' : (r.plannedNote || '')}${r.isOpen ? ' <span class="open-badge">OPEN</span>' : ''}${r.extendCount > 0 ? ' <span style="display:inline-block;background:rgba(156,43,43,0.12);color:#9C2B2B;border:1px solid rgba(156,43,43,0.4);padding:1px 7px;border-radius:4px;font-family:\'Cinzel\',\'Anuphan\',serif;font-size:0.58rem;font-weight:700;letter-spacing:1.2px;margin-left:6px;" title="Lot maturity extended ' + r.extendCount + ' time(s) — SPY was out of macro top-2 at scheduled exit, so the same picks were held another hold period instead of being sold. Exit date shown is the updated maturity.">🔁 EXTENDED ' + r.extendCount + 'x</span>' : ''}${reinvestBadge}</div>
-      <div style="font-family:'Cinzel','Anuphan',serif;font-size:0.68rem;font-weight:700;color:var(--gold-deep);letter-spacing:0.1em;text-transform:uppercase;margin-top:4px;opacity:0.85;">Signal · ${_fmtTradeDate(r.signalDate)}${r.kind ? ' <span style="display:inline-block;background:' + (r.kind === 'dip' ? 'rgba(46,159,95,0.10)' : 'rgba(193,69,69,0.10)') + ';color:' + (r.kind === 'dip' ? '#2E9F5F' : '#C14545') + ';border:1px solid ' + (r.kind === 'dip' ? 'rgba(46,159,95,0.4)' : 'rgba(193,69,69,0.4)') + ';padding:1px 8px;border-radius:4px;font-size:0.6rem;font-weight:700;letter-spacing:0.6px;margin-left:6px;vertical-align:1px;">' + (r.kind === 'dip' ? 'ประตู 1 · ระลอกฟื้น' : 'ประตู 2 · พีคกลัว') + '</span>' : ''}</div>
+      <div style="font-family:'Cinzel','Anuphan',serif;font-size:0.68rem;font-weight:700;color:var(--gold-deep);letter-spacing:0.1em;text-transform:uppercase;margin-top:4px;opacity:0.85;">Signal · ${_fmtTradeDate(r.signalDate)}${r.kind ? ' <span style="display:inline-block;background:' + (r.kind === 'dip' ? 'rgba(46,159,95,0.10)' : 'rgba(193,69,69,0.10)') + ';color:' + (r.kind === 'dip' ? '#2E9F5F' : '#C14545') + ';border:1px solid ' + (r.kind === 'dip' ? 'rgba(46,159,95,0.4)' : 'rgba(193,69,69,0.4)') + ';padding:1px 8px;border-radius:4px;font-size:0.6rem;font-weight:700;letter-spacing:0.6px;margin-left:6px;vertical-align:1px;">' + (r.kind === 'dip' ? 'The Dip Gate' : 'Recovery Gate') + '</span>' : ''}</div>
       <div class="trade-summary">ไม้นี้ <strong>${r.stocks.length} ตัว</strong> · ทุน <strong>$${Math.round(r.equity).toLocaleString()}</strong>`;
     if (!r.isOpen) {
       header += ` · P&L: <span class="${retCls}"><strong>$${Math.round(r.pnl).toLocaleString()}</strong> (${r.pnlPct>=0?'+':''}${r.pnlPct.toFixed(2)}%)</span>`;
@@ -4725,11 +4726,11 @@ function renderBreadthChart() {
       datasets: [
         { label: 'Breadth — % หุ้นที่ z < −2', data: bdata, borderColor: '#722F37',
           backgroundColor: 'rgba(114,47,55,0.10)', borderWidth: 1.4, pointRadius: 0, fill: true, tension: 0.1 },
-        { label: 'ประตู 2 · พีคกลัว ≥ ' + CONFIG.fearBd + '%', data: fearLine, borderColor: 'rgba(193,69,69,0.85)',
+        { label: 'Recovery Gate ≥ ' + CONFIG.fearBd + '%', data: fearLine, borderColor: 'rgba(193,69,69,0.85)',
           borderDash: [6, 4], borderWidth: 1.2, pointRadius: 0, fill: false },
-        { label: 'ประตู 1 · เพดานระลอก ≤ ' + CONFIG.dipMax + '%', data: dipLine, borderColor: 'rgba(46,159,95,0.85)',
+        { label: 'The Dip Gate · เพดานระลอก ≤ ' + CONFIG.dipMax + '%', data: dipLine, borderColor: 'rgba(46,159,95,0.85)',
           borderDash: [3, 3], borderWidth: 1.2, pointRadius: 0, fill: false },
-        { label: 'ประตู 1 · จุดเริ่มระลอก ≥ ' + CONFIG.dipArm + '%', data: armLine, borderColor: 'rgba(46,159,95,0.45)',
+        { label: 'The Dip Gate · จุดเริ่มระลอก ≥ ' + CONFIG.dipArm + '%', data: armLine, borderColor: 'rgba(46,159,95,0.45)',
           borderDash: [2, 5], borderWidth: 1.1, pointRadius: 0, fill: false },
         { label: 'สัญญาณยิง', data: sigData, borderColor: 'rgba(46,159,95,0)',
           backgroundColor: '#2E9F5F', pointRadius: 4, pointHoverRadius: 6, showLine: false },
