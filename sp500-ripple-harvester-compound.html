@@ -3547,16 +3547,20 @@ function runSniperBacktest() {
     const firedKind = (res.firePending != null && _S.signals.indexOf(res.firePending) >= 0)
       ? _S.sigKinds[_S.signals.indexOf(res.firePending)] : null;
 
+    // ทุกช่องมีไม้ ณ ปิดวันสัญญาณ → พรุ่งนี้ engine จะข้ามสัญญาณนี้ (ไม้ที่ขาย close พรุ่งนี้ยังกินช่องตอน open — กติกา B9)
+    // ต้องบอกผู้ใช้ว่า "ไม่ซื้อ" ไม่ใช่โชว์คำสั่งซื้อ + งบ fallback $PT ที่ไม่มีอยู่จริง
+    const slotFull = (res.nextSlotBal == null);
     if (res.firePending != null) {
       state.pendingSignal = {
-        mode: 'fired', signalDate: _S.dates[res.firePending], kind: firedKind,
-        breadthNow: bdNow, capital: (res.nextSlotBal != null ? res.nextSlotBal : PT),
-        openCount: res.openLots.length, picks: preview(res.firePending)
+        mode: slotFull ? 'capped' : 'fired', signalDate: _S.dates[res.firePending], kind: firedKind,
+        breadthNow: bdNow, capital: (res.nextSlotBal != null ? res.nextSlotBal : null),
+        openCount: res.openLots.length, picks: preview(res.firePending), slotFull: slotFull
       };
     }
 
     state.sniperStatus = {
-      mode: (res.firePending != null) ? 'fired' : ((fearWatch || dipWatch) ? 'watch' : 'calm'),
+      mode: (res.firePending != null) ? (slotFull ? 'capped' : 'fired') : ((fearWatch || dipWatch) ? 'watch' : 'calm'),
+      slotFull: slotFull,
       asOf: lastDate,
       bdNow: bdNow, bdPrev: bdPrev, dipArm: CONFIG.dipArm, dipMax: CONFIG.dipMax, dipPeakNow: dipPeakNow, fearBd: CONFIG.fearBd,
       spyNow: spyNow, smaNow: smaNow, retNow: retNow, retPrev: retPrev,
@@ -3577,7 +3581,7 @@ function runSniperBacktest() {
       })(),
       lastSkippedCap: (res.skippedByCap && res.skippedByCap.length)
         ? res.skippedByCap[res.skippedByCap.length - 1] : null,
-      openCount: res.openLots.length, capital: (res.nextSlotBal != null ? res.nextSlotBal : PT),
+      openCount: res.openLots.length, capital: (res.nextSlotBal != null ? res.nextSlotBal : null),
       nextSlotBal: res.nextSlotBal
     };
   } catch (err) {
@@ -4432,8 +4436,10 @@ function renderTradeLog() {
     if (st && (!window._tradeLogPage || window._tradeLogPage === 1)) {
       const ps = state.pendingSignal;
       const isFired = st.mode === 'fired';
+      const isCapped = st.mode === 'capped';   // สัญญาณยิงแล้วแต่ทุกช่องมีไม้ — engine จะไม่เปิดไม้
       const isWatch = st.mode === 'watch';
       const TH = {
+        capped:{ c: '#8B6914', b: 'rgba(212,175,55,0.65)', bg: 'rgba(212,175,55,0.14)', glow: '0 0 24px rgba(212,175,55,0.18)', grad: 'linear-gradient(135deg, rgba(212,175,55,0.12), rgba(255,254,248,1))', badge: 'SIGNAL · ติดเพดาน' },
         fired: { c: '#2E9F5F', b: 'rgba(46,159,95,0.5)',  bg: 'rgba(46,159,95,0.10)',  glow: '0 0 24px rgba(91,196,142,0.18)', grad: 'linear-gradient(135deg, rgba(91,196,142,0.08), rgba(255,254,248,1))', badge: 'SIGNAL FIRED' },
         watch: { c: '#C14545', b: 'rgba(193,69,69,0.55)', bg: 'rgba(193,69,69,0.10)',  glow: '0 0 24px rgba(193,69,69,0.20)',  grad: 'linear-gradient(135deg, rgba(193,69,69,0.10), rgba(255,254,248,1))', badge: 'WATCH' },
         calm:  { c: '#8B6914', b: 'rgba(212,175,55,0.45)', bg: 'rgba(212,175,55,0.10)', glow: 'none',                            grad: 'linear-gradient(135deg, rgba(212,175,55,0.07), rgba(255,254,248,1))', badge: 'NO SETUP' }
@@ -4507,17 +4513,20 @@ function renderTradeLog() {
 
       // --- หัวการ์ด ---
       const gateToday = st.dipToday || st.fearToday;   // เข้าประตูวันนี้แล้ว — ถ้าไม่ fired แปลว่าติด MIN GAP
+      const gateName = (st.firedKind === 'dip' ? 'ประตู 1 · ระลอกฟื้น' : 'ประตู 2 · พีคกลัว');
       const line1 = isFired
-        ? 'สัญญาณยิงแล้ว (' + (st.firedKind === 'dip' ? 'ประตู 1 · ระลอกฟื้น' : 'ประตู 2 · พีคกลัว') + ') — เข้าซื้อที่<strong>ราคาเปิดวันทำการถัดไป</strong>'
+        ? 'สัญญาณยิงแล้ว (' + gateName + ') — เข้าซื้อที่<strong>ราคาเปิดวันทำการถัดไป</strong>'
+        : (isCapped
+        ? 'สัญญาณยิงแล้ว (' + gateName + ') แต่<strong style="color:var(--red);">ทุกช่องมีไม้</strong> (ถืออยู่ ' + st.openCount + '/' + st.maxConc + ') — กติกา<strong>ไม่เปิดไม้ใหม่</strong> สัญญาณนี้ถูกข้าม ไม่ยกไปยิงย้อนหลังเมื่อช่องว่าง'
         : (gateToday
             ? 'วันนี้เข้า' + (st.dipToday ? '<strong>ประตู 1 · ระลอกฟื้น</strong>' : '<strong>ประตู 2 · พีคกลัว</strong>') + 'แล้ว แต่<strong style="color:var(--red);">ติด MIN GAP</strong> — สัญญาณถูกข้าม ไม่เปิดไม้ (รายละเอียดด้านล่าง)'
             : (isWatch
                 ? 'ตลาดเข้าใกล้ประตูเข้า — ' +
                   [st.fearWatch ? 'breadth ≥ ' + st.fearBd + '% แล้ว รอวันที่หักลง (ประตู 2)' : null,
                    st.dipWatch ? 'SPY ลบวันแรกเหนือ SMA50 — ลบอีกวัน = ครบประตู 1' : null].filter(Boolean).join(' · ')
-                : 'ยังไม่เข้าเงื่อนไข — รอตลาดย่อแบบสะอาด หรือรอคลื่นความกลัวผ่านพีค จึงยังไม่มีวันเข้าไม้ล่วงหน้าให้บอก'));
+                : 'ยังไม่เข้าเงื่อนไข — รอตลาดย่อแบบสะอาด หรือรอคลื่นความกลัวผ่านพีค จึงยังไม่มีวันเข้าไม้ล่วงหน้าให้บอก')));
 
-      const pdfBtn = ps ? ('<button class="trade-details-btn" onclick="downloadDetailsPdf(event, null, null, true)" title="ดาวน์โหลดรายละเอียดเป็น PDF">' +
+      const pdfBtn = (ps && !isCapped) ? ('<button class="trade-details-btn" onclick="downloadDetailsPdf(event, null, null, true)" title="ดาวน์โหลดรายละเอียดเป็น PDF">' +
           '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>Details PDF' +
         '</button>') : '';
 
@@ -4532,15 +4541,20 @@ function renderTradeLog() {
       let sectionHtml = '';
       const picks = (ps && ps.picks) ? ps.picks : ((st.watchPicks && st.watchPicks.length) ? st.watchPicks : []);
       if (picks.length > 0) {
-        const perStock = st.capital / picks.length;
+        const perStock = (st.capital != null ? st.capital : 0) / picks.length;
         const previewNote = isFired
           ? 'รายชื่อจากราคาปิดวันสัญญาณ (ตัดสินแล้ว)'
-          : 'รายชื่อเต็ง ณ ราคาปิดล่าสุด — รายชื่อจริงจะตัดสินที่ close ของวันสัญญาณ ยังเปลี่ยนได้';
+          : (isCapped
+          ? 'รายชื่อจากราคาปิดวันสัญญาณ — <strong style="color:var(--red);">ไม่ได้ซื้อ</strong> (ติดเพดานไม้ซ้อน)'
+          : 'รายชื่อเต็ง ณ ราคาปิดล่าสุด — รายชื่อจริงจะตัดสินที่ close ของวันสัญญาณ ยังเปลี่ยนได้');
+        const budgetTxt = (isCapped || st.capital == null)
+          ? '· <strong style="color:var(--red);">ไม่มีช่องว่าง</strong> · '
+          : '· งบ $' + Math.round(st.capital).toLocaleString() + ' · ~$' + perStock.toFixed(0) + '/ตัว · ';
         const badges = picks.map(p => '<span class="stock-badge" style="border-color:rgba(212,175,55,0.4);color:var(--gold-deep);background:rgba(212,175,55,0.08);">' +
           p.ticker + ' ' + (p.ret * 100).toFixed(1) + '%</span>').join('');
         sectionHtml = '<div class="trade-section">' +
           '<div class="trade-section-label mom">TOP ' + picks.length + ' ตามอันดับ Return/Volume ' +
-          '<span class="alloc-info">· งบ $' + Math.round(st.capital).toLocaleString() + ' · ~$' + perStock.toFixed(0) + '/ตัว · ' + previewNote + '</span>' +
+          '<span class="alloc-info">' + budgetTxt + previewNote + '</span>' +
           '</div><div>' + badges + '</div></div>';
       }
 
@@ -4618,7 +4632,9 @@ function renderTradeLog() {
   if (totalPages > 1) {
     const pagBar = document.createElement('div');
     pagBar.className = 'trade-log-pagination';
-    const pendingMsg = state.pendingSignal ? ' · <span style="color:#2E9F5F;">+สัญญาณรอ</span>' : '';
+    const pendingMsg = state.pendingSignal
+      ? (state.pendingSignal.slotFull ? ' · <span style="color:#8B6914;">สัญญาณติดเพดาน</span>' : ' · <span style="color:#2E9F5F;">+สัญญาณรอ</span>')
+      : '';
     let pagHtml = '<div class="tlp-info"><strong>' + records.length + '</strong> ไม้' + pendingMsg + ' · หน้า <strong>' + page + '</strong>/' + totalPages + '</div>';
     pagHtml += `<button class="tlp-btn nav" onclick="gotoTradeLogPage(1)" ${page===1?'disabled':''}>«</button>`;
     pagHtml += `<button class="tlp-btn nav" onclick="gotoTradeLogPage(${page-1})" ${page===1?'disabled':''}>‹</button>`;
