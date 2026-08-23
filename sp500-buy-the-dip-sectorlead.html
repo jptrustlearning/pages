@@ -2218,12 +2218,16 @@
     </div>
 
     <div class="control-group">
-      <label>SECTORS — จำนวนอุตสาหกรรมต่อไม้</label>
-      <div class="top-n-wrapper" style="display:flex; align-items:center; gap:10px;">
-        <input type="number" id="topNInput" class="input-box" value="10" min="1" max="11" style="max-width:120px;">
-        <span style="color:var(--text-muted); font-weight:600;">SECTORS × 1 STOCK</span>
+      <label>PORTFOLIO SIZE — อุตสาหกรรม × หุ้นต่ออุตสาหกรรม</label>
+      <div class="top-n-wrapper" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <input type="number" id="sectorCountInput" class="input-box" value="10" min="1" max="11" style="max-width:82px;" oninput="syncTopNDisplay()">
+        <span style="color:var(--text-muted); font-weight:600;">SECTORS ×</span>
+        <input type="number" id="perSectorInput" class="input-box" value="1" min="1" max="10" style="max-width:82px;" oninput="syncTopNDisplay()">
+        <span style="color:var(--text-muted); font-weight:600;">STOCKS =</span>
+        <input type="number" id="topNInput" class="input-box" value="10" readonly tabindex="-1" style="max-width:82px; opacity:.7; cursor:default;">
+        <span style="color:var(--text-muted); font-weight:600;">TOTAL</span>
       </div>
-      <span class="hint">ไล่อันดับจาก Ranking Weight ด้านบนจากบนลงล่าง แต่หยิบได้<strong>อุตสาหกรรมละ 1 ตัว</strong> (หุ้นเบอร์ 1 ของแต่ละ GICS Sector = "ประธานอุตสาหกรรม") จนครบจำนวนที่ตั้ง · อุตสาหกรรมมาจาก <strong>master_map.csv</strong> (11 Sector · 657 ticker) · ค่าโรงงาน 10 อุตสาหกรรม = 10 ตัว · จังหวะเข้า–ออก ช่องเงิน และจำนวนไม้ <strong>เหมือน Buy the Dip Compound ทุกตัวอักษร</strong> ต่างกันแค่วิธีเลือกหุ้น</span>
+      <span class="hint">ไล่อันดับจาก Ranking Weight ด้านบนจากบนลงล่าง แต่จำกัด<strong>ไม่เกิน (หุ้นต่ออุตสาหกรรม) ตัวในอุตสาหกรรมเดียวกัน</strong> และ<strong>ใช้ได้ไม่เกิน (จำนวนอุตสาหกรรม) อุตสาหกรรมต่อไม้</strong> — กติกาเดียวกับการ์ด ผู้นำอุตสาหกรรมใหญ่ · อุตสาหกรรม = GICS Sector จาก <strong>master_map.csv</strong> (11 Sector · 657 ticker) · ค่าโรงงาน 10 × 1 = 10 ตัว ("ประธานอุตสาหกรรม" — เบอร์ 1 ของแต่ละอุตสาหกรรม) · งบต่อตัว = เงินช่อง ÷ รวม · จังหวะเข้า–ออก ช่องเงิน และจำนวนไม้ <strong>เหมือน Buy the Dip Compound ทุกตัวอักษร</strong> ต่างกันแค่วิธีเลือกหุ้น</span>
     </div>
 
     <!-- 3. Start Year -->
@@ -2274,7 +2278,7 @@
     <div class="about-philosophy">
       <div class="philosophy-label">Trading Philosophy</div>
       <div class="philosophy-text">
-        <strong>เก็บของถูกตอนตลาดใหญ่ยังแข็งแรง</strong> · เราวัด "ความกว้างของการเทขาย" (Breadth) = สัดส่วนหุ้นใน S&amp;P 500 ที่ราคาหลุดต่ำกว่าค่าเฉลี่ย 60 วันแบบรุนแรง (z-score &lt; −2) แล้วเปิดประตูเข้าไว้สองบาน · <strong>ประตู 1 · The Dip Gate</strong>: Breadth ก่อระลอกเล็ก — ไต่ขึ้นแตะ ≥ <strong>2%</strong> โดยพีคของระลอกไม่เกิน <strong>3%</strong> แล้ว<strong>วันแรกที่ Breadth หักหัวลง</strong> = เข้าเลย — คลื่นขายเล็กๆ เพิ่งจบโดยไม่ลุกลาม (ถ้าระลอกลามเกิน 3% ระลอกนั้นถูกทิ้งทั้งระลอก ไม่ยิง — เป็นตัวกรองพายุในตัว) · <strong>ประตู 2 · Recovery Gate</strong>: Breadth พุ่ง ≥ <strong>10%</strong> แล้ววันถัดมาเริ่มหักลง — แรงเทระลอกนั้นผ่านจุดพีคแล้ว · เข้าประตูไหนก็ได้ → หยิบ<strong>เงินก้อนของช่องที่ว่างมานานที่สุด</strong> (FIFO) ไล่อันดับโมเมนตัม 6 เดือนผสม Volume (70/30) จากบนลงล่าง หยิบ<strong>อุตสาหกรรมละ 1 ตัว จนครบ 10 อุตสาหกรรม</strong> (GICS Sector จาก master_map.csv) ซื้อที่ราคาเปิดวันถัดไป ถือตาม<strong>ระยะที่ตั้งไว้ 1–6 เดือนปฏิทิน (ค่าโรงงาน 6 เดือน)</strong> แล้วขายที่ราคาปิดของวันครบกำหนด — เงินที่ขายได้ทั้งก้อนกลับเข้าช่องเดิม รอสัญญาณถัดไป · สัญญาณต้องห่างกันอย่างน้อย <strong>10 วันเทรด</strong> (MIN GAP) · ทุกช่องมีไม้อยู่ = สัญญาณถูกข้าม
+        <strong>เก็บของถูกตอนตลาดใหญ่ยังแข็งแรง</strong> · เราวัด "ความกว้างของการเทขาย" (Breadth) = สัดส่วนหุ้นใน S&amp;P 500 ที่ราคาหลุดต่ำกว่าค่าเฉลี่ย 60 วันแบบรุนแรง (z-score &lt; −2) แล้วเปิดประตูเข้าไว้สองบาน · <strong>ประตู 1 · The Dip Gate</strong>: Breadth ก่อระลอกเล็ก — ไต่ขึ้นแตะ ≥ <strong>2%</strong> โดยพีคของระลอกไม่เกิน <strong>3%</strong> แล้ว<strong>วันแรกที่ Breadth หักหัวลง</strong> = เข้าเลย — คลื่นขายเล็กๆ เพิ่งจบโดยไม่ลุกลาม (ถ้าระลอกลามเกิน 3% ระลอกนั้นถูกทิ้งทั้งระลอก ไม่ยิง — เป็นตัวกรองพายุในตัว) · <strong>ประตู 2 · Recovery Gate</strong>: Breadth พุ่ง ≥ <strong>10%</strong> แล้ววันถัดมาเริ่มหักลง — แรงเทระลอกนั้นผ่านจุดพีคแล้ว · เข้าประตูไหนก็ได้ → หยิบ<strong>เงินก้อนของช่องที่ว่างมานานที่สุด</strong> (FIFO) ไล่อันดับโมเมนตัม 6 เดือนผสม Volume (70/30) จากบนลงล่าง หยิบ<strong>อุตสาหกรรมละไม่เกิน N ตัว จนครบจำนวนอุตสาหกรรมที่ตั้ง</strong> (ค่าโรงงาน 10 อุตสาหกรรม × 1 ตัว · GICS Sector จาก master_map.csv · ปรับได้ในหน้าตั้งค่า เช่น 5 × 2) ซื้อที่ราคาเปิดวันถัดไป ถือตาม<strong>ระยะที่ตั้งไว้ 1–6 เดือนปฏิทิน (ค่าโรงงาน 6 เดือน)</strong> แล้วขายที่ราคาปิดของวันครบกำหนด — เงินที่ขายได้ทั้งก้อนกลับเข้าช่องเดิม รอสัญญาณถัดไป · สัญญาณต้องห่างกันอย่างน้อย <strong>10 วันเทรด</strong> (MIN GAP) · ทุกช่องมีไม้อยู่ = สัญญาณถูกข้าม
       </div>
       <div class="philosophy-signature">Two-Gate Dip Trigger · One Leader per Sector · Compounding FIFO Slots</div>
     </div>
@@ -2293,7 +2297,7 @@
           <span class="pillar-icon">🌾</span>
           <span class="pillar-title">PICKS</span>
         </div>
-        <div class="pillar-subtitle">ประธานอุตสาหกรรม · อุตสาหกรรมละ 1 ตัว</div>
+        <div class="pillar-subtitle">ประธานอุตสาหกรรม · ค่าโรงงาน 10 × 1 (ปรับได้)</div>
         <div class="pillar-desc">จัดอันดับด้วย<strong>ผลตอบแทน 126 วันเทรด (70%) ผสม Volume สะสม (30%)</strong> — สูตรเดียวกับกลยุทธ์หลัก · แต่ไม่เอา Top 10 ตรงๆ: ไล่จากบนลงล่าง <strong>หยิบหุ้นอันดับดีสุดของแต่ละอุตสาหกรรม อุตสาหกรรมละ 1 ตัว</strong> จนครบ 10 (จาก 11 GICS Sector) — พอร์ตกระจายข้ามอุตสาหกรรมโดยโครงสร้าง ไม่กระจุกในกลุ่มที่ร้อนแรงที่สุด · งบเท่ากันทุกตัว · ถือครบกำหนดตามระยะที่ตั้ง (ค่าโรงงาน 6 เดือน) แล้วขายที่ราคาปิด ไม่เดา ไม่ยื้อ</div>
       </div>
     </div>
@@ -2308,8 +2312,9 @@
 // --- CONFIGURATION ---
 let CONFIG = {
   perTradeCapital: 10000,      // ทุนตั้งต้นต่อช่อง — compound: เงินหมุนทบต้นในช่อง ไม่เติมใหม่ (แก้ได้ใน settings)
-  topN: 10,                    // จำนวนอุตสาหกรรมต่อไม้ (sector-capped · หุ้นต่อไม้ = topN × perSector)
-  perSector: 1,                // หุ้นต่ออุตสาหกรรม — ล็อก 1 ("ประธานอุตสาหกรรม") ไม่มีใน UI
+  topN: 10,                    // DERIVED = sectorCount × perSector (หุ้นต่อไม้ · อย่าตั้งมือ)
+  sectorCount: 10,             // จำนวนอุตสาหกรรมต่อไม้ (1–11)
+  perSector: 1,                // หุ้นต่ออุตสาหกรรม (1–10) · ค่าโรงงาน 1 = "ประธานอุตสาหกรรม"
   holdMonths: 6,               // ระยะถือครอง = เดือนปฏิทิน 1–6 (ค่าโรงงาน 6 — B12.5 ตามคำสั่ง Joon) — ขาย close ของวันทำการแรกที่ถึงวันครบกำหนด
   zWindow: 60,                 // หน้าต่าง SMA/STD ของ z-score (breadth)
   zThresh: -2,                 // นับหุ้นเป็น "โดนเทแรง" เมื่อ z < −2
@@ -2348,6 +2353,8 @@ const MACRO_DEFS = [
 const DEFAULT_SNIPER = {
   perTradeCapital: 10000,
   topN: 10,
+  sectorCount: 10,
+  perSector: 1,
   startYear: 2015,
   minGapTd: 10,           // วันเทรด (สเปก B6)
   weightRet: 70,          // % — Return 70 / Volume 30 (สเปก B6)
@@ -2384,6 +2391,10 @@ function getSniperSettings() {
   const y = document.getElementById('startYearSelect');
   return {
     perTradeCapital: c ? parseFloat(c.value) || DEFAULT_SNIPER.perTradeCapital : DEFAULT_SNIPER.perTradeCapital,
+    sectorCount: (() => { const e = document.getElementById('sectorCountInput');
+      const v = e ? parseInt(e.value, 10) : NaN; return (v >= 1 && v <= 11) ? v : DEFAULT_SNIPER.sectorCount; })(),
+    perSector: (() => { const e = document.getElementById('perSectorInput');
+      const v = e ? parseInt(e.value, 10) : NaN; return (v >= 1 && v <= 10) ? v : DEFAULT_SNIPER.perSector; })(),
     topN: n ? parseInt(n.value, 10) || DEFAULT_SNIPER.topN : DEFAULT_SNIPER.topN,
     startYear: y ? parseInt(y.value, 10) || DEFAULT_SNIPER.startYear : DEFAULT_SNIPER.startYear,
     minGapTd: (() => { const g = document.getElementById('minGapSelect');
@@ -2407,7 +2418,11 @@ function applySniperSettings(s) {
   const n = document.getElementById('topNInput');
   const y = document.getElementById('startYearSelect');
   if (c && s.perTradeCapital != null) c.value = s.perTradeCapital;
-  if (n && s.topN != null) n.value = Math.min(11, Math.max(1, parseInt(s.topN, 10) || 10));
+  const sc = document.getElementById('sectorCountInput');
+  if (sc && s.sectorCount != null) sc.value = Math.min(11, Math.max(1, parseInt(s.sectorCount, 10) || 10));
+  const psI = document.getElementById('perSectorInput');
+  if (psI && s.perSector != null) psI.value = Math.min(10, Math.max(1, parseInt(s.perSector, 10) || 1));
+  if (typeof syncTopNDisplay === 'function') syncTopNDisplay();   // topN เป็นค่าอนุพันธ์ ไม่อ่านคืนจาก s.topN
   if (y && s.startYear != null) y.value = s.startYear;
   const g = document.getElementById('minGapSelect');
   if (g && s.minGapTd != null) g.value = s.minGapTd;
@@ -2481,6 +2496,8 @@ const el = {
   
   // Strategy Controls
   inputTopN: document.getElementById('topNInput'),
+  inputSectorCount: document.getElementById('sectorCountInput'),
+  inputPerSector: document.getElementById('perSectorInput'),
   inputInitCap: document.getElementById('initialCapitalInput'),
   inputStartYear: document.getElementById('startYearSelect'),
   inputMinGap: document.getElementById('minGapSelect'),
@@ -2576,6 +2593,16 @@ async function loadDataFromCloud() {
 el.input.addEventListener('change', handleUpload);
 el.sliderMarket.addEventListener('input', updateMarketAnalyzer);
 el.inputTopN.addEventListener('change', runBacktest);
+if (el.inputSectorCount) el.inputSectorCount.addEventListener('change', () => { syncTopNDisplay(); runBacktest(); });
+if (el.inputPerSector)   el.inputPerSector.addEventListener('change',   () => { syncTopNDisplay(); runBacktest(); });
+// รวม = อุตสาหกรรม × ตัว (อ่านอย่างเดียว) — โครงเดียวกับ engine rolling
+function syncTopNDisplay() {
+  const a = document.getElementById('sectorCountInput'), b = document.getElementById('perSectorInput'), o = document.getElementById('topNInput');
+  if (!a || !b || !o) return;
+  const ns = Math.min(11, Math.max(1, parseInt(a.value, 10) || 10));
+  const ps = Math.min(10, Math.max(1, parseInt(b.value, 10) || 1));
+  o.value = ns * ps;
+}
 if (el.sliderWeight) {
   el.sliderWeight.addEventListener('input', updateWeightsUI);          // ลากแล้วตัวเลข/แถบขยับทันที
   el.sliderWeight.addEventListener('change', () => { updateWeightsUI(); runBacktest(); });
@@ -3218,7 +3245,7 @@ function selectSectorCapped(ranked, S, nSectors, perSector) {
   return picks;
 }
 
-function sniperRankLB6(S, t, topN) {
+function sniperRankLB6(S, t, topN) {   // topN ไม่ใช้ตรงๆ — cap มาจาก CONFIG.sectorCount × CONFIG.perSector (= topN)
   const m = S.m, closeA = S.closeA, volA = S.volA, LBn = CONFIG.lb;
   if (t < LBn) return [];
   const wRet = (typeof CONFIG.weightRet === 'number') ? CONFIG.weightRet : 1;
@@ -3233,14 +3260,14 @@ function sniperRankLB6(S, t, topN) {
     }
     cand.push({ j, r: c1 / c0 - 1, v: v });
   }
-  if (wVol <= 0) { cand.sort((a, b) => b.r - a.r); return selectSectorCapped(cand, S, topN, CONFIG.perSector); }
+  if (wVol <= 0) { cand.sort((a, b) => b.r - a.r); return selectSectorCapped(cand, S, CONFIG.sectorCount, CONFIG.perSector); }
   cand.sort((a, b) => b.r - a.r);
   cand.forEach((c, i) => { c.rankRet = i; });
   cand.sort((a, b) => b.v - a.v);
   cand.forEach((c, i) => { c.rankVol = i; });
   cand.forEach(c => { c.score = c.rankRet * wRet + c.rankVol * wVol; });
   cand.sort((a, b) => a.score - b.score);
-  return selectSectorCapped(cand, S, topN, CONFIG.perSector);   // "ประธานอุตสาหกรรม": อุตสาหกรรมละ 1 ตัว
+  return selectSectorCapped(cand, S, CONFIG.sectorCount, CONFIG.perSector);   // sector-capped: อุตสาหกรรม × ตัว (cap = topN)
 }
 
 function sniperRun(holdM, topN, perTrade, startIdx) {
@@ -3458,7 +3485,10 @@ function renderHoldCompare() {
 }
 
 function runSniperBacktest() {
-  CONFIG.topN = parseInt(el.inputTopN.value) || 10;
+  CONFIG.sectorCount = Math.min(11, Math.max(1, parseInt(el.inputSectorCount && el.inputSectorCount.value, 10) || 10));
+  CONFIG.perSector   = Math.min(10, Math.max(1, parseInt(el.inputPerSector && el.inputPerSector.value, 10) || 1));
+  CONFIG.topN = CONFIG.sectorCount * CONFIG.perSector;
+  if (el.inputTopN) el.inputTopN.value = CONFIG.topN;
   CONFIG.perTradeCapital = parseFloat(el.inputInitCap.value) || 10000;
   CONFIG.holdMonths = (() => { const h = document.getElementById('holdMonthsSelect');
     const v = h ? parseInt(h.value, 10) : NaN; return (v >= 1 && v <= 6) ? v : 6; })();
@@ -3951,7 +3981,7 @@ function calculateStats() {
   const rscNarrative = $id('rscNarrative');
   if (rscNarrative) {
     const startYr = $id('startYearSelect') ? $id('startYearSelect').value : CONFIG.startYear;
-    rscNarrative.innerHTML = `ด้วยการตั้งค่า <strong>${CONFIG.topN} อุตสาหกรรม × 1 ตัว = ${CONFIG.topN} หุ้น (Rank Return ${Math.round((CONFIG.weightRet ?? 0.7) * 100)}/${100 - Math.round((CONFIG.weightRet ?? 0.7) * 100)} Volume)</strong> · ถือไม้ละ ${holdLabelTh()} · ตั้งแต่ปี ${startYr} <strong>ยิงตามสัญญาณเมื่อมีช่องว่าง ${totalTrades} ไม้</strong> ทำกำไรรวม <strong class="${totalPnl >= 0 ? 'text-green' : 'text-red'}">${usd(totalPnl)}</strong> (เฉลี่ย ${(avgTrade >= 0 ? '+' : '') + fmt(avgTrade)}/ไม้ · ชนะ ${fmt(winRate, 0)}) · เงินตั้งต้น <strong>$${warChest.toLocaleString()}</strong> (${(CONFIG.maxConcurrent|0)} ช่อง — ไม้ปิดแล้วเงินต้นทุน+กำไรกลับเข้าช่อง รอลงไม้ถัดไปทั้งก้อน)${(CONFIG.defensiveExtend !== false && (state.extendedCount || 0) > 0) ? ' · ยืดตอนหมี ' + state.extendedCount + ' ไม้' : ''}`;
+    rscNarrative.innerHTML = `ด้วยการตั้งค่า <strong>${CONFIG.sectorCount} อุตสาหกรรม × ${CONFIG.perSector} ตัว = ${CONFIG.topN} หุ้น (Rank Return ${Math.round((CONFIG.weightRet ?? 0.7) * 100)}/${100 - Math.round((CONFIG.weightRet ?? 0.7) * 100)} Volume)</strong> · ถือไม้ละ ${holdLabelTh()} · ตั้งแต่ปี ${startYr} <strong>ยิงตามสัญญาณเมื่อมีช่องว่าง ${totalTrades} ไม้</strong> ทำกำไรรวม <strong class="${totalPnl >= 0 ? 'text-green' : 'text-red'}">${usd(totalPnl)}</strong> (เฉลี่ย ${(avgTrade >= 0 ? '+' : '') + fmt(avgTrade)}/ไม้ · ชนะ ${fmt(winRate, 0)}) · เงินตั้งต้น <strong>$${warChest.toLocaleString()}</strong> (${(CONFIG.maxConcurrent|0)} ช่อง — ไม้ปิดแล้วเงินต้นทุน+กำไรกลับเข้าช่อง รอลงไม้ถัดไปทั้งก้อน)${(CONFIG.defensiveExtend !== false && (state.extendedCount || 0) > 0) ? ' · ยืดตอนหมี ' + state.extendedCount + ' ไม้' : ''}`;
   }
 
   // เก็บไว้ให้ส่วนอื่น
@@ -5206,7 +5236,7 @@ window.switchStatsTab = function(tab) {
         config: {
           'โหมด': 'ยิงทุกสัญญาณ (ถือซ้อนกันได้)',
           'ทุนต่อไม้': '$' + (CONFIG.perTradeCapital || 0).toLocaleString(),
-          'จำนวนหุ้นต่อไม้': CONFIG.topN + ' ตัว (' + CONFIG.topN + ' อุตสาหกรรม × 1)',
+          'จำนวนหุ้นต่อไม้': CONFIG.topN + ' ตัว (' + CONFIG.sectorCount + ' อุตสาหกรรม × ' + CONFIG.perSector + ')',
           'ระยะถือครอง': (typeof holdLabelTh === 'function' ? holdLabelTh() : ''),
           'Trigger': 'สองประตู: The Dip Gate (breadth แตะ 2–3% แล้วหักลงครั้งแรก) / Recovery Gate (breadth ≥ 10% แล้วหักลง)',
           'Ranking': 'Rank 70/30 (Return 126 วันเทรด + Volume)',
@@ -5380,8 +5410,9 @@ window.switchStatsTab = function(tab) {
       var _el = (typeof el !== 'undefined') ? el : null;
       if (cfgMap) applyMapToInputs(cfgMap);
       v = q.get('topn'); if (v !== null && _el && _el.inputTopN)       _el.inputTopN.value = v;
-      v = q.get('tc');   if (v !== null && _el && _el.inputThemeCount) _el.inputThemeCount.value = v;
-      v = q.get('pt');   if (v !== null && _el && _el.inputPerTheme)   _el.inputPerTheme.value = v;
+      v = q.get('tc');   if (v !== null && _el && _el.inputSectorCount) _el.inputSectorCount.value = v;
+      v = q.get('pt');   if (v !== null && _el && _el.inputPerSector)   _el.inputPerSector.value = v;
+      if (typeof syncTopNDisplay === 'function') syncTopNDisplay();
       if (!cfgMap){                    /* no explicit config → deterministic zero stops */
         if (_el && _el.inputStopLoss)  _el.inputStopLoss.value  = (q.get('sl') !== null ? q.get('sl') : 0);
         if (_el && _el.inputTrailStop) _el.inputTrailStop.value = (q.get('ts') !== null ? q.get('ts') : 0);
