@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Decision Tree — JP Trust Playbook (draft v0.1)</title>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FAF6ED; --cream-light:#FFFEF8; --cream-card:#F8F2E4; --cream-deep:#EDE4D0;
+  --gold:#D4AF37; --gold-dark:#B8860B; --gold-deep:#8B6914; --gold-pale:#F4E4BA;
+  --maroon:#722F37; --m1:#1a0a0e; --m2:#2d1018; --m3:#3a1520;
+  --t1:#3D3228; --t2:#5A3D20; --t3:#7A6F62; --l1:#E8E4DC; --l2:#F4E4BA; --l3:#A09B92;
+  --ok:#2E7D32; --ok-bg:rgba(76,175,80,.14); --dev:#9A6B12; --dev-bg:rgba(212,175,55,.2);
+  --out:#8A3B2E; --out-bg:rgba(138,59,46,.1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--cream);color:var(--t1);font-family:'Anuphan','Sarabun',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;padding-bottom:60px}
+.wrap{max-width:520px;margin:0 auto;padding:0 16px}
+.eyebrow{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-deep)}
+.num{font-family:'DM Serif Display',serif;font-weight:400;line-height:1}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:8px}
+.draft-note{background:var(--cream-deep);border-bottom:1px solid rgba(212,175,55,.3);padding:10px 16px;font-size:12.5px;color:var(--t3);text-align:center}
+.draft-note b{color:var(--t2)}
+
+.head{padding:22px 0 8px}
+.head h1{margin:6px 0 4px;font-size:26px;font-weight:600;color:var(--t2);line-height:1.25}
+.head h1 span{font-family:'Cinzel',serif;font-size:20px;color:var(--maroon);letter-spacing:.03em}
+.head p{margin:0;font-size:14px;color:var(--t3)}
+
+.vars{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 4px}
+.var{background:linear-gradient(160deg,var(--cream-light),var(--cream-card));border:1px solid rgba(212,175,55,.25);border-radius:14px;padding:9px 10px}
+.var .k{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-deep);display:block}
+.var .v{font-size:12.5px;color:var(--t2);font-weight:500;line-height:1.4;display:block;margin-top:3px}
+.vars-note{font-size:12px;color:var(--t3);margin:0 0 10px}
+
+/* mode switch */
+.mode{display:flex;gap:6px;background:var(--cream-deep);border-radius:50px;padding:4px;margin:10px 0 14px}
+.mode button{flex:1;border:0;background:transparent;font-family:inherit;font-size:13.5px;font-weight:500;color:var(--t3);padding:8px;border-radius:50px;cursor:pointer}
+.mode button[aria-pressed=true]{background:linear-gradient(135deg,var(--maroon),#8B3A44);color:var(--cream-light);box-shadow:0 3px 12px rgba(114,47,55,.25)}
+
+/* trail */
+.trail{position:relative;margin:0 0 12px;padding-left:22px;min-height:4px}
+.trail::before{content:"";position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:linear-gradient(var(--gold),rgba(212,175,55,.25));border-radius:2px}
+.trail:empty::before{display:none}
+.crumb{position:relative;display:flex;align-items:baseline;gap:8px;font-size:13px;color:var(--t3);padding:3px 0}
+.crumb::before{content:"";position:absolute;left:-19px;top:11px;width:8px;height:8px;border-radius:50%;background:var(--cream-light);border:2px solid var(--gold)}
+.crumb b{color:var(--t2);font-weight:500}
+.crumb .q{font-size:11.5px}
+
+/* question card */
+.qcard{background:linear-gradient(160deg,var(--cream-light),var(--cream-card));border:1px solid rgba(212,175,55,.22);border-radius:20px;box-shadow:0 4px 20px rgba(114,47,55,.06);padding:18px 16px 14px;animation:fade .25s ease}
+.qcard .eyebrow{display:block;margin-bottom:4px}
+.qcard h2{margin:0 0 4px;font-size:20px;font-weight:700;color:var(--t2);line-height:1.35}
+.qcard .hint{font-size:13px;color:var(--t3);margin:0 0 12px}
+.opts{display:grid;gap:8px}
+.opt{display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;width:100%;border:1.5px solid rgba(212,175,55,.35);background:var(--cream-light);border-radius:14px;padding:12px 14px;font-family:inherit;font-size:15px;font-weight:500;color:var(--t2);cursor:pointer;transition:border-color .15s,background .15s,transform .1s}
+.opt:hover{border-color:var(--gold);background:#fff}
+.opt:active{transform:scale(.99)}
+.opt small{display:block;font-size:12px;color:var(--t3);font-weight:400;line-height:1.4}
+.opt .arr{flex:0 0 22px;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--gold);display:grid;place-items:center;color:var(--gold-deep)}
+.opt .arr svg{width:11px;height:11px}
+
+/* leaf card */
+.leaf{background:linear-gradient(135deg,var(--m1),var(--m3));border:1px solid rgba(212,175,55,.2);border-radius:20px;padding:18px 16px 16px;color:var(--l1);animation:fade .25s ease;position:relative;overflow:hidden}
+.leaf::after{content:"";position:absolute;inset:0;background:radial-gradient(110% 70% at 100% 0%,rgba(212,175,55,.12),transparent 55%);pointer-events:none}
+.leaf>*{position:relative}
+.leaf .eyebrow{color:var(--gold);display:block;margin-bottom:4px}
+.leaf h2{margin:0 0 6px;font-size:22px;font-weight:700;color:var(--l2);line-height:1.3}
+.leaf .why{font-size:14px;color:var(--l1);margin:0 0 10px}
+.leaf .dont{border-top:1px dashed rgba(212,175,55,.3);padding-top:10px;font-size:13.5px;color:var(--l3)}
+.leaf .dont b{color:var(--gold-pale);font-weight:600}
+.leaf .meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.leaf.out{background:linear-gradient(160deg,var(--cream-light),#F3E9DA);border-color:rgba(138,59,46,.25);color:var(--t1)}
+.leaf.out h2{color:var(--out)}
+.leaf.out .why{color:var(--t1)}
+.leaf.out .dont{border-top-color:rgba(138,59,46,.25);color:var(--t3)}
+.leaf.out .dont b{color:var(--out)}
+.leaf.out .eyebrow{color:var(--out)}
+.leaf.out::after{display:none}
+
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500;border-radius:50px;padding:2px 9px;line-height:1.5;white-space:nowrap}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.85}
+.b-ok{color:#7CCB80;background:rgba(76,175,80,.16)}
+.b-dev{color:var(--gold-pale);background:rgba(212,175,55,.2)}
+.b-rule{color:var(--gold-pale);background:rgba(212,175,55,.14);border:1px solid rgba(212,175,55,.35)}
+.b-rule::before{display:none}
+.leaf.out .b-ok{color:var(--ok);background:var(--ok-bg)}
+.leaf.out .b-dev{color:var(--dev);background:var(--dev-bg)}
+.leaf.out .b-rule{color:var(--out);background:var(--out-bg);border-color:rgba(138,59,46,.3)}
+
+.nav{display:flex;gap:8px;margin-top:12px}
+.btn{font-family:inherit;font-size:14px;font-weight:600;border:0;cursor:pointer;border-radius:50px;padding:10px 18px;flex:1;background:linear-gradient(135deg,var(--maroon),#8B3A44);color:var(--cream-light);box-shadow:0 4px 16px rgba(114,47,55,.25)}
+.btn.ghost{background:transparent;color:var(--maroon);border:1.5px solid rgba(114,47,55,.4);box-shadow:none}
+.btn:disabled{opacity:.4;cursor:default;box-shadow:none}
+
+/* outline (review) view */
+.outline{display:none}
+.outline.active{display:block}
+.node{background:linear-gradient(160deg,var(--cream-light),var(--cream-card));border:1px solid rgba(212,175,55,.2);border-radius:16px;padding:12px 14px;margin-bottom:10px}
+.node .q{font-size:15px;font-weight:700;color:var(--t2);margin:0 0 6px}
+.node .q .id{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;color:var(--gold-deep);margin-right:6px}
+.node ul{list-style:none;margin:0;padding:0}
+.node li{display:grid;grid-template-columns:1fr auto;gap:8px;font-size:13.5px;padding:5px 0;border-top:1px dashed rgba(212,175,55,.3)}
+.node li:first-child{border-top:0}
+.node li .to{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.08em;color:var(--maroon);white-space:nowrap;padding-top:4px}
+.lf{border-left:3px solid var(--gold);background:linear-gradient(90deg,rgba(26,10,14,.04),transparent);border-radius:0 14px 14px 0;padding:10px 12px;margin-bottom:8px}
+.lf .t{font-size:14.5px;font-weight:700;color:var(--t2);margin:0}
+.lf .t .id{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;color:var(--gold-deep);margin-right:6px}
+.lf .w{font-size:13px;color:var(--t1);margin:2px 0 0}
+.lf .d{font-size:12.5px;color:var(--t3);margin:2px 0 0}
+.lf .meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.lf .meta .badge{font-size:10.5px}
+.lf .meta .b-ok{color:var(--ok);background:var(--ok-bg)}
+.lf .meta .b-dev{color:var(--dev);background:var(--dev-bg)}
+.lf .meta .b-rule{color:var(--t2);background:rgba(212,175,55,.14);border:1px solid rgba(212,175,55,.35)}
+.lf.out{border-left-color:var(--out)}
+.stat{display:flex;gap:14px;margin:6px 0 12px;font-size:13px;color:var(--t3)}
+.stat b{font-family:'DM Serif Display',serif;font-size:20px;color:var(--t2);font-weight:400;margin-right:4px}
+.sec{margin:18px 0 8px}
+
+.drill{margin-top:18px;background:linear-gradient(160deg,var(--cream-light),var(--cream-card));border:1px dashed rgba(212,175,55,.5);border-radius:20px;padding:14px 16px}
+.drill h3{margin:0 0 4px;font-size:16px;font-weight:700;color:var(--t2);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.drill p{margin:0;font-size:13.5px;color:var(--t3)}
+.drill .b-dev{color:var(--dev);background:var(--dev-bg)}
+
+.foot{margin:22px 0 0;font-size:11.5px;color:var(--t3);text-align:center;line-height:1.6}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.qcard,.leaf{animation:none}}
+</style>
+</head>
+<body>
+<div class="draft-note"><b>Draft v0.1</b> · Decision Tree · ยังไม่เชื่อมแอป · ไฟสถานะ (Regime / Sniper) ให้สมาชิกตอบเองไปก่อน</div>
+
+<div class="wrap">
+  <header class="head">
+    <span class="eyebrow">JP Trust · Playbook</span>
+    <h1><span>Decision Tree</span> เกิดอะไรขึ้น ให้ทำอะไร</h1>
+    <p>ตอบไม่เกิน 3 คำถาม แล้วจะถึงกฎที่ตรงกับสถานการณ์ — กฎอยู่ที่เดิม ต้นไม้นี้แค่พาไปให้ถูกข้อ</p>
+  </header>
+
+  <div class="vars" aria-label="ตัวแปรส่วนตัวที่เปลี่ยนคำตอบได้">
+    <div class="var"><span class="k">ตัวแปร 1</span><span class="v">เงินนี้ต้องใช้ใน 12 เดือนไหม</span></div>
+    <div class="var"><span class="k">ตัวแปร 2</span><span class="v">กู้ / margin มาไหม</span></div>
+    <div class="var"><span class="k">ตัวแปร 3</span><span class="v">% ของ "เงินในระบบ" ไม่ใช่ทั้งชีวิต</span></div>
+  </div>
+  <p class="vars-note">สมาชิกแต่ละคนถือสินทรัพย์อื่นต่างกันมาก แต่มีแค่ 3 ตัวแปรนี้ที่เปลี่ยนคำตอบของเราได้ ต้นไม้จึงแตกกิ่งตาม "สถานการณ์" ไม่ใช่ตามพอร์ตของแต่ละคน</p>
+
+  <div class="mode" role="group" aria-label="โหมดแสดงผล">
+    <button id="mWalk" aria-pressed="true">เดินตามต้นไม้</button>
+    <button id="mOutline" aria-pressed="false">ดูทั้งต้น (รีวิว)</button>
+  </div>
+
+  <!-- walk mode -->
+  <section id="walk">
+    <div class="trail" id="trail" aria-label="เส้นทางที่เลือก"></div>
+    <div id="stage"></div>
+    <div class="nav">
+      <button class="btn ghost" id="back" disabled>ย้อนกลับ</button>
+      <button class="btn ghost" id="restart">เริ่มใหม่</button>
+    </div>
+
+    <div class="drill">
+      <h3>ซ้อมวิกฤต <span class="badge b-dev">กำลังพัฒนา</span></h3>
+      <p>จำลอง "ประวัติศาสตร์" ไม่ใช่พอร์ตของคุณ: ถ้าเข้าระบบเดือนก่อน COVID 2020 / ก่อนปี 2022 / ก่อนปี 2008 จะเจออะไรทีละเดือน ให้คุณเลือกเองว่าถือ-ขาย-เติม แล้วดูว่าทางเลือกนั้นจบยังไงตาม backtest จริง — ฝึก reflex ให้ตรงกับต้นไม้นี้ก่อนวิกฤตจริงมาถึง</p>
+    </div>
+  </section>
+
+  <!-- outline mode -->
+  <section class="outline" id="outline" aria-label="ต้นไม้ทั้งต้น">
+    <div class="stat"><span><b id="nQ">0</b>คำถาม</span><span><b id="nL">0</b>ใบ</span><span><b id="nD">0</b>ชั้นลึกสุด</span></div>
+    <div id="outlineBody"></div>
+  </section>
+
+  <p class="foot">เพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน · ครอบคลุมเฉพาะเงินที่อยู่ในระบบ JP Trust<br>Draft v0.1 · สิงหาคม 2026</p>
+</div>
+
+<script>
+(function(){
+  // ───────── TREE DATA ─────────
+  // q = question node, l = leaf. rule = playbook section reference.
+  var T = {
+    root:{q:'เกิดอะไรขึ้น?', hint:'เลือกสิ่งที่ใกล้เคียงที่สุด', opts:[
+      {t:'มีเงินใหม่', s:'โบนัส เงินเดือน เงินจากที่อื่น', to:'m1'},
+      {t:'พอร์ตในระบบลง', s:'กลยุทธ์ใดกลยุทธ์หนึ่งลงจากจุดสูงสุด', to:'d1'},
+      {t:'ตลาดช็อก / ข่าวใหญ่', s:'สงคราม ดอกเบี้ย เงินเฟ้อ ตลาดดิ่ง', to:'s1'},
+      {t:'ถึงวัน lot ครบกำหนด', s:'Rebalance / lot ครบ 6 เดือน / สัญญาณศุกร์', to:'L11'},
+      {t:'อยากขาย / ถอนเงิน', s:'ด้วยเหตุผลอะไรก็ตาม', to:'w1'},
+      {t:'สินทรัพย์อื่นของฉันลง', s:'หุ้นไทย ทอง คริปโต กองทุน', to:'L18'}
+    ]},
+
+    // ── 1 เงินใหม่ ──
+    m1:{q:'เงินก้อนนี้ต้องใช้ภายใน 12 เดือนไหม', hint:'ตัวแปร 1 — ค่าเทอม ดาวน์บ้าน ค่ารักษา', opts:[
+      {t:'ใช่ ต้องใช้', to:'L1'},{t:'ไม่ เป็นเงินเย็น', to:'m2'}]},
+    m2:{q:'เงินนี้กู้หรือ margin มาไหม', hint:'ตัวแปร 2', opts:[
+      {t:'ใช่', to:'L2'},{t:'ไม่ เงินตัวเอง', to:'m3'}]},
+    m3:{q:'ไฟ Regime ตอนนี้เป็นอะไร', hint:'ดูในแอป (ร่างนี้ให้ตอบเอง) — Defensive = SPY หลุด top 2 ของ SPY / USDJPY / WTI / GOLD', opts:[
+      {t:'Defensive', to:'L3'},{t:'ปกติ', to:'L4'}]},
+    L1:{l:'ไม่เอาเงินก้อนนี้เข้าระบบ', why:'ทุกกลยุทธ์ถืออย่างน้อยรอบละ 6 เดือน และ DD 10–15% เป็นเรื่องปกติ เงินที่ต้องใช้ห้ามอยู่ในที่ที่อาจลง 15% ในวันที่ต้องใช้', dont:'ไม่ "เข้าแป๊บเดียวเดี๋ยวออก" — นั่นคือการเทรด ไม่ใช่ระบบนี้', rule:'§2 เงินใหม่', st:'ok'},
+    L2:{l:'ยังไม่เข้า — จนกว่าจะเป็นเงินตัวเอง', why:'Momentum มี DD เป็นเรื่องปกติ ถ้ามีดอกเบี้ยหรือ margin call ซ้อนอยู่ จะถูกบังคับขายตรงจุดต่ำสุดพอดี ซึ่งคือสิ่งเดียวที่ทำให้ระบบนี้แพ้', dont:'ไม่มีข้อยกเว้น แม้ตลาดจะดูดีแค่ไหน', rule:'§2 เงินใหม่ · หลักไม่ใช้ leverage', st:'ok'},
+    L3:{l:'พักเดือนนี้ ไม่เปิด lot Momentum ใหม่', why:'ช่วง Defensive เราไม่เปิด lot ใหม่ เงินเดือนนี้ถือเป็นเงินสดรอเดือนหน้า ไม่ไล่ใส่ที่อื่น', dont:'ไม่เอาไปซื้อทอง น้ำมัน หรือ "หลบ" ที่ไหน — ทดสอบแล้วแพ้การรอเฉยๆ', rule:'§2 เงินใหม่ · Regime', st:'ok'},
+    L4:{l:'เปิด lot ตามปฏิทิน — ทีละ lot', why:'ค่าเริ่มต้นคือ Rolling 6M เพราะเกลี่ยเป็น 6 lot อยู่แล้ว การเกลี่ยคือการป้องกันเดียวที่ไม่ต้องทำนายว่าตลาดแพงหรือถูก', dont:'ไม่ใส่ก้อนเดียว แม้จะ "รอมานาน" แล้วก็ตาม', rule:'§2 เงินใหม่ · §5 ปฏิทิน', st:'ok'},
+
+    // ── 2 พอร์ตในระบบลง ──
+    d1:{q:'กลยุทธ์นั้นลงจากจุดสูงสุดกี่ %', hint:'ตัวแปร 3 — วัดเฉพาะกลยุทธ์นั้น ไม่ใช่ทั้งชีวิต (แอปจะคำนวณให้ในอนาคต)', opts:[
+      {t:'ไม่ถึง 10%', to:'L5'},{t:'10 – 20%', to:'d2'},{t:'เกิน 20%', to:'L7'}]},
+    d2:{q:'ที่ลงมาจากอะไร', hint:'ดูจากหุ้นในพอร์ตของกลยุทธ์นั้น', opts:[
+      {t:'ตลาดลงทั้งกระดาน', s:'หุ้นส่วนใหญ่ลงพร้อมกัน', to:'L6a'},
+      {t:'หุ้น 1–2 ตัวที่เคยขึ้นแรงมาก กลับตัว', s:'ตัวที่ขึ้นมาเกิน ~150% แล้วร่วง', to:'L6b'},
+      {t:'ไม่แน่ใจ', to:'L6c'}]},
+    L5:{l:'ไม่ทำอะไร', why:'ต่ำกว่า 10% อยู่ในช่วงปกติของทุกกลยุทธ์ใน backtest ถ้ารู้สึกอยากทำอะไร ให้เปิดดู Max DD ที่กลยุทธ์นั้นเคยเจอแล้วผ่านมาได้', dont:'ไม่เปิดแอปถี่ขึ้น — นั่นคือสัญญาณว่ากำลังจะทำอะไรนอกกฎ', rule:'§3 บันได · ขั้น -10', st:'ok'},
+    L6a:{l:'ถือต่อ — กฎทำงานตามคาด', why:'ตลาดลงทั้งกระดานคือสิ่งที่ backtest เคยเจอหลายรอบ ระบบแก้จังหวะตัวเองตอน rebalance รอบถัดไป เราทดสอบการหนีกลางทางแล้ว แพ้ทุกแบบ', dont:'ไม่ขาย ไม่โยกไปทอง ไม่ถือเงินสดรอ', rule:'§3 บันได · ขั้น -15', st:'ok'},
+    L6b:{l:'ถือต่อ — แต่จดเข้ารอบทบทวน', why:'DD จาก extreme winner กลับตัวคือจุดอ่อนที่เรารู้ของ Momentum และกำลังทดสอบวิธีตัดผู้สมัครที่ขึ้นเกิน 150% ออก — จดกรณีนี้ไว้ ให้รอบทบทวนไตรมาสตัดสิน', dont:'ไม่แก้กฎกลางทาง ไม่ขายเฉพาะตัวนั้นทิ้ง', rule:'§3 บันได · §6 ทบทวน', st:'ok'},
+    L6c:{l:'ถือต่อ — แล้วเปิด Weekly Brief ดูว่าลงจากอะไร', why:'ค่าตั้งต้นเมื่อไม่แน่ใจคือ "ไม่ทำอะไร" Weekly Brief จะแยกให้ว่า DD มาจากกลยุทธ์ไหน lot ไหน theme ไหน', dont:'ไม่เดาเอง ไม่ถามในกลุ่มแล้วทำตามคนที่เสียงดังสุด', rule:'§3 บันได · §7 Weekly Brief', st:'dev'},
+    L7:{l:'ยังไม่ขายนอกกฎ — แต่หยุดเติม', why:'เกิน 20% คือระดับที่เคยเกิดเฉพาะวิกฤตใหญ่ กฎคือไม่เปิด lot ใหม่ทุกกลยุทธ์ ยกเว้น Sniper จนกว่า Breadth Gate จะเปิด lot ที่ถืออยู่ปล่อยให้ครบกำหนดตามปกติ', dont:'ไม่ "ตัดขาดทุน" ทั้งพอร์ต — backtest ทุกวิกฤตฟื้นหลังจุดนี้ คนที่เจ็บถาวรคือคนที่ขายตรงนี้', rule:'§3 บันได · ขั้น -20', st:'ok'},
+
+    // ── 3 ช็อก ──
+    s1:{q:'ไฟ Sniper ติดไหม', hint:'ช็อก = เงื่อนไข trigger ของ Washout Sniper ติด ไม่ใช้ความรู้สึก (ร่างนี้ให้ตอบเอง)', opts:[
+      {t:'ติด', to:'L8'},{t:'ไม่ติด', to:'s2'}]},
+    s2:{q:'ข่าวนี้เกี่ยวกับอะไร', opts:[
+      {t:'ดอกเบี้ย / เงินเฟ้อ / น้ำมัน', s:'Fed, CPI, OPEC, สงครามที่กระทบพลังงาน', to:'L9'},
+      {t:'บริษัทตัวใดตัวหนึ่ง', s:'งบพลาด CEO ลาออก ถูกฟ้อง', to:'L10'},
+      {t:'การเมือง / อื่นๆ', to:'L9'}]},
+    L8:{l:'Sniper เข้าตามกฎ — ที่เหลือไม่แตะ', why:'Sniper ใช้เงินจากกระเป๋าที่กันไว้เท่านั้น ถือตามระยะที่กลยุทธ์กำหนด lot Momentum ที่ถืออยู่ไม่เพิ่มไม่ลดไม่ย้าย ภายใน 24 ชม. จะมีข้อความเดียวจากทีมบอกว่ากฎข้อไหนกำลังทำงาน', dont:'ไม่เติมเงินนอกกระเป๋า Sniper เพราะ "โอกาสครั้งใหญ่" — ไม่มีคำนี้ในระบบ', rule:'§4 ช็อก · Sniper', st:'ok'},
+    L9:{l:'ไม่ทำอะไร — รอทีมจัดประเภทภายใน 24 ชม.', why:'ข่าวประเภทนี้อาจเปลี่ยน Regime ได้ แต่ตัวที่ตัดสินคือไฟ Regime ไม่ใช่พาดหัว ทีมข่าวจะจัดว่าเป็น (ก) เปลี่ยนกฎเกม หรือ (ข) เสียงรบกวน แล้วแจ้ง', dont:'ไม่ขายก่อนรู้ผลการจัดประเภท', rule:'§4 ช็อก · Macro Framework', st:'ok'},
+    L10:{l:'เสียงรบกวน — ระบบจัดการเองตอน rebalance', why:'หุ้นตัวเดียวไม่เปลี่ยนกฎ ถ้ามันหมดแรงจริง อันดับจะร่วงและถูกคัดออกในรอบถัดไป ถ้าเป็นเรื่องชั่วคราว มันจะยังอยู่', dont:'ไม่ขายเฉพาะตัวนั้นเพราะข่าว — นั่นคือการ "แต่งงานกับหุ้น" กลับด้าน', rule:'§4 ช็อก · กฎ rebalance', st:'ok'},
+
+    // ── 4 ครบกำหนด ──
+    L11:{l:'ทำตามปฏิทินกลยุทธ์ — ไม่มีทางแยก', why:'6M: ขายทั้งพอร์ต จัดอันดับใหม่ ซื้อใหม่ · Rolling: ขาย lot ที่ครบ เปิด lot ใหม่ · Weekly: ทำตามสัญญาณศุกร์ — ถ้าเดือนนั้น Defensive: ขาย lot ที่ครบได้ตามปกติ แต่ไม่เปิด lot ใหม่', dont:'ไม่ "ถือต่ออีกหน่อย" ตัวที่กำลังดี และไม่ "รอให้ฟื้นก่อน" ตัวที่ลง', rule:'§5 ปฏิทิน · กฎแต่ละกลยุทธ์', st:'ok'},
+
+    // ── 5 อยากขาย ──
+    w1:{q:'เพราะอะไร', hint:'ตอบตรงๆ กับตัวเอง แต่ละเหตุผลไปคนละทาง', opts:[
+      {t:'ต้องใช้เงิน', to:'w2'},
+      {t:'กลัว / ไม่สบายใจ', to:'L15'},
+      {t:'คิดว่ากฎไม่ทำงานแล้ว', to:'L16'},
+      {t:'ได้กำไรแล้ว อยากล็อก', to:'L17'}]},
+    w2:{q:'ต้องใช้เมื่อไหร่', opts:[
+      {t:'ภายใน 1 เดือน', to:'L14a'},{t:'มากกว่า 1 เดือน', to:'L14b'}]},
+    L14a:{l:'ขาย lot ที่ใกล้ครบกำหนดที่สุดก่อน', why:'ถ้าจำเป็นจริง ให้ขายเป็น lot ไม่ใช่ขายกระจายทุกกลยุทธ์ และถือว่านี่คือสัญญาณว่าเงินก้อนนี้ไม่ควรอยู่ในระบบตั้งแต่แรก (ย้อนดูกิ่ง "เงินใหม่")', dont:'ไม่ขายตัวที่กำไรมากสุดเพื่อ "เก็บตัวที่ขาดทุนไว้รอฟื้น"', rule:'§2 เงินใหม่ (ย้อนกลับ) · §5 ปฏิทิน', st:'ok'},
+    L14b:{l:'รอ lot ครบกำหนดตามปฏิทิน แล้วถอนจากเงินสดที่ได้', why:'ภายในไม่กี่สัปดาห์จะมี lot ครบกำหนดเสมอ (Rolling ทุกเดือน / Weekly ทุกสัปดาห์) ถอนจากตรงนั้นโดยไม่ต้องขายนอกกฎ', dont:'ไม่ขายก่อนกำหนดเพื่อ "เผื่อไว้"', rule:'§5 ปฏิทิน', st:'ok'},
+    L15:{l:'ยังไม่ขาย — ไปซ้อมวิกฤตก่อน', why:'ความกลัวคือสัญญาณที่ดีที่สุดว่ากำลังจะทำสิ่งที่ backtest บอกว่าแพ้ เปิดบันได Drawdown ดูว่ากลยุทธ์นี้เคยลงลึกกว่านี้แล้วผ่านมาได้อย่างไร แล้วลองซ้อมวิกฤตด้วยข้อมูลจริง', dont:'ไม่ตัดสินใจในวันเดียวกับที่รู้สึกกลัว', rule:'§3 บันได · ซ้อมวิกฤต', st:'dev'},
+    L16:{l:'จดเข้ารอบทบทวน — ไม่แก้เดี๋ยวนี้', why:'กฎแก้ได้เฉพาะในรอบทบทวนไตรมาส หรือวาระพิเศษที่ §4 เปิด เพื่อไม่ให้ "ความรู้สึกว่ากฎพัง" ตอนตลาดแย่ กลายเป็นการเปลี่ยนกฎตอนจุดต่ำสุด', dont:'ไม่ออกจากระบบเงียบๆ โดยไม่บอกเหตุผล — ถ้ากฎพังจริง เราอยากรู้', rule:'§6 ทบทวน', st:'ok'},
+    L17:{l:'ระบบล็อกให้ตอน rebalance — ไม่ต้องล็อกเอง', why:'Momentum ทำกำไรจากตัวชนะที่วิ่งต่อ การขายก่อนกำหนดคือการตัดตัววิ่งทิ้ง backtest แสดงว่าตัวบวกวิ่งได้ไม่มีเพดาน ตัวลบลบได้แค่เท่าทุน', dont:'ไม่ "ขายครึ่งเก็บครึ่ง" — นั่นคือกฎใหม่ที่ไม่เคยทดสอบ', rule:'กฎ rebalance · หลัก Momentum', st:'ok'},
+
+    // ── 6 นอกขอบเขต ──
+    L18:{l:'นอกขอบเขต — เราไม่ให้คำแนะนำสินทรัพย์อื่น', why:'Playbook นี้ครอบคลุมเฉพาะเงินที่อยู่ในระบบ JP Trust เพราะนั่นคือส่วนเดียวที่เรามีผลทดสอบรองรับ สิ่งที่พูดได้คือหลักทั่วไปซึ่งไม่ใช่คำแนะนำ: ไม่ใช้ leverage ไม่ขายด้วยความกลัว ไม่ตัดสินใจวันเดียวกับที่ตกใจ', dont:'เราไม่ตอบว่า "ควรขายหุ้นไทย/ทอง/คริปโตไหม" — ถามใครก็ได้ที่มีหลักฐาน แต่ไม่ใช่เรา', rule:'ขอบเขต Playbook', st:'ok', out:true}
+  };
+
+  var $=function(s){return document.querySelector(s)};
+  var path=[]; // [{node, optIndex}]
+  var cur='root';
+
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+
+  function renderTrail(){
+    var h='';
+    path.forEach(function(p){ var n=T[p.node], o=n.opts[p.opt]; h+='<div class="crumb"><span class="q">'+esc(n.q)+'</span><b>'+esc(o.t)+'</b></div>'; });
+    $('#trail').innerHTML=h;
+  }
+  function render(){
+    var n=T[cur], s=$('#stage');
+    if(n.q){
+      var h='<div class="qcard"><span class="eyebrow">คำถาม '+(path.length+1)+'</span><h2>'+esc(n.q)+'</h2>'+(n.hint?'<p class="hint">'+esc(n.hint)+'</p>':'')+'<div class="opts">';
+      n.opts.forEach(function(o,i){ h+='<button class="opt" data-i="'+i+'"><span>'+esc(o.t)+(o.s?'<small>'+esc(o.s)+'</small>':'')+'</span><span class="arr" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 2l4 4-4 4"/></svg></span></button>'; });
+      h+='</div></div>'; s.innerHTML=h;
+      Array.prototype.forEach.call(s.querySelectorAll('.opt'),function(b){ b.addEventListener('click',function(){ choose(parseInt(b.getAttribute('data-i'),10)); }); });
+    }else{
+      s.innerHTML='<div class="leaf'+(n.out?' out':'')+'"><span class="eyebrow">'+(n.out?'นอกขอบเขต':'ให้ทำอย่างนี้')+'</span><h2>'+esc(n.l)+'</h2><p class="why">'+esc(n.why)+'</p><p class="dont"><b>สิ่งที่ไม่ทำ:</b> '+esc(n.dont)+'</p><div class="meta"><span class="badge b-rule">'+esc(n.rule)+'</span><span class="badge '+(n.st==='ok'?'b-ok':'b-dev')+'">'+(n.st==='ok'?'Active':'กำลังพัฒนา')+'</span></div></div>';
+    }
+    $('#back').disabled = path.length===0;
+    renderTrail();
+  }
+  function choose(i){ path.push({node:cur,opt:i}); cur=T[cur].opts[i].to; render(); window.scrollTo({top:$('#trail').offsetTop-70,behavior:'smooth'}); }
+  $('#back').addEventListener('click',function(){ var p=path.pop(); if(p){cur=p.node; render();} });
+  $('#restart').addEventListener('click',function(){ path=[]; cur='root'; render(); });
+
+  // ── outline ──
+  function buildOutline(){
+    var qs=0,ls=0,maxd=0,h='';
+    var order=['root','m1','m2','m3','d1','d2','s1','s2','w1','w2'];
+    var groups=[['1 · มีเงินใหม่',['m1','m2','m3','L1','L2','L3','L4']],['2 · พอร์ตในระบบลง',['d1','d2','L5','L6a','L6b','L6c','L7']],['3 · ตลาดช็อก / ข่าวใหญ่',['s1','s2','L8','L9','L10']],['4 · ถึงวัน lot ครบกำหนด',['L11']],['5 · อยากขาย / ถอนเงิน',['w1','w2','L14a','L14b','L15','L16','L17']],['6 · สินทรัพย์อื่น',['L18']]];
+    function depth(id,d){ var n=T[id]; if(!n.q) return d; var m=d; n.opts.forEach(function(o){ m=Math.max(m,depth(o.to,d+1)); }); return m; }
+    maxd=depth('root',0);
+    h+='<div class="node"><p class="q"><span class="id">ROOT</span>'+esc(T.root.q)+'</p><ul>'; T.root.opts.forEach(function(o){h+='<li><span>'+esc(o.t)+(o.s?' <span style="color:var(--t3);font-size:12px">— '+esc(o.s)+'</span>':'')+'</span><span class="to">→ '+o.to+'</span></li>'}); h+='</ul></div>'; qs++;
+    groups.forEach(function(g){
+      h+='<div class="sec eyebrow">'+esc(g[0])+'</div>';
+      g[1].forEach(function(id){ var n=T[id];
+        if(n.q){ qs++; h+='<div class="node"><p class="q"><span class="id">'+id+'</span>'+esc(n.q)+'</p>'+(n.hint?'<p style="margin:0 0 6px;font-size:12px;color:var(--t3)">'+esc(n.hint)+'</p>':'')+'<ul>'; n.opts.forEach(function(o){h+='<li><span>'+esc(o.t)+'</span><span class="to">→ '+o.to+'</span></li>'}); h+='</ul></div>'; }
+        else { ls++; h+='<div class="lf'+(n.out?' out':'')+'"><p class="t"><span class="id">'+id+'</span>'+esc(n.l)+'</p><p class="w">'+esc(n.why)+'</p><p class="d"><b>ไม่ทำ:</b> '+esc(n.dont)+'</p><div class="meta"><span class="badge b-rule">'+esc(n.rule)+'</span><span class="badge '+(n.st==='ok'?'b-ok':'b-dev')+'">'+(n.st==='ok'?'Active':'กำลังพัฒนา')+'</span></div></div>'; }
+      });
+    });
+    $('#outlineBody').innerHTML=h; $('#nQ').textContent=qs; $('#nL').textContent=ls; $('#nD').textContent=maxd;
+  }
+  function mode(m){
+    var walk=m==='walk';
+    $('#mWalk').setAttribute('aria-pressed',walk?'true':'false'); $('#mOutline').setAttribute('aria-pressed',walk?'false':'true');
+    $('#walk').style.display=walk?'':'none'; $('#outline').classList.toggle('active',!walk);
+  }
+  $('#mWalk').addEventListener('click',function(){mode('walk')});
+  $('#mOutline').addEventListener('click',function(){mode('outline')});
+
+  buildOutline(); render();
+})();
+</script>
+</body>
+</html>

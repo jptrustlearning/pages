@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Playbook — JP Trust Learning (draft v0.1)</title>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+/* ───────── tokens ───────── */
+:root{
+  --cream:#FAF6ED; --cream-light:#FFFEF8; --cream-card:#F8F2E4; --cream-deep:#EDE4D0;
+  --gold:#D4AF37; --gold-dark:#B8860B; --gold-deep:#8B6914; --gold-pale:#F4E4BA;
+  --maroon:#722F37; --m1:#1a0a0e; --m2:#2d1018; --m3:#3a1520;
+  --t1:#3D3228; --t2:#5A3D20; --t3:#7A6F62;
+  --l1:#E8E4DC; --l2:#F4E4BA; --l3:#A09B92;
+  --ok:#2E7D32; --ok-bg:rgba(76,175,80,.14);
+  --dev:#9A6B12; --dev-bg:rgba(212,175,55,.2);
+  --cfg:#722F37; --cfg-bg:rgba(114,47,55,.09);
+  --radius:20px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--cream);color:var(--t1);font-family:'Anuphan','Sarabun',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;padding-bottom:90px}
+.wrap{max-width:520px;margin:0 auto;padding:0 16px}
+.eyebrow{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-deep)}
+.num{font-family:'DM Serif Display',serif;font-weight:400;line-height:1}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:6px}
+
+/* ───────── draft banner ───────── */
+.draft-note{background:var(--cream-deep);border-bottom:1px solid rgba(212,175,55,.3);padding:10px 16px;font-size:12.5px;color:var(--t3);text-align:center}
+.draft-note b{color:var(--t2)}
+
+/* ───────── Lab context mock ───────── */
+.lab-ctx{padding:18px 0 6px}
+.lab-ctx .eyebrow{display:block;margin-bottom:8px}
+.lab-ctx p{margin:0 0 12px;font-size:13px;color:var(--t3)}
+
+/* wide banner — mirrors "เปรียบเทียบกลยุทธ์" */
+.banner{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0;cursor:pointer;
+  background:linear-gradient(135deg,var(--m1) 0%,var(--m3) 100%);border-radius:22px;padding:18px 16px;color:var(--l1);
+  box-shadow:0 10px 30px rgba(58,21,32,.25);position:relative;overflow:hidden;font-family:inherit}
+.banner::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 100% 0%,rgba(212,175,55,.12),transparent 55%);pointer-events:none}
+.banner .ring{flex:0 0 58px;width:58px;height:58px;border-radius:50%;border:2px solid var(--gold);display:grid;place-items:center;background:rgba(212,175,55,.08);color:var(--gold)}
+.banner .ring svg{width:26px;height:26px}
+.banner .bt{flex:1;min-width:0}
+.banner .bt h3{margin:0;font-size:20px;font-weight:700;color:var(--l2);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.banner .bt p{margin:2px 0 0;font-size:13.5px;color:var(--l3);line-height:1.5}
+.banner .pill{font-size:12px;font-weight:500;color:var(--gold-pale);background:rgba(212,175,55,.18);border:1px solid rgba(212,175,55,.45);border-radius:50px;padding:2px 10px;white-space:nowrap}
+.banner .go{flex:0 0 44px;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-dark));display:grid;place-items:center;color:var(--m1);box-shadow:0 4px 18px rgba(212,175,55,.35)}
+.banner .go svg{width:18px;height:18px}
+
+/* ───────── playbook view ───────── */
+.pb{margin-top:26px}
+.pb-head{padding:4px 0 10px}
+.pb-head h1{margin:6px 0 4px;font-size:28px;font-weight:600;color:var(--t2);line-height:1.25}
+.pb-head h1 span{font-family:'Cinzel',serif;font-size:22px;letter-spacing:.04em;color:var(--maroon)}
+.pb-head p{margin:0;font-size:14.5px;color:var(--t3)}
+
+/* status strip — 3 lamps */
+.status{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 6px}
+.lamp{background:linear-gradient(160deg,var(--cream-light),var(--cream-card));border:1px solid rgba(212,175,55,.25);border-radius:14px;padding:10px 10px 9px;min-height:78px}
+.lamp .k{font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-deep);display:block}
+.lamp .v{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:14px;font-weight:600;color:var(--t2)}
+.lamp .dot{width:8px;height:8px;border-radius:50%;background:#C9BFA9;box-shadow:0 0 0 3px rgba(201,191,169,.25);flex:0 0 8px}
+.lamp .s{font-size:11px;color:var(--t3);display:block;line-height:1.35;margin-top:2px}
+
+/* badges */
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500;border-radius:50px;padding:2px 9px;line-height:1.5;white-space:nowrap;vertical-align:middle}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.85}
+.b-ok{color:var(--ok);background:var(--ok-bg)}
+.b-dev{color:var(--dev);background:var(--dev-bg)}
+.b-cfg{color:var(--cfg);background:var(--cfg-bg)}
+.b-lock{color:var(--t3);background:rgba(122,111,98,.12)}
+
+/* tab strip */
+.tabs{position:sticky;top:0;z-index:5;background:linear-gradient(var(--cream) 85%,rgba(250,246,237,0));padding:10px 0 8px;margin:6px -16px 0;padding-left:16px}
+.tabs [role=tablist]{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;padding-right:16px;scrollbar-width:none}
+.tabs [role=tablist]::-webkit-scrollbar{display:none}
+.tab{scroll-snap-align:start;flex:0 0 auto;border:1.5px solid rgba(212,175,55,.35);background:var(--cream-light);color:var(--t2);font-family:inherit;font-size:13.5px;font-weight:500;padding:7px 14px;border-radius:50px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .2s,color .2s,border-color .2s}
+.tab .i{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.08em;color:var(--gold-deep)}
+.tab[aria-selected=true]{background:linear-gradient(135deg,var(--maroon),#8B3A44);border-color:transparent;color:var(--cream-light);box-shadow:0 4px 16px rgba(114,47,55,.28)}
+.tab[aria-selected=true] .i{color:var(--gold-pale)}
+.tab .mini{font-size:9.5px;padding:0 6px;border-radius:50px;background:var(--dev-bg);color:var(--dev);font-weight:600}
+.tab[aria-selected=true] .mini{background:rgba(212,175,55,.3);color:var(--gold-pale)}
+
+/* panels */
+.panel{display:none;padding-top:12px}
+.panel.active{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.panel.active{animation:none}}
+
+.card{background:linear-gradient(160deg,var(--cream-light),var(--cream-card));border:1px solid rgba(212,175,55,.2);border-radius:var(--radius);box-shadow:0 4px 20px rgba(114,47,55,.06);padding:16px;margin:0 0 12px}
+.card.dark{background:linear-gradient(135deg,var(--m1),var(--m3));border-color:rgba(212,175,55,.18);color:var(--l1)}
+.card.dark .ch{color:var(--l2)}
+.card.dark .eyebrow{color:var(--gold)}
+.card.dark p,.card.dark li{color:var(--l1)}
+.card.dark .muted{color:var(--l3)}
+.ch{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:0 0 6px;font-size:17px;font-weight:700;color:var(--t2)}
+.ch .badges{display:flex;gap:5px;flex-wrap:wrap}
+.card p{margin:0 0 8px;font-size:14px}
+.card p:last-child{margin-bottom:0}
+.muted{color:var(--t3);font-size:13px}
+.rule{list-style:none;margin:8px 0 0;padding:0}
+.rule li{position:relative;padding:8px 0 8px 26px;font-size:14px;border-top:1px dashed rgba(212,175,55,.3)}
+.rule li:first-child{border-top:0;padding-top:2px}
+.rule li::before{content:"";position:absolute;left:4px;top:16px;width:9px;height:9px;border-radius:50%;border:2px solid var(--gold);background:var(--cream-light)}
+.rule li b{color:var(--t2)}
+.card.dark .rule li{border-top-color:rgba(212,175,55,.2)}
+.card.dark .rule li::before{background:var(--m2)}
+.card.dark .rule li b{color:var(--l2)}
+
+.kv{display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-size:14px;margin-top:6px}
+.kv dt{color:var(--t3)}
+.kv dd{margin:0;text-align:right;color:var(--t2);font-weight:500}
+
+/* controls */
+.ctl{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px dashed rgba(212,175,55,.3)}
+.ctl:first-of-type{border-top:0}
+.ctl label,.ctl .lbl{font-size:14px;color:var(--t2);font-weight:500;display:block}
+.ctl .hint{display:block;font-size:12px;color:var(--t3);font-weight:400;line-height:1.4}
+.inp{font-family:inherit;font-size:15px;color:var(--t2);background:var(--cream-light);border:1.5px solid rgba(212,175,55,.4);border-radius:12px;padding:8px 12px;width:120px;text-align:right;font-feature-settings:"tnum" 1}
+.inp:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.18)}
+select.inp{text-align:left;width:auto;max-width:170px;appearance:none;padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%238B6914' stroke-width='1.8'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.sw{position:relative;width:46px;height:26px;flex:0 0 46px}
+.sw input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.sw span{position:absolute;inset:0;border-radius:50px;background:#D9D0BC;transition:background .2s}
+.sw span::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25);transition:transform .2s}
+.sw input:checked+span{background:linear-gradient(135deg,var(--gold),var(--gold-dark))}
+.sw input:checked+span::after{transform:translateX(20px)}
+.sw input:focus-visible+span{outline:2px solid var(--gold);outline-offset:2px}
+.slider{width:100%;accent-color:var(--gold-dark);margin-top:6px}
+.slider-row{display:flex;align-items:baseline;justify-content:space-between;margin-top:10px}
+.slider-row .big{font-size:34px;color:var(--t2)}
+.slider-row .big small{font-family:'Anuphan',sans-serif;font-size:14px;color:var(--t3);margin-left:4px}
+.btn{font-family:inherit;font-size:15px;font-weight:600;border:0;cursor:pointer;border-radius:50px;padding:11px 22px;width:100%;margin-top:10px;background:linear-gradient(135deg,var(--maroon),#8B3A44);color:var(--cream-light);box-shadow:0 4px 20px rgba(114,47,55,.28)}
+.btn.ghost{background:transparent;color:var(--maroon);border:1.5px solid rgba(114,47,55,.4);box-shadow:none}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--m2);color:var(--l2);padding:10px 18px;border-radius:50px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;border:1px solid rgba(212,175,55,.35);z-index:20}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ───────── signature: drawdown staircase ───────── */
+.stairs{margin:12px 0 4px;padding:0;list-style:none}
+.step{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:start;padding:14px 14px 14px 0;border-radius:0 16px 16px 0;margin-bottom:6px;color:var(--l1);
+  background:linear-gradient(90deg,var(--m2),var(--m3));border-left:3px solid var(--gold)}
+.step:nth-child(1){margin-left:0}
+.step:nth-child(2){margin-left:14px;background:linear-gradient(90deg,#24101a,var(--m3))}
+.step:nth-child(3){margin-left:28px;background:linear-gradient(90deg,var(--m1),var(--m2))}
+.step .lvl{text-align:center;padding-top:2px}
+.step .lvl .num{font-size:30px;color:var(--gold-pale);display:block}
+.step .lvl .k{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.14em;color:var(--gold)}
+.step .do{font-size:14.5px;font-weight:600;color:var(--l2);margin:0 0 2px}
+.step .why{font-size:12.5px;color:var(--l3);margin:0;line-height:1.5}
+.step .alert{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin-top:8px;font-size:12px;color:var(--l3)}
+
+/* calendar rows */
+.cal{list-style:none;margin:8px 0 0;padding:0}
+.cal li{display:grid;grid-template-columns:58px 1fr;gap:10px;padding:9px 0;border-top:1px dashed rgba(212,175,55,.3);font-size:14px}
+.cal li:first-child{border-top:0;padding-top:2px}
+.cal .d{font-family:'DM Serif Display',serif;font-size:15px;color:var(--maroon);line-height:1.2}
+.cal .d small{display:block;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--gold-deep)}
+.cal .t{color:var(--t2);font-weight:500}
+.cal .s{display:block;font-size:12.5px;color:var(--t3)}
+.tag{display:inline-block;font-size:11px;padding:1px 8px;border-radius:50px;border:1px solid rgba(212,175,55,.35);color:var(--gold-deep);margin-left:4px;vertical-align:1px}
+.tag.rule-hit{border-color:rgba(114,47,55,.35);color:var(--maroon)}
+
+/* weekly brief skeleton */
+.brief{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.brief .cell{background:var(--cream-light);border:1px dashed rgba(212,175,55,.45);border-radius:14px;padding:10px 12px;min-height:70px}
+.brief .cell .k{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-deep);display:block}
+.brief .cell .num{font-size:26px;color:#C9BFA9;margin-top:2px;display:block}
+.brief .cell .s{font-size:11.5px;color:var(--t3);line-height:1.35;display:block}
+.brief .cell.wide{grid-column:1/-1;min-height:auto}
+
+/* thesis table */
+.thesis{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+.thesis th{font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-deep);text-align:left;padding:6px 4px;border-bottom:1px solid rgba(212,175,55,.4);font-weight:500}
+.thesis td{padding:8px 4px;border-bottom:1px dashed rgba(212,175,55,.3);vertical-align:top;color:var(--t1)}
+.thesis td:first-child{color:var(--t2);font-weight:500}
+
+.check{list-style:none;margin:8px 0 0;padding:0}
+.check li{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-top:1px dashed rgba(212,175,55,.3);font-size:14px}
+.check li:first-child{border-top:0}
+.check .box{flex:0 0 18px;width:18px;height:18px;border:1.5px solid var(--gold);border-radius:5px;margin-top:4px;background:var(--cream-light)}
+
+.foot{margin:26px 0 0;font-size:11.5px;color:var(--t3);text-align:center;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="draft-note"><b>Draft v0.1</b> · ยังไม่ได้เชื่อมกับ member-dashboard · ค่าที่ตั้งยังเก็บเฉพาะในหน้านี้ (production จะใช้ jp-settings / Supabase)</div>
+
+<div class="wrap">
+
+  <!-- ===== 1. ตำแหน่งบนหน้า Lab (ตัวอย่าง) ===== -->
+  <section class="lab-ctx" aria-label="ตัวอย่างตำแหน่งบนหน้า Lab">
+    <span class="eyebrow">Lab · ตำแหน่งการ์ด</span>
+    <p>การ์ดยาวแบบเดียวกับ "เปรียบเทียบกลยุทธ์" วางต่อท้ายกัน แตะแล้วเปิดหน้า Playbook</p>
+
+    <button class="banner" id="openPb" aria-controls="playbook">
+      <span class="ring" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h7a3 3 0 0 1 3 3v11a2 2 0 0 0-2-2H4z"/><path d="M20 5h-7a3 3 0 0 0-3 3v11a2 2 0 0 1 2-2h8z"/><path d="M8 9h3M8 12h3M13 9h4M13 12h4"/></svg>
+      </span>
+      <span class="bt">
+        <h3>Playbook <span class="pill">7 หัวข้อ</span></h3>
+        <p>สถานการณ์ไหน ทำอะไร — เขียนไว้ตอนใจนิ่ง<br>เพื่อวันที่ใจไม่นิ่ง</p>
+      </span>
+      <span class="go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+    </button>
+  </section>
+
+  <!-- ===== 2. หน้า Playbook ===== -->
+  <section class="pb" id="playbook">
+    <header class="pb-head">
+      <span class="eyebrow">JP Trust · Member Playbook</span>
+      <h1><span>Playbook</span> คู่มือตัดสินใจ</h1>
+      <p>กลยุทธ์บอกว่า "ซื้ออะไร ขายเมื่อไร" — Playbook บอกว่า "ตอนเกิดเรื่อง ให้ทำอะไร" ทุกข้อด้านล่างมาจากกฎที่ทดสอบแล้ว ไม่ใช่การคาดเดา</p>
+    </header>
+
+    <!-- status strip -->
+    <div class="status" aria-label="สถานะระบบตอนนี้">
+      <div class="lamp">
+        <span class="k">Regime</span>
+        <span class="v"><span class="dot"></span>—</span>
+        <span class="s">Δ6M: SPY / USDJPY / WTI / GOLD<br><span class="badge b-dev">กำลังพัฒนา</span></span>
+      </div>
+      <div class="lamp">
+        <span class="k">Breadth Gate</span>
+        <span class="v"><span class="dot"></span>—</span>
+        <span class="s">ประตูของ Pullback / Ripple<br><span class="badge b-dev">กำลังพัฒนา</span></span>
+      </div>
+      <div class="lamp">
+        <span class="k">Sniper</span>
+        <span class="v"><span class="dot"></span>—</span>
+        <span class="s">Washout trigger<br><span class="badge b-dev">กำลังพัฒนา</span></span>
+      </div>
+    </div>
+    <p class="muted" style="margin:4px 0 0;font-size:12px">สามไฟนี้คือตัวบอกว่า Playbook ข้อไหนกำลังทำงาน — เมื่อเชื่อมข้อมูลสดแล้วจะเปลี่ยนสีเอง สมาชิกไม่ต้องคำนวณ</p>
+
+    <!-- tab strip -->
+    <nav class="tabs">
+      <div role="tablist" aria-label="หัวข้อ Playbook">
+        <button class="tab" role="tab" aria-selected="true" aria-controls="p-over" id="t-over"><span class="i">01</span>ภาพรวม</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="p-money" id="t-money"><span class="i">02</span>เงินใหม่</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="p-dd" id="t-dd"><span class="i">03</span>บันได Drawdown</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="p-shock" id="t-shock"><span class="i">04</span>ช็อก · Sniper</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="p-cal" id="t-cal"><span class="i">05</span>ปฏิทิน</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="p-brief" id="t-brief"><span class="i">06</span>Weekly Brief <span class="mini">DEV</span></button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="p-review" id="t-review"><span class="i">07</span>ทบทวน</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="p-set" id="t-set"><span class="i">⚙</span>ตั้งค่า</button>
+      </div>
+    </nav>
+
+    <!-- ───── 01 ภาพรวม ───── -->
+    <div class="panel active" role="tabpanel" id="p-over" aria-labelledby="t-over">
+      <div class="card dark">
+        <span class="eyebrow">หลักสามข้อ</span>
+        <ul class="rule">
+          <li><b>ไม่หนีกลางทาง</b> — เราทดสอบการโยกเงินตอนวิกฤตไปเงินสด ทอง และน้ำมันแล้ว ทุกแบบแพ้การถือข้ามวิกฤต</li>
+          <li><b>ทุกการขายต้องชี้กลับไปที่กฎได้</b> — ถ้าตอบไม่ได้ว่ามาจากข้อไหน คือยังไม่ถึงเวลาขาย</li>
+          <li><b>ตัดสินใจตอนใจนิ่ง</b> — Playbook เขียนไว้ล่วงหน้า วันที่ตลาดเหวี่ยง เราแค่เปิดอ่าน</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="ch">ใช้ Playbook ยังไง <span class="badges"><span class="badge b-ok">Active</span></span></div>
+        <p>ดูไฟสถานะสามดวงด้านบน แล้วเปิดหัวข้อที่ตรงกับสิ่งที่เกิดขึ้น: มีเงินใหม่ → 02, พอร์ตลง → 03, ตลาดช็อก → 04 ที่เหลือคือจังหวะประจำ (05–07)</p>
+      </div>
+
+      <div class="card">
+        <div class="ch">ทดสอบแล้ว — ไม่ใช้ <span class="badges"><span class="badge b-ok">Active</span></span></div>
+        <p class="muted">บันทึกไว้เพื่อไม่ต้องทดสอบซ้ำ และเพื่อให้สมาชิกรู้ว่าทำไมเราไม่ทำ</p>
+        <ul class="rule">
+          <li><b>โยกเงินช่วงวิกฤต</b> (เงินสด / ทอง / น้ำมัน) — แพ้ถือข้ามทุกแบบ ต้องตัดสินใจถูกสองครั้งและพลาดวันกลับตัว</li>
+          <li><b>จำกัดสัดส่วนรายกลุ่ม</b> (4×3, 5×2) — แพ้ 10×1 ทุกการทดสอบ</li>
+          <li><b>กรองหุ้น Momentum ด้วย P/E</b> — ทำลาย edge ของกลยุทธ์</li>
+          <li><b>ใช้ CAPE จับจังหวะ</b> — CAPE บอกผลตอบแทน 10 ปี ไม่บอกว่าเดือนไหน</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="ch">ความหมายของป้าย</div>
+        <dl class="kv">
+          <dt><span class="badge b-ok">Active</span></dt><dd>ใช้ได้แล้ว กฎทดสอบแล้ว</dd>
+          <dt><span class="badge b-cfg">ตั้งค่าได้</span></dt><dd>สมาชิกปรับค่าของตัวเองได้</dd>
+          <dt><span class="badge b-lock">กฎตายตัว</span></dt><dd>ปรับไม่ได้ เพราะผลทดสอบชัด</dd>
+          <dt><span class="badge b-dev">กำลังพัฒนา</span></dt><dd>ควรมี แต่ยังเชื่อมข้อมูลไม่เสร็จ</dd>
+        </dl>
+      </div>
+    </div>
+
+    <!-- ───── 02 เงินใหม่ ───── -->
+    <div class="panel" role="tabpanel" id="p-money" aria-labelledby="t-money">
+      <div class="card">
+        <div class="ch">กฎเงินใหม่ <span class="badges"><span class="badge b-ok">Active</span><span class="badge b-lock">กฎตายตัว</span></span></div>
+        <ul class="rule">
+          <li><b>เข้าทีละ lot ตามเดือน</b> — ไม่ใส่ก้อนเดียว โดยเฉพาะตอนตลาดแพง การเกลี่ยคือการป้องกันเดียวที่ไม่ต้องทำนาย</li>
+          <li><b>เดือนที่ Regime เป็น Defensive ไม่เปิด lot Momentum ใหม่</b> — เงินเดือนนั้นพักไว้ ไม่ไล่ใส่ที่อื่น</li>
+          <li><b>ไม่ "ซื้อเพิ่มเพราะราคาลง" นอกกฎ</b> — Pullback / Ripple มีประตูของตัวเอง ปล่อยให้ประตูทำงาน</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="ch">แผนเงินใหม่ของฉัน <span class="badges"><span class="badge b-cfg">ตั้งค่าได้</span></span></div>
+        <div class="ctl">
+          <div><label for="newMoney">เงินใหม่ต่อเดือน</label><span class="hint">ใช้คำนวณขนาด lot ใน Weekly Brief</span></div>
+          <input class="inp" id="newMoney" type="number" min="0" step="100" value="5000" inputmode="numeric"> 
+        </div>
+        <div class="ctl">
+          <div><label for="newMoneyStrat">เข้ากลยุทธ์</label><span class="hint">ค่าเริ่มต้น Rolling 6M เพราะเกลี่ยเป็น 6 lot อยู่แล้ว</span></div>
+          <select class="inp" id="newMoneyStrat">
+            <option value="rolling">Rolling 6M</option>
+            <option value="6m">6M Momentum</option>
+            <option value="weekly">Weekly</option>
+          </select>
+        </div>
+        <div class="ctl">
+          <div><span class="lbl">เตือนวันเปิด lot</span><span class="hint">แจ้งเตือนในแอป 1 วันก่อน <span class="badge b-dev">กำลังพัฒนา</span></span></div>
+          <label class="sw"><input type="checkbox" id="lotRemind" checked><span></span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── 03 บันได Drawdown ───── -->
+    <div class="panel" role="tabpanel" id="p-dd" aria-labelledby="t-dd">
+      <div class="card">
+        <div class="ch">พอร์ตลงแล้วทำอะไร <span class="badges"><span class="badge b-ok">Active</span><span class="badge b-lock">กฎตายตัว</span></span></div>
+        <p class="muted">วัดจากพอร์ตรวม จุดสูงสุดถึงจุดต่ำสุด ทุกขั้นมีคำตอบเดียวกันในใจความ — ต่างกันแค่ "สิ่งที่ไม่ทำ"</p>
+        <ol class="stairs" aria-label="บันไดตอบสนอง drawdown">
+          <li class="step">
+            <div class="lvl"><span class="num">-10</span><span class="k">Percent</span></div>
+            <div><p class="do">ไม่ทำอะไร</p><p class="why">อยู่ในช่วงปกติของทุกกลยุทธ์ใน backtest ถ้ารู้สึกอยากทำอะไร ให้เปิด 07 ดู Max DD ที่เคยเกิด</p>
+              <div class="alert"><label class="sw"><input type="checkbox" data-dd="10" checked><span></span></label>แจ้งเตือนเมื่อถึง <span class="badge b-dev">กำลังพัฒนา</span></div></div>
+          </li>
+          <li class="step">
+            <div class="lvl"><span class="num">-15</span><span class="k">Percent</span></div>
+            <div><p class="do">ถือต่อ — แต่เช็คหนึ่งอย่าง</p><p class="why">DD มาจาก "กฎทำงานตามคาด" หรือ "กฎพัง" (เช่น หุ้นที่ขึ้นมาเกิน 150% แล้วกลับตัว) ถ้าอย่างหลัง จดไว้รอรอบทบทวน ไม่แก้กฎกลางทาง</p>
+              <div class="alert"><label class="sw"><input type="checkbox" data-dd="15" checked><span></span></label>แจ้งเตือนเมื่อถึง <span class="badge b-dev">กำลังพัฒนา</span></div></div>
+          </li>
+          <li class="step">
+            <div class="lvl"><span class="num">-20</span><span class="k">Percent</span></div>
+            <div><p class="do">ยังไม่ขายนอกกฎ — หยุดเติม</p><p class="why">ไม่เปิด lot ใหม่ทุกกลยุทธ์ ยกเว้น Sniper จนกว่า Breadth Gate จะเปิด</p>
+              <div class="alert"><label class="sw"><input type="checkbox" data-dd="20" checked><span></span></label>แจ้งเตือนเมื่อถึง <span class="badge b-dev">กำลังพัฒนา</span></div></div>
+          </li>
+        </ol>
+        <p class="muted" style="margin-top:8px">ตัวเลข -10 / -15 / -20 เป็นค่าตั้งต้น จะปรับหลังตรวจกับ DD จริงในแต่ละกลยุทธ์</p>
+      </div>
+
+      <div class="card">
+        <div class="ch">DD ของพอร์ตฉันตอนนี้ <span class="badges"><span class="badge b-dev">กำลังพัฒนา</span></span></div>
+        <p class="muted">ต้องเชื่อมกับ Portfolio Tracker ก่อน ถึงจะแสดง DD จริงและยิงแจ้งเตือนตามบันไดได้</p>
+        <div class="slider-row"><span class="num big" style="color:#C9BFA9">—</span><span class="muted">จาก peak</span></div>
+      </div>
+    </div>
+
+    <!-- ───── 04 ช็อก · Sniper ───── -->
+    <div class="panel" role="tabpanel" id="p-shock" aria-labelledby="t-shock">
+      <div class="card dark">
+        <span class="eyebrow">นิยาม "ช็อก"</span>
+        <p style="font-size:16px;font-weight:600;color:var(--l2);margin:4px 0 6px">ช็อก = เงื่อนไข trigger ของ Washout Sniper ติด</p>
+        <p class="muted">ไม่ใช้ดุลยพินิจ ข่าวดังแค่ไหนถ้า trigger ไม่ติดก็ไม่นับ ถ้า trigger ติดโดยไม่มีข่าวก็นับ</p>
+      </div>
+
+      <div class="card">
+        <div class="ch">ลำดับเมื่อ trigger ติด <span class="badges"><span class="badge b-ok">Active</span></span></div>
+        <ul class="rule">
+          <li><b>วันเดียวกัน</b> — Sniper เข้าด้วยเงินจาก "กระเป๋า Sniper" ที่กันไว้ ถือตามระยะที่กลยุทธ์กำหนด</li>
+          <li><b>lot Momentum ที่ถืออยู่ ไม่แตะ</b> — ไม่เพิ่ม ไม่ลด ไม่ย้าย</li>
+          <li><b>ภายใน 24 ชม.</b> — ทีมข่าวจัดประเภทเหตุการณ์ด้วย Macro Framework: (ก) เปลี่ยนกฎเกม — ดอกเบี้ย / Regime / สภาพคล่อง หรือ (ข) เสียงรบกวน</li>
+          <li><b>สมาชิกได้ข้อความเดียว</b> — บอกว่ากฎข้อไหนกำลังทำงาน ไม่พยากรณ์ ไม่มีคำว่า "โอกาสครั้งใหญ่"</li>
+        </ul>
+        <p class="muted" style="margin-top:8px">บทเรียนปี 2020: ตลาดลง 30% ในเดือนเดียว lookback 6 เดือนตามไม่ทัน — Sniper คือเครื่องมือเดียวที่ออกแบบมาสำหรับจังหวะนี้</p>
+      </div>
+
+      <div class="card">
+        <div class="ch">กระเป๋า Sniper ของฉัน <span class="badges"><span class="badge b-cfg">ตั้งค่าได้</span></span></div>
+        <p class="muted">เงินสดส่วนเดียวที่เรากันไว้โดยตั้งใจ ไม่ใช่เพื่อ "รอจังหวะ" แต่เพื่อให้ Sniper มีกระสุนเมื่อ trigger ติด</p>
+        <div class="slider-row"><span class="num big" id="pocketVal">10<small>% ของพอร์ต</small></span><span class="muted">ค่าตั้งต้น 10%</span></div>
+        <input class="slider" type="range" id="pocket" min="0" max="25" step="1" value="10" aria-label="สัดส่วนกระเป๋า Sniper">
+        <p class="muted" style="margin-top:6px">สูงเกิน 20% = เริ่มกลายเป็นการถือเงินสดรอ ซึ่งผลทดสอบบอกว่าไม่คุ้ม</p>
+      </div>
+
+      <div class="card">
+        <div class="ch">ผลทดสอบ Washout Sniper <span class="badges"><span class="badge b-dev">รอคำนวณใหม่</span></span></div>
+        <p class="muted">พารามิเตอร์เปลี่ยนแล้ว ตัวเลข CAGR / Max DD / จำนวนครั้งที่ trigger ติด จะแสดงหลังคำนวณใหม่เสร็จ — ก่อนหน้านั้นหัวข้อนี้ยังไม่เผยแพร่ให้สมาชิก</p>
+      </div>
+    </div>
+
+    <!-- ───── 05 ปฏิทิน ───── -->
+    <div class="panel" role="tabpanel" id="p-cal" aria-labelledby="t-cal">
+      <div class="card">
+        <div class="ch">วันของเรา <span class="badges"><span class="badge b-ok">Active</span></span></div>
+        <p class="muted">ประกาศล่วงหน้า สมาชิกไม่ต้องเดา</p>
+        <ul class="cal">
+          <li><span class="d">ก.พ.<small>+ ส.ค.</small></span><span><span class="t">6M Momentum — Rebalance</span><span class="s">ขายทั้งพอร์ต จัดอันดับใหม่ ซื้อใหม่</span></span></li>
+          <li><span class="d">ทุก<small>เดือน</small></span><span><span class="t">Rolling 6M — เปิด lot ใหม่</span><span class="s">6 lot ซ้อนกัน lot ที่ครบ 6 เดือนขายออก</span></span></li>
+          <li><span class="d">ศุกร์<small>→ จันทร์</small></span><span><span class="t">Weekly — สัญญาณศุกร์ เปิดจันทร์</span><span class="s">ถือ N สัปดาห์ตามที่ตั้งไว้</span></span></li>
+          <li><span class="d">—<small>ไม่มีวัน</small></span><span><span class="t">Pullback · Ripple · Sniper</span><span class="s">ทำงานตามประตู ไม่ใช่ปฏิทิน</span></span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="ch">วันของโลก <span class="badges"><span class="badge b-dev">กำลังพัฒนา</span></span></div>
+        <p class="muted">แต่ละวันจับคู่ล่วงหน้าว่า "อาจทำให้กฎข้อไหนติด" หรือ "ไม่มีผลอะไร" — วันที่จะดึงอัตโนมัติ</p>
+        <ul class="cal">
+          <li><span class="d">FOMC</span><span><span class="t">ประชุม Fed <span class="tag rule-hit">อาจเปลี่ยน Regime</span></span><span class="s">ดอกเบี้ยคือตัวแปรหลักใน Δ6M quad</span></span></li>
+          <li><span class="d">CPI</span><span><span class="t">เงินเฟ้อสหรัฐ <span class="tag rule-hit">อาจเปลี่ยน Regime</span></span><span class="s">สูงกว่าคาด → Fed ลดดอกเบี้ยไม่ได้ → USD แข็ง</span></span></li>
+          <li><span class="d">NFP</span><span><span class="t">ตัวเลขจ้างงาน <span class="tag">เสียงรบกวน</span></span><span class="s">ผลต่อกฎเราต่ำ ยกเว้นประกอบกับ CPI</span></span></li>
+          <li><span class="d">OPEC</span><span><span class="t">ประชุมน้ำมัน <span class="tag rule-hit">อาจเปลี่ยน Regime</span></span><span class="s">WTI เป็น 1 ใน 4 ตัวของ quad</span></span></li>
+          <li><span class="d">EPS</span><span><span class="t">งบ Top 10 ที่ถืออยู่ <span class="tag">เสียงรบกวน</span></span><span class="s">หุ้นตัวเดียวไม่เปลี่ยนกฎ แต่ใช้ดูข้อ -15%</span></span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="ch">การแจ้งเตือน <span class="badges"><span class="badge b-cfg">ตั้งค่าได้</span></span></div>
+        <div class="ctl">
+          <div><span class="lbl">เตือนวันของเรา</span><span class="hint">1 วันก่อน rebalance / เปิด lot <span class="badge b-dev">กำลังพัฒนา</span></span></div>
+          <label class="sw"><input type="checkbox" id="calOurs" checked><span></span></label>
+        </div>
+        <div class="ctl">
+          <div><span class="lbl">เตือนวันของโลก</span><span class="hint">เฉพาะวันที่ติดป้าย "อาจเปลี่ยน Regime" <span class="badge b-dev">กำลังพัฒนา</span></span></div>
+          <label class="sw"><input type="checkbox" id="calWorld"><span></span></label>
+        </div>
+        <div class="ctl">
+          <div><span class="lbl">ส่งออกไปปฏิทินมือถือ (.ics)</span><span class="hint"><span class="badge b-dev">กำลังพัฒนา</span></span></div>
+          <button class="btn ghost" style="width:auto;margin:0;padding:7px 14px;font-size:13px" disabled>ส่งออก</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── 06 Weekly Brief ───── -->
+    <div class="panel" role="tabpanel" id="p-brief" aria-labelledby="t-brief">
+      <div class="card">
+        <div class="ch">Weekly Brief — ทุกวันอาทิตย์ <span class="badges"><span class="badge b-dev">กำลังพัฒนา</span></span></div>
+        <p class="muted">หน้าเดียว สร้างอัตโนมัติจาก Lab + ข่าว อ่าน 5 นาที แล้วปิดแอปได้ทั้งสัปดาห์ — นี่คือแบบร่างว่าจะมีค่าอะไรบ้าง</p>
+        <div class="brief" aria-label="โครง Weekly Brief">
+          <div class="cell"><span class="k">Lots maturing</span><span class="num">—</span><span class="s">lot ที่ครบกำหนดสัปดาห์หน้า</span></div>
+          <div class="cell"><span class="k">Regime</span><span class="num">—</span><span class="s">อันดับ SPY ใน quad + ห่างจากหลุด top 2</span></div>
+          <div class="cell"><span class="k">Breadth</span><span class="num">—</span><span class="s">% หุ้นเหนือ SMA200 เทียบ threshold ประตู</span></div>
+          <div class="cell"><span class="k">Theme conc.</span><span class="num">—</span><span class="s">theme ที่หนักสุดในหุ้นที่ถือ กี่ตัวจาก 10</span></div>
+          <div class="cell"><span class="k">Top holding</span><span class="num">—</span><span class="s">หุ้นตัวใหญ่สุดและผลตอบแทนตั้งแต่เข้า</span></div>
+          <div class="cell"><span class="k">Actions → rules</span><span class="num">—</span><span class="s">การกระทำสัปดาห์นี้ / ชี้กฎได้กี่ข้อ</span></div>
+          <div class="cell wide"><span class="k">Catalysts next week</span><span class="s">รายการวันของโลกที่ติดป้าย "อาจเปลี่ยน Regime" พร้อมกฎที่เกี่ยว</span></div>
+          <div class="cell wide"><span class="k">One line</span><span class="s">ประโยคเดียวจากผู้ดูแล: สัปดาห์หน้าต้องทำอะไร หรือ "ไม่ต้องทำอะไร"</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch">รับ Brief ทางไหน <span class="badges"><span class="badge b-cfg">ตั้งค่าได้</span></span></div>
+        <div class="ctl">
+          <div><label for="briefCh">ช่องทาง</label><span class="hint">อีเมลใช้ Resend ที่มีอยู่แล้ว</span></div>
+          <select class="inp" id="briefCh"><option value="app">ในแอป</option><option value="email">อีเมล</option><option value="both">ทั้งสองทาง</option></select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── 07 ทบทวน ───── -->
+    <div class="panel" role="tabpanel" id="p-review" aria-labelledby="t-review">
+      <div class="card">
+        <div class="ch">รอบทบทวน — ไตรมาสละครั้ง <span class="badges"><span class="badge b-ok">Active</span></span></div>
+        <p class="muted">ดูสามอย่าง ไม่ดูกำไร กฎแก้ได้เฉพาะในวาระนี้ หรือวาระพิเศษที่ข้อ 04 เปิด</p>
+        <ul class="check">
+          <li><span class="box" aria-hidden="true"></span><span>ประตูแต่ละบานติดกี่ครั้ง เทียบความถี่ใน backtest — ถี่หรือห่างผิดปกติไหม</span></li>
+          <li><span class="box" aria-hidden="true"></span><span>ผลจริง vs backtest ต่างเกิน slippage ที่คาดไหม (แยกรายกลยุทธ์)</span></li>
+          <li><span class="box" aria-hidden="true"></span><span>มีเหตุการณ์ประเภท (ก) จากข้อ 04 ค้างอยู่ไหม — ถ้ามี ตัดสินว่ากฎข้อไหนต้องเปลี่ยน</span></li>
+          <li><span class="box" aria-hidden="true"></span><span>รายการ "ทดสอบแล้ว ไม่ใช้" มีอะไรเพิ่มไหม</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="ch">Thesis ที่เรายึด — และอะไรจะทำให้เปลี่ยนใจ <span class="badges"><span class="badge b-ok">Active</span></span></div>
+        <table class="thesis">
+          <thead><tr><th>Thesis</th><th>เปลี่ยนใจเมื่อ</th><th>ทบทวน</th></tr></thead>
+          <tbody>
+            <tr><td>ของที่แรง มักแรงต่อ (LB6)</td><td>momentum ใน S&amp;P 500 ให้ผลต่ำกว่าดัชนีต่อเนื่อง 2 ปีเต็ม</td><td>Q3 26</td></tr>
+            <tr><td>ถือข้ามวิกฤต ชนะโยกเงิน</td><td>มีสัญญาณ "กลับเข้า" ที่ทดสอบแล้วชนะการไม่ออก</td><td>Q3 26</td></tr>
+            <tr><td>อิหร่าน: น้ำมันขึ้น → ทองลง (ไม่ใช่ safe haven)</td><td>Fed ลดดอกเบี้ยได้ทั้งที่น้ำมันยังสูง</td><td>รอ §1 Macro</td></tr>
+            <tr><td>Dip condition = เบรกความถี่ ไม่ใช่แหล่งกำไร</td><td>backtest ใหม่แสดง edge จาก dip เอง</td><td>Q2 26</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="ch">สุขภาพข้อมูล — เช็คทุกสัปดาห์ <span class="badges"><span class="badge b-dev">กำลังพัฒนา</span></span></div>
+        <p class="muted">สำหรับผู้ดูแล ไม่แสดงให้สมาชิก: CSV บน R2 สดไหม · gold pipeline · Brent/WTI · master_map ที่ว่าง · Sniper recompute — จะกลายเป็นไฟเขียว/แดงอัตโนมัติ</p>
+      </div>
+    </div>
+
+    <!-- ───── ⚙ ตั้งค่า ───── -->
+    <div class="panel" role="tabpanel" id="p-set" aria-labelledby="t-set">
+      <div class="card">
+        <div class="ch">สรุปค่าที่ฉันตั้ง <span class="badges"><span class="badge b-cfg">ตั้งค่าได้</span></span></div>
+        <dl class="kv" id="summary">
+          <dt>เงินใหม่ต่อเดือน</dt><dd data-s="newMoney">5,000</dd>
+          <dt>เข้ากลยุทธ์</dt><dd data-s="strat">Rolling 6M</dd>
+          <dt>กระเป๋า Sniper</dt><dd data-s="pocket">10%</dd>
+          <dt>แจ้งเตือน DD</dt><dd data-s="dd">-10 · -15 · -20</dd>
+          <dt>เตือนวันของเรา</dt><dd data-s="calOurs">เปิด</dd>
+          <dt>เตือนวันของโลก</dt><dd data-s="calWorld">ปิด</dd>
+          <dt>Weekly Brief</dt><dd data-s="brief">ในแอป</dd>
+        </dl>
+        <button class="btn" id="save">บันทึกค่า</button>
+        <button class="btn ghost" id="reset">คืนค่าตั้งต้น</button>
+        <p class="muted" style="margin-top:10px">ค่าที่ปรับไม่ได้ (กฎตายตัว) ไม่อยู่ในหน้านี้โดยตั้งใจ — ถ้าอยากรู้เหตุผล เปิด 01 หัวข้อ "ทดสอบแล้ว ไม่ใช้"</p>
+      </div>
+    </div>
+
+    <p class="foot">Playbook นี้เพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน · ผลทดสอบย้อนหลังไม่รับประกันผลในอนาคต<br>Draft v0.1 · สิงหาคม 2026</p>
+  </section>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  // ── state (in-memory only for the draft) ──
+  var DEF = {newMoney:5000, strat:'rolling', pocket:10, dd:{10:true,15:true,20:true}, lotRemind:true, calOurs:true, calWorld:false, brief:'app'};
+  var S = JSON.parse(JSON.stringify(DEF));
+  var STRAT = {rolling:'Rolling 6M', '6m':'6M Momentum', weekly:'Weekly'};
+  var BRIEF = {app:'ในแอป', email:'อีเมล', both:'ทั้งสองทาง'};
+  var $ = function(s,c){return (c||document).querySelector(s)};
+  var $$ = function(s,c){return Array.prototype.slice.call((c||document).querySelectorAll(s))};
+
+  // ── tabs ──
+  var tabs = $$('.tab'), panels = $$('.panel');
+  function show(id){
+    tabs.forEach(function(t){ var on = t.getAttribute('aria-controls')===id; t.setAttribute('aria-selected', on?'true':'false'); });
+    panels.forEach(function(p){ p.classList.toggle('active', p.id===id); });
+    var t = tabs.filter(function(t){return t.getAttribute('aria-controls')===id})[0];
+    if(t && t.scrollIntoView) t.scrollIntoView({block:'nearest', inline:'center', behavior:'smooth'});
+  }
+  tabs.forEach(function(t){ t.addEventListener('click', function(){ show(t.getAttribute('aria-controls')); }); });
+  $('#openPb').addEventListener('click', function(){ $('#playbook').scrollIntoView({behavior:'smooth', block:'start'}); });
+
+  // keyboard arrows on tablist
+  $('[role=tablist]').addEventListener('keydown', function(e){
+    var i = tabs.findIndex(function(t){return t.getAttribute('aria-selected')==='true'});
+    if(e.key==='ArrowRight'){ e.preventDefault(); var n=tabs[(i+1)%tabs.length]; n.focus(); show(n.getAttribute('aria-controls')); }
+    if(e.key==='ArrowLeft'){ e.preventDefault(); var p=tabs[(i-1+tabs.length)%tabs.length]; p.focus(); show(p.getAttribute('aria-controls')); }
+  });
+
+  // ── controls → state ──
+  function fmt(n){ return Number(n||0).toLocaleString('en-US'); }
+  function render(){
+    $('[data-s=newMoney]').textContent = fmt(S.newMoney);
+    $('[data-s=strat]').textContent = STRAT[S.strat];
+    $('[data-s=pocket]').textContent = S.pocket+'%';
+    var dd = [10,15,20].filter(function(k){return S.dd[k]}).map(function(k){return '-'+k}).join(' · ');
+    $('[data-s=dd]').textContent = dd || 'ปิดทั้งหมด';
+    $('[data-s=calOurs]').textContent = S.calOurs?'เปิด':'ปิด';
+    $('[data-s=calWorld]').textContent = S.calWorld?'เปิด':'ปิด';
+    $('[data-s=brief]').textContent = BRIEF[S.brief];
+    $('#pocketVal').innerHTML = S.pocket+'<small>% ของพอร์ต</small>';
+  }
+  function syncInputs(){
+    $('#newMoney').value = S.newMoney; $('#newMoneyStrat').value = S.strat; $('#pocket').value = S.pocket;
+    $$('[data-dd]').forEach(function(c){ c.checked = !!S.dd[c.getAttribute('data-dd')]; });
+    $('#lotRemind').checked = S.lotRemind; $('#calOurs').checked = S.calOurs; $('#calWorld').checked = S.calWorld; $('#briefCh').value = S.brief;
+  }
+  $('#newMoney').addEventListener('input', function(){ S.newMoney = Math.max(0, parseInt(this.value||0,10)); render(); });
+  $('#newMoneyStrat').addEventListener('change', function(){ S.strat = this.value; render(); });
+  $('#pocket').addEventListener('input', function(){ S.pocket = parseInt(this.value,10); render(); });
+  $$('[data-dd]').forEach(function(c){ c.addEventListener('change', function(){ S.dd[c.getAttribute('data-dd')] = c.checked; render(); }); });
+  $('#lotRemind').addEventListener('change', function(){ S.lotRemind = this.checked; });
+  $('#calOurs').addEventListener('change', function(){ S.calOurs = this.checked; render(); });
+  $('#calWorld').addEventListener('change', function(){ S.calWorld = this.checked; render(); });
+  $('#briefCh').addEventListener('change', function(){ S.brief = this.value; render(); });
+
+  // ── save / reset ──
+  var toastT;
+  function toast(msg){ var t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(function(){t.classList.remove('show')},2200); }
+  $('#save').addEventListener('click', function(){ toast('บันทึกแล้ว (เฉพาะหน้านี้ — production จะซิงก์ Supabase)'); });
+  $('#reset').addEventListener('click', function(){ S = JSON.parse(JSON.stringify(DEF)); syncInputs(); render(); toast('คืนค่าตั้งต้นแล้ว'); });
+
+  syncInputs(); render();
+})();
+</script>
+</body>
+</html>

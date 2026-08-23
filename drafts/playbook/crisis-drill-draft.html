@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ซ้อมวิกฤต — JP Trust Playbook (draft v0.1)</title>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#FAF6ED;--cream-light:#FFFEF8;--cream-card:#F8F2E4;--cream-deep:#EDE4D0;--gold:#D4AF37;--gold-dark:#B8860B;--gold-deep:#8B6914;--gold-pale:#F4E4BA;--maroon:#722F37;--m1:#1a0a0e;--m2:#2d1018;--m3:#3a1520;--t1:#3D3228;--t2:#5A3D20;--t3:#7A6F62;--l1:#E8E4DC;--l2:#F4E4BA;--l3:#A09B92;--ok:#2E7D32;--ok-bg:rgba(76,175,80,.14);--dev:#9A6B12;--dev-bg:rgba(212,175,55,.2);--red:#B23B3B}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:var(--cream);color:var(--t1);font-family:'Anuphan','Sarabun',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;padding-bottom:60px}
+.wrap{max-width:520px;margin:0 auto;padding:0 16px}
+.eyebrow{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-deep)}
+.num{font-family:'DM Serif Display',serif;font-weight:400;line-height:1;font-feature-settings:"tnum" 1}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:8px}
+.draft-note{background:var(--cream-deep);border-bottom:1px solid rgba(212,175,55,.3);padding:10px 16px;font-size:12.5px;color:var(--t3);text-align:center}
+.draft-note b{color:var(--t2)}
+.head{padding:22px 0 6px}
+.head h1{margin:6px 0 4px;font-size:26px;font-weight:600;color:var(--t2);line-height:1.25}
+.head h1 span{font-family:'Cinzel',serif;font-size:19px;color:var(--maroon);letter-spacing:.03em}
+.head p{margin:0;font-size:14px;color:var(--t3)}
+.spec{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 4px}
+.chip{font-size:12px;color:var(--t2);background:var(--cream-light);border:1px solid rgba(212,175,55,.35);border-radius:50px;padding:2px 10px}
+.card{background:linear-gradient(160deg,var(--cream-light),var(--cream-card));border:1px solid rgba(212,175,55,.2);border-radius:20px;box-shadow:0 4px 20px rgba(114,47,55,.06);padding:16px;margin:12px 0}
+.card.dark{background:linear-gradient(135deg,var(--m1),var(--m3));border-color:rgba(212,175,55,.18);color:var(--l1)}
+.card h2{margin:0 0 6px;font-size:18px;font-weight:700;color:var(--t2)}
+.card.dark h2{color:var(--l2)}
+.muted{color:var(--t3);font-size:13px}
+.card.dark .muted{color:var(--l3)}
+/* scenario picker */
+.sc{display:grid;gap:10px}
+.scb{display:block;width:100%;text-align:left;border:1.5px solid rgba(212,175,55,.35);background:var(--cream-light);border-radius:16px;padding:14px;font-family:inherit;cursor:pointer;color:var(--t2);transition:border-color .15s,transform .1s}
+.scb:hover{border-color:var(--gold)}.scb:active{transform:scale(.99)}
+.scb .t{font-size:17px;font-weight:700;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.scb .t .y{font-family:'DM Serif Display',serif;font-size:22px;color:var(--maroon)}
+.scb .s{font-size:13px;color:var(--t3);display:block;margin-top:2px}
+.scb .meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;border-radius:50px;padding:1px 9px;white-space:nowrap}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.85}
+.b-dev{color:var(--dev);background:var(--dev-bg)}.b-ok{color:var(--ok);background:var(--ok-bg)}.b-warn{color:var(--red);background:rgba(178,59,59,.1)}
+/* stage */
+#stage{display:none}
+.mon{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.mon .m{font-family:'DM Serif Display',serif;font-size:30px;color:var(--t2)}
+.mon .m small{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.12em;color:var(--gold-deep);display:block;line-height:1.2;margin-bottom:2px}
+.mon .n{font-size:12px;color:var(--t3);text-align:right}
+.ctx{margin:8px 0 0;font-size:13.5px;color:var(--t1);min-height:22px}
+.ctx.reb{color:var(--maroon);font-weight:500}
+.kp{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:12px 0 0}
+.k{background:var(--cream-light);border:1px solid rgba(212,175,55,.25);border-radius:12px;padding:8px 6px;text-align:center}
+.k .l{font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-deep);display:block}
+.k .v{font-family:'DM Serif Display',serif;font-size:19px;color:var(--t2);display:block;margin-top:2px}
+.k.you{border-color:var(--maroon);background:rgba(114,47,55,.06)}
+.k.you .v{color:var(--maroon)}
+.k .v.neg{color:var(--red)}
+.k .sub{font-size:10px;color:var(--t3);display:block;line-height:1.2}
+.chart{margin:12px 0 4px;background:var(--cream-light);border:1px solid rgba(212,175,55,.25);border-radius:14px;padding:8px 6px 4px}
+svg{width:100%;height:auto;display:block}
+.leg{display:flex;gap:12px;justify-content:center;font-size:11px;color:var(--t3);margin-top:2px}
+.leg i{display:inline-block;width:14px;height:0;border-top:2.5px solid;vertical-align:middle;margin-right:4px}
+.hint{margin:12px 0 0;background:linear-gradient(135deg,var(--m1),var(--m3));color:var(--l1);border-radius:14px;padding:10px 12px;font-size:13px;display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start}
+.hint .tag{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;color:var(--gold);padding-top:4px;white-space:nowrap}
+.hint b{color:var(--l2)}
+.act{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.btn{font-family:inherit;font-size:14px;font-weight:600;border:0;cursor:pointer;border-radius:50px;padding:11px 14px;background:linear-gradient(135deg,var(--maroon),#8B3A44);color:var(--cream-light);box-shadow:0 4px 16px rgba(114,47,55,.25)}
+.btn.ghost{background:transparent;color:var(--maroon);border:1.5px solid rgba(114,47,55,.4);box-shadow:none}
+.btn.sell{background:transparent;color:var(--red);border:1.5px solid rgba(178,59,59,.45);box-shadow:none}
+.btn.buy{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:var(--m1);box-shadow:0 4px 16px rgba(212,175,55,.3)}
+.btn.wide{grid-column:1/-1}
+.btn:disabled{opacity:.4;cursor:default;box-shadow:none}
+.state{margin-top:8px;font-size:12px;color:var(--t3);text-align:center}
+.state b{color:var(--maroon)}
+/* result */
+#result{display:none}
+.res{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.r{border-radius:14px;padding:10px 8px;text-align:center;background:var(--cream-light);border:1px solid rgba(212,175,55,.25)}
+.r .l{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-deep);display:block}
+.r .v{font-family:'DM Serif Display',serif;font-size:22px;color:var(--t2);display:block;margin-top:2px}
+.r .p{font-size:11.5px;display:block;color:var(--t3)}
+.r.you{background:linear-gradient(135deg,var(--m1),var(--m3));border-color:rgba(212,175,55,.3)}
+.r.you .v{color:var(--gold-pale)}.r.you .l{color:var(--gold)}.r.you .p{color:var(--l3)}
+.log{list-style:none;margin:8px 0 0;padding:0}
+.log li{display:grid;grid-template-columns:64px 1fr auto;gap:8px;font-size:13px;padding:6px 0;border-top:1px dashed rgba(212,175,55,.3)}
+.log li:first-child{border-top:0}
+.log .d{font-family:'DM Serif Display',serif;color:var(--maroon)}
+.log .a.sell{color:var(--red)}.log .a.buy{color:var(--gold-deep)}
+.lesson{margin-top:10px;font-size:14px;color:var(--t1)}
+.lesson b{color:var(--t2)}
+.cav{margin-top:12px;border:1px dashed rgba(178,59,59,.4);border-radius:14px;padding:10px 12px;font-size:12.5px;color:var(--t3)}
+.cav b{color:var(--red)}
+.foot{margin:22px 0 0;font-size:11.5px;color:var(--t3);text-align:center;line-height:1.6}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="draft-note"><b>Draft v0.1</b> · ซ้อมวิกฤต · ตัวเลขคำนวณจากข้อมูลจริงใน repo <code>sp500</code> (Python reference) · ยังไม่เชื่อมแอป</div>
+<div class="wrap">
+  <header class="head">
+    <span class="eyebrow">JP Trust · Playbook</span>
+    <h1><span>Crisis Drill</span> ซ้อมวิกฤต</h1>
+    <p>ไม่ได้จำลองพอร์ตของคุณ — จำลอง "ประวัติศาสตร์" ให้คุณเดินผ่านทีละเดือน แล้วเลือกเองว่าจะถือ ขาย หรือกลับเข้า ระบบจะบอกว่าทางเลือกนั้นจบอย่างไรตามข้อมูลจริง</p>
+    <div class="spec">
+      <span class="chip">กระทิงแถวหน้า · 6M Momentum</span><span class="chip">Top 10 · เท่ากันทุกตัว</span><span class="chip">Return/Volume 50/50</span><span class="chip">Rebalance ก.พ. · ส.ค.</span><span class="chip">ทุน $10,000</span><span class="chip">ไม่คิดค่าธรรมเนียม</span>
+    </div>
+  </header>
+
+  <section id="picker" class="card">
+    <h2>เลือกวิกฤตที่จะซ้อม</h2>
+    <p class="muted" style="margin:0 0 10px">ทุกสถานการณ์เริ่มที่วัน rebalance ก่อนวิกฤตพอดี — จังหวะเข้าที่แย่ที่สุดเท่าที่ระบบจะเจอได้</p>
+    <div class="sc" id="sc"></div>
+  </section>
+
+  <section id="stage" class="card">
+    <div class="mon"><div class="m" id="mon"><small>Month</small>—</div><div class="n" id="monN"></div></div>
+    <p class="ctx" id="ctx"></p>
+    <div class="kp">
+      <div class="k you"><span class="l">คุณ</span><span class="v" id="kYou">100</span><span class="sub" id="kYouS">$10,000</span></div>
+      <div class="k"><span class="l">ระบบ</span><span class="v" id="kSys">100</span><span class="sub">ถือตามกฎ</span></div>
+      <div class="k"><span class="l">S&amp;P 500</span><span class="v" id="kSpy">100</span><span class="sub">ถือดัชนี</span></div>
+      <div class="k"><span class="l">DD ระบบ</span><span class="v" id="kDd">0%</span><span class="sub">จากจุดสูงสุด</span></div>
+    </div>
+    <div class="chart"><svg id="svg" viewBox="0 0 480 200" aria-label="กราฟเทียบ คุณ / ระบบ / S&P 500"></svg>
+      <div class="leg"><span><i style="border-color:#722F37"></i>คุณ</span><span><i style="border-color:#D4AF37"></i>ระบบ</span><span><i style="border-color:#A09B92;border-top-style:dashed"></i>S&amp;P 500</span></div></div>
+    <div class="hint"><span class="tag">Tree</span><span id="hint"></span></div>
+    <div class="act">
+      <button class="btn" id="hold1">ถือต่อ 1 เดือน</button>
+      <button class="btn ghost" id="hold3">ถือต่อ 3 เดือน</button>
+      <button class="btn sell wide" id="sell">ขายทั้งหมด → เงินสด</button>
+      <button class="btn buy wide" id="buy" style="display:none">กลับเข้าซื้อตามระบบ</button>
+    </div>
+    <p class="state" id="state"></p>
+  </section>
+
+  <section id="result" class="card">
+    <span class="eyebrow">ผลการซ้อม</span>
+    <h2 id="resTitle"></h2>
+    <div class="res">
+      <div class="r you"><span class="l">คุณ</span><span class="v" id="rYou"></span><span class="p" id="rYouP"></span></div>
+      <div class="r"><span class="l">ระบบ</span><span class="v" id="rSys"></span><span class="p" id="rSysP"></span></div>
+      <div class="r"><span class="l">S&amp;P 500</span><span class="v" id="rSpy"></span><span class="p" id="rSpyP"></span></div>
+    </div>
+    <p class="lesson" id="lesson"></p>
+    <ul class="log" id="log"></ul>
+    <div class="cav" id="cav"></div>
+    <div class="act" style="margin-top:14px">
+      <button class="btn" id="again">ซ้อมอีกครั้ง</button>
+      <button class="btn ghost" id="other">เปลี่ยนวิกฤต</button>
+    </div>
+  </section>
+
+  <p class="foot">เพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน · ผลทดสอบย้อนหลังไม่รับประกันผลในอนาคต · ซื้อ-ขายในซ้อมใช้ราคาปิดสิ้นเดือน<br>Draft v0.1 · สิงหาคม 2026</p>
+</div>
+
+<script>
+var DATA={"gfc":{"name":"วิกฤตการเงินโลก 2008","entry":"2007-08-01","hint":"เข้าระบบ ส.ค. 2007 — 2 เดือนก่อนจุดสูงสุดของตลาด","rows":[{"m":"2007-08","d":"2007-08-31","s":101.94,"spy":100.79,"dd":0.0},{"m":"2007-09","d":"2007-09-28","s":110.46,"spy":104.69,"dd":0.0},{"m":"2007-10","d":"2007-10-31","s":118.85,"spy":106.11,"dd":0.0},{"m":"2007-11","d":"2007-11-30","s":116.92,"spy":102.01,"dd":-1.6},{"m":"2007-12","d":"2007-12-31","s":121.67,"spy":100.86,"dd":0.0},{"m":"2008-01","d":"2008-01-31","s":106.35,"spy":94.76,"dd":-12.6},{"m":"2008-02","d":"2008-02-29","s":105.49,"spy":92.31,"dd":-13.3},{"m":"2008-03","d":"2008-03-31","s":110.81,"spy":91.49,"dd":-8.9},{"m":"2008-04","d":"2008-04-30","s":121.17,"spy":95.85,"dd":-0.4},{"m":"2008-05","d":"2008-05-30","s":122.52,"spy":97.3,"dd":0.0},{"m":"2008-06","d":"2008-06-30","s":112.04,"spy":89.16,"dd":-8.6},{"m":"2008-07","d":"2008-07-31","s":110.26,"spy":88.36,"dd":-10.0},{"m":"2008-08","d":"2008-08-29","s":110.58,"spy":89.73,"dd":-9.7},{"m":"2008-09","d":"2008-09-30","s":94.12,"spy":81.28,"dd":-23.2},{"m":"2008-10","d":"2008-10-31","s":78.11,"spy":67.85,"dd":-36.2},{"m":"2008-11","d":"2008-11-28","s":71.67,"spy":63.13,"dd":-41.5},{"m":"2008-12","d":"2008-12-31","s":73.38,"spy":63.75,"dd":-40.1},{"m":"2009-01","d":"2009-01-30","s":71.74,"spy":58.51,"dd":-41.4},{"m":"2009-02","d":"2009-02-27","s":65.66,"spy":52.22,"dd":-46.4},{"m":"2009-03","d":"2009-03-31","s":69.77,"spy":56.58,"dd":-43.1},{"m":"2009-04","d":"2009-04-30","s":71.63,"spy":62.2,"dd":-41.5},{"m":"2009-05","d":"2009-05-29","s":68.84,"spy":65.83,"dd":-43.8},{"m":"2009-06","d":"2009-06-30","s":68.15,"spy":65.79,"dd":-44.4},{"m":"2009-07","d":"2009-07-31","s":71.76,"spy":70.7,"dd":-41.4},{"m":"2009-08","d":"2009-08-31","s":79.66,"spy":73.31,"dd":-35.0},{"m":"2009-09","d":"2009-09-30","s":85.92,"spy":75.91,"dd":-29.9},{"m":"2009-10","d":"2009-10-30","s":78.2,"spy":74.45,"dd":-36.2},{"m":"2009-11","d":"2009-11-30","s":84.7,"spy":79.04,"dd":-30.9},{"m":"2009-12","d":"2009-12-31","s":85.63,"spy":80.54,"dd":-30.1},{"m":"2010-01","d":"2010-01-29","s":91.6,"spy":77.62,"dd":-25.2},{"m":"2010-02","d":"2010-02-26","s":98.11,"spy":80.04,"dd":-19.9},{"m":"2010-03","d":"2010-03-31","s":113.72,"spy":84.91,"dd":-7.2},{"m":"2010-04","d":"2010-04-30","s":126.43,"spy":86.22,"dd":0.0},{"m":"2010-05","d":"2010-05-28","s":115.55,"spy":79.38,"dd":-8.6},{"m":"2010-06","d":"2010-06-30","s":95.74,"spy":75.27,"dd":-24.3},{"m":"2010-07","d":"2010-07-30","s":104.1,"spy":80.41,"dd":-17.7},{"m":"2010-08","d":"2010-08-02","s":106.7,"spy":82.23,"dd":-15.6}],"rebals":[{"date":"2007-08-01","tickers":["AMZN","AAPL","NVDA","MA","FCX","CMG","BKNG","CSX","LRCX","AMAT"]},{"date":"2008-02-01","tickers":["NFLX","BKNG","MA","CMG","CF","GILD","GME","MSFT","GOOG","GOOGL"]},{"date":"2008-08-01","tickers":["CSX","AAPL","CF","QCOM","NFLX","WMT","HAL","ROST","CMCSA","FAST"]},{"date":"2009-02-02","tickers":["NFLX","MNST","ORLY","XOM","BMY","ABT","GLD","UAL","HD","GILD"]},{"date":"2009-08-03","tickers":["BAC","F","FITB","FCX","LVS","HBAN","AAPL","GNW","DD","CMG"]},{"date":"2010-02-01","tickers":["FMCC","FNMA","AMZN","AMD","AIG","NFLX","BKNG","GNW","LVS","AIV"]},{"date":"2010-08-02","tickers":["NFLX","LVS","CMG","AAPL","AIG","AAL","AIV","ORLY","CMCSA","C"]}],"ctx":{"2007-08":"เข้าระบบ · ตลาดยังใกล้จุดสูงสุด ข่าวซับไพรม์เริ่มดัง","2007-10":"S&P 500 ทำจุดสูงสุดตลอดกาล 9 ต.ค.","2008-03":"Bear Stearns ถูก JPMorgan ซื้อในราคาถูก","2008-09":"Lehman Brothers ล้ม 15 ก.ย.","2008-10":"เดือนที่เลวร้ายที่สุดของวิกฤต ตลาดดิ่งทุกสัปดาห์","2009-02":"พอร์ตต่ำสุด · Rebalance ก.พ. ระบบคัดหุ้นใหม่ในวันที่แย่ที่สุด","2009-03":"S&P 500 ทำจุดต่ำสุด 9 มี.ค. แล้วกลับตัว","2009-08":"Rebalance ส.ค. · ตัวที่ฟื้นแรงถูกดึงเข้าพอร์ต","2010-02":"Rebalance · เศรษฐกิจเริ่มฟื้น","2010-05":"Flash Crash · วิกฤตหนี้กรีซ","2010-08":"ครบ 3 ปี"}},"covid":{"name":"COVID-19 2020","entry":"2020-02-03","hint":"เข้าระบบ ก.พ. 2020 — 2 สัปดาห์ก่อนตลาดเริ่มดิ่ง","rows":[{"m":"2020-02","d":"2020-02-28","s":93.54,"spy":91.4,"dd":-6.5},{"m":"2020-03","d":"2020-03-31","s":86.38,"spy":79.99,"dd":-13.6},{"m":"2020-04","d":"2020-04-30","s":100.23,"spy":90.15,"dd":0.0},{"m":"2020-05","d":"2020-05-29","s":107.65,"spy":94.44,"dd":0.0},{"m":"2020-06","d":"2020-06-30","s":116.9,"spy":96.12,"dd":0.0},{"m":"2020-07","d":"2020-07-31","s":131.71,"spy":101.78,"dd":0.0},{"m":"2020-08","d":"2020-08-31","s":158.68,"spy":108.88,"dd":0.0},{"m":"2020-09","d":"2020-09-30","s":152.33,"spy":104.81,"dd":-4.0},{"m":"2020-10","d":"2020-10-30","s":143.17,"spy":102.19,"dd":-9.8},{"m":"2020-11","d":"2020-11-30","s":188.45,"spy":113.31,"dd":0.0},{"m":"2020-12","d":"2020-12-31","s":186.62,"spy":117.51,"dd":-1.0},{"m":"2021-01","d":"2021-01-29","s":202.76,"spy":116.31,"dd":0.0},{"m":"2021-02","d":"2021-02-26","s":226.9,"spy":119.54,"dd":0.0},{"m":"2021-03","d":"2021-03-31","s":219.39,"spy":124.97,"dd":-3.3},{"m":"2021-04","d":"2021-04-30","s":232.29,"spy":131.58,"dd":0.0},{"m":"2021-05","d":"2021-05-28","s":244.3,"spy":132.45,"dd":0.0},{"m":"2021-06","d":"2021-06-30","s":245.96,"spy":135.42,"dd":0.0},{"m":"2021-07","d":"2021-07-30","s":245.96,"spy":138.72,"dd":0.0},{"m":"2021-08","d":"2021-08-31","s":258.25,"spy":142.85,"dd":0.0},{"m":"2021-09","d":"2021-09-30","s":258.75,"spy":136.19,"dd":0.0},{"m":"2021-10","d":"2021-10-29","s":282.29,"spy":145.75,"dd":0.0},{"m":"2021-11","d":"2021-11-30","s":285.89,"spy":144.58,"dd":0.0},{"m":"2021-12","d":"2021-12-31","s":282.52,"spy":151.26,"dd":-1.2},{"m":"2022-01","d":"2022-01-31","s":278.38,"spy":143.29,"dd":-2.6},{"m":"2022-02","d":"2022-02-01","s":285.44,"spy":144.25,"dd":-0.2}],"rebals":[{"date":"2020-02-03","tickers":["TSLA","AAPL","NVDA","AMD","LRCX","BMY","INTC","MSFT","KLAC","NOW"]},{"date":"2020-08-03","tickers":["NVDA","TSLA","AMZN","AMD","AAPL","MRNA","NFLX","TTD","CMG","CVNA"]},{"date":"2021-02-01","tickers":["TSLA","FCX","NCLH","MRNA","GM","F","GE","UBER","PSKY","MGM"]},{"date":"2021-08-02","tickers":["NVDA","WFC","GOOGL","MRNA","GOOG","DVN","ORCL","FCX","META","COP"]},{"date":"2022-02-01","tickers":["F","TSLA","XOM","NVDA","OXY","PCG","DVN","BAC","APA","SLB"]}],"ctx":{"2020-02":"เข้าระบบ 3 ก.พ. · ตลาดทำจุดสูงสุด 19 ก.พ. แล้วเริ่มดิ่ง","2020-03":"ตลาดลง 30% ในเดือนเดียว เร็วที่สุดในประวัติศาสตร์ · จุดต่ำสุด 23 มี.ค.","2020-04":"กลับตัวแรง หลัง Fed และรัฐบาลอัดฉีด","2020-08":"Rebalance ส.ค. · หุ้นเทคโนโลยีนำตลาด","2020-11":"ข่าววัคซีน · เงินไหลเข้าหุ้นที่ถูกทิ้งตอน COVID","2021-02":"Rebalance ก.พ.","2021-08":"Rebalance ส.ค.","2022-01":"Fed ส่งสัญญาณขึ้นดอกเบี้ย ตลาดเริ่มลง","2022-02":"ครบ 2 ปี"}},"hike":{"name":"ปีดอกเบี้ยขึ้น 2022","entry":"2022-02-01","hint":"เข้าระบบ ก.พ. 2022 — ก่อน Fed เริ่มขึ้นดอกเบี้ยรอบใหญ่","rows":[{"m":"2022-02","d":"2022-02-28","s":99.03,"spy":96.4,"dd":-1.0},{"m":"2022-03","d":"2022-03-31","s":108.13,"spy":100.02,"dd":0.0},{"m":"2022-04","d":"2022-04-29","s":99.55,"spy":91.24,"dd":-7.9},{"m":"2022-05","d":"2022-05-31","s":110.0,"spy":91.45,"dd":0.0},{"m":"2022-06","d":"2022-06-30","s":89.65,"spy":83.91,"dd":-18.5},{"m":"2022-07","d":"2022-07-29","s":101.96,"spy":91.63,"dd":-7.3},{"m":"2022-08","d":"2022-08-31","s":104.75,"spy":87.9,"dd":-4.8},{"m":"2022-09","d":"2022-09-30","s":95.36,"spy":79.77,"dd":-13.3},{"m":"2022-10","d":"2022-10-31","s":111.33,"spy":86.25,"dd":0.0},{"m":"2022-11","d":"2022-11-30","s":110.67,"spy":91.05,"dd":-0.6},{"m":"2022-12","d":"2022-12-30","s":102.23,"spy":85.8,"dd":-8.2},{"m":"2023-01","d":"2023-01-31","s":104.4,"spy":91.2,"dd":-6.2},{"m":"2023-02","d":"2023-02-28","s":98.71,"spy":88.9,"dd":-11.3},{"m":"2023-03","d":"2023-03-31","s":96.55,"spy":92.2,"dd":-13.3},{"m":"2023-04","d":"2023-04-28","s":97.17,"spy":93.67,"dd":-12.7},{"m":"2023-05","d":"2023-05-31","s":94.84,"spy":94.11,"dd":-14.8},{"m":"2023-06","d":"2023-06-30","s":103.87,"spy":100.2,"dd":-6.7},{"m":"2023-07","d":"2023-07-31","s":109.23,"spy":103.48,"dd":-1.9},{"m":"2023-08","d":"2023-08-31","s":101.01,"spy":101.8,"dd":-9.3},{"m":"2023-09","d":"2023-09-29","s":95.31,"spy":96.97,"dd":-14.4},{"m":"2023-10","d":"2023-10-31","s":85.35,"spy":94.87,"dd":-23.3},{"m":"2023-11","d":"2023-11-30","s":102.38,"spy":103.53,"dd":-8.0},{"m":"2023-12","d":"2023-12-29","s":115.83,"spy":108.26,"dd":0.0},{"m":"2024-01","d":"2024-01-31","s":124.68,"spy":109.98,"dd":0.0},{"m":"2024-02","d":"2024-02-01","s":127.96,"spy":111.42,"dd":0.0}],"rebals":[{"date":"2022-02-01","tickers":["F","TSLA","XOM","NVDA","OXY","PCG","DVN","BAC","APA","SLB"]},{"date":"2022-08-01","tickers":["OXY","XOM","CTRA","CVX","EQT","DVN","VICI","BMY","MOS","MRK"]},{"date":"2023-02-01","tickers":["NFLX","PCG","FCX","SLB","HAL","GE","XOM","GILD","UAL","VTRS"]},{"date":"2023-08-01","tickers":["CVNA","NVDA","PLTR","TSLA","CCL","META","SMCI","AVGO","UBER","AMD"]},{"date":"2024-02-01","tickers":["AMD","SMCI","NVDA","UBER","NFLX","AVGO","T","VZ","INTC","COIN"]}],"ctx":{"2022-02":"เข้าระบบ · รัสเซียบุกยูเครน 24 ก.พ.","2022-03":"Fed ขึ้นดอกเบี้ยครั้งแรกของรอบ","2022-06":"S&P 500 เข้าตลาดหมีอย่างเป็นทางการ (-20%)","2022-08":"Rebalance ส.ค. · Powell ที่ Jackson Hole ย้ำขึ้นต่อ","2022-10":"S&P 500 ทำจุดต่ำสุดของรอบ 12 ต.ค.","2023-02":"Rebalance ก.พ.","2023-03":"Silicon Valley Bank ล้ม","2023-08":"Rebalance ส.ค.","2023-10":"พอร์ตต่ำสุด · บอนด์ 10 ปีแตะ 5%","2023-11":"ตลาดกลับตัวแรง คาด Fed หยุดขึ้น","2024-02":"ครบ 2 ปี"}}};
+(function(){
+  var $=function(s){return document.querySelector(s)};
+  var CAV={
+    gfc:'<b>ข้อจำกัดหนักที่สุดในสามสถานการณ์:</b> ชุดหุ้นคือสมาชิก S&P 500 ปัจจุบัน + หุ้นที่ถูกถอด 146 ตัว (2001–2010) — ระบบจึง "รู้ล่วงหน้า" ว่า AMZN, AAPL, NVDA จะรอด ผลจริงในปี 2008 น่าจะแย่กว่านี้ ใช้ซ้อม "อารมณ์" ได้ ใช้อ้างตัวเลขไม่ได้',
+    covid:'<b>ข้อจำกัด:</b> ชุดหุ้น = สมาชิก S&P 500 ปัจจุบัน (survivorship bias ระดับปานกลาง) · ผลตอบแทนสูงผิดปกติมาจากหุ้นเทคโนโลยี/TSLA ที่ระบบคัดเข้าก่อน COVID พอดี — ไม่ใช่ผลปกติของกลยุทธ์',
+    hike:'<b>ข้อจำกัด:</b> ชุดหุ้น = สมาชิก S&P 500 ปัจจุบัน (survivorship bias ระดับต่ำ เพราะใกล้ปัจจุบัน) · สังเกตว่ารอบนี้ระบบแพ้ดัชนีอยู่นานกว่าปี ก่อนจะแซงในช่วงท้าย'
+  };
+  var TAG={gfc:'3 ปี · DD ลึกสุด −46%',covid:'2 ปี · ดิ่งเร็วสุดในประวัติศาสตร์',hike:'2 ปี · ตลาดหมีแบบช้าๆ'};
+  var S=null, i=0, inMkt=true, you=100, log=[], outMonths=0;
+
+  // picker
+  var h=''; Object.keys(DATA).forEach(function(k){ var d=DATA[k]; var y=d.entry.slice(0,4);
+    h+='<button class="scb" data-k="'+k+'"><span class="t">'+d.name+'<span class="y">'+y+'</span></span><span class="s">'+d.hint+'</span><span class="meta"><span class="badge b-warn">'+TAG[k]+'</span><span class="badge '+(k==='gfc'?'b-dev':'b-ok')+'">'+(k==='gfc'?'survivorship bias สูง':'ข้อมูลจริง')+'</span></span></button>'; });
+  $('#sc').innerHTML=h;
+  Array.prototype.forEach.call(document.querySelectorAll('.scb'),function(b){ b.addEventListener('click',function(){ start(b.getAttribute('data-k')); }); });
+
+  function start(k){ S=DATA[k]; S.key=k; i=0; inMkt=true; you=S.rows[0].s; log=[]; outMonths=0;
+    $('#picker').style.display='none'; $('#result').style.display='none'; $('#stage').style.display='block'; render(); window.scrollTo({top:$('#stage').offsetTop-60,behavior:'smooth'}); }
+
+  function fmtM(m){ var y=m.slice(0,4), mo=parseInt(m.slice(5,7),10); var TH=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.']; return TH[mo-1]+' '+y; }
+  function usd(v){ return '$'+Math.round(v*100).toLocaleString('en-US'); }
+  function pct(v){ return (v>=0?'+':'')+v.toFixed(1)+'%'; }
+  function isRebal(m){ return S.rebals.some(function(r){return r.date.slice(0,7)===m}); }
+  function rebalTickers(m){ var r=S.rebals.filter(function(r){return r.date.slice(0,7)===m})[0]; return r?r.tickers:null; }
+
+  function treeHint(dd){
+    if(dd>-10) return '<b>ไม่ทำอะไร</b> — ต่ำกว่า 10% คือช่วงปกติของทุกกลยุทธ์ (§3 ขั้น −10)';
+    if(dd>-20) return '<b>ถือต่อ — กฎทำงานตามคาด</b> ตลาดลงทั้งกระดาน ระบบแก้จังหวะตัวเองตอน rebalance (§3 ขั้น −15)';
+    return '<b>ยังไม่ขายนอกกฎ — หยุดเติม</b> ระดับนี้เคยเกิดเฉพาะวิกฤตใหญ่ backtest ทุกรอบฟื้นหลังจุดนี้ (§3 ขั้น −20)';
+  }
+
+  function render(){
+    var r=S.rows[i], first=S.rows[0];
+    $('#mon').innerHTML='<small>Month '+(i+1)+' / '+S.rows.length+'</small>'+fmtM(r.m);
+    $('#monN').textContent='สิ้นเดือน '+r.d;
+    var ctx=S.ctx[r.m]||''; var tk=rebalTickers(r.m);
+    if(tk && i>0) ctx=(ctx?ctx+' · ':'')+'Rebalance: '+tk.slice(0,5).join(' ')+' …';
+    if(i===0 && tk) ctx=(ctx?ctx+' · ':'')+'พอร์ตแรก: '+tk.join(' ');
+    $('#ctx').textContent=ctx; $('#ctx').className='ctx'+(tk?' reb':'');
+    $('#kYou').textContent=you.toFixed(0); $('#kYouS').textContent=usd(you)+(inMkt?'':' · เงินสด');
+    $('#kSys').textContent=r.s.toFixed(0); $('#kSpy').textContent=r.spy.toFixed(0);
+    var dd=$('#kDd'); dd.textContent=r.dd.toFixed(0)+'%'; dd.className='v'+(r.dd<=-10?' neg':'');
+    $('#hint').innerHTML=treeHint(r.dd);
+    $('#sell').style.display=inMkt?'':'none'; $('#buy').style.display=inMkt?'none':'';
+    $('#state').innerHTML=inMkt?'สถานะ: <b>อยู่ในระบบ</b>':'สถานะ: <b>ถือเงินสด</b> · ออกมาแล้ว '+outMonths+' เดือน';
+    draw();
+  }
+
+  // chart — progressive
+  function draw(){
+    var W=480,H=200,px=34,py=14; var rows=S.rows;
+    var ys=[], spys=[], yous=[]; var yv=100;
+    var yTrack=[rows[0].s]; // recompute member path from log for drawing
+    var tmp=rows[0].s, st=true, lg=log.slice();
+    for(var k=1;k<=i;k++){ var ev=lg.filter(function(e){return e.i===k-1}); ev.forEach(function(e){ st=(e.a==='buy'); }); if(st) tmp*=rows[k].s/rows[k-1].s; yTrack.push(tmp); }
+    var all=rows.slice(0,i+1).map(function(r){return r.s}).concat(rows.slice(0,i+1).map(function(r){return r.spy})).concat(yTrack);
+    var allFull=rows.map(function(r){return r.s}).concat(rows.map(function(r){return r.spy}));
+    var lo=Math.min.apply(null,allFull.concat(all))*0.95, hi=Math.max.apply(null,allFull.concat(all))*1.03;
+    var n=rows.length; var X=function(k){return px+(W-px-8)*k/(n-1)}; var Y=function(v){return py+(H-py-18)*(1-(v-lo)/(hi-lo))};
+    function path(arr){ return arr.map(function(v,k){return (k?'L':'M')+X(k).toFixed(1)+' '+Y(v).toFixed(1)}).join(' '); }
+    var g='';
+    // grid 100 line
+    g+='<line x1="'+px+'" y1="'+Y(100).toFixed(1)+'" x2="'+(W-8)+'" y2="'+Y(100).toFixed(1)+'" stroke="rgba(212,175,55,.35)" stroke-dasharray="2 3"/>';
+    g+='<text x="4" y="'+(Y(100)+4).toFixed(1)+'" font-size="10" fill="#8B6914" font-family="DM Serif Display">100</text>';
+    g+='<text x="4" y="'+(Y(hi/1.03)+4).toFixed(1)+'" font-size="10" fill="#7A6F62" font-family="DM Serif Display">'+Math.round(hi/1.03)+'</text>';
+    g+='<text x="4" y="'+(Y(lo/0.95)+4).toFixed(1)+'" font-size="10" fill="#7A6F62" font-family="DM Serif Display">'+Math.round(lo/0.95)+'</text>';
+    // rebal markers
+    S.rebals.forEach(function(rb){ var idx=rows.findIndex(function(r){return r.m===rb.date.slice(0,7)}); if(idx>0&&idx<=i) g+='<line x1="'+X(idx).toFixed(1)+'" y1="'+py+'" x2="'+X(idx).toFixed(1)+'" y2="'+(H-18)+'" stroke="rgba(114,47,55,.18)"/>'; });
+    g+='<path d="'+path(rows.slice(0,i+1).map(function(r){return r.spy}))+'" fill="none" stroke="#A09B92" stroke-width="1.5" stroke-dasharray="4 3"/>';
+    g+='<path d="'+path(rows.slice(0,i+1).map(function(r){return r.s}))+'" fill="none" stroke="#D4AF37" stroke-width="2.5" stroke-linejoin="round"/>';
+    g+='<path d="'+path(yTrack)+'" fill="none" stroke="#722F37" stroke-width="2.5" stroke-linejoin="round"/>';
+    g+='<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(yTrack[i]).toFixed(1)+'" r="4" fill="#722F37"/>';
+    // x labels: first, last, and years
+    rows.forEach(function(r,k){ if(r.m.slice(5)==='01'||k===0) g+='<text x="'+X(k).toFixed(1)+'" y="'+(H-4)+'" font-size="10" fill="#7A6F62" text-anchor="middle" font-family="Cinzel">'+r.m.slice(0,4)+'</text>'; });
+    $('#svg').innerHTML=g;
+  }
+
+  function step(){ if(i>=S.rows.length-1) return finish();
+    var a=S.rows[i], b=S.rows[i+1]; if(inMkt) you*=b.s/a.s; else outMonths++; i++; render(); if(i>=S.rows.length-1) finish(); }
+  $('#hold1').addEventListener('click',function(){ step(); });
+  $('#hold3').addEventListener('click',function(){ for(var k=0;k<3;k++){ if(i>=S.rows.length-1) break; step(); } });
+  $('#sell').addEventListener('click',function(){ if(!inMkt) return; inMkt=false; log.push({i:i,a:'sell',m:S.rows[i].m,v:you,dd:S.rows[i].dd}); render(); });
+  $('#buy').addEventListener('click',function(){ if(inMkt) return; inMkt=true; log.push({i:i,a:'buy',m:S.rows[i].m,v:you,dd:S.rows[i].dd}); render(); });
+
+  function finish(){
+    var last=S.rows[S.rows.length-1];
+    $('#stage').style.display='none'; $('#result').style.display='block';
+    $('#resTitle').textContent=S.name+' — ผ่านไป '+(S.rows.length-1)+' เดือน';
+    $('#rYou').textContent=usd(you); $('#rYouP').textContent=pct(you-100);
+    $('#rSys').textContent=usd(last.s); $('#rSysP').textContent=pct(last.s-100);
+    $('#rSpy').textContent=usd(last.spy); $('#rSpyP').textContent=pct(last.spy-100);
+    var minDD=Math.min.apply(null,S.rows.map(function(r){return r.dd}));
+    var sells=log.filter(function(e){return e.a==='sell'});
+    var L='';
+    if(sells.length===0){ L='<b>คุณทำตามระบบทั้งรอบ</b> ผ่าน drawdown ลึกสุด '+minDD.toFixed(0)+'% โดยไม่ขยับ — นี่คือสิ่งที่ทำยากที่สุดและเป็นสิ่งเดียวที่ผลทดสอบของเรายืนยันว่าคุ้ม'; }
+    else { var gap=you-last.s; var worst=sells.reduce(function(a,e){return e.dd<a.dd?e:a},sells[0]);
+      if(gap<-0.5) L='<b>คุณได้น้อยกว่าระบบ '+usd(-gap).replace('$','$')+'</b> — ขายครั้งที่เจ็บที่สุดคือ '+fmtM(worst.m)+' ที่ DD '+worst.dd.toFixed(0)+'% '+(inMkt?'และกลับเข้าช้ากว่าที่ตลาดกลับตัว':'แล้วไม่ได้กลับเข้าเลย')+' · วันที่ดีที่สุดมักเกิดติดกับวันที่แย่ที่สุด คนที่ออกไปรอจึงพลาดวันกลับตัวเกือบแน่นอน';
+      else L='<b>คุณได้มากกว่าระบบ '+usd(gap)+'</b> — รอบนี้จังหวะออก-เข้าของคุณถูก ลองซ้อมซ้ำแล้วดูว่าทำได้อีกไหม ผลทดสอบหลายรอบของเราบอกว่าความถูกแบบนี้ทำซ้ำไม่ได้ และการพยายามทำซ้ำคือสิ่งที่ทำให้แพ้'; }
+    if(outMonths>0) L+=' · อยู่นอกตลาด '+outMonths+' เดือน';
+    $('#lesson').innerHTML=L;
+    var lh=''; log.forEach(function(e){ lh+='<li><span class="d">'+fmtM(e.m)+'</span><span class="a '+e.a+'">'+(e.a==='sell'?'ขายทั้งหมด':'กลับเข้าซื้อ')+' · DD ระบบ '+e.dd.toFixed(0)+'%</span><span>'+usd(e.v)+'</span></li>'; });
+    if(!lh) lh='<li><span class="d">—</span><span>ไม่มีการขายนอกกฎ</span><span></span></li>';
+    $('#log').innerHTML=lh; $('#cav').innerHTML=CAV[S.key];
+    window.scrollTo({top:$('#result').offsetTop-60,behavior:'smooth'});
+  }
+  $('#again').addEventListener('click',function(){ start(S.key); });
+  $('#other').addEventListener('click',function(){ $('#result').style.display='none'; $('#picker').style.display='block'; window.scrollTo({top:0,behavior:'smooth'}); });
+})();
+</script>
+</body>
+</html>
