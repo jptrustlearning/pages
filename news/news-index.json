@@ -1,6 +1,181 @@
 {
-  "lastUpdated": "2026-08-27T08:20:00Z",
+  "lastUpdated": "2026-08-28T06:45:00Z",
   "batches": [
+    {
+      "file": "2026-08-28-0645.md",
+      "date": "2026-08-28T06:45:00Z",
+      "date_display": "28 ส.ค. 2026 · 06:45",
+      "summary": "Salesforce ปิดบวก 22.6% วันเดียว แต่กำไรก้อนใหญ่มาจากการตีมูลค่าเงินลงทุน ไม่ใช่ธุรกิจหลัก · คืนนี้ 21:00 น. Warsh ขึ้นเวที Jackson Hole ครั้งแรก หลังผู้ว่าการเฟด 3 คนเตือนเงินเฟ้อพร้อมกัน · ขาดดุลการค้าสหรัฐฯ กว้างสุด 16 เดือนจากการนำเข้าอุปกรณ์ AI · น้ำมันร่วงวันที่ 4 ติด หลังอิหร่าน-โอมานตกลงเรื่องฮอร์มุซ",
+      "tickers": [
+        "CRM",
+        "NOW",
+        "ADBE",
+        "PLTR",
+        "NVDA",
+        "MU",
+        "TSM",
+        "QQQ",
+        "SPY",
+        "TLT",
+        "GLD",
+        "USO",
+        "XLE",
+        "USD",
+        "VIX",
+        "SET",
+        "PTT",
+        "PTTEP",
+        "AOT",
+        "CPALL",
+        "TU",
+        "DELTA",
+        "KCE",
+        "HANA"
+      ],
+      "headlines": [
+        {
+          "title": "Salesforce ปิดบวก 22.6% วันเดียว หลังกำไรและเป้าทั้งปีดีกว่าคาด — แต่กำไรก้อนใหญ่ที่สุดในไตรมาสนี้ไม่ได้มาจากการขายซอฟต์แวร์",
+          "tickers": [
+            {
+              "symbol": "CRM",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "NOW",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "ADBE",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PLTR",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SPY",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "CNBC, Reuters, Yahoo Finance, Motley Fool, Salesforce Investor Relations",
+          "published": "28 ส.ค. 2026"
+        },
+        {
+          "title": "คืนนี้ 21:00 น. Kevin Warsh ขึ้นเวที Jackson Hole ครั้งแรกในฐานะประธานเฟด — และวันก่อนหน้า ผู้ว่าการเฟด 3 คนออกมาเตือนเรื่องเงินเฟ้อพร้อมกัน",
+          "tickers": [
+            {
+              "symbol": "TLT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "SPY",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "USD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "VIX",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "GLD",
+              "sentiment": "neutral"
+            }
+          ],
+          "tone_override": "bearish",
+          "source": "CNBC, Quartz, Reuters, Trading Economics, Epoch Times",
+          "published": "28 ส.ค. 2026"
+        },
+        {
+          "title": "ยอดขาดดุลการค้าสหรัฐฯ กว้างสุดในรอบ 16 เดือน — แต่เกือบทั้งหมดมาจากการนำเข้าเครื่องมือสร้างศูนย์ข้อมูล AI",
+          "tickers": [
+            {
+              "symbol": "NVDA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "MU",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "TSM",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "KCE",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "HANA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SPY",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "USD",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "Reuters, Census Bureau, Benzinga, Yahoo Finance",
+          "published": "28 ส.ค. 2026"
+        },
+        {
+          "title": "น้ำมันร่วงเป็นวันที่สี่ติด หลังอิหร่านและโอมานตกลงแบ่งรายได้ในช่องแคบฮอร์มุซ — สัปดาห์เดียวราคาลงกว่า 7%",
+          "tickers": [
+            {
+              "symbol": "USO",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "XLE",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "PTT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "PTTEP",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "CPALL",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "TU",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SET",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "Bloomberg, CNBC, Trading Economics, Reuters",
+          "published": "28 ส.ค. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-08-27-0820.md",
       "date": "2026-08-27T08:20:00Z",
