@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="robots" content="noindex">
+<title>แผนที่ความรู้ · JP Trust Learning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Cinzel:wght@500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<!-- JP Trust hard auth-gate (redirect to login if no session) -->
+<script src="./jp-gate.js?v=1788026881"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { height:100%; overflow:hidden; }
+  body { background:#1a0a0e; font-family:'Anuphan',sans-serif; color:#FAF6ED;
+         display:flex; flex-direction:column; }
+
+  /* ── header ── */
+  .hdr { padding:14px 16px 6px; flex:0 0 auto; }
+  .hdr .eyebrow { font-family:'Cinzel',serif; font-size:10px; letter-spacing:3px;
+                  color:#D4AF37; text-transform:uppercase; }
+  .hdr h1 { font-size:20px; font-weight:600; margin-top:2px; color:#FAF6ED; }
+
+  .searchbar { margin:8px 16px 0; display:flex; align-items:center; gap:9px;
+               background:#2d1018; border:1px solid #4a2028; border-radius:12px;
+               padding:9px 13px; transition:border-color .25s, box-shadow .25s; flex:0 0 auto; }
+  .searchbar.active { border-color:#D4AF37; box-shadow:0 0 14px rgba(212,175,55,.18); }
+  .searchbar svg { flex:0 0 auto; }
+  .searchbar input { flex:1; background:none; border:none; outline:none; color:#F4E4BA;
+                     font-family:'Anuphan',sans-serif; font-size:15px; min-width:0; }
+  .searchbar input::placeholder { color:#7a5a60; }
+  .searchbar .hits { font-size:11px; color:#8a6d6f; white-space:nowrap; }
+  .searchbar .clear { display:none; color:#b89aa0; font-size:16px; line-height:1;
+                      padding:2px 4px; cursor:pointer; }
+  .searchbar.active .clear { display:block; }
+
+  .legend { display:flex; gap:6px; overflow-x:auto; padding:9px 16px 7px;
+            scrollbar-width:none; flex:0 0 auto; }
+  .legend::-webkit-scrollbar { display:none; }
+  .chip { flex:0 0 auto; display:flex; align-items:center; gap:6px; font-size:11.5px;
+          color:#c9a8ae; background:#2d1018; border:1px solid #3f1c26; border-radius:999px;
+          padding:5px 11px; cursor:pointer; user-select:none; transition:all .2s; }
+  .chip .dot { width:8px; height:8px; border-radius:50%; }
+  .chip.on { color:#1a0a0e; background:#F4E4BA; border-color:#D4AF37; font-weight:600; }
+
+  /* ── graph stage ── */
+  .stage { position:relative; flex:1 1 auto; overflow:hidden; touch-action:none;
+           background:radial-gradient(circle at 50% 30%, #241016 0%, #1a0a0e 60%); }
+  .stage svg { position:absolute; inset:0; width:100%; height:100%; display:block; cursor:grab; }
+  .stage svg.dragging { cursor:grabbing; }
+
+  .edge { stroke:#5a3630; stroke-width:1.1; opacity:.4; transition:opacity .25s, stroke .25s; }
+  .edge.lit { stroke:#D4AF37; stroke-width:1.8; opacity:.9; }
+  .edge.dim { opacity:.05; }
+
+  .node { cursor:pointer; }
+  .node circle { fill:#2d1018; stroke-width:1.6; transition:opacity .25s, filter .25s; }
+  .node text { font-family:'Anuphan',sans-serif; font-weight:600; fill:#d8c2c7;
+               text-anchor:middle; pointer-events:none; transition:opacity .25s;
+               paint-order:stroke; stroke:#1a0a0e; stroke-width:3px; stroke-linejoin:round; }
+  .node.dim circle { opacity:.1; }
+  .node.dim text { opacity:.08; }
+  .node.hit circle { filter:drop-shadow(0 0 10px rgba(212,175,55,.75)); }
+  .node.hit text { fill:#F4E4BA; }
+  .node.near circle { filter:drop-shadow(0 0 5px rgba(212,175,55,.35)); }
+  .node.near text { fill:#e0c98a; }
+  .node.sel circle { stroke:#F4E4BA !important; stroke-width:2.6;
+                     filter:drop-shadow(0 0 14px rgba(212,175,55,.9)); }
+
+  /* ── controls ── */
+  .zoomctl { position:absolute; right:12px; bottom:16px; display:flex; flex-direction:column;
+             gap:7px; z-index:5; }
+  .zoomctl button { width:38px; height:38px; border-radius:11px; background:#2d1018;
+                    border:1px solid #4a2028; color:#D4AF37; font-size:18px; cursor:pointer;
+                    display:flex; align-items:center; justify-content:center;
+                    font-family:'Anuphan',sans-serif; }
+  .zoomctl button:active { background:#3a1520; }
+  .hint { position:absolute; left:14px; bottom:18px; font-size:10.5px; color:#6f545a;
+          line-height:1.6; z-index:5; pointer-events:none; }
+
+  /* ── detail sheet ── */
+  .sheet { position:fixed; left:0; right:0; bottom:0; background:#FAF6ED;
+           border-radius:18px 18px 0 0; padding:16px 18px calc(18px + env(safe-area-inset-bottom));
+           transform:translateY(105%); transition:transform .3s cubic-bezier(.3,.9,.35,1);
+           z-index:20; max-height:62vh; overflow-y:auto; box-shadow:0 -8px 30px rgba(0,0,0,.5); }
+  .sheet.open { transform:translateY(0); }
+  .sheet .grab { width:38px; height:4px; border-radius:2px; background:#d5c9b6; margin:0 auto 12px; }
+  .sheet .cattag { display:inline-flex; align-items:center; gap:6px;
+                   font-family:'Cinzel',serif; font-size:9px; letter-spacing:2px;
+                   color:#6a5a2a; font-weight:700; text-transform:uppercase; }
+  .sheet .cattag .dot { width:8px; height:8px; border-radius:50%; }
+  .sheet .badge { display:inline-block; margin-left:8px; font-size:9px; letter-spacing:1.5px;
+                  font-weight:700; color:#8a3a1a; background:#f5e2cc; border:1px solid #e0b98a;
+                  border-radius:6px; padding:2px 7px; vertical-align:1px; }
+  .sheet h2 { font-size:19px; color:#1a0a0e; font-weight:700; margin-top:4px; }
+  .sheet .desc { font-size:13.5px; color:#3f3236; line-height:1.65; margin-top:7px; }
+  .sheet ul { margin:9px 0 0 2px; list-style:none; }
+  .sheet li { font-size:12.5px; color:#5a4a4e; line-height:1.55; padding-left:16px;
+              position:relative; margin-top:5px; }
+  .sheet li::before { content:''; position:absolute; left:2px; top:8px; width:6px; height:6px;
+                      border-radius:50%; background:#D4AF37; }
+  .sheet .actions { display:flex; gap:9px; margin-top:14px; }
+  .sheet .go { flex:1; text-align:center; font-size:13.5px; font-weight:600; padding:11px 0;
+               border-radius:11px; background:linear-gradient(135deg,#D4AF37,#b8952c);
+               color:#1a0a0e; text-decoration:none; }
+  .sheet .rel-h { font-family:'Cinzel',serif; font-size:9px; letter-spacing:2px; color:#8a7a6e;
+                  font-weight:700; margin-top:15px; }
+  .sheet .rel { display:flex; flex-wrap:wrap; gap:7px; margin-top:7px; }
+  .sheet .rel span { font-size:11.5px; color:#4a3238; background:#efe7d6;
+                     border:1px solid #ddd0b8; border-radius:999px; padding:5px 11px;
+                     cursor:pointer; }
+  .backdrop { position:fixed; inset:0; background:rgba(10,4,6,.35); opacity:0;
+              pointer-events:none; transition:opacity .3s; z-index:15; }
+  .backdrop.on { opacity:1; pointer-events:auto; }
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="eyebrow">Knowledge Map</div>
+  <h1>แผนที่ความรู้ JPTrust</h1>
+</div>
+
+<div class="searchbar" id="searchbar">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+  <input id="q" type="text" placeholder="ค้นหาแนวคิด กลยุทธ์ คำสำคัญ…" autocomplete="off">
+  <span class="hits" id="hits"></span>
+  <span class="clear" id="clearBtn">✕</span>
+</div>
+
+<div class="legend" id="legend"></div>
+
+<div class="stage" id="stage">
+  <svg id="svg">
+    <g id="world">
+      <g id="edges"></g>
+      <g id="nodes"></g>
+    </g>
+  </svg>
+  <div class="zoomctl">
+    <button id="zin">＋</button>
+    <button id="zout">－</button>
+    <button id="zfit" title="ดูทั้งแผนที่" style="font-size:13px">⌂</button>
+  </div>
+  <div class="hint">ลากเลื่อน · หยิกซูม · แตะ node เพื่ออ่าน<br>ขนาดวง = ปริมาณเนื้อหา</div>
+</div>
+
+<div class="backdrop" id="backdrop"></div>
+<div class="sheet" id="sheet">
+  <div class="grab"></div>
+  <div><span class="cattag" id="shCat"></span><span class="badge" id="shBadge" style="display:none">RESEARCH</span></div>
+  <h2 id="shTitle"></h2>
+  <div class="desc" id="shDesc"></div>
+  <ul id="shPoints"></ul>
+  <div class="actions" id="shActions"></div>
+  <div class="rel-h">แนวคิดที่เชื่อมกัน</div>
+  <div class="rel" id="shRel"></div>
+</div>
+
+<script>
+const DATA = {"world":[1250,1650],"nodes":[{"id":"risk","title":"ผลตอบแทน & ความเสี่ยง","cat":"fnd","desc":"ทุกกลยุทธ์คือการแลกเปลี่ยน — ผลตอบแทนที่สูงขึ้นมาพร้อมความผันผวนหรือ Drawdown ที่ลึกขึ้นเสมอ คำถามที่ถูกไม่ใช่ \"อันไหนกำไรเยอะสุด\" แต่คือ \"อันไหนเราถือไหวจนจบรอบ\"","points":["กลยุทธ์ที่ดีที่สุดคือกลยุทธ์ที่เราทำตามได้จริงตลอดทาง","ตัวเลขทุกตัวใน Lab แสดงทั้งกำไรและความเสี่ยงคู่กันเสมอ"],"link":null,"badge":null,"size":29.3,"x":535.7,"y":388.9},{"id":"dd","title":"Max Drawdown","cat":"fnd","desc":"ระยะร่วงลึกสุดจากจุดสูงสุดถึงจุดต่ำสุดของพอร์ต — ตัววัดว่า \"เจ็บสุดแค่ไหนระหว่างทาง\" สำคัญกว่า CAGR สำหรับการอยู่รอด เพราะคนส่วนใหญ่ถอดใจตอน DD ลึก ไม่ใช่ตอนกำไรน้อย","points":["ฐานที่ใช้หาร DD ต้องนิยามให้ชัด — ฐานผิดตัวเลขเพี้ยนได้หลายเท่า","ทบต้นให้กำไรโตเร็วขึ้น แต่ DD บนมูลค่าพอร์ตก็ลึกขึ้นเป็นราคาที่ต้องจ่าย"],"link":null,"badge":null,"size":25.2,"x":680.0,"y":110.0},{"id":"divers","title":"การกระจายความเสี่ยง","cat":"fnd","desc":"ถือหลายตัว/หลายกลยุทธ์ที่ทำเงินคนละสภาพตลาด ช่วยให้เส้นทุนเรียบขึ้น — แต่การบังคับกระจายมากเกินไปก็มีต้นทุน","points":["ผลทดสอบจริง: บังคับกระจาย sector ละ 1 ตัว ไม่ลด DD แต่ตัดกำไรเกินครึ่ง","กระจาย \"กลยุทธ์\" (momentum + mean reversion) ได้ผลกว่ากระจาย \"จำนวนหุ้น\""],"link":null,"badge":null,"size":25.6,"x":612.6,"y":756.4},{"id":"bt","title":"Backtest คืออะไร","cat":"fnd","desc":"การจำลองกติกาซื้อขายบนข้อมูลอดีตเพื่อดูว่ากติกานั้น \"เคย\" ให้ผลแบบไหน — เป็นเครื่องมือคัดกติกาที่แย่ทิ้ง ไม่ใช่คำพยากรณ์อนาคต","points":["ทุก backtest ของ JPTrust มี Python อ้างอิงคำนวณซ้ำอิสระ ตรวจเลขตรงกันทุกหลัก","กติกาต้องพิสูจน์ว่าตัดสินใจจากข้อมูลถึง \"เมื่อวาน\" เท่านั้นก่อนเผยแพร่"],"link":null,"badge":null,"size":29.3,"x":331.5,"y":563.0},{"id":"lookahead","title":"Lookahead Bias","cat":"fnd","desc":"บั๊กร้ายแรงสุดของ backtest: แอบใช้ราคาปิดวันนี้ตัดสินใจแล้วกินกำไรวันเดียวกัน ผลคือกำไรปลอมที่เกิดจาก \"การมองอนาคต\"","points":["เคสจริงบนทอง: ลงมือวันเดียวกัน +8.7%/ปี ชนะถือยาว → แก้เป็นลงมือวันถัดไป เหลือ +1.6%/ปี แพ้ขาด","Edge ทั้งหมดหายไปเพราะบั๊กตัวเดียว — เป็นบทเรียนที่ทำเป็นบทสอนในหน้า Zone Trading"],"link":null,"badge":null,"size":25.0,"x":403.8,"y":824.0},{"id":"surviv","title":"Survivorship Bias","cat":"fnd","desc":"ถ้าชุดข้อมูลมีแต่หุ้นที่ \"รอดมาถึงวันนี้\" ผล backtest จะสวยเกินจริง เพราะหุ้นที่ล้มหายไปไม่อยู่ในการทดสอบ","points":["JPTrust ผนวกไฟล์หุ้น delisted เข้าชุดทดสอบเพื่อลดอาการนี้","ข้อมูลยุคเก่าที่ครอบคลุมไม่ครบ ต้องติด disclaimer ทุกจุดที่แสดงผล"],"link":null,"badge":null,"size":21.9,"x":110.0,"y":507.8},{"id":"tstat","title":"t-statistic","cat":"fnd","desc":"ตัววัดว่าผลกำไรส่วนเกินเป็น \"ฝีมือของกติกา\" หรือแค่ \"โชค\" — ค่ายิ่งสูงยิ่งมั่นใจว่าไม่ใช่ความบังเอิญ เกณฑ์วิชาการยุคใหม่ต้องการ t > 3","points":["จำนวนไม้น้อย (เช่น 19 ไม้ของ Sniper) ยังสรุปนัยสำคัญทางสถิติไม่ได้ ต่อให้ win 100%"],"link":null,"badge":null,"size":23.2,"x":345.1,"y":301.1},{"id":"mom","title":"Momentum","cat":"mech","desc":"หุ้นที่แรงมาแล้วมีแนวโน้มแรงต่ออีกระยะ — ปรากฏการณ์ที่มีงานวิจัยรองรับยาวนานที่สุดตัวหนึ่งของตลาด และเป็นแกนกลางของกลยุทธ์หุ้นทุกตัวใน Lab","points":["เหตุผลเชิงพฤติกรรม: ข่าวดีถูกซึมซับช้า คนแห่ตามทีหลัง","ใช้ผลตอบแทนย้อนหลังจัดอันดับ แล้วซื้อกลุ่มหัวตาราง"],"link":null,"badge":null,"size":36.6,"x":790.9,"y":510.0},{"id":"lb6","title":"6M Lookback แบบปฏิทิน","cat":"mech","desc":"มองย้อน 6 เดือนปฏิทินจริง (ไม่ใช่นับแท่ง) เพื่อวัดแรงส่ง — ระยะที่ผลทดสอบของเราชี้ว่าสมดุลสุดระหว่าง \"จับเทรนด์ทัน\" กับ \"ไม่ไวต่อสัญญาณรบกวน\"","points":["ใช้ binary search หาวันที่ตรงปฏิทิน หนีบสิ้นเดือนอัตโนมัติ","จุดเริ่มวัดผลต้องเป็นวันเดียวกันทุก setting (Fair-start rule) ไม่งั้น benchmark ย้ายทั้งเส้น"],"link":null,"badge":null,"size":28.2,"x":749.0,"y":631.6},{"id":"tail","title":"หางขวา Top 5%","cat":"mech","desc":"หัวใจของ momentum: ราวครึ่งหนึ่งของกำไรส่วนเกินทั้งหมดมาจากไม้เพียง 5% แรก — มันคือเกมหางขวา ไม่ใช่เกมชนะบ่อย","points":["นัยเชิงปฏิบัติ: ต้องถือครบรอบ ห้ามขายหมูไม้ที่กำลังวิ่ง","Stop-loss โดยทั่วไปไม่ช่วย 6M momentum เพราะไปตัดหางขวาทิ้ง"],"link":null,"badge":null,"size":25.0,"x":772.7,"y":268.0},{"id":"hold","title":"ถือครบรอบ","cat":"mech","desc":"วินัยที่สำคัญกว่าจังหวะเข้า: กำหนดระยะถือไว้ล่วงหน้าแล้วถือให้ครบ เพราะกำไรก้อนใหญ่มักมาช่วงท้ายของรอบ","points":["เลื่อนวันเข้า ±5 วัน ผลแทบไม่เปลี่ยน — จังหวะเป๊ะไม่ใช่ตัวตัดสิน การถือครบต่างหาก"],"link":null,"badge":null,"size":27.3,"x":929.6,"y":368.3},{"id":"breadth","title":"Breadth (ความกว้างตลาด)","cat":"mech","desc":"สัดส่วนหุ้นทั้งตลาดที่ร่วงแรงพร้อมกัน (z-score < −2) — ตัววัดว่า \"ตลาดล้าง\" จริงหรือแค่หุ้นบางตัวร่วง ใช้เป็นประตูยิงสัญญาณของกลยุทธ์สาย washout","points":["พายุ breadth สั้น (เฉลี่ย ~3 วัน) ต่างจากพายุ drawdown ที่ค้างนานกว่า 3.6 เท่า — ห้ามเทียบ percentile ข้ามตัววัด"],"link":null,"badge":null,"size":25.8,"x":1074.2,"y":884.9},{"id":"mr","title":"Mean Reversion","cat":"mech","desc":"ราคาที่ยืดออกจากค่าเฉลี่ยมากผิดปกติ มีแนวโน้มดีดกลับ — ขั้วตรงข้ามของ momentum ทำเงินคนละสภาพตลาด จึงใช้ประกบกันได้","points":["ใช้ได้ดีใน FX และทองที่แกว่งเป็นกรอบ","อันตรายเมื่อสวนเทรนด์ใหญ่ — ต้องมีตัวกรองทิศทางเสมอ"],"link":null,"badge":null,"size":29.3,"x":783.7,"y":958.8},{"id":"zscore","title":"Z-score","cat":"mech","desc":"ตัววัดว่าราคาห่างจากค่าเฉลี่ย 20 วันกี่เท่าของความผันผวนปกติ — ภาษากลางที่ทำให้ \"แพงผิดปกติ/ถูกผิดปกติ\" เทียบกันได้ทุกสินทรัพย์","points":["z = (ราคาปิด − MA20) ÷ SD20","ผลทดสอบสำคัญ: z รายหุ้นเดี่ยวๆ ทำนายอนาคตไม่ได้ — ต้องใช้ระดับตลาด (breadth) หรือประกบเงื่อนไขอื่น"],"link":null,"badge":null,"size":28.9,"x":889.8,"y":1153.9},{"id":"tf","title":"Trend Following","cat":"mech","desc":"ตามน้ำเมื่อทิศทางใหญ่ชัด — เข้าเมื่อราคายืนเหนือค่าเฉลี่ยระยะยาวและแรงส่งสอดคล้องกันหลายกรอบเวลา","points":["คะแนนทิศทาง 3 ชั้น (MA252 / MA63 / ผลตอบแทน 6 เดือน) — ชั้นเวลาขัดกัน = ไม่เดา","ถอดตัวกรองเทรนด์ออกเมื่อไหร่ DD ระเบิดถึง −73%"],"link":null,"badge":null,"size":24.9,"x":833.7,"y":1285.3},{"id":"defext","title":"Defensive Extend (ยืดตอนหมี)","cat":"mech","desc":"ถ้าไม้ครบกำหนดขายตอนตลาดอยู่โหมดหมี (SPY หลุด top-2 ของ macro ranking) ให้ยืดถือต่ออีกหนึ่งรอบเต็มแล้วค่อยเช็คใหม่ — ไม่ขายของถูกทิ้งกลางเหว","points":["บทเรียนสำคัญ: ในสาย Buy the Dip ตัวยืดนี้เป็น \"ตัวเพิ่มกำไร\" ไม่ใช่ตัวลด DD — ห้ามเล่าสลับบทบาท","ตัวจัดอันดับ macro: Δ6M ของ JPY-flip / SPY / น้ำมัน / ทอง"],"link":null,"badge":null,"size":28.2,"x":1080.6,"y":388.8},{"id":"volfilter","title":"ตัวกรองวอลระเบิด","cat":"mech","desc":"เมื่อความผันผวนระยะสั้นพุ่งเกิน 1.5 เท่าของทั้งระยะกลางและระยะยาวพร้อมกัน = ตลาดกำลังระเบิด ห้ามเปิดไม้ใหม่ (ไม้เก่าไม่ต้องปิด)","points":["ใช้ SD ของผลตอบแทนรายวัน 21 / 63 / 252 วันเทียบกัน","เป็นเบรกความเสี่ยงของระบบ Z-Grid ทุกขา"],"link":null,"badge":null,"size":24.8,"x":750.3,"y":1389.9},{"id":"edge6m","title":"Edge ของ 6M Momentum (t=6.75)","cat":"ev","desc":"ผลตรวจทางสถิติเข้มข้นที่สุดของเรา: ส่วนเกินเหนือ SPY ของกลยุทธ์ 6M Momentum ผ่านการทดสอบ 50 รอบ (2001–2026) ได้ t-statistic 6.75 สูงกว่าเกณฑ์วิชาการ (t>3) ราวเท่าตัว","points":["ผ่าน stress ทุกแบบ (ตัดหุ้นดังออก 10 ตัว / จำกัดกำไรต่อไม้) เหลือส่วนเกิน +6–9%/รอบ 6 เดือน","แยกยุคทดสอบ 2001–13 และ 2014–26 ผ่านทั้งคู่ — edge ไม่ได้ตายไปตามกาลเวลา","ความซื่อสัตย์: รอบแย่สุด (2009) แพ้ SPY ถึง −23% — edge เฉลี่ยไม่ได้แปลว่าชนะทุกรอบ"],"link":null,"badge":"RESEARCH","size":29.4,"x":578.5,"y":216.7},{"id":"crisis","title":"ซ้อมวิกฤต & บทเรียนหนีตลาด","cat":"ev","desc":"จำลองพากลยุทธ์ผ่าน 2008 / COVID / 2022 แบบวันต่อวัน — และผลทดสอบที่สำคัญที่สุด: การโยกเงินหนีไปเงินสด/ทอง/น้ำมันช่วงวิกฤต แพ้การถือข้ามทุกรูปแบบ","points":["2022: ระบบ +28% ใน 2 ปี แต่ระหว่างทาง DD −23% และแพ้ดัชนีนานกว่าหนึ่งปี","ข้อสรุปที่ล็อกแล้ว: ไม่เสนอ market timing ทุกรูปแบบ"],"link":null,"badge":null,"size":26.0,"x":902.4,"y":171.0},{"id":"calm","title":"กติกา Calm-Entry ลู่เข้าหากัน","cat":"ev","desc":"ข้อค้นพบจากสาย Harvester: กติกาจับจังหวะเข้าแบบต่างๆ (ปิดลบติดกัน, ระลอกฟื้น ฯลฯ) ไม่ใช่แหล่งกำไร — เป็นแค่เบรกความถี่ เพราะทุกแบบลู่เข้าผลตอบแทนต่อไม้ใกล้กันเมื่อถือ 6 เดือน","points":["นัย: อย่าหลงขัดเกลา \"จังหวะเข้า\" — พลังงานควรไปลงที่ระยะถือและการจัดการเงิน","ที่ระยะถือ 6 เดือน คอขวดจริงคือช่องเงิน ไม่ใช่ความถี่สัญญาณ"],"link":null,"badge":null,"size":27.0,"x":1140,"y":532.2},{"id":"gridtruth","title":"ความจริงเรื่อง Grid","cat":"ev","desc":"ผลทดสอบ grid แบบไม่มีจุดตัดขาดทุน: Monte Carlo ให้ค่าคาดหวัง ≈ 0 และ grid หลายสินทรัพย์บน CFD ติดลบหลังหัก swap แทบทุกตัว — กำไรถี่ๆ ที่เห็นคือการยืมจากหางซ้ายก้อนใหญ่ในอนาคต","points":["เคสจริง: แผน grid ที่ไม่มี SL ล้างบัญชีในวันเดียว (12 มี.ค. 2020)","ดัชนีหุ้น: ถือเฉยๆ ชนะ grid — น้ำมัน: ติดลบทุกแบบ","นี่คือเหตุผลที่ Z-Grid ของเราต้องมีตัวกรองเทรนด์ + ตัวกรองวอล + ขนาดไม้คงที่"],"link":null,"badge":null,"size":28.3,"x":671.4,"y":1290.8},{"id":"weekly","title":"Weekly Combined","cat":"eq","desc":"กลยุทธ์รายสัปดาห์รุ่นบุกเบิกของแพลตฟอร์ม — รวมหลายสัญญาณเข้าเป็นพอร์ตเดียว เป็นมาตรฐาน KPI (Annualized / Sharpe / Alpha / MaxDD) ที่หน้ากลยุทธ์อื่นยึดตาม","points":[],"link":["เปิดหน้ากลยุทธ์","sp500-combined-strategy.html"],"badge":null,"size":21.8,"x":595.7,"y":646.9},{"id":"rolling","title":"Rolling 6M Momentum","cat":"eq","desc":"พอร์ตแรงส่ง 6 เดือนแบบรีบาลานซ์ต่อเนื่อง — จุดเริ่มของตระกูล 6M ทั้งหมด และเป็นกลยุทธ์ที่มีคู่มือ animation ตัวแรก (กระทิงแถวหน้า)","points":["มีรุ่นทดลองต่อยอดหลายตัว: downvol / risk-adjusted / multi-lookback"],"link":["เปิดหน้ากลยุทธ์","sp500-rolling-6m-momentum.html"],"badge":null,"size":24.4,"x":658.4,"y":533.0},{"id":"mom6m","title":"6M Momentum (ก.พ./ส.ค.)","cat":"eq","desc":"เรือธงของ Lab: จัดอันดับแรงส่ง 6 เดือน ซื้อหัวตาราง ถือครบรอบครึ่งปี — กลยุทธ์ที่ผ่านการตรวจ edge เข้มข้นที่สุด (t=6.75, ส่วนเกิน stress-floor +6–9%/รอบ)","points":["ครึ่งหนึ่งของส่วนเกินมาจากไม้ top 5% — เกมหางขวาแท้ๆ","รอบแย่ที่สุดแพ้ดัชนีได้ลึก — ต้องเข้าใจก่อนใช้"],"link":["เปิดหน้ากลยุทธ์","lab-momentum-frontbull.html"],"badge":null,"size":30.5,"x":780.4,"y":398.2},{"id":"sniper","title":"Washout Sniper","cat":"eq","desc":"ยิงเฉพาะตอนตลาดล้าง: ตัวกรอง 2 ใน 3 (breadth ระเบิด / SPY drawdown ลึก / หลุด macro top-2) แล้วซื้อหัวตาราง ถือ 6 เดือน + ยืดตอนหมี — ออกแบบมาเก็บผลตอบแทนจากปีที่ตลาดช็อก ไม่ใช่ชนะทุกปี","points":["ผลรันปัจจุบัน: 19 ไม้ / กำไรเฉลี่ย +40.8%/ไม้ / MaxDD −9.7% — จำนวนไม้ยังน้อย ไม่อ้างนัยสำคัญทางสถิติ","วันเข้าถูกกำหนดโดยตลาด ไม่ใช่ปฏิทิน — ใช้เป็นตัวเสริมพอร์ต ไม่ใช่ตัวหลักตัวเดียว"],"link":["เปิดหน้ากลยุทธ์","sp500-sniper-washout.html"],"badge":null,"size":31.5,"x":898.5,"y":625.7},{"id":"btd","title":"Buy the Dip Compound","cat":"eq","desc":"จับ \"ระลอกฟื้น\" หลังตลาดย่อ (breadth ไต่แตะแล้วหักลง) → ลงเงินผ่านช่องเงินทบต้นแบบ FIFO ถือ 6 เดือน + ยืดตอนหมี — สายทบต้นเต็มรูปแบบของ Lab","points":["ค่าโรงงาน 6 ช่อง × $10k: 88 ไม้ / win 93% / บวก 11 จาก 11 ปี","ราคาของทบต้น: MaxDD บนมูลค่าพอร์ตลึกกว่าแบบเงินคงที่อย่างมีนัย"],"link":["เปิดหน้ากลยุทธ์","sp500-buy-the-dip-compound.html"],"badge":null,"size":29.1,"x":1140,"y":644.5},{"id":"harvester","title":"Pullback Harvester","cat":"eq","desc":"เก็บเกี่ยวหลังย่อ: รอราคาปิดลบต่อเนื่องตามเงื่อนไขสองประตู แล้วเข้าเก็บระยะถือสั้น–กลาง (1–6 เดือนปฏิทิน) มีทั้งรุ่นเงินคงที่และรุ่นทบต้น","points":["บวกทุกปี 2015–2026 ในค่าโรงงาน / Hold Compare ชี้ 3 เดือนเด่นสุดเชิงกำไร"],"link":["เปิดหน้ากลยุทธ์","sp500-pullback-harvester.html"],"badge":null,"size":24.7,"x":987.2,"y":753.7},{"id":"sectorlead","title":"ตระกูลประธานอุตสาหกรรม","cat":"eq","desc":"ชุดทดลอง: บังคับหยิบหุ้นเบอร์หนึ่งของแต่ละ GICS sector แทนหัวตารางรวม — คำตอบจากข้อมูลชัดเจน: การบังคับกระจาย sector ไม่ลด DD แต่ตัดกำไรเกินครึ่ง","points":["เป็นตัวอย่างการใช้ Lab ตอบคำถาม \"ความเชื่อ\" ด้วยตัวเลข"],"link":["เปิดหน้ากลยุทธ์","sp500-buy-the-dip-sectorlead.html"],"badge":null,"size":24.4,"x":1053.3,"y":629.6},{"id":"goldmom","title":"Gold Momentum 6M","cat":"gold","desc":"แรงส่ง 6 เดือนบนทองคำ ทบทวนสัญญาณสิ้นเดือน ลงมือวันถัดไป — และผลทดสอบที่ซื่อสัตย์: บนทองคำ ไม่มีกฎเทรนด์ตัวไหนชนะการถือยาวเฉยๆ","points":["MOM 6M ให้ MaxDD เท่ากับถือยาวเป๊ะ (−25%) แต่ผลตอบแทนต่ำกว่า","คุณค่าของหน้านี้คือการรู้ว่า \"อะไรไม่เวิร์ค\" ก่อนเสียเงินจริง"],"link":["เปิดหน้ากลยุทธ์","gold-momentum-6m.html"],"badge":null,"size":25.6,"x":893.0,"y":850.0},{"id":"goldencross","title":"Golden Cross","cat":"gold","desc":"สัญญาณคลาสสิก MA50 ตัด MA200 บนทองคำ — ทดสอบเทียบกับถือยาวและ DCA แบบตรงไปตรงมา","points":[],"link":["เปิดหน้ากลยุทธ์","gold-golden-cross.html"],"badge":null,"size":21.6,"x":795.3,"y":1078.2},{"id":"goldzone","title":"Zone Trading","cat":"gold","desc":"ระบบโซนแนวรับ-แนวต้าน 21 ระดับ (Classic Pivot × 3 กรอบเวลา) × Momentum Score — หน้านี้เป็นบทเรียนใหญ่สองเรื่อง: lookahead bias และ \"ยิ่งซ้อนกรอบเวลายิ่งแย่\"","points":["ผลจริง: ชนะถือยาวแค่ 3 จาก 12 ปี / ปี 2020 แย่สุด −16% ขณะถือยาว +24.6%","มี dropdown สอนเรื่อง lookahead ในหน้า — ความผิดพลาดที่กลายเป็นบทเรียนสาธารณะ"],"link":["เปิดหน้ากลยุทธ์","gold-zone-backtest.html"],"badge":null,"size":28.5,"x":664.8,"y":986.2},{"id":"goldswing","title":"Gold H1 Swing","cat":"gold","desc":"สวิงกรอบชั่วโมงบนทอง พร้อมตาราง sensitivity เทียบพารามิเตอร์ Single vs Multi — หน้าทดลองที่ยังไม่เปิดการ์ดให้สมาชิกทั่วไป","points":[],"link":["เปิดหน้ากลยุทธ์","gold-swing-h1-sensitivity.html"],"badge":null,"size":21.0,"x":904.2,"y":940.9},{"id":"golddca","title":"Buy & Hold + DCA","cat":"gold","desc":"เส้นฐานของทุกการเปรียบเทียบบนทองคำ — ก่อนเชื่อกลยุทธ์ไหน ต้องชนะเส้นนี้ให้ได้ก่อน","points":[],"link":["เปิดหน้ากลยุทธ์","gold-buyhold-dca.html"],"badge":null,"size":21.7,"x":919.7,"y":1057.3},{"id":"zgrid","title":"Z-Grid Hybrid (MR+TF)","cat":"fx","desc":"ระบบลูกผสมบนทอง + 5 คู่ FX: ขา Mean Reversion สวนที่ ±2SD (เฉพาะตามทิศ MA252) + ขา Trend Following ตามที่ ±1SD พร้อมคะแนนทิศทาง 3 ชั้น — ออกแบบจากซากของ grid ที่พังมาแล้ว","points":["ผลคาด: กำไร ~2–3.7%/ปีต่อทุน MaxDD −17 ถึง −23% — \"รายได้ระดับพันธบัตร ความเสี่ยงระดับหุ้น\" สิ่งที่ซื้อคือไม่ต้องเดาทิศ + ไม่ล้างพอร์ต","กติกาห้ามแตะ: ห้ามตัดคู่ที่แย่ / ห้ามทบต้น / ห้ามเพิ่มไม้ตามผลไม้ก่อน — ทุกข้อพิสูจน์แล้วว่าทำให้แย่ลง","ผ่าน out-of-sample 2000–2012 แยกจากช่วงออกแบบ"],"link":null,"badge":"RESEARCH","size":33.5,"x":652.9,"y":1141.1},{"id":"vixladder","title":"VIX Short Ladder","cat":"fx","desc":"งานวิจัยขายความผันผวนเป็นขั้นบันได 3 ระดับพร้อมจุดตัดขาดทุน — บทเรียนหลักคือด้านมืด: มี.ค. 2020 โดนตัดขาดทุนครบทุกขั้นในเหตุการณ์เดียว","points":["กระแสเงินเฉลี่ยดูสวย แต่ 5 ปีอาจไม่มีไม้เลย และหางซ้ายมาทีเดียวเท่ากำไรหลายปี","percentile ล้วนๆ ใช้ตั้งขั้นไม่ได้ — ระดับยุบตามยุคสมัย ต้องมี floor","ยังไม่ทดสอบปี 2008 — สถานะวิจัยภายในเท่านั้น"],"link":null,"badge":"RESEARCH","size":25.7,"x":656.7,"y":1540.0},{"id":"lab","title":"Strategy Lab","cat":"tool","desc":"ห้องทดลองกลยุทธ์ทั้งหมด — ทุกการ์ดปรับค่าได้ รันสดบนเบราว์เซอร์ ตัวเลขทุกตัวตรวจซ้ำกับ Python อ้างอิง","points":[],"link":["เปิด Lab","member-dashboard.html"],"badge":null,"size":33.4,"x":748.4,"y":749.0},{"id":"scanner","title":"S&P 500 Scanner","cat":"tool","desc":"สแกนหุ้นทั้งดัชนีตามแรงส่ง จัดกลุ่ม Bull / Neutral / Bear — จุดเชื่อมระหว่างทฤษฎี momentum กับหุ้นรายตัววันนี้","points":[],"link":["เปิด Scanner","member-dashboard.html"],"badge":null,"size":20.8,"x":465.6,"y":605.1},{"id":"port","title":"Port Recorder","cat":"tool","desc":"สมุดบันทึกพอร์ตจริง: หลายพอร์ต กลุ่ม ประวัติขาย เส้นทุน อ่านสลิปอัตโนมัติ เก็บบน Google Drive ของสมาชิกเอง","points":[],"link":["เปิด Port Recorder","port-recorder.html"],"badge":null,"size":19.1,"x":355.6,"y":140.0},{"id":"news","title":"ข่าว & บทวิเคราะห์รายวัน","cat":"tool","desc":"สรุปข่าวการเงินภาษาไทยวันละหลายรอบ พร้อม sentiment รายหุ้นและมุม \"สำหรับนักลงทุนไทย\" — บริบทตลาดที่ประกบเครื่องมือเชิงตัวเลข","points":[],"link":["อ่านข่าว","member-dashboard.html"],"badge":null,"size":21.1,"x":385.2,"y":962.0},{"id":"library","title":"ห้องสมุดความรู้","cat":"tool","desc":"บทความ macro เชิงลึกฟรี: ดอกเบี้ยกับหุ้น สถิติรอบขึ้นดอกเบี้ย ฯลฯ — พื้นฐานเศรษฐศาสตร์ที่รองรับการอ่านข่าวและกลยุทธ์","points":[],"link":["เปิดห้องสมุด","https://public.jptrustlearning.com"],"badge":null,"size":19.3,"x":144.0,"y":1102.6}],"edges":[["risk","dd"],["risk","divers"],["risk","bt"],["bt","lookahead"],["bt","surviv"],["bt","tstat"],["bt","lab"],["mom","risk"],["mom","lb6"],["mom","tail"],["mom","hold"],["tail","hold"],["lb6","mom6m"],["mr","zscore"],["tf","zscore"],["mr","mom"],["breadth","zscore"],["volfilter","zscore"],["defext","hold"],["edge6m","tstat"],["edge6m","mom6m"],["edge6m","tail"],["crisis","dd"],["crisis","mom6m"],["crisis","defext"],["calm","hold"],["calm","harvester"],["calm","btd"],["gridtruth","mr"],["gridtruth","zgrid"],["gridtruth","vixladder"],["lookahead","goldzone"],["mom6m","mom"],["mom6m","hold"],["mom6m","lab"],["rolling","lb6"],["rolling","mom"],["rolling","lab"],["weekly","mom"],["weekly","lab"],["sniper","breadth"],["sniper","defext"],["sniper","mom"],["sniper","lab"],["btd","breadth"],["btd","defext"],["btd","lab"],["harvester","mr"],["harvester","lab"],["sectorlead","divers"],["sectorlead","btd"],["sectorlead","sniper"],["goldmom","lb6"],["goldmom","golddca"],["goldmom","lab"],["goldencross","tf"],["goldencross","golddca"],["goldencross","lab"],["goldzone","zscore"],["goldzone","golddca"],["goldzone","lab"],["goldswing","mr"],["goldswing","lab"],["zgrid","mr"],["zgrid","tf"],["zgrid","volfilter"],["zgrid","divers"],["vixladder","volfilter"],["scanner","mom"],["scanner","lab"],["port","risk"],["news","library"],["news","lab"]],"cats":{"fnd":["ฐานราก","#A8B8C8"],"mech":["กลไก","#F4E4BA"],"ev":["หลักฐาน Edge","#5BC48E"],"eq":["หุ้นสหรัฐ","#D4AF37"],"gold":["ทองคำ","#E8973D"],"fx":["กริด & FX","#B784C7"],"tool":["เครื่องมือ","#7EA8D8"]}};
+</script>
+<script>
+(function(){
+'use strict';
+const [WW, WH] = DATA.world;
+const byId = {}; DATA.nodes.forEach(n => byId[n.id] = n);
+const nbr = {}; DATA.nodes.forEach(n => nbr[n.id] = new Set());
+DATA.edges.forEach(([a,b]) => { nbr[a].add(b); nbr[b].add(a); });
+
+const svg = document.getElementById('svg');
+const world = document.getElementById('world');
+const gE = document.getElementById('edges');
+const gN = document.getElementById('nodes');
+const stage = document.getElementById('stage');
+
+/* ── build SVG ── */
+const edgeEls = DATA.edges.map(([a,b]) => {
+  const A = byId[a], B = byId[b];
+  const el = document.createElementNS('http://www.w3.org/2000/svg','line');
+  el.setAttribute('x1',A.x); el.setAttribute('y1',A.y);
+  el.setAttribute('x2',B.x); el.setAttribute('y2',B.y);
+  el.setAttribute('class','edge'); el.dataset.a=a; el.dataset.b=b;
+  gE.appendChild(el); return el;
+});
+const nodeEls = {};
+DATA.nodes.forEach(n => {
+  const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+  g.setAttribute('class','node'); g.dataset.id = n.id;
+  const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  c.setAttribute('cx',n.x); c.setAttribute('cy',n.y); c.setAttribute('r',n.size);
+  c.setAttribute('stroke', DATA.cats[n.cat][1]);
+  const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+  t.setAttribute('x',n.x); t.setAttribute('y', n.y + n.size + 17);
+  t.setAttribute('font-size', 13.5);
+  t.textContent = n.title;
+  g.appendChild(c); g.appendChild(t);
+  gN.appendChild(g); nodeEls[n.id] = g;
+});
+
+/* ── legend chips ── */
+const legend = document.getElementById('legend');
+const catState = {};
+Object.entries(DATA.cats).forEach(([k,[name,color]]) => {
+  const ch = document.createElement('div');
+  ch.className = 'chip'; ch.dataset.cat = k;
+  ch.innerHTML = `<span class="dot" style="background:${color}"></span>${name}`;
+  ch.addEventListener('click', () => {
+    catState[k] = !catState[k];
+    ch.classList.toggle('on', catState[k]);
+    applyState();
+  });
+  legend.appendChild(ch);
+});
+
+/* ── view transform ── */
+let vx=0, vy=0, vs=1;
+function apply(){ world.setAttribute('transform',`translate(${vx},${vy}) scale(${vs})`); }
+function fit(){
+  const r = stage.getBoundingClientRect();
+  vs = Math.min(r.width/WW, r.height/WH) * 0.96;
+  vx = (r.width - WW*vs)/2; vy = (r.height - WH*vs)/2;
+  apply();
+}
+function zoomAt(cx, cy, f){
+  const ns = Math.min(4, Math.max(0.18, vs*f));
+  vx = cx - (cx - vx) * (ns/vs); vy = cy - (cy - vy) * (ns/vs);
+  vs = ns; apply();
+}
+window.addEventListener('resize', fit);
+fit();
+
+document.getElementById('zin').onclick = () => { const r=stage.getBoundingClientRect(); zoomAt(r.width/2,r.height/2,1.35); };
+document.getElementById('zout').onclick = () => { const r=stage.getBoundingClientRect(); zoomAt(r.width/2,r.height/2,1/1.35); };
+document.getElementById('zfit').onclick = fit;
+svg.addEventListener('wheel', e => {
+  e.preventDefault();
+  const r = stage.getBoundingClientRect();
+  zoomAt(e.clientX-r.left, e.clientY-r.top, e.deltaY < 0 ? 1.12 : 1/1.12);
+}, {passive:false});
+
+/* ── pointer pan / pinch / tap ── */
+const pts = new Map();
+let moved = 0, pinchD = 0;
+svg.addEventListener('pointerdown', e => {
+  svg.setPointerCapture(e.pointerId);
+  pts.set(e.pointerId, {x:e.clientX, y:e.clientY});
+  moved = 0;
+  if (pts.size === 2) {
+    const [a,b] = [...pts.values()];
+    pinchD = Math.hypot(a.x-b.x, a.y-b.y);
+  }
+  svg.classList.add('dragging');
+});
+svg.addEventListener('pointermove', e => {
+  if (!pts.has(e.pointerId)) return;
+  const p = pts.get(e.pointerId);
+  const dx = e.clientX - p.x, dy = e.clientY - p.y;
+  moved += Math.abs(dx) + Math.abs(dy);
+  p.x = e.clientX; p.y = e.clientY;
+  if (pts.size === 1) { vx += dx; vy += dy; apply(); }
+  else if (pts.size === 2) {
+    const [a,b] = [...pts.values()];
+    const d = Math.hypot(a.x-b.x, a.y-b.y);
+    const r = stage.getBoundingClientRect();
+    const mx = (a.x+b.x)/2 - r.left, my = (a.y+b.y)/2 - r.top;
+    if (pinchD > 0) zoomAt(mx, my, d/pinchD);
+    pinchD = d;
+  }
+});
+function endPt(e){
+  pts.delete(e.pointerId);
+  if (pts.size < 2) pinchD = 0;
+  if (pts.size === 0) svg.classList.remove('dragging');
+}
+svg.addEventListener('pointerup', e => {
+  if (pts.size === 1 && moved < 8) {
+    const g = e.target.closest('.node');
+    if (g) selectNode(g.dataset.id);
+    else if (selected) { selected = null; closeSheet(); applyState(); }
+  }
+  endPt(e);
+});
+svg.addEventListener('pointercancel', endPt);
+
+/* ── search + state machine ── */
+const qInput = document.getElementById('q');
+const hitsEl = document.getElementById('hits');
+const searchbar = document.getElementById('searchbar');
+let query = '', selected = null;
+
+function matches(n, q){
+  const hay = (n.title + ' ' + n.desc + ' ' + n.points.join(' ')).toLowerCase();
+  return hay.includes(q);
+}
+function applyState(){
+  const q = query.trim().toLowerCase();
+  const activeCats = Object.keys(catState).filter(k => catState[k]);
+  let hitSet = null;
+  if (q) {
+    hitSet = new Set(DATA.nodes.filter(n => matches(n,q)).map(n => n.id));
+  }
+  if (activeCats.length) {
+    const catSet = new Set(DATA.nodes.filter(n => activeCats.includes(n.cat)).map(n => n.id));
+    hitSet = hitSet ? new Set([...hitSet].filter(id => catSet.has(id))) : catSet;
+  }
+  if (selected) {
+    hitSet = new Set([selected]);
+  }
+  hitsEl.textContent = (q && !selected) ? `เจอ ${hitSet ? hitSet.size : 0} node` : '';
+  searchbar.classList.toggle('active', !!q);
+
+  if (!hitSet) { /* neutral */
+    DATA.nodes.forEach(n => nodeEls[n.id].setAttribute('class','node'));
+    edgeEls.forEach(el => el.setAttribute('class','edge'));
+    return;
+  }
+  const nearSet = new Set();
+  hitSet.forEach(id => nbr[id].forEach(m => { if(!hitSet.has(m)) nearSet.add(m); }));
+  DATA.nodes.forEach(n => {
+    let cls = 'node dim';
+    if (hitSet.has(n.id)) cls = 'node hit' + (n.id===selected ? ' sel' : '');
+    else if (nearSet.has(n.id)) cls = 'node near';
+    nodeEls[n.id].setAttribute('class', cls);
+  });
+  edgeEls.forEach(el => {
+    const a = el.dataset.a, b = el.dataset.b;
+    if (hitSet.has(a) || hitSet.has(b)) el.setAttribute('class','edge lit');
+    else el.setAttribute('class','edge dim');
+  });
+}
+qInput.addEventListener('input', () => { query = qInput.value; selected = null; closeSheet(); applyState(); });
+document.getElementById('clearBtn').addEventListener('click', () => {
+  qInput.value = ''; query = ''; selected = null; closeSheet(); applyState();
+});
+
+/* ── detail sheet ── */
+const sheet = document.getElementById('sheet');
+const backdrop = document.getElementById('backdrop');
+function closeSheet(){ sheet.classList.remove('open'); backdrop.classList.remove('on'); }
+backdrop.addEventListener('click', () => { selected = null; closeSheet(); applyState(); });
+
+function selectNode(id){
+  selected = id; applyState();
+  const n = byId[id];
+  const [catName, catColor] = DATA.cats[n.cat];
+  document.getElementById('shCat').innerHTML =
+    `<span class="dot" style="background:${catColor}"></span>${catName}`;
+  document.getElementById('shBadge').style.display = n.badge ? 'inline-block' : 'none';
+  document.getElementById('shTitle').textContent = n.title;
+  document.getElementById('shDesc').textContent = n.desc;
+  const ul = document.getElementById('shPoints');
+  ul.innerHTML = '';
+  n.points.forEach(p => { const li = document.createElement('li'); li.textContent = p; ul.appendChild(li); });
+  const act = document.getElementById('shActions');
+  act.innerHTML = '';
+  if (n.link) {
+    const a = document.createElement('a');
+    a.className = 'go'; a.textContent = n.link[0] + ' ›'; a.href = n.link[1];
+    act.appendChild(a);
+  }
+  const rel = document.getElementById('shRel');
+  rel.innerHTML = '';
+  [...nbr[id]].forEach(m => {
+    const s = document.createElement('span');
+    s.textContent = byId[m].title;
+    s.addEventListener('click', () => selectNode(m));
+    rel.appendChild(s);
+  });
+  sheet.classList.add('open'); backdrop.classList.add('on');
+  /* pan selected node into upper-third view */
+  const r = stage.getBoundingClientRect();
+  vx = r.width/2 - n.x*vs; vy = r.height*0.32 - n.y*vs; apply();
+}
+
+/* ── deep link ?n=id ── */
+const p = new URLSearchParams(location.search).get('n');
+if (p && byId[p]) setTimeout(() => selectNode(p), 300);
+})();
+</script>
+</body>
+</html>
