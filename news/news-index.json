@@ -1,6 +1,191 @@
 {
-  "lastUpdated": "2026-08-28T06:45:00Z",
+  "lastUpdated": "2026-08-29T09:55:00Z",
   "batches": [
+    {
+      "file": "2026-08-29-0955.md",
+      "date": "2026-08-29T09:55:00Z",
+      "date_display": "29 ส.ค. 2026 · 09:55",
+      "summary": "Warsh ส่งสัญญาณแข็งกร้าวที่ Jackson Hole โอกาสขึ้นดอกเบี้ย ก.ย. กระโดดจาก 34% เป็นเกินครึ่ง · Marvell ดีกว่าคาดทุกบรรทัดแต่ปิดลบ 10% สะท้อนการปรับฐานของมูลค่าไม่ใช่อุปสงค์ · น้ำมันปิดสัปดาห์ลบ 5% เพราะเรือผ่านฮอร์มุซมากขึ้น ทั้งที่การทูตยังตัน · แบงก์ชาติใช้ตลาดทองคุมค่าบาท เตรียมลดเพดานซื้อขายออนไลน์ · ปฏิทิน 31 ส.ค.–4 ก.ย. ตัวเลขจ้างงานคืนวันศุกร์คือตัวชี้ขาด",
+      "tickers": [
+        "SPY",
+        "QQQ",
+        "TLT",
+        "GLD",
+        "USD",
+        "VIX",
+        "MRVL",
+        "NVDA",
+        "AVGO",
+        "SOXX",
+        "USO",
+        "XLE",
+        "SET",
+        "PTT",
+        "PTTEP",
+        "TOP",
+        "AOT",
+        "CPALL",
+        "DELTA",
+        "KCE",
+        "HANA",
+        "TU"
+      ],
+      "headlines": [
+        {
+          "title": "Warsh พูดจบ ตลาดล่วงหน้าเปลี่ยนใจทันที — โอกาสขึ้นดอกเบี้ยเดือนกันยายนกระโดดจากราว 34% ขึ้นไปเกินครึ่งภายในชั่วโมงเดียว",
+          "tickers": [
+            {
+              "symbol": "SPY",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "TLT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "GLD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "USD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "VIX",
+              "sentiment": "positive"
+            }
+          ],
+          "tone_override": "bearish",
+          "source": "CNBC, Reuters, Bloomberg, Washington Post, PBS/AP, Yahoo Finance, Trading Economics",
+          "published": "29 ส.ค. 2026"
+        },
+        {
+          "title": "Marvell ทำได้ดีกว่าคาดทุกบรรทัดและปรับเป้ารายได้ขึ้น แต่หุ้นปิดลบราว 10% — บทเรียนว่าผลประกอบการที่ดีไม่พออีกต่อไปสำหรับหุ้นชิป",
+          "tickers": [
+            {
+              "symbol": "MRVL",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "SOXX",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AVGO",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "KCE",
+              "sentiment": "negative"
+            }
+          ],
+          "source": "CNBC, Reuters, Yahoo Finance, Motley Fool, Trading Economics",
+          "published": "29 ส.ค. 2026"
+        },
+        {
+          "title": "น้ำมันปิดสัปดาห์ลบราว 5% ทั้งที่การเจรจาสหรัฐฯ–อิหร่านยังตัน — ตลาดเลิกซื้อข่าวสงคราม แล้วหันมานับเรือที่ผ่านช่องแคบแทน",
+          "tickers": [
+            {
+              "symbol": "USO",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "XLE",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "PTT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "PTTEP",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "TOP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "CPALL",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "Reuters, CNBC, Trading Economics, Wall Street Journal",
+          "published": "29 ส.ค. 2026"
+        },
+        {
+          "title": "แบงก์ชาติใช้ตลาดทองคำเป็นเครื่องมือคุมค่าเงินบาท เตรียมลดเพดานซื้อขายทองออนไลน์ลงอีก — ความสัมพันธ์ทอง-บาทลดจาก 0.85 เหลือ 0.30",
+          "tickers": [
+            {
+              "symbol": "GLD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "KCE",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "TU",
+              "sentiment": "positive"
+            }
+          ],
+          "tone_override": "mixed",
+          "source": "Thailand Business News, Bank of Thailand, Trading Economics, USAGOLD",
+          "published": "29 ส.ค. 2026"
+        },
+        {
+          "title": "ปฏิทินสัปดาห์ 31 ส.ค. – 4 ก.ย. — ตัวเลขจ้างงานสหรัฐฯ คืนวันศุกร์คือตัวชี้ขาดว่าเฟดจะขึ้นดอกเบี้ยใส่ตลาดแรงงานที่กำลังหดตัวหรือไม่",
+          "tickers": [
+            {
+              "symbol": "SPY",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "SET",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "AVGO",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "USD",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "TLT",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "Schaeffer's Research, Reuters, BLS, Kaohoon International, Thailand Business News",
+          "published": "29 ส.ค. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-08-28-0645.md",
       "date": "2026-08-28T06:45:00Z",
