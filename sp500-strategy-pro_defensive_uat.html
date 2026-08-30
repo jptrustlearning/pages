@@ -2899,10 +2899,13 @@ const MACRO_ASSETS = [
   { key: 'GOLD', signalTicker: 'GOLD',   signFlip: false }
 ];
 
-const MACRO_EXCLUDED_TICKERS = new Set(['USDJPY', 'WTI', 'GOLD']);
+// Full commodity/FX/cash-proxy list — must match rolling defensive pages.
+// input_commodities_daily.csv carries FXY/USL/USO/GLD/SGOV/BIL/SHY too;
+// excluding only 3 let USO leak into the stock ranking (found 2026-08-30).
+const MACRO_EXCLUDED_TICKERS = new Set(['USDJPY', 'WTI', 'GOLD', 'FXY', 'USL', 'USO', 'GLD', 'SGOV', 'BIL', 'SHY', '$CASH']);
 // NOTE: Pro22 already declares BENCHMARK_TICKERS earlier (SPY/QQQ/DIA only).
 // We extend it dynamically so existing ranking code naturally excludes macro tickers.
-['USDJPY', 'WTI', 'GOLD'].forEach(t => BENCHMARK_TICKERS.add(t));
+MACRO_EXCLUDED_TICKERS.forEach(t => BENCHMARK_TICKERS.add(t));
 
 function getCloseAtOrBefore(ticker, idx) {
   for (let k = 0; k <= 10 && (idx - k) >= 0; k++) {
