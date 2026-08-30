@@ -1,6 +1,202 @@
 {
-  "lastUpdated": "2026-08-29T09:55:00Z",
+  "lastUpdated": "2026-08-30T09:10:00Z",
   "batches": [
+    {
+      "file": "2026-08-30-0910.md",
+      "date": "2026-08-30T09:10:00Z",
+      "date_display": "30 ส.ค. 2026 · 09:10",
+      "summary": "ตัวเลขจ้างงานสหรัฐฯ ถูกปรับลดย้อนหลัง 79,000 ตำแหน่ง ทั้งที่ตลาดคาดว่าจะถูกปรับขึ้น 183,000 · ทองคำปิดสัปดาห์ลบกว่า 3% ราคาทองในประเทศลดลง 1,600 บาท · สหรัฐฯ เล็งขยายภาษีชิปถึงเซิร์ฟเวอร์และโน้ตบุ๊ก · ดีลซื้อ PayPal ล่ม · กำไร บจ.ไทยครึ่งปีแรกโต 22.2%",
+      "tickers": [
+        "SPY",
+        "QQQ",
+        "TLT",
+        "GLD",
+        "SOXX",
+        "MU",
+        "PYPL",
+        "SET",
+        "PTTGC",
+        "DELTA",
+        "KCE",
+        "HANA",
+        "KBANK"
+      ],
+      "headlines": [
+        {
+          "title": "ตัวเลขจ้างงานสหรัฐฯ ถูกปรับลดย้อนหลัง 79,000 ตำแหน่ง ทั้งที่นักเศรษฐศาสตร์คาดว่าจะถูกปรับ \"ขึ้น\" 183,000 — และรายงานฉบับนี้ออกในนาทีเดียวกับที่ Warsh เริ่มพูดที่ Jackson Hole",
+          "tickers": [
+            {
+              "symbol": "SPY",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "QQQ",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "XRT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "TLT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DIA",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "Bureau of Labor Statistics, Bloomberg, Yahoo Finance, ZeroHedge, Trading Economics",
+          "published": "30 ส.ค. 2026"
+        },
+        {
+          "title": "ทองคำร่วงแรงในคืนวันศุกร์ ปิดสัปดาห์ลบกว่า 3% แย่ที่สุดตั้งแต่เดือนมิถุนายน — ราคาทองในประเทศลดลง 1,600 บาทในวันเดียว",
+          "tickers": [
+            {
+              "symbol": "GLD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "SLV",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "GDX",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "TLT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "UUP",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "Reuters, CNBC, สมาคมค้าทองคำ, Yahoo Finance",
+          "published": "30 ส.ค. 2026"
+        },
+        {
+          "title": "สหรัฐฯ เตรียมขยายภาษีชิปไปถึงเซิร์ฟเวอร์ โน้ตบุ๊ก และเครื่องเล่นเกม — ข้อยกเว้นที่เคยให้กับศูนย์ข้อมูลกำลังจะถูกปิด และไทยอยู่ในเส้นทางกระสุน",
+          "tickers": [
+            {
+              "symbol": "SOXX",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "WDC",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "STX",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "MU",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "TSM",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "KCE",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "HANA",
+              "sentiment": "negative"
+            }
+          ],
+          "source": "POLITICO, CNBC, Bloomberg, Nation Thailand",
+          "published": "30 ส.ค. 2026"
+        },
+        {
+          "title": "ดีลซื้อ PayPal มูลค่ากว่า 50,000 ล้านดอลลาร์ล่ม หุ้นร่วง 15% ในวันเดียว — บทเรียนเรื่องราคาหุ้นที่มี \"ส่วนของข่าวดีล\" ปนอยู่",
+          "tickers": [
+            {
+              "symbol": "PYPL",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AFRM",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "V",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "MA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "SQ",
+              "sentiment": "neutral"
+            }
+          ],
+          "tone_override": "bearish",
+          "source": "Bloomberg, Reuters, Axios, Quartz",
+          "published": "30 ส.ค. 2026"
+        },
+        {
+          "title": "กำไรสุทธิบริษัทจดทะเบียนไทยครึ่งปีแรกโต 22.2% กำไรจากการดำเนินงานโต 64.5% — แต่ดัชนี SET ยังวนอยู่แถว 1,600 จุด",
+          "tickers": [
+            {
+              "symbol": "SET",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTTGC",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "IVL",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "MINT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "KBANK",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "SCB",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "CPF",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "TU",
+              "sentiment": "negative"
+            }
+          ],
+          "tone_override": "bullish",
+          "source": "ตลาดหลักทรัพย์แห่งประเทศไทย, InfoQuest, Kaohoon",
+          "published": "30 ส.ค. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-08-29-0955.md",
       "date": "2026-08-29T09:55:00Z",
