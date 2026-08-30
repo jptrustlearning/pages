@@ -2329,7 +2329,9 @@ const BENCH_URL = 'https://raw.githubusercontent.com/jptrustlearning/sp500/main/
 const JPY_URL = 'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_jpy_daily.csv';
 const COMMOD_URL = 'https://raw.githubusercontent.com/jptrustlearning/sp500/main/input_commodities_daily.csv';
 const BENCHMARK_TICKERS = new Set(['SPY', 'QQQ', 'DIA']);
-['USDJPY', 'WTI', 'GOLD'].forEach(t => BENCHMARK_TICKERS.add(t));  // Defensive UAT;
+['USDJPY', 'WTI', 'GOLD', 'FXY', 'USL', 'USO', 'GLD', 'SGOV', 'BIL', 'SHY', '$CASH'].forEach(t => BENCHMARK_TICKERS.add(t));  // Defensive UAT;
+// ^ full commodity/FX/cash-proxy list from input_commodities_daily.csv — excluding
+//   only 3 let USO leak into the stock ranking (same bug as strategy-pro_defensive, fixed 2026-08-30)
 
 let CONFIG = {
   capital: 100,
@@ -3367,7 +3369,7 @@ function isSPYBenignAt(fridayDate) {
 }
 
 // Macro tickers should not be candidates in the stock universe scan
-const MACRO_EXCLUDED_TICKERS = new Set(['USDJPY', 'WTI', 'GOLD']);
+const MACRO_EXCLUDED_TICKERS = new Set(['USDJPY', 'WTI', 'GOLD', 'FXY', 'USL', 'USO', 'GLD', 'SGOV', 'BIL', 'SHY', '$CASH']);
 
 function runCombinedBacktest() {
   console.time('combined-backtest');
