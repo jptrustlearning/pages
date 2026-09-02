@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>ตีกริดรายเดือน · JP Trust Learning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Cinzel:wght@500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<!-- JP Trust hard auth-gate (internal tool · unlisted · ไม่ลิงก์จาก dashboard) -->
+<script src="./jp-gate.js?v=1788371467"></script>
+<style>
+  :root {
+    --bg:#1a0a0e; --panel:#2d1018; --panel2:#3a1520; --line:#4a2028;
+    --gold:#D4AF37; --gold-soft:#F4E4BA; --text:#E8E4DC; --muted:#A09B92; --faint:#7a5a60;
+    --buy:#5BC48E; --sell:#D77A8C;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html { background:var(--bg); }
+  body { min-height:100%; background:radial-gradient(circle at 50% 0, #241016 0%, var(--bg) 55%);
+         font-family:'Anuphan',sans-serif; color:var(--text); line-height:1.6; padding:22px 16px 60px; }
+  .wrap { max-width:640px; margin:0 auto; }
+
+  .eyebrow { font-family:'Cinzel',serif; font-size:10px; letter-spacing:3px; color:var(--gold); }
+  h1 { font-size:22px; font-weight:600; color:#FAF6ED; margin-top:2px; }
+  .sub { color:var(--muted); font-size:13.5px; margin-top:4px; }
+
+  /* ── controls ── */
+  .ctl { margin-top:18px; display:grid; grid-template-columns:1.3fr 1fr 0.8fr; gap:8px; }
+  .ctl label { display:block; font-size:11.5px; color:var(--muted); margin-bottom:4px; }
+  .ctl select { width:100%; background:var(--panel); border:1px solid var(--line); border-radius:12px;
+                color:var(--gold-soft); font-family:'Anuphan',sans-serif; font-size:15px; padding:10px 34px 10px 12px;
+                appearance:none; -webkit-appearance:none; outline:none;
+                background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23D4AF37' stroke-width='1.6'/></svg>");
+                background-repeat:no-repeat; background-position:right 12px center; }
+  .ctl select:focus-visible { border-color:var(--gold); box-shadow:0 0 0 3px rgba(212,175,55,.18); }
+  .ctl select option:disabled { color:#7a5a60; }
+  .go { margin-top:12px; width:100%; padding:13px; border:none; border-radius:14px; cursor:pointer;
+        background:linear-gradient(135deg,#D4AF37,#B8860B); color:#1a0a0e; font-family:'Anuphan',sans-serif;
+        font-size:16px; font-weight:700; }
+  .go:disabled { opacity:.45; cursor:not-allowed; }
+  .go:focus-visible { outline:3px solid rgba(244,228,186,.6); outline-offset:2px; }
+
+  .status { margin-top:12px; font-size:12.5px; color:var(--muted); display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .status .dot { width:8px; height:8px; border-radius:50%; background:#7a5a60; flex:0 0 auto; }
+  .status.ok .dot { background:var(--buy); } .status.err .dot { background:var(--sell); }
+  .upload { display:none; margin-top:8px; font-size:13px; color:var(--gold-soft); }
+  .upload input { margin-top:6px; color:var(--muted); font-size:12px; }
+  .notice { margin-top:12px; padding:11px 13px; border-radius:12px; border:1px solid rgba(215,122,140,.45);
+            background:rgba(215,122,140,.08); color:#f0c9d1; font-size:13.5px; display:none; }
+  .notice.show { display:block; }
+
+  /* ── result ── */
+  .result { display:none; margin-top:22px; }
+  .result.show { display:block; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:16px; }
+  .card + .card { margin-top:12px; }
+  .card h2 { font-size:15px; font-weight:600; color:var(--gold-soft); }
+  .meta { font-size:12.5px; color:var(--muted); margin-top:2px; }
+
+  .kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px; }
+  .kpi { border-top:1px solid var(--line); padding-top:8px; }
+  .kpi .v { font-family:'DM Serif Display',serif; font-size:26px; line-height:1.1; color:#FAF6ED; }
+  .kpi .v.gold { color:var(--gold); }
+  .kpi .l { font-size:11.5px; color:var(--muted); margin-top:2px; }
+  .formula { margin-top:12px; font-size:13px; color:var(--text); background:rgba(0,0,0,.18); border-radius:10px; padding:9px 12px; line-height:1.55; }
+  .formula b { color:var(--gold-soft); font-weight:600; }
+  .formula code { font-family:ui-monospace,Menlo,Consolas,monospace; color:#FAF6ED; font-size:12.5px; }
+  .zones { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; }
+  .zone { border-radius:12px; padding:10px 12px; font-size:13px; }
+  .zone.buy { background:rgba(91,196,142,.10); border:1px solid rgba(91,196,142,.35); }
+  .zone.sell { background:rgba(215,122,140,.10); border:1px solid rgba(215,122,140,.35); }
+  .zone .t { font-weight:700; } .zone.buy .t { color:var(--buy); } .zone.sell .t { color:var(--sell); }
+  .zone .r { color:var(--text); } .zone .n { color:var(--muted); font-size:12px; }
+
+  /* ── ladder ── */
+  .ladder { margin-top:12px; }
+  .lrow { display:grid; grid-template-columns:52px 84px 1fr; align-items:center; gap:10px; height:22px;
+          font-size:12.5px; font-variant-numeric:tabular-nums; position:relative; }
+  .lrow .p { color:var(--faint); text-align:right; }
+  .lrow .px { color:var(--text); font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12.5px; }
+  .lrow .bar { height:8px; border-radius:4px; background:transparent; position:relative; }
+  .lrow .bar i { position:absolute; left:0; top:0; bottom:0; border-radius:4px; }
+  .lrow.buy .p { color:var(--buy); } .lrow.buy .bar i { background:rgba(91,196,142,.55); }
+  .lrow.sell .p { color:var(--sell); } .lrow.sell .bar i { background:rgba(215,122,140,.55); }
+  .lrow.mid .bar i { background:rgba(255,255,255,.07); }
+  .lrow .lot { position:absolute; right:0; font-size:11px; color:var(--muted); }
+  .lrow.buy .lot { color:rgba(91,196,142,.85); } .lrow.sell .lot { color:rgba(215,122,140,.85); }
+  .marker { display:grid; grid-template-columns:52px 1fr; gap:10px; align-items:center; height:18px; }
+  .marker .ln { height:0; border-top:2px dashed var(--gold); position:relative; }
+  .marker .ln span { position:absolute; right:0; top:-10px; background:var(--gold); color:#1a0a0e; font-size:11px;
+                     font-weight:700; padding:1px 8px; border-radius:999px; white-space:nowrap; }
+  .marker .lbl { font-family:'DM Serif Display',serif; color:var(--gold); text-align:right; font-size:13px; }
+  .ladder-note { font-size:12px; color:var(--muted); margin-top:10px; }
+
+  /* ── output ── */
+  textarea { width:100%; height:260px; margin-top:12px; background:#120609; color:#F4E4BA; border:1px solid var(--line);
+             border-radius:12px; padding:12px; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12.5px;
+             line-height:1.5; resize:vertical; outline:none; white-space:pre; }
+  .acts { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+  .acts button { padding:12px; border-radius:12px; cursor:pointer; font-family:'Anuphan',sans-serif; font-size:15px; font-weight:600; }
+  .acts .copy { background:var(--gold); color:#1a0a0e; border:none; }
+  .acts .dl { background:transparent; color:var(--gold-soft); border:1px solid var(--gold); }
+  .acts button:focus-visible { outline:3px solid rgba(244,228,186,.6); outline-offset:2px; }
+  .howto { margin-top:12px; font-size:13px; color:var(--muted); line-height:1.65; }
+  .howto code { font-family:ui-monospace,Menlo,Consolas,monospace; color:var(--gold-soft); font-size:12.5px; }
+  .guard { margin-top:14px; font-size:12.5px; color:var(--muted); border-left:2px solid var(--gold); padding-left:10px; line-height:1.6; }
+  .guard b { color:var(--gold-soft); font-weight:600; }
+  .toast { position:fixed; left:50%; bottom:28px; transform:translateX(-50%) translateY(20px); opacity:0;
+           background:var(--gold-soft); color:#1a0a0e; padding:9px 16px; border-radius:999px; font-size:13.5px;
+           font-weight:600; transition:opacity .2s, transform .2s; pointer-events:none; }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  @media (max-width:480px) {
+    .ctl { grid-template-columns:1fr 1fr; }
+    .ctl .f-pair { grid-column:1 / -1; }
+    .kpis { grid-template-columns:1fr 1fr 1fr; gap:6px; }
+    .kpi .v { font-size:22px; }
+    .zones { grid-template-columns:1fr; }
+    .lrow { grid-template-columns:44px 76px 1fr; font-size:12px; }
+    .marker { grid-template-columns:44px 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { .toast { transition:none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Percentile Grid</div>
+  <h1>ตีกริดรายเดือน</h1>
+  <div class="sub">ระดับ percentile 10 ปี ปรับด้วย DXY · ใช้ข้อมูลถึงสิ้นเดือนก่อนเท่านั้น · ก็อปลง MT5 ได้ทันที</div>
+
+  <div class="ctl">
+    <div class="f-pair">
+      <label for="pair">คู่เงิน</label>
+      <select id="pair"></select>
+    </div>
+    <div>
+      <label for="month">เดือนที่จะเทรด</label>
+      <select id="month"></select>
+    </div>
+    <div>
+      <label for="year">ปี</label>
+      <select id="year"></select>
+    </div>
+  </div>
+  <button class="go" id="go" disabled>สร้างกริด</button>
+
+  <div class="status" id="status"><span class="dot"></span><span id="statusText">กำลังโหลด input_fx_daily.csv …</span></div>
+  <div class="upload" id="upload">โหลดจาก R2 ไม่สำเร็จ — เลือกไฟล์ <code>input_fx_daily.csv</code> จากเครื่องแทนได้
+    <br><input type="file" id="file" accept=".csv,text/csv"></div>
+  <div class="notice" id="notice"></div>
+
+  <div class="result" id="result">
+    <div class="card">
+      <h2 id="rTitle"></h2>
+      <div class="meta" id="rMeta"></div>
+      <div class="kpis">
+        <div class="kpi"><div class="v" id="kLast"></div><div class="l" id="kLastL">ราคาปิดล่าสุดที่ใช้</div></div>
+        <div class="kpi"><div class="v gold" id="kP"></div><div class="l">percentile ของราคานี้ใน 10 ปี</div></div>
+        <div class="kpi"><div class="v" id="kDxy"></div><div class="l" id="kDxyL">DXY ที่ใช้แปลงกลับ</div></div>
+      </div>
+      <div class="formula" id="formula"></div>
+      <div class="zones">
+        <div class="zone buy"><div class="t">BUY limit · p40 → p0 (17 ชั้น)</div><div class="r" id="zBuy"></div><div class="n">$10 ที่ p40 · +$5 ทุก 10p ที่ลึกลง · รวม $310</div></div>
+        <div class="zone sell"><div class="t">SELL limit · p85 → p100 (7 ชั้น)</div><div class="r" id="zSell"></div><div class="n">$10 ทุกชั้น · รวม $70 · TP −2.5p</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>บันไดกริด 41 ระดับ</h2>
+      <div class="meta">ราคาสูงอยู่บน · แถบยาว = ระยะห่างจากชั้นถัดลง · เส้นทอง = ราคาปิดล่าสุด</div>
+      <div class="ladder" id="ladder"></div>
+      <div class="ladder-note" id="ladderNote"></div>
+    </div>
+
+    <div class="card">
+      <h2 id="fileTitle"></h2>
+      <div class="meta">41 บรรทัด <code>p,price</code> + บรรทัดหัว # — ฟอร์แมตเดียวกับ make_grid.py ทุกตัวอักษร (EA เทียบ hash ทั้งไฟล์)</div>
+      <textarea id="out" readonly spellcheck="false"></textarea>
+      <div class="acts">
+        <button class="copy" id="copy">คัดลอกข้อความ</button>
+        <button class="dl" id="dl">ดาวน์โหลด .txt</button>
+      </div>
+      <div class="howto">วางไฟล์ที่ <code id="mt5path"></code> (MT5: File → Open Data Folder) · EA <code>JPT_PercentileGrid</code> อ่านซ้ำทุก 10 วิ ถ้า hash เปลี่ยนจะกางกริดใหม่ทั้งแผงเอง</div>
+      <div class="guard" id="guard"></div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* JPT Percentile Grid engine — port ของ make_grid.py (B15) ทีละบรรทัด
+ * กติกา no-lookahead: ทุกฟังก์ชันรับ asof (ISO 'YYYY-MM-DD' = สิ้นเดือนก่อนเดือนที่จะเทรด)
+ * แล้วใช้เฉพาะแถวที่ Date <= asof — ไม่มีทางเห็นแถวของเดือนที่เทรด
+ */
+(function (root) {
+  'use strict';
+
+  var P = []; for (var i = 0; i < 41; i++) P.push(i * 2.5);
+
+  // ---- CSV: Ticker,Date,Open,High,Low,Close,Volume -> {TICKER: {dates:[], close:[]}} เรียงวันที่
+  function parseFxCsv(text) {
+    var lines = text.replace(/\r/g, '').split('\n');
+    var head = lines[0].split(',');
+    var iT = head.indexOf('Ticker'), iD = head.indexOf('Date'), iC = head.indexOf('Close');
+    if (iT < 0 || iD < 0 || iC < 0) throw new Error('CSV ต้องมีคอลัมน์ Ticker, Date, Close');
+    var by = {};
+    for (var k = 1; k < lines.length; k++) {
+      var ln = lines[k]; if (!ln) continue;
+      var c = ln.split(',');
+      var t = c[iT], d = c[iD], v = parseFloat(c[iC]);
+      if (!t || !d || !isFinite(v)) continue;
+      (by[t] = by[t] || []).push([d.slice(0, 10), v]);
+    }
+    var out = {};
+    Object.keys(by).forEach(function (t) {
+      var rows = by[t].sort(function (a, b) { return a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0; });
+      // dedupe keep-last (เหมือน drop_duplicates(keep='last') ของ pipeline)
+      var dates = [], close = [];
+      for (var j = 0; j < rows.length; j++) {
+        if (dates.length && dates[dates.length - 1] === rows[j][0]) { close[close.length - 1] = rows[j][1]; continue; }
+        dates.push(rows[j][0]); close.push(rows[j][1]);
+      }
+      out[t] = { dates: dates, close: close };
+    });
+    return out;
+  }
+
+  // ---- numpy.percentile (method='linear') รวม _lerp ที่สลับสูตรเมื่อ t >= 0.5
+  function npPercentile(sorted, p) {
+    var n = sorted.length;
+    if (!n) return NaN;
+    var q = p / 100;
+    var vi = (n - 1) * q;
+    var lo = Math.floor(vi);
+    var hi = Math.min(lo + 1, n - 1);
+    var t = vi - lo;
+    var a = sorted[lo], b = sorted[hi];
+    var diff = b - a;
+    var v = a + diff * t;
+    if (t >= 0.5) v = b - diff * (1 - t);
+    return v;
+  }
+
+  // ---- reindex + ffill + bfill ของ DXY ลงบนวันของราคา
+  function alignFfillBfill(priceDates, dxDates, dxClose) {
+    var out = new Array(priceDates.length);
+    var j = 0, last = NaN;
+    for (var i = 0; i < priceDates.length; i++) {
+      var d = priceDates[i];
+      while (j < dxDates.length && dxDates[j] <= d) { last = dxClose[j]; j++; }
+      out[i] = last;                                     // ffill (ค่า DXY ล่าสุดที่ <= d)
+    }
+    // bfill สำหรับหัวไฟล์ที่ยังไม่มี DXY
+    var firstOk = -1;
+    for (var m = 0; m < out.length; m++) if (isFinite(out[m])) { firstOk = m; break; }
+    if (firstOk > 0) for (var q = 0; q < firstOk; q++) out[q] = out[firstOk];
+    return out;
+  }
+
+  function addYears(iso, y) {            // asof - DateOffset(years=y) → ISO (pandas: เลื่อนปี คงวัน/เดือน, 29 ก.พ. → 28)
+    var Y = +iso.slice(0, 4) - y, M = iso.slice(5, 7), D = +iso.slice(8, 10);
+    if (M === '02' && D === 29) { var leap = (Y % 4 === 0 && Y % 100 !== 0) || Y % 400 === 0; if (!leap) D = 28; }
+    return Y + '-' + M + '-' + (D < 10 ? '0' + D : '' + D);
+  }
+
+  function fmt(v, d) { return v.toFixed(d); }
+  function fmtSigned(v, d) { return (v >= 0 ? '+' : '') + v.toFixed(d); }
+
+  /**
+   * buildGrid({symbol, mode:'mul'|'div'|'raw', price:{dates,close}, dxy:{dates,close}, asof, years=10, drift=1/12, floor=null, digits=null})
+   * → {header, lines:[{p,price}], text, meta}
+   */
+  function buildGrid(opt) {
+    var years = opt.years == null ? 10 : opt.years;
+    var driftH = opt.drift == null ? 1 / 12 : opt.drift;
+    var asof = opt.asof;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(asof)) throw new Error('asof ต้องเป็น YYYY-MM-DD');
+
+    // px = px[px.index <= asof]
+    var pd = [], pc = [];
+    for (var i = 0; i < opt.price.dates.length; i++) {
+      if (opt.price.dates[i] <= asof) {
+        pd.push(opt.price.dates[i]);
+        pc.push(opt.floor != null ? Math.max(opt.price.close[i], opt.floor) : opt.price.close[i]);
+      }
+    }
+    if (pd.length < 260) throw new Error('ข้อมูล ' + opt.symbol + ' ถึง ' + asof + ' มีแค่ ' + pd.length + ' แถว');
+
+    var dx = alignFfillBfill(pd, opt.dxy.dates, opt.dxy.close);
+    var dxLast = dx[dx.length - 1];
+    var adj = new Array(pd.length), k;
+    if (opt.mode === 'mul') {
+      for (var a = 0; a < pd.length; a++) adj[a] = pc[a] * dx[a] / 100.0;
+      k = 1.0 / (dxLast / 100.0);
+    } else if (opt.mode === 'div') {
+      for (var b = 0; b < pd.length; b++) adj[b] = pc[b] / (dx[b] / 100.0);
+      k = dxLast / 100.0;
+    } else {
+      for (var c = 0; c < pd.length; c++) adj[c] = pc[c];
+      k = 1.0;
+    }
+
+    // win = adj[adj.index > asof - years]
+    var winStart = addYears(asof, years);
+    var win = [];
+    for (var w = 0; w < pd.length; w++) if (pd[w] > winStart) win.push(adj[w]);
+    var sorted = win.slice().sort(function (x, y) { return x - y; });
+    var lv = P.map(function (p) { return npPercentile(sorted, p); });
+
+    // drift: month-end last ของ adj (ทั้งช่วง <= asof) → ล่าสุด years*12+12 เดือน → YoY log → mean
+    var meKeys = [], meVals = {};
+    for (var m = 0; m < pd.length; m++) {
+      var key = pd[m].slice(0, 7);
+      if (!(key in meVals)) meKeys.push(key);
+      meVals[key] = adj[m];                             // แถวสุดท้ายของเดือนชนะ (resample('ME').last())
+    }
+    var take = Math.round(years * 12) + 12;
+    var me = meKeys.slice(-take).map(function (kk) { return meVals[kk]; });
+    var yoy = [];
+    for (var y = 12; y < me.length; y++) yoy.push(Math.log(me[y] / me[y - 12]));
+    var g = yoy.length ? yoy.reduce(function (s, v) { return s + v; }, 0) / yoy.length : 0.0;
+    var mult = Math.exp(g * driftH);
+    var nom = lv.map(function (v) { return (v * mult) * k; });
+
+    var digits = opt.digits != null ? opt.digits : (nom[20] > 20 ? 2 : 5);
+    var adjLast = adj[adj.length - 1];
+    var cnt = 0; for (var z = 0; z < win.length; z++) if (win[z] <= adjLast) cnt++;
+    var curP = cnt / win.length * 100;
+
+    var header = '# ' + opt.symbol + ' grid | asof ' + pd[pd.length - 1] + ' | mode ' + opt.mode +
+      ' | dxy ' + fmt(dxLast, 2) + ' | last ' + fmt(pc[pc.length - 1], digits) + ' = p' + fmt(curP, 1) +
+      ' | drift ' + fmtSigned(g * 100, 2) + '%/y';
+    var lines = P.map(function (p, idx) { return { p: p, price: fmt(nom[idx], digits), raw: nom[idx] }; });
+    var text = header + '\n' + lines.map(function (l) { return (l.p % 1 === 0 ? l.p : l.p) + ',' + l.price; }).join('\n') + '\n';
+
+    return {
+      header: header, lines: lines, text: text,
+      meta: {
+        symbol: opt.symbol, mode: opt.mode, asofRequested: asof, asofData: pd[pd.length - 1],
+        dxyUsed: dxLast, dxyRowDate: lastDxyRowOnOrBefore(opt.dxy.dates, pd[pd.length - 1]),
+        lastClose: pc[pc.length - 1], curP: curP, drift: g, k: k, digits: digits,
+        winStart: winStart, winN: win.length, adjLast: adjLast, monthEnds: me.length, yoyN: yoy.length
+      }
+    };
+  }
+
+  function lastDxyRowOnOrBefore(dxDates, d) {
+    var last = null;
+    for (var i = 0; i < dxDates.length && dxDates[i] <= d; i++) last = dxDates[i];
+    return last;
+  }
+
+  // สิ้นเดือนปฏิทินของเดือนก่อนหน้า (year, month 1-12) → 'YYYY-MM-DD'
+  function prevMonthEnd(year, month) {
+    var d = new Date(Date.UTC(year, month - 1, 0));   // วัน 0 ของเดือน = วันสุดท้ายของเดือนก่อน
+    return d.toISOString().slice(0, 10);
+  }
+
+  var api = { P: P, parseFxCsv: parseFxCsv, npPercentile: npPercentile, buildGrid: buildGrid, prevMonthEnd: prevMonthEnd, addYears: addYears };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  root.JPTGrid = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script>
+(function () {
+  'use strict';
+  var DATA_URL = 'https://app.jptrustlearning.com/data/input_fx_daily.csv';
+  // ×DXY = USD เป็นสกุลหลัง (USD-quote) · ÷DXY = USD เป็นสกุลหน้า (USD-base) — ห้ามสลับ (B15)
+  var PAIRS = [
+    { sym:'EURUSD', label:'EUR/USD', mode:'mul', on:true,  base:'EUR', quote:'USD' },
+    { sym:'GBPUSD', label:'GBP/USD', mode:'mul', on:false, base:'GBP', quote:'USD' },
+    { sym:'AUDUSD', label:'AUD/USD', mode:'mul', on:false, base:'AUD', quote:'USD' },
+    { sym:'USDCAD', label:'USD/CAD', mode:'div', on:false, base:'USD', quote:'CAD' }
+  ];
+  var TH_MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  var FIRST_YEAR = 2014;                 // หน้าต่าง 10 ปีเต็ม (EURUSD/GBPUSD/USDCAD เริ่ม 2003)
+  var $ = function (id) { return document.getElementById(id); };
+  var data = null, lastDataDate = null, loadedAt = null;
+
+  // ---- วันนี้ตามเวลาไทย (ใช้ตั้งค่าเริ่มต้น + ตรวจอายุแถว DXY)
+  function bkkToday() {
+    var s = new Intl.DateTimeFormat('en-CA', { timeZone:'Asia/Bangkok', year:'numeric', month:'2-digit', day:'2-digit' }).format(new Date());
+    return s.slice(0, 10);
+  }
+  function daysBetween(a, b) { return Math.round((Date.UTC(+b.slice(0,4), +b.slice(5,7)-1, +b.slice(8,10)) - Date.UTC(+a.slice(0,4), +a.slice(5,7)-1, +a.slice(8,10))) / 86400000); }
+  function thDate(iso) { return (+iso.slice(8,10)) + ' ' + TH_MONTHS[+iso.slice(5,7)-1] + ' ' + iso.slice(0,4); }
+  function pips(sym, d) { return sym === 'USDJPY' ? d * 100 : d * 10000; }
+
+  // ---- controls
+  (function initControls() {
+    var pair = $('pair');
+    PAIRS.forEach(function (p) {
+      var o = document.createElement('option'); o.value = p.sym;
+      o.textContent = p.label + (p.on ? '' : ' (ยังไม่เปิด)'); o.disabled = !p.on; pair.appendChild(o);
+    });
+    var today = bkkToday(), y0 = +today.slice(0,4), m0 = +today.slice(5,7);
+    var month = $('month');
+    TH_MONTHS.forEach(function (n, i) { var o = document.createElement('option'); o.value = i + 1; o.textContent = n; month.appendChild(o); });
+    month.value = m0;
+    var year = $('year');
+    for (var y = y0 + 1; y >= FIRST_YEAR; y--) { var o2 = document.createElement('option'); o2.value = y; o2.textContent = y; year.appendChild(o2); }
+    year.value = y0;
+  })();
+
+  // ---- data load: R2 ก่อน → ไม่ได้ค่อยให้เลือกไฟล์เอง
+  function useCsv(text, source) {
+    data = JPTGrid.parseFxCsv(text);
+    var need = ['DXY'].concat(PAIRS.filter(function (p) { return p.on; }).map(function (p) { return p.sym; }));
+    var missing = need.filter(function (t) { return !data[t]; });
+    if (missing.length) throw new Error('ไฟล์ไม่มี ticker: ' + missing.join(', '));
+    lastDataDate = data.EURUSD.dates[data.EURUSD.dates.length - 1];
+    loadedAt = new Date();
+    var st = $('status'); st.className = 'status ok';
+    $('statusText').textContent = source + ' · แถวล่าสุด ' + thDate(lastDataDate) + ' · DXY ล่าสุด ' + thDate(data.DXY.dates[data.DXY.dates.length - 1]) +
+      ' · โหลด ' + loadedAt.toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit' });
+    $('go').disabled = false;
+  }
+  function loadFail(msg) {
+    var st = $('status'); st.className = 'status err';
+    $('statusText').textContent = 'โหลดข้อมูลไม่สำเร็จ: ' + msg;
+    $('upload').style.display = 'block';
+  }
+  fetch(DATA_URL, { cache:'no-cache' })
+    .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+    .then(function (t) { useCsv(t, 'R2 /data/input_fx_daily.csv'); })
+    .catch(function (e) { loadFail(e.message || String(e)); });
+  $('file').addEventListener('change', function (ev) {
+    var f = ev.target.files && ev.target.files[0]; if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () { try { useCsv(String(rd.result), 'ไฟล์จากเครื่อง ' + f.name); $('notice').className = 'notice'; } catch (e) { loadFail(e.message); } };
+    rd.readAsText(f);
+  });
+
+  // ---- generate
+  function notice(msg) { var n = $('notice'); n.textContent = msg; n.className = 'notice show'; $('result').className = 'result'; }
+  function lotFor(p) { return p <= 40 ? 10 + 5 * Math.floor((40 - p) / 10) : (p >= 85 ? 10 : 0); }
+
+  $('go').addEventListener('click', function () {
+    if (!data) return;
+    var pair = PAIRS.filter(function (p) { return p.sym === $('pair').value; })[0];
+    var y = +$('year').value, m = +$('month').value;
+    var asof = JPTGrid.prevMonthEnd(y, m);              // สิ้นเดือนปฏิทินของเดือนก่อนเดือนที่เทรด
+    var series = data[pair.sym];
+    var lastRow = series.dates[series.dates.length - 1];
+    if (asof > lastRow) {
+      notice('ยังสร้างกริดเดือน ' + TH_MONTHS[m-1] + ' ' + y + ' ไม่ได้ — ต้องมีข้อมูลถึง ' + thDate(asof) +
+             ' แต่ไฟล์มีถึง ' + thDate(lastRow) + ' (กันมองอนาคต: กริดใช้ราคาปิดถึงสิ้นเดือนก่อนเท่านั้น)');
+      return;
+    }
+    var r;
+    try { r = JPTGrid.buildGrid({ symbol:pair.sym, mode:pair.mode, price:series, dxy:data.DXY, asof:asof }); }
+    catch (e) { notice(e.message); return; }
+    $('notice').className = 'notice';
+    render(pair, y, m, asof, r);
+  });
+
+  function render(pair, y, m, asof, r) {
+    var M = r.meta, d = M.digits, lines = r.lines;
+    var today = bkkToday();
+    $('rTitle').textContent = pair.label + ' · กริดเดือน ' + TH_MONTHS[m-1] + ' ' + y;
+    var gap = daysBetween(M.asofData, asof);
+    $('rMeta').textContent = 'ใช้ราคาปิดถึง ' + thDate(M.asofData) + (gap > 0 ? ' (สิ้นเดือน ' + thDate(asof) + ' ไม่มีแถว — ใช้แถวสุดท้ายก่อนหน้า)' : '') +
+      ' · หน้าต่าง percentile ' + M.winN + ' วัน (หลัง ' + thDate(M.winStart) + ') · drift ' + (M.drift*100 >= 0 ? '+' : '') + (M.drift*100).toFixed(2) + '%/ปี × 1/12';
+
+    $('kLast').textContent = M.lastClose.toFixed(d);
+    $('kLastL').textContent = 'ปิด ' + thDate(M.asofData) + ' (แถว Yahoo = 07:00 ไทยของวันนั้น)';
+    $('kP').textContent = 'p' + M.curP.toFixed(1);
+    $('kDxy').textContent = M.dxyUsed.toFixed(2);
+    $('kDxyL').textContent = 'DXY แถว ' + thDate(M.dxyRowDate) + (M.dxyRowDate !== M.asofData ? ' (ffill)' : '');
+
+    var f = pair.mode === 'mul'
+      ? '<b>' + pair.label + '</b> คือ USD ต่อ 1 ' + pair.base + ' (USD เป็นสกุลหลัง) → DXY ขึ้น ราคาลง จึงต้อง<b>คูณ</b>: <code>adj = ' + pair.sym + ' × DXY ÷ 100</code><br>แปลงกลับเป็นราคาจริง: <code>level ÷ (' + M.dxyUsed.toFixed(2) + ' ÷ 100)</code> (k = ' + M.k.toFixed(6) + ')'
+      : '<b>' + pair.label + '</b> คือ ' + pair.quote + ' ต่อ 1 USD (USD เป็นสกุลหน้า) → DXY ขึ้นราคาขึ้น จึงต้อง<b>หาร</b>: <code>adj = ' + pair.sym + ' ÷ (DXY ÷ 100)</code><br>แปลงกลับเป็นราคาจริง: <code>level × (' + M.dxyUsed.toFixed(2) + ' ÷ 100)</code> (k = ' + M.k.toFixed(6) + ')';
+    $('formula').innerHTML = f;
+
+    var p40 = lines[16], p0 = lines[0], p85 = lines[34], p100 = lines[40];
+    var buyDist = pips(pair.sym, M.lastClose - +p40.price), sellDist = pips(pair.sym, +p85.price - M.lastClose);
+    $('zBuy').textContent = p0.price + ' – ' + p40.price + (buyDist >= 0 ? ' · ราคาอยู่เหนือ p40 ' + Math.round(buyDist) + ' pips' : ' · ราคาอยู่ในโซน buy แล้ว');
+    $('zSell').textContent = p85.price + ' – ' + p100.price + (sellDist >= 0 ? ' · ราคาอยู่ใต้ p85 ' + Math.round(sellDist) + ' pips' : ' · ราคาอยู่ในโซน sell แล้ว');
+
+    // ladder: p100 บนสุด → p0 ล่างสุด · แถบ = ช่องห่างจากชั้นถัดลง เทียบช่องกว้างสุด
+    var maxGap = 0;
+    for (var i = 1; i < 41; i++) maxGap = Math.max(maxGap, lines[i].raw - lines[i-1].raw);
+    var html = '', placed = false;
+    for (var j = 40; j >= 0; j--) {
+      var L = lines[j];
+      if (!placed && M.lastClose >= L.raw) {
+        html += '<div class="marker"><div class="lbl">' + M.lastClose.toFixed(d) + '</div><div class="ln"><span>ราคาล่าสุด p' + M.curP.toFixed(1) + '</span></div></div>';
+        placed = true;
+      }
+      var cls = L.p <= 40 ? 'buy' : (L.p >= 85 ? 'sell' : 'mid');
+      var g = j > 0 ? (L.raw - lines[j-1].raw) / maxGap : 0;
+      var lot = lotFor(L.p);
+      html += '<div class="lrow ' + cls + '"><div class="p">p' + L.p + '</div><div class="px">' + L.price + '</div>' +
+              '<div class="bar"><i style="width:' + Math.max(2, Math.round(g * 100)) + '%"></i>' + (lot ? '<span class="lot">$' + lot + '</span>' : '') + '</div></div>';
+    }
+    if (!placed) html += '<div class="marker"><div class="lbl">' + M.lastClose.toFixed(d) + '</div><div class="ln"><span>ราคาล่าสุด p' + M.curP.toFixed(1) + '</span></div></div>';
+    $('ladder').innerHTML = html;
+    var minGap = Infinity; for (var q = 1; q < 41; q++) minGap = Math.min(minGap, lines[q].raw - lines[q-1].raw);
+    $('ladderNote').textContent = 'ช่องแคบสุด ' + Math.round(pips(pair.sym, minGap)) + ' pips · กว้างสุด ' + Math.round(pips(pair.sym, maxGap)) + ' pips · TP ของทุกไม้ = ชั้นถัดไป 1 ช่อง (2.5p) ตามระดับของเดือนที่เปิดอยู่';
+
+    $('fileTitle').textContent = 'grid_' + pair.sym + '.txt';
+    $('mt5path').textContent = 'MQL5\\Files\\grid_' + pair.sym + '.txt';
+    $('out').value = r.text;
+
+    // guard: no-lookahead + DXY jitter
+    var unused = data[pair.sym].dates.filter(function (x) { return x > asof; }).length;
+    var dxyAge = daysBetween(M.dxyRowDate, today);
+    var gtxt = '<b>กันมองอนาคต:</b> ทุกตัวเลขมาจากแถว ≤ ' + thDate(asof) + ' เท่านั้น' +
+      (unused ? ' — แถวหลังจากนั้นในไฟล์ ' + unused + ' แถว (ถึง ' + thDate(data[pair.sym].dates[data[pair.sym].dates.length-1]) + ') ไม่ถูกใช้' : '') +
+      ' · ทดสอบแล้ว: ตัดไฟล์ให้จบที่ ' + thDate(asof) + ' หรือเติมแถวปลอมหลังจากนั้น ผลลัพธ์เหมือนเดิมทุกตัวอักษร';
+    if (dxyAge < 2) gtxt += '<br><b>ระวัง DXY:</b> แถว ' + thDate(M.dxyRowDate) + ' อายุ ' + dxyAge + ' วัน — Yahoo revise ค่า DX-Y.NYB ย้อนหลัง 1–2 วัน (±3–10 pips ทั้งแผง) ควรสร้างซ้ำหลัง ' + thDate(addDays(M.dxyRowDate, 2));
+    if (gap > 4) gtxt += '<br><b>ระวัง:</b> แถวสุดท้ายที่ใช้ห่างจากสิ้นเดือน ' + gap + ' วัน — ไฟล์อาจยังไม่ครบเดือน รอ pipeline (00:25 UTC อ.–ส.) แล้วสร้างใหม่';
+    $('guard').innerHTML = gtxt;
+    $('result').className = 'result show';
+    $('result').scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+  function addDays(iso, n) { var t = Date.UTC(+iso.slice(0,4), +iso.slice(5,7)-1, +iso.slice(8,10)) + n * 86400000; return new Date(t).toISOString().slice(0,10); }
+
+  // ---- copy / download
+  function toast(msg) { var t = $('toast'); t.textContent = msg; t.className = 'toast show'; setTimeout(function () { t.className = 'toast'; }, 1600); }
+  $('copy').addEventListener('click', function () {
+    var txt = $('out').value; if (!txt) return;
+    function fallback() { var ta = $('out'); ta.focus(); ta.select(); ta.setSelectionRange(0, txt.length); try { document.execCommand('copy'); toast('คัดลอกแล้ว'); } catch (e) { toast('คัดลอกไม่สำเร็จ — เลือกข้อความแล้วก็อปเอง'); } }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { toast('คัดลอกแล้ว'); }, fallback);
+    else fallback();
+  });
+  $('dl').addEventListener('click', function () {
+    var txt = $('out').value; if (!txt) return;
+    var name = $('fileTitle').textContent || 'grid.txt';
+    var blob = new Blob([txt], { type:'text/plain' });
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    toast('ดาวน์โหลด ' + name);
+  });
+})();
+</script>
+</body>
+</html>
