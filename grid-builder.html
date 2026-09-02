@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Cinzel:wght@500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <!-- JP Trust hard auth-gate (internal tool · unlisted · ไม่ลิงก์จาก dashboard) -->
-<script src="./jp-gate.js?v=1788371467"></script>
+<script src="./jp-gate.js?v=1788372957"></script>
 <style>
   :root {
     --bg:#1a0a0e; --panel:#2d1018; --panel2:#3a1520; --line:#4a2028;
@@ -105,6 +105,13 @@
   .acts button:focus-visible { outline:3px solid rgba(244,228,186,.6); outline-offset:2px; }
   .howto { margin-top:12px; font-size:13px; color:var(--muted); line-height:1.65; }
   .howto code { font-family:ui-monospace,Menlo,Consolas,monospace; color:var(--gold-soft); font-size:12.5px; }
+  .howto b { color:var(--gold-soft); font-weight:600; }
+  .alt { margin-top:16px; border-top:1px solid var(--line); padding-top:12px; }
+  .alt summary { cursor:pointer; font-size:13px; color:var(--muted); list-style:none; }
+  .alt summary::before { content:'▸ '; color:var(--gold); }
+  .alt[open] summary::before { content:'▾ '; }
+  .alt summary::-webkit-details-marker { display:none; }
+  .alt textarea { height:200px; }
   .guard { margin-top:14px; font-size:12.5px; color:var(--muted); border-left:2px solid var(--gold); padding-left:10px; line-height:1.6; }
   .guard b { color:var(--gold-soft); font-weight:600; }
   .toast { position:fixed; left:50%; bottom:28px; transform:translateX(-50%) translateY(20px); opacity:0;
@@ -174,20 +181,299 @@
     </div>
 
     <div class="card">
-      <h2 id="fileTitle"></h2>
-      <div class="meta">41 บรรทัด <code>p,price</code> + บรรทัดหัว # — ฟอร์แมตเดียวกับ make_grid.py ทุกตัวอักษร (EA เทียบ hash ทั้งไฟล์)</div>
-      <textarea id="out" readonly spellcheck="false"></textarea>
+      <h2 id="eaTitle"></h2>
+      <div class="meta">โค้ด EA ทั้งตัว ระดับราคา 41 ค่าฝังอยู่ในโค้ด — ไม่ต้องใช้ไฟล์ txt</div>
+      <textarea id="eaOut" readonly spellcheck="false"></textarea>
       <div class="acts">
-        <button class="copy" id="copy">คัดลอกข้อความ</button>
-        <button class="dl" id="dl">ดาวน์โหลด .txt</button>
+        <button class="copy" id="eaDl">ดาวน์โหลด .mq5</button>
+        <button class="dl" id="eaCopy">คัดลอกโค้ด</button>
       </div>
-      <div class="howto">วางไฟล์ที่ <code id="mt5path"></code> (MT5: File → Open Data Folder) · EA <code>JPT_PercentileGrid</code> อ่านซ้ำทุก 10 วิ ถ้า hash เปลี่ยนจะกางกริดใหม่ทั้งแผงเอง</div>
+      <div class="howto">
+        <b>ครั้งแรก:</b> วางไฟล์ใน <code>MQL5\Experts\</code> (MetaEditor: File → Open Data Folder) → เปิดใน MetaEditor → Compile (F7) → ลาก EA ลงกราฟ <span id="eaSym"></span> · ต้องเป็นบัญชี Hedging + เปิด Algo Trading<br>
+        <b>ทุกต้นเดือน:</b> กดสร้างกริดเดือนใหม่ → ดาวน์โหลด → วางทับไฟล์เดิม<b>ชื่อเดียวกัน</b> → Compile — MT5 รีโหลด EA บนกราฟให้เอง ไม้ที่ค้างอยู่ไม่โดนปิด แค่ย้าย TP ตามกริดใหม่ · ห้ามเปลี่ยน Magic ระหว่างเดือน
+      </div>
       <div class="guard" id="guard"></div>
+      <details class="alt">
+        <summary>ทางเลือกเดิม: ไฟล์ <code id="fileTitle"></code> สำหรับ EA <code>JPT_PercentileGrid</code> (อ่านจาก MQL5\Files)</summary>
+        <textarea id="out" readonly spellcheck="false"></textarea>
+        <div class="acts">
+          <button class="dl" id="copy">คัดลอกข้อความ</button>
+          <button class="dl" id="dl">ดาวน์โหลด .txt</button>
+        </div>
+        <div class="howto">วางไฟล์ที่ <code id="mt5path"></code> · EA ตัวเดิมอ่านซ้ำทุก 10 วิ ถ้า hash เปลี่ยนจะกางกริดใหม่ทั้งแผงเอง</div>
+      </details>
     </div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
 
+<script type="text/plain" id="eaTpl">//+------------------------------------------------------------------+
+//|  __EAFILE__                                                       |
+//|  JPT Percentile Grid EA — ระดับกริดฝังในโค้ด (สร้างจาก grid-builder.html) |
+//|  __TAG__                                                          |
+//|  สร้างเมื่อ __GEN__ · ห้ามแก้ตัวเลขมือ ให้สร้างใหม่จากหน้าเว็บทุกต้นเดือน  |
+//|                                                                  |
+//|  - BUY limit  ที่ p <= BuyMaxP (40)  TP = ระดับ +2.5p             |
+//|  - SELL limit ที่ p >= SellMinP (85) TP = ระดับ -2.5p             |
+//|  - ไม่มี SL · หนึ่งไม้ต่อระดับต่อฝั่ง · TP แล้วตั้งใหม่ทันที        |
+//|  - compile ทับด้วยกริดเดือนใหม่ → ไม้ค้างคง p-index เดิม TP ย้ายตาม   |
+//|    ระดับใหม่, pending ตั้งใหม่หมด (กติกาเดียวกับ backtest B15)      |
+//|  - lot ฝั่ง buy โตทุก 10p ที่ลึกลง (+LotStep) ฝั่ง sell คงที่       |
+//|  ต้องใช้บัญชี HEDGING · magic ต้องเท่าเดิมทุกเดือน                 |
+//+------------------------------------------------------------------+
+#property copyright   "JP Trust Learning"
+#property version     "1.01"
+#property description "__TAG__"
+
+#include <Trade/Trade.mqh>
+
+//---------------------------------------------------------------- กริดเดือนนี้ (ฝังจาก grid-builder.html)
+#define NP 41                              // p0, p2.5, ..., p100
+const string GRID_SYMBOL = "__SYMBOL__";
+const string GRID_TAG    = "__TAG__";
+const double GRID_PRICE[NP] =
+{
+__LEVELS__
+};
+
+//---------------------------------------------------------------- inputs
+input double InpBuyMaxP       = 40.0;      // BUY เมื่อ p <= ค่านี้
+input double InpSellMinP      = 85.0;      // SELL เมื่อ p >= ค่านี้
+input bool   InpUseSell       = true;      // เปิดฝั่ง SELL ไหม
+input double InpBaseLot       = 0.02;      // lot ชั้นแรก (buy p40 / sell ทุกชั้น)
+input double InpLotStep10p    = 0.01;      // buy: +lot ทุก 10p ที่ลึกลง (0 = คงที่)
+input long   InpMagic         = 260902;    // magic base (ห้ามชนกับ EA อื่น · ห้ามเปลี่ยนระหว่างเดือน)
+input int    InpTimerSec      = 10;        // กระทบยอด ทุกกี่วินาที
+input bool   InpMarketIfCrossed = true;    // ราคาเลยระดับไปแล้ว → เข้า market (ตาม backtest)
+input int    InpSlippagePts   = 30;        // slippage สำหรับ market order (points)
+
+//---------------------------------------------------------------- globals
+CTrade  trade;
+double  gP[NP];                            // 0, 2.5, ... 100
+double  gPrice[NP];                        // ราคา nominal ของแต่ละ p
+bool    gGridOK = false;
+datetime gGridLoadedAt = 0;
+double  gStopsLevel;                       // ระยะขั้นต่ำของโบรก (price units)
+
+//---------------------------------------------------------------- helpers
+long MagicOf(bool isBuy, int idx) { return InpMagic + (isBuy ? 0 : 50) + idx; }
+bool IsOurMagic(long m) { return (m >= InpMagic && m < InpMagic + 100); }
+bool IsBuyLevel(int i)  { return gP[i] <= InpBuyMaxP + 1e-9; }
+bool IsSellLevel(int i) { return InpUseSell && gP[i] >= InpSellMinP - 1e-9 && i >= 1; }
+
+double NormLot(double lot)
+{
+   double step = SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_STEP);
+   double mn   = SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_MIN);
+   double mx   = SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_MAX);
+   double v = MathRound(lot / step) * step;
+   if(v < mn) v = mn;
+   if(v > mx) v = mx;
+   return NormalizeDouble(v, 8);
+}
+double LotOf(bool isBuy, int idx)
+{
+   if(!isBuy) return NormLot(InpBaseLot);
+   int deep = (int)MathFloor((InpBuyMaxP - gP[idx]) / 10.0 + 1e-9);
+   return NormLot(InpBaseLot + InpLotStep10p * deep);
+}
+double NP_(double p) { return NormalizeDouble(p, _Digits); }
+
+//---------------------------------------------------------------- grid (embedded)
+bool LoadEmbeddedGrid()
+{
+   for(int i = 0; i < NP; i++) { gP[i] = i * 2.5; gPrice[i] = GRID_PRICE[i]; }
+   if(gPrice[0] <= 0.0) { Print("[GRID] ระดับ p0 ต้องมากกว่าศูนย์"); return false; }
+   for(int i = 1; i < NP; i++)
+      if(gPrice[i] < gPrice[i-1]) { PrintFormat("[GRID] ระดับไม่เรียงจากน้อยไปมาก ที่ p%.1f", i * 2.5); return false; }
+   gGridOK = true; gGridLoadedAt = TimeCurrent();
+   PrintFormat("[GRID] โหลดกริดฝัง %s | p%.1f=%s ... p%.1f=%s", GRID_TAG,
+               InpBuyMaxP, DoubleToString(gPrice[(int)(InpBuyMaxP / 2.5)], _Digits),
+               InpSellMinP, DoubleToString(gPrice[(int)(InpSellMinP / 2.5)], _Digits));
+   return true;
+}
+
+//---------------------------------------------------------------- broker state
+bool FindPosition(bool isBuy, int idx, ulong &ticket, double &tp)
+{
+   long m = MagicOf(isBuy, idx);
+   for(int i = PositionsTotal() - 1; i >= 0; i--)
+   {
+      ulong t = PositionGetTicket(i);
+      if(t == 0) continue;
+      if(PositionGetString(POSITION_SYMBOL) != _Symbol) continue;
+      if(PositionGetInteger(POSITION_MAGIC) != m) continue;
+      ticket = t; tp = PositionGetDouble(POSITION_TP); return true;
+   }
+   return false;
+}
+bool FindPending(bool isBuy, int idx, ulong &ticket, double &price, double &tp)
+{
+   long m = MagicOf(isBuy, idx);
+   for(int i = OrdersTotal() - 1; i >= 0; i--)
+   {
+      ulong t = OrderGetTicket(i);
+      if(t == 0) continue;
+      if(OrderGetString(ORDER_SYMBOL) != _Symbol) continue;
+      if(OrderGetInteger(ORDER_MAGIC) != m) continue;
+      ticket = t; price = OrderGetDouble(ORDER_PRICE_OPEN); tp = OrderGetDouble(ORDER_TP); return true;
+   }
+   return false;
+}
+void DeleteAllOurPendings()
+{
+   for(int i = OrdersTotal() - 1; i >= 0; i--)
+   {
+      ulong t = OrderGetTicket(i);
+      if(t == 0) continue;
+      if(OrderGetString(ORDER_SYMBOL) != _Symbol) continue;
+      if(!IsOurMagic(OrderGetInteger(ORDER_MAGIC))) continue;
+      trade.OrderDelete(t);
+   }
+}
+
+//---------------------------------------------------------------- core: reconcile
+// idempotent: ทำให้สถานะที่โบรกตรงกับกริดปัจจุบันเสมอ
+void Reconcile()
+{
+   if(!gGridOK) return;
+   double ask = SymbolInfoDouble(_Symbol, SYMBOL_ASK);
+   double bid = SymbolInfoDouble(_Symbol, SYMBOL_BID);
+   if(ask <= 0 || bid <= 0) return;
+   gStopsLevel = SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL) * _Point;
+
+   for(int i = 0; i < NP; i++)
+   {
+      if(IsBuyLevel(i))  ReconcileLevel(true,  i, ask, bid);
+      if(IsSellLevel(i)) ReconcileLevel(false, i, ask, bid);
+   }
+   UpdateComment();
+}
+
+void ReconcileLevel(bool isBuy, int idx, double ask, double bid)
+{
+   if(isBuy && idx + 1 >= NP) return;
+   if(!isBuy && idx - 1 < 0) return;
+   double lvl = NP_(gPrice[idx]);
+   double tp  = NP_(isBuy ? gPrice[idx + 1] : gPrice[idx - 1]);
+   if(lvl <= 0 || tp <= 0) return;
+   string cmt = StringFormat("GRID %s p%.1f", isBuy ? "B" : "S", gP[idx]);
+   trade.SetExpertMagicNumber(MagicOf(isBuy, idx));
+
+   // 1) มีไม้ค้างที่ระดับนี้ → ดูแล TP ให้ตรงกริดปัจจุบัน
+   ulong pt; double ptp;
+   if(FindPosition(isBuy, idx, pt, ptp))
+   {
+      // TP ใหม่อยู่ "ผ่านไปแล้ว" → เท่ากับโดน TP ตามกติกา → ปิดที่ market
+      if(isBuy  && bid >= tp) { trade.PositionClose(pt, InpSlippagePts); return; }
+      if(!isBuy && ask <= tp) { trade.PositionClose(pt, InpSlippagePts); return; }
+      // TP ใกล้ราคาเกิน stops level → เลื่อนออกเท่าที่โบรกยอม
+      double minTp = isBuy ? bid + gStopsLevel : ask - gStopsLevel;
+      double useTp = isBuy ? MathMax(tp, minTp) : MathMin(tp, minTp);
+      useTp = NP_(useTp);
+      if(MathAbs(useTp - ptp) > _Point / 2) trade.PositionModify(pt, 0.0, useTp);
+      return;
+   }
+
+   // 2) ไม่มีไม้ค้าง → ต้องมี pending 1 ใบที่ระดับนี้ (หรือ market ถ้าราคาเลยไปแล้ว)
+   ulong ot; double oprice, otp;
+   bool hasPending = FindPending(isBuy, idx, ot, oprice, otp);
+   bool crossed = isBuy ? (ask <= lvl) : (bid >= lvl);
+
+   if(crossed)
+   {
+      // ราคาอยู่ต่ำกว่าระดับ buy (หรือสูงกว่าระดับ sell) แล้ว → backtest ถือว่า fill ที่ราคาเปิด
+      if(hasPending) trade.OrderDelete(ot);
+      if(!InpMarketIfCrossed) return;
+      if(isBuy  && bid >= tp) return;             // ทั้ง entry และ TP ผ่านไปแล้ว → ไม่มีอะไรให้ทำ
+      if(!isBuy && ask <= tp) return;
+      double lot = LotOf(isBuy, idx);
+      trade.SetDeviationInPoints(InpSlippagePts);
+      bool ok = isBuy ? trade.Buy(lot, _Symbol, 0.0, 0.0, tp, cmt)
+                      : trade.Sell(lot, _Symbol, 0.0, 0.0, tp, cmt);
+      if(!ok) PrintFormat("[GRID] market %s p%.1f ล้มเหลว: %d %s", isBuy ? "BUY" : "SELL", gP[idx],
+                          trade.ResultRetcode(), trade.ResultRetcodeDescription());
+      return;
+   }
+
+   // pending ปกติ — ต้องห่างราคาปัจจุบันอย่างน้อย stops level
+   double dist = isBuy ? (ask - lvl) : (lvl - bid);
+   if(dist < gStopsLevel) return;                 // ใกล้เกิน รอรอบหน้า (จะกลายเป็น crossed หรือห่างออก)
+
+   if(hasPending)
+   {
+      if(MathAbs(oprice - lvl) <= _Point / 2 && MathAbs(otp - tp) <= _Point / 2) return; // ตรงแล้ว
+      trade.OrderDelete(ot);                     // ราคา/TP เปลี่ยน → ตั้งใหม่
+   }
+   double lot = LotOf(isBuy, idx);
+   bool ok = isBuy ? trade.BuyLimit (lot, lvl, _Symbol, 0.0, tp, ORDER_TIME_GTC, 0, cmt)
+                   : trade.SellLimit(lot, lvl, _Symbol, 0.0, tp, ORDER_TIME_GTC, 0, cmt);
+   if(!ok) PrintFormat("[GRID] pending %s p%.1f @%s ล้มเหลว: %d %s", isBuy ? "BUY" : "SELL", gP[idx],
+                       DoubleToString(lvl, _Digits), trade.ResultRetcode(), trade.ResultRetcodeDescription());
+}
+
+//---------------------------------------------------------------- UI
+void UpdateComment()
+{
+   int nPos = 0, nOrd = 0; double fl = 0.0;
+   for(int i = PositionsTotal() - 1; i >= 0; i--)
+   {
+      ulong t = PositionGetTicket(i);
+      if(t == 0 || PositionGetString(POSITION_SYMBOL) != _Symbol) continue;
+      if(!IsOurMagic(PositionGetInteger(POSITION_MAGIC))) continue;
+      nPos++; fl += PositionGetDouble(POSITION_PROFIT) + PositionGetDouble(POSITION_SWAP);
+   }
+   for(int i = OrdersTotal() - 1; i >= 0; i--)
+   {
+      ulong t = OrderGetTicket(i);
+      if(t == 0 || OrderGetString(ORDER_SYMBOL) != _Symbol) continue;
+      if(IsOurMagic(OrderGetInteger(ORDER_MAGIC))) nOrd++;
+   }
+   int bi = (int)(InpBuyMaxP / 2.5), si = (int)(InpSellMinP / 2.5);
+   Comment(StringFormat("JPT Percentile Grid  %s\n%s\nโหลดเมื่อ %s\nBUY  <= p%.0f @ %s   SELL >= p%.0f @ %s\nไม้ค้าง %d  pending %d  ลอยตัว %.2f",
+           _Symbol, GRID_TAG, TimeToString(gGridLoadedAt, TIME_DATE | TIME_MINUTES),
+           InpBuyMaxP, DoubleToString(gPrice[bi], _Digits), InpSellMinP, DoubleToString(gPrice[si], _Digits),
+           nPos, nOrd, fl));
+}
+
+//---------------------------------------------------------------- events
+int OnInit()
+{
+   if(StringFind(_Symbol, GRID_SYMBOL) < 0)
+   {
+      PrintFormat("[GRID] EA นี้ฝังกริดของ %s แต่ถูกแปะบนกราฟ %s — ยกเลิก", GRID_SYMBOL, _Symbol);
+      return INIT_FAILED;
+   }
+   if((ENUM_ACCOUNT_MARGIN_MODE)AccountInfoInteger(ACCOUNT_MARGIN_MODE) != ACCOUNT_MARGIN_MODE_RETAIL_HEDGING)
+   {
+      Print("[GRID] ต้องใช้บัญชี HEDGING — บัญชีนี้เป็น netting จะรวมไม้กันจนแยกระดับไม่ได้");
+      return INIT_FAILED;
+   }
+   if(!LoadEmbeddedGrid()) return INIT_FAILED;
+   trade.SetExpertMagicNumber(InpMagic);
+   trade.SetTypeFillingBySymbol(_Symbol);
+   trade.SetAsyncMode(false);
+   // กริดใหม่ (compile ทับทุกต้นเดือน) → ลบ pending เก่าของเราทั้งหมดแล้วตั้งใหม่ตามระดับใหม่
+   // ไม้ค้างไม่ถูกแตะ — Reconcile จะย้าย TP ให้ตรงระดับใหม่เอง
+   DeleteAllOurPendings();
+   Reconcile();
+   EventSetTimer(MathMax(1, InpTimerSec));
+   return INIT_SUCCEEDED;
+}
+void OnDeinit(const int reason) { EventKillTimer(); Comment(""); }
+
+void OnTimer() { Reconcile(); }
+
+void OnTick()  { /* ทำงานผ่าน timer + trade transaction พอ */ }
+
+void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest &req, const MqlTradeResult &res)
+{
+   // ไม้ปิด (TP) หรือ pending fill → กระทบยอดทันที ให้ระดับนั้นกลับมามี pending
+   if(trans.type == TRADE_TRANSACTION_DEAL_ADD || trans.type == TRADE_TRANSACTION_ORDER_DELETE)
+      if(trans.symbol == _Symbol) Reconcile();
+}
+//+------------------------------------------------------------------+
+</script>
 <script>
 /* JPT Percentile Grid engine — port ของ make_grid.py (B15) ทีละบรรทัด
  * กติกา no-lookahead: ทุกฟังก์ชันรับ asof (ISO 'YYYY-MM-DD' = สิ้นเดือนก่อนเดือนที่จะเทรด)
@@ -470,7 +756,7 @@
     $('kDxyL').textContent = 'DXY แถว ' + thDate(M.dxyRowDate) + (M.dxyRowDate !== M.asofData ? ' (ffill)' : '');
 
     var f = pair.mode === 'mul'
-      ? '<b>' + pair.label + '</b> คือ USD ต่อ 1 ' + pair.base + ' (USD เป็นสกุลหลัง) → DXY ขึ้น ราคาลง จึงต้อง<b>คูณ</b>: <code>adj = ' + pair.sym + ' × DXY ÷ 100</code><br>แปลงกลับเป็นราคาจริง: <code>level ÷ (' + M.dxyUsed.toFixed(2) + ' ÷ 100)</code> (k = ' + M.k.toFixed(6) + ')'
+      ? '<b>' + pair.label + ' = ' + pair.base + ' ต่อ 1 USD?</b> ไม่ใช่ — ราคาคือ USD ต่อ 1 ' + pair.base + ' (USD เป็นสกุลหลัง) → DXY ขึ้นราคาลง จึงต้อง<b>คูณ</b>: <code>adj = ' + pair.sym + ' × DXY ÷ 100</code><br>แปลงกลับเป็นราคาจริง: <code>level ÷ (' + M.dxyUsed.toFixed(2) + ' ÷ 100)</code> (k = ' + M.k.toFixed(6) + ')'
       : '<b>' + pair.label + '</b> คือ ' + pair.quote + ' ต่อ 1 USD (USD เป็นสกุลหน้า) → DXY ขึ้นราคาขึ้น จึงต้อง<b>หาร</b>: <code>adj = ' + pair.sym + ' ÷ (DXY ÷ 100)</code><br>แปลงกลับเป็นราคาจริง: <code>level × (' + M.dxyUsed.toFixed(2) + ' ÷ 100)</code> (k = ' + M.k.toFixed(6) + ')';
     $('formula').innerHTML = f;
 
@@ -503,6 +789,10 @@
     $('fileTitle').textContent = 'grid_' + pair.sym + '.txt';
     $('mt5path').textContent = 'MQL5\\Files\\grid_' + pair.sym + '.txt';
     $('out').value = r.text;
+    var eaFile = 'JPT_Grid_' + pair.sym + '.mq5';
+    $('eaTitle').textContent = eaFile + ' · กริดเดือน ' + TH_MONTHS[m-1] + ' ' + y;
+    $('eaSym').textContent = pair.sym;
+    $('eaOut').value = buildEa(pair, r, eaFile);
 
     // guard: no-lookahead + DXY jitter
     var unused = data[pair.sym].dates.filter(function (x) { return x > asof; }).length;
@@ -516,6 +806,22 @@
     $('result').className = 'result show';
     $('result').scrollIntoView({ behavior:'smooth', block:'start' });
   }
+  // ---- EA source: แม่แบบใน #eaTpl + ฝัง 41 ระดับ (ค่าจาก textarea txt ตัวเดียวกัน → ตรงกันเสมอ)
+  function buildEa(pair, r, eaFile) {
+    var tpl = $('eaTpl').textContent;
+    var rows = [];
+    for (var i = 0; i < r.lines.length; i += 6) {
+      var chunk = r.lines.slice(i, i + 6);
+      rows.push('   ' + chunk.map(function (l) { return l.price; }).join(', ') + (i + 6 < r.lines.length ? ',' : '') +
+                '   // p' + chunk[0].p + ' … p' + chunk[chunk.length - 1].p);
+    }
+    var gen = new Intl.DateTimeFormat('th-TH', { timeZone:'Asia/Bangkok', dateStyle:'medium', timeStyle:'short' }).format(new Date());
+    return tpl.split('__EAFILE__').join(eaFile)
+              .split('__SYMBOL__').join(pair.sym)
+              .split('__TAG__').join(r.header)
+              .split('__GEN__').join(gen + ' (เวลาไทย)')
+              .split('__LEVELS__').join(rows.join('\n'));
+  }
   function addDays(iso, n) { var t = Date.UTC(+iso.slice(0,4), +iso.slice(5,7)-1, +iso.slice(8,10)) + n * 86400000; return new Date(t).toISOString().slice(0,10); }
 
   // ---- copy / download
@@ -525,6 +831,21 @@
     function fallback() { var ta = $('out'); ta.focus(); ta.select(); ta.setSelectionRange(0, txt.length); try { document.execCommand('copy'); toast('คัดลอกแล้ว'); } catch (e) { toast('คัดลอกไม่สำเร็จ — เลือกข้อความแล้วก็อปเอง'); } }
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { toast('คัดลอกแล้ว'); }, fallback);
     else fallback();
+  });
+  $('eaCopy').addEventListener('click', function () {
+    var txt = $('eaOut').value; if (!txt) return;
+    function fallback() { var ta = $('eaOut'); ta.focus(); ta.select(); ta.setSelectionRange(0, txt.length); try { document.execCommand('copy'); toast('คัดลอกโค้ดแล้ว'); } catch (e) { toast('คัดลอกไม่สำเร็จ — เลือกข้อความแล้วก็อปเอง'); } }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { toast('คัดลอกโค้ดแล้ว'); }, fallback);
+    else fallback();
+  });
+  $('eaDl').addEventListener('click', function () {
+    var txt = $('eaOut').value; if (!txt) return;
+    var name = 'JPT_Grid_' + $('pair').value + '.mq5';
+    var blob = new Blob(['\ufeff' + txt], { type:'text/plain;charset=utf-8' });   // BOM ให้ MetaEditor อ่านไทยใน comment ถูก
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    toast('ดาวน์โหลด ' + name);
   });
   $('dl').addEventListener('click', function () {
     var txt = $('out').value; if (!txt) return;
