@@ -168,7 +168,7 @@
       </div>
       <div class="formula" id="formula"></div>
       <div class="zones">
-        <div class="zone buy"><div class="t">BUY limit · p40 → p0 (17 ชั้น)</div><div class="r" id="zBuy"></div><div class="n">$10 ที่ p40 · +$5 ทุก 10p ที่ลึกลง · รวม $310</div></div>
+        <div class="zone buy"><div class="t">BUY limit · p50 → p0 (21 ชั้น)</div><div class="r" id="zBuy"></div><div class="n">$10 ที่ p50 · +$5 ทุก 10p ที่ลึกลง · รวม $435 (B19 ขยายจาก p40/$310)</div></div>
         <div class="zone sell"><div class="t">SELL limit · p85 → p100 (7 ชั้น)</div><div class="r" id="zSell"></div><div class="n">$10 ทุกชั้น · รวม $70 · TP −2.5p</div></div>
       </div>
     </div>
@@ -213,7 +213,7 @@
 //|  __TAG__                                                          |
 //|  สร้างเมื่อ __GEN__ · ห้ามแก้ตัวเลขมือ ให้สร้างใหม่จากหน้าเว็บทุกต้นเดือน  |
 //|                                                                  |
-//|  - BUY limit  ที่ p <= BuyMaxP (40)  TP = ระดับ +2.5p             |
+//|  - BUY limit  ที่ p <= BuyMaxP (50)  TP = ระดับ +2.5p             |
 //|  - SELL limit ที่ p >= SellMinP (85) TP = ระดับ -2.5p             |
 //|  - ไม่มี SL · หนึ่งไม้ต่อระดับต่อฝั่ง · TP แล้วตั้งใหม่ทันที        |
 //|  - compile ทับด้วยกริดเดือนใหม่ → ไม้ค้างคง p-index เดิม TP ย้ายตาม   |
@@ -237,10 +237,10 @@ __LEVELS__
 };
 
 //---------------------------------------------------------------- inputs
-input double InpBuyMaxP       = 40.0;      // BUY เมื่อ p <= ค่านี้
+input double InpBuyMaxP       = 50.0;      // BUY เมื่อ p <= ค่านี้ (B19: 50 · เดิม 40)
 input double InpSellMinP      = 85.0;      // SELL เมื่อ p >= ค่านี้
 input bool   InpUseSell       = true;      // เปิดฝั่ง SELL ไหม
-input double InpBaseLot       = 0.02;      // lot ชั้นแรก (buy p40 / sell ทุกชั้น)
+input double InpBaseLot       = 0.02;      // lot ชั้นแรก (buy p50 / sell ทุกชั้น)
 input double InpLotStep10p    = 0.01;      // buy: +lot ทุก 10p ที่ลึกลง (0 = คงที่)
 input long   InpMagic         = 260902;    // magic base (ห้ามชนกับ EA อื่น · ห้ามเปลี่ยนระหว่างเดือน)
 input int    InpTimerSec      = 10;        // กระทบยอด ทุกกี่วินาที
@@ -720,7 +720,8 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
 
   // ---- generate
   function notice(msg) { var n = $('notice'); n.textContent = msg; n.className = 'notice show'; $('result').className = 'result'; }
-  function lotFor(p) { return p <= 40 ? 10 + 5 * Math.floor((40 - p) / 10) : (p >= 85 ? 10 : 0); }
+  var BUY_MAX_P = 50; // B19: ขยายโซน buy p40→p50 (sell คง p85) — backtest 4 คู่ 2013→26 $550 vs $403
+  function lotFor(p) { return p <= BUY_MAX_P ? 10 + 5 * Math.floor((BUY_MAX_P - p) / 10) : (p >= 85 ? 10 : 0); }
 
   $('go').addEventListener('click', function () {
     if (!data) return;
@@ -760,9 +761,9 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
       : '<b>' + pair.label + '</b> คือ ' + pair.quote + ' ต่อ 1 USD (USD เป็นสกุลหน้า) → DXY ขึ้นราคาขึ้น จึงต้อง<b>หาร</b>: <code>adj = ' + pair.sym + ' ÷ (DXY ÷ 100)</code><br>แปลงกลับเป็นราคาจริง: <code>level × (' + M.dxyUsed.toFixed(2) + ' ÷ 100)</code> (k = ' + M.k.toFixed(6) + ')';
     $('formula').innerHTML = f;
 
-    var p40 = lines[16], p0 = lines[0], p85 = lines[34], p100 = lines[40];
+    var p40 = lines[BUY_MAX_P / 2.5], p0 = lines[0], p85 = lines[34], p100 = lines[40];
     var buyDist = pips(pair.sym, M.lastClose - +p40.price), sellDist = pips(pair.sym, +p85.price - M.lastClose);
-    $('zBuy').textContent = p0.price + ' – ' + p40.price + (buyDist >= 0 ? ' · ราคาอยู่เหนือ p40 ' + Math.round(buyDist) + ' pips' : ' · ราคาอยู่ในโซน buy แล้ว');
+    $('zBuy').textContent = p0.price + ' – ' + p40.price + (buyDist >= 0 ? ' · ราคาอยู่เหนือ p' + BUY_MAX_P + ' ' + Math.round(buyDist) + ' pips' : ' · ราคาอยู่ในโซน buy แล้ว');
     $('zSell').textContent = p85.price + ' – ' + p100.price + (sellDist >= 0 ? ' · ราคาอยู่ใต้ p85 ' + Math.round(sellDist) + ' pips' : ' · ราคาอยู่ในโซน sell แล้ว');
 
     // ladder: p100 บนสุด → p0 ล่างสุด · แถบ = ช่องห่างจากชั้นถัดลง เทียบช่องกว้างสุด
@@ -775,7 +776,7 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
         html += '<div class="marker"><div class="lbl">' + M.lastClose.toFixed(d) + '</div><div class="ln"><span>ราคาล่าสุด p' + M.curP.toFixed(1) + '</span></div></div>';
         placed = true;
       }
-      var cls = L.p <= 40 ? 'buy' : (L.p >= 85 ? 'sell' : 'mid');
+      var cls = L.p <= BUY_MAX_P ? 'buy' : (L.p >= 85 ? 'sell' : 'mid');
       var g = j > 0 ? (L.raw - lines[j-1].raw) / maxGap : 0;
       var lot = lotFor(L.p);
       html += '<div class="lrow ' + cls + '"><div class="p">p' + L.p + '</div><div class="px">' + L.price + '</div>' +
