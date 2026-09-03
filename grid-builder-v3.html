@@ -175,7 +175,7 @@
         <div class="zone buy"><div class="t">BUY limit · p50 → p0 (21 ชั้น)</div><div class="r" id="zBuy"></div><div class="n">$10 ที่ p50 · +$5 ทุก 10p ที่ลึกลง · รวม $435 (B19 ขยายจาก p40/$310)</div></div>
         <div class="zone sell"><div class="t">SELL limit · p85 → p100 (7 ชั้น)</div><div class="r" id="zSell"></div><div class="n">$10 ทุกชั้น · รวม $70 · TP −2.5p</div></div>
         <div class="zone midz"><div class="t">โซนกลาง · p51 → p60 ทุก 1p (10 ชั้น)</div><div class="r" id="zMid"></div><div class="n">คี่ = BUY (51 53 55 57 59) · คู่ = SELL (52 54 56 58 60) · $10 ทุกชั้น · TP ±1p · รวม $100</div></div>
-        <div class="zone adapt" id="zAdaptBox"><div class="t">โซนกลางปรับตัว · สวิตช์ใน EA (<code>InpUseAdaptiveMid</code> ปิดเป็นค่าเริ่มต้น)</div><div class="r" id="zAdapt"></div><div class="n" id="zAdaptNote">แถบ 2.5p แคบสุดที่ครอบ 70% ของ 12 เดือนล่าสุด · ทุก 1p คี่ BUY / คู่ SELL $10 · TP ±1p · ล้าง sell เมื่อ close สิ้นเดือน &gt; ขอบบนแถบ · ⚠️ backtest EUR 2013→26 (fill จริง) −$40 · 9 ปีลบ — เปิดเพื่อดูพฤติกรรม EA บนเดโม่เท่านั้น<br><b>โหมดจุด</b> (<code>InpAdaptMode=1</code>): ชั้นละ <code>InpAdaptStepPips</code> pip ทั่วแถบ (ค่าเริ่มต้น 1 pip) · คี่ BUY / คู่ SELL · TP <code>InpAdaptTpPips</code> (50 pip) · เพดาน pending <code>InpAdaptMaxOrders</code> (150 ใบ · เลือกใกล้ราคาก่อน) · ไม่มี backtest (daily bar จำลองชั้น 1 pip ไม่ได้)</div></div>
+        <div class="zone adapt" id="zAdaptBox"><div class="t">โซนกลางปรับตัว · สวิตช์ใน EA (<code>InpUseAdaptiveMid</code> ปิดเป็นค่าเริ่มต้น)</div><div class="r" id="zAdapt"></div><div class="n" id="zAdaptNote">แถบ 2.5p แคบสุดที่ครอบ 70% ของ 12 เดือนล่าสุด · ทุก 1p คี่ BUY / คู่ SELL $10 · TP ±1p · ล้าง sell เมื่อ close สิ้นเดือน &gt; ขอบบนแถบ · ⚠️ backtest EUR 2013→26 (fill จริง) −$40 · 9 ปีลบ — เปิดเพื่อดูพฤติกรรม EA บนเดโม่เท่านั้น<br><b>กริดจุด</b> (<code>InpUsePointGrid=true</code> · เปิดซ้อนกับโซนปรับตัวได้): ชั้นละ <code>InpAdaptStepPips</code> pip ทั่วแถบ (ค่าเริ่มต้น 1 pip) · คี่ BUY / คู่ SELL · TP <code>InpAdaptTpPips</code> (50 pip) · เพดาน pending <code>InpAdaptMaxOrders</code> (150 ใบ · เลือกใกล้ราคาก่อน) · ไม่มี backtest (daily bar จำลองชั้น 1 pip ไม่ได้)</div></div>
         <div class="zone flush" id="zFlushBox"><div class="t">ล้าง SELL โซนกลางต้นเดือนนี้?</div><div class="r" id="zFlush"></div><div class="n">กติกา: ราคาปิดสิ้นเดือนก่อน &gt; p70 → EA ปิดไม้ sell โซนกลางที่ค้างทั้งหมดตอนโหลดกริดใหม่ (ไม่แตะ buy / ไม่แตะ sell p85+)</div></div>
       </div>
     </div>
@@ -273,10 +273,10 @@ input int    InpTimerSec      = 10;        // กระทบยอด ทุก
 input int    InpSlippagePts   = 30;        // slippage สำหรับ market order (points)
 input bool   InpUseMid        = true;      // เปิดโซนกลาง p51-60 ไหม (B20 rev2)
 input bool   InpUseAdaptiveMid = false;    // ⚠️ โซนกลางปรับตัว 70%/12M (backtest EUR ติดลบ · เดโม่เท่านั้น)
-input int    InpAdaptMode     = 0;         // 0 = ชั้นละ 1 percentile (TP ±1p) · 1 = ชั้นละ N pip ในแถบ (TP คงที่ pip) — B21.2
-input double InpAdaptStepPips = 1.0;       // โหมด 1: ระยะห่างชั้น (pip) · คี่ BUY / คู่ SELL สลับกัน
-input double InpAdaptTpPips   = 50.0;      // โหมด 1: TP (pip) จากราคาเข้า
-input int    InpAdaptMaxOrders = 150;      // โหมด 1: เพดาน pending ของโซนนี้ — เกินจะเลือกชั้นที่ใกล้ราคาก่อน
+input bool   InpUsePointGrid  = false;     // ⚠️ กริดจุดในแถบ 70% (ซ้อนกับโซนปรับตัวได้ · B21.2): ชั้นละ N pip · คี่ BUY / คู่ SELL
+input double InpAdaptStepPips = 1.0;       // กริดจุด: ระยะห่างชั้น (pip)
+input double InpAdaptTpPips   = 50.0;      // กริดจุด: TP (pip) จากราคาเข้า
+input int    InpAdaptMaxOrders = 150;      // กริดจุด: เพดาน pending — เกินจะเลือกชั้นที่ใกล้ราคาก่อน
 
 //---------------------------------------------------------------- globals
 CTrade  trade;
@@ -394,7 +394,7 @@ void FlushMidSellsOnce()
 // ล้าง SELL โซนกลางปรับตัว — ครั้งเดียวต่อกริด (เหมือน mid)
 void FlushAdaptSellsOnce()
 {
-   if(!GRID_FLUSH_ADAPT_SELL || !InpUseAdaptiveMid) return;
+   if(!GRID_FLUSH_ADAPT_SELL || (!InpUseAdaptiveMid && !InpUsePointGrid)) return;
    string key = "JPT_AFLUSH_" + _Symbol + "_" + StringSubstr(GRID_TAG, StringFind(GRID_TAG, "asof ") + 5, 10);
    if(GlobalVariableCheck(key)) return;
    int n = 0;
@@ -435,7 +435,7 @@ void Reconcile()
       if(IsBuyLevel(i))  ReconcileLevel(true,  i, ask, bid);
       if(IsSellLevel(i)) ReconcileLevel(false, i, ask, bid);
    }
-   if(InpUseAdaptiveMid && InpAdaptMode == 1 && NA >= 2)
+   if(InpUsePointGrid && NA >= 2)
    {
       // โหมดจุด (B21.2): ชั้นละ InpAdaptStepPips จากขอบล่างแถบ (ADAPT_PRICE[0]) ถึงขอบบน (ADAPT_PRICE[NA-1])
       // ชั้นคี่ = BUY (TP +InpAdaptTpPips) · ชั้นคู่ = SELL (TP −InpAdaptTpPips) · pending ล้วน · ชั้นผิดฝั่งของราคาข้าม
@@ -461,7 +461,7 @@ void Reconcile()
          }
       }
    }
-   if(InpUseAdaptiveMid && InpAdaptMode == 0 && NA >= 3)
+   if(InpUseAdaptiveMid && NA >= 3)
       for(int i = 1; i < NA - 1; i++)                       // ปลายสองข้างเป็น TP เท่านั้น
       {
          int p = ADAPT_P[i];
@@ -559,7 +559,7 @@ void UpdateComment()
            InpBuyMaxP, DoubleToString(gPrice[bi], _Digits), InpSellMinP, DoubleToString(gPrice[si], _Digits),
            InpUseMid ? DoubleToString(gMid[0], _Digits) : "off", InpUseMid ? DoubleToString(gMid[NM-1], _Digits) : "off",
            GRID_FLUSH_MID_SELL ? "· ล้าง mid-sell เดือนนี้" : "",
-           InpUseAdaptiveMid ? StringFormat("\nADAPT ON (%s)  แถบ %s–%s%s", InpAdaptMode == 1 ? StringFormat("จุด: ชั้นละ %.1f pip · TP %.0f pip · เพดาน %d", InpAdaptStepPips, InpAdaptTpPips, InpAdaptMaxOrders) : StringFormat("percentile a%d..a%d", ADAPT_LO, ADAPT_HI), DoubleToString(ADAPT_PRICE[0], _Digits), DoubleToString(ADAPT_PRICE[NA-1], _Digits), GRID_FLUSH_ADAPT_SELL ? " · ล้าง adapt-sell เดือนนี้" : "") : "",
+           (InpUseAdaptiveMid || InpUsePointGrid) ? StringFormat("\nแถบ 70%%: %s–%s%s%s%s", DoubleToString(ADAPT_PRICE[0], _Digits), DoubleToString(ADAPT_PRICE[NA-1], _Digits), InpUseAdaptiveMid ? StringFormat(" · percentile a%d..a%d", ADAPT_LO, ADAPT_HI) : "", InpUsePointGrid ? StringFormat(" · กริดจุด %.1f pip TP %.0f (เพดาน %d)", InpAdaptStepPips, InpAdaptTpPips, InpAdaptMaxOrders) : "", GRID_FLUSH_ADAPT_SELL ? " · ล้าง sell แถบเดือนนี้" : "") : "",
            nPos, nOrd, fl));
 }
 
