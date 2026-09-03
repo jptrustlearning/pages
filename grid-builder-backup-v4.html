@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>ตีกริดรายเดือน · JP Trust Learning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Cinzel:wght@500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<!-- JP Trust hard auth-gate (internal tool · unlisted · ไม่ลิงก์จาก dashboard) -->
+<script src="./jp-gate.js?v=1788372957"></script>
+<style>
+  :root {
+    --bg:#1a0a0e; --panel:#2d1018; --panel2:#3a1520; --line:#4a2028;
+    --gold:#D4AF37; --gold-soft:#F4E4BA; --text:#E8E4DC; --muted:#A09B92; --faint:#7a5a60;
+    --buy:#5BC48E; --sell:#D77A8C;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html { background:var(--bg); }
+  body { min-height:100%; background:radial-gradient(circle at 50% 0, #241016 0%, var(--bg) 55%);
+         font-family:'Anuphan',sans-serif; color:var(--text); line-height:1.6; padding:22px 16px 60px; }
+  .wrap { max-width:640px; margin:0 auto; }
+
+  .eyebrow { font-family:'Cinzel',serif; font-size:10px; letter-spacing:3px; color:var(--gold); }
+  h1 { font-size:22px; font-weight:600; color:#FAF6ED; margin-top:2px; }
+  .sub { color:var(--muted); font-size:13.5px; margin-top:4px; }
+
+  /* ── controls ── */
+  .ctl { margin-top:18px; display:grid; grid-template-columns:1.3fr 1fr 0.8fr; gap:8px; }
+  .ctl label { display:block; font-size:11.5px; color:var(--muted); margin-bottom:4px; }
+  .ctl select { width:100%; background:var(--panel); border:1px solid var(--line); border-radius:12px;
+                color:var(--gold-soft); font-family:'Anuphan',sans-serif; font-size:15px; padding:10px 34px 10px 12px;
+                appearance:none; -webkit-appearance:none; outline:none;
+                background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23D4AF37' stroke-width='1.6'/></svg>");
+                background-repeat:no-repeat; background-position:right 12px center; }
+  .ctl select:focus-visible { border-color:var(--gold); box-shadow:0 0 0 3px rgba(212,175,55,.18); }
+  .ctl select option:disabled { color:#7a5a60; }
+  .go { margin-top:12px; width:100%; padding:13px; border:none; border-radius:14px; cursor:pointer;
+        background:linear-gradient(135deg,#D4AF37,#B8860B); color:#1a0a0e; font-family:'Anuphan',sans-serif;
+        font-size:16px; font-weight:700; }
+  .go:disabled { opacity:.45; cursor:not-allowed; }
+  .go:focus-visible { outline:3px solid rgba(244,228,186,.6); outline-offset:2px; }
+
+  .status { margin-top:12px; font-size:12.5px; color:var(--muted); display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .status .dot { width:8px; height:8px; border-radius:50%; background:#7a5a60; flex:0 0 auto; }
+  .status.ok .dot { background:var(--buy); } .status.err .dot { background:var(--sell); }
+  .upload { display:none; margin-top:8px; font-size:13px; color:var(--gold-soft); }
+  .upload input { margin-top:6px; color:var(--muted); font-size:12px; }
+  .notice { margin-top:12px; padding:11px 13px; border-radius:12px; border:1px solid rgba(215,122,140,.45);
+            background:rgba(215,122,140,.08); color:#f0c9d1; font-size:13.5px; display:none; }
+  .notice.show { display:block; }
+
+  /* ── result ── */
+  .result { display:none; margin-top:22px; }
+  .result.show { display:block; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:16px; }
+  .card + .card { margin-top:12px; }
+  .card h2 { font-size:15px; font-weight:600; color:var(--gold-soft); }
+  .meta { font-size:12.5px; color:var(--muted); margin-top:2px; }
+
+  .kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px; }
+  .kpi { border-top:1px solid var(--line); padding-top:8px; }
+  .kpi .v { font-family:'DM Serif Display',serif; font-size:26px; line-height:1.1; color:#FAF6ED; }
+  .kpi .v.gold { color:var(--gold); }
+  .kpi .l { font-size:11.5px; color:var(--muted); margin-top:2px; }
+  .formula { margin-top:12px; font-size:13px; color:var(--text); background:rgba(0,0,0,.18); border-radius:10px; padding:9px 12px; line-height:1.55; }
+  .formula b { color:var(--gold-soft); font-weight:600; }
+  .formula code { font-family:ui-monospace,Menlo,Consolas,monospace; color:#FAF6ED; font-size:12.5px; }
+  .zones { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; }
+  .zone { border-radius:12px; padding:10px 12px; font-size:13px; }
+  .zone.buy { background:rgba(91,196,142,.10); border:1px solid rgba(91,196,142,.35); }
+  .zone.midz { background:rgba(212,175,55,.08); border:1px solid rgba(212,175,55,.35); } .zone.midz .t { color:var(--gold); }
+  .zone.flush { background:rgba(120,120,140,.10); border:1px solid rgba(160,160,180,.35); } .zone.flush.on { background:rgba(215,122,140,.14); border-color:rgba(215,122,140,.6); } .zone.flush .t { color:#c9c3d0; } .zone.flush.on .t { color:var(--sell); }
+  .lrow.midb .p { color:var(--gold); } .lrow.midb .bar i { background:rgba(91,196,142,.35); } .lrow.mids .p { color:var(--gold); } .lrow.mids .bar i { background:rgba(215,122,140,.35); } .lrow.midb .lot, .lrow.mids .lot { color:var(--gold); }
+  .zone.sell { background:rgba(215,122,140,.10); border:1px solid rgba(215,122,140,.35); }
+  .zone .t { font-weight:700; } .zone.buy .t { color:var(--buy); } .zone.sell .t { color:var(--sell); }
+  .zone .r { color:var(--text); } .zone .n { color:var(--muted); font-size:12px; }
+
+  /* ── ladder ── */
+  .ladder { margin-top:12px; }
+  .lrow { display:grid; grid-template-columns:52px 84px 1fr; align-items:center; gap:10px; height:22px;
+          font-size:12.5px; font-variant-numeric:tabular-nums; position:relative; }
+  .lrow .p { color:var(--faint); text-align:right; }
+  .lrow .px { color:var(--text); font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12.5px; }
+  .lrow .bar { height:8px; border-radius:4px; background:transparent; position:relative; }
+  .lrow .bar i { position:absolute; left:0; top:0; bottom:0; border-radius:4px; }
+  .lrow.buy .p { color:var(--buy); } .lrow.buy .bar i { background:rgba(91,196,142,.55); }
+  .lrow.sell .p { color:var(--sell); } .lrow.sell .bar i { background:rgba(215,122,140,.55); }
+  .lrow.mid .bar i { background:rgba(255,255,255,.07); }
+  .lrow .lot { position:absolute; right:0; font-size:11px; color:var(--muted); }
+  .lrow.buy .lot { color:rgba(91,196,142,.85); } .lrow.sell .lot { color:rgba(215,122,140,.85); }
+  .marker { display:grid; grid-template-columns:52px 1fr; gap:10px; align-items:center; height:18px; }
+  .marker .ln { height:0; border-top:2px dashed var(--gold); position:relative; }
+  .marker .ln span { position:absolute; right:0; top:-10px; background:var(--gold); color:#1a0a0e; font-size:11px;
+                     font-weight:700; padding:1px 8px; border-radius:999px; white-space:nowrap; }
+  .marker .lbl { font-family:'DM Serif Display',serif; color:var(--gold); text-align:right; font-size:13px; }
+  .ladder-note { font-size:12px; color:var(--muted); margin-top:10px; }
+
+  /* ── output ── */
+  textarea { width:100%; height:260px; margin-top:12px; background:#120609; color:#F4E4BA; border:1px solid var(--line);
+             border-radius:12px; padding:12px; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12.5px;
+             line-height:1.5; resize:vertical; outline:none; white-space:pre; }
+  .acts { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+  .acts button { padding:12px; border-radius:12px; cursor:pointer; font-family:'Anuphan',sans-serif; font-size:15px; font-weight:600; }
+  .acts .copy { background:var(--gold); color:#1a0a0e; border:none; }
+  .acts .dl { background:transparent; color:var(--gold-soft); border:1px solid var(--gold); }
+  .acts button:focus-visible { outline:3px solid rgba(244,228,186,.6); outline-offset:2px; }
+  .howto { margin-top:12px; font-size:13px; color:var(--muted); line-height:1.65; }
+  .howto code { font-family:ui-monospace,Menlo,Consolas,monospace; color:var(--gold-soft); font-size:12.5px; }
+  .howto b { color:var(--gold-soft); font-weight:600; }
+  .alt { margin-top:16px; border-top:1px solid var(--line); padding-top:12px; }
+  .alt summary { cursor:pointer; font-size:13px; color:var(--muted); list-style:none; }
+  .alt summary::before { content:'▸ '; color:var(--gold); }
+  .alt[open] summary::before { content:'▾ '; }
+  .alt summary::-webkit-details-marker { display:none; }
+  .alt textarea { height:200px; }
+  .guard { margin-top:14px; font-size:12.5px; color:var(--muted); border-left:2px solid var(--gold); padding-left:10px; line-height:1.6; }
+  .guard b { color:var(--gold-soft); font-weight:600; }
+  .toast { position:fixed; left:50%; bottom:28px; transform:translateX(-50%) translateY(20px); opacity:0;
+           background:var(--gold-soft); color:#1a0a0e; padding:9px 16px; border-radius:999px; font-size:13.5px;
+           font-weight:600; transition:opacity .2s, transform .2s; pointer-events:none; }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  @media (max-width:480px) {
+    .ctl { grid-template-columns:1fr 1fr; }
+    .ctl .f-pair { grid-column:1 / -1; }
+    .kpis { grid-template-columns:1fr 1fr 1fr; gap:6px; }
+    .kpi .v { font-size:22px; }
+    .zones { grid-template-columns:1fr; }
+    .lrow { grid-template-columns:44px 76px 1fr; font-size:12px; }
+    .marker { grid-template-columns:44px 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { .toast { transition:none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Percentile Grid</div>
+  <h1>ตีกริดรายเดือน</h1>
+  <div class="sub">Grid v2 (B20) · main p50/p85 + โซนกลาง p51–60 สลับคี่/คู่ · ระดับ percentile 10 ปี ปรับด้วย DXY · ใช้ข้อมูลถึงสิ้นเดือนก่อนเท่านั้น · ก็อปลง MT5 ได้ทันที</div>
+
+  <div class="ctl">
+    <div class="f-pair">
+      <label for="pair">คู่เงิน</label>
+      <select id="pair"></select>
+    </div>
+    <div>
+      <label for="month">เดือนที่จะเทรด</label>
+      <select id="month"></select>
+    </div>
+    <div>
+      <label for="year">ปี</label>
+      <select id="year"></select>
+    </div>
+  </div>
+  <button class="go" id="go" disabled>สร้างกริด</button>
+
+  <div class="status" id="status"><span class="dot"></span><span id="statusText">กำลังโหลด input_fx_daily.csv …</span></div>
+  <div class="upload" id="upload">โหลดจาก R2 ไม่สำเร็จ — เลือกไฟล์ <code>input_fx_daily.csv</code> จากเครื่องแทนได้
+    <br><input type="file" id="file" accept=".csv,text/csv"></div>
+  <div class="notice" id="notice"></div>
+
+  <div class="result" id="result">
+    <div class="card">
+      <h2 id="rTitle"></h2>
+      <div class="meta" id="rMeta"></div>
+      <div class="kpis">
+        <div class="kpi"><div class="v" id="kLast"></div><div class="l" id="kLastL">ราคาปิดล่าสุดที่ใช้</div></div>
+        <div class="kpi"><div class="v gold" id="kP"></div><div class="l">percentile ของราคานี้ใน 10 ปี</div></div>
+        <div class="kpi"><div class="v" id="kDxy"></div><div class="l" id="kDxyL">DXY ที่ใช้แปลงกลับ</div></div>
+      </div>
+      <div class="formula" id="formula"></div>
+      <div class="zones">
+        <div class="zone buy"><div class="t">BUY limit · p50 → p0 (21 ชั้น)</div><div class="r" id="zBuy"></div><div class="n">$10 ที่ p50 · +$5 ทุก 10p ที่ลึกลง · รวม $435 (B19 ขยายจาก p40/$310)</div></div>
+        <div class="zone sell"><div class="t">SELL limit · p85 → p100 (7 ชั้น)</div><div class="r" id="zSell"></div><div class="n">$10 ทุกชั้น · รวม $70 · TP −2.5p</div></div>
+        <div class="zone midz"><div class="t">โซนกลาง · p51 → p60 ทุก 1p (10 ชั้น)</div><div class="r" id="zMid"></div><div class="n">คี่ = BUY (51 53 55 57 59) · คู่ = SELL (52 54 56 58 60) · $10 ทุกชั้น · TP ±1p · รวม $100</div></div>
+        <div class="zone flush" id="zFlushBox"><div class="t">ล้าง SELL โซนกลางต้นเดือนนี้?</div><div class="r" id="zFlush"></div><div class="n">กติกา: ราคาปิดสิ้นเดือนก่อน &gt; p70 → EA ปิดไม้ sell โซนกลางที่ค้างทั้งหมดตอนโหลดกริดใหม่ (ไม่แตะ buy / ไม่แตะ sell p85+)</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>บันไดกริด 41 ระดับ</h2>
+      <div class="meta">ราคาสูงอยู่บน · แถบยาว = ระยะห่างจากชั้นถัดลง · เส้นทอง = ราคาปิดล่าสุด</div>
+      <div class="ladder" id="ladder"></div>
+      <div class="ladder-note" id="ladderNote"></div>
+    </div>
+
+    <div class="card">
+      <h2 id="eaTitle"></h2>
+      <div class="meta">โค้ด EA ทั้งตัว ระดับราคา 41 ค่าฝังอยู่ในโค้ด — ไม่ต้องใช้ไฟล์ txt</div>
+      <textarea id="eaOut" readonly spellcheck="false"></textarea>
+      <div class="acts">
+        <button class="copy" id="eaDl">ดาวน์โหลด .mq5</button>
+        <button class="dl" id="eaCopy">คัดลอกโค้ด</button>
+      </div>
+      <div class="howto">
+        <b>ครั้งแรก:</b> วางไฟล์ใน <code>MQL5\Experts\</code> (MetaEditor: File → Open Data Folder) → เปิดใน MetaEditor → Compile (F7) → ลาก EA ลงกราฟ <span id="eaSym"></span> · ต้องเป็นบัญชี Hedging + เปิด Algo Trading<br>
+        <b>ทุกต้นเดือน:</b> กดสร้างกริดเดือนใหม่ → ดาวน์โหลด → วางทับไฟล์เดิม<b>ชื่อเดียวกัน</b> → Compile — MT5 รีโหลด EA บนกราฟให้เอง ไม้ที่ค้างอยู่ไม่โดนปิด แค่ย้าย TP ตามกริดใหม่ · ห้ามเปลี่ยน Magic ระหว่างเดือน
+      </div>
+      <div class="guard" id="guard"></div>
+      <details class="alt">
+        <summary>ทางเลือกเดิม: ไฟล์ <code id="fileTitle"></code> สำหรับ EA <code>JPT_PercentileGrid</code> (อ่านจาก MQL5\Files)</summary>
+        <textarea id="out" readonly spellcheck="false"></textarea>
+        <div class="acts">
+          <button class="dl" id="copy">คัดลอกข้อความ</button>
+          <button class="dl" id="dl">ดาวน์โหลด .txt</button>
+        </div>
+        <div class="howto">วางไฟล์ที่ <code id="mt5path"></code> · EA ตัวเดิมอ่านซ้ำทุก 10 วิ ถ้า hash เปลี่ยนจะกางกริดใหม่ทั้งแผงเอง</div>
+      </details>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script type="text/plain" id="eaTpl">//+------------------------------------------------------------------+
+//|  __EAFILE__                                                       |
+//|  JPT Percentile Grid EA — ระดับกริดฝังในโค้ด (สร้างจาก grid-builder.html) |
+//|  __TAG__                                                          |
+//|  สร้างเมื่อ __GEN__ · ห้ามแก้ตัวเลขมือ ให้สร้างใหม่จากหน้าเว็บทุกต้นเดือน  |
+//|                                                                  |
+//|  - main: BUY limit p <= BuyMaxP (50) TP +2.5p · SELL p >= 85 TP -2.5p |
+//|  - โซนกลาง (B20 rev2): p51..p60 ทุก 1p · คี่ = BUY · คู่ = SELL       |
+//|    ไม้ $ เท่า BaseLot · TP = ชั้นถัดไป 1p ในชุดโซนกลาง                 |
+//|  - ล้าง: ถ้า GRID_FLUSH_MID_SELL = true (close สิ้นเดือนก่อน > p70)      |
+//|    ปิดไม้ SELL โซนกลางที่ค้างทั้งหมดครั้งเดียวตอนโหลดกริดเดือนนี้        |
+//|  - ไม่มี SL · หนึ่งไม้ต่อระดับต่อฝั่ง · TP แล้วตั้งใหม่ทันที        |
+//|  - compile ทับด้วยกริดเดือนใหม่ → ไม้ค้างคง p-index เดิม TP ย้ายตาม   |
+//|    ระดับใหม่, pending ตั้งใหม่หมด (กติกาเดียวกับ backtest B15)      |
+//|  - lot ฝั่ง buy โตทุก 10p ที่ลึกลง (+LotStep) ฝั่ง sell คงที่       |
+//|  ต้องใช้บัญชี HEDGING · magic ต้องเท่าเดิมทุกเดือน                 |
+//+------------------------------------------------------------------+
+#property copyright   "JP Trust Learning"
+#property version     "1.01"
+#property description "__TAG__"
+
+#include <Trade/Trade.mqh>
+
+//---------------------------------------------------------------- กริดเดือนนี้ (ฝังจาก grid-builder.html)
+#define NP 41                              // p0, p2.5, ..., p100
+const string GRID_SYMBOL = "__SYMBOL__";
+const string GRID_TAG    = "__TAG__";
+const double GRID_PRICE[NP] =
+{
+__LEVELS__
+};
+#define NM 10                              // โซนกลาง m51, m52, ..., m60 (1p)
+const double MID_PRICE[NM] =
+{
+__MIDLEVELS__
+};
+const bool   GRID_FLUSH_MID_SELL = __FLUSH__;   // จากหน้าเว็บ: close สิ้นเดือนก่อน > p70 ?
+
+//---------------------------------------------------------------- inputs
+input double InpBuyMaxP       = 50.0;      // BUY เมื่อ p <= ค่านี้ (B19: 50 · เดิม 40)
+input double InpSellMinP      = 85.0;      // SELL เมื่อ p >= ค่านี้
+input bool   InpUseSell       = true;      // เปิดฝั่ง SELL ไหม
+input double InpBaseLot       = 0.02;      // lot ชั้นแรก (buy p50 / sell ทุกชั้น)
+input double InpLotStep10p    = 0.01;      // buy: +lot ทุก 10p ที่ลึกลง (0 = คงที่)
+input long   InpMagic         = 260902;    // magic base (ห้ามชนกับ EA อื่น · ห้ามเปลี่ยนระหว่างเดือน)
+input int    InpTimerSec      = 10;        // กระทบยอด ทุกกี่วินาที
+input bool   InpMarketIfCrossed = true;    // ราคาเลยระดับไปแล้ว → เข้า market (ตาม backtest)
+input int    InpSlippagePts   = 30;        // slippage สำหรับ market order (points)
+input bool   InpUseMid        = true;      // เปิดโซนกลาง p51-60 ไหม (B20 rev2)
+
+//---------------------------------------------------------------- globals
+CTrade  trade;
+double  gP[NP];                            // 0, 2.5, ... 100
+double  gPrice[NP];                        // ราคา nominal ของแต่ละ p
+double  gMid[NM];                          // ราคา nominal โซนกลาง m51..m60
+bool    gGridOK = false;
+datetime gGridLoadedAt = 0;
+double  gStopsLevel;                       // ระยะขั้นต่ำของโบรก (price units)
+
+//---------------------------------------------------------------- helpers
+long MagicOf(bool isBuy, int idx) { return InpMagic + (isBuy ? 0 : 50) + idx; }          // main
+long MagicMid(bool isBuy, int j)   { return InpMagic + (isBuy ? 100 : 150) + j; }        // โซนกลาง j = 0..9 (m51..m60)
+bool IsOurMagic(long m) { return (m >= InpMagic && m < InpMagic + 200); }
+bool IsMidSellMagic(long m) { return (m >= InpMagic + 150 && m < InpMagic + 160); }
+bool IsMidBuyIdx(int j)  { return (51 + j) % 2 == 1; }                                   // คี่ = BUY
+bool IsMidSellIdx(int j) { return (51 + j) % 2 == 0; }                                   // คู่ = SELL
+bool IsBuyLevel(int i)  { return gP[i] <= InpBuyMaxP + 1e-9; }
+bool IsSellLevel(int i) { return InpUseSell && gP[i] >= InpSellMinP - 1e-9 && i >= 1; }
+
+double NormLot(double lot)
+{
+   double step = SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_STEP);
+   double mn   = SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_MIN);
+   double mx   = SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_MAX);
+   double v = MathRound(lot / step) * step;
+   if(v < mn) v = mn;
+   if(v > mx) v = mx;
+   return NormalizeDouble(v, 8);
+}
+double LotOf(bool isBuy, int idx)
+{
+   if(!isBuy) return NormLot(InpBaseLot);
+   int deep = (int)MathFloor((InpBuyMaxP - gP[idx]) / 10.0 + 1e-9);
+   return NormLot(InpBaseLot + InpLotStep10p * deep);
+}
+double NP_(double p) { return NormalizeDouble(p, _Digits); }
+
+//---------------------------------------------------------------- grid (embedded)
+bool LoadEmbeddedGrid()
+{
+   for(int i = 0; i < NP; i++) { gP[i] = i * 2.5; gPrice[i] = GRID_PRICE[i]; }
+   if(gPrice[0] <= 0.0) { Print("[GRID] ระดับ p0 ต้องมากกว่าศูนย์"); return false; }
+   for(int i = 1; i < NP; i++)
+      if(gPrice[i] < gPrice[i-1]) { PrintFormat("[GRID] ระดับไม่เรียงจากน้อยไปมาก ที่ p%.1f", i * 2.5); return false; }
+   for(int j = 0; j < NM; j++) gMid[j] = MID_PRICE[j];
+   for(int j = 1; j < NM; j++)
+      if(gMid[j] < gMid[j-1]) { PrintFormat("[GRID] โซนกลางไม่เรียง ที่ m%d", 51 + j); return false; }
+   if(gMid[0] < gPrice[20] - _Point || gMid[NM-1] > gPrice[24] + _Point) { Print("[GRID] โซนกลางต้องอยู่ระหว่าง p50 กับ p60 ของ main"); return false; }
+   gGridOK = true; gGridLoadedAt = TimeCurrent();
+   PrintFormat("[GRID] โหลดกริดฝัง %s | p%.1f=%s ... p%.1f=%s", GRID_TAG,
+               InpBuyMaxP, DoubleToString(gPrice[(int)(InpBuyMaxP / 2.5)], _Digits),
+               InpSellMinP, DoubleToString(gPrice[(int)(InpSellMinP / 2.5)], _Digits));
+   return true;
+}
+
+//---------------------------------------------------------------- broker state
+bool FindPosition(bool isBuy, int idx, ulong &ticket, double &tp) { return FindPositionM(MagicOf(isBuy, idx), ticket, tp); }
+bool FindPositionM(long m, ulong &ticket, double &tp)
+{
+   for(int i = PositionsTotal() - 1; i >= 0; i--)
+   {
+      ulong t = PositionGetTicket(i);
+      if(t == 0) continue;
+      if(PositionGetString(POSITION_SYMBOL) != _Symbol) continue;
+      if(PositionGetInteger(POSITION_MAGIC) != m) continue;
+      ticket = t; tp = PositionGetDouble(POSITION_TP); return true;
+   }
+   return false;
+}
+bool FindPending(bool isBuy, int idx, ulong &ticket, double &price, double &tp) { return FindPendingM(MagicOf(isBuy, idx), ticket, price, tp); }
+bool FindPendingM(long m, ulong &ticket, double &price, double &tp)
+{
+   for(int i = OrdersTotal() - 1; i >= 0; i--)
+   {
+      ulong t = OrderGetTicket(i);
+      if(t == 0) continue;
+      if(OrderGetString(ORDER_SYMBOL) != _Symbol) continue;
+      if(OrderGetInteger(ORDER_MAGIC) != m) continue;
+      ticket = t; price = OrderGetDouble(ORDER_PRICE_OPEN); tp = OrderGetDouble(ORDER_TP); return true;
+   }
+   return false;
+}
+// ล้าง SELL โซนกลางที่ค้าง — ทำครั้งเดียวต่อกริด (กันโหลด EA ซ้ำกลางเดือนแล้วล้างไม้ที่เพิ่งเปิดใหม่)
+void FlushMidSellsOnce()
+{
+   if(!GRID_FLUSH_MID_SELL || !InpUseMid) return;
+   string key = "JPT_FLUSH_" + _Symbol + "_" + StringSubstr(GRID_TAG, StringFind(GRID_TAG, "asof ") + 5, 10);
+   if(GlobalVariableCheck(key)) { PrintFormat("[GRID] ล้าง mid-sell ของกริดนี้ทำไปแล้ว (%s)", key); return; }
+   int n = 0;
+   for(int i = PositionsTotal() - 1; i >= 0; i--)
+   {
+      ulong t = PositionGetTicket(i);
+      if(t == 0 || PositionGetString(POSITION_SYMBOL) != _Symbol) continue;
+      if(!IsMidSellMagic(PositionGetInteger(POSITION_MAGIC))) continue;
+      if(trade.PositionClose(t, InpSlippagePts)) n++;
+      else PrintFormat("[GRID] ล้าง mid-sell ticket %I64u ล้มเหลว: %d %s", t, trade.ResultRetcode(), trade.ResultRetcodeDescription());
+   }
+   GlobalVariableSet(key, (double)TimeCurrent());
+   PrintFormat("[GRID] ล้าง SELL โซนกลาง %d ไม้ (close สิ้นเดือนก่อน > p70) key=%s", n, key);
+}
+void DeleteAllOurPendings()
+{
+   for(int i = OrdersTotal() - 1; i >= 0; i--)
+   {
+      ulong t = OrderGetTicket(i);
+      if(t == 0) continue;
+      if(OrderGetString(ORDER_SYMBOL) != _Symbol) continue;
+      if(!IsOurMagic(OrderGetInteger(ORDER_MAGIC))) continue;
+      trade.OrderDelete(t);
+   }
+}
+
+//---------------------------------------------------------------- core: reconcile
+// idempotent: ทำให้สถานะที่โบรกตรงกับกริดปัจจุบันเสมอ
+void Reconcile()
+{
+   if(!gGridOK) return;
+   double ask = SymbolInfoDouble(_Symbol, SYMBOL_ASK);
+   double bid = SymbolInfoDouble(_Symbol, SYMBOL_BID);
+   if(ask <= 0 || bid <= 0) return;
+   gStopsLevel = SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL) * _Point;
+
+   for(int i = 0; i < NP; i++)
+   {
+      if(IsBuyLevel(i))  ReconcileLevel(true,  i, ask, bid);
+      if(IsSellLevel(i)) ReconcileLevel(false, i, ask, bid);
+   }
+   if(InpUseMid)
+      for(int j = 0; j < NM; j++)
+      {
+         if(IsMidBuyIdx(j)  && j + 1 < NM) ReconcileAt(true,  MagicMid(true,  j), NP_(gMid[j]), NP_(gMid[j + 1]), NormLot(InpBaseLot), StringFormat("MID B m%d", 51 + j), ask, bid);
+         if(IsMidSellIdx(j) && j - 1 >= 0) ReconcileAt(false, MagicMid(false, j), NP_(gMid[j]), NP_(gMid[j - 1]), NormLot(InpBaseLot), StringFormat("MID S m%d", 51 + j), ask, bid);
+      }
+   UpdateComment();
+}
+
+void ReconcileLevel(bool isBuy, int idx, double ask, double bid)
+{
+   if(isBuy && idx + 1 >= NP) return;
+   if(!isBuy && idx - 1 < 0) return;
+   double lvl = NP_(gPrice[idx]);
+   double tp  = NP_(isBuy ? gPrice[idx + 1] : gPrice[idx - 1]);
+   ReconcileAt(isBuy, MagicOf(isBuy, idx), lvl, tp, LotOf(isBuy, idx), StringFormat("GRID %s p%.1f", isBuy ? "B" : "S", gP[idx]), ask, bid);
+}
+
+// ตัวทำงานจริง (ใช้ทั้ง main และโซนกลาง): หนึ่ง magic = หนึ่งระดับหนึ่งฝั่ง
+void ReconcileAt(bool isBuy, long magic, double lvl, double tp, double lot, string cmt, double ask, double bid)
+{
+   if(lvl <= 0 || tp <= 0) return;
+   trade.SetExpertMagicNumber(magic);
+
+   // 1) มีไม้ค้างที่ระดับนี้ → ดูแล TP ให้ตรงกริดปัจจุบัน
+   ulong pt; double ptp;
+   if(FindPositionM(magic, pt, ptp))
+   {
+      // TP ใหม่อยู่ "ผ่านไปแล้ว" → เท่ากับโดน TP ตามกติกา → ปิดที่ market
+      if(isBuy  && bid >= tp) { trade.PositionClose(pt, InpSlippagePts); return; }
+      if(!isBuy && ask <= tp) { trade.PositionClose(pt, InpSlippagePts); return; }
+      // TP ใกล้ราคาเกิน stops level → เลื่อนออกเท่าที่โบรกยอม
+      double minTp = isBuy ? bid + gStopsLevel : ask - gStopsLevel;
+      double useTp = isBuy ? MathMax(tp, minTp) : MathMin(tp, minTp);
+      useTp = NP_(useTp);
+      if(MathAbs(useTp - ptp) > _Point / 2) trade.PositionModify(pt, 0.0, useTp);
+      return;
+   }
+
+   // 2) ไม่มีไม้ค้าง → ต้องมี pending 1 ใบที่ระดับนี้ (หรือ market ถ้าราคาเลยไปแล้ว)
+   ulong ot; double oprice, otp;
+   bool hasPending = FindPendingM(magic, ot, oprice, otp);
+   bool crossed = isBuy ? (ask <= lvl) : (bid >= lvl);
+
+   if(crossed)
+   {
+      // ราคาอยู่ต่ำกว่าระดับ buy (หรือสูงกว่าระดับ sell) แล้ว → backtest ถือว่า fill ที่ราคาเปิด
+      if(hasPending) trade.OrderDelete(ot);
+      if(!InpMarketIfCrossed) return;
+      if(isBuy  && bid >= tp) return;             // ทั้ง entry และ TP ผ่านไปแล้ว → ไม่มีอะไรให้ทำ
+      if(!isBuy && ask <= tp) return;
+      trade.SetDeviationInPoints(InpSlippagePts);
+      bool ok = isBuy ? trade.Buy(lot, _Symbol, 0.0, 0.0, tp, cmt)
+                      : trade.Sell(lot, _Symbol, 0.0, 0.0, tp, cmt);
+      if(!ok) PrintFormat("[GRID] market %s ล้มเหลว: %d %s", cmt,
+                          trade.ResultRetcode(), trade.ResultRetcodeDescription());
+      return;
+   }
+
+   // pending ปกติ — ต้องห่างราคาปัจจุบันอย่างน้อย stops level
+   double dist = isBuy ? (ask - lvl) : (lvl - bid);
+   if(dist < gStopsLevel) return;                 // ใกล้เกิน รอรอบหน้า (จะกลายเป็น crossed หรือห่างออก)
+
+   if(hasPending)
+   {
+      if(MathAbs(oprice - lvl) <= _Point / 2 && MathAbs(otp - tp) <= _Point / 2) return; // ตรงแล้ว
+      trade.OrderDelete(ot);                     // ราคา/TP เปลี่ยน → ตั้งใหม่
+   }
+   bool ok = isBuy ? trade.BuyLimit (lot, lvl, _Symbol, 0.0, tp, ORDER_TIME_GTC, 0, cmt)
+                   : trade.SellLimit(lot, lvl, _Symbol, 0.0, tp, ORDER_TIME_GTC, 0, cmt);
+   if(!ok) PrintFormat("[GRID] pending %s @%s ล้มเหลว: %d %s", cmt,
+                       DoubleToString(lvl, _Digits), trade.ResultRetcode(), trade.ResultRetcodeDescription());
+}
+
+//---------------------------------------------------------------- UI
+void UpdateComment()
+{
+   int nPos = 0, nOrd = 0; double fl = 0.0;
+   for(int i = PositionsTotal() - 1; i >= 0; i--)
+   {
+      ulong t = PositionGetTicket(i);
+      if(t == 0 || PositionGetString(POSITION_SYMBOL) != _Symbol) continue;
+      if(!IsOurMagic(PositionGetInteger(POSITION_MAGIC))) continue;
+      nPos++; fl += PositionGetDouble(POSITION_PROFIT) + PositionGetDouble(POSITION_SWAP);
+   }
+   for(int i = OrdersTotal() - 1; i >= 0; i--)
+   {
+      ulong t = OrderGetTicket(i);
+      if(t == 0 || OrderGetString(ORDER_SYMBOL) != _Symbol) continue;
+      if(IsOurMagic(OrderGetInteger(ORDER_MAGIC))) nOrd++;
+   }
+   int bi = (int)(InpBuyMaxP / 2.5), si = (int)(InpSellMinP / 2.5);
+   Comment(StringFormat("JPT Percentile Grid v2  %s\n%s\nโหลดเมื่อ %s\nBUY  <= p%.0f @ %s   SELL >= p%.0f @ %s\nMID m51-m60 %s–%s (คี่ BUY · คู่ SELL) %s\nไม้ค้าง %d  pending %d  ลอยตัว %.2f",
+           _Symbol, GRID_TAG, TimeToString(gGridLoadedAt, TIME_DATE | TIME_MINUTES),
+           InpBuyMaxP, DoubleToString(gPrice[bi], _Digits), InpSellMinP, DoubleToString(gPrice[si], _Digits),
+           InpUseMid ? DoubleToString(gMid[0], _Digits) : "off", InpUseMid ? DoubleToString(gMid[NM-1], _Digits) : "off",
+           GRID_FLUSH_MID_SELL ? "· ล้าง mid-sell เดือนนี้" : "",
+           nPos, nOrd, fl));
+}
+
+//---------------------------------------------------------------- events
+int OnInit()
+{
+   if(StringFind(_Symbol, GRID_SYMBOL) < 0)
+   {
+      PrintFormat("[GRID] EA นี้ฝังกริดของ %s แต่ถูกแปะบนกราฟ %s — ยกเลิก", GRID_SYMBOL, _Symbol);
+      return INIT_FAILED;
+   }
+   if((ENUM_ACCOUNT_MARGIN_MODE)AccountInfoInteger(ACCOUNT_MARGIN_MODE) != ACCOUNT_MARGIN_MODE_RETAIL_HEDGING)
+   {
+      Print("[GRID] ต้องใช้บัญชี HEDGING — บัญชีนี้เป็น netting จะรวมไม้กันจนแยกระดับไม่ได้");
+      return INIT_FAILED;
+   }
+   if(!LoadEmbeddedGrid()) return INIT_FAILED;
+   trade.SetExpertMagicNumber(InpMagic);
+   trade.SetTypeFillingBySymbol(_Symbol);
+   trade.SetAsyncMode(false);
+   // กริดใหม่ (compile ทับทุกต้นเดือน) → ลบ pending เก่าของเราทั้งหมดแล้วตั้งใหม่ตามระดับใหม่
+   // ไม้ค้างไม่ถูกแตะ — Reconcile จะย้าย TP ให้ตรงระดับใหม่เอง
+   DeleteAllOurPendings();
+   FlushMidSellsOnce();        // B20: ก่อน Reconcile — ไม่งั้น Reconcile จะไปดูแล TP ให้ไม้ที่ต้องล้าง
+   Reconcile();
+   EventSetTimer(MathMax(1, InpTimerSec));
+   return INIT_SUCCEEDED;
+}
+void OnDeinit(const int reason) { EventKillTimer(); Comment(""); }
+
+void OnTimer() { Reconcile(); }
+
+void OnTick()  { /* ทำงานผ่าน timer + trade transaction พอ */ }
+
+void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest &req, const MqlTradeResult &res)
+{
+   // ไม้ปิด (TP) หรือ pending fill → กระทบยอดทันที ให้ระดับนั้นกลับมามี pending
+   if(trans.type == TRADE_TRANSACTION_DEAL_ADD || trans.type == TRADE_TRANSACTION_ORDER_DELETE)
+      if(trans.symbol == _Symbol) Reconcile();
+}
+//+------------------------------------------------------------------+
+</script>
+<script>
+/* JPT Percentile Grid engine — port ของ make_grid.py (B15) ทีละบรรทัด
+ * กติกา no-lookahead: ทุกฟังก์ชันรับ asof (ISO 'YYYY-MM-DD' = สิ้นเดือนก่อนเดือนที่จะเทรด)
+ * แล้วใช้เฉพาะแถวที่ Date <= asof — ไม่มีทางเห็นแถวของเดือนที่เทรด
+ */
+(function (root) {
+  'use strict';
+
+  var P = []; for (var i = 0; i < 41; i++) P.push(i * 2.5);
+  var MIDP = []; for (var j = 51; j <= 60; j++) MIDP.push(j);      // โซนกลาง 1p (B20 rev2)
+  var FLUSH_P = 70;                                                 // ล้าง mid-sell เมื่อ close สิ้นเดือน > p70
+
+  // ---- CSV: Ticker,Date,Open,High,Low,Close,Volume -> {TICKER: {dates:[], close:[]}} เรียงวันที่
+  function parseFxCsv(text) {
+    var lines = text.replace(/\r/g, '').split('\n');
+    var head = lines[0].split(',');
+    var iT = head.indexOf('Ticker'), iD = head.indexOf('Date'), iC = head.indexOf('Close');
+    if (iT < 0 || iD < 0 || iC < 0) throw new Error('CSV ต้องมีคอลัมน์ Ticker, Date, Close');
+    var by = {};
+    for (var k = 1; k < lines.length; k++) {
+      var ln = lines[k]; if (!ln) continue;
+      var c = ln.split(',');
+      var t = c[iT], d = c[iD], v = parseFloat(c[iC]);
+      if (!t || !d || !isFinite(v)) continue;
+      (by[t] = by[t] || []).push([d.slice(0, 10), v]);
+    }
+    var out = {};
+    Object.keys(by).forEach(function (t) {
+      var rows = by[t].sort(function (a, b) { return a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0; });
+      // dedupe keep-last (เหมือน drop_duplicates(keep='last') ของ pipeline)
+      var dates = [], close = [];
+      for (var j = 0; j < rows.length; j++) {
+        if (dates.length && dates[dates.length - 1] === rows[j][0]) { close[close.length - 1] = rows[j][1]; continue; }
+        dates.push(rows[j][0]); close.push(rows[j][1]);
+      }
+      out[t] = { dates: dates, close: close };
+    });
+    return out;
+  }
+
+  // ---- numpy.percentile (method='linear') รวม _lerp ที่สลับสูตรเมื่อ t >= 0.5
+  function npPercentile(sorted, p) {
+    var n = sorted.length;
+    if (!n) return NaN;
+    var q = p / 100;
+    var vi = (n - 1) * q;
+    var lo = Math.floor(vi);
+    var hi = Math.min(lo + 1, n - 1);
+    var t = vi - lo;
+    var a = sorted[lo], b = sorted[hi];
+    var diff = b - a;
+    var v = a + diff * t;
+    if (t >= 0.5) v = b - diff * (1 - t);
+    return v;
+  }
+
+  // ---- reindex + ffill + bfill ของ DXY ลงบนวันของราคา
+  function alignFfillBfill(priceDates, dxDates, dxClose) {
+    var out = new Array(priceDates.length);
+    var j = 0, last = NaN;
+    for (var i = 0; i < priceDates.length; i++) {
+      var d = priceDates[i];
+      while (j < dxDates.length && dxDates[j] <= d) { last = dxClose[j]; j++; }
+      out[i] = last;                                     // ffill (ค่า DXY ล่าสุดที่ <= d)
+    }
+    // bfill สำหรับหัวไฟล์ที่ยังไม่มี DXY
+    var firstOk = -1;
+    for (var m = 0; m < out.length; m++) if (isFinite(out[m])) { firstOk = m; break; }
+    if (firstOk > 0) for (var q = 0; q < firstOk; q++) out[q] = out[firstOk];
+    return out;
+  }
+
+  function addYears(iso, y) {            // asof - DateOffset(years=y) → ISO (pandas: เลื่อนปี คงวัน/เดือน, 29 ก.พ. → 28)
+    var Y = +iso.slice(0, 4) - y, M = iso.slice(5, 7), D = +iso.slice(8, 10);
+    if (M === '02' && D === 29) { var leap = (Y % 4 === 0 && Y % 100 !== 0) || Y % 400 === 0; if (!leap) D = 28; }
+    return Y + '-' + M + '-' + (D < 10 ? '0' + D : '' + D);
+  }
+
+  function fmt(v, d) { return v.toFixed(d); }
+  function fmtSigned(v, d) { return (v >= 0 ? '+' : '') + v.toFixed(d); }
+
+  /**
+   * buildGrid({symbol, mode:'mul'|'div'|'raw', price:{dates,close}, dxy:{dates,close}, asof, years=10, drift=1/12, floor=null, digits=null})
+   * → {header, lines:[{p,price}], text, meta}
+   */
+  function buildGrid(opt) {
+    var years = opt.years == null ? 10 : opt.years;
+    var driftH = opt.drift == null ? 1 / 12 : opt.drift;
+    var asof = opt.asof;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(asof)) throw new Error('asof ต้องเป็น YYYY-MM-DD');
+
+    // px = px[px.index <= asof]
+    var pd = [], pc = [];
+    for (var i = 0; i < opt.price.dates.length; i++) {
+      if (opt.price.dates[i] <= asof) {
+        pd.push(opt.price.dates[i]);
+        pc.push(opt.floor != null ? Math.max(opt.price.close[i], opt.floor) : opt.price.close[i]);
+      }
+    }
+    if (pd.length < 260) throw new Error('ข้อมูล ' + opt.symbol + ' ถึง ' + asof + ' มีแค่ ' + pd.length + ' แถว');
+
+    var dx = alignFfillBfill(pd, opt.dxy.dates, opt.dxy.close);
+    var dxLast = dx[dx.length - 1];
+    var adj = new Array(pd.length), k;
+    if (opt.mode === 'mul') {
+      for (var a = 0; a < pd.length; a++) adj[a] = pc[a] * dx[a] / 100.0;
+      k = 1.0 / (dxLast / 100.0);
+    } else if (opt.mode === 'div') {
+      for (var b = 0; b < pd.length; b++) adj[b] = pc[b] / (dx[b] / 100.0);
+      k = dxLast / 100.0;
+    } else {
+      for (var c = 0; c < pd.length; c++) adj[c] = pc[c];
+      k = 1.0;
+    }
+
+    // win = adj[adj.index > asof - years]
+    var winStart = addYears(asof, years);
+    var win = [];
+    for (var w = 0; w < pd.length; w++) if (pd[w] > winStart) win.push(adj[w]);
+    // guard: หน้าต่างต้องครบ 10 ปี (แถวแรกของข้อมูลต้องมาก่อน winStart) — AUD ก่อน มิ.ย. 2016 จะถูกบล็อก
+    if (pd[0] > winStart) throw new Error('ข้อมูล ' + opt.symbol + ' เริ่ม ' + pd[0] + ' — หน้าต่าง 10 ปีถึง ' + asof + ' ยังไม่ครบ (ต้องมีข้อมูลก่อน ' + winStart + ')');
+    var sorted = win.slice().sort(function (x, y) { return x - y; });
+    var lv = P.map(function (p) { return npPercentile(sorted, p); });
+    var lvMid = MIDP.map(function (p) { return npPercentile(sorted, p); });   // โซนกลาง p51..p60 จากหน้าต่างเดียวกัน (≤ asof)
+
+    // drift: month-end last ของ adj (ทั้งช่วง <= asof) → ล่าสุด years*12+12 เดือน → YoY log → mean
+    var meKeys = [], meVals = {};
+    for (var m = 0; m < pd.length; m++) {
+      var key = pd[m].slice(0, 7);
+      if (!(key in meVals)) meKeys.push(key);
+      meVals[key] = adj[m];                             // แถวสุดท้ายของเดือนชนะ (resample('ME').last())
+    }
+    var take = Math.round(years * 12) + 12;
+    var me = meKeys.slice(-take).map(function (kk) { return meVals[kk]; });
+    var yoy = [];
+    for (var y = 12; y < me.length; y++) yoy.push(Math.log(me[y] / me[y - 12]));
+    var g = yoy.length ? yoy.reduce(function (s, v) { return s + v; }, 0) / yoy.length : 0.0;
+    var mult = Math.exp(g * driftH);
+    var nom = lv.map(function (v) { return (v * mult) * k; });
+    var nomMid = lvMid.map(function (v) { return (v * mult) * k; });
+
+    var digits = opt.digits != null ? opt.digits : (nom[20] > 20 ? 2 : 5);
+    var adjLast = adj[adj.length - 1];
+    var cnt = 0; for (var z = 0; z < win.length; z++) if (win[z] <= adjLast) cnt++;
+    var curP = cnt / win.length * 100;
+
+    var header = '# ' + opt.symbol + ' grid | asof ' + pd[pd.length - 1] + ' | mode ' + opt.mode +
+      ' | dxy ' + fmt(dxLast, 2) + ' | last ' + fmt(pc[pc.length - 1], digits) + ' = p' + fmt(curP, 1) +
+      ' | drift ' + fmtSigned(g * 100, 2) + '%/y';
+    var lines = P.map(function (p, idx) { return { p: p, price: fmt(nom[idx], digits), raw: nom[idx] }; });
+    // โซนกลาง: คี่ = BUY · คู่ = SELL · TP = ชั้นถัดไป 1p ในชุดเดียวกัน · ล้าง sell เมื่อ close สิ้นเดือน > p70 (B20 rev2)
+    var mid = MIDP.map(function (p, idx) { return { p: p, price: fmt(nomMid[idx], digits), raw: nomMid[idx], side: (p % 2 === 1) ? 'B' : 'S' }; });
+    var flushMidSell = curP > FLUSH_P;
+    var text = header + '\n' + lines.map(function (l) { return (l.p % 1 === 0 ? l.p : l.p) + ',' + l.price; }).join('\n') + '\n' +
+      '# mid p51-60 step 1p | odd=BUY even=SELL | flush_mid_sell=' + (flushMidSell ? 'true' : 'false') + ' (close p' + fmt(curP, 1) + (flushMidSell ? ' >' : ' <=') + ' p' + FLUSH_P + ')\n' +
+      mid.map(function (l) { return 'm' + l.p + ',' + l.price + ',' + l.side; }).join('\n') + '\n';
+
+    return {
+      header: header, lines: lines, mid: mid, flushMidSell: flushMidSell, text: text,
+      meta: {
+        symbol: opt.symbol, mode: opt.mode, asofRequested: asof, asofData: pd[pd.length - 1],
+        dxyUsed: dxLast, dxyRowDate: lastDxyRowOnOrBefore(opt.dxy.dates, pd[pd.length - 1]),
+        lastClose: pc[pc.length - 1], curP: curP, drift: g, k: k, digits: digits,
+        winStart: winStart, winN: win.length, adjLast: adjLast, monthEnds: me.length, yoyN: yoy.length
+      }
+    };
+  }
+
+  function lastDxyRowOnOrBefore(dxDates, d) {
+    var last = null;
+    for (var i = 0; i < dxDates.length && dxDates[i] <= d; i++) last = dxDates[i];
+    return last;
+  }
+
+  // สิ้นเดือนปฏิทินของเดือนก่อนหน้า (year, month 1-12) → 'YYYY-MM-DD'
+  function prevMonthEnd(year, month) {
+    var d = new Date(Date.UTC(year, month - 1, 0));   // วัน 0 ของเดือน = วันสุดท้ายของเดือนก่อน
+    return d.toISOString().slice(0, 10);
+  }
+
+  var api = { P: P, MIDP: MIDP, FLUSH_P: FLUSH_P, parseFxCsv: parseFxCsv, npPercentile: npPercentile, buildGrid: buildGrid, prevMonthEnd: prevMonthEnd, addYears: addYears };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  root.JPTGrid = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script>
+(function () {
+  'use strict';
+  var DATA_URL = 'https://app.jptrustlearning.com/data/input_fx_daily.csv';
+  // ×DXY = USD เป็นสกุลหลัง (USD-quote) · ÷DXY = USD เป็นสกุลหน้า (USD-base) — ห้ามสลับ (B15)
+  var PAIRS = [
+    { sym:'EURUSD', label:'EUR/USD', mode:'mul', on:true,  base:'EUR', quote:'USD' },
+    { sym:'GBPUSD', label:'GBP/USD', mode:'mul', on:true,  base:'GBP', quote:'USD' },
+    { sym:'AUDUSD', label:'AUD/USD', mode:'mul', on:true,  base:'AUD', quote:'USD' },   // ข้อมูล 2006-05 → ladder 10 ปีครบ มิ.ย. 2016
+    { sym:'USDCAD', label:'USD/CAD', mode:'div', on:true,  base:'USD', quote:'CAD' }    // USD-base → ÷DXY
+  ];
+  var TH_MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  var FIRST_YEAR = 2014;                 // หน้าต่าง 10 ปีเต็ม (EURUSD/GBPUSD/USDCAD เริ่ม 2003)
+  var $ = function (id) { return document.getElementById(id); };
+  var data = null, lastDataDate = null, loadedAt = null;
+
+  // ---- วันนี้ตามเวลาไทย (ใช้ตั้งค่าเริ่มต้น + ตรวจอายุแถว DXY)
+  function bkkToday() {
+    var s = new Intl.DateTimeFormat('en-CA', { timeZone:'Asia/Bangkok', year:'numeric', month:'2-digit', day:'2-digit' }).format(new Date());
+    return s.slice(0, 10);
+  }
+  function daysBetween(a, b) { return Math.round((Date.UTC(+b.slice(0,4), +b.slice(5,7)-1, +b.slice(8,10)) - Date.UTC(+a.slice(0,4), +a.slice(5,7)-1, +a.slice(8,10))) / 86400000); }
+  function thDate(iso) { return (+iso.slice(8,10)) + ' ' + TH_MONTHS[+iso.slice(5,7)-1] + ' ' + iso.slice(0,4); }
+  function pips(sym, d) { return sym === 'USDJPY' ? d * 100 : d * 10000; }
+
+  // ---- controls
+  (function initControls() {
+    var pair = $('pair');
+    PAIRS.forEach(function (p) {
+      var o = document.createElement('option'); o.value = p.sym;
+      o.textContent = p.label + (p.on ? '' : ' (ยังไม่เปิด)'); o.disabled = !p.on; pair.appendChild(o);
+    });
+    var today = bkkToday(), y0 = +today.slice(0,4), m0 = +today.slice(5,7);
+    var month = $('month');
+    TH_MONTHS.forEach(function (n, i) { var o = document.createElement('option'); o.value = i + 1; o.textContent = n; month.appendChild(o); });
+    month.value = m0;
+    var year = $('year');
+    for (var y = y0 + 1; y >= FIRST_YEAR; y--) { var o2 = document.createElement('option'); o2.value = y; o2.textContent = y; year.appendChild(o2); }
+    year.value = y0;
+  })();
+
+  // ---- data load: R2 ก่อน → ไม่ได้ค่อยให้เลือกไฟล์เอง
+  function useCsv(text, source) {
+    data = JPTGrid.parseFxCsv(text);
+    var need = ['DXY'].concat(PAIRS.filter(function (p) { return p.on; }).map(function (p) { return p.sym; }));
+    var missing = need.filter(function (t) { return !data[t]; });
+    if (missing.length) throw new Error('ไฟล์ไม่มี ticker: ' + missing.join(', '));
+    lastDataDate = data.EURUSD.dates[data.EURUSD.dates.length - 1];
+    loadedAt = new Date();
+    var st = $('status'); st.className = 'status ok';
+    $('statusText').textContent = source + ' · แถวล่าสุด ' + thDate(lastDataDate) + ' · DXY ล่าสุด ' + thDate(data.DXY.dates[data.DXY.dates.length - 1]) +
+      ' · โหลด ' + loadedAt.toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit' });
+    $('go').disabled = false;
+  }
+  function loadFail(msg) {
+    var st = $('status'); st.className = 'status err';
+    $('statusText').textContent = 'โหลดข้อมูลไม่สำเร็จ: ' + msg;
+    $('upload').style.display = 'block';
+  }
+  fetch(DATA_URL, { cache:'no-cache' })
+    .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+    .then(function (t) { useCsv(t, 'R2 /data/input_fx_daily.csv'); })
+    .catch(function (e) { loadFail(e.message || String(e)); });
+  $('file').addEventListener('change', function (ev) {
+    var f = ev.target.files && ev.target.files[0]; if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () { try { useCsv(String(rd.result), 'ไฟล์จากเครื่อง ' + f.name); $('notice').className = 'notice'; } catch (e) { loadFail(e.message); } };
+    rd.readAsText(f);
+  });
+
+  // ---- generate
+  function notice(msg) { var n = $('notice'); n.textContent = msg; n.className = 'notice show'; $('result').className = 'result'; }
+  var BUY_MAX_P = 50; // B19: ขยายโซน buy p40→p50 (sell คง p85) — backtest 4 คู่ 2013→26 $550 vs $403
+  function lotFor(p) { return p <= BUY_MAX_P ? 10 + 5 * Math.floor((BUY_MAX_P - p) / 10) : (p >= 85 ? 10 : 0); }
+
+  $('go').addEventListener('click', function () {
+    if (!data) return;
+    var pair = PAIRS.filter(function (p) { return p.sym === $('pair').value; })[0];
+    var y = +$('year').value, m = +$('month').value;
+    var asof = JPTGrid.prevMonthEnd(y, m);              // สิ้นเดือนปฏิทินของเดือนก่อนเดือนที่เทรด
+    var series = data[pair.sym];
+    var lastRow = series.dates[series.dates.length - 1];
+    if (asof > lastRow) {
+      notice('ยังสร้างกริดเดือน ' + TH_MONTHS[m-1] + ' ' + y + ' ไม่ได้ — ต้องมีข้อมูลถึง ' + thDate(asof) +
+             ' แต่ไฟล์มีถึง ' + thDate(lastRow) + ' (กันมองอนาคต: กริดใช้ราคาปิดถึงสิ้นเดือนก่อนเท่านั้น)');
+      return;
+    }
+    var r;
+    try { r = JPTGrid.buildGrid({ symbol:pair.sym, mode:pair.mode, price:series, dxy:data.DXY, asof:asof }); }
+    catch (e) { notice(e.message); return; }
+    $('notice').className = 'notice';
+    render(pair, y, m, asof, r);
+  });
+
+  function render(pair, y, m, asof, r) {
+    var M = r.meta, d = M.digits, lines = r.lines;
+    var today = bkkToday();
+    $('rTitle').textContent = pair.label + ' · กริดเดือน ' + TH_MONTHS[m-1] + ' ' + y;
+    var gap = daysBetween(M.asofData, asof);
+    $('rMeta').textContent = 'ใช้ราคาปิดถึง ' + thDate(M.asofData) + (gap > 0 ? ' (สิ้นเดือน ' + thDate(asof) + ' ไม่มีแถว — ใช้แถวสุดท้ายก่อนหน้า)' : '') +
+      ' · หน้าต่าง percentile ' + M.winN + ' วัน (หลัง ' + thDate(M.winStart) + ') · drift ' + (M.drift*100 >= 0 ? '+' : '') + (M.drift*100).toFixed(2) + '%/ปี × 1/12';
+
+    $('kLast').textContent = M.lastClose.toFixed(d);
+    $('kLastL').textContent = 'ปิด ' + thDate(M.asofData) + ' (แถว Yahoo = 07:00 ไทยของวันนั้น)';
+    $('kP').textContent = 'p' + M.curP.toFixed(1);
+    $('kDxy').textContent = M.dxyUsed.toFixed(2);
+    $('kDxyL').textContent = 'DXY แถว ' + thDate(M.dxyRowDate) + (M.dxyRowDate !== M.asofData ? ' (ffill)' : '');
+
+    var f = pair.mode === 'mul'
+      ? '<b>' + pair.label + ' = ' + pair.base + ' ต่อ 1 USD?</b> ไม่ใช่ — ราคาคือ USD ต่อ 1 ' + pair.base + ' (USD เป็นสกุลหลัง) → DXY ขึ้นราคาลง จึงต้อง<b>คูณ</b>: <code>adj = ' + pair.sym + ' × DXY ÷ 100</code><br>แปลงกลับเป็นราคาจริง: <code>level ÷ (' + M.dxyUsed.toFixed(2) + ' ÷ 100)</code> (k = ' + M.k.toFixed(6) + ')'
+      : '<b>' + pair.label + '</b> คือ ' + pair.quote + ' ต่อ 1 USD (USD เป็นสกุลหน้า) → DXY ขึ้นราคาขึ้น จึงต้อง<b>หาร</b>: <code>adj = ' + pair.sym + ' ÷ (DXY ÷ 100)</code><br>แปลงกลับเป็นราคาจริง: <code>level × (' + M.dxyUsed.toFixed(2) + ' ÷ 100)</code> (k = ' + M.k.toFixed(6) + ')';
+    $('formula').innerHTML = f;
+
+    var p40 = lines[BUY_MAX_P / 2.5], p0 = lines[0], p85 = lines[34], p100 = lines[40];
+    var buyDist = pips(pair.sym, M.lastClose - +p40.price), sellDist = pips(pair.sym, +p85.price - M.lastClose);
+    $('zBuy').textContent = p0.price + ' – ' + p40.price + (buyDist >= 0 ? ' · ราคาอยู่เหนือ p' + BUY_MAX_P + ' ' + Math.round(buyDist) + ' pips' : ' · ราคาอยู่ในโซน buy แล้ว');
+    $('zSell').textContent = p85.price + ' – ' + p100.price + (sellDist >= 0 ? ' · ราคาอยู่ใต้ p85 ' + Math.round(sellDist) + ' pips' : ' · ราคาอยู่ในโซน sell แล้ว');
+    var mid = r.mid, inMid = M.lastClose >= mid[0].raw && M.lastClose <= mid[9].raw;
+    $('zMid').textContent = mid[0].price + ' – ' + mid[9].price + (inMid ? ' · ราคาอยู่ในโซนกลาง' : (M.lastClose > mid[9].raw ? ' · ราคาอยู่เหนือ p60 ' + Math.round(pips(pair.sym, M.lastClose - mid[9].raw)) + ' pips' : ' · ราคาอยู่ใต้ p51 ' + Math.round(pips(pair.sym, mid[0].raw - M.lastClose)) + ' pips'));
+    $('zFlush').textContent = r.flushMidSell ? 'ใช่ — ปิด p' + M.curP.toFixed(1) + ' > p' + JPTGrid.FLUSH_P + ' → EA จะล้าง sell โซนกลางที่ค้างตอนโหลด' : 'ไม่ — ปิด p' + M.curP.toFixed(1) + ' ≤ p' + JPTGrid.FLUSH_P + ' → ไม้ sell โซนกลางถือต่อ';
+    $('zFlushBox').className = 'zone flush' + (r.flushMidSell ? ' on' : '');
+
+    // ladder: p100 บนสุด → p0 ล่างสุด · แถบ = ช่องห่างจากชั้นถัดลง เทียบช่องกว้างสุด
+    var maxGap = 0;
+    for (var i = 1; i < 41; i++) maxGap = Math.max(maxGap, lines[i].raw - lines[i-1].raw);
+    var html = '', placed = false;
+    for (var j = 40; j >= 0; j--) {
+      var L = lines[j];
+      if (!placed && M.lastClose >= L.raw) {
+        html += '<div class="marker"><div class="lbl">' + M.lastClose.toFixed(d) + '</div><div class="ln"><span>ราคาล่าสุด p' + M.curP.toFixed(1) + '</span></div></div>';
+        placed = true;
+      }
+      var cls = L.p <= BUY_MAX_P ? 'buy' : (L.p >= 85 ? 'sell' : 'mid');
+      var g = j > 0 ? (L.raw - lines[j-1].raw) / maxGap : 0;
+      var lot = lotFor(L.p);
+      html += '<div class="lrow ' + cls + '"><div class="p">p' + L.p + '</div><div class="px">' + L.price + '</div>' +
+              '<div class="bar"><i style="width:' + Math.max(2, Math.round(g * 100)) + '%"></i>' + (lot ? '<span class="lot">$' + lot + '</span>' : '') + '</div></div>';
+      // โซนกลาง p60 → p51 แทรกใต้ p62.5 (ก่อน p60 ของ main… main ไม่มีไม้ที่ p52.5–60 อยู่แล้ว)
+      if (L.p === 62.5) {
+        for (var mj = mid.length - 1; mj >= 0; mj--) {
+          var ML = mid[mj];
+          if (!placed && M.lastClose >= ML.raw) {
+            html += '<div class="marker"><div class="lbl">' + M.lastClose.toFixed(d) + '</div><div class="ln"><span>ราคาล่าสุด p' + M.curP.toFixed(1) + '</span></div></div>';
+            placed = true;
+          }
+          var mg = mj > 0 ? (ML.raw - mid[mj-1].raw) / maxGap : 0;
+          html += '<div class="lrow ' + (ML.side === 'B' ? 'midb' : 'mids') + '"><div class="p">m' + ML.p + '</div><div class="px">' + ML.price + '</div>' +
+                  '<div class="bar"><i style="width:' + Math.max(2, Math.round(mg * 100)) + '%"></i><span class="lot">' + (ML.side === 'B' ? 'BUY' : 'SELL') + ' $10</span></div></div>';
+        }
+      }
+    }
+    if (!placed) html += '<div class="marker"><div class="lbl">' + M.lastClose.toFixed(d) + '</div><div class="ln"><span>ราคาล่าสุด p' + M.curP.toFixed(1) + '</span></div></div>';
+    $('ladder').innerHTML = html;
+    var minGap = Infinity; for (var q = 1; q < 41; q++) minGap = Math.min(minGap, lines[q].raw - lines[q-1].raw);
+    $('ladderNote').textContent = 'ช่องแคบสุด ' + Math.round(pips(pair.sym, minGap)) + ' pips · กว้างสุด ' + Math.round(pips(pair.sym, maxGap)) + ' pips · TP ของทุกไม้ = ชั้นถัดไป 1 ช่อง (main 2.5p · โซนกลาง 1p) ตามระดับของเดือนที่เปิดอยู่';
+
+    $('fileTitle').textContent = 'grid_' + pair.sym + '.txt';
+    $('mt5path').textContent = 'MQL5\\Files\\grid_' + pair.sym + '.txt';
+    $('out').value = r.text;
+    var eaFile = 'JPT_Grid_' + pair.sym + '.mq5';
+    $('eaTitle').textContent = eaFile + ' · กริดเดือน ' + TH_MONTHS[m-1] + ' ' + y;
+    $('eaSym').textContent = pair.sym;
+    $('eaOut').value = buildEa(pair, r, eaFile);
+
+    // guard: no-lookahead + DXY jitter
+    var unused = data[pair.sym].dates.filter(function (x) { return x > asof; }).length;
+    var dxyAge = daysBetween(M.dxyRowDate, today);
+    var gtxt = '<b>กันมองอนาคต:</b> ทุกตัวเลขมาจากแถว ≤ ' + thDate(asof) + ' เท่านั้น' +
+      (unused ? ' — แถวหลังจากนั้นในไฟล์ ' + unused + ' แถว (ถึง ' + thDate(data[pair.sym].dates[data[pair.sym].dates.length-1]) + ') ไม่ถูกใช้' : '') +
+      ' · ทดสอบแล้ว: ตัดไฟล์ให้จบที่ ' + thDate(asof) + ' หรือเติมแถวปลอมหลังจากนั้น ผลลัพธ์เหมือนเดิมทุกตัวอักษร';
+    if (dxyAge < 2) gtxt += '<br><b>ระวัง DXY:</b> แถว ' + thDate(M.dxyRowDate) + ' อายุ ' + dxyAge + ' วัน — Yahoo revise ค่า DX-Y.NYB ย้อนหลัง 1–2 วัน (±3–10 pips ทั้งแผง) ควรสร้างซ้ำหลัง ' + thDate(addDays(M.dxyRowDate, 2));
+    if (gap > 4) gtxt += '<br><b>ระวัง:</b> แถวสุดท้ายที่ใช้ห่างจากสิ้นเดือน ' + gap + ' วัน — ไฟล์อาจยังไม่ครบเดือน รอ pipeline (00:25 UTC อ.–ส.) แล้วสร้างใหม่';
+    $('guard').innerHTML = gtxt;
+    $('result').className = 'result show';
+    $('result').scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+  // ---- EA source: แม่แบบใน #eaTpl + ฝัง 41 ระดับ (ค่าจาก textarea txt ตัวเดียวกัน → ตรงกันเสมอ)
+  function buildEa(pair, r, eaFile) {
+    var tpl = $('eaTpl').textContent;
+    var rows = [];
+    for (var i = 0; i < r.lines.length; i += 6) {
+      var chunk = r.lines.slice(i, i + 6);
+      rows.push('   ' + chunk.map(function (l) { return l.price; }).join(', ') + (i + 6 < r.lines.length ? ',' : '') +
+                '   // p' + chunk[0].p + ' … p' + chunk[chunk.length - 1].p);
+    }
+    var midRows = ['   ' + r.mid.slice(0, 5).map(function (l) { return l.price; }).join(', ') + ',   // m51 … m55',
+                   '   ' + r.mid.slice(5, 10).map(function (l) { return l.price; }).join(', ') + '    // m56 … m60'];
+    var gen = new Intl.DateTimeFormat('th-TH', { timeZone:'Asia/Bangkok', dateStyle:'medium', timeStyle:'short' }).format(new Date());
+    return tpl.split('__EAFILE__').join(eaFile)
+              .split('__MIDLEVELS__').join(midRows.join('\n'))
+              .split('__FLUSH__').join(r.flushMidSell ? 'true' : 'false')
+              .split('__SYMBOL__').join(pair.sym)
+              .split('__TAG__').join(r.header)
+              .split('__GEN__').join(gen + ' (เวลาไทย)')
+              .split('__LEVELS__').join(rows.join('\n'));
+  }
+  function addDays(iso, n) { var t = Date.UTC(+iso.slice(0,4), +iso.slice(5,7)-1, +iso.slice(8,10)) + n * 86400000; return new Date(t).toISOString().slice(0,10); }
+
+  // ---- copy / download
+  function toast(msg) { var t = $('toast'); t.textContent = msg; t.className = 'toast show'; setTimeout(function () { t.className = 'toast'; }, 1600); }
+  $('copy').addEventListener('click', function () {
+    var txt = $('out').value; if (!txt) return;
+    function fallback() { var ta = $('out'); ta.focus(); ta.select(); ta.setSelectionRange(0, txt.length); try { document.execCommand('copy'); toast('คัดลอกแล้ว'); } catch (e) { toast('คัดลอกไม่สำเร็จ — เลือกข้อความแล้วก็อปเอง'); } }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { toast('คัดลอกแล้ว'); }, fallback);
+    else fallback();
+  });
+  $('eaCopy').addEventListener('click', function () {
+    var txt = $('eaOut').value; if (!txt) return;
+    function fallback() { var ta = $('eaOut'); ta.focus(); ta.select(); ta.setSelectionRange(0, txt.length); try { document.execCommand('copy'); toast('คัดลอกโค้ดแล้ว'); } catch (e) { toast('คัดลอกไม่สำเร็จ — เลือกข้อความแล้วก็อปเอง'); } }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { toast('คัดลอกโค้ดแล้ว'); }, fallback);
+    else fallback();
+  });
+  $('eaDl').addEventListener('click', function () {
+    var txt = $('eaOut').value; if (!txt) return;
+    var name = 'JPT_Grid_' + $('pair').value + '.mq5';
+    var blob = new Blob(['\ufeff' + txt], { type:'text/plain;charset=utf-8' });   // BOM ให้ MetaEditor อ่านไทยใน comment ถูก
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    toast('ดาวน์โหลด ' + name);
+  });
+  $('dl').addEventListener('click', function () {
+    var txt = $('out').value; if (!txt) return;
+    var name = $('fileTitle').textContent || 'grid.txt';
+    var blob = new Blob([txt], { type:'text/plain' });
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    toast('ดาวน์โหลด ' + name);
+  });
+})();
+</script>
+</body>
+</html>
