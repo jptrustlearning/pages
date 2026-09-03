@@ -70,6 +70,9 @@
   .zones { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; }
   .zone { border-radius:12px; padding:10px 12px; font-size:13px; }
   .zone.buy { background:rgba(91,196,142,.10); border:1px solid rgba(91,196,142,.35); }
+  .zone.midz { background:rgba(212,175,55,.08); border:1px solid rgba(212,175,55,.35); } .zone.midz .t { color:var(--gold); }
+  .zone.flush { background:rgba(120,120,140,.10); border:1px solid rgba(160,160,180,.35); } .zone.flush.on { background:rgba(215,122,140,.14); border-color:rgba(215,122,140,.6); } .zone.flush .t { color:#c9c3d0; } .zone.flush.on .t { color:var(--sell); }
+  .lrow.midb .p { color:var(--gold); } .lrow.midb .bar i { background:rgba(91,196,142,.35); } .lrow.mids .p { color:var(--gold); } .lrow.mids .bar i { background:rgba(215,122,140,.35); } .lrow.midb .lot, .lrow.mids .lot { color:var(--gold); }
   .zone.sell { background:rgba(215,122,140,.10); border:1px solid rgba(215,122,140,.35); }
   .zone .t { font-weight:700; } .zone.buy .t { color:var(--buy); } .zone.sell .t { color:var(--sell); }
   .zone .r { color:var(--text); } .zone .n { color:var(--muted); font-size:12px; }
@@ -134,7 +137,7 @@
 <div class="wrap">
   <div class="eyebrow">Percentile Grid</div>
   <h1>ตีกริดรายเดือน</h1>
-  <div class="sub">ระดับ percentile 10 ปี ปรับด้วย DXY · ใช้ข้อมูลถึงสิ้นเดือนก่อนเท่านั้น · ก็อปลง MT5 ได้ทันที</div>
+  <div class="sub">Grid v2 (B20) · main p50/p85 + โซนกลาง p51–60 สลับคี่/คู่ · ระดับ percentile 10 ปี ปรับด้วย DXY · ใช้ข้อมูลถึงสิ้นเดือนก่อนเท่านั้น · ก็อปลง MT5 ได้ทันที</div>
 
   <div class="ctl">
     <div class="f-pair">
@@ -170,6 +173,8 @@
       <div class="zones">
         <div class="zone buy"><div class="t">BUY limit · p50 → p0 (21 ชั้น)</div><div class="r" id="zBuy"></div><div class="n">$10 ที่ p50 · +$5 ทุก 10p ที่ลึกลง · รวม $435 (B19 ขยายจาก p40/$310)</div></div>
         <div class="zone sell"><div class="t">SELL limit · p85 → p100 (7 ชั้น)</div><div class="r" id="zSell"></div><div class="n">$10 ทุกชั้น · รวม $70 · TP −2.5p</div></div>
+        <div class="zone midz"><div class="t">โซนกลาง · p51 → p60 ทุก 1p (10 ชั้น)</div><div class="r" id="zMid"></div><div class="n">คี่ = BUY (51 53 55 57 59) · คู่ = SELL (52 54 56 58 60) · $10 ทุกชั้น · TP ±1p · รวม $100</div></div>
+        <div class="zone flush" id="zFlushBox"><div class="t">ล้าง SELL โซนกลางต้นเดือนนี้?</div><div class="r" id="zFlush"></div><div class="n">กติกา: ราคาปิดสิ้นเดือนก่อน &gt; p70 → EA ปิดไม้ sell โซนกลางที่ค้างทั้งหมดตอนโหลดกริดใหม่ (ไม่แตะ buy / ไม่แตะ sell p85+)</div></div>
       </div>
     </div>
 
@@ -213,8 +218,11 @@
 //|  __TAG__                                                          |
 //|  สร้างเมื่อ __GEN__ · ห้ามแก้ตัวเลขมือ ให้สร้างใหม่จากหน้าเว็บทุกต้นเดือน  |
 //|                                                                  |
-//|  - BUY limit  ที่ p <= BuyMaxP (50)  TP = ระดับ +2.5p             |
-//|  - SELL limit ที่ p >= SellMinP (85) TP = ระดับ -2.5p             |
+//|  - main: BUY limit p <= BuyMaxP (50) TP +2.5p · SELL p >= 85 TP -2.5p |
+//|  - โซนกลาง (B20 rev2): p51..p60 ทุก 1p · คี่ = BUY · คู่ = SELL       |
+//|    ไม้ $ เท่า BaseLot · TP = ชั้นถัดไป 1p ในชุดโซนกลาง                 |
+//|  - ล้าง: ถ้า GRID_FLUSH_MID_SELL = true (close สิ้นเดือนก่อน > p70)      |
+//|    ปิดไม้ SELL โซนกลางที่ค้างทั้งหมดครั้งเดียวตอนโหลดกริดเดือนนี้        |
 //|  - ไม่มี SL · หนึ่งไม้ต่อระดับต่อฝั่ง · TP แล้วตั้งใหม่ทันที        |
 //|  - compile ทับด้วยกริดเดือนใหม่ → ไม้ค้างคง p-index เดิม TP ย้ายตาม   |
 //|    ระดับใหม่, pending ตั้งใหม่หมด (กติกาเดียวกับ backtest B15)      |
@@ -235,6 +243,12 @@ const double GRID_PRICE[NP] =
 {
 __LEVELS__
 };
+#define NM 10                              // โซนกลาง m51, m52, ..., m60 (1p)
+const double MID_PRICE[NM] =
+{
+__MIDLEVELS__
+};
+const bool   GRID_FLUSH_MID_SELL = __FLUSH__;   // จากหน้าเว็บ: close สิ้นเดือนก่อน > p70 ?
 
 //---------------------------------------------------------------- inputs
 input double InpBuyMaxP       = 50.0;      // BUY เมื่อ p <= ค่านี้ (B19: 50 · เดิม 40)
@@ -246,18 +260,24 @@ input long   InpMagic         = 260902;    // magic base (ห้ามชนก�
 input int    InpTimerSec      = 10;        // กระทบยอด ทุกกี่วินาที
 input bool   InpMarketIfCrossed = true;    // ราคาเลยระดับไปแล้ว → เข้า market (ตาม backtest)
 input int    InpSlippagePts   = 30;        // slippage สำหรับ market order (points)
+input bool   InpUseMid        = true;      // เปิดโซนกลาง p51-60 ไหม (B20 rev2)
 
 //---------------------------------------------------------------- globals
 CTrade  trade;
 double  gP[NP];                            // 0, 2.5, ... 100
 double  gPrice[NP];                        // ราคา nominal ของแต่ละ p
+double  gMid[NM];                          // ราคา nominal โซนกลาง m51..m60
 bool    gGridOK = false;
 datetime gGridLoadedAt = 0;
 double  gStopsLevel;                       // ระยะขั้นต่ำของโบรก (price units)
 
 //---------------------------------------------------------------- helpers
-long MagicOf(bool isBuy, int idx) { return InpMagic + (isBuy ? 0 : 50) + idx; }
-bool IsOurMagic(long m) { return (m >= InpMagic && m < InpMagic + 100); }
+long MagicOf(bool isBuy, int idx) { return InpMagic + (isBuy ? 0 : 50) + idx; }          // main
+long MagicMid(bool isBuy, int j)   { return InpMagic + (isBuy ? 100 : 150) + j; }        // โซนกลาง j = 0..9 (m51..m60)
+bool IsOurMagic(long m) { return (m >= InpMagic && m < InpMagic + 200); }
+bool IsMidSellMagic(long m) { return (m >= InpMagic + 150 && m < InpMagic + 160); }
+bool IsMidBuyIdx(int j)  { return (51 + j) % 2 == 1; }                                   // คี่ = BUY
+bool IsMidSellIdx(int j) { return (51 + j) % 2 == 0; }                                   // คู่ = SELL
 bool IsBuyLevel(int i)  { return gP[i] <= InpBuyMaxP + 1e-9; }
 bool IsSellLevel(int i) { return InpUseSell && gP[i] >= InpSellMinP - 1e-9 && i >= 1; }
 
@@ -286,6 +306,10 @@ bool LoadEmbeddedGrid()
    if(gPrice[0] <= 0.0) { Print("[GRID] ระดับ p0 ต้องมากกว่าศูนย์"); return false; }
    for(int i = 1; i < NP; i++)
       if(gPrice[i] < gPrice[i-1]) { PrintFormat("[GRID] ระดับไม่เรียงจากน้อยไปมาก ที่ p%.1f", i * 2.5); return false; }
+   for(int j = 0; j < NM; j++) gMid[j] = MID_PRICE[j];
+   for(int j = 1; j < NM; j++)
+      if(gMid[j] < gMid[j-1]) { PrintFormat("[GRID] โซนกลางไม่เรียง ที่ m%d", 51 + j); return false; }
+   if(gMid[0] < gPrice[20] - _Point || gMid[NM-1] > gPrice[24] + _Point) { Print("[GRID] โซนกลางต้องอยู่ระหว่าง p50 กับ p60 ของ main"); return false; }
    gGridOK = true; gGridLoadedAt = TimeCurrent();
    PrintFormat("[GRID] โหลดกริดฝัง %s | p%.1f=%s ... p%.1f=%s", GRID_TAG,
                InpBuyMaxP, DoubleToString(gPrice[(int)(InpBuyMaxP / 2.5)], _Digits),
@@ -294,9 +318,9 @@ bool LoadEmbeddedGrid()
 }
 
 //---------------------------------------------------------------- broker state
-bool FindPosition(bool isBuy, int idx, ulong &ticket, double &tp)
+bool FindPosition(bool isBuy, int idx, ulong &ticket, double &tp) { return FindPositionM(MagicOf(isBuy, idx), ticket, tp); }
+bool FindPositionM(long m, ulong &ticket, double &tp)
 {
-   long m = MagicOf(isBuy, idx);
    for(int i = PositionsTotal() - 1; i >= 0; i--)
    {
       ulong t = PositionGetTicket(i);
@@ -307,9 +331,9 @@ bool FindPosition(bool isBuy, int idx, ulong &ticket, double &tp)
    }
    return false;
 }
-bool FindPending(bool isBuy, int idx, ulong &ticket, double &price, double &tp)
+bool FindPending(bool isBuy, int idx, ulong &ticket, double &price, double &tp) { return FindPendingM(MagicOf(isBuy, idx), ticket, price, tp); }
+bool FindPendingM(long m, ulong &ticket, double &price, double &tp)
 {
-   long m = MagicOf(isBuy, idx);
    for(int i = OrdersTotal() - 1; i >= 0; i--)
    {
       ulong t = OrderGetTicket(i);
@@ -319,6 +343,24 @@ bool FindPending(bool isBuy, int idx, ulong &ticket, double &price, double &tp)
       ticket = t; price = OrderGetDouble(ORDER_PRICE_OPEN); tp = OrderGetDouble(ORDER_TP); return true;
    }
    return false;
+}
+// ล้าง SELL โซนกลางที่ค้าง — ทำครั้งเดียวต่อกริด (กันโหลด EA ซ้ำกลางเดือนแล้วล้างไม้ที่เพิ่งเปิดใหม่)
+void FlushMidSellsOnce()
+{
+   if(!GRID_FLUSH_MID_SELL || !InpUseMid) return;
+   string key = "JPT_FLUSH_" + _Symbol + "_" + StringSubstr(GRID_TAG, StringFind(GRID_TAG, "asof ") + 5, 10);
+   if(GlobalVariableCheck(key)) { PrintFormat("[GRID] ล้าง mid-sell ของกริดนี้ทำไปแล้ว (%s)", key); return; }
+   int n = 0;
+   for(int i = PositionsTotal() - 1; i >= 0; i--)
+   {
+      ulong t = PositionGetTicket(i);
+      if(t == 0 || PositionGetString(POSITION_SYMBOL) != _Symbol) continue;
+      if(!IsMidSellMagic(PositionGetInteger(POSITION_MAGIC))) continue;
+      if(trade.PositionClose(t, InpSlippagePts)) n++;
+      else PrintFormat("[GRID] ล้าง mid-sell ticket %I64u ล้มเหลว: %d %s", t, trade.ResultRetcode(), trade.ResultRetcodeDescription());
+   }
+   GlobalVariableSet(key, (double)TimeCurrent());
+   PrintFormat("[GRID] ล้าง SELL โซนกลาง %d ไม้ (close สิ้นเดือนก่อน > p70) key=%s", n, key);
 }
 void DeleteAllOurPendings()
 {
@@ -347,6 +389,12 @@ void Reconcile()
       if(IsBuyLevel(i))  ReconcileLevel(true,  i, ask, bid);
       if(IsSellLevel(i)) ReconcileLevel(false, i, ask, bid);
    }
+   if(InpUseMid)
+      for(int j = 0; j < NM; j++)
+      {
+         if(IsMidBuyIdx(j)  && j + 1 < NM) ReconcileAt(true,  MagicMid(true,  j), NP_(gMid[j]), NP_(gMid[j + 1]), NormLot(InpBaseLot), StringFormat("MID B m%d", 51 + j), ask, bid);
+         if(IsMidSellIdx(j) && j - 1 >= 0) ReconcileAt(false, MagicMid(false, j), NP_(gMid[j]), NP_(gMid[j - 1]), NormLot(InpBaseLot), StringFormat("MID S m%d", 51 + j), ask, bid);
+      }
    UpdateComment();
 }
 
@@ -356,13 +404,18 @@ void ReconcileLevel(bool isBuy, int idx, double ask, double bid)
    if(!isBuy && idx - 1 < 0) return;
    double lvl = NP_(gPrice[idx]);
    double tp  = NP_(isBuy ? gPrice[idx + 1] : gPrice[idx - 1]);
+   ReconcileAt(isBuy, MagicOf(isBuy, idx), lvl, tp, LotOf(isBuy, idx), StringFormat("GRID %s p%.1f", isBuy ? "B" : "S", gP[idx]), ask, bid);
+}
+
+// ตัวทำงานจริง (ใช้ทั้ง main และโซนกลาง): หนึ่ง magic = หนึ่งระดับหนึ่งฝั่ง
+void ReconcileAt(bool isBuy, long magic, double lvl, double tp, double lot, string cmt, double ask, double bid)
+{
    if(lvl <= 0 || tp <= 0) return;
-   string cmt = StringFormat("GRID %s p%.1f", isBuy ? "B" : "S", gP[idx]);
-   trade.SetExpertMagicNumber(MagicOf(isBuy, idx));
+   trade.SetExpertMagicNumber(magic);
 
    // 1) มีไม้ค้างที่ระดับนี้ → ดูแล TP ให้ตรงกริดปัจจุบัน
    ulong pt; double ptp;
-   if(FindPosition(isBuy, idx, pt, ptp))
+   if(FindPositionM(magic, pt, ptp))
    {
       // TP ใหม่อยู่ "ผ่านไปแล้ว" → เท่ากับโดน TP ตามกติกา → ปิดที่ market
       if(isBuy  && bid >= tp) { trade.PositionClose(pt, InpSlippagePts); return; }
@@ -377,7 +430,7 @@ void ReconcileLevel(bool isBuy, int idx, double ask, double bid)
 
    // 2) ไม่มีไม้ค้าง → ต้องมี pending 1 ใบที่ระดับนี้ (หรือ market ถ้าราคาเลยไปแล้ว)
    ulong ot; double oprice, otp;
-   bool hasPending = FindPending(isBuy, idx, ot, oprice, otp);
+   bool hasPending = FindPendingM(magic, ot, oprice, otp);
    bool crossed = isBuy ? (ask <= lvl) : (bid >= lvl);
 
    if(crossed)
@@ -387,11 +440,10 @@ void ReconcileLevel(bool isBuy, int idx, double ask, double bid)
       if(!InpMarketIfCrossed) return;
       if(isBuy  && bid >= tp) return;             // ทั้ง entry และ TP ผ่านไปแล้ว → ไม่มีอะไรให้ทำ
       if(!isBuy && ask <= tp) return;
-      double lot = LotOf(isBuy, idx);
       trade.SetDeviationInPoints(InpSlippagePts);
       bool ok = isBuy ? trade.Buy(lot, _Symbol, 0.0, 0.0, tp, cmt)
                       : trade.Sell(lot, _Symbol, 0.0, 0.0, tp, cmt);
-      if(!ok) PrintFormat("[GRID] market %s p%.1f ล้มเหลว: %d %s", isBuy ? "BUY" : "SELL", gP[idx],
+      if(!ok) PrintFormat("[GRID] market %s ล้มเหลว: %d %s", cmt,
                           trade.ResultRetcode(), trade.ResultRetcodeDescription());
       return;
    }
@@ -405,10 +457,9 @@ void ReconcileLevel(bool isBuy, int idx, double ask, double bid)
       if(MathAbs(oprice - lvl) <= _Point / 2 && MathAbs(otp - tp) <= _Point / 2) return; // ตรงแล้ว
       trade.OrderDelete(ot);                     // ราคา/TP เปลี่ยน → ตั้งใหม่
    }
-   double lot = LotOf(isBuy, idx);
    bool ok = isBuy ? trade.BuyLimit (lot, lvl, _Symbol, 0.0, tp, ORDER_TIME_GTC, 0, cmt)
                    : trade.SellLimit(lot, lvl, _Symbol, 0.0, tp, ORDER_TIME_GTC, 0, cmt);
-   if(!ok) PrintFormat("[GRID] pending %s p%.1f @%s ล้มเหลว: %d %s", isBuy ? "BUY" : "SELL", gP[idx],
+   if(!ok) PrintFormat("[GRID] pending %s @%s ล้มเหลว: %d %s", cmt,
                        DoubleToString(lvl, _Digits), trade.ResultRetcode(), trade.ResultRetcodeDescription());
 }
 
@@ -430,9 +481,11 @@ void UpdateComment()
       if(IsOurMagic(OrderGetInteger(ORDER_MAGIC))) nOrd++;
    }
    int bi = (int)(InpBuyMaxP / 2.5), si = (int)(InpSellMinP / 2.5);
-   Comment(StringFormat("JPT Percentile Grid  %s\n%s\nโหลดเมื่อ %s\nBUY  <= p%.0f @ %s   SELL >= p%.0f @ %s\nไม้ค้าง %d  pending %d  ลอยตัว %.2f",
+   Comment(StringFormat("JPT Percentile Grid v2  %s\n%s\nโหลดเมื่อ %s\nBUY  <= p%.0f @ %s   SELL >= p%.0f @ %s\nMID m51-m60 %s–%s (คี่ BUY · คู่ SELL) %s\nไม้ค้าง %d  pending %d  ลอยตัว %.2f",
            _Symbol, GRID_TAG, TimeToString(gGridLoadedAt, TIME_DATE | TIME_MINUTES),
            InpBuyMaxP, DoubleToString(gPrice[bi], _Digits), InpSellMinP, DoubleToString(gPrice[si], _Digits),
+           InpUseMid ? DoubleToString(gMid[0], _Digits) : "off", InpUseMid ? DoubleToString(gMid[NM-1], _Digits) : "off",
+           GRID_FLUSH_MID_SELL ? "· ล้าง mid-sell เดือนนี้" : "",
            nPos, nOrd, fl));
 }
 
@@ -456,6 +509,7 @@ int OnInit()
    // กริดใหม่ (compile ทับทุกต้นเดือน) → ลบ pending เก่าของเราทั้งหมดแล้วตั้งใหม่ตามระดับใหม่
    // ไม้ค้างไม่ถูกแตะ — Reconcile จะย้าย TP ให้ตรงระดับใหม่เอง
    DeleteAllOurPendings();
+   FlushMidSellsOnce();        // B20: ก่อน Reconcile — ไม่งั้น Reconcile จะไปดูแล TP ให้ไม้ที่ต้องล้าง
    Reconcile();
    EventSetTimer(MathMax(1, InpTimerSec));
    return INIT_SUCCEEDED;
@@ -483,6 +537,8 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
   'use strict';
 
   var P = []; for (var i = 0; i < 41; i++) P.push(i * 2.5);
+  var MIDP = []; for (var j = 51; j <= 60; j++) MIDP.push(j);      // โซนกลาง 1p (B20 rev2)
+  var FLUSH_P = 70;                                                 // ล้าง mid-sell เมื่อ close สิ้นเดือน > p70
 
   // ---- CSV: Ticker,Date,Open,High,Low,Close,Volume -> {TICKER: {dates:[], close:[]}} เรียงวันที่
   function parseFxCsv(text) {
@@ -591,8 +647,11 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
     var winStart = addYears(asof, years);
     var win = [];
     for (var w = 0; w < pd.length; w++) if (pd[w] > winStart) win.push(adj[w]);
+    // guard: หน้าต่างต้องครบ 10 ปี (แถวแรกของข้อมูลต้องมาก่อน winStart) — AUD ก่อน มิ.ย. 2016 จะถูกบล็อก
+    if (pd[0] > winStart) throw new Error('ข้อมูล ' + opt.symbol + ' เริ่ม ' + pd[0] + ' — หน้าต่าง 10 ปีถึง ' + asof + ' ยังไม่ครบ (ต้องมีข้อมูลก่อน ' + winStart + ')');
     var sorted = win.slice().sort(function (x, y) { return x - y; });
     var lv = P.map(function (p) { return npPercentile(sorted, p); });
+    var lvMid = MIDP.map(function (p) { return npPercentile(sorted, p); });   // โซนกลาง p51..p60 จากหน้าต่างเดียวกัน (≤ asof)
 
     // drift: month-end last ของ adj (ทั้งช่วง <= asof) → ล่าสุด years*12+12 เดือน → YoY log → mean
     var meKeys = [], meVals = {};
@@ -608,6 +667,7 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
     var g = yoy.length ? yoy.reduce(function (s, v) { return s + v; }, 0) / yoy.length : 0.0;
     var mult = Math.exp(g * driftH);
     var nom = lv.map(function (v) { return (v * mult) * k; });
+    var nomMid = lvMid.map(function (v) { return (v * mult) * k; });
 
     var digits = opt.digits != null ? opt.digits : (nom[20] > 20 ? 2 : 5);
     var adjLast = adj[adj.length - 1];
@@ -618,10 +678,15 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
       ' | dxy ' + fmt(dxLast, 2) + ' | last ' + fmt(pc[pc.length - 1], digits) + ' = p' + fmt(curP, 1) +
       ' | drift ' + fmtSigned(g * 100, 2) + '%/y';
     var lines = P.map(function (p, idx) { return { p: p, price: fmt(nom[idx], digits), raw: nom[idx] }; });
-    var text = header + '\n' + lines.map(function (l) { return (l.p % 1 === 0 ? l.p : l.p) + ',' + l.price; }).join('\n') + '\n';
+    // โซนกลาง: คี่ = BUY · คู่ = SELL · TP = ชั้นถัดไป 1p ในชุดเดียวกัน · ล้าง sell เมื่อ close สิ้นเดือน > p70 (B20 rev2)
+    var mid = MIDP.map(function (p, idx) { return { p: p, price: fmt(nomMid[idx], digits), raw: nomMid[idx], side: (p % 2 === 1) ? 'B' : 'S' }; });
+    var flushMidSell = curP > FLUSH_P;
+    var text = header + '\n' + lines.map(function (l) { return (l.p % 1 === 0 ? l.p : l.p) + ',' + l.price; }).join('\n') + '\n' +
+      '# mid p51-60 step 1p | odd=BUY even=SELL | flush_mid_sell=' + (flushMidSell ? 'true' : 'false') + ' (close p' + fmt(curP, 1) + (flushMidSell ? ' >' : ' <=') + ' p' + FLUSH_P + ')\n' +
+      mid.map(function (l) { return 'm' + l.p + ',' + l.price + ',' + l.side; }).join('\n') + '\n';
 
     return {
-      header: header, lines: lines, text: text,
+      header: header, lines: lines, mid: mid, flushMidSell: flushMidSell, text: text,
       meta: {
         symbol: opt.symbol, mode: opt.mode, asofRequested: asof, asofData: pd[pd.length - 1],
         dxyUsed: dxLast, dxyRowDate: lastDxyRowOnOrBefore(opt.dxy.dates, pd[pd.length - 1]),
@@ -643,7 +708,7 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
     return d.toISOString().slice(0, 10);
   }
 
-  var api = { P: P, parseFxCsv: parseFxCsv, npPercentile: npPercentile, buildGrid: buildGrid, prevMonthEnd: prevMonthEnd, addYears: addYears };
+  var api = { P: P, MIDP: MIDP, FLUSH_P: FLUSH_P, parseFxCsv: parseFxCsv, npPercentile: npPercentile, buildGrid: buildGrid, prevMonthEnd: prevMonthEnd, addYears: addYears };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.JPTGrid = api;
 })(typeof window !== 'undefined' ? window : globalThis);
@@ -655,9 +720,9 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
   // ×DXY = USD เป็นสกุลหลัง (USD-quote) · ÷DXY = USD เป็นสกุลหน้า (USD-base) — ห้ามสลับ (B15)
   var PAIRS = [
     { sym:'EURUSD', label:'EUR/USD', mode:'mul', on:true,  base:'EUR', quote:'USD' },
-    { sym:'GBPUSD', label:'GBP/USD', mode:'mul', on:false, base:'GBP', quote:'USD' },
-    { sym:'AUDUSD', label:'AUD/USD', mode:'mul', on:false, base:'AUD', quote:'USD' },
-    { sym:'USDCAD', label:'USD/CAD', mode:'div', on:false, base:'USD', quote:'CAD' }
+    { sym:'GBPUSD', label:'GBP/USD', mode:'mul', on:true,  base:'GBP', quote:'USD' },
+    { sym:'AUDUSD', label:'AUD/USD', mode:'mul', on:true,  base:'AUD', quote:'USD' },   // ข้อมูล 2006-05 → ladder 10 ปีครบ มิ.ย. 2016
+    { sym:'USDCAD', label:'USD/CAD', mode:'div', on:true,  base:'USD', quote:'CAD' }    // USD-base → ÷DXY
   ];
   var TH_MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
   var FIRST_YEAR = 2014;                 // หน้าต่าง 10 ปีเต็ม (EURUSD/GBPUSD/USDCAD เริ่ม 2003)
@@ -765,6 +830,10 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
     var buyDist = pips(pair.sym, M.lastClose - +p40.price), sellDist = pips(pair.sym, +p85.price - M.lastClose);
     $('zBuy').textContent = p0.price + ' – ' + p40.price + (buyDist >= 0 ? ' · ราคาอยู่เหนือ p' + BUY_MAX_P + ' ' + Math.round(buyDist) + ' pips' : ' · ราคาอยู่ในโซน buy แล้ว');
     $('zSell').textContent = p85.price + ' – ' + p100.price + (sellDist >= 0 ? ' · ราคาอยู่ใต้ p85 ' + Math.round(sellDist) + ' pips' : ' · ราคาอยู่ในโซน sell แล้ว');
+    var mid = r.mid, inMid = M.lastClose >= mid[0].raw && M.lastClose <= mid[9].raw;
+    $('zMid').textContent = mid[0].price + ' – ' + mid[9].price + (inMid ? ' · ราคาอยู่ในโซนกลาง' : (M.lastClose > mid[9].raw ? ' · ราคาอยู่เหนือ p60 ' + Math.round(pips(pair.sym, M.lastClose - mid[9].raw)) + ' pips' : ' · ราคาอยู่ใต้ p51 ' + Math.round(pips(pair.sym, mid[0].raw - M.lastClose)) + ' pips'));
+    $('zFlush').textContent = r.flushMidSell ? 'ใช่ — ปิด p' + M.curP.toFixed(1) + ' > p' + JPTGrid.FLUSH_P + ' → EA จะล้าง sell โซนกลางที่ค้างตอนโหลด' : 'ไม่ — ปิด p' + M.curP.toFixed(1) + ' ≤ p' + JPTGrid.FLUSH_P + ' → ไม้ sell โซนกลางถือต่อ';
+    $('zFlushBox').className = 'zone flush' + (r.flushMidSell ? ' on' : '');
 
     // ladder: p100 บนสุด → p0 ล่างสุด · แถบ = ช่องห่างจากชั้นถัดลง เทียบช่องกว้างสุด
     var maxGap = 0;
@@ -781,11 +850,24 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
       var lot = lotFor(L.p);
       html += '<div class="lrow ' + cls + '"><div class="p">p' + L.p + '</div><div class="px">' + L.price + '</div>' +
               '<div class="bar"><i style="width:' + Math.max(2, Math.round(g * 100)) + '%"></i>' + (lot ? '<span class="lot">$' + lot + '</span>' : '') + '</div></div>';
+      // โซนกลาง p60 → p51 แทรกใต้ p62.5 (ก่อน p60 ของ main… main ไม่มีไม้ที่ p52.5–60 อยู่แล้ว)
+      if (L.p === 62.5) {
+        for (var mj = mid.length - 1; mj >= 0; mj--) {
+          var ML = mid[mj];
+          if (!placed && M.lastClose >= ML.raw) {
+            html += '<div class="marker"><div class="lbl">' + M.lastClose.toFixed(d) + '</div><div class="ln"><span>ราคาล่าสุด p' + M.curP.toFixed(1) + '</span></div></div>';
+            placed = true;
+          }
+          var mg = mj > 0 ? (ML.raw - mid[mj-1].raw) / maxGap : 0;
+          html += '<div class="lrow ' + (ML.side === 'B' ? 'midb' : 'mids') + '"><div class="p">m' + ML.p + '</div><div class="px">' + ML.price + '</div>' +
+                  '<div class="bar"><i style="width:' + Math.max(2, Math.round(mg * 100)) + '%"></i><span class="lot">' + (ML.side === 'B' ? 'BUY' : 'SELL') + ' $10</span></div></div>';
+        }
+      }
     }
     if (!placed) html += '<div class="marker"><div class="lbl">' + M.lastClose.toFixed(d) + '</div><div class="ln"><span>ราคาล่าสุด p' + M.curP.toFixed(1) + '</span></div></div>';
     $('ladder').innerHTML = html;
     var minGap = Infinity; for (var q = 1; q < 41; q++) minGap = Math.min(minGap, lines[q].raw - lines[q-1].raw);
-    $('ladderNote').textContent = 'ช่องแคบสุด ' + Math.round(pips(pair.sym, minGap)) + ' pips · กว้างสุด ' + Math.round(pips(pair.sym, maxGap)) + ' pips · TP ของทุกไม้ = ชั้นถัดไป 1 ช่อง (2.5p) ตามระดับของเดือนที่เปิดอยู่';
+    $('ladderNote').textContent = 'ช่องแคบสุด ' + Math.round(pips(pair.sym, minGap)) + ' pips · กว้างสุด ' + Math.round(pips(pair.sym, maxGap)) + ' pips · TP ของทุกไม้ = ชั้นถัดไป 1 ช่อง (main 2.5p · โซนกลาง 1p) ตามระดับของเดือนที่เปิดอยู่';
 
     $('fileTitle').textContent = 'grid_' + pair.sym + '.txt';
     $('mt5path').textContent = 'MQL5\\Files\\grid_' + pair.sym + '.txt';
@@ -816,8 +898,12 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
       rows.push('   ' + chunk.map(function (l) { return l.price; }).join(', ') + (i + 6 < r.lines.length ? ',' : '') +
                 '   // p' + chunk[0].p + ' … p' + chunk[chunk.length - 1].p);
     }
+    var midRows = ['   ' + r.mid.slice(0, 5).map(function (l) { return l.price; }).join(', ') + ',   // m51 … m55',
+                   '   ' + r.mid.slice(5, 10).map(function (l) { return l.price; }).join(', ') + '    // m56 … m60'];
     var gen = new Intl.DateTimeFormat('th-TH', { timeZone:'Asia/Bangkok', dateStyle:'medium', timeStyle:'short' }).format(new Date());
     return tpl.split('__EAFILE__').join(eaFile)
+              .split('__MIDLEVELS__').join(midRows.join('\n'))
+              .split('__FLUSH__').join(r.flushMidSell ? 'true' : 'false')
               .split('__SYMBOL__').join(pair.sym)
               .split('__TAG__').join(r.header)
               .split('__GEN__').join(gen + ' (เวลาไทย)')
