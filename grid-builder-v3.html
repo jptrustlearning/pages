@@ -879,7 +879,9 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
     { sym:'AUDUSD', label:'AUD/USD', mode:'mul', on:true,  base:'AUD', quote:'USD' },   // ข้อมูล 2006-05 → ladder 10 ปีครบ มิ.ย. 2016
     { sym:'USDCAD', label:'USD/CAD', mode:'div', on:true,  base:'USD', quote:'CAD' },   // USD-base → ÷DXY
     // WTI: ราคา USD ต่อบาร์เรล (USD เป็นสกุลหลัง) → ×DXY เหมือน EUR · floor $5 (CFD ไม่ติดลบ · B15) · ข้อมูล CL=F 1995→ (ladder ครบ 2005)
-    { sym:'WTI', label:'WTI น้ำมันดิบ', mode:'mul', on:true, base:'WTI', quote:'USD', floor:5, src:'comm', alts:'WTI|USOIL|XTIUSD|CL|OIL', comm:true }
+    { sym:'WTI', label:'WTI น้ำมันดิบ', mode:'mul', on:true, base:'WTI', quote:'USD', floor:5, src:'comm', alts:'WTI|USOIL|XTIUSD|CL|OIL', comm:true },
+    // GOLD (B21.4 · Joon ขอมีให้เลือก): USD ต่อออนซ์ → ×DXY เหมือน EUR · ⚠️ backtest ทุกแบบติดลบ/แพ้ถือเฉยๆ (§5.10–5.11) · เดโม่เท่านั้น
+    { sym:'GOLD', label:'ทอง XAU/USD (⚠️ backtest ติดลบ)', mode:'mul', on:true, base:'XAU', quote:'USD', src:'comm', alts:'XAUUSD|GOLD|XAU', comm:true }
   ];
   var TH_MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
   var FIRST_YEAR = 2014;                 // หน้าต่าง 10 ปีเต็ม (EURUSD/GBPUSD/USDCAD เริ่ม 2003)
@@ -893,8 +895,8 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
   }
   function daysBetween(a, b) { return Math.round((Date.UTC(+b.slice(0,4), +b.slice(5,7)-1, +b.slice(8,10)) - Date.UTC(+a.slice(0,4), +a.slice(5,7)-1, +a.slice(8,10))) / 86400000); }
   function thDate(iso) { return (+iso.slice(8,10)) + ' ' + TH_MONTHS[+iso.slice(5,7)-1] + ' ' + iso.slice(0,4); }
-  function pips(sym, d) { return (sym === 'USDJPY' || sym === 'WTI') ? d * 100 : d * 10000; }   // WTI: 1 จุด = $0.01
-  function unit(sym) { return sym === 'WTI' ? ' เซนต์' : ' pips'; }
+  function pips(sym, d) { return (sym === 'USDJPY' || sym === 'WTI' || sym === 'GOLD') ? d * 100 : d * 10000; }   // WTI/GOLD: 1 จุด = $0.01
+  function unit(sym) { return (sym === 'WTI' || sym === 'GOLD') ? ' เซนต์' : ' pips'; }
 
   // ---- controls
   (function initControls() {
@@ -993,7 +995,9 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
     $('kDxy').textContent = M.dxyUsed.toFixed(2);
     $('kDxyL').textContent = 'DXY แถว ' + thDate(M.dxyRowDate) + (M.dxyRowDate !== M.asofData ? ' (ffill)' : '');
 
-    var f = pair.comm
+    var f = pair.sym === 'GOLD'
+      ? '<b>ทอง</b> คือ USD ต่อ 1 ออนซ์ (USD เป็นสกุลหลัง เหมือน EUR/USD) → <b>คูณ</b>: <code>adj = XAU × DXY ÷ 100</code> · แปลงกลับ: <code>level ÷ (' + M.dxyUsed.toFixed(2) + ' ÷ 100)</code> (k = ' + M.k.toFixed(6) + ')<br>⚠️ ทอง 2005→26 ขึ้น 10 เท่า อยู่ p85+ เกือบตลอด — กริดทุกแบบ (main / mid / ปรับตัว / buy-only) ติดลบหรือแพ้ถือเฉยๆ (§5.10–5.11) · ใช้เดโม่ดูพฤติกรรมเท่านั้น · ใน EA 1 pip = $0.01 → กริดจุดควรตั้ง step 10–50 ไม่ใช่ 1'
+      : pair.comm
       ? '<b>' + pair.label + '</b> คือ USD ต่อ 1 บาร์เรล (USD เป็นสกุลหลัง เหมือน EUR/USD) → DXY ขึ้นราคาลง จึงต้อง<b>คูณ</b>: <code>adj = WTI × DXY ÷ 100</code> · floor $5 (CFD ไม่ติดลบ — เม.ย. 2020 ราคาจริงติดลบ)<br>แปลงกลับ: <code>level ÷ (' + M.dxyUsed.toFixed(2) + ' ÷ 100)</code> (k = ' + M.k.toFixed(6) + ') · แหล่ง CL=F (สัญญาหน้า Yahoo) — CFD โบรกต่างจากนี้ได้ตอน roll'
       : pair.mode === 'mul'
       ? '<b>' + pair.label + ' = ' + pair.base + ' ต่อ 1 USD?</b> ไม่ใช่ — ราคาคือ USD ต่อ 1 ' + pair.base + ' (USD เป็นสกุลหลัง) → DXY ขึ้นราคาลง จึงต้อง<b>คูณ</b>: <code>adj = ' + pair.sym + ' × DXY ÷ 100</code><br>แปลงกลับเป็นราคาจริง: <code>level ÷ (' + M.dxyUsed.toFixed(2) + ' ÷ 100)</code> (k = ' + M.k.toFixed(6) + ')'
