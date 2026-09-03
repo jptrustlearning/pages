@@ -554,8 +554,8 @@ void UpdateComment()
       if(IsOurMagic(OrderGetInteger(ORDER_MAGIC))) nOrd++;
    }
    int bi = (int)(InpBuyMaxP / 2.5), si = (int)(InpSellMinP / 2.5);
-   Comment(StringFormat("JPT Percentile Grid v3 (pending only)  %s\n%s\nโหลดเมื่อ %s\nBUY  <= p%.0f @ %s   SELL >= p%.0f @ %s\nMID m51-m60 %s–%s (คี่ BUY · คู่ SELL) %s%s\nไม้ค้าง %d  pending %d  ลอยตัว %.2f",
-           _Symbol, GRID_TAG, TimeToString(gGridLoadedAt, TIME_DATE | TIME_MINUTES),
+   Comment(StringFormat("JPT Percentile Grid v3 (pending only)  %s%s\n%s\nโหลดเมื่อ %s\nBUY  <= p%.0f @ %s   SELL >= p%.0f @ %s\nMID m51-m60 %s–%s (คี่ BUY · คู่ SELL) %s%s\nไม้ค้าง %d  pending %d  ลอยตัว %.2f",
+           _Symbol, gPaused ? "   ⏸ PAUSED — ไม่ตั้ง pending ใหม่ (กด RESUME)" : "", GRID_TAG, TimeToString(gGridLoadedAt, TIME_DATE | TIME_MINUTES),
            InpBuyMaxP, DoubleToString(gPrice[bi], _Digits), InpSellMinP, DoubleToString(gPrice[si], _Digits),
            InpUseMid ? DoubleToString(gMid[0], _Digits) : "off", InpUseMid ? DoubleToString(gMid[NM-1], _Digits) : "off",
            GRID_FLUSH_MID_SELL ? "· ล้าง mid-sell เดือนนี้" : "",
@@ -585,13 +585,66 @@ int OnInit()
    DeleteAllOurPendings();
    FlushMidSellsOnce();        // B20: ก่อน Reconcile — ไม่งั้น Reconcile จะไปดูแล TP ให้ไม้ที่ต้องล้าง
    FlushAdaptSellsOnce();
+   DrawButtons();
    Reconcile();
    EventSetTimer(MathMax(1, InpTimerSec));
    return INIT_SUCCEEDED;
 }
-void OnDeinit(const int reason) { EventKillTimer(); Comment(""); }
+void OnDeinit(const int reason) { EventKillTimer(); Comment(""); ObjectDelete(0, BTN_CLEAR); ObjectDelete(0, BTN_PAUSE); }
 
-void OnTimer() { Reconcile(); }
+void OnTimer() { if(gArmedUntil > 0 && TimeCurrent() > gArmedUntil) { gArmedUntil = 0; DrawButtons(); } if(!gPaused) Reconcile(); else UpdateComment(); }
+
+//---------------------------------------------------------------- ปุ่มบนกราฟ (B21.3)
+#define BTN_CLEAR "JPT_BTN_CLEAR_ALL"
+#define BTN_PAUSE "JPT_BTN_PAUSE"
+bool     gPaused     = false;      // หยุดตั้ง pending ใหม่ (ไม้ค้างยังดูแล TP ผ่าน Reconcile ไม่ได้ → หยุดทั้งหมด)
+datetime gArmedUntil = 0;          // กด CLEAR ครั้งแรก = arm 8 วินาที · กดอีกครั้ง = ทำจริง
+
+void DrawButtons()
+{
+   if(ObjectFind(0, BTN_CLEAR) < 0) { ObjectCreate(0, BTN_CLEAR, OBJ_BUTTON, 0, 0, 0); ObjectSetInteger(0, BTN_CLEAR, OBJPROP_CORNER, CORNER_RIGHT_UPPER); ObjectSetInteger(0, BTN_CLEAR, OBJPROP_XDISTANCE, 170); ObjectSetInteger(0, BTN_CLEAR, OBJPROP_YDISTANCE, 30); ObjectSetInteger(0, BTN_CLEAR, OBJPROP_XSIZE, 160); ObjectSetInteger(0, BTN_CLEAR, OBJPROP_YSIZE, 28); ObjectSetInteger(0, BTN_CLEAR, OBJPROP_FONTSIZE, 9); }
+   if(ObjectFind(0, BTN_PAUSE) < 0) { ObjectCreate(0, BTN_PAUSE, OBJ_BUTTON, 0, 0, 0); ObjectSetInteger(0, BTN_PAUSE, OBJPROP_CORNER, CORNER_RIGHT_UPPER); ObjectSetInteger(0, BTN_PAUSE, OBJPROP_XDISTANCE, 170); ObjectSetInteger(0, BTN_PAUSE, OBJPROP_YDISTANCE, 62); ObjectSetInteger(0, BTN_PAUSE, OBJPROP_XSIZE, 160); ObjectSetInteger(0, BTN_PAUSE, OBJPROP_YSIZE, 28); ObjectSetInteger(0, BTN_PAUSE, OBJPROP_FONTSIZE, 9); }
+   bool armed = (gArmedUntil > 0);
+   ObjectSetString (0, BTN_CLEAR, OBJPROP_TEXT, armed ? "กดอีกครั้งเพื่อยืนยัน!" : "CLEAR ALL (ไม้ + pending)");
+   ObjectSetInteger(0, BTN_CLEAR, OBJPROP_BGCOLOR, armed ? clrRed : clrFireBrick);
+   ObjectSetInteger(0, BTN_CLEAR, OBJPROP_COLOR, clrWhite);
+   ObjectSetInteger(0, BTN_CLEAR, OBJPROP_STATE, false);
+   ObjectSetString (0, BTN_PAUSE, OBJPROP_TEXT, gPaused ? "RESUME (กลับมาตั้งกริด)" : "PAUSE (หยุดตั้ง pending)");
+   ObjectSetInteger(0, BTN_PAUSE, OBJPROP_BGCOLOR, gPaused ? clrDarkOrange : clrDimGray);
+   ObjectSetInteger(0, BTN_PAUSE, OBJPROP_COLOR, clrWhite);
+   ObjectSetInteger(0, BTN_PAUSE, OBJPROP_STATE, false);
+   ChartRedraw();
+}
+
+// ปิดไม้ทั้งหมด + ลบ pending ทั้งหมด ของ EA นี้ (magic ของเรา · symbol นี้) แล้ว PAUSE ไว้ กัน Reconcile ตั้งกลับทันที
+void ClearAll()
+{
+   int nPos = 0, nOrd = 0;
+   for(int i = PositionsTotal() - 1; i >= 0; i--)
+   {
+      ulong t = PositionGetTicket(i);
+      if(t == 0 || PositionGetString(POSITION_SYMBOL) != _Symbol) continue;
+      if(!IsOurMagic(PositionGetInteger(POSITION_MAGIC))) continue;
+      if(trade.PositionClose(t, InpSlippagePts)) nPos++;
+      else PrintFormat("[GRID] CLEAR: ปิด position %I64u ไม่ได้: %d %s", t, trade.ResultRetcode(), trade.ResultRetcodeDescription());
+   }
+   DeleteAllOurPendings();
+   for(int i = OrdersTotal() - 1; i >= 0; i--) { ulong t = OrderGetTicket(i); if(t != 0 && OrderGetString(ORDER_SYMBOL) == _Symbol && IsOurMagic(OrderGetInteger(ORDER_MAGIC))) nOrd++; }
+   gPaused = true;
+   PrintFormat("[GRID] CLEAR ALL: ปิด %d ไม้ · ลบ pending แล้ว (เหลือ %d) · EA PAUSE — กด RESUME เมื่อต้องการให้ตั้งกริดใหม่", nPos, nOrd);
+   UpdateComment();
+}
+
+void OnChartEvent(const int id, const long &lparam, const double &dparam, const string &sparam)
+{
+   if(id != CHARTEVENT_OBJECT_CLICK) return;
+   if(sparam == BTN_CLEAR)
+   {
+      if(gArmedUntil == 0) { gArmedUntil = TimeCurrent() + 8; DrawButtons(); return; }   // ครั้งแรก = arm
+      gArmedUntil = 0; ClearAll(); DrawButtons();                                          // ครั้งที่สองใน 8 วิ = ทำจริง
+   }
+   else if(sparam == BTN_PAUSE) { gPaused = !gPaused; DrawButtons(); if(!gPaused) Reconcile(); else UpdateComment(); }
+}
 
 void OnTick()  { /* ทำงานผ่าน timer + trade transaction พอ */ }
 
