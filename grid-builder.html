@@ -239,6 +239,7 @@
 #define NP 41                              // p0, p2.5, ..., p100
 const string GRID_SYMBOL = "__SYMBOL__";
 const string GRID_TAG    = "__TAG__";
+const string GRID_SYMBOL_ALTS = "__SYMALTS__";   // ชื่อ symbol ที่โบรกอาจใช้ คั่นด้วย | (WTI: USOIL/XTIUSD/CL/OIL)
 const double GRID_PRICE[NP] =
 {
 __LEVELS__
@@ -298,6 +299,13 @@ double LotOf(bool isBuy, int idx)
    return NormLot(InpBaseLot + InpLotStep10p * deep);
 }
 double NP_(double p) { return NormalizeDouble(p, _Digits); }
+bool SymbolMatches()
+{
+   string s = _Symbol; StringToUpper(s);
+   string alts[]; int n = StringSplit(GRID_SYMBOL_ALTS, '|', alts);
+   for(int i = 0; i < n; i++) { string a = alts[i]; StringToUpper(a); if(StringLen(a) > 0 && StringFind(s, a) >= 0) return true; }
+   return false;
+}
 
 //---------------------------------------------------------------- grid (embedded)
 bool LoadEmbeddedGrid()
@@ -492,9 +500,9 @@ void UpdateComment()
 //---------------------------------------------------------------- events
 int OnInit()
 {
-   if(StringFind(_Symbol, GRID_SYMBOL) < 0)
+   if(!SymbolMatches())
    {
-      PrintFormat("[GRID] EA นี้ฝังกริดของ %s แต่ถูกแปะบนกราฟ %s — ยกเลิก", GRID_SYMBOL, _Symbol);
+      PrintFormat("[GRID] EA นี้ฝังกริดของ %s (ชื่อที่ยอมรับ: %s) แต่ถูกแปะบนกราฟ %s — ยกเลิก", GRID_SYMBOL, GRID_SYMBOL_ALTS, _Symbol);
       return INIT_FAILED;
    }
    if((ENUM_ACCOUNT_MARGIN_MODE)AccountInfoInteger(ACCOUNT_MARGIN_MODE) != ACCOUNT_MARGIN_MODE_RETAIL_HEDGING)
@@ -717,12 +725,15 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
 (function () {
   'use strict';
   var DATA_URL = 'https://app.jptrustlearning.com/data/input_fx_daily.csv';
+  var COMM_URL = 'https://app.jptrustlearning.com/data/input_commodities_daily.csv';   // WTI (CL=F) · B20.2
   // ×DXY = USD เป็นสกุลหลัง (USD-quote) · ÷DXY = USD เป็นสกุลหน้า (USD-base) — ห้ามสลับ (B15)
   var PAIRS = [
     { sym:'EURUSD', label:'EUR/USD', mode:'mul', on:true,  base:'EUR', quote:'USD' },
     { sym:'GBPUSD', label:'GBP/USD', mode:'mul', on:true,  base:'GBP', quote:'USD' },
     { sym:'AUDUSD', label:'AUD/USD', mode:'mul', on:true,  base:'AUD', quote:'USD' },   // ข้อมูล 2006-05 → ladder 10 ปีครบ มิ.ย. 2016
-    { sym:'USDCAD', label:'USD/CAD', mode:'div', on:true,  base:'USD', quote:'CAD' }    // USD-base → ÷DXY
+    { sym:'USDCAD', label:'USD/CAD', mode:'div', on:true,  base:'USD', quote:'CAD' },   // USD-base → ÷DXY
+    // WTI: ราคา USD ต่อบาร์เรล (USD เป็นสกุลหลัง) → ×DXY เหมือน EUR · floor $5 (CFD ไม่ติดลบ · B15) · ข้อมูล CL=F 1995→ (ladder ครบ 2005)
+    { sym:'WTI', label:'WTI น้ำมันดิบ', mode:'mul', on:true, base:'WTI', quote:'USD', floor:5, src:'comm', alts:'WTI|USOIL|XTIUSD|CL|OIL', comm:true }
   ];
   var TH_MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
   var FIRST_YEAR = 2014;                 // หน้าต่าง 10 ปีเต็ม (EURUSD/GBPUSD/USDCAD เริ่ม 2003)
@@ -736,7 +747,8 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
   }
   function daysBetween(a, b) { return Math.round((Date.UTC(+b.slice(0,4), +b.slice(5,7)-1, +b.slice(8,10)) - Date.UTC(+a.slice(0,4), +a.slice(5,7)-1, +a.slice(8,10))) / 86400000); }
   function thDate(iso) { return (+iso.slice(8,10)) + ' ' + TH_MONTHS[+iso.slice(5,7)-1] + ' ' + iso.slice(0,4); }
-  function pips(sym, d) { return sym === 'USDJPY' ? d * 100 : d * 10000; }
+  function pips(sym, d) { return (sym === 'USDJPY' || sym === 'WTI') ? d * 100 : d * 10000; }   // WTI: 1 จุด = $0.01
+  function unit(sym) { return sym === 'WTI' ? ' เซนต์' : ' pips'; }
 
   // ---- controls
   (function initControls() {
@@ -755,11 +767,20 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
   })();
 
   // ---- data load: R2 ก่อน → ไม่ได้ค่อยให้เลือกไฟล์เอง
+  function mergeCsv(text) {
+    var add = JPTGrid.parseFxCsv(text); data = data || {};
+    Object.keys(add).forEach(function (t) { data[t] = add[t]; });
+  }
   function useCsv(text, source) {
-    data = JPTGrid.parseFxCsv(text);
-    var need = ['DXY'].concat(PAIRS.filter(function (p) { return p.on; }).map(function (p) { return p.sym; }));
+    mergeCsv(text);
+    var need = ['DXY'].concat(PAIRS.filter(function (p) { return p.on && !p.comm; }).map(function (p) { return p.sym; }));
     var missing = need.filter(function (t) { return !data[t]; });
     if (missing.length) throw new Error('ไฟล์ไม่มี ticker: ' + missing.join(', '));
+    // ticker จากไฟล์ commodities (WTI) เป็น optional: ไม่มี → ปิดตัวเลือก ไม่ล้มทั้งหน้า
+    PAIRS.filter(function (p) { return p.comm; }).forEach(function (p) {
+      var o = $('pair').querySelector('option[value="' + p.sym + '"]');
+      if (o) { o.disabled = !data[p.sym]; o.textContent = p.label + (data[p.sym] ? '' : ' (ยังไม่มีข้อมูล)'); }
+    });
     lastDataDate = data.EURUSD.dates[data.EURUSD.dates.length - 1];
     loadedAt = new Date();
     var st = $('status'); st.className = 'status ok';
@@ -774,7 +795,12 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
   }
   fetch(DATA_URL, { cache:'no-cache' })
     .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
-    .then(function (t) { useCsv(t, 'R2 /data/input_fx_daily.csv'); })
+    .then(function (t) {
+      // ไฟล์ commodities (WTI) โหลดต่อ — ล้มเหลวก็ไม่กระทบ FX
+      return fetch(COMM_URL, { cache:'no-cache' })
+        .then(function (r2) { return r2.ok ? r2.text() : ''; }, function () { return ''; })
+        .then(function (t2) { if (t2) mergeCsv(t2); useCsv(t, 'R2 /data/input_fx_daily.csv' + (t2 ? ' + input_commodities_daily.csv' : ' (WTI โหลดไม่ได้)')); });
+    })
     .catch(function (e) { loadFail(e.message || String(e)); });
   $('file').addEventListener('change', function (ev) {
     var f = ev.target.files && ev.target.files[0]; if (!f) return;
@@ -801,7 +827,7 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
       return;
     }
     var r;
-    try { r = JPTGrid.buildGrid({ symbol:pair.sym, mode:pair.mode, price:series, dxy:data.DXY, asof:asof }); }
+    try { r = JPTGrid.buildGrid({ symbol:pair.sym, mode:pair.mode, price:series, dxy:data.DXY, asof:asof, floor:(pair.floor != null ? pair.floor : null) }); }
     catch (e) { notice(e.message); return; }
     $('notice').className = 'notice';
     render(pair, y, m, asof, r);
@@ -821,17 +847,19 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
     $('kDxy').textContent = M.dxyUsed.toFixed(2);
     $('kDxyL').textContent = 'DXY แถว ' + thDate(M.dxyRowDate) + (M.dxyRowDate !== M.asofData ? ' (ffill)' : '');
 
-    var f = pair.mode === 'mul'
+    var f = pair.comm
+      ? '<b>' + pair.label + '</b> คือ USD ต่อ 1 บาร์เรล (USD เป็นสกุลหลัง เหมือน EUR/USD) → DXY ขึ้นราคาลง จึงต้อง<b>คูณ</b>: <code>adj = WTI × DXY ÷ 100</code> · floor $5 (CFD ไม่ติดลบ — เม.ย. 2020 ราคาจริงติดลบ)<br>แปลงกลับ: <code>level ÷ (' + M.dxyUsed.toFixed(2) + ' ÷ 100)</code> (k = ' + M.k.toFixed(6) + ') · แหล่ง CL=F (สัญญาหน้า Yahoo) — CFD โบรกต่างจากนี้ได้ตอน roll'
+      : pair.mode === 'mul'
       ? '<b>' + pair.label + ' = ' + pair.base + ' ต่อ 1 USD?</b> ไม่ใช่ — ราคาคือ USD ต่อ 1 ' + pair.base + ' (USD เป็นสกุลหลัง) → DXY ขึ้นราคาลง จึงต้อง<b>คูณ</b>: <code>adj = ' + pair.sym + ' × DXY ÷ 100</code><br>แปลงกลับเป็นราคาจริง: <code>level ÷ (' + M.dxyUsed.toFixed(2) + ' ÷ 100)</code> (k = ' + M.k.toFixed(6) + ')'
       : '<b>' + pair.label + '</b> คือ ' + pair.quote + ' ต่อ 1 USD (USD เป็นสกุลหน้า) → DXY ขึ้นราคาขึ้น จึงต้อง<b>หาร</b>: <code>adj = ' + pair.sym + ' ÷ (DXY ÷ 100)</code><br>แปลงกลับเป็นราคาจริง: <code>level × (' + M.dxyUsed.toFixed(2) + ' ÷ 100)</code> (k = ' + M.k.toFixed(6) + ')';
     $('formula').innerHTML = f;
 
     var p40 = lines[BUY_MAX_P / 2.5], p0 = lines[0], p85 = lines[34], p100 = lines[40];
     var buyDist = pips(pair.sym, M.lastClose - +p40.price), sellDist = pips(pair.sym, +p85.price - M.lastClose);
-    $('zBuy').textContent = p0.price + ' – ' + p40.price + (buyDist >= 0 ? ' · ราคาอยู่เหนือ p' + BUY_MAX_P + ' ' + Math.round(buyDist) + ' pips' : ' · ราคาอยู่ในโซน buy แล้ว');
-    $('zSell').textContent = p85.price + ' – ' + p100.price + (sellDist >= 0 ? ' · ราคาอยู่ใต้ p85 ' + Math.round(sellDist) + ' pips' : ' · ราคาอยู่ในโซน sell แล้ว');
+    $('zBuy').textContent = p0.price + ' – ' + p40.price + (buyDist >= 0 ? ' · ราคาอยู่เหนือ p' + BUY_MAX_P + ' ' + Math.round(buyDist) + unit(pair.sym) : ' · ราคาอยู่ในโซน buy แล้ว');
+    $('zSell').textContent = p85.price + ' – ' + p100.price + (sellDist >= 0 ? ' · ราคาอยู่ใต้ p85 ' + Math.round(sellDist) + unit(pair.sym) : ' · ราคาอยู่ในโซน sell แล้ว');
     var mid = r.mid, inMid = M.lastClose >= mid[0].raw && M.lastClose <= mid[9].raw;
-    $('zMid').textContent = mid[0].price + ' – ' + mid[9].price + (inMid ? ' · ราคาอยู่ในโซนกลาง' : (M.lastClose > mid[9].raw ? ' · ราคาอยู่เหนือ p60 ' + Math.round(pips(pair.sym, M.lastClose - mid[9].raw)) + ' pips' : ' · ราคาอยู่ใต้ p51 ' + Math.round(pips(pair.sym, mid[0].raw - M.lastClose)) + ' pips'));
+    $('zMid').textContent = mid[0].price + ' – ' + mid[9].price + (inMid ? ' · ราคาอยู่ในโซนกลาง' : (M.lastClose > mid[9].raw ? ' · ราคาอยู่เหนือ p60 ' + Math.round(pips(pair.sym, M.lastClose - mid[9].raw)) + unit(pair.sym) : ' · ราคาอยู่ใต้ p51 ' + Math.round(pips(pair.sym, mid[0].raw - M.lastClose)) + unit(pair.sym)));
     $('zFlush').textContent = r.flushMidSell ? 'ใช่ — ปิด p' + M.curP.toFixed(1) + ' > p' + JPTGrid.FLUSH_P + ' → EA จะล้าง sell โซนกลางที่ค้างตอนโหลด' : 'ไม่ — ปิด p' + M.curP.toFixed(1) + ' ≤ p' + JPTGrid.FLUSH_P + ' → ไม้ sell โซนกลางถือต่อ';
     $('zFlushBox').className = 'zone flush' + (r.flushMidSell ? ' on' : '');
 
@@ -867,7 +895,7 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
     if (!placed) html += '<div class="marker"><div class="lbl">' + M.lastClose.toFixed(d) + '</div><div class="ln"><span>ราคาล่าสุด p' + M.curP.toFixed(1) + '</span></div></div>';
     $('ladder').innerHTML = html;
     var minGap = Infinity; for (var q = 1; q < 41; q++) minGap = Math.min(minGap, lines[q].raw - lines[q-1].raw);
-    $('ladderNote').textContent = 'ช่องแคบสุด ' + Math.round(pips(pair.sym, minGap)) + ' pips · กว้างสุด ' + Math.round(pips(pair.sym, maxGap)) + ' pips · TP ของทุกไม้ = ชั้นถัดไป 1 ช่อง (main 2.5p · โซนกลาง 1p) ตามระดับของเดือนที่เปิดอยู่';
+    $('ladderNote').textContent = 'ช่องแคบสุด ' + Math.round(pips(pair.sym, minGap)) + unit(pair.sym) + ' · กว้างสุด ' + Math.round(pips(pair.sym, maxGap)) + unit(pair.sym) + ' · TP ของทุกไม้ = ชั้นถัดไป 1 ช่อง (main 2.5p · โซนกลาง 1p) ตามระดับของเดือนที่เปิดอยู่';
 
     $('fileTitle').textContent = 'grid_' + pair.sym + '.txt';
     $('mt5path').textContent = 'MQL5\\Files\\grid_' + pair.sym + '.txt';
@@ -905,6 +933,7 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
               .split('__MIDLEVELS__').join(midRows.join('\n'))
               .split('__FLUSH__').join(r.flushMidSell ? 'true' : 'false')
               .split('__SYMBOL__').join(pair.sym)
+              .split('__SYMALTS__').join(pair.alts || pair.sym)
               .split('__TAG__').join(r.header)
               .split('__GEN__').join(gen + ' (เวลาไทย)')
               .split('__LEVELS__').join(rows.join('\n'));
