@@ -393,12 +393,11 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .news-batch-date::before{content:'◆';color:var(--gold,#D4AF37);font-size:9px}
 .news-grid{display:flex;flex-direction:column;gap:10px}
 
-.news-dash-card{position:relative;display:grid;grid-template-columns:30px 1fr auto;gap:11px;align-items:start;background:var(--cream-card);border:1.5px solid rgba(212,175,55,0.30);border-radius:14px;padding:13px 15px;margin:0;box-shadow:0 2px 8px rgba(114,47,55,0.05);cursor:pointer;transition:border-color .2s,box-shadow .2s,transform .1s}
+.news-dash-card{position:relative;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start;background:var(--cream-card);border:1.5px solid rgba(212,175,55,0.30);border-radius:14px;padding:13px 15px;margin:0;box-shadow:0 2px 8px rgba(114,47,55,0.05);cursor:pointer;transition:border-color .2s,box-shadow .2s,transform .1s}
 .news-dash-card:hover{border-color:var(--gold);box-shadow:0 6px 16px rgba(114,47,55,0.10)}
 .news-dash-card:active{transform:scale(.99)}
 
-.story-lead{display:flex;align-items:flex-start;justify-content:center;padding-top:2px}
-.impact-icon{width:28px;height:28px;display:block;object-fit:contain}
+.impact-icon{width:34px;height:34px;display:block;object-fit:contain}
 
 .story-body{min-width:0}
 .news-dash-title{font-family:'Sarabun','Anuphan',sans-serif;font-size:14px;font-weight:500;color:var(--text-dark);line-height:1.45;margin:0 0 8px 0;letter-spacing:0.1px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;min-height:2.9em}
@@ -408,12 +407,8 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .story-tag.negative{color:#C62828;background:rgba(198,40,40,0.09);border-color:rgba(198,40,40,0.30)}
 .story-tag.neutral{color:#8B6914;background:rgba(212,175,55,0.13);border-color:rgba(212,175,55,0.40)}
 
-.story-meta{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-start;gap:7px;min-width:52px;font-family:'Sarabun','Anuphan',sans-serif}
-.story-bm{width:14px;height:16px;color:#8B6914;opacity:0.45;cursor:pointer;transition:opacity .2s}
-.story-bm:hover{opacity:0.95}
-.story-bm svg{width:14px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
-.story-meta-time{font-size:11px;color:var(--text-dark-muted);line-height:1.3;font-weight:400;text-align:right}
-.impact-label{font-family:'Cinzel',serif;font-size:10.5px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;text-align:right}
+.story-meta{flex-shrink:0;align-self:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:62px;font-family:'Sarabun','Anuphan',sans-serif}
+.impact-label{font-family:'Cinzel',serif;font-size:10.5px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;text-align:center}
 .impact-label.bullish{color:#2E7D32}
 .impact-label.bearish{color:#C62828}
 .impact-label.neutral{color:#8B6914}
@@ -460,9 +455,8 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .insight-text{font-family:'Anuphan',sans-serif;font-size:12px;color:var(--text-dark,#3D3228);line-height:1.6}
 
 @media (max-width:380px){
-  .story-meta{width:74px;padding-left:9px}
+  .story-meta{min-width:56px}
   .news-dash-title{font-size:13px}
-  .story-meta-time{font-size:10px}
 }
 
 .activity-list{display:flex;flex-direction:column;gap:2px;margin-bottom:24px}
@@ -2675,16 +2669,13 @@ function renderHeadlineCard(h){
   const tickers=normalizeTickers(h.tickers);
   const tone=deriveTone(tickers,h.tone_override);
   const tagsHtml=tickers.slice(0,4).map(t=>'<span class="story-tag '+(t.sentiment||'neutral')+'">'+escapeText(t.symbol)+'</span>').join('');
-  const time=timeAgo(h._batchDate);
   return '<article class="news-dash-card" onclick="openNewsDetail(\''+safeFile+'\','+(h._origIndex||0)+')">'
-    +'<div class="story-lead">'+impactIcon(tone.impactClass)+'</div>'
     +'<div class="story-body">'
       +'<div class="news-dash-title">'+escapeText(h.title)+'</div>'
       +'<div class="story-tags">'+tagsHtml+'</div>'
     +'</div>'
     +'<div class="story-meta">'
-      +'<svg class="story-bm" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>'
-      +'<div class="story-meta-time">'+time+'</div>'
+      +impactIcon(tone.impactClass)
       +'<div class="impact-label '+tone.impactClass+'">'+tone.impactText+'</div>'
     +'</div>'
   +'</article>';
