@@ -164,6 +164,11 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .qa-icon.bg-gold,.qa-icon.bg-blue,.qa-icon.bg-green,.qa-icon.bg-burgundy{background:linear-gradient(160deg,#FFF1D8 0%,#FCE4CB 60%,#F8D5BC 100%);border:1px solid rgba(218,160,120,0.42);color:#722F37;box-shadow:0 2px 6px rgba(114,47,55,0.10)}
 .qa-icon.bg-gold .jpt-icon svg,.qa-icon.bg-blue .jpt-icon svg,.qa-icon.bg-green .jpt-icon svg,.qa-icon.bg-burgundy .jpt-icon svg{color:#722F37;stroke:#722F37}
 .qa-label{font-size:11px;font-weight:500;color:var(--text-dark-muted);text-align:center;line-height:1.3}
+/* Home shortcut row: no white tile — the gold trim on the icon carries it */
+.quick-actions .quick-action{background:transparent;border:none;box-shadow:none;padding:6px 4px;gap:9px}
+.quick-actions .quick-action:active{transform:scale(.93);box-shadow:none}
+.quick-actions .qa-icon{width:48px;height:48px;border-radius:15px;border:1.5px solid var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,0.10),0 3px 8px rgba(114,47,55,0.10)}
+.quick-actions .qa-label{color:var(--text-dark)}
 
 .section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .section-title{font-size:16px;font-weight:600;color:var(--text-dark)}.section-link{font-size:13px;color:var(--gold-dark);cursor:pointer;font-weight:500}
