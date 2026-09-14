@@ -38,11 +38,6 @@ TOPN = 25
 # Final fallback for tickers missing from every name source (dataset lags a few names)
 MANUAL_NAMES = {'EPAM': 'EPAM Systems', 'MOH': 'Molina Healthcare',
                 'LW': 'Lamb Weston', 'PAYC': 'Paycom Software'}
-# Ticker changes in input_sp500_daily.csv (old -> new): history is stitched so the
-# new symbol keeps its full 1Y lookback instead of being dropped as a short-history IPO
-RENAMES = {'BK': 'BNY'}
-# A ticker whose last bar is older than this (days) vs the file's max date left the index
-STALE_DAYS = 7
 
 def load_names():
     comp = {}
@@ -64,17 +59,9 @@ def rsi14(c):
 def main():
     df = pd.read_csv(SRC, usecols=['Ticker', 'Date', 'Close'])
     df['Date'] = df['Date'].astype(str)
-    df['Ticker'] = df['Ticker'].replace(RENAMES)  # stitch history across ticker changes
     max_date = df['Date'].max()
     cutoff = (datetime.date.fromisoformat(max_date) - datetime.timedelta(days=365 * 3)).isoformat()
     df = df[df['Date'] >= cutoff]
-    # drop tickers no longer updated by the pipeline (left the index / delisted):
-    # their last close is months old, so ranking them would be wrong
-    stale_cut = (datetime.date.fromisoformat(max_date) - datetime.timedelta(days=STALE_DAYS)).isoformat()
-    last = df.groupby('Ticker')['Date'].max()
-    stale = sorted(last[last < stale_cut].index)
-    if stale: print('drop stale tickers (last date <', stale_cut, '):', stale, file=sys.stderr)
-    df = df[~df['Ticker'].isin(stale)]
     comp = load_names()
 
     recs = []
