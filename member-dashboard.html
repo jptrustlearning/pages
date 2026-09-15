@@ -428,6 +428,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 
 .story-meta{flex-shrink:0;align-self:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:66px;font-family:'Sarabun','Anuphan',sans-serif}
 .impact-label{font-family:'Cinzel',serif;font-size:9.5px;font-weight:600;letter-spacing:0.6px;text-transform:uppercase;text-align:center;color:var(--text-dark-muted);line-height:1.1}
+.story-meta-time{font-family:'Sarabun','Anuphan',sans-serif;font-size:10px;font-weight:400;letter-spacing:0.2px;text-align:center;color:var(--text-dark-muted);line-height:1.1;white-space:nowrap;opacity:0.9}
 
 /* Latest Dispatches sect-hd + refresh button */
 .news-sect-hd{display:flex;justify-content:space-between;align-items:center;margin:4px 4px 14px 4px}
@@ -472,6 +473,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 
 @media (max-width:380px){
   .story-meta{min-width:56px}
+  .story-meta-time{font-size:9px}
   .news-dash-title{font-size:13px}
 }
 
@@ -2675,6 +2677,7 @@ function renderHeadlineCard(h){
   const tickers=normalizeTickers(h.tickers);
   const tone=deriveTone(tickers,h.tone_override);
   const ns=newsStrength(tickers,tone,h.source);
+  const time=timeAgo(h._batchDate);
   const tagsHtml=tickers.slice(0,4).map(t=>'<span class="story-tag '+(t.sentiment||'neutral')+'">'+escapeText(t.symbol)+'</span>').join('');
   return '<article class="news-dash-card" onclick="openNewsDetail(\''+safeFile+'\','+(h._origIndex||0)+')">'
     +'<div class="story-body">'
@@ -2685,6 +2688,7 @@ function renderHeadlineCard(h){
       +'<div class="news-trend '+ns.dir+'"><svg viewBox="0 0 24 24">'+trendGlyph(ns.dir)+'</svg>'+ns.dirText+'</div>'
       +'<div class="impact-label">'+ns.levelText+'</div>'
       +strengthBar(ns.dir,ns.bars)
+      +(time?'<div class="story-meta-time">'+escapeText(time)+'</div>':'')
     +'</div>'
   +'</article>';
 }
