@@ -1106,6 +1106,53 @@ body > * { position: relative; z-index: 1; }
 }
 
 /* ============================================================
+   QUOTE SECTION — between Planning Toolkit and Learning section (v18)
+   ============================================================ */
+.brand-quote {
+  max-width: 720px;
+  margin: 36px auto 26px;
+  padding: 0 28px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  position: relative;
+}
+.brand-quote::before,
+.brand-quote::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(184,134,11,0.4) 50%, transparent 100%);
+  max-width: 80px;
+}
+.bq-mark {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2.4rem;
+  color: var(--gold);
+  line-height: 0;
+  position: relative;
+  top: 8px;
+}
+.bq-text {
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+  font-size: 1.2rem;
+  color: var(--maroon);
+  letter-spacing: 0.4px;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+@media (max-width: 480px) {
+  .brand-quote { margin: 26px auto 20px; padding: 0 16px; gap: 6px; }
+  .brand-quote::before,
+  .brand-quote::after { max-width: 28px; }
+  .bq-mark { font-size: 1.9rem; top: 6px; }
+  .bq-text { font-size: 0.98rem; letter-spacing: 0.2px; }
+}
+
+/* ============================================================
    NEW JPTRUST LEARNING SECTION — Calendar redesign (v11)
    ============================================================ */
 
@@ -1183,6 +1230,44 @@ body > * { position: relative; z-index: 1; }
   gap: 12px;
   margin-bottom: 18px;
 }
+.hero-cards.single {
+  grid-template-columns: 1fr;
+}
+
+/* Floating settings button — top-right corner of progress card */
+.pc-settings-btn {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-gold);
+  background: rgba(255,254,248,0.85);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(114,47,55,0.06);
+}
+.pc-settings-btn:hover {
+  border-color: var(--gold);
+  background: var(--cream-card);
+  transform: rotate(45deg);
+  box-shadow: 0 4px 10px rgba(114,47,55,0.1);
+}
+.pc-settings-btn svg {
+  width: 18px;
+  height: 18px;
+  color: var(--maroon);
+}
+@media (max-width: 480px) {
+  .pc-settings-btn { width: 32px; height: 32px; top: 10px; right: 10px; }
+  .pc-settings-btn svg { width: 16px; height: 16px; }
+}
+
 .greet-card,
 .progress-card {
   background: linear-gradient(180deg, var(--cream-card) 0%, var(--cream) 70%, var(--cream-deep) 100%);
@@ -1224,40 +1309,45 @@ body > * { position: relative; z-index: 1; }
 }
 
 /* Progress card */
-.pc-label {
-  font-family: 'Anuphan', sans-serif;
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  font-weight: 500;
-  margin-bottom: 4px;
+/* แถบเดียวจบ: ซ้าย = Cycle/Day · กลาง = แถบขีด · ขวา = % (เดิมเป็นการ์ดสูง 177px) */
+.progress-card.pc-strip {
+  display: flex;
+  /* กฎฐาน .progress-card ตั้ง flex-direction:column ไว้ ต้องเขียนทับตรงนี้ ไม่งั้นยังซ้อนลงล่าง */
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 52px 11px 14px;
 }
-.pc-numbers { display: flex; align-items: baseline; gap: 4px; margin-bottom: 8px; }
+.pc-head { flex-shrink: 0; }
+.pc-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.64rem;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 1px;
+}
+.pc-numbers { display: flex; align-items: baseline; gap: 3px; }
 .pc-big {
   font-family: 'DM Serif Display', serif;
-  font-size: 2.4rem;
+  font-size: 1.5rem;
   color: var(--maroon);
-  line-height: 1;
+  line-height: 1.05;
 }
 .pc-divider {
   font-family: 'DM Serif Display', serif;
-  font-size: 1.4rem;
+  font-size: 1rem;
   color: var(--text-muted);
   margin: 0 2px;
 }
 .pc-total {
   font-family: 'Anuphan', sans-serif;
-  font-size: 0.85rem;
+  font-size: 0.74rem;
   color: var(--text-muted);
   font-weight: 500;
 }
-.pc-spark {
-  position: absolute;
-  top: 14px; right: 14px;
-  width: 100px; height: 50px;
-  pointer-events: none;
-}
-.pc-spark svg { width: 100%; height: 100%; overflow: visible; }
-.pc-bar-wrap { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.pc-bar-wrap { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
 .pc-bar {
   flex: 1;
   display: grid;
@@ -1284,7 +1374,7 @@ body > * { position: relative; z-index: 1; }
   .hero-cards { grid-template-columns: 1fr; gap: 10px; }
   .greet-name { font-size: 1.45rem; }
   .pc-big { font-size: 2.6rem; }
-  .pc-spark { width: 90px; height: 44px; top: 16px; right: 14px; }
+  .pc-spark { width: 80px; height: 40px; top: 18px; right: 50px; }
 }
 
 /* ===== Status legend ===== */
@@ -1353,7 +1443,7 @@ body > * { position: relative; z-index: 1; }
 }
 .cal-headers {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 6px;
   padding: 6px 2px 10px;
   border-bottom: 1px solid var(--border-gold);
@@ -1367,6 +1457,70 @@ body > * { position: relative; z-index: 1; }
   text-align: center;
   letter-spacing: 0.5px;
 }
+/* เดือนเลื่อนแนวนอนทีละเดือน (scroll-snap) แทนการวางซ้อนลงล่าง */
+.cal-months {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.cal-months::-webkit-scrollbar { display: none; }
+.cal-month {
+  flex: 0 0 100%;
+  min-width: 0;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  margin-top: 4px;
+}
+.cal-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  margin-top: 12px;
+}
+.cal-dot {
+  width: 7px; height: 7px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(184,134,11,0.28);
+  cursor: pointer;
+  transition: width .22s ease, background .22s ease;
+}
+.cal-dot.active {
+  width: 20px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #E8C56A 0%, #D4AF37 100%);
+}
+.cal-swipe-hint {
+  text-align: center;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+  margin-top: 6px;
+}
+.cal-month-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.1rem;
+  color: var(--maroon);
+  text-align: center;
+  padding: 8px 8px 10px;
+  margin: 0 6px 10px;
+  border-bottom: 1px dashed rgba(184,134,11,0.32);
+  letter-spacing: 0.2px;
+}
+.cal-month-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  padding: 0 4px;
+}
+
 .cal-week {
   position: relative;
   margin-top: 22px;
@@ -1397,21 +1551,35 @@ body > * { position: relative; z-index: 1; }
 }
 .cal-cells {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 6px;
 }
 .cal-cell {
-  aspect-ratio: 1 / 1.05;
+  aspect-ratio: 1 / 1.28;
   border-radius: 10px;
   background: var(--cream-card);
-  border: 1.5px solid rgba(184,134,11,0.18);
+  border: 1.5px solid rgba(184,134,11,0.16);
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: space-between;
-  padding: 6px 4px 5px;
-  cursor: pointer;
+  gap: 1px;
+  padding: 5px 2px 4px;
+  cursor: default;
   transition: all 0.2s ease;
   position: relative;
+  min-width: 0;
+  overflow: hidden;
+}
+.cal-cell.program,
+.cal-cell.today {
+  cursor: pointer;
+}
+.cal-cell.program:hover,
+.cal-cell.today:hover {
+  transform: translateY(-1px);
+  border-color: var(--gold);
+  box-shadow: 0 4px 10px rgba(114,47,55,0.1);
 }
 .cal-cell.empty {
   background: transparent;
@@ -1419,47 +1587,94 @@ body > * { position: relative; z-index: 1; }
   cursor: default;
   pointer-events: none;
 }
-.cal-cell:not(.empty):hover {
-  transform: translateY(-1px);
-  border-color: var(--gold);
-  box-shadow: 0 4px 10px rgba(114,47,55,0.1);
-}
+/* hover handled per-state above */
 .cal-num {
   font-family: 'DM Serif Display', serif;
-  font-size: 1.05rem;
+  font-size: 1rem;
   color: var(--text-dark);
   line-height: 1;
   text-align: center;
   margin-top: 1px;
 }
+.cal-day-label {
+  font-family: 'Cinzel', sans-serif;
+  font-size: 0.54rem;
+  color: var(--maroon);
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.2px;
+  line-height: 1;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  max-width: 100%;
+  padding: 0 1px;
+}
+.cal-day-label.other {
+  color: var(--text-muted);
+  opacity: 0.55;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+}
 .cal-status {
-  width: 18px; height: 18px;
+  width: 26px; height: 26px;
   border-radius: 50%;
   display: grid; place-items: center;
   margin: 0 auto 1px;
   flex-shrink: 0;
 }
-.cal-status svg { width: 10px; height: 10px; stroke-width: 2.5; }
+.cal-status svg { width: 16px; height: 16px; stroke-width: 2.2; }
 
-/* States */
-.cal-cell.locked { background: var(--cream); }
-.cal-cell.locked .cal-status {
-  background: var(--cream-deep);
+/* ===== Cell states (calendar-first paradigm) ===== */
+
+/* Program cell — soft gold-pink tint (the "from Day 1 onwards" fill) */
+.cal-cell.program {
+  background: linear-gradient(160deg, #FFF1D8 0%, #FCE4CB 60%, #F8D5BC 100%);
+  border-color: rgba(218,160,120,0.42);
+}
+.cal-cell.program .cal-num {
+  color: var(--maroon);
+  font-weight: 600;
+}
+.cal-cell.program .cal-status {
+  background: rgba(255,254,248,0.78);
   border: 1.2px solid rgba(184,134,11,0.32);
   color: var(--gold-deep);
 }
 
-.cal-cell.completed .cal-status { background: var(--emerald); color: #FFFEF8; border: 1.2px solid var(--emerald-dk); }
-.cal-cell.completed .cal-num { color: var(--text-dark); }
+/* Out-of-cycle (other cycle's program days, viewed from this cycle) — muted neutral */
+.cal-cell.out-of-cycle {
+  background: var(--cream);
+  border-color: rgba(184,134,11,0.1);
+  cursor: default;
+  pointer-events: none;
+}
+.cal-cell.out-of-cycle .cal-num {
+  color: var(--text-muted);
+  opacity: 0.65;
+}
 
-.cal-cell.missed .cal-status { background: var(--burgundy); color: #FFFEF8; border: 1.2px solid var(--burgundy-dk); }
+/* Out-of-program — outside the 90-day window */
+.cal-cell.out-of-program {
+  background: transparent;
+  border-color: rgba(184,134,11,0.07);
+  cursor: default;
+  pointer-events: none;
+}
+.cal-cell.out-of-program .cal-num {
+  color: var(--text-muted);
+  opacity: 0.42;
+}
 
+/* Today — full gold (overrides program tint) */
 .cal-cell.today {
   background: linear-gradient(150deg, #E8C56A 0%, #D4AF37 70%, #B8860B 100%);
   border-color: #B8860B;
   box-shadow: 0 4px 14px rgba(184,134,11,0.35);
 }
 .cal-cell.today .cal-num { color: #FFFEF8; font-weight: 600; }
+.cal-cell.today .cal-day-label { color: #FFFEF8; }
 .cal-cell.today .cal-status {
   background: rgba(255,254,248,0.95);
   border: 1.5px solid #FFFEF8;
@@ -1474,17 +1689,64 @@ body > * { position: relative; z-index: 1; }
   text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
+/* Today but in another cycle (viewed from current cycle tab) — gold ring on the muted cell */
+.cal-cell.today-other-cycle {
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 0 1px rgba(212,175,55,0.5);
+}
+.cal-cell.today-other-cycle .cal-num {
+  color: var(--gold-deep);
+  opacity: 1;
+  font-weight: 600;
+}
+
+/* JP Day (every 7th program day) — a subtle deeper rose tint within program */
+.cal-cell.program.jp-day {
+  background: linear-gradient(160deg, #F9D9C8 0%, #F4D4A8 60%, #EFC08A 100%);
+  border-color: rgba(201,140,100,0.6);
+}
+/* JP Day signal lives in the deeper rose background tint (above) — no text suffix
+   to keep the day-label compact on narrow cells. */
+
 @media (max-width: 480px) {
-  .cal-grid { padding: 10px 6px 14px; }
-  .cal-headers { gap: 4px; padding: 4px 2px 8px; }
-  .cal-headers > div { font-size: 0.62rem; }
-  .cal-cells { gap: 4px; }
-  .cal-cell { padding: 4px 2px 4px; }
-  .cal-num { font-size: 0.92rem; }
-  .cal-status { width: 16px; height: 16px; }
-  .cal-status svg { width: 9px; height: 9px; }
-  .cal-week { margin-top: 20px; }
-  .cal-week-tag { font-size: 0.55rem; padding: 3px 8px 3px 6px; top: -14px; }
+  .cal-grid { padding: 10px 4px 14px; }
+  .cal-headers { gap: 3px; padding: 4px 2px 8px; }
+  .cal-headers > div { font-size: 0.6rem; }
+  .cal-month-grid { gap: 3px; padding: 0 2px; }
+  .cal-cell { padding: 4px 1px; gap: 2px; }
+  .cal-num { font-size: 0.88rem; }
+  .cal-day-label { font-size: 0.46rem; letter-spacing: 0.1px; }
+  .cal-status { width: 20px; height: 20px; }
+  .cal-status svg { width: 14px; height: 14px; }
+  .cal-month { margin-top: 14px; }
+  .cal-month-title { font-size: 0.96rem; padding: 6px 6px 8px; margin-bottom: 8px; }
+  .cal-range { font-size: 0.7rem !important; padding: 6px 6px 10px !important; }
+}
+
+/* ===== Cycle date range header (above each cycle's calendar) ===== */
+.cal-range {
+  font-family: 'Anuphan', sans-serif;
+  font-size: 0.82rem;
+  color: var(--gold-deep);
+  text-align: center;
+  padding: 8px 8px 12px;
+  margin: 0 4px 8px;
+  border-bottom: 1px dashed rgba(184,134,11,0.32);
+  font-weight: 500;
+  line-height: 1.3;
+}
+.cal-range strong {
+  color: var(--maroon);
+  font-weight: 700;
+  font-family: 'DM Serif Display', serif;
+  font-size: 0.92rem;
+  letter-spacing: 0.2px;
+  margin: 0 4px;
+}
+.cal-range-sep {
+  color: var(--gold);
+  margin: 0 6px;
+  opacity: 0.75;
 }
 
 /* ===== Today summary card (bottom) ===== */
@@ -1757,6 +2019,8 @@ body > * { position: relative; z-index: 1; }
 
 
 </style>
+  <!-- JP Trust hard auth-gate (redirect to login if no session) -->
+  <script src="./jp-gate.js?v=1783134367"></script>
 </head>
 <body>
 
@@ -1795,122 +2059,39 @@ body > * { position: relative; z-index: 1; }
   </svg>
 </div>
 
-<!-- ===== PLANNING DASHBOARDS (top of roadmap) ===== -->
-<section class="planning-section">
-  <div class="planning-inner">
-    <div class="planning-label">Planning Toolkit</div>
-    <div class="planning-grid">
-      <button class="planning-card" onclick="openPlanningDashboard('finance')">
-        <div class="planning-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="9"/>
-            <path d="M12 7v10"/>
-            <path d="M15 9.5a2.5 2.5 0 0 0-2.5-2.5h-1a2 2 0 0 0 0 4h1a2.5 2.5 0 0 1 0 5h-1a2.5 2.5 0 0 1-2.5-2.5"/>
-          </svg>
-        </div>
-        <div class="planning-meta">
-          <div class="planning-title">วางแผนการเงินส่วนบุคคล</div>
-          <div class="planning-desc">รายรับ · รายจ่าย · เงินสำรอง · เป้าหมายการเงิน</div>
-        </div>
-        <svg class="planning-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="9 18 15 12 9 6"/>
-        </svg>
-      </button>
-      <button class="planning-card" onclick="openPlanningDashboard('portfolio')">
-        <div class="planning-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 3v18h18"/>
-            <rect x="7" y="12" width="3" height="6"/>
-            <rect x="12" y="8" width="3" height="10"/>
-            <rect x="17" y="5" width="3" height="13"/>
-          </svg>
-        </div>
-        <div class="planning-meta">
-          <div class="planning-title">วางแผนพอร์ตการลงทุน</div>
-          <div class="planning-desc">Asset allocation · risk budget · rebalancing plan</div>
-        </div>
-        <svg class="planning-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="9 18 15 12 9 6"/>
-        </svg>
-      </button>
-    </div>
-  </div>
+
+<!-- ===== QUOTE — between Planning Toolkit and JPTrust Learning ===== -->
+<section class="brand-quote">
+  <span class="bq-mark bq-open">“</span>
+  <span class="bq-text">Discipline Today, Freedom Tomorrow.</span>
+  <span class="bq-mark bq-close">”</span>
 </section>
 
-<!-- ===== JPTRUST LEARNING SECTION (NEW DESIGN — calendar + progress) ===== -->
+<!-- ===== JPTRUST LEARNING SECTION (calendar + progress) ===== -->
 <section class="learning-section">
 
-  <!-- Brand header -->
-  <div class="learning-header">
-    <div class="lh-brand">
-      <div class="lh-owl">
-        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4">
-          <!-- owl body silhouette -->
-          <path d="M32 8 C20 8, 12 18, 12 32 C12 46, 20 56, 32 56 C44 56, 52 46, 52 32 C52 18, 44 8, 32 8 Z"/>
-          <!-- ear tufts -->
-          <path d="M18 12 L22 6 L24 14"/>
-          <path d="M46 12 L42 6 L40 14"/>
-          <!-- left eye -->
-          <circle cx="24" cy="28" r="6.5"/>
-          <circle cx="24" cy="28" r="2.2" fill="currentColor"/>
-          <!-- right eye -->
-          <circle cx="40" cy="28" r="6.5"/>
-          <circle cx="40" cy="28" r="2.2" fill="currentColor"/>
-          <!-- beak -->
-          <path d="M32 33 L29 38 L35 38 Z" fill="currentColor"/>
-        </svg>
-      </div>
-      <div class="lh-text">
-        <div class="lh-title">JP TRUST</div>
-        <div class="lh-tagline">Discipline Today, Freedom Tomorrow.</div>
-      </div>
-    </div>
-    <div class="lh-actions">
-      <button class="lh-btn has-dot" id="bellBtn" onclick="onBellClick()" aria-label="Notifications">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
-          <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
-        </svg>
-      </button>
-      <button class="lh-btn" id="settingsBtn" onclick="openRoadmapSettings()" aria-label="Settings">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Cycle Progress card (full width) — settings gear floats top-right -->
+  <div class="hero-cards single">
+    <div class="progress-card pc-strip">
+      <button class="pc-settings-btn" onclick="openRoadmapSettings()" aria-label="ตั้งค่า Roadmap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3"/>
           <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
         </svg>
       </button>
-    </div>
-  </div>
-
-  <!-- Greeting + Progress row -->
-  <div class="hero-cards">
-
-    <!-- Greeting card -->
-    <div class="greet-card">
-      <div class="greet-line">สวัสดี, ยินดีต้อนรับ</div>
-      <div class="greet-name" id="greetName">@JPtrust</div>
-      <div class="greet-tag">
-        <svg class="gt-star" viewBox="0 0 24 24" fill="currentColor">
-          <polygon points="12,2 15,8.5 22,9.3 17,14.2 18.2,21 12,17.8 5.8,21 7,14.2 2,9.3 9,8.5"/>
-        </svg>
-        <span>Stay Consistent,<br>Get Closer to Freedom.</span>
+      <div class="pc-head">
+        <div class="pc-label">Cycle <span id="pcCycleNum">1</span></div>
+        <div class="pc-numbers">
+          <span class="pc-big" id="pcDayNum">—</span>
+          <span class="pc-divider">/</span>
+          <span class="pc-total"><span id="pcDayTotal">30</span> Days</span>
+        </div>
       </div>
-    </div>
-
-    <!-- Progress card -->
-    <div class="progress-card">
-      <div class="pc-label">Cycle <span id="pcCycleNum">1</span> Progress</div>
-      <div class="pc-numbers">
-        <span class="pc-big" id="pcDayNum">—</span>
-        <span class="pc-divider">/</span>
-        <span class="pc-total"><span id="pcDayTotal">30</span> Days</span>
-      </div>
-      <div class="pc-spark" id="pcSpark"></div>
       <div class="pc-bar-wrap">
         <div class="pc-bar" id="pcBar"></div>
         <div class="pc-pct" id="pcPct">0%</div>
       </div>
     </div>
-
   </div>
 </section>
 
@@ -2238,9 +2419,11 @@ function setStartDate(date) {
     localStorage.setItem(ROADMAP_CONFIG.storageKeyStart, ymd(roadmapStart));
   } catch (e) {}
   // Sync to cloud (best-effort, fire and forget)
-  if (window.JPSettings && typeof window.JPSettings.save === 'function') {
+  // CRITICAL: use patch() not save() — save() OVERWRITES the full data column
+  // which would wipe other dashboards' settings (name, risk, capital, etc.)
+  if (window.JPSettings && typeof window.JPSettings.patch === 'function') {
     try {
-      window.JPSettings.save({ roadmapStartDate: ymd(roadmapStart) }).catch(()=>{});
+      window.JPSettings.patch({ roadmapStartDate: ymd(roadmapStart) }).catch(()=>{});
     } catch (e) {}
   }
 }
@@ -2371,37 +2554,179 @@ function renderAllCycles() {
     const panel = document.getElementById('cyclePanel-' + c);
     panel.innerHTML = renderCalendarForCycle(c);
   }
+  initCalSliders();
+}
+
+// ========================================
+// MONTH SLIDER (one month per screen, swipe horizontally)
+// ========================================
+function initCalSliders() {
+  document.querySelectorAll('.cal-dots').forEach(dots => {
+    const track = document.getElementById(dots.dataset.track);
+    if (!track) return;
+
+    dots.querySelectorAll('.cal-dot').forEach(dot => {
+      dot.addEventListener('click', () => {
+        track.scrollTo({ left: track.clientWidth * parseInt(dot.dataset.i, 10), behavior: 'smooth' });
+      });
+    });
+
+    let raf = null;
+    track.addEventListener('scroll', () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = null;
+        const w = track.clientWidth || 1;
+        const i = Math.round(track.scrollLeft / w);
+        dots.querySelectorAll('.cal-dot').forEach(d => d.classList.toggle('active', parseInt(d.dataset.i, 10) === i));
+      });
+    }, { passive: true });
+  });
+  // Land on the month containing today for whichever cycle is showing now
+  const active = document.querySelector('.cycle-panel.active');
+  if (active) syncCalSlider(active);
+}
+
+// Jump the track to its starting month. Width is only measurable once the panel
+// is visible, so this runs on tab switch — not at render time.
+function syncCalSlider(panel) {
+  const dots = panel.querySelector('.cal-dots');
+  if (!dots) return;
+  const track = document.getElementById(dots.dataset.track);
+  if (!track || !track.clientWidth) return;
+  const i = parseInt(dots.dataset.start || '0', 10);
+  track.scrollLeft = track.clientWidth * i;
+  dots.querySelectorAll('.cal-dot').forEach(d => d.classList.toggle('active', parseInt(d.dataset.i, 10) === i));
+}
+
+const THAI_MONTHS_SHORT = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+const THAI_MONTHS_LONG = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+
+// Build list of distinct {year, month} pairs from sd through ed inclusive
+function monthsBetween(sd, ed) {
+  const months = [];
+  let cur = new Date(sd.getFullYear(), sd.getMonth(), 1);
+  const stop = new Date(ed.getFullYear(), ed.getMonth(), 1);
+  while (cur <= stop) {
+    months.push({ y: cur.getFullYear(), m: cur.getMonth() });
+    cur.setMonth(cur.getMonth() + 1);
+  }
+  return months;
 }
 
 function renderCalendarForCycle(cycle) {
-  const rows = buildCalendarRows(cycle);
+  const startDay = (cycle - 1) * ROADMAP_CONFIG.cycleDays + 1;
+  const endDay = cycle * ROADMAP_CONFIG.cycleDays;
+  const sd = dateForDay(startDay);
+  const ed = dateForDay(endDay);
 
   let html = '<div class="cal-grid">';
 
-  // Mon-Sun headers
+  // Cycle date range header
+  const rangeStart = `${sd.getDate()} ${THAI_MONTHS_SHORT[sd.getMonth()]} ${(sd.getFullYear() + 543) % 100}`;
+  const rangeEnd = `${ed.getDate()} ${THAI_MONTHS_SHORT[ed.getMonth()]} ${(ed.getFullYear() + 543) % 100}`;
+  html += `<div class="cal-range">ช่วงเวลาของ Cycle ${cycle} · <strong>${rangeStart}</strong><span class="cal-range-sep">—</span><strong>${rangeEnd}</strong></div>`;
+
+  // Render each month that this cycle touches as a full calendar grid,
+  // laid out side by side in a horizontal snap track (one month per screen)
+  const months = monthsBetween(sd, ed);
+  const today = startOfDay(new Date());
+  let todayIdx = -1;
+  html += `<div class="cal-months" id="calMonths-${cycle}">`;
+  months.forEach(({y, m}, i) => {
+    if (today.getFullYear() === y && today.getMonth() === m) todayIdx = i;
+    html += renderMonthGrid(y, m, startDay, endDay);
+  });
+  html += '</div>';
+
+  if (months.length > 1) {
+    const startIdx = todayIdx >= 0 ? todayIdx : 0;
+    html += `<div class="cal-dots" data-track="calMonths-${cycle}" data-start="${startIdx}">`;
+    months.forEach(({y, m}, i) => {
+      const label = `${THAI_MONTHS_LONG[m]} ${(y + 543) % 100}`;
+      html += `<button type="button" class="cal-dot${i === startIdx ? ' active' : ''}" data-i="${i}" aria-label="${label}"></button>`;
+    });
+    html += '</div>';
+    html += '<div class="cal-swipe-hint">ปัดซ้าย–ขวาเพื่อเปลี่ยนเดือน</div>';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+function renderMonthGrid(year, month, cycleStartDay, cycleEndDay) {
+  const today = startOfDay(new Date());
+  const start = getStartDate();
+
+  let html = '<div class="cal-month">';
+  html += `<div class="cal-month-title">${THAI_MONTHS_LONG[month]} ${(year + 543) % 100}</div>`;
   html += '<div class="cal-headers">'
        + '<div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div><div>SUN</div>'
        + '</div>';
 
-  // Week rows
-  rows.forEach(row => {
-    html += `<div class="cal-week"><span class="cal-week-tag">WEEK ${row.weekNum}</span><div class="cal-cells">`;
-    row.cells.forEach(cell => {
-      if (!cell) {
-        html += '<div class="cal-cell empty"></div>';
-        return;
-      }
-      const state = getDayState(cell.day);
-      const dd = String(cell.day).padStart(2, '0');
-      html += `<div class="cal-cell ${state}" data-day="${cell.day}" onclick="openDayModal(${cell.day})">`
-            + `<div class="cal-num">${dd}</div>`
-            + `<div class="cal-status">${statusIconSvg(state)}</div>`
-            + `</div>`;
-    });
-    html += '</div></div>';
-  });
+  const first = new Date(year, month, 1);
+  const firstDow = (first.getDay() + 6) % 7; // 0=Mon ... 6=Sun
+  const lastDom = new Date(year, month + 1, 0).getDate();
 
-  html += '</div>';
+  html += '<div class="cal-month-grid">';
+
+  // Leading empty cells (days from prev month)
+  for (let i = 0; i < firstDow; i++) {
+    html += '<div class="cal-cell empty"></div>';
+  }
+
+  // Date cells
+  for (let dom = 1; dom <= lastDom; dom++) {
+    const cellDate = startOfDay(new Date(year, month, dom));
+    const diffDays = Math.round((cellDate - start) / 86400000);
+    const programDay = diffDays + 1;
+    const inProgram = programDay >= 1 && programDay <= ROADMAP_CONFIG.totalDays;
+    const inThisCycle = inProgram && programDay >= cycleStartDay && programDay <= cycleEndDay;
+    const isToday = sameDate(cellDate, today);
+    const isJpDay = inThisCycle && (programDay % 7 === 0);
+
+    let cls = 'cal-cell';
+    let inner = `<div class="cal-num">${dom}</div>`;
+    let click = '';
+    let dataDay = '';
+
+    if (isToday && inThisCycle) {
+      cls += ' today';
+      inner += `<div class="cal-day-label">Day ${programDay}</div>`;
+      // Today keeps the inner status dot for the focal "you are here" indicator
+      inner += `<div class="cal-status">${statusIconSvg('today')}</div>`;
+      click = `onclick="openDayModal(${programDay})"`;
+      dataDay = ` data-day="${programDay}"`;
+    } else if (inThisCycle) {
+      cls += isJpDay ? ' program jp-day' : ' program';
+      inner += `<div class="cal-day-label">Day ${programDay}</div>`;
+      // Small lock icon at the bottom — Joon prefers the inline indicator over a bg watermark
+      inner += `<div class="cal-status">${statusIconSvg('locked')}</div>`;
+      click = `onclick="openDayModal(${programDay})"`;
+      dataDay = ` data-day="${programDay}"`;
+    } else if (inProgram) {
+      // Other cycle's program day — show muted with small "Day N" hint
+      cls += ' out-of-cycle';
+      if (isToday) cls += ' today-other-cycle';
+      inner += `<div class="cal-day-label other">D${programDay}</div>`;
+    } else {
+      // Outside the 90-day program entirely
+      cls += ' out-of-program';
+      if (isToday) cls += ' today-other-cycle';
+    }
+
+    html += `<div class="${cls}"${dataDay} ${click}>${inner}</div>`;
+  }
+
+  // Trailing empty cells to complete the last row (so the grid bottom is straight)
+  const totalCells = firstDow + lastDom;
+  const trail = (7 - (totalCells % 7)) % 7;
+  for (let i = 0; i < trail; i++) {
+    html += '<div class="cal-cell empty"></div>';
+  }
+
+  html += '</div>'; // .cal-month-grid
+  html += '</div>'; // .cal-month
   return html;
 }
 
@@ -2456,8 +2781,6 @@ function updateLearningHeader() {
   document.getElementById('pcPct').textContent = pct + '%';
   renderProgressBar(dayInCycle);
 
-  // Sparkline (decorative — show ascending pattern)
-  renderSparkline();
 
   // Today summary card
   updateTodayCard(todayDay, today, start);
@@ -2475,26 +2798,6 @@ function renderProgressBar(dayInCycle) {
   bar.innerHTML = html;
 }
 
-function renderSparkline() {
-  const el = document.getElementById('pcSpark');
-  if (!el) return;
-  // Decorative ascending sparkline — positions are scaled to 100x50 SVG
-  const pts = [
-    [4, 42], [16, 35], [28, 38], [40, 28],
-    [52, 32], [64, 22], [76, 18], [88, 14], [96, 10]
-  ];
-  const path = pts.map((p, i) => (i === 0 ? `M ${p[0]} ${p[1]}` : `L ${p[0]} ${p[1]}`)).join(' ');
-  const dots = pts.map((p, i) => {
-    const isLast = i === pts.length - 1;
-    return `<circle cx="${p[0]}" cy="${p[1]}" r="${isLast ? 3.5 : 2}" fill="${isLast ? '#D4AF37' : '#B8860B'}" ${isLast ? 'stroke="#FFFEF8" stroke-width="1.5"' : ''}/>`;
-  }).join('');
-  el.innerHTML = `
-    <svg viewBox="0 0 100 50" preserveAspectRatio="none">
-      <path d="${path}" stroke="#B8860B" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      ${dots}
-    </svg>
-  `;
-}
 
 function updateTodayCard(todayDay, today, start) {
   const card = document.getElementById('todayCard');
@@ -2610,7 +2913,9 @@ function saveRoadmapSettings() {
 function switchCycle(n) {
   document.querySelectorAll('.cycle-tab').forEach(t => t.classList.toggle('active', parseInt(t.dataset.cycle) === n));
   document.querySelectorAll('.cycle-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('cyclePanel-' + n).classList.add('active');
+  const panel = document.getElementById('cyclePanel-' + n);
+  panel.classList.add('active');
+  syncCalSlider(panel);
   // Only scroll up if we're below the nav bar — otherwise let user stay where they are
   const nav = document.querySelector('.cycles-nav');
   const navTop = nav.getBoundingClientRect().top;
@@ -2638,7 +2943,7 @@ function openPlanningDashboard(type) {
   };
   const t = TARGETS[type];
   if (!t) return;
-  const url = 'https://jptrustlearning.github.io/pages/' + t.file + '?v=' + Date.now();
+  const url = './' + t.file + '?v=' + Date.now();
   if (window.parent && window.parent !== window) {
     // Inside an iframe — ask parent to open
     window.parent.postMessage({ type: 'openIframe', title: t.title, url: url }, '*');
@@ -2701,7 +3006,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (cur >= 1 && cur <= 3) {
     document.querySelectorAll('.cycle-tab').forEach(t => t.classList.toggle('active', parseInt(t.dataset.cycle) === cur));
     document.querySelectorAll('.cycle-panel').forEach(p => p.classList.remove('active'));
-    document.getElementById('cyclePanel-' + cur).classList.add('active');
+    const panel = document.getElementById('cyclePanel-' + cur);
+    panel.classList.add('active');
+    syncCalSlider(panel);
   }
 });
 
@@ -2716,5 +3023,6 @@ document.addEventListener('keydown', (e) => {
 });
 </script>
 
+<script defer src="/lib/jpt-track.js" data-page="roadmap"></script>
 </body>
 </html>
