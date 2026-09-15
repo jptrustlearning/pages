@@ -400,7 +400,17 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .news-dash-card:hover{border-color:var(--gold);box-shadow:0 6px 16px rgba(114,47,55,0.10)}
 .news-dash-card:active{transform:scale(.99)}
 
-.impact-icon{width:34px;height:34px;display:block;object-fit:contain}
+/* news impact = ทิศทาง + ความแรงของข่าว (แทนไอคอนสัตว์ · โทนเดียวกับตาราง Scanner) */
+.news-trend{display:flex;align-items:center;justify-content:center;gap:4px;font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;line-height:1.15;text-align:center}
+.news-trend svg{width:14px;height:14px;flex-shrink:0;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.news-trend.up{color:#2E7D32}.news-trend.up svg{stroke:#2E7D32}
+.news-trend.mix{color:#8B6914}.news-trend.mix svg{stroke:#8B6914}
+.news-trend.down{color:#C62828}.news-trend.down svg{stroke:#C62828}
+.news-strbar{display:flex;gap:3px}
+.news-strbar i{width:7px;height:3px;border-radius:2px;background:rgba(122,111,98,0.22)}
+.news-strbar.up i.on{background:#2E7D32}
+.news-strbar.mix i.on{background:#B8860B}
+.news-strbar.down i.on{background:#C62828}
 
 .story-body{min-width:0}
 .news-dash-title{font-family:'Sarabun','Anuphan',sans-serif;font-size:14px;font-weight:500;color:var(--text-dark);line-height:1.45;margin:0 0 8px 0;letter-spacing:0.1px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;min-height:2.9em}
@@ -410,11 +420,8 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .story-tag.negative{color:#C62828;background:rgba(198,40,40,0.09);border-color:rgba(198,40,40,0.30)}
 .story-tag.neutral{color:#8B6914;background:rgba(212,175,55,0.13);border-color:rgba(212,175,55,0.40)}
 
-.story-meta{flex-shrink:0;align-self:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:62px;font-family:'Sarabun','Anuphan',sans-serif}
-.impact-label{font-family:'Cinzel',serif;font-size:10.5px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;text-align:center}
-.impact-label.bullish{color:#2E7D32}
-.impact-label.bearish{color:#C62828}
-.impact-label.neutral{color:#8B6914}
+.story-meta{flex-shrink:0;align-self:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:66px;font-family:'Sarabun','Anuphan',sans-serif}
+.impact-label{font-family:'Cinzel',serif;font-size:9.5px;font-weight:600;letter-spacing:0.6px;text-transform:uppercase;text-align:center;color:var(--text-dark-muted);line-height:1.1}
 
 /* Latest Dispatches sect-hd + refresh button */
 .news-sect-hd{display:flex;justify-content:space-between;align-items:center;margin:4px 4px 14px 4px}
@@ -2565,14 +2572,36 @@ function deriveTone(tickers,override){
   if(c.negative>c.positive&&c.negative>=sentTotal*0.7)return{impactClass:'bearish',impactText:'Bearish'};
   return{impactClass:'neutral',impactText:'Neutral'};
 }
-function impactIcon(impactClass){
-  if(impactClass==='bullish'){
-    return '<img class="impact-icon" src="icon-bull-green.png?v=1783496563" alt="Bullish" loading="lazy">';
+// ความแรงของข่าว — สองค่าแบบตาราง Scanner: ทิศทาง (Up/Mixed/Down) + ความแรง (Strong/Moderate/Weak)
+// ทิศทางยึด deriveTone() ตัวเดิม (tone_override ยังชนะเสมอ) · ความแรง = ความเอนเอียง 50% + จำนวนหุ้นที่กระทบ 30% + จำนวนแหล่งข่าว 20%
+function newsStrength(tickers,tone,source){
+  var pos=0,neg=0;
+  for(var i=0;i<tickers.length;i++){
+    var s=tickers[i].sentiment;
+    if(s==='positive')pos++;else if(s==='negative')neg++;
   }
-  if(impactClass==='bearish'){
-    return '<img class="impact-icon" src="icon-bear-red.png?v=1783496563" alt="Bearish" loading="lazy">';
-  }
-  return '<img class="impact-icon" src="icon-owl-gold.png?v=1783496563" alt="Neutral" loading="lazy">';
+  var tot=pos+neg;
+  var conviction=tot?Math.abs(pos-neg)/tot:0;
+  var breadth=Math.min(tot,6)/6;
+  var srcCount=String(source||'').split(/[,;/]/).filter(function(x){return x.trim();}).length;
+  var corroboration=Math.min(srcCount,5)/5;
+  var score=Math.round(100*(0.50*conviction+0.30*breadth+0.20*corroboration));
+  var level=score>=72?3:(score>=48?2:1);
+  var levelText=level===3?'Strong':(level===2?'Moderate':'Weak');
+  var bars=Math.max(1,Math.min(5,Math.round(score/20)));
+  var dir=tone.impactClass==='bullish'?'up':(tone.impactClass==='bearish'?'down':'mix');
+  var dirText=dir==='up'?'Up':(dir==='down'?'Down':'Mixed');
+  return{dir:dir,dirText:dirText,level:level,levelText:levelText,bars:bars,score:score};
+}
+function trendGlyph(dir){
+  if(dir==='up')return '<polyline points="4 14 10 8 14 12 20 5"/><polyline points="15 5 20 5 20 10"/>';
+  if(dir==='down')return '<polyline points="4 8 10 14 14 10 20 17"/><polyline points="15 17 20 17 20 12"/>';
+  return '<line x1="4" y1="12" x2="20" y2="12"/>';
+}
+function strengthBar(dir,bars){
+  var out='<div class="news-strbar '+dir+'">';
+  for(var i=1;i<=5;i++)out+='<i'+(i<=bars?' class="on"':'')+'></i>';
+  return out+'</div>';
 }
 
 const NEWS_INDEX_URL='https://app.jptrustlearning.com/news/news-index.json';
@@ -2671,6 +2700,7 @@ function renderHeadlineCard(h){
   const safeFile=encodeURIComponent(h._file||'');
   const tickers=normalizeTickers(h.tickers);
   const tone=deriveTone(tickers,h.tone_override);
+  const ns=newsStrength(tickers,tone,h.source);
   const tagsHtml=tickers.slice(0,4).map(t=>'<span class="story-tag '+(t.sentiment||'neutral')+'">'+escapeText(t.symbol)+'</span>').join('');
   return '<article class="news-dash-card" onclick="openNewsDetail(\''+safeFile+'\','+(h._origIndex||0)+')">'
     +'<div class="story-body">'
@@ -2678,8 +2708,9 @@ function renderHeadlineCard(h){
       +'<div class="story-tags">'+tagsHtml+'</div>'
     +'</div>'
     +'<div class="story-meta">'
-      +impactIcon(tone.impactClass)
-      +'<div class="impact-label '+tone.impactClass+'">'+tone.impactText+'</div>'
+      +'<div class="news-trend '+ns.dir+'"><svg viewBox="0 0 24 24">'+trendGlyph(ns.dir)+'</svg>'+ns.dirText+'</div>'
+      +'<div class="impact-label">'+ns.levelText+'</div>'
+      +strengthBar(ns.dir,ns.bars)
     +'</div>'
   +'</article>';
 }
