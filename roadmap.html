@@ -1451,10 +1451,53 @@ body > * { position: relative; z-index: 1; }
   text-align: center;
   letter-spacing: 0.5px;
 }
-.cal-month {
-  margin-top: 18px;
+/* เดือนเลื่อนแนวนอนทีละเดือน (scroll-snap) แทนการวางซ้อนลงล่าง */
+.cal-months {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-.cal-month:first-of-type { margin-top: 4px; }
+.cal-months::-webkit-scrollbar { display: none; }
+.cal-month {
+  flex: 0 0 100%;
+  min-width: 0;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  margin-top: 4px;
+}
+.cal-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  margin-top: 12px;
+}
+.cal-dot {
+  width: 7px; height: 7px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(184,134,11,0.28);
+  cursor: pointer;
+  transition: width .22s ease, background .22s ease;
+}
+.cal-dot.active {
+  width: 20px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #E8C56A 0%, #D4AF37 100%);
+}
+.cal-swipe-hint {
+  text-align: center;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+  margin-top: 6px;
+}
 .cal-month-title {
   font-family: 'DM Serif Display', serif;
   font-size: 1.1rem;
@@ -2504,6 +2547,49 @@ function renderAllCycles() {
     const panel = document.getElementById('cyclePanel-' + c);
     panel.innerHTML = renderCalendarForCycle(c);
   }
+  initCalSliders();
+}
+
+// ========================================
+// MONTH SLIDER (one month per screen, swipe horizontally)
+// ========================================
+function initCalSliders() {
+  document.querySelectorAll('.cal-dots').forEach(dots => {
+    const track = document.getElementById(dots.dataset.track);
+    if (!track) return;
+
+    dots.querySelectorAll('.cal-dot').forEach(dot => {
+      dot.addEventListener('click', () => {
+        track.scrollTo({ left: track.clientWidth * parseInt(dot.dataset.i, 10), behavior: 'smooth' });
+      });
+    });
+
+    let raf = null;
+    track.addEventListener('scroll', () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = null;
+        const w = track.clientWidth || 1;
+        const i = Math.round(track.scrollLeft / w);
+        dots.querySelectorAll('.cal-dot').forEach(d => d.classList.toggle('active', parseInt(d.dataset.i, 10) === i));
+      });
+    }, { passive: true });
+  });
+  // Land on the month containing today for whichever cycle is showing now
+  const active = document.querySelector('.cycle-panel.active');
+  if (active) syncCalSlider(active);
+}
+
+// Jump the track to its starting month. Width is only measurable once the panel
+// is visible, so this runs on tab switch — not at render time.
+function syncCalSlider(panel) {
+  const dots = panel.querySelector('.cal-dots');
+  if (!dots) return;
+  const track = document.getElementById(dots.dataset.track);
+  if (!track || !track.clientWidth) return;
+  const i = parseInt(dots.dataset.start || '0', 10);
+  track.scrollLeft = track.clientWidth * i;
+  dots.querySelectorAll('.cal-dot').forEach(d => d.classList.toggle('active', parseInt(d.dataset.i, 10) === i));
 }
 
 const THAI_MONTHS_SHORT = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
@@ -2534,11 +2620,28 @@ function renderCalendarForCycle(cycle) {
   const rangeEnd = `${ed.getDate()} ${THAI_MONTHS_SHORT[ed.getMonth()]} ${(ed.getFullYear() + 543) % 100}`;
   html += `<div class="cal-range">ช่วงเวลาของ Cycle ${cycle} · <strong>${rangeStart}</strong><span class="cal-range-sep">—</span><strong>${rangeEnd}</strong></div>`;
 
-  // Render each month that this cycle touches as a full calendar grid
+  // Render each month that this cycle touches as a full calendar grid,
+  // laid out side by side in a horizontal snap track (one month per screen)
   const months = monthsBetween(sd, ed);
-  months.forEach(({y, m}) => {
+  const today = startOfDay(new Date());
+  let todayIdx = -1;
+  html += `<div class="cal-months" id="calMonths-${cycle}">`;
+  months.forEach(({y, m}, i) => {
+    if (today.getFullYear() === y && today.getMonth() === m) todayIdx = i;
     html += renderMonthGrid(y, m, startDay, endDay);
   });
+  html += '</div>';
+
+  if (months.length > 1) {
+    const startIdx = todayIdx >= 0 ? todayIdx : 0;
+    html += `<div class="cal-dots" data-track="calMonths-${cycle}" data-start="${startIdx}">`;
+    months.forEach(({y, m}, i) => {
+      const label = `${THAI_MONTHS_LONG[m]} ${(y + 543) % 100}`;
+      html += `<button type="button" class="cal-dot${i === startIdx ? ' active' : ''}" data-i="${i}" aria-label="${label}"></button>`;
+    });
+    html += '</div>';
+    html += '<div class="cal-swipe-hint">ปัดซ้าย–ขวาเพื่อเปลี่ยนเดือน</div>';
+  }
 
   html += '</div>';
   return html;
@@ -2825,7 +2928,9 @@ function saveRoadmapSettings() {
 function switchCycle(n) {
   document.querySelectorAll('.cycle-tab').forEach(t => t.classList.toggle('active', parseInt(t.dataset.cycle) === n));
   document.querySelectorAll('.cycle-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('cyclePanel-' + n).classList.add('active');
+  const panel = document.getElementById('cyclePanel-' + n);
+  panel.classList.add('active');
+  syncCalSlider(panel);
   // Only scroll up if we're below the nav bar — otherwise let user stay where they are
   const nav = document.querySelector('.cycles-nav');
   const navTop = nav.getBoundingClientRect().top;
@@ -2916,7 +3021,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (cur >= 1 && cur <= 3) {
     document.querySelectorAll('.cycle-tab').forEach(t => t.classList.toggle('active', parseInt(t.dataset.cycle) === cur));
     document.querySelectorAll('.cycle-panel').forEach(p => p.classList.remove('active'));
-    document.getElementById('cyclePanel-' + cur).classList.add('active');
+    const panel = document.getElementById('cyclePanel-' + cur);
+    panel.classList.add('active');
+    syncCalSlider(panel);
   }
 });
 
