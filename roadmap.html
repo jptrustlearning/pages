@@ -1237,10 +1237,11 @@ body > * { position: relative; z-index: 1; }
 /* Floating settings button — top-right corner of progress card */
 .pc-settings-btn {
   position: absolute;
-  top: 12px;
+  top: 50%;
   right: 12px;
-  width: 36px;
-  height: 36px;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: 1.5px solid var(--border-gold);
   background: rgba(255,254,248,0.85);
@@ -1308,40 +1309,45 @@ body > * { position: relative; z-index: 1; }
 }
 
 /* Progress card */
-.pc-label {
-  font-family: 'Anuphan', sans-serif;
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  font-weight: 500;
-  margin-bottom: 4px;
+/* แถบเดียวจบ: ซ้าย = Cycle/Day · กลาง = แถบขีด · ขวา = % (เดิมเป็นการ์ดสูง 177px) */
+.progress-card.pc-strip {
+  display: flex;
+  /* กฎฐาน .progress-card ตั้ง flex-direction:column ไว้ ต้องเขียนทับตรงนี้ ไม่งั้นยังซ้อนลงล่าง */
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 52px 11px 14px;
 }
-.pc-numbers { display: flex; align-items: baseline; gap: 4px; margin-bottom: 8px; }
+.pc-head { flex-shrink: 0; }
+.pc-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.64rem;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 1px;
+}
+.pc-numbers { display: flex; align-items: baseline; gap: 3px; }
 .pc-big {
   font-family: 'DM Serif Display', serif;
-  font-size: 2.4rem;
+  font-size: 1.5rem;
   color: var(--maroon);
-  line-height: 1;
+  line-height: 1.05;
 }
 .pc-divider {
   font-family: 'DM Serif Display', serif;
-  font-size: 1.4rem;
+  font-size: 1rem;
   color: var(--text-muted);
   margin: 0 2px;
 }
 .pc-total {
   font-family: 'Anuphan', sans-serif;
-  font-size: 0.85rem;
+  font-size: 0.74rem;
   color: var(--text-muted);
   font-weight: 500;
 }
-.pc-spark {
-  position: absolute;
-  top: 18px; right: 58px;
-  width: 100px; height: 50px;
-  pointer-events: none;
-}
-.pc-spark svg { width: 100%; height: 100%; overflow: visible; }
-.pc-bar-wrap { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.pc-bar-wrap { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
 .pc-bar {
   flex: 1;
   display: grid;
@@ -2066,20 +2072,21 @@ body > * { position: relative; z-index: 1; }
 
   <!-- Cycle Progress card (full width) — settings gear floats top-right -->
   <div class="hero-cards single">
-    <div class="progress-card">
+    <div class="progress-card pc-strip">
       <button class="pc-settings-btn" onclick="openRoadmapSettings()" aria-label="ตั้งค่า Roadmap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3"/>
           <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
         </svg>
       </button>
-      <div class="pc-label">Cycle <span id="pcCycleNum">1</span> Progress</div>
-      <div class="pc-numbers">
-        <span class="pc-big" id="pcDayNum">—</span>
-        <span class="pc-divider">/</span>
-        <span class="pc-total"><span id="pcDayTotal">30</span> Days</span>
+      <div class="pc-head">
+        <div class="pc-label">Cycle <span id="pcCycleNum">1</span></div>
+        <div class="pc-numbers">
+          <span class="pc-big" id="pcDayNum">—</span>
+          <span class="pc-divider">/</span>
+          <span class="pc-total"><span id="pcDayTotal">30</span> Days</span>
+        </div>
       </div>
-      <div class="pc-spark" id="pcSpark"></div>
       <div class="pc-bar-wrap">
         <div class="pc-bar" id="pcBar"></div>
         <div class="pc-pct" id="pcPct">0%</div>
@@ -2774,8 +2781,6 @@ function updateLearningHeader() {
   document.getElementById('pcPct').textContent = pct + '%';
   renderProgressBar(dayInCycle);
 
-  // Sparkline (decorative — show ascending pattern)
-  renderSparkline();
 
   // Today summary card
   updateTodayCard(todayDay, today, start);
@@ -2793,26 +2798,6 @@ function renderProgressBar(dayInCycle) {
   bar.innerHTML = html;
 }
 
-function renderSparkline() {
-  const el = document.getElementById('pcSpark');
-  if (!el) return;
-  // Decorative ascending sparkline — positions are scaled to 100x50 SVG
-  const pts = [
-    [4, 42], [16, 35], [28, 38], [40, 28],
-    [52, 32], [64, 22], [76, 18], [88, 14], [96, 10]
-  ];
-  const path = pts.map((p, i) => (i === 0 ? `M ${p[0]} ${p[1]}` : `L ${p[0]} ${p[1]}`)).join(' ');
-  const dots = pts.map((p, i) => {
-    const isLast = i === pts.length - 1;
-    return `<circle cx="${p[0]}" cy="${p[1]}" r="${isLast ? 3.5 : 2}" fill="${isLast ? '#D4AF37' : '#B8860B'}" ${isLast ? 'stroke="#FFFEF8" stroke-width="1.5"' : ''}/>`;
-  }).join('');
-  el.innerHTML = `
-    <svg viewBox="0 0 100 50" preserveAspectRatio="none">
-      <path d="${path}" stroke="#B8860B" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      ${dots}
-    </svg>
-  `;
-}
 
 function updateTodayCard(todayDay, today, start) {
   const card = document.getElementById('todayCard');
