@@ -1237,9 +1237,11 @@ body > * { position: relative; z-index: 1; }
 /* Floating settings button — top-right corner of progress card */
 .pc-settings-btn {
   position: absolute;
+  /* จัดกลางแนวตั้งด้วย margin-top ไม่ใช่ translateY เพราะ :hover ใช้ transform:rotate
+     ถ้าใช้ translateY ปุ่มจะกระโดดลง 16px ตอน hover */
   top: 50%;
+  margin-top: -16px;
   right: 12px;
-  transform: translateY(-50%);
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -1264,7 +1266,7 @@ body > * { position: relative; z-index: 1; }
   color: var(--maroon);
 }
 @media (max-width: 480px) {
-  .pc-settings-btn { width: 32px; height: 32px; top: 10px; right: 10px; }
+  .pc-settings-btn { width: 32px; height: 32px; top: 50%; margin-top: -16px; right: 10px; }
   .pc-settings-btn svg { width: 16px; height: 16px; }
 }
 
