@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>วันนี้ระบบเปิดไหม — JPT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Anuphan:wght@400;500;600;700&family=Cinzel:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<style>
+:root{
+  --bg:#FAF6ED; --card:#FFFEF8; --border:rgba(212,175,55,.18);
+  --gold:#D4AF37; --gold-deep:#8B6914; --gold-soft:rgba(212,175,55,.12);
+  --maroon:#3a1520; --maroon-deep:#1a0a0e; --maroon-mid:#2d1018;
+  --emerald:#2E7D32; --red:#C62828; --amber:#B07A18;
+  --text:#3D3228; --muted:#8a7d6b;
+  --font-h:'Cinzel',serif; --font-b:'Sarabun','Anuphan',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:900px;margin:0 auto;padding:18px 14px 56px}
+
+.hdr{display:flex;align-items:flex-start;gap:12px;padding:10px 0 16px;border-bottom:1px solid var(--border);margin-bottom:18px}
+.hdr h1{font-family:var(--font-h);font-size:clamp(19px,4.6vw,26px);letter-spacing:.4px;color:var(--maroon);font-weight:600}
+.hdr .sub{font-size:12px;color:var(--muted);margin-top:2px}
+.eyebrow{font-family:var(--font-h);font-size:9.5px;letter-spacing:2.2px;color:var(--gold-deep);font-weight:600;text-transform:uppercase}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:14px;
+  box-shadow:0 2px 8px rgba(114,47,55,.05)}
+
+/* ---------- verdict ---------- */
+.verdict{background:linear-gradient(160deg,#1a0a0e,#2d1018 45%,#3a1520 62%,#1a0a0e);border-color:rgba(212,175,55,.3);
+  color:#F4E4BA;text-align:center;padding:26px 18px 22px}
+.v-state{font-family:var(--font-h);font-size:clamp(30px,8.4vw,44px);letter-spacing:1px;line-height:1.15;margin:6px 0 4px}
+.v-on{color:#6FD774}.v-off{color:#E9909B}.v-wait{color:#E9A23B}
+.v-for{font-size:12.5px;color:rgba(244,228,186,.62)}
+.v-line{font-size:13.5px;color:rgba(244,228,186,.9);margin-top:10px;max-width:460px;margin-left:auto;margin-right:auto}
+.v-meta{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid rgba(212,175,55,.2)}
+.vm{min-width:74px}
+.vm b{display:block;font-size:21px;font-weight:500;color:var(--gold);line-height:1.2;font-variant-numeric:tabular-nums}
+.vm span{font-size:10.5px;color:rgba(244,228,186,.55);letter-spacing:.4px}
+
+/* ---------- levels ---------- */
+.lv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.lv{border:1px solid var(--border);border-radius:12px;padding:12px 13px;background:#fff}
+.lv.buy{border-color:rgba(46,125,50,.3)}.lv.sell{border-color:rgba(198,40,40,.28)}
+.lv .lv-t{font-size:10.5px;letter-spacing:1.3px;font-weight:600;text-transform:uppercase}
+.lv.buy .lv-t{color:var(--emerald)}.lv.sell .lv-t{color:var(--red)}
+.lv .lv-p{font-size:23px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--maroon);line-height:1.25}
+.lv .lv-s{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.sect-t{font-family:var(--font-h);font-size:13px;letter-spacing:1.4px;color:var(--maroon);text-transform:uppercase;margin-bottom:3px}
+.sect-d{font-size:12px;color:var(--muted)}
+
+/* ---------- chart ---------- */
+#chart{height:300px;width:100%;margin-top:12px;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:11.5px;color:var(--muted)}
+.legend i{display:inline-block;width:16px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.i-box{background:var(--gold)}.i-buy{background:#2E7D32}.i-sell{background:#C62828}
+
+/* ---------- table ---------- */
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px}
+th{font-family:var(--font-h);font-size:10px;letter-spacing:1.2px;color:var(--gold-deep);text-align:right;
+  padding:7px 8px;border-bottom:1px solid rgba(212,175,55,.3);font-weight:600}
+th:first-child{text-align:left}
+td{padding:7px 8px;border-bottom:1px solid rgba(212,175,55,.09);text-align:right;font-variant-numeric:tabular-nums}
+td:first-child{text-align:left;color:var(--muted)}
+tr:last-child td{border-bottom:none}
+.tag{display:inline-block;padding:1px 9px;border-radius:99px;font-size:11px;font-weight:600;letter-spacing:.3px}
+.t-HIGH{background:rgba(46,125,50,.1);color:var(--emerald)}
+.t-MID{background:rgba(176,122,24,.12);color:var(--amber)}
+.t-LOW{background:rgba(198,40,40,.09);color:var(--red)}
+.t-NA{background:rgba(138,125,107,.12);color:var(--muted)}
+
+.note{font-size:11.5px;color:var(--muted);line-height:1.75}
+.note b{color:var(--gold-deep);font-weight:600}
+.note ul{margin:6px 0 0 16px}
+.note li{margin-bottom:3px}
+.warn{background:rgba(233,162,59,.08);border:1px solid rgba(176,122,24,.25);border-radius:10px;padding:10px 12px;font-size:12px;color:#7a5a12;margin-top:10px}
+.loading{text-align:center;padding:36px 16px;color:var(--muted);font-size:13.5px}
+.spin{width:22px;height:22px;border:2px solid rgba(212,175,55,.25);border-top-color:var(--gold);border-radius:50%;
+  margin:0 auto 12px;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.err{color:var(--red);font-size:13px;text-align:center;padding:26px 14px}
+@media(max-width:430px){ .lv-grid{grid-template-columns:1fr} .v-meta{gap:16px} #chart{height:250px} }
+</style>
+<!-- JP Trust hard auth-gate (redirect to login if no session) -->
+<script src="./jp-gate.js?v=1783134367"></script>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hdr">
+    <div>
+      <div class="eyebrow">Asia Range Regime</div>
+      <h1>วันนี้ระบบเปิดไหม</h1>
+      <div class="sub">XAUUSD · เวลาไทย · คำนวณสดจากข้อมูล H1 ทุกครั้งที่เปิดหน้า</div>
+    </div>
+  </div>
+
+  <div id="app">
+    <div class="card"><div class="loading"><div class="spin"></div>กำลังโหลดข้อมูลราคา (ราว 900 KB) แล้วคำนวณสวิตช์…</div></div>
+  </div>
+
+  <div class="card">
+    <div class="sect-t">อ่านค่ายังไง</div>
+    <div class="note" style="margin-top:8px">
+      <ul>
+        <li><b>สวิตช์</b> = สัดส่วนที่ช่วงเอเชียกินของกรอบราคาทั้งวัน เฉลี่ย 60 วันเทรด แล้วจัดอันดับเทียบ 500 วันหลังสุด</li>
+        <li><b>HIGH</b> (อันดับ &gt; 0.66) = ช่วงเอเชียคุมทิศของวัน → วันเทรนด์ ระบบเปิด · <b>MID</b> = ก้ำกึ่ง · <b>LOW</b> (&lt; 0.33) = แกว่งไร้ทิศ</li>
+        <li>ค่าของวันนี้ใช้ข้อมูล<b>ถึงเมื่อวาน</b>เท่านั้น จึงรู้คำตอบได้ตั้งแต่ก่อนตลาดเปิด — ไม่ใช่การทำนาย แต่เป็นการอ่านโครงสร้างที่ผ่านมา</li>
+        <li>สถิติอ้างอิง 22 ปี: เข้าเฉพาะวัน HIGH ให้ Sharpe 1.19 · วัน LOW ตามทิศติดลบ — ที่มาเต็มอยู่ใน SPEC-ASIA-HIGH-BREAKOUT</li>
+      </ul>
+      <div class="warn">
+        ⚠️ หน้านี้คำนวณจากฟีด spot สาธารณะที่อัปเดตวันละครั้ง (ราว 07:00 น.) ค่าที่ได้ต่างจากไฟล์วิจัยของเราเฉลี่ย 0.005 สูงสุด 0.056
+        และเคยให้ป้ายต่างกัน 6 วันจาก 431 วัน (กระจุกที่รอยต่อข้อมูล มี.ค. 2025) — ถ้าค่าอยู่ใกล้เส้น 0.66 ให้ยึดค่าจาก EA บนเครื่องของคุณเป็นหลัก
+        ทั้งหมดนี้เป็นข้อมูลประกอบการศึกษา ไม่ใช่คำแนะนำการลงทุน
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/*===CORE-START=== ส่วนคำนวณล้วน ไม่มี DOM — มีสคริปต์เทียบผลกับ Python อยู่ใน jptrustdocs ===*/
+var JPT = (function () {
+  var P = { asiaStart: 7, asiaEnd: 13, shareWin: 60, shareMinPeriods: 40, pctWin: 500, pctMin: 250,
+            highThr: 0.66, lowThr: 0.33, minAsiaBars: 3, shareMinBars: 5 };
+
+  /* ---- US Eastern DST (post-2007 rule) for a naive New York wall clock ---- */
+  function nthSunday(y, month, n) {              // month 1-12, n=1 -> first Sunday
+    var d = new Date(Date.UTC(y, month - 1, 1));
+    var first = 1 + ((7 - d.getUTCDay()) % 7);   // day-of-month of the first Sunday
+    return first + (n - 1) * 7;
+  }
+  function isNyDst(y, mo, da, ho) {
+    if (mo > 3 && mo < 11) return true;
+    if (mo < 3 || mo > 11) return false;
+    if (mo === 3) { var s = nthSunday(y, 3, 2); return da > s || (da === s && ho >= 2); }
+    var e = nthSunday(y, 11, 1); return da < e || (da === e && ho < 2);
+  }
+  /* MT server time (New York + 7h) -> Thai time (UTC+7).
+     Thai = serverNaive + 4h when New York is on DST, + 5h otherwise. */
+  function serverToThaiMs(y, mo, da, ho, mi) {
+    var ny = new Date(Date.UTC(y, mo - 1, da, ho, mi) - 7 * 3600e3);
+    var off = isNyDst(ny.getUTCFullYear(), ny.getUTCMonth() + 1, ny.getUTCDate(), ny.getUTCHours()) ? 4 : 5;
+    return Date.UTC(y, mo - 1, da, ho, mi) + off * 3600e3;
+  }
+
+  /* ---- CSV (time,open,high,low,close,tick_volume) -> Thai-time bars, oldest first ---- */
+  function parseCsv(text, fromYear) {
+    var lines = text.split('\n'), out = [], seen = Object.create(null);
+    for (var i = 1; i < lines.length; i++) {
+      var ln = lines[i]; if (ln.length < 20) continue;
+      var y = +ln.slice(0, 4); if (y < fromYear) continue;
+      var f = ln.split(',');
+      if (f.length < 5) continue;
+      var t = f[0];
+      var ms = serverToThaiMs(y, +t.slice(5, 7), +t.slice(8, 10), +t.slice(11, 13), +t.slice(14, 16));
+      if (seen[ms]) continue; seen[ms] = 1;
+      var o = +f[1], h = +f[2], l = +f[3], c = +f[4];
+      if (!(o > 0 && h > 0 && l > 0 && c > 0)) continue;
+      out.push({ ms: ms, o: o, h: h, l: l, c: c });
+    }
+    out.sort(function (a, b) { return a.ms - b.ms; });
+    for (var j = 0; j < out.length; j++) {
+      var d = new Date(out[j].ms);
+      out[j].hour = d.getUTCHours();
+      out[j].day = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+    }
+    return out;
+  }
+
+  /* ---- one row per calendar day: Asia 07-13 box + share of the full-day range ---- */
+  function asiaTable(bars) {
+    var byDay = Object.create(null), order = [];
+    for (var i = 0; i < bars.length; i++) {
+      var b = bars[i], r = byDay[b.day];
+      if (!r) { r = byDay[b.day] = { day: b.day, dH: -Infinity, dL: Infinity, n: 0 }; order.push(b.day); }
+      if (b.h > r.dH) r.dH = b.h;
+      if (b.l < r.dL) r.dL = b.l;
+      if (b.hour >= P.asiaStart && b.hour <= P.asiaEnd) {
+        if (r.n === 0) { r.aO = b.o; r.aH = b.h; r.aL = b.l; }
+        else { if (b.h > r.aH) r.aH = b.h; if (b.l < r.aL) r.aL = b.l; }
+        r.aC = b.c; r.n++;
+      }
+    }
+    order.sort(function (a, b) { return a - b; });
+    var A = [];
+    for (var k = 0; k < order.length; k++) {
+      var q = byDay[order[k]];
+      if (q.n < P.minAsiaBars) continue;                       // not a trading day
+      q.range = q.aH - q.aL;
+      q.dir = q.aC > q.aO ? 1 : (q.aC < q.aO ? -1 : 0);
+      var dr = q.dH - q.dL;
+      q.share = (q.n >= P.shareMinBars && dr > 0) ? q.range / dr : null;   // known only after the day ends
+      A.push(q);
+    }
+    return A;
+  }
+
+  /* ---- regime: s60 = mean share of the 60 previous trading days (shifted, no look-ahead)
+          pct  = rank of s60 inside the 500 previous s60 values ---- */
+  function mean60(A, end) {                       // window = A[end-60 .. end-1]
+    var s = 0, n = 0;
+    for (var i = Math.max(0, end - P.shareWin); i < end; i++) if (A[i].share !== null) { s += A[i].share; n++; }
+    return n >= P.shareMinPeriods ? s / n : null;
+  }
+  function rank(s60, idx, val) {                  // fraction of the previous window below val
+    var lo = Math.max(0, idx - P.pctWin + 1), cnt = 0, tot = 0, valid = 0;
+    for (var i = lo; i < idx; i++) { tot++; if (s60[i] !== null) { valid++; if (s60[i] < val) cnt++; } }
+    if (tot === 0 || valid + 1 < P.pctMin) return null;
+    return cnt / tot;
+  }
+  function label(p) { return p === null ? 'NA' : (p > P.highThr ? 'HIGH' : (p < P.lowThr ? 'LOW' : 'MID')); }
+
+  function regime(A) {
+    var s60 = [], pct = [], reg = [];
+    for (var i = 0; i < A.length; i++) s60.push(mean60(A, i));
+    for (var j = 0; j < A.length; j++) {
+      var p = s60[j] === null ? null : rank(s60, j, s60[j]);
+      pct.push(p); reg.push(label(p));
+    }
+    /* the next trading day is fully determined by the days already closed */
+    var ns = mean60(A, A.length);
+    var np = ns === null ? null : rank(s60, s60.length, ns);
+    return { s60: s60, pct: pct, reg: reg, next: { s60: ns, pct: np, reg: label(np) } };
+  }
+
+  return { P: P, parseCsv: parseCsv, asiaTable: asiaTable, regime: regime,
+           serverToThaiMs: serverToThaiMs, label: label };
+})();
+/*===CORE-END===*/
+
+/* ------------------------------------------------------------------ view */
+var SRC = 'https://raw.githubusercontent.com/simom1/XAUUSD-history/main/Gold-Cash/XAUUSD/XAUUSD_H1.csv';
+var TH_MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+var app = document.getElementById('app');
+
+function fmtDay(ms) { var d = new Date(ms); return d.getUTCDate() + ' ' + TH_MONTHS[d.getUTCMonth()] + ' ' + (d.getUTCFullYear() + 543 - 2500 + 2500); }
+function fmtShort(ms) { var d = new Date(ms); return d.getUTCDate() + ' ' + TH_MONTHS[d.getUTCMonth()]; }
+function fmtStamp(ms) { var d = new Date(ms); return fmtShort(ms) + ' ' + String(d.getUTCHours()).padStart(2, '0') + ':00'; }
+function px(v) { return v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/, ','); }
+function num(v) { return String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+/* today's Thai calendar day, as a UTC-midnight key (bars use the same convention) */
+function thaiTodayKey() {
+  var n = new Date(Date.now() + 7 * 3600e3);
+  return Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate());
+}
+
+function render(bars, A, R) {
+  var last = A[A.length - 1], lastIdx = A.length - 1;
+  var todayKey = thaiTodayKey(), dow = new Date(todayKey).getUTCDay();
+  var weekend = (dow === 6 || dow === 0);
+  /* the last row in the file is already closed, so the live answer is always "the next trading day" */
+  var forToday = todayKey > last.day && !weekend;
+  var use = forToday ? R.next : { pct: R.pct[lastIdx], reg: R.reg[lastIdx], s60: R.s60[lastIdx] };
+  var forLabel = forToday ? 'สำหรับวันนี้ · ' + fmtDay(todayKey)
+                          : (weekend ? 'ตลาดปิดสุดสัปดาห์ · ค่าของวันเทรดถัดไป' : 'วันเทรดล่าสุด · ' + fmtDay(last.day));
+  if (weekend) use = R.next;
+
+  var on = use.reg === 'HIGH';
+  var stateCls = use.reg === 'NA' ? 'v-wait' : (on ? 'v-on' : 'v-off');
+  var stateTxt = use.reg === 'NA' ? 'ข้อมูลไม่พอ' : (on ? 'ระบบเปิด' : 'ไม่เปิด');
+  var line = use.reg === 'NA' ? 'ยังคำนวณสวิตช์ไม่ได้ ข้อมูลย้อนหลังไม่ครบ 250 วัน'
+    : on ? 'วันเทรนด์ — วางออเดอร์สองฝั่งที่ขอบกรอบเอเชียตอน 14:00 น. ตามสเปก'
+    : (use.reg === 'LOW' ? 'ช่วงเอเชียแคบผิดปกติ วันแบบนี้ตามทิศแล้วติดลบมาตลอด — อยู่เฉยๆ'
+                         : 'ก้ำกึ่ง ไม่เข้าเกณฑ์ HIGH — สเปกให้พัก');
+
+  var h = '';
+  h += '<div class="card verdict">'
+     + '<div class="eyebrow" style="color:rgba(212,175,55,.85)">' + (on ? 'SYSTEM ON' : 'SYSTEM OFF') + '</div>'
+     + '<div class="v-state ' + stateCls + '">' + stateTxt + '</div>'
+     + '<div class="v-for">' + forLabel + '</div>'
+     + '<div class="v-line">' + line + '</div>'
+     + '<div class="v-meta">'
+     +   '<div class="vm"><b>' + (use.reg === 'NA' ? '—' : use.reg) + '</b><span>REGIME</span></div>'
+     +   '<div class="vm"><b>' + (use.pct === null ? '—' : use.pct.toFixed(2)) + '</b><span>PERCENTILE</span></div>'
+     +   '<div class="vm"><b>' + (use.s60 === null ? '—' : use.s60.toFixed(3)) + '</b><span>S60</span></div>'
+     +   '<div class="vm"><b>0.66</b><span>เกณฑ์ HIGH</span></div>'
+     + '</div></div>';
+
+  /* levels — from the last closed Asia session; today's own box only exists after 13:59 */
+  var stale = forToday || weekend;
+  h += '<div class="card">'
+     + '<div class="sect-t">กรอบเอเชียล่าสุด</div>'
+     + '<div class="sect-d">แท่ง 07:00–13:00 ของ ' + fmtDay(last.day) + ' · กว้าง ' + px(last.range)
+     +   ' (' + Math.round(last.range / last.aC * 1e4) + ' bp) · เอเชีย' + (last.dir > 0 ? 'ขึ้น' : last.dir < 0 ? 'ลง' : 'ไม่เปลี่ยน') + '</div>'
+     + '<div class="lv-grid">'
+     +   '<div class="lv buy"><div class="lv-t">Buy stop</div><div class="lv-p">' + px(last.aH) + '</div>'
+     +     '<div class="lv-s">SL ' + px(last.aL) + '</div></div>'
+     +   '<div class="lv sell"><div class="lv-t">Sell stop</div><div class="lv-p">' + px(last.aL) + '</div>'
+     +     '<div class="lv-s">SL ' + px(last.aH) + '</div></div>'
+     + '</div>';
+  if (stale) h += '<div class="warn">ระดับราคาด้านบนเป็นของ ' + fmtDay(last.day)
+     + ' ยังไม่ใช่ของวันนี้ — กรอบของวันนี้จะครบเมื่อแท่ง 13:00 ปิด และฟีดนี้จะได้ข้อมูลนั้นในเช้าวันถัดไป '
+     + 'ระหว่างวันให้อ่านระดับจาก EA หรือกราฟของคุณเอง</div>';
+  h += '</div>';
+
+  h += '<div class="card"><div class="sect-t">กราฟ 8 วันเทรดล่าสุด</div>'
+     + '<div class="sect-d">แท่ง H1 เวลาไทย · แถบทอง = กรอบเอเชีย 07:00–13:00 ของแต่ละวัน</div>'
+     + '<div id="chart"></div>'
+     + '<div class="legend"><span><i class="i-box"></i>กรอบเอเชีย</span>'
+     +   '<span><i class="i-buy"></i>buy stop</span><span><i class="i-sell"></i>sell stop</span></div></div>';
+
+  var rows = '';
+  for (var i = Math.max(0, A.length - 12); i < A.length; i++) {
+    rows += '<tr><td>' + fmtShort(A[i].day) + '</td>'
+          + '<td><span class="tag t-' + R.reg[i] + '">' + R.reg[i] + '</span></td>'
+          + '<td>' + (R.pct[i] === null ? '—' : R.pct[i].toFixed(2)) + '</td>'
+          + '<td>' + (A[i].share === null ? '—' : A[i].share.toFixed(2)) + '</td>'
+          + '<td>' + Math.round(A[i].range / A[i].aC * 1e4) + '</td></tr>';
+  }
+  h += '<div class="card"><div class="sect-t">12 วันเทรดล่าสุด</div>'
+     + '<table><thead><tr><th>วัน</th><th>REGIME</th><th>PCT</th><th>SHARE</th><th>กรอบ (BP)</th></tr></thead>'
+     + '<tbody>' + rows + '</tbody></table>'
+     + '<div class="note" style="margin-top:10px">ข้อมูลถึง ' + fmtStamp(bars[bars.length - 1].ms)
+     + ' · ใช้แท่ง H1 ' + num(bars.length) + ' แท่ง · วันเทรด ' + num(A.length) + ' วัน'
+     + ' · แหล่ง simom1/XAUUSD-history (MT5 spot)</div></div>';
+
+  app.innerHTML = h;
+  drawChart(bars, A, R);
+}
+
+function drawChart(bars, A, R) {
+  var el = document.getElementById('chart');
+  if (!window.LightweightCharts) { el.innerHTML = '<div class="err">โหลดไลบรารีกราฟไม่สำเร็จ — ตัวเลขด้านบนยังใช้ได้ปกติ</div>'; return; }
+  var days = A.slice(-8).map(function (d) { return d.day; });
+  var from = days[0], to = days[days.length - 1] + 24 * 3600e3;
+  var seg = bars.filter(function (b) { return b.ms >= from && b.ms < to; });
+  if (!seg.length) return;
+
+  var chart = LightweightCharts.createChart(el, {
+    localization: { locale: 'en-US' },
+    layout: { background: { color: '#241016' }, textColor: '#C4B88A', fontFamily: 'Sarabun, sans-serif', fontSize: 11 },
+    grid: { vertLines: { color: 'rgba(212,175,55,.07)' }, horzLines: { color: 'rgba(212,175,55,.07)' } },
+    rightPriceScale: { borderColor: 'rgba(212,175,55,.22)' },
+    timeScale: { borderColor: 'rgba(212,175,55,.22)', timeVisible: true, secondsVisible: false },
+    crosshair: { vertLine: { color: 'rgba(212,175,55,.45)' }, horzLine: { color: 'rgba(212,175,55,.45)' } },
+    handleScale: { axisPressedMouseMove: false },
+    width: el.clientWidth, height: el.clientHeight, autoSize: true
+  });
+  var candles = chart.addCandlestickSeries({
+    upColor: '#2E9F5F', downColor: '#C6472E', wickUpColor: '#2E9F5F', wickDownColor: '#C6472E', borderVisible: false,
+    priceFormat: { type: 'price', precision: 2, minMove: 0.01 }
+  });
+  candles.setData(seg.map(function (b) { return { time: b.ms / 1000, open: b.o, high: b.h, low: b.l, close: b.c }; }));
+
+  /* Asia box: one short line series per day per edge — whitespace points do not reliably
+     break a line series, and separate series guarantee no join across days */
+  var boxOpt = { color: 'rgba(212,175,55,.9)', lineWidth: 2, priceLineVisible: false,
+                 lastValueVisible: false, crosshairMarkerVisible: false };
+  A.slice(-8).forEach(function (d) {
+    var s0 = (d.day + JPT.P.asiaStart * 3600e3) / 1000, e0 = (d.day + JPT.P.asiaEnd * 3600e3) / 1000;
+    chart.addLineSeries(boxOpt).setData([{ time: s0, value: d.aH }, { time: e0, value: d.aH }]);
+    chart.addLineSeries(boxOpt).setData([{ time: s0, value: d.aL }, { time: e0, value: d.aL }]);
+  });
+
+  var last = A[A.length - 1];
+  candles.createPriceLine({ price: last.aH, color: '#2E9F5F', lineWidth: 1, lineStyle: 2, title: 'BUY' });
+  candles.createPriceLine({ price: last.aL, color: '#C6472E', lineWidth: 1, lineStyle: 2, title: 'SELL' });
+  chart.timeScale().fitContent();
+  /* autoSize keeps the canvas in step with the container, but the visible range is
+     fixed at the width it was fitted on — refit whenever the box actually changes size */
+  if (window.ResizeObserver) new ResizeObserver(function () { chart.timeScale().fitContent(); }).observe(el);
+}
+
+fetch(SRC, { cache: 'default' })
+  .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+  .then(function (txt) {
+    var bars = JPT.parseCsv(txt, new Date().getUTCFullYear() - 5);
+    if (bars.length < 5000) throw new Error('ข้อมูลไม่พอ');
+    var A = JPT.asiaTable(bars);
+    var R = JPT.regime(A);
+    render(bars, A, R);
+  })
+  .catch(function (e) {
+    app.innerHTML = '<div class="card"><div class="err">ดึงข้อมูลราคาไม่สำเร็จ (' + e.message + ')<br>'
+      + 'ลองรีเฟรชอีกครั้ง — ถ้ายังไม่ได้แปลว่าแหล่งข้อมูลต้นทางล่ม</div></div>';
+  });
+</script>
+</body>
+</html>
