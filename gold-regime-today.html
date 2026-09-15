@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex,nofollow">
-<title>วันนี้ระบบเปิดไหม — JPT</title>
+<title>Asia Range Regime — JPT</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Anuphan:wght@400;500;600;700&family=Cinzel:wght@500;600&display=swap" rel="stylesheet">
@@ -54,7 +54,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .sect-d{font-size:12px;color:var(--muted)}
 
 /* ---------- chart ---------- */
-#chart{height:300px;width:100%;margin-top:12px;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+#chart{height:336px;width:100%;margin-top:12px;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
 .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:11.5px;color:var(--muted)}
 .legend i{display:inline-block;width:16px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
 .i-box{background:var(--gold)}.i-buy{background:#2E7D32}.i-sell{background:#C62828}
@@ -83,7 +83,7 @@ tr:last-child td{border-bottom:none}
   margin:0 auto 12px;animation:sp .8s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 .err{color:var(--red);font-size:13px;text-align:center;padding:26px 14px}
-@media(max-width:430px){ .lv-grid{grid-template-columns:1fr} .v-meta{gap:16px} #chart{height:250px} }
+@media(max-width:430px){ .lv-grid{grid-template-columns:1fr} .v-meta{gap:16px} #chart{height:292px} }
 </style>
 <!-- JP Trust hard auth-gate (redirect to login if no session) -->
 <script src="./jp-gate.js?v=1783134367"></script>
@@ -93,8 +93,7 @@ tr:last-child td{border-bottom:none}
 
   <div class="hdr">
     <div>
-      <div class="eyebrow">Asia Range Regime</div>
-      <h1>วันนี้ระบบเปิดไหม</h1>
+      <h1>Asia Range Regime</h1>
       <div class="sub">XAUUSD · เวลาไทย · คำนวณสดจากข้อมูล H1 ทุกครั้งที่เปิดหน้า</div>
     </div>
   </div>
@@ -334,13 +333,13 @@ function drawChart(bars, A, R) {
 
   var chart = LightweightCharts.createChart(el, {
     localization: { locale: 'en-US' },
-    layout: { background: { color: '#241016' }, textColor: '#C4B88A', fontFamily: 'Sarabun, sans-serif', fontSize: 11 },
+    layout: { background: { color: '#241016' }, textColor: '#C4B88A', fontFamily: 'Helvetica, Arial, sans-serif', fontSize: 11 },
     grid: { vertLines: { color: 'rgba(212,175,55,.07)' }, horzLines: { color: 'rgba(212,175,55,.07)' } },
     rightPriceScale: { borderColor: 'rgba(212,175,55,.22)' },
     timeScale: { borderColor: 'rgba(212,175,55,.22)', timeVisible: true, secondsVisible: false },
     crosshair: { vertLine: { color: 'rgba(212,175,55,.45)' }, horzLine: { color: 'rgba(212,175,55,.45)' } },
     handleScale: { axisPressedMouseMove: false },
-    width: el.clientWidth, height: el.clientHeight, autoSize: true
+    width: el.clientWidth, height: el.clientHeight, autoSize: false
   });
   var candles = chart.addCandlestickSeries({
     upColor: '#2E9F5F', downColor: '#C6472E', wickUpColor: '#2E9F5F', wickDownColor: '#C6472E', borderVisible: false,
@@ -361,10 +360,15 @@ function drawChart(bars, A, R) {
   var last = A[A.length - 1];
   candles.createPriceLine({ price: last.aH, color: '#2E9F5F', lineWidth: 1, lineStyle: 2, title: 'BUY' });
   candles.createPriceLine({ price: last.aL, color: '#C6472E', lineWidth: 1, lineStyle: 2, title: 'SELL' });
-  chart.timeScale().fitContent();
-  /* autoSize keeps the canvas in step with the container, but the visible range is
-     fixed at the width it was fitted on — refit whenever the box actually changes size */
-  if (window.ResizeObserver) new ResizeObserver(function () { chart.timeScale().fitContent(); }).observe(el);
+  /* size is managed by hand: autoSize measures the border box, so the time axis ends up
+     drawn a couple of pixels below the padding box and gets clipped by overflow:hidden */
+  function fit() {
+    chart.applyOptions({ width: el.clientWidth, height: el.clientHeight });
+    chart.timeScale().fitContent();
+  }
+  fit();
+  if (window.ResizeObserver) new ResizeObserver(fit).observe(el);
+  else window.addEventListener('resize', fit);
 }
 
 fetch(SRC, { cache: 'default' })
