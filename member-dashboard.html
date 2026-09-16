@@ -427,7 +427,6 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .story-tag.neutral{color:#8B6914;background:rgba(212,175,55,0.13);border-color:rgba(212,175,55,0.40)}
 
 .story-meta{flex-shrink:0;align-self:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:66px;font-family:'Sarabun','Anuphan',sans-serif}
-.impact-label{font-family:'Cinzel',serif;font-size:9.5px;font-weight:600;letter-spacing:0.6px;text-transform:uppercase;text-align:center;color:var(--text-dark-muted);line-height:1.1}
 .story-meta-time{font-family:'Sarabun','Anuphan',sans-serif;font-size:10px;font-weight:400;letter-spacing:0.2px;text-align:center;color:var(--text-dark-muted);line-height:1.1;white-space:nowrap;opacity:0.9}
 
 /* Latest Dispatches sect-hd + refresh button */
@@ -2686,7 +2685,6 @@ function renderHeadlineCard(h){
     +'</div>'
     +'<div class="story-meta">'
       +'<div class="news-trend '+ns.dir+'"><svg viewBox="0 0 24 24">'+trendGlyph(ns.dir)+'</svg>'+ns.dirText+'</div>'
-      +'<div class="impact-label">'+ns.levelText+'</div>'
       +strengthBar(ns.dir,ns.bars)
       +(time?'<div class="story-meta-time">'+escapeText(time)+'</div>':'')
     +'</div>'
