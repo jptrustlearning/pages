@@ -63,6 +63,19 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 .pnl-pos{color:#2E9F5F}.pnl-neg{color:#C0392B}.pnl-zero{color:rgba(255,245,225,0.6)}
 .hero .pnl-pos{color:#4DE89A;text-shadow:0 0 14px rgba(77,232,154,0.5)}
 .hero .pnl-neg{color:#FF6B6B;text-shadow:0 0 14px rgba(255,107,107,0.4)}
+/* === DAILY CHANGE — % เปลี่ยนแปลงเทียบราคาปิดวันก่อนหน้า (แสดงผลอย่างเดียว ไม่แตะข้อมูล/ซิงก์) === */
+.day-tag{font-family:var(--font-label);font-size:.52rem;letter-spacing:1.4px;font-weight:700;padding:1px 5px;border-radius:100px;background:rgba(212,175,55,0.16);color:var(--gold-dark);line-height:1.5;vertical-align:middle}
+.hero .day-tag{background:rgba(212,175,55,0.2);color:var(--gold-light)}
+.hero-day-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;margin:-2px 0 8px;position:relative;z-index:1}
+.hero-day{display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 6px;border-radius:100px;background:rgba(255,245,225,0.07);border:1px solid rgba(212,175,55,0.22)}
+.hero-day-val{font-family:var(--font-number);font-size:.95rem;line-height:1.1}
+.hero-day-usd{font-size:.68rem;color:rgba(255,245,225,0.65)}
+.hero-day-note{font-size:.66rem;color:rgba(255,245,225,0.55)}
+.lot-pnl-day{font-size:.66rem;margin-top:4px;display:inline-flex;align-items:center;justify-content:flex-end;gap:5px;white-space:nowrap}
+.g-lot-day{font-size:.66rem;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.g-lot-r{display:inline-flex;align-items:center;gap:10px;margin-left:auto}
+.g-stat-val.pnl-pos{color:var(--green)}.g-stat-val.pnl-neg{color:var(--red)}
+.day-na,.lot-pnl-day.pnl-zero,.g-lot-day.pnl-zero,.g-day.pnl-zero{color:var(--text-muted)}
 
 /* === BUTTONS === */
 .action-row{display:flex;gap:10px;margin-bottom:16px}
@@ -370,6 +383,7 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
       <div class="hero-title">มูลค่าพอร์ตปัจจุบัน</div>
       <div class="hero-value-row"><span class="hero-value" id="heroValue">$0.0000</span><span class="hero-value-cur">USD</span></div>
       <div><span class="hero-total-pct pnl-zero" id="heroPct">0.00%</span></div>
+      <div class="hero-day-row"><span class="hero-day" title="เปลี่ยนแปลงเทียบราคาปิดวันก่อนหน้า"><span class="day-tag">1D</span><span class="hero-day-val pnl-zero" id="heroDayVal">—</span><span class="hero-day-usd" id="heroDayUsd"></span></span><span class="hero-day-note" id="heroDayNote"></span></div>
       <div class="hero-sub" id="heroSub">ยังไม่มีรายการ</div>
       <div class="hero-pnl-row">
         <div><div class="pnl-cell-label">REALIZED P&amp;L</div><div class="pnl-cell-value" id="heroRealized">$0.0000</div><div class="pnl-cell-pct" id="heroRealizedSub">ยังไม่มีการขาย</div></div>
@@ -1011,6 +1025,22 @@ function priceInfo(lot){
   if(c!=null){ const p=PRICES[lot.ticker]; return {price:c, date:p.dates[p.dates.length-1], stale:false}; }
   return {price:lot.price, date:lot.date, stale:true}; // fallback: buy price
 }
+/* ---------- DAILY CHANGE = ราคาปิดล่าสุด เทียบราคาปิดวันทำการก่อนหน้า ----------
+   อ่านจาก PRICES อย่างเดียว (closes 2 ตัวท้าย) ไม่มีการเขียน/ไม่แตะ D หรือ rev
+   series สั้นกว่า 2 แท่ง (เช่น เพิ่งซื้อวันนี้) = null → แสดง '—'                     */
+function dayChange(tk){
+  const p=PRICES[tk]; if(!p || !Array.isArray(p.closes) || p.closes.length<2) return null;
+  const n=p.closes.length, last=p.closes[n-1], prev=p.closes[n-2];
+  if(last==null || !(prev>0)) return null;
+  return {last, prev, diff:last-prev, pct:(last-prev)/prev*100, date:p.dates[n-1], prevDate:p.dates[n-2]};
+}
+function thDateShort(s){ if(!s) return ''; const a=String(s).split('-'); if(a.length<3) return s; return parseInt(a[2],10)+' '+(TH_MON[parseInt(a[1],10)-1]||''); }
+/* บรรทัด 1D บนการ์ด: usd = การเปลี่ยนแปลงเป็นเงินของจำนวนหุ้นที่ถือ (null = ไม่มีข้อมูล) */
+function dayLineHtml(dc, usd, cls){
+  cls=cls||'lot-pnl-day';
+  if(!dc) return '<div class="'+cls+' day-na"><span class="day-tag">1D</span>—</div>';
+  return '<div class="'+cls+' '+pnlClass(dc.diff)+'"><span class="day-tag">1D</span>'+fmtPct(dc.pct,true)+(usd!=null?' · '+fmtUSDsigned(usd):'')+'</div>';
+}
 function visibleLots(pid){ return D.lots.filter(l=> pid===ALL ? true : l.portfolioId===pid).slice().sort((a,b)=> (b.date||'').localeCompare(a.date||'')); }
 /* ---------- NET CAPITAL (peak deployed) = ตัวหารของ %กำไรรวม ----------
    ตัวหาร = จุดที่เงินตัวเองจมในตลาดพร้อมกันสูงสุดตลอดเส้นเวลา
@@ -1045,16 +1075,21 @@ function netBaseFor(pid){
 function portStats(pid){
   const lots=visibleLots(pid);
   let invested=0, curVal=0, unreal=0, openCount=0, costOpen=0;
+  let dayUsd=0, dayBase=0, dayN=0, dayDate='', dayPrevDate='';   // เทียบวันก่อนหน้า (นับเฉพาะไม้ที่มีราคา 2 วัน)
   lots.forEach(l=>{
     const rem=remShares(l);
     invested+=lotAmount(l);
-    if(rem>0){ openCount++; const pi=priceInfo(l); const v=rem*pi.price; curVal+=v; costOpen+=rem*l.price; unreal+=v-rem*l.price; }
+    if(rem>0){ openCount++; const pi=priceInfo(l); const v=rem*pi.price; curVal+=v; costOpen+=rem*l.price; unreal+=v-rem*l.price;
+      const dc=dayChange(l.ticker);
+      if(dc){ dayUsd+=rem*dc.diff; dayBase+=rem*dc.prev; dayN++; if(dc.date>dayDate) dayDate=dc.date; if(dc.prevDate>dayPrevDate) dayPrevDate=dc.prevDate; }
+    }
   });
   let realized=0;
   const lotIds=new Set(lots.map(l=>l.id));
   D.sells.forEach(s=>{ if(lotIds.has(s.lotId)){ const lot=D.lots.find(l=>l.id===s.lotId); if(lot) realized+=(s.price-lot.price)*s.shares; } });
   const netBase=netBaseFor(pid);
-  return {lots, invested, curVal, unreal, realized, openCount, costOpen, netBase};
+  return {lots, invested, curVal, unreal, realized, openCount, costOpen, netBase,
+    dayUsd, dayBase, dayPct: dayBase>0? dayUsd/dayBase*100 : 0, dayN, dayDate, dayPrevDate};
 }
 
 /* ---------- RENDER: DASHBOARD ---------- */
@@ -1162,6 +1197,18 @@ function renderHero(){
   const base=st.netBase;   // เดิม st.invested (ซื้อรวม) → เปลี่ยนเป็นเงินต้นสุทธิ (peak deployed)
   const pct= base>0 ? totPnl/base*100 : 0;
   const el=$('heroPct'); el.className='hero-total-pct '+pnlClass(totPnl); el.textContent=fmtPct(pct,true);
+  // 1D = มูลค่าที่ถืออยู่วันนี้ เทียบมูลค่าเดียวกันที่ราคาปิดวันก่อนหน้า
+  const dv=$('heroDayVal'), du=$('heroDayUsd'), dn=$('heroDayNote');
+  if(dv && du && dn){
+    if(st.dayN>0){
+      dv.className='hero-day-val '+pnlClass(st.dayUsd); dv.textContent=fmtPct(st.dayPct,true);
+      du.textContent=' · '+fmtUSDsigned(st.dayUsd);
+      dn.textContent='เทียบราคาปิด '+thDateShort(st.dayPrevDate)+(st.dayN<st.openCount? ' · นับ '+st.dayN+'/'+st.openCount+' ไม้ที่มีราคา' : '');
+    }else{
+      dv.className='hero-day-val pnl-zero'; dv.textContent='—'; du.textContent='';
+      dn.textContent= st.openCount? 'ยังไม่มีราคาวันก่อนหน้า — กด ⟳ ราคา' : '';
+    }
+  }
   $('heroSub').textContent = st.openCount>0
     ? st.openCount+' ไม้ที่ถืออยู่ · จากทั้งหมด '+st.lots.length+' ไม้ · ลงทุนไปแล้ว '+fmtUSD(st.invested)+' · เงินต้นสุทธิ '+fmtUSD(st.netBase)
     : (st.lots.length>0 ? 'ปิดครบทุกไม้แล้ว · '+st.lots.length+' ไม้' : 'ยังไม่มีรายการ — เริ่มบันทึกไม้แรกได้เลย');
@@ -1180,6 +1227,7 @@ function renderLots(){
     const badge = status==='closed'?'<span class="lot-badge closed">CLOSED</span>':(status==='partial'?'<span class="lot-badge partial">PARTIAL</span>':'<span class="lot-badge open">OPEN</span>');
     const pi=priceInfo(l);
     const pv=rem*pi.price, pc=rem*l.price, pnl=pv-pc, pnlPct=pc>0?pnl/pc*100:0;
+    const dc = (rem>0 && !pi.stale) ? dayChange(l.ticker) : null;
     const pname = sel===ALL ? (portById(l.portfolioId)||{}).name : null;
     const slip = slipTag(l,'lot','');
     return '<div class="lot-card '+(status==='closed'?'closed':'')+'">'
@@ -1187,7 +1235,7 @@ function renderLots(){
       +'<div class="lot-ticker-row"><span class="lot-ticker">'+esc(l.ticker)+'</span>'+badge+grpChip(l)+(pi.stale&&rem>0?'<span class="lot-badge stale" title="ยังไม่มีราคาจากตลาด ใช้ราคาซื้อแทน">ราคาไม่อัพเดต</span>':'')+'</div>'
       +'<div class="lot-meta">'+(pname?esc(pname)+' · ':'')+'ซื้อ '+esc(l.date)+' @ $'+l.price.toFixed(4)+'<br>'+fmtSh(l.shares)+' Shares · ลงทุน '+fmtUSD(lotAmount(l))+(rem>0&&st.curVal>0?' · <b style="color:var(--gold-dark)">'+(pv/st.curVal*100).toFixed(1)+'% ของพอร์ต</b>':'')+'</div>'
       +'</div>'+slip
-      +(rem>0?'<div class="lot-pnl"><div class="lot-pnl-val '+pnlClass(pnl)+'">'+fmtUSDsigned(pnl)+'</div><div class="lot-pnl-pct '+pnlClass(pnl)+'">'+fmtPct(pnlPct,true)+'</div></div>':'')
+      +(rem>0?'<div class="lot-pnl"><div class="lot-pnl-val '+pnlClass(pnl)+'">'+fmtUSDsigned(pnl)+'</div><div class="lot-pnl-pct '+pnlClass(pnl)+'">'+fmtPct(pnlPct,true)+'</div>'+dayLineHtml(dc, dc? rem*dc.diff : null)+'</div>':'')
       +'</div>'
       +(rem>0?'<div class="lot-detail-row">'
         +'<div><div class="lot-detail-label">ถืออยู่</div><div class="lot-detail-val">'+fmtSh(rem)+' Shares</div></div>'
@@ -1344,13 +1392,15 @@ function renderGroups(){
   buckets.forEach(b=>{
     if(!b.lots.length && b.key==='__none__' && (p.groups||[]).length) return;
     any=true;
-    let invested=0, value=0, openVal=0;
+    let invested=0, value=0, openVal=0, gDay=0, gDayBase=0, gDayN=0;
     b.lots.forEach(l=>{
       invested+=lotAmount(l);
       const rem=remShares(l), pi=priceInfo(l);
       value+=rem*pi.price; openVal+=rem*pi.price;
+      if(rem>0 && !pi.stale){ const dc=dayChange(l.ticker); if(dc){ gDay+=rem*dc.diff; gDayBase+=rem*dc.prev; gDayN++; } }
       lotSells(l.id).forEach(s=>{ value+=s.shares*s.price; });
     });
+    const gDayPct = gDayBase>0? gDay/gDayBase*100 : 0;
     const netBase=peakDeployedLots(b.lots)||invested;   // เงินต้นสุทธิของกลุ่ม (recycle ในกลุ่มตัวเอง; fallback ซื้อรวม)
     const pnl=value-invested, pct=netBase>0?pnl/netBase*100:0;
     const opened=!!openGroups[b.key];
@@ -1364,11 +1414,14 @@ function renderGroups(){
       +'<div><div class="g-stat-label">ซื้อรวม</div><div class="g-stat-val">'+fmtUSD(invested)+'</div></div>'
       +'<div><div class="g-stat-label">มูลค่ารวม</div><div class="g-stat-val">'+fmtUSD(value)+'</div></div>'
       +'<div><div class="g-stat-label">P&L</div><div class="g-stat-val '+pnlClass(pnl)+'">'+fmtUSDsigned(pnl)+' ('+fmtPct(pct,true)+')</div></div>'
+      +'<div style="grid-column:1/-1"><div class="g-stat-label">1D · เทียบวันก่อนหน้า</div><div class="g-stat-val g-day '+(gDayN?pnlClass(gDay):'day-na')+'">'+(gDayN? fmtUSDsigned(gDay)+' ('+fmtPct(gDayPct,true)+')' : '—')+'</div></div>'
       +'</div>'
       +'<div class="g-body">'+(b.lots.length? b.lots.map(l=>{
           const rem=remShares(l), pi=priceInfo(l), v=rem*pi.price, lp=v-rem*l.price;
           const w=portOpenTotal>0&&v>0? ' <span style="color:var(--gold-dark);font-weight:700">('+(v/portOpenTotal*100).toFixed(1)+'%)</span>':'';
-          return '<div class="g-lot-row"><span class="g-lot-tk">'+esc(l.ticker)+'</span><span>'+fmtSh(rem)+' Shares</span><span>'+fmtUSD(v)+w+'</span><span class="'+pnlClass(lp)+'" style="font-family:var(--font-number)">'+fmtUSDsigned(lp)+'</span></div>';
+          const dc=(rem>0 && !pi.stale)? dayChange(l.ticker) : null;
+          const dl= rem>0 ? (dc? '<span class="g-lot-day '+pnlClass(dc.diff)+'"><span class="day-tag">1D</span>'+fmtPct(dc.pct,true)+'</span>' : '<span class="g-lot-day day-na"><span class="day-tag">1D</span>—</span>') : '';
+          return '<div class="g-lot-row"><span class="g-lot-tk">'+esc(l.ticker)+'</span><span>'+fmtSh(rem)+' Shares</span><span>'+fmtUSD(v)+w+'</span><span class="g-lot-r">'+dl+'<span class="'+pnlClass(lp)+'" style="font-family:var(--font-number)">'+fmtUSDsigned(lp)+'</span></span></div>';
         }).join(''):'<div class="field-hint">ไม่มีไม้ในกลุ่มนี้ — กด "+ จัดกลุ่ม" ที่การ์ดไม้ในมุมมอง "ดูเป็นไม้"</div>')
       +'</div></div>';
   });
@@ -1405,11 +1458,12 @@ function renderByTicker(){
   wrap.innerHTML=agg.map(t=>{
     const curVal=t.rem*t.price, unreal=curVal-t.costOpen, avg=t.rem>0? t.costOpen/t.rem : 0;
     const pct=t.costOpen>0? unreal/t.costOpen*100:0;
+    const dc = (t.rem>0 && !t.stale) ? dayChange(t.ticker) : null;
     return '<div class="lot-card">'
       +'<div class="lot-head"><div style="flex:1;min-width:0">'
       +'<div class="lot-ticker-row"><span class="lot-ticker" style="font-size:1.4rem">'+esc(t.ticker)+'</span>'+(t.stale?'<span class="lot-badge stale">ราคาไม่อัพเดต</span>':'')+'</div>'
       +'<div class="lot-meta">'+t.n+' ไม้ · ราคาตอนนี้ $'+t.price.toFixed(4)+(t.rem>0&&grand>0?' · <b style="color:var(--gold-dark)">'+(t.rem*t.price/grand*100).toFixed(1)+'% ของพอร์ต</b>':'')+'</div></div>'
-      +(t.rem>0?'<div class="lot-pnl"><div class="lot-pnl-val '+pnlClass(unreal)+'">'+fmtUSDsigned(unreal)+'</div><div class="lot-pnl-pct '+pnlClass(unreal)+'">'+fmtPct(pct,true)+'</div></div>':'')
+      +(t.rem>0?'<div class="lot-pnl"><div class="lot-pnl-val '+pnlClass(unreal)+'">'+fmtUSDsigned(unreal)+'</div><div class="lot-pnl-pct '+pnlClass(unreal)+'">'+fmtPct(pct,true)+'</div>'+dayLineHtml(dc, dc? t.rem*dc.diff : null)+'</div>':'')
       +'</div>'
       +'<div class="lot-detail-row">'
       +'<div><div class="lot-detail-label">ถืออยู่</div><div class="lot-detail-val">'+fmtSh(t.rem)+' Shares</div></div>'
