@@ -371,25 +371,24 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 @media(max-width:520px){.mk-head .modeseg{min-width:0}.mk-head .modeseg button{padding-left:6px;padding-right:6px}.mk-xs{display:none}}
 
 /* ค่าเงิน: ความแข็ง–อ่อนของสกุลเงินเทียบ USD (แท่งขึ้น/ลงจากแถวชื่อสกุลตรงกลาง) */
-.mk-str{position:relative;height:310px;border-radius:10px;background:var(--maroon3);overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none}
+.mk-str{position:relative;height:310px;border-radius:10px;background:#fff;border:1px solid var(--line);overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none}
 .mk-str-cols{position:absolute;top:0;bottom:0;left:12px;right:54px;display:flex;gap:3px}
 .mk-sc{position:relative;flex:1;min-width:0;cursor:pointer;--f:0}
 .mk-sc .chip{position:absolute;left:0;right:0;top:50%;height:22px;margin-top:-11px;border-radius:3px;display:grid;place-items:center;
   font-size:11.5px;font-weight:600;color:#fff;letter-spacing:.4px;text-shadow:0 1px 1px rgba(0,0,0,.35)}
 .mk-sc.sel .chip{outline:2px solid var(--gold);outline-offset:1px}
-.mk-sc .bar{position:absolute;left:0;right:0;opacity:.6;height:calc((50% - 40px) * var(--f))}
+.mk-sc .bar{position:absolute;left:0;right:0;opacity:.38;height:calc((50% - 40px) * var(--f))}
 .mk-sc.u .bar{bottom:calc(50% + 12px);border-radius:2px 2px 0 0}
 .mk-sc.d .bar{top:calc(50% + 12px);border-radius:0 0 2px 2px}
-.mk-sc .val{position:absolute;left:-8px;right:-8px;text-align:center;font-size:10.5px;font-weight:600;color:rgba(244,228,186,.92);
+.mk-sc .val{position:absolute;left:-8px;right:-8px;text-align:center;font-size:10.5px;font-weight:600;color:var(--ink);
   font-variant-numeric:tabular-nums;white-space:nowrap;line-height:1}
 .mk-sc .val i{font-style:normal}
 .mk-sc.u .val{bottom:calc(50% + 16px + (50% - 40px) * var(--f))}
 .mk-sc.d .val{top:calc(50% + 16px + (50% - 40px) * var(--f))}
-.mk-gl{position:absolute;left:12px;right:0;height:0;border-top:1px dashed rgba(244,228,186,.13)}
-.mk-gl span{position:absolute;right:8px;top:-6px;font-size:10px;line-height:12px;color:rgba(244,228,186,.55);background:var(--maroon3);padding-left:6px;
+.mk-gl{position:absolute;left:12px;right:0;height:0;border-top:1px dashed rgba(61,50,40,.16)}
+.mk-gl span{position:absolute;right:8px;top:-6px;font-size:10px;line-height:12px;color:var(--muted);background:#fff;padding-left:6px;
   font-variant-numeric:tabular-nums}
-.mk-str .empty-slot{position:absolute;inset:10px;height:auto;border-color:rgba(212,175,55,.35)}
-.mk-str .empty-slot .e-d{color:rgba(244,228,186,.7)}
+.mk-str .empty-slot{position:absolute;inset:10px;height:auto}
 @media(max-width:640px){
   .mk-str{height:280px}.mk-str-cols{left:8px;right:44px;gap:2px}.mk-gl{left:8px}
   .mk-sc .chip{font-size:10px;letter-spacing:0}.mk-sc .val{font-size:9px;left:-10px;right:-10px}.mk-sc .val i{display:none}.mk-gl span{font-size:9px;right:5px}
@@ -1549,6 +1548,11 @@ function mkStrRefDate(S){
   for(const d of S.dates){ if(d<=iso) ref=d; else break; }
   return ref;
 }
+function mkStrColor(v,cl){                       // เหมือน mkColor() แต่ฐานกลางสว่างกว่า ใช้กับแผงพื้นขาว · ตัวหนังสือขาวบนสีนี้ contrast ≥4.5
+  const t=Math.max(-1,Math.min(1,v/cl)), a=Math.pow(Math.abs(t),.7);
+  const N=[122,113,108], T=t>=0?[30,138,76]:[196,58,40];
+  return 'rgb('+N.map((n,i)=>Math.round(n+(T[i]-n)*a)).join(',')+')';
+}
 function mkStrLoad(){
   if(mkStrState!=='idle') return; mkStrState='loading';
   const t=new Date(); t.setUTCDate(t.getUTCDate()-50);
@@ -1576,7 +1580,7 @@ function mkStrRender(){
       +'<div class="mk-gl" style="top:calc(50% + 12px + (50% - 40px) * '+k+')"><span>−'+lab+'%</span></div>'; }
   h+='<div class="mk-str-cols">';
   for(const o of R.rows){
-    const usd=o.c==='USD', f=(Math.abs(o.v)/mx).toFixed(4), col=usd?'rgb(86,74,80)':mkColor(o.v,mx*.6);
+    const usd=o.c==='USD', f=(Math.abs(o.v)/mx).toFixed(4), col=usd?'rgb(122,113,108)':mkStrColor(o.v,mx*.6);
     h+='<div class="mk-sc '+(o.v>=0?'u':'d')+(mkStrSel===o.c?' sel':'')+'" data-c="'+o.c+'" style="--f:'+(usd?0:f)+'">'
       +(usd?'':'<div class="bar" style="background:'+col+'"></div><div class="val">'+mkPct(o.v).replace('%','<i>%</i>')+'</div>')
       +'<div class="chip" style="background:'+col+'">'+o.c+'</div></div>';
