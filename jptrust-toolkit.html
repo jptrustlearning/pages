@@ -232,6 +232,88 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 .mchip.alt{background:linear-gradient(135deg,#8B2252,#722F37);color:var(--gold-l)}
 .mchip.free{background:linear-gradient(135deg,var(--gold),#b8901f);color:#231016}
 
+/* ---- market overview: bars + heatmap (หุ้น / ทอง) ---- */
+.mk-head{margin-top:28px;scroll-margin-top:70px}
+.mk-head .modeseg{margin:0 0 0 auto;min-width:240px}
+.mk-ctl{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.mk-chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 14px;
+  font-family:var(--f-b);font-size:12.5px;color:var(--muted);cursor:pointer;transition:border-color .15s}
+.mk-chip:hover{border-color:var(--gold)}
+.mk-chip.on{background:linear-gradient(135deg,var(--maroon),var(--maroon2));border-color:transparent;color:var(--gold-l);font-weight:600}
+.mk-sum{margin-left:auto;font-size:12px;color:var(--muted);font-weight:300;display:flex;gap:10px;flex-wrap:wrap}
+.mk-sum b{font-weight:600}
+.mk-sum .u{color:var(--up)} .mk-sum .d{color:var(--down)}
+.mk-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:14px;align-items:start}
+@media(max-width:1080px){.mk-grid{grid-template-columns:1fr}}
+.mk-cap{font-size:11.5px;color:var(--muted);font-weight:300;margin-top:10px;line-height:1.55}
+.mk-hide{display:none!important}
+
+/* sector bars — diverging around a centre zero line */
+.mk-bars{display:flex;flex-direction:column;gap:3px}
+.mk-row{display:grid;grid-template-columns:132px minmax(0,1fr) 58px;align-items:center;gap:8px;
+  padding:4px 6px;border-radius:8px;cursor:pointer;border:1px solid transparent}
+@media(hover:hover){.mk-row:hover{background:var(--gold-soft)}}
+.mk-row.sel{background:var(--gold-soft);border-color:rgba(212,175,55,.55)}
+.mk-rl{min-width:0;line-height:1.25}
+.mk-rl b{display:block;font-size:12.5px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mk-rl i{display:block;font-style:normal;font-size:10.5px;color:var(--muted);font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mk-track{position:relative;height:18px;border-radius:4px;background:
+  linear-gradient(90deg,transparent calc(50% - .5px),rgba(61,50,40,.28) calc(50% - .5px),rgba(61,50,40,.28) calc(50% + .5px),transparent calc(50% + .5px))}
+.mk-fill{position:absolute;top:2px;bottom:2px;border-radius:3px;min-width:2px}
+.mk-fill.u{left:50%;background:linear-gradient(90deg,#3FB573,#2E9E5B)}
+.mk-fill.d{right:50%;background:linear-gradient(270deg,#DA6046,#C6472E)}
+.mk-rv{text-align:right;font-family:var(--f-n);font-size:14px;font-variant-numeric:tabular-nums}
+.mk-rv.u{color:#23834A} .mk-rv.d{color:#B23A24}
+@media(max-width:520px){.mk-row{grid-template-columns:104px minmax(0,1fr) 52px;gap:6px}.mk-rl b{font-size:12px}.mk-rl .th{display:none}}
+
+/* treemap heatmap */
+.mk-tree{position:relative;height:450px;border-radius:10px;overflow:hidden;background:var(--maroon3);
+  -webkit-tap-highlight-color:transparent;user-select:none}
+@media(max-width:640px){.mk-tree{height:520px}}
+.mk-t{position:absolute;box-sizing:border-box;border:1px solid var(--maroon3);overflow:hidden;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;line-height:1.1;text-align:center}
+.mk-t b{font-family:var(--f-b);font-weight:600;font-size:10px;letter-spacing:.2px;text-shadow:0 1px 1px rgba(0,0,0,.35)}
+.mk-t i{font-style:normal;font-size:9px;opacity:.92;font-variant-numeric:tabular-nums}
+.mk-t b.xs{font-size:7.5px;letter-spacing:0;font-weight:400}
+.mk-t.lg b{font-size:13px} .mk-t.lg i{font-size:10.5px}
+.mk-t.xl b{font-size:16px} .mk-t.xl i{font-size:12px}
+.mk-t.sel{outline:2px solid var(--gold);outline-offset:-2px;z-index:2}
+.mk-sh{position:absolute;box-sizing:border-box;height:15px;padding:0 5px;font-size:9.5px;line-height:15px;font-weight:600;
+  letter-spacing:.3px;color:var(--gold-l);background:var(--maroon3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;
+  border-left:1px solid var(--maroon3)}
+.mk-sh:hover{color:#fff}
+.mk-sh span{font-weight:400;opacity:.85;margin-left:4px}
+.mk-info{display:flex;align-items:center;gap:9px;min-height:34px;margin-top:10px;padding:6px 10px;border-radius:9px;
+  background:var(--gold-soft);font-size:12.5px;color:var(--ink);flex-wrap:wrap}
+.mk-info img{width:22px;height:22px;border-radius:50%;flex-shrink:0;background:#fff}
+.mk-info b{font-weight:600;color:var(--maroon)}
+.mk-info .v{font-family:var(--f-n);font-size:15px}
+.mk-info .v.u{color:#23834A} .mk-info .v.d{color:#B23A24}
+.mk-info .m{color:var(--muted);font-weight:300}
+.mk-leg{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:11px;color:var(--muted);flex-wrap:wrap}
+.mk-leg .g{flex:0 0 170px;height:8px;border-radius:4px}
+.mk-leg .n{margin-left:auto}
+@media(max-width:640px){.mk-leg .n{margin-left:0;width:100%}}
+.mk-back{margin-left:auto}
+
+/* gold: month × year table */
+.mk-tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.mk-tbl{width:100%;min-width:610px;border-collapse:separate;border-spacing:2px;font-variant-numeric:tabular-nums}
+.mk-tbl th,.mk-tbl thead th{font-size:10.5px;font-weight:600;color:var(--muted);padding:3px 0;text-align:center;background:none}
+.mk-tbl tbody tr{border-top:none}
+.mk-tbl th.y,.mk-tbl thead th.y{text-align:left;padding-left:4px;color:var(--maroon);font-size:11.5px;white-space:nowrap}
+.mk-tbl th.y{position:sticky;left:0;z-index:1;background:var(--card)!important}
+.mk-tbl td{font-size:11px;text-align:center;padding:6px 0;border-radius:4px;color:#fff;min-width:38px}
+.mk-tbl td.na{background:rgba(61,50,40,.05);color:transparent}
+.mk-tbl td.yr{font-weight:600;border:1px solid rgba(212,175,55,.6)}
+.mk-tbl td.p{opacity:.78}
+.mk-tbl tr.avg th.y,.mk-tbl tr.win th.y{color:var(--muted);font-weight:600}
+.mk-tbl tr.avg td,.mk-tbl tr.win td{background:none!important;color:var(--ink);font-weight:600;border-top:1px solid var(--line);border-radius:0}
+.mk-tbl tr.avg td.u{color:#23834A} .mk-tbl tr.avg td.d{color:#B23A24}
+.mk-tbl tr.win td{font-weight:400;color:var(--muted);border-top:none}
+.plot.mk-gold{height:300px}
+@media(max-width:520px){.mk-head .modeseg{width:100%;margin-left:0}.mk-sum{margin-left:0;width:100%}}
+
 /* ---- tool view ---- */
 .frame-wrap{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card);height:calc(100vh - 128px);min-height:460px}
 .frame-wrap iframe{width:100%;height:100%;border:0;display:block;background:var(--cream)}
@@ -372,6 +454,60 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
           <div class="plot" id="chartSlot"></div>
         </div>
 
+        <!-- ---------- MARKET OVERVIEW: bars + heatmap (หุ้น / ทอง) ---------- -->
+        <div class="sec-head mk-head" id="mkSec">
+          <h2>ภาพรวมตลาด</h2>
+          <div class="modeseg" id="mkAsset">
+            <button type="button" data-a="stock" class="on">หุ้น S&amp;P 500</button>
+            <button type="button" data-a="gold">ทองคำ</button>
+          </div>
+        </div>
+
+        <div id="mkStock">
+          <div class="mk-ctl" id="mkPer">
+            <button type="button" class="mk-chip on" data-n="1">1 วัน</button>
+            <button type="button" class="mk-chip" data-n="5">5 วัน</button>
+            <button type="button" class="mk-chip" data-n="10">10 วัน</button>
+            <div class="mk-sum" id="mkSum">กำลังโหลดข้อมูลหุ้น…</div>
+          </div>
+          <div class="mk-grid">
+            <div class="card">
+              <div class="card-h"><h3>ผลตอบแทนรายกลุ่มอุตสาหกรรม</h3></div>
+              <div class="mk-bars" id="mkBars"><div class="empty-slot"><div class="e-t">SECTORS</div><div class="e-d">กำลังโหลด…</div></div></div>
+              <div class="mk-cap">ค่าเฉลี่ยแบบให้น้ำหนักเท่ากันทุกตัวในกลุ่ม (ไม่ได้ถ่วงตามมูลค่าตลาด) · แตะแถวเพื่อขยายกลุ่มนั้นใน Heatmap</div>
+            </div>
+            <div class="card">
+              <div class="card-h">
+                <h3 id="mkTreeTitle">Heatmap S&amp;P 500</h3>
+                <button type="button" class="btn mk-back mk-hide" id="mkBack">← ทั้งตลาด</button>
+              </div>
+              <div class="mk-tree" id="mkTree"></div>
+              <div class="mk-info" id="mkInfo"><span class="m">แตะกล่องเพื่อดูรายตัว · แตะชื่อกลุ่มเพื่อขยาย</span></div>
+              <div class="mk-leg"><span id="mkLegLo">−3%</span><span class="g" id="mkLegBar"></span><span id="mkLegHi">+3%</span>
+                <span class="n">ขนาดกล่องเรียงตามมูลค่าซื้อขายเฉลี่ย (ไม่ใช่มูลค่าตลาด)</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="mkGold" class="mk-hide">
+          <div class="card">
+            <div class="card-h">
+              <h3 id="mkGoldBarTitle">ผลตอบแทนทองคำรายเดือน</h3>
+              <div class="tools" id="mkGoldMode">
+                <button type="button" class="mk-chip on" data-g="m">รายเดือน</button>
+                <button type="button" class="mk-chip" data-g="y">รายปี</button>
+              </div>
+            </div>
+            <div class="plot mk-gold" id="mkGoldBars"></div>
+          </div>
+          <div class="card" style="margin-top:14px">
+            <div class="card-h"><h3>Heatmap ผลตอบแทนทองคำ · เดือน × ปี</h3></div>
+            <div class="mk-tblwrap" id="mkGoldHeat"></div>
+            <div class="mk-cap" id="mkGoldCap"></div>
+          </div>
+        </div>
+        <div class="mk-cap" style="margin-top:12px">ข้อมูลราคาปิดรายวัน อัปเดตวันละครั้งหลังตลาดปิด · เป็นข้อมูลประกอบการศึกษา ไม่ใช่คำแนะนำการลงทุน</div>
+
         <div class="card prod" id="prodCard">
           <div class="prod-head">
             <div>
@@ -430,6 +566,7 @@ const LOCK='<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor
 const MENU=[
   {cap:'ภาพรวม',items:[
     {t:'Sentiment ทองคำรายวัน',ic:'grid',dash:true},
+    {t:'Heatmap หุ้น · ทองคำ',ic:'chart',mk:1,chip:'ใหม่'},
     {t:'หน้าหลักสมาชิก',ic:'home',url:'https://jptrustlearning.com',ext:true}
   ]},
   {cap:'ทองคำ',items:[
@@ -486,6 +623,7 @@ MENU.forEach((g,gi)=>{
     }else{
       const attr = it.prod
         ? `href="#" data-prod="1" title="แพ็กเกจเสริม"`
+        : it.mk ? `href="#" data-mk="1"`
         : `href="${it.url}"${it.ext?' target="_blank" rel="noopener"':` data-tool="${it.url}" data-title="${it.t}"`}`;
       html+=`<a class="nav-i" ${attr}>${svg(IC[it.ic])}<span>${it.t}</span>${it.chip?`<span class="mchip ${it.chipCls||'alt'}">${it.chip}</span>`:''}</a>`;
     }
@@ -518,6 +656,9 @@ nav.addEventListener('click',e=>{
     el.scrollIntoView({behavior:'smooth',block:'center'});
     el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse');
     return; }
+  const mk=e.target.closest('[data-mk]');
+  if(mk){ e.preventDefault(); showDash(); mkLoadStocks();
+    document.getElementById('mkSec').scrollIntoView({behavior:'smooth',block:'start'}); return; }
   const d=e.target.closest('[data-dash]');
   if(d){ e.preventDefault(); showDash(); }
 });
@@ -791,8 +932,9 @@ function boot(){
     const px=parsePX(pxT);
     if(!px.c.length) throw new Error('อ่านไม่ออก');
     if(px.d[px.d.length-1] < LAST.date) throw new Error('เก่ากว่าที่มีอยู่');
-    PX=px; SPOT=spot; applySpotBasis(); renderAll(); setStatus('live');
-  }).catch(()=>{ setStatus('stale'); });
+    PX_RAW={d:px.d.slice(),c:px.c.slice()};        // ก่อน applySpotBasis — ผลตอบแทนรายเดือนต้องคิดจากราคาดิบ
+    PX=px; SPOT=spot; applySpotBasis(); renderAll(); setStatus('live'); mkGoldRender();
+  }).catch(()=>{ setStatus('stale'); if(!PX_RAW) PX_RAW={d:[],c:[]}; mkGoldRender(); });
 }
 
 /* ---------- KPI ---------- */
@@ -904,6 +1046,274 @@ function drawChart(){
                  grid:{color:'rgba(212,175,55,.12)'}}}}
   });
 }
+
+/* =====================================================================
+   MARKET OVERVIEW — หุ้น: แท่งรายกลุ่ม + treemap · ทอง: แท่งรายเดือน/ปี + heatmap เดือน×ปี
+   ต้องอยู่ "ก่อน" บล็อก boot — boot() เรียก mkGoldRender() ถ้าประกาศ let ทีหลังจะชน TDZ
+   ===================================================================== */
+const MK_MINI='https://app.jptrustlearning.com/data/mini_sp500_last14days.csv';
+const MK_MAPS=['https://app.jptrustlearning.com/data/master_map.csv','./map/master_map.csv'];
+const MK_SEC={
+  'Information Technology':['Technology','เทคโนโลยี'],
+  'Communication Services':['Communication','สื่อสาร'],
+  'Consumer Discretionary':['Discretionary','สินค้าฟุ่มเฟือย'],
+  'Consumer Staples':['Staples','สินค้าจำเป็น'],
+  'Health Care':['Health Care','สุขภาพ'],
+  'Financials':['Financials','การเงิน'],
+  'Industrials':['Industrials','อุตสาหกรรม'],
+  'Materials':['Materials','วัสดุ'],
+  'Energy':['Energy','พลังงาน'],
+  'Utilities':['Utilities','สาธารณูปโภค'],
+  'Real Estate':['Real Estate','อสังหาริมทรัพย์']
+};
+const MK_CLAMP={1:3,5:6,10:10};          // เพดานสีของ heatmap หุ้น (±%) ต่อช่วงเวลา
+const MK_TH_M=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+let MK=null, mkN=1, mkZoom=null, mkSel=null, mkState='idle';
+let PX_RAW=null;                          // ราคาปิดทองจาก CSV "ก่อน" เลื่อนระนาบ spot — ใช้คิดผลตอบแทนรายเดือน
+let mkGoldMode='m', mkGoldChart=null, mkGoldShown=false;
+
+const mkEsc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const mkPct=(v,d=2)=>{const a=Math.abs(v).toFixed(d); return (+a===0?'':v>0?'+':'−')+a+'%';};
+const mkSecName=s=>(MK_SEC[s]||[s])[0];
+
+function mkColor(v,cl){
+  const t=Math.max(-1,Math.min(1,v/cl)), a=Math.pow(Math.abs(t),.7);
+  const N=[66,54,58], T=t>=0?[30,138,76]:[196,58,40];
+  return 'rgb('+N.map((n,i)=>Math.round(n+(T[i]-n)*a)).join(',')+')';
+}
+
+/* ---------- squarified treemap (Bruls et al.) ---------- */
+function mkSquarify(items,x,y,w,h){
+  const out=[], tot=items.reduce((a,b)=>a+b.v,0);
+  if(!(tot>0)||w<=0||h<=0) return out;
+  const k=w*h/tot, arr=items.map(it=>({it,a:it.v*k}));
+  let R={x,y,w,h}, row=[];
+  const worst=(rw,side)=>{let s=0,mx=0,mn=Infinity;for(const r of rw){s+=r.a;if(r.a>mx)mx=r.a;if(r.a<mn)mn=r.a;}
+    return Math.max(side*side*mx/(s*s),s*s/(side*side*mn));};
+  const place=rw=>{const s=rw.reduce((a,b)=>a+b.a,0);
+    if(R.w>=R.h){const cw=s/R.h;let cy=R.y;for(const r of rw){const ch=r.a/cw;out.push({it:r.it,x:R.x,y:cy,w:cw,h:ch});cy+=ch;}
+      R={x:R.x+cw,y:R.y,w:R.w-cw,h:R.h};}
+    else{const ch=s/R.w;let cx=R.x;for(const r of rw){const cw=r.a/ch;out.push({it:r.it,x:cx,y:R.y,w:cw,h:ch});cx+=cw;}
+      R={x:R.x,y:R.y+ch,w:R.w,h:R.h-ch};}};
+  for(const el of arr){
+    const side=Math.min(R.w,R.h);
+    if(!row.length||worst(row.concat([el]),side)<=worst(row,side)) row.push(el);
+    else{place(row);row=[el];}
+  }
+  if(row.length) place(row);
+  return out;
+}
+
+/* ---------- หุ้น: โหลด + คำนวณ ---------- */
+function mkParseStocks(miniT,mapT){
+  const sec={};
+  for(const line of mapT.split('\n')){const a=line.split(',');if(a.length>1&&a[0]!=='ticker')sec[a[0].trim().replace(/^\uFEFF/,'')]=a[1].trim();}
+  const by={};
+  for(const line of miniT.split('\n')){
+    const a=line.split(','); if(a.length<7) continue;
+    const c=+a[5], v=+a[6]; if(!/^\d{4}-\d{2}-\d{2}/.test(a[1])||!(c>0)) continue;
+    (by[a[0].trim()]=by[a[0].trim()]||[]).push({d:a[1].slice(0,10),c,v:isFinite(v)?v:0});
+  }
+  let asof=''; for(const t in by){by[t].sort((p,q)=>p.d<q.d?-1:1);const d=by[t][by[t].length-1].d;if(d>asof)asof=d;}
+  const list=[];
+  for(const t in by){
+    const r=by[t], n=r.length; if(r[n-1].d!==asof||!MK_SEC[sec[t]]) continue;   // ตัวที่ราคาค้าง/ไม่มีกลุ่ม ไม่เอามาปน
+    const ret={}; for(const k of [1,5,10]) ret[k]=n>k?(r[n-1].c/r[n-1-k].c-1)*100:null;
+    const tail=r.slice(-10), dv=tail.reduce((s,x)=>s+x.c*x.v,0)/tail.length;
+    list.push({t,sec:sec[t],c:r[n-1].c,r:ret,w:Math.sqrt(Math.max(dv,1))});   // √ ของมูลค่าซื้อขาย กันไม่ให้ตัวใหญ่ไม่กี่ตัวกินทั้งแผนที่
+  }
+  if(list.length<100) throw new Error('ข้อมูลหุ้นน้อยผิดปกติ');
+  return {asof,list};
+}
+function mkLoadStocks(){
+  if(mkState!=='idle') return; mkState='loading';
+  const txt=u=>fetch(u,{cache:'no-cache'}).then(r=>r.ok?r.text():Promise.reject(new Error('HTTP '+r.status)));
+  const map=()=>txt(MK_MAPS[0]).catch(()=>txt(MK_MAPS[1]));
+  Promise.all([txt(MK_MINI),map()]).then(([a,b])=>{MK=mkParseStocks(a,b);mkState='ok';mkRenderStocks();})
+  .catch(e=>{mkState='idle';
+    const msg='<div class="empty-slot"><div class="e-t">S&amp;P 500</div><div class="e-d">ดึงข้อมูลหุ้นไม่สำเร็จ ('+mkEsc(e&&e.message||'เครือข่าย')+') — ลองรีเฟรชอีกครั้ง</div></div>';
+    document.getElementById('mkBars').innerHTML=msg; document.getElementById('mkTree').innerHTML='';
+    document.getElementById('mkSum').textContent='';});
+}
+function mkSectors(){
+  const g={};
+  for(const s of MK.list){const v=s.r[mkN]; if(v==null) continue;
+    const o=g[s.sec]=g[s.sec]||{sec:s.sec,n:0,sum:0,up:0,dn:0}; o.n++;o.sum+=v; if(v>0.05)o.up++; else if(v<-0.05)o.dn++;}
+  return Object.values(g).map(o=>(o.avg=o.sum/o.n,o)).sort((a,b)=>b.avg-a.avg);
+}
+function mkRenderStocks(){
+  if(!MK) return;
+  const secs=mkSectors(), all=MK.list.filter(s=>s.r[mkN]!=null);
+  const up=all.filter(s=>s.r[mkN]>0.05).length, dn=all.filter(s=>s.r[mkN]<-0.05).length;
+  const avg=all.reduce((a,s)=>a+s.r[mkN],0)/all.length;
+  document.getElementById('mkSum').innerHTML='<span>ขึ้น <b class="u">'+up+'</b></span><span>ลง <b class="d">'+dn+'</b></span>'
+    +'<span>เฉลี่ย <b class="'+(avg>=0?'u':'d')+'">'+mkPct(avg)+'</b></span><span>ปิดตลาด '+thDate(MK.asof)+' · '+all.length+' ตัว</span>';
+  const mx=Math.max(.5,...secs.map(o=>Math.abs(o.avg)));
+  document.getElementById('mkBars').innerHTML=secs.map(o=>{
+    const nm=MK_SEC[o.sec], w=(Math.abs(o.avg)/mx*50).toFixed(1), cls=o.avg>=0?'u':'d';
+    return '<div class="mk-row'+(mkZoom===o.sec?' sel':'')+'" data-sec="'+mkEsc(o.sec)+'">'
+      +'<div class="mk-rl"><b>'+nm[0]+'</b><i><span class="th">'+nm[1]+' · </span>ขึ้น '+o.up+' / ลง '+o.dn+'</i></div>'
+      +'<div class="mk-track"><div class="mk-fill '+cls+'" style="width:'+w+'%"></div></div>'
+      +'<div class="mk-rv '+cls+'">'+mkPct(o.avg)+'</div></div>';
+  }).join('');
+  const cl=MK_CLAMP[mkN];
+  document.getElementById('mkLegLo').textContent='−'+cl+'%'; document.getElementById('mkLegHi').textContent='+'+cl+'%';
+  document.getElementById('mkLegBar').style.background='linear-gradient(90deg,'+[-1,-.5,0,.5,1].map(t=>mkColor(t*cl,cl)).join(',')+')';
+  mkRenderTree(secs);
+}
+function mkTile(r,cl){
+  const s=r.it.s, v=s.r[mkN], x=Math.round(r.x), y=Math.round(r.y), w=Math.round(r.x+r.w)-x, h=Math.round(r.y+r.h)-y;
+  if(w<2||h<2) return '';
+  const sz=(w>=84&&h>=56)?' xl':(w>=56&&h>=38)?' lg':'';
+  const lab=(w>=34&&h>=25)?'<b>'+s.t+'</b><i>'+mkPct(v,1)+'</i>':(w>=26&&h>=13)?'<b>'+s.t+'</b>':(w>=19&&h>=11&&s.t.length<=4)?'<b class="xs">'+s.t+'</b>':'';
+  return '<div class="mk-t'+sz+(mkSel===s.t?' sel':'')+'" data-k="'+s.t+'" style="left:'+x+'px;top:'+y+'px;width:'+w+'px;height:'+h+'px;background:'+mkColor(v,cl)+'">'+lab+'</div>';
+}
+function mkRenderTree(secs){
+  const el=document.getElementById('mkTree'), W=el.clientWidth, H=el.clientHeight;
+  if(!MK||!W||!H) return;
+  secs=secs||mkSectors();
+  const cl=MK_CLAMP[mkN], by={};
+  for(const s of MK.list){ if(s.r[mkN]==null) continue; (by[s.sec]=by[s.sec]||[]).push({v:s.w,s}); }
+  for(const k in by) by[k].sort((a,b)=>b.v-a.v);
+  let html='';
+  if(mkZoom&&by[mkZoom]){
+    for(const r of mkSquarify(by[mkZoom],0,0,W,H)) html+=mkTile(r,cl);
+  }else{
+    const groups=Object.keys(by).map(k=>({v:by[k].reduce((a,b)=>a+b.v,0),k})).sort((a,b)=>b.v-a.v);
+    for(const g of mkSquarify(groups,0,0,W,H)){
+      const hd=(g.w>=64&&g.h>=48)?15:0, o=secs.find(z=>z.sec===g.it.k);
+      if(hd) html+='<div class="mk-sh" data-sec="'+mkEsc(g.it.k)+'" style="left:'+Math.round(g.x)+'px;top:'+Math.round(g.y)+'px;width:'+(Math.round(g.x+g.w)-Math.round(g.x))+'px">'
+        +mkSecName(g.it.k).toUpperCase()+(o?'<span>'+mkPct(o.avg,1)+'</span>':'')+'</div>';
+      for(const r of mkSquarify(by[g.it.k],g.x,g.y+hd,g.w,g.h-hd)) html+=mkTile(r,cl);
+    }
+  }
+  el.innerHTML=html;
+  document.getElementById('mkTreeTitle').innerHTML=mkZoom?'Heatmap · '+mkSecName(mkZoom):'Heatmap S&amp;P 500';
+  document.getElementById('mkBack').classList.toggle('mk-hide',!mkZoom);
+}
+function mkShowInfo(t){
+  const s=MK&&MK.list.find(z=>z.t===t), el=document.getElementById('mkInfo'); if(!s) return;
+  const v=s.r[mkN], per={1:'1 วัน',5:'5 วัน',10:'10 วัน'}[mkN];
+  el.innerHTML='<img src="logos/'+encodeURIComponent(s.t)+'.png" alt="" onerror="this.remove()"><b>'+s.t+'</b>'
+    +'<span class="m">'+mkSecName(s.sec)+'</span><span class="v '+(v>=0?'u':'d')+'">'+mkPct(v)+'</span>'
+    +'<span class="m">'+per+' · ปิด $'+s.c.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})+'</span>';
+}
+function mkSetZoom(sec){
+  mkZoom=(sec&&sec!==mkZoom)?sec:null;
+  document.querySelectorAll('#mkBars .mk-row').forEach(r=>r.classList.toggle('sel',r.dataset.sec===mkZoom));
+  mkRenderTree();
+}
+
+/* ---------- ทอง: ผลตอบแทนรายเดือน / รายปี ---------- */
+function mkGoldPeriods(){
+  const P=PX_RAW, M=[], Y=[]; let first=null;
+  for(let i=0;i<P.d.length;i++){
+    const wd=new Date(P.d[i]+'T00:00:00Z').getUTCDay(); if(wd===0||wd===6) continue;   // แถวเสาร์-อาทิตย์ของฟิวเจอร์สไม่ใช่ราคาปิดวัน
+    if(first==null) first=P.c[i];
+    const ym=P.d[i].slice(0,7), yy=P.d[i].slice(0,4);
+    if(!M.length||M[M.length-1].k!==ym) M.push({k:ym,c:P.c[i]}); else M[M.length-1].c=P.c[i];
+    if(!Y.length||Y[Y.length-1].k!==yy) Y.push({k:yy,c:P.c[i]}); else Y[Y.length-1].c=P.c[i];
+  }
+  const ret=A=>A.forEach((o,i)=>{o.r=(o.c/(i?A[i-1].c:first)-1)*100;});
+  ret(M); ret(Y);
+  const lastD=P.d[P.d.length-1], nx=new Date(lastD+'T00:00:00Z'); nx.setUTCDate(nx.getUTCDate()+3);
+  if(M.length) M[M.length-1].p=nx.toISOString().slice(0,7)===M[M.length-1].k;          // เดือนยังไม่จบ
+  if(Y.length) Y[Y.length-1].p=nx.toISOString().slice(0,4)===Y[Y.length-1].k;
+  return {M,Y,lastD};
+}
+function mkGoldRender(){
+  try{
+    if(!mkGoldShown) return;
+    const bars=document.getElementById('mkGoldBars'), heat=document.getElementById('mkGoldHeat'), cap=document.getElementById('mkGoldCap');
+    if(!PX_RAW||PX_RAW.c.length<400){
+      const why=PX_RAW===null?'กำลังโหลดข้อมูลย้อนหลัง…':'ข้อมูลย้อนหลังไม่ครบ — ลองรีเฟรชอีกครั้ง';
+      bars.innerHTML='<div class="empty-slot"><div class="e-t">GOLD</div><div class="e-d">'+why+'</div></div>'; heat.innerHTML=''; cap.textContent=''; return;
+    }
+    const G=mkGoldPeriods();
+    /* heatmap เดือน × ปี — ปีล่าสุดอยู่บน */
+    const years=G.Y.map(o=>o.k).reverse(), mm={}; G.M.forEach(o=>mm[o.k]=o);
+    let h='<table class="mk-tbl"><thead><tr><th class="y">พ.ศ.</th>'+MK_TH_M.map(m=>'<th>'+m+'</th>').join('')+'<th>ทั้งปี</th></tr></thead><tbody>';
+    for(const y of years){
+      h+='<tr><th class="y">'+(+y+543)+'</th>';
+      for(let m=1;m<=12;m++){const o=mm[y+'-'+String(m).padStart(2,'0')];
+        h+=o?'<td class="'+(o.p?'p':'')+'" style="background:'+mkColor(o.r,8)+'" title="'+MK_TH_M[m-1]+' '+(+y+543)+'">'+mkPct(o.r,1).replace('%','')+(o.p?'*':'')+'</td>':'<td class="na">·</td>';}
+      const yo=G.Y.find(o=>o.k===y);
+      h+='<td class="yr'+(yo.p?' p':'')+'" style="background:'+mkColor(yo.r,30)+'">'+mkPct(yo.r,1).replace('%','')+(yo.p?'*':'')+'</td></tr>';
+    }
+    let a='<tr class="avg"><th class="y">เฉลี่ย</th>', w='<tr class="win"><th class="y">เดือนบวก</th>';
+    for(let m=1;m<=12;m++){const v=G.M.filter(o=>!o.p&&+o.k.slice(5)===m).map(o=>o.r);
+      const av=v.reduce((s,x)=>s+x,0)/(v.length||1), pos=v.filter(x=>x>0).length;
+      a+='<td class="'+(av>=0?'u':'d')+'">'+mkPct(av,1).replace('%','')+'</td>'; w+='<td>'+pos+'/'+v.length+'</td>';}
+    const yv=G.Y.filter(o=>!o.p).map(o=>o.r), ya=yv.reduce((s,x)=>s+x,0)/(yv.length||1);
+    a+='<td class="'+(ya>=0?'u':'d')+'">'+mkPct(ya,1).replace('%','')+'</td></tr>'; w+='<td>'+yv.filter(x=>x>0).length+'/'+yv.length+'</td></tr>';
+    heat.innerHTML=h+a+w+'</tbody></table>';
+    cap.innerHTML='ตัวเลขเป็น % เปลี่ยนแปลงของราคาปิดสิ้นเดือนเทียบสิ้นเดือนก่อน · อ้างอิงราคาฟิวเจอร์ส COMEX (GC=F) ถึง '+thDate(G.lastD)
+      +' · * = เดือน/ปีที่ยังไม่จบ ไม่นับในแถวเฉลี่ย · สถิติย้อนหลังไม่ได้บอกว่าเดือนหน้าจะเป็นแบบเดิม';
+    /* แท่ง */
+    const src=mkGoldMode==='m'?G.M.slice(-24):G.Y;
+    document.getElementById('mkGoldBarTitle').textContent=mkGoldMode==='m'?'ผลตอบแทนทองคำรายเดือน · 24 เดือนล่าสุด':'ผลตอบแทนทองคำรายปี';
+    if(typeof Chart==='undefined'){
+      bars.innerHTML='<div class="empty-slot"><div class="e-t">CHART</div><div class="e-d">กำลังโหลดกราฟ…</div></div>';
+      window.addEventListener('load',()=>{ if(typeof Chart!=='undefined') mkGoldRender();
+        else bars.innerHTML='<div class="empty-slot"><div class="e-t">CHART</div><div class="e-d">กราฟโหลดไม่สำเร็จ — ตาราง Heatmap ด้านล่างยังครบ</div></div>'; },{once:true});
+      return;
+    }
+    if(!bars.querySelector('canvas')) bars.innerHTML='<canvas></canvas>';
+    if(mkGoldChart) mkGoldChart.destroy();
+    const lab=src.map(o=>mkGoldMode==='m'?MK_TH_M[+o.k.slice(5)-1]+' '+String(+o.k.slice(0,4)+543).slice(2):String(+o.k+543));
+    mkGoldChart=new Chart(bars.querySelector('canvas'),{type:'bar',
+      data:{labels:lab,datasets:[{data:src.map(o=>+o.r.toFixed(2)),borderRadius:3,
+        backgroundColor:src.map(o=>o.r>=0?(o.p?'rgba(46,158,91,.55)':'#2E9E5B'):(o.p?'rgba(198,71,46,.55)':'#C6472E'))}]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},
+          tooltip:{backgroundColor:'#2d1018',titleFont:{family:'Anuphan',size:12},bodyFont:{family:'Anuphan',size:12},padding:10,
+            borderColor:'rgba(212,175,55,.4)',borderWidth:1,displayColors:false,
+            callbacks:{label:c=>' '+mkPct(c.parsed.y)+(src[c.dataIndex].p?' (ยังไม่จบงวด)':'')}}},
+        scales:{x:{ticks:{font:{family:'Anuphan',size:10.5},color:'#8a7d6b',maxRotation:0,autoSkip:true,maxTicksLimit:12},grid:{display:false}},
+                y:{ticks:{font:{family:'Anuphan',size:11},color:'#8a7d6b',callback:v=>v+'%'},
+                   grid:{color:c=>c.tick.value===0?'rgba(61,50,40,.45)':'rgba(212,175,55,.12)'}}}}});
+  }catch(e){ console.warn('mkGoldRender',e); }
+}
+
+/* ---------- ต่อสาย event ---------- */
+(function(){
+  const secEl=document.getElementById('mkSec'); if(!secEl) return;
+  document.getElementById('mkAsset').addEventListener('click',e=>{
+    const b=e.target.closest('button'); if(!b) return;
+    document.querySelectorAll('#mkAsset button').forEach(x=>x.classList.toggle('on',x===b));
+    const gold=b.dataset.a==='gold';
+    document.getElementById('mkStock').classList.toggle('mk-hide',gold);
+    document.getElementById('mkGold').classList.toggle('mk-hide',!gold);
+    if(gold){ mkGoldShown=true; mkGoldRender(); } else { mkLoadStocks(); mkRenderTree(); }
+  });
+  document.getElementById('mkPer').addEventListener('click',e=>{
+    const b=e.target.closest('.mk-chip'); if(!b) return;
+    document.querySelectorAll('#mkPer .mk-chip').forEach(x=>x.classList.toggle('on',x===b));
+    mkN=+b.dataset.n; mkRenderStocks(); if(mkSel) mkShowInfo(mkSel);
+  });
+  document.getElementById('mkGoldMode').addEventListener('click',e=>{
+    const b=e.target.closest('.mk-chip'); if(!b) return;
+    document.querySelectorAll('#mkGoldMode .mk-chip').forEach(x=>x.classList.toggle('on',x===b));
+    mkGoldMode=b.dataset.g; mkGoldRender();
+  });
+  document.getElementById('mkBars').addEventListener('click',e=>{const r=e.target.closest('.mk-row'); if(r) mkSetZoom(r.dataset.sec);});
+  document.getElementById('mkBack').addEventListener('click',()=>mkSetZoom(null));
+  const tree=document.getElementById('mkTree');
+  tree.addEventListener('click',e=>{
+    const sh=e.target.closest('.mk-sh'); if(sh){ mkSetZoom(sh.dataset.sec); return; }
+    const t=e.target.closest('.mk-t'); if(!t) return;
+    mkSel=t.dataset.k; tree.querySelectorAll('.mk-t.sel').forEach(x=>x.classList.remove('sel')); t.classList.add('sel'); mkShowInfo(mkSel);
+  });
+  if(window.matchMedia&&matchMedia('(hover:hover)').matches)
+    tree.addEventListener('mouseover',e=>{const t=e.target.closest('.mk-t'); if(t) mkShowInfo(t.dataset.k);});
+  /* โหลดข้อมูลหุ้นเมื่อเลื่อนมาใกล้ — หน้าแรกไม่ต้องจ่าย 400 KB ถ้าไม่ได้เลื่อนลงมาดู */
+  if('IntersectionObserver' in window){
+    const io=new IntersectionObserver(en=>{ if(en.some(x=>x.isIntersecting)){ io.disconnect(); mkLoadStocks(); } },{rootMargin:'700px'});
+    io.observe(secEl);
+  }else mkLoadStocks();
+  let mkRt=null;
+  window.addEventListener('resize',()=>{clearTimeout(mkRt);mkRt=setTimeout(()=>{ if(MK) mkRenderTree(); },220);});
+})();
 
 /* ---------- boot ---------- */
 boot();
