@@ -232,20 +232,6 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 .mchip.alt{background:linear-gradient(135deg,#8B2252,#722F37);color:var(--gold-l)}
 .mchip.free{background:linear-gradient(135deg,var(--gold),#b8901f);color:#231016}
 
-/* ---- free download card ---- */
-.card.freedl{margin-top:20px;background:linear-gradient(150deg,#FFFDF4,#FBF3DE);
-  border-color:rgba(212,175,55,.55);box-shadow:0 3px 16px rgba(212,175,55,.15);
-  display:flex;align-items:center;gap:17px;flex-wrap:wrap;padding:18px 20px}
-.fd-ic{width:52px;height:52px;border-radius:14px;flex-shrink:0;display:grid;place-items:center;
-  background:linear-gradient(135deg,var(--gold),#b8901f);color:#231016}
-.fd-ic svg{width:26px;height:26px}
-.fd-t{min-width:210px;flex:1}
-.fd-eyebrow{font-family:var(--f-d);font-size:9.5px;letter-spacing:2.2px;color:#B8860B;font-weight:600}
-.fd-t h3{font-size:17px;font-weight:600;color:var(--maroon);margin:3px 0 2px}
-.fd-t p{font-size:12.5px;color:var(--muted);font-weight:300}
-.fd-cta{margin-left:auto;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
-@media(max-width:600px){.fd-cta{margin-left:0;width:100%}.fd-cta .btn{flex:1;justify-content:center;text-align:center}}
-
 /* ---- tool view ---- */
 .frame-wrap{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card);height:calc(100vh - 128px);min-height:460px}
 .frame-wrap iframe{width:100%;height:100%;border:0;display:block;background:var(--cream)}
@@ -386,22 +372,6 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
           <div class="plot" id="chartSlot"></div>
         </div>
 
-        <div class="card freedl" id="freeDlCard">
-          <div class="fd-ic">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
-          </div>
-          <div class="fd-t">
-            <div class="fd-eyebrow">FREE DOWNLOAD</div>
-            <h3>JPT OneClick Desk <span class="mchip free" style="margin-left:4px">ฟรี</span></h3>
-            <p>แผงส่งคำสั่งสำหรับ MetaTrader 5 · เวอร์ชัน 3.03 · โหลดได้เลย ไม่ต้องเป็นสมาชิก</p>
-          </div>
-          <div class="fd-cta">
-            <a class="btn" href="./ea-oneclick-desk.html" target="_blank" rel="noopener">วิธีติดตั้ง ↗</a>
-            <a class="btn gold" href="./downloads/JPT_OneClick_Desk_v303.ex5" download>ดาวน์โหลดฟรี</a>
-          </div>
-        </div>
-
         <div class="card prod" id="prodCard">
           <div class="prod-head">
             <div>
@@ -460,7 +430,6 @@ const LOCK='<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor
 const MENU=[
   {cap:'ภาพรวม',items:[
     {t:'Sentiment ทองคำรายวัน',ic:'grid',dash:true},
-    {t:'Asia Range Regime',ic:'flask',url:'./gold-regime-today.html',chip:'รายวัน'},
     {t:'หน้าหลักสมาชิก',ic:'home',url:'https://jptrustlearning.com',ext:true}
   ]},
   {cap:'ทองคำ',items:[
@@ -489,7 +458,6 @@ const MENU=[
     {t:'Roadmap',ic:'map',url:'./roadmap.html'}
   ]},
   {cap:'ผลิตภัณฑ์',items:[
-    {t:'JPT OneClick Desk',ic:'dl',url:'./ea-oneclick-desk.html',ext:true,chip:'ฟรี',chipCls:'free'},
     {t:'แพ็กเกจเสริม · EA',ic:'bot',chip:'เช่า',prod:1}
   ]}
 ];
