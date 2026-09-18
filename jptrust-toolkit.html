@@ -246,6 +246,38 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 .mchip.alt{background:linear-gradient(135deg,#8B2252,#722F37);color:var(--gold-l)}
 .mchip.free{background:linear-gradient(135deg,var(--gold),#b8901f);color:#231016}
 
+/* ---- Insight ล่าสุด (สรุปข่าวรายวันจาก news/news-latest.json) ---- */
+.card.ins{margin-bottom:20px;background:linear-gradient(150deg,#FFFDF4,#FBF3DE);border-color:rgba(212,175,55,.5);
+  box-shadow:0 3px 16px rgba(212,175,55,.12);padding:16px 18px}
+.ins-h{display:flex;align-items:center;gap:12px;margin-bottom:11px}
+.ins-ic{width:40px;height:40px;border-radius:12px;flex-shrink:0;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--maroon),var(--maroon2));color:var(--gold-l)}
+.ins-ic svg{width:21px;height:21px}
+.ins-tt{min-width:0;line-height:1.2}
+.ins-k{display:flex;align-items:center;gap:6px;font-family:var(--f-d);font-size:9.5px;letter-spacing:2.2px;color:#B8860B;font-weight:600}
+.ins-k .dotlive{width:6px;height:6px}
+.ins-tt h3{font-size:15.5px;font-weight:600;color:var(--maroon);margin-top:2px}
+.ins-when{margin-left:auto;font-size:11.5px;color:var(--muted);font-weight:300;text-align:right;line-height:1.35;flex-shrink:0}
+.ins-list{display:flex;flex-direction:column;gap:7px}
+.ins-li{display:flex;gap:9px;font-size:13.5px;line-height:1.6;color:var(--ink)}
+.ins-li::before{content:'';width:6px;height:6px;margin-top:8px;flex-shrink:0;background:var(--gold);transform:rotate(45deg)}
+.ins-p{font-size:13.5px;line-height:1.65;color:var(--ink)}
+.ins-sk{height:12px;border-radius:6px;background:linear-gradient(90deg,rgba(212,175,55,.14),rgba(212,175,55,.28),rgba(212,175,55,.14));
+  background-size:200% 100%;animation:insSk 1.4s linear infinite}
+.ins-sk+.ins-sk{margin-top:9px} .ins-sk:nth-child(2){width:92%} .ins-sk:nth-child(3){width:78%}
+@keyframes insSk{to{background-position:-200% 0}}
+.ins-tone{margin-top:13px;padding-top:12px;border-top:1px solid var(--line);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.ins-tone .lab{font-size:12.5px;color:var(--ink);white-space:nowrap}
+.ins-tone .lab b{font-weight:600}
+.ins-tone .lab b.u{color:#23834A} .ins-tone .lab b.d{color:#B23A24} .ins-tone .lab b.x{color:#8B6914}
+.ins-bar{flex:1;min-width:140px;height:8px;border-radius:4px;overflow:hidden;display:flex;background:rgba(61,50,40,.08)}
+.ins-bar i{display:block;height:100%}
+.ins-bar .u{background:#2E9E5B} .ins-bar .n{background:#C9BFA8} .ins-bar .d{background:#C6472E}
+.ins-tone .cnt{font-size:11.5px;color:var(--muted);font-weight:300;white-space:nowrap}
+.ins-foot{margin-top:13px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ins-note{font-size:11.5px;color:var(--muted);font-weight:300;flex:1;min-width:200px}
+@media(max-width:640px){.ins-when{font-size:10.5px}.ins-li,.ins-p{font-size:13px}.ins-foot .btn{width:100%;justify-content:center;text-align:center}}
+
 /* ---- ticker tape (TradingView widget) — ชุดเดียวกับหน้า Home ของแอปสมาชิก ---- */
 .ticker-tape-wrapper{background:#0a0e17;border:1px solid rgba(212,175,55,.35);border-radius:14px;margin:0 0 20px;overflow:hidden;
   box-shadow:0 4px 18px rgba(114,47,55,.18);position:relative;min-height:46px}
@@ -469,6 +501,22 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
             <div class="tradingview-widget-container__widget"></div>
           </div>
           <div class="ticker-owl-badge"><span class="ticker-live-dot"></span><span class="ticker-live-text">LIVE</span></div>
+        </div>
+
+        <!-- Insight ล่าสุด — สำเนาย่อของ batch ข่าวบนสุด (news/news-latest.json · สร้างโดย tools/gen_news_latest.py) -->
+        <div class="card ins" id="insCard">
+          <div class="ins-h">
+            <div class="ins-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.4 1.1 2.2h5c0-.8.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/></svg></div>
+            <div class="ins-tt"><span class="ins-k"><span class="dotlive"></span>INSIGHT</span><h3 id="insTitle">Insight ล่าสุด</h3></div>
+            <span class="ins-when" id="insWhen"></span>
+          </div>
+          <div id="insBody"><div class="ins-sk"></div><div class="ins-sk"></div><div class="ins-sk"></div></div>
+          <div class="ins-tone" id="insTone" hidden></div>
+          <div class="ins-foot">
+            <span class="ins-note">สรุปจากข่าวและบทวิเคราะห์รายวันของ JP Trust Learning · เป็นข้อมูลประกอบการศึกษา ไม่ใช่คำแนะนำการลงทุน</span>
+            <a class="btn gold" href="https://app.jptrustlearning.com" target="_blank" rel="noopener">อ่านข่าวเต็มในแอปสมาชิก ↗</a>
+          </div>
         </div>
 
         <div class="sec-head">
@@ -1551,6 +1599,41 @@ document.addEventListener('visibilitychange',()=>{            // กลับจ
   const fx=document.getElementById('mkFx');
   if(!document.hidden&&fx&&!fx.classList.contains('mk-hide')&&document.getElementById('viewDash').classList.contains('on')) mkFxLoad(true);
 });
+
+/* =====================================================================
+   INSIGHT ล่าสุด — อ่าน news/news-latest.json (~1–2 KB · สำเนาย่อของ batch ข่าวบนสุด)
+   ไฟล์นี้สร้างโดย tools/gen_news_latest.py ตอนอัปเดตข่าว — แอปสมาชิกไม่ได้ใช้ไฟล์นี้
+   ข้อความ + การนับโทน = ตรรกะเดียวกับ renderInsight() ใน member-dashboard.html
+   โหลดไม่ได้ = ถอดการ์ดออกเงียบๆ (หน้าสาธารณะ ไม่โชว์ error ของระบบข่าว)
+   ===================================================================== */
+(function(){
+  const card=document.getElementById('insCard'); if(!card) return;
+  const URLS=['https://app.jptrustlearning.com/news/news-latest.json','./news/news-latest.json'];
+  const get=u=>fetch(u,{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject(new Error('HTTP '+r.status)));
+  /* ธรรมเนียมของระบบข่าว: date ลงท้าย Z แต่ตัวเลขคือเวลาไทย → ตีความเป็น +07:00 (เหมือน parseBatchDate ในแอป) */
+  const when=iso=>{ if(!iso) return null; const d=new Date(String(iso).replace(/Z$/,'+07:00')); return isNaN(d)?null:d; };
+  const ago=d=>{ const m=(Date.now()-d.getTime())/60000;
+    if(m<0) return ''; if(m<60) return Math.max(1,Math.floor(m))+' นาทีที่แล้ว';
+    if(m<1440) return Math.floor(m/60)+' ชม.ที่แล้ว'; return Math.floor(m/1440)+' วันที่แล้ว'; };
+  get(URLS[0]).catch(()=>get(URLS[1])).then(j=>{
+    const b=j&&j.batch; if(!b||!b.summary) throw new Error('ว่าง');
+    const d=when(b.date), bkk=x=>new Date(x.getTime()+7*3600e3).toISOString().slice(0,10);
+    document.getElementById('insTitle').textContent=(d&&bkk(d)===bkk(new Date()))?'Insight วันนี้':'Insight ล่าสุด';
+    document.getElementById('insWhen').innerHTML='อัปเดต '+mkEsc(b.date_display||'')+(d&&ago(d)?'<br>'+ago(d):'');
+    const seg=String(b.summary).split(' · ').map(x=>x.trim()).filter(Boolean);
+    document.getElementById('insBody').innerHTML=seg.length>1
+      ?'<div class="ins-list">'+seg.map(x=>'<div class="ins-li"><span>'+mkEsc(x)+'</span></div>').join('')+'</div>'
+      :'<div class="ins-p">'+mkEsc(seg[0]||'')+'</div>';
+    const t=b.tone||{}, tot=t.total||0, el=document.getElementById('insTone');
+    if(tot>0){
+      const tilt=t.positive>t.negative?['เชิงบวก','u']:t.negative>t.positive?['เชิงลบ','d']:['ผสม','x'], w=n=>(n/tot*100).toFixed(1)+'%';
+      el.innerHTML='<span class="lab">โทนตลาดโดยรวม <b class="'+tilt[1]+'">'+tilt[0]+'</b></span>'
+        +'<span class="ins-bar" aria-hidden="true"><i class="u" style="width:'+w(t.positive)+'"></i><i class="n" style="width:'+w(t.neutral)+'"></i><i class="d" style="width:'+w(t.negative)+'"></i></span>'
+        +'<span class="cnt">บวก '+t.positive+' · กลาง '+t.neutral+' · ลบ '+t.negative+' · จาก '+tot+' สินทรัพย์ที่ข่าวพูดถึง</span>';
+      el.hidden=false;
+    }
+  }).catch(()=>{ card.remove(); });
+})();
 
 /* =====================================================================
    TICKER TAPE — TradingView embed (ฟรี · ราคาสด · ไม่ต้องมี API key)
