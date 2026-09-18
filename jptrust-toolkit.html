@@ -147,9 +147,6 @@ body:not(.in-tool) .top-act{display:none}  /* ปุ่มทั้งคู่�
 .card-h{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .card-h h3{font-size:14.5px;font-weight:600;color:var(--maroon)}
 .card-h .tools{margin-left:auto;display:flex;gap:6px}
-.tg{border:1px solid var(--line);background:var(--card);border-radius:7px;padding:5px 8px;cursor:pointer;color:var(--muted);line-height:0}
-.tg svg{width:15px;height:15px}
-.tg.on{background:linear-gradient(135deg,var(--maroon),var(--maroon2));border-color:transparent;color:var(--gold-l)}
 .plot{position:relative;height:290px}
 .plot.sm{height:230px}
 
@@ -444,7 +441,7 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 @media(max-width:640px){.mk-fxbox{height:600px}}
 @media(max-width:520px){.mk-head .modeseg{min-width:0}}
 
-/* ค่าเงิน: ช่วงเวลาตลาด Forex (เวลาไทย) — คำนวณฝั่งเบราว์เซอร์ล้วน ไม่ดึงข้อมูลจากที่ไหน */
+/* ช่วงเวลาตลาด Forex (เวลาไทย) — การ์ดใต้ตารางโซน เหนือ "ภาพรวมตลาด" · คำนวณฝั่งเบราว์เซอร์ล้วน ไม่ดึงข้อมูลจากที่ไหน */
 #mkSes{scroll-margin-top:70px}
 .ses-top{display:flex;align-items:center;gap:13px;flex-wrap:wrap;margin-bottom:14px}
 .ses-clock{font-family:var(--f-n);font-size:36px;line-height:1;color:var(--maroon);font-variant-numeric:tabular-nums;letter-spacing:.5px}
@@ -478,7 +475,7 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 .ses-ax .ses-pin{top:auto;bottom:-7px;width:0;height:0;border:5px solid transparent;border-top:6px solid var(--gold);border-bottom:none;transform:translateX(-50%)!important}
 .ses-ht .ses-tk{height:12px;border:none;background:none;display:flex;gap:1px;border-radius:4px;overflow:hidden}
 .ses-ht .ses-tk i{flex:1;min-width:0;background:var(--c)}
-.ses-ht .ses-l b{font-size:11.5px;font-weight:400;color:var(--muted)}
+.ses-ht .ses-l b{grid-column:1/-1;font-size:11.5px;font-weight:400;color:var(--muted)}
 .ses-ht .ses-now{top:-3px;bottom:-3px}
 .ses-lg{display:flex;align-items:center;gap:6px 14px;flex-wrap:wrap;margin-top:12px;font-size:11px;color:var(--muted);font-weight:300}
 .ses-lg span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
@@ -671,19 +668,21 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 
         </div>
 
-        <div class="card">
+        <!-- ---------- FOREX SESSIONS: ช่วงเวลาตลาด 4 ศูนย์กลาง เวลาไทย (มาแทนการ์ดกราฟทอง 60 วัน + โซนวันนี้ — ของเดิมอยู่ใน backup v21) ---------- -->
+        <div class="card" id="mkSes">
           <div class="card-h">
-            <h3 id="chartTitle">ราคาทอง 60 วันล่าสุด + โซนวันนี้</h3>
-            <div class="tools" id="chartTools">
-              <button class="tg on" data-t="line" title="กราฟเส้น">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-6 4 4 6-8"/></svg>
-              </button>
-              <button class="tg" data-t="bar" title="กราฟแท่ง">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>
-              </button>
-            </div>
+            <h3>ช่วงเวลาตลาด Forex · เวลาไทย</h3>
+            <span class="mk-live"><span class="dotlive"></span>ตามเวลาจริง</span>
           </div>
-          <div class="plot" id="chartSlot"></div>
+          <div class="ses-top">
+            <div class="ses-clock" id="sesClock">--:--</div>
+            <div class="ses-date"><b id="sesDay">&nbsp;</b>เวลาประเทศไทย (GMT+7)</div>
+            <div class="ses-liq" id="sesLiq"><i></i>ปริมาณซื้อขายโดยทั่วไป <b>—</b></div>
+          </div>
+          <div class="ses-body" id="sesBody"><div class="empty-slot"><div class="e-t">SESSIONS</div><div class="e-d">กำลังคำนวณเวลา…</div></div></div>
+          <div class="ses-lg" id="sesLg"></div>
+          <div class="mk-info" id="sesNote"><span class="m">&nbsp;</span></div>
+          <div class="mk-cap">เวลาทำการตามธรรมเนียมของแต่ละศูนย์กลางการเงิน (เวลาท้องถิ่น): ซิดนีย์ 07:00–16:00 · โตเกียว 09:00–18:00 · ลอนดอน 08:00–17:00 · นิวยอร์ก 08:00–17:00 แปลงเป็นเวลาไทยให้อัตโนมัติ รวมช่วงที่ต่างประเทศปรับเวลาฤดูร้อน (Daylight Saving) แล้ว · ตลาด Forex ซื้อขายต่อเนื่องตั้งแต่เช้าวันจันทร์ถึงเช้าวันเสาร์ตามเวลาไทย แถบเหล่านี้บอกว่าศูนย์กลางใดกำลังทำการ ซึ่งสัมพันธ์กับปริมาณซื้อขายและความผันผวน · แถบ “ปริมาณซื้อขาย” เป็นภาพโดยทั่วไป ไม่ใช่ข้อมูลปริมาณจริง · ไม่นับวันหยุดธนาคารของแต่ละประเทศ · เป็นข้อมูลประกอบการศึกษา ไม่ใช่คำแนะนำการลงทุน</div>
         </div>
 
         <!-- ---------- MARKET OVERVIEW: bars + heatmap (หุ้น / ทอง) ---------- -->
@@ -741,22 +740,7 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
           </div>
         </div>
         <div id="mkFx" class="mk-hide">
-          <div class="card" id="mkSes">
-            <div class="card-h">
-              <h3>ช่วงเวลาตลาด Forex · เวลาไทย</h3>
-              <span class="mk-live"><span class="dotlive"></span>ตามเวลาจริง</span>
-            </div>
-            <div class="ses-top">
-              <div class="ses-clock" id="sesClock">--:--</div>
-              <div class="ses-date"><b id="sesDay">&nbsp;</b>เวลาประเทศไทย (GMT+7)</div>
-              <div class="ses-liq" id="sesLiq"><i></i>ปริมาณซื้อขายโดยทั่วไป <b>—</b></div>
-            </div>
-            <div class="ses-body" id="sesBody"><div class="empty-slot"><div class="e-t">SESSIONS</div><div class="e-d">กำลังคำนวณเวลา…</div></div></div>
-            <div class="ses-lg" id="sesLg"></div>
-            <div class="mk-info" id="sesNote"><span class="m">&nbsp;</span></div>
-            <div class="mk-cap">เวลาทำการตามธรรมเนียมของแต่ละศูนย์กลางการเงิน (เวลาท้องถิ่น): ซิดนีย์ 07:00–16:00 · โตเกียว 09:00–18:00 · ลอนดอน 08:00–17:00 · นิวยอร์ก 08:00–17:00 แปลงเป็นเวลาไทยให้อัตโนมัติ รวมช่วงที่ต่างประเทศปรับเวลาฤดูร้อน (Daylight Saving) แล้ว · ตลาด Forex ซื้อขายต่อเนื่องตั้งแต่เช้าวันจันทร์ถึงเช้าวันเสาร์ตามเวลาไทย แถบเหล่านี้บอกว่าศูนย์กลางใดกำลังทำการ ซึ่งสัมพันธ์กับปริมาณซื้อขายและความผันผวน · แถบ “ปริมาณซื้อขาย” เป็นภาพโดยทั่วไป ไม่ใช่ข้อมูลปริมาณจริง · ไม่นับวันหยุดธนาคารของแต่ละประเทศ · เป็นข้อมูลประกอบการศึกษา ไม่ใช่คำแนะนำการลงทุน</div>
-          </div>
-          <div class="card" style="margin-top:14px">
+          <div class="card">
             <div class="card-h">
               <h3>ความแข็ง–อ่อนของสกุลเงิน · เทียบดอลลาร์สหรัฐ</h3>
               <div class="tools" id="mkStrPer">
@@ -874,9 +858,9 @@ const LOCK='<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor
 const MENU=[
   {cap:'ภาพรวม',items:[
     {t:'Sentiment ทองคำรายวัน',ic:'grid',dash:true},
+    {t:'เวลาตลาด Forex',ic:'clock',mk:1,to:'mkSes',chip:'ใหม่'},
     {t:'Heatmap หุ้น · ทองคำ',ic:'chart',mk:1,chip:'ใหม่'},
     {t:'อัตราแลกเปลี่ยนสด',ic:'fx',mk:'fx',chip:'LIVE'},
-    {t:'เวลาตลาด Forex',ic:'clock',mk:'fx',to:'mkSes',chip:'ใหม่'},
     {t:'กราฟราคา',ic:'candle',mk:'chart',chip:'ใหม่'},
     {t:'หน้าหลักสมาชิก',ic:'home',url:'https://jptrustlearning.com',ext:true}
   ]},
@@ -970,7 +954,7 @@ nav.addEventListener('click',e=>{
   const mk=e.target.closest('[data-mk]');
   if(mk){ e.preventDefault(); showDash();
     const mkBtn=document.querySelector('#mkAsset button[data-a="'+mk.dataset.mk+'"]');     // mk:'fx' / 'chart' = เปิดแท็บนั้น · mk:1 = ไม่เปลี่ยนแท็บ
-    if(mkBtn) mkBtn.click(); else mkLoadStocks();
+    if(mkBtn) mkBtn.click(); else if(!mk.dataset.to) mkLoadStocks();     // มี to = แค่เลื่อนไปหาการ์ด ไม่ต้องปลุกข้อมูลหุ้น
     (document.getElementById(mk.dataset.to||'')||document.getElementById('mkSec')).scrollIntoView({behavior:'smooth',block:'start'}); return; }     // to = เลื่อนไปที่การ์ดเฉพาะใบในแท็บนั้น
   const d=e.target.closest('[data-dash]');
   if(d){ e.preventDefault(); showDash(); }
@@ -1003,14 +987,6 @@ function showDash(){
   closeSb();
 }
 btnBack.onclick=showDash;
-
-/* ---------- chart type toggle ---------- */
-let chartType='line', chart=null;
-document.getElementById('chartTools').addEventListener('click',e=>{
-  const b=e.target.closest('button'); if(!b) return;
-  document.querySelectorAll('#chartTools .tg').forEach(x=>x.classList.remove('on'));
-  b.classList.add('on'); chartType=b.dataset.t; drawChart();
-});
 
 /* =====================================================================
    GOLD DAILY SENTIMENT + ATR ZONES
@@ -1138,9 +1114,9 @@ const thDate=s=>{const m=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ
    ตอนนี้วาดจากข้อมูลสำรองที่ฝังในไฟล์ทันที (0 ไบต์ ไม่ต้องรอเน็ต)
    แล้วค่อยดึงของสดมาทับเงียบๆ เบื้องหลัง — ผู้ใช้เห็นเนื้อหาทันทีเสมอ */
 /* ปรับทั้งชุดราคาให้อยู่ระนาบ spot ก่อนคำนวณอะไรทั้งสิ้น
-   เลื่อนด้วยค่าคงที่ค่าเดียว -> ATR/ผลตอบแทน/รูปทรงกราฟไม่เปลี่ยน
-   แต่แนวพิวอต เส้นโซนบนกราฟ และตารางโซน มาอยู่ระนาบเดียวกันหมด
-   ถ้าไม่ทำ เส้นโซนจะลอยต่ำกว่าเส้นราคาราว $50 และดาวซ้อนแนวจะไม่มีวันติด */
+   เลื่อนด้วยค่าคงที่ค่าเดียว -> ATR/ผลตอบแทนไม่เปลี่ยน
+   แต่แนวพิวอตกับตารางโซนมาอยู่ระนาบเดียวกัน
+   ถ้าไม่ทำ โซนจะต่ำกว่าราคาสดราว $50 และดาวซ้อนแนวจะไม่มีวันติด */
 function applySpotBasis(){
   if(!SPOT||!PX||!PX.c.length) return;
   const b=SPOT.price-PX.c[PX.c.length-1];
@@ -1170,7 +1146,7 @@ function renderAll(){
   ATR=wilderATR(PX); PIV=pivots(PX); TOL=Math.max(4,0.10*ATR);
   LAST={date:PX.d[PX.d.length-1],open:PX.o[PX.o.length-1],close:PX.c[PX.c.length-1]};
   applyMode();
-  paintKPIs(); calc(); drawChart();
+  paintKPIs(); calc();
 }
 function setStatus(state){
   const el=document.getElementById('asOf');
@@ -1272,7 +1248,7 @@ function paintKPIs(){
 
 
 /* ---------- ATR zone ladder ---------- */
-let ZONES=null;
+let ZONES=null;                           // เคยป้อนเส้นประให้กราฟทอง 60 วัน (ถอด A92) — ตอนนี้ไม่มีใครอ่าน เก็บไว้เผื่อคืนกราฟ
 function calc(){
   /* โหมดอัตโนมัติต้องยึดราคาจากข้อมูลเสมอ ไม่อ่านจากช่องกรอก
      ถ้าช่องกรอกค้างค่าที่ผู้ใช้เคยพิมพ์ไว้ด้วยเหตุใดก็ตาม โซนจะได้ไม่ผิดตาม */
@@ -1313,54 +1289,12 @@ function calc(){
        `<span class="ps-c ${k==='PP'?'pp':k[0]==='R'?'r':'s'}">${k} $${f0(PIV[k])}</span>`).join('')+'</div>';
   h+=`<div class="lad-note">โอกาสแตะ = สถิติจริงจากราคาทองย้อนหลัง 3,433 วัน (2556–2569 · ปรับปรุง ส.ค. 69) — เป็นความถี่ที่เคยเกิดขึ้น ไม่ใช่การพยากรณ์<br>
       ★ โซนหนา = ระดับนี้ซ้อนกับแนวพิวอตรายวันพอดี น้ำหนักมากกว่าระดับเดี่ยว · บางวันไม่มีเลยถือเป็นเรื่องปกติ</div>`;
-  if(SPOT) h+=`<div class="lad-note">ราคาตั้งต้นเป็นราคาทองสด (XAU/USD) · กราฟและแนวพิวอตปรับฐานมาที่ระนาบเดียวกันแล้ว</div>`;
+  if(SPOT) h+=`<div class="lad-note">ราคาตั้งต้นเป็นราคาทองสด (XAU/USD) · แนวพิวอตปรับฐานมาที่ระนาบเดียวกันแล้ว</div>`;
   document.getElementById('ladder').innerHTML=h;
   ZONES={open,levels:rows};
-  drawChart();
 }
 document.getElementById('btnCalc').onclick=calc;
 document.getElementById('openIn').addEventListener('keydown',e=>{if(e.key==='Enter')calc()});
-
-/* ---------- 60-day chart with today's zones ---------- */
-function drawChart(){
-  const slot=document.getElementById('chartSlot');
-  if(typeof Chart==='undefined'){
-    slot.innerHTML='<div class="empty-slot"><div class="e-t">CHART</div><div class="e-d">กำลังโหลดกราฟ…</div></div>';
-    window.addEventListener('load',()=>{
-      if(typeof Chart!=='undefined') drawChart();
-      else slot.innerHTML='<div class="empty-slot"><div class="e-t">CHART</div><div class="e-d">กราฟโหลดไม่สำเร็จ — ตัวเลขในหน้านี้ยังถูกต้องครบ</div></div>';
-    },{once:true});
-    return;
-  }
-  if(!slot.querySelector('canvas')) slot.innerHTML='<canvas id="mainCv"></canvas>';
-  if(chart) chart.destroy();
-  const n=PX.c.length, s=Math.max(0,n-60);
-  const labels=PX.d.slice(s), close=PX.c.slice(s);
-  const ds=[{label:'ราคาปิด',data:close,borderColor:'#D4AF37',backgroundColor:chartType==='bar'?'#D4AF37':'rgba(212,175,55,.10)',
-             borderWidth:2.2,fill:chartType==='line',pointRadius:0,pointHitRadius:12,tension:.12}];
-  if(ZONES){
-    const pick=[[0.5,'#C6472E','โซนต้าน 2'],[-0.5,'#2E9E5B','โซนรับ 2'],
-                [1,'#8B2252','โซนต้าน 4'],[-1,'#1e7a44','โซนรับ 4']];
-    for(const [k,col,name] of pick){
-      ds.push({label:name,data:labels.map(()=>ZONES.open+k*ATR),borderColor:col,borderWidth:1.2,
-               borderDash:[5,4],pointRadius:0,fill:false,type:'line',tension:0});
-    }
-  }
-  chart=new Chart(document.getElementById('mainCv'),{
-    type:chartType,
-    data:{labels,datasets:ds},
-    options:{responsive:true,maintainAspectRatio:false,
-      interaction:{mode:'index',intersect:false},
-      plugins:{legend:{position:'bottom',labels:{boxWidth:14,boxHeight:3,font:{family:'Anuphan',size:11.5},color:'#8a7d6b',padding:12}},
-        tooltip:{backgroundColor:'#2d1018',titleFont:{family:'Anuphan',size:12},bodyFont:{family:'Anuphan',size:12},
-          padding:10,borderColor:'rgba(212,175,55,.4)',borderWidth:1,
-          callbacks:{title:it=>thDate(it[0].label),label:c=>' '+c.dataset.label+': $'+f0(c.parsed.y)}}},
-      scales:{x:{ticks:{maxTicksLimit:7,font:{family:'Anuphan',size:11},color:'#8a7d6b',
-                   callback:function(v){const d=this.getLabelForValue(v);return d.slice(8)+'/'+d.slice(5,7)}},grid:{display:false}},
-              y:{ticks:{font:{family:'Anuphan',size:11},color:'#8a7d6b',callback:v=>'$'+f0(v)},
-                 grid:{color:'rgba(212,175,55,.12)'}}}}
-  });
-}
 
 /* =====================================================================
    MARKET OVERVIEW — หุ้น: แท่งรายกลุ่ม + treemap · ทอง: แท่งรายเดือน/ปี + heatmap เดือน×ปี
@@ -1603,7 +1537,7 @@ function mkGoldRender(){
     document.getElementById('mkChart').classList.toggle('mk-hide',a!=='chart');
     document.getElementById('mkDailyNote').classList.toggle('mk-hide',a==='fx'||a==='chart');     // หมายเหตุ "ข้อมูลรายวัน" ไม่จริงสำหรับแท็บค่าเงิน/กราฟ
     if(a==='gold'){ mkGoldShown=true; mkGoldRender(); }
-    else if(a==='fx'){ mkSesStart(); mkStrLoad(); mkFxLoad(); }
+    else if(a==='fx'){ mkStrLoad(); mkFxLoad(); }
     else if(a==='chart'){ mkChLoad(); }
     else { mkLoadStocks(); mkRenderTree(); }
   });
@@ -1763,7 +1697,7 @@ document.addEventListener('visibilitychange',()=>{            // กลับจ
 });
 
 /* =====================================================================
-   FOREX SESSIONS — ช่วงเวลาตลาด 4 ศูนย์กลาง บนแกนเวลาไทย 24 ชม. (#mkSes)
+   FOREX SESSIONS — ช่วงเวลาตลาด 4 ศูนย์กลาง บนแกนเวลาไทย 24 ชม. (#mkSes · อยู่ตรงที่เคยเป็นการ์ดกราฟทอง 60 วัน)
    ไม่มีการดึงข้อมูล: นิยามเวลาทำการเป็น "เวลาท้องถิ่น" ของแต่ละเมือง แล้วให้ Intl แปลงเขตเวลา → DST ถูกเองทุกช่วงของปี
    ตรรกะระดับปริมาณซื้อขาย (sesLevel) เป็นภาพโดยทั่วไป ไม่ใช่ข้อมูลจริง — เขียนบอกไว้ใต้การ์ดแล้ว
    ===================================================================== */
@@ -1848,13 +1782,13 @@ function mkSesRender(){
       +(ov&&names.length?'<span class="m">ลอนดอน–นิวยอร์กเปิดพร้อมกันวันนี้ '+sesHM(ov[0])+'–'+sesHM(ov[1])+' น.</span>':'');
   }catch(e){ sesOK=false; const c=document.getElementById('mkSes'); if(c) c.classList.add('mk-hide'); }   // เบราว์เซอร์เก่าที่ไม่รู้จักเขตเวลา — ถอดการ์ดเงียบๆ
 }
-function mkSesVisible(){ const fx=document.getElementById('mkFx');
-  return !document.hidden&&fx&&!fx.classList.contains('mk-hide')&&document.getElementById('viewDash').classList.contains('on'); }
+function mkSesVisible(){ return !document.hidden&&document.getElementById('viewDash').classList.contains('on'); }
 function mkSesStart(){
   mkSesRender();
   if(!sesTimer) sesTimer=setInterval(()=>{ if(mkSesVisible()) mkSesRender(); },15000);
 }
 document.addEventListener('visibilitychange',()=>{ if(sesTimer&&mkSesVisible()) mkSesRender(); });
+mkSesStart();                                      // การ์ดอยู่ในหน้าภาพรวมโดยตรง (ไม่ได้อยู่ในแท็บ) — เริ่มทันทีที่โหลดหน้า
 
 /* =====================================================================
    HOUSE AD — แบนเนอร์บริการของ JP Trust Learning (#prodCard)
@@ -2012,8 +1946,6 @@ function mkChLoad(sym){
 
 /* ---------- boot ---------- */
 boot();
-let rt=null;
-window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(PX)drawChart();},220)});
 const h0=location.hash.slice(1);
 if(h0){
   const u='./'+h0.replace(/^\.\//,'');
