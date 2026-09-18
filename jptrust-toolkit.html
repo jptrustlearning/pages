@@ -98,6 +98,14 @@ body:not(.in-tool) .top-act{display:none}  /* ปุ่มทั้งคู่�
 .btn:hover{border-color:var(--gold);background:var(--gold-soft)}
 .btn.gold{background:linear-gradient(135deg,var(--gold),#b8901f);border-color:transparent;color:#231016;font-weight:600}
 .btn.hide{display:none}
+/* ---- ปุ่มกลับเว็บไซต์หลัก — อยู่นอก .top-act จึงไม่โดนกฎซ่อนตอนอยู่หน้าภาพรวม ----
+   วางไว้ซ้ายสุดถัดจากปุ่มเมนู เพื่อไม่ไปแย่งที่ป้ายสปอนเซอร์ที่ต้องชิดขวา */
+.btn-web{flex-shrink:0}
+.btn-web svg{width:15px;height:15px;display:block}
+@media(max-width:640px){
+  .btn-web{padding:7px 9px}
+  .btn-web .bw-t{display:none}     /* จอแคบเหลือไอคอนอย่างเดียว กัน crumb ถูกบีบจนอ่านไม่ออก */
+}
 
 .content{flex:1;padding:22px;min-width:0}
 .view{display:none}
@@ -608,6 +616,10 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
       <button class="burger" id="burger" aria-label="เปิดเมนู">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
       </button>
+      <a class="btn btn-web" href="https://jptrustlearning.com" title="กลับสู่เว็บไซต์ JP Trust Learning">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
+        <span class="bw-t">กลับสู่เว็บไซต์</span>
+      </a>
       <div class="crumb">
         <b>หน้าหลัก</b><span class="sep">/</span><span class="cur" id="crumb">Sentiment ทองคำรายวัน</span>
       </div>
