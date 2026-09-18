@@ -233,7 +233,7 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 /* ---- house ad: แบนเนอร์บริการของ JP Trust Learning (แทนการ์ด ADD-ON · A89) ----
    ทั้งแบนเนอร์เป็นลิงก์เดียวไปหน้าสมัคร · ฉากแรกฝังใน HTML (ไม่มี JS ก็ยังเป็นโฆษณาที่อ่านรู้เรื่อง) · JS สลับฉาก + พลิกตัวอักษรแบบป้ายสนามบิน */
 @keyframes prodPulse{0%,100%{box-shadow:0 0 0 0 rgba(212,175,55,0)}30%{box-shadow:0 0 0 5px rgba(212,175,55,.30)}}
-.jad{position:relative;isolation:isolate;display:flex;align-items:center;gap:22px;margin-top:20px;padding:20px 22px 22px;min-height:118px;
+.jad{position:relative;isolation:isolate;display:flex;align-items:center;gap:16px;margin:0 0 20px;padding:0 16px;height:46px;
   border-radius:14px;overflow:hidden;text-decoration:none;color:var(--gold-l);border:1px solid rgba(212,175,55,.45);
   background:linear-gradient(120deg,var(--maroon3) 0%,var(--maroon2) 45%,var(--maroon) 100%);box-shadow:0 6px 22px rgba(26,10,14,.22)}
 .jad.pulse{animation:prodPulse 1.5s ease 1}
@@ -248,8 +248,8 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 .jad-brand img{width:44px;height:44px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,.45))}
 .jad-bn{font-family:var(--f-d);font-size:13px;letter-spacing:1.6px;font-weight:600;color:var(--gold-l);line-height:1.3}
 .jad-bn span{display:block;font-size:9.5px;letter-spacing:2.4px;color:rgba(212,175,55,.8);font-weight:500}
-.jad-copy{position:relative;flex:1;min-width:0;height:72px}
-.jad-scene{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:3px;opacity:0;transform:translateY(16px);
+.jad-copy{position:relative;flex:1;min-width:0;height:30px}
+.jad-scene{position:absolute;inset:0;display:flex;flex-direction:row;align-items:center;gap:11px;opacity:0;transform:translateY(16px);
   transition:opacity .45s ease,transform .6s cubic-bezier(.22,.85,.2,1)}
 .jad-scene.on{opacity:1;transform:none}
 .jad-scene.out{opacity:0;transform:translateY(-16px);transition-duration:.35s,.4s}
@@ -275,16 +275,31 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 .jad.paused .jad-bar i.run{animation-play-state:paused}
 @keyframes jadBar{to{width:100%}}
 .jad-tag{position:absolute;top:7px;right:10px;font-size:9.5px;letter-spacing:.6px;color:rgba(244,228,186,.45);font-weight:300}
+/* ---- โหมดแถบเตี้ย: สูงเท่าแถบราคาวิ่ง (A89 เดิมสูง 118px · จูนสั่งย่อ) ---- */
+.jad-brand{padding-right:14px}
+.jad-brand img{width:26px;height:26px}
+.jad-bn{font-size:11.5px;letter-spacing:1.2px}
+.jad-bn span{font-size:8px;letter-spacing:1.8px}
+.jad-en{flex-shrink:0}
+.jad-h{font-size:14px;font-weight:500}
+.jad-s{display:none}                 /* บรรทัดรองไม่มีที่ในแถบเตี้ย — ข้อความยังอยู่ใน JAD_SCENES ไม่ได้ลบ */
+.jad-tag{display:none}
+.jad-tiles{gap:4px}
+.jad-tiles i{width:24px;height:29px;border-radius:5px}
+.jad-tiles b{font-size:15px}
+.jad-cta{padding:6px 13px;font-size:12.5px;border-radius:8px}
+.jad-cta svg{width:14px;height:14px}
+.jad-bar{height:2px}
 @media(max-width:1180px){.jad-brand .jad-bn{display:none}.jad-brand{padding-right:16px}}
+@media(max-width:900px){ .jad-tiles{display:none} }     /* ป้ายตัวอักษรพลิกเป็นของเล่น ตัดก่อนเมื่อที่เริ่มไม่พอ */
 @media(max-width:760px){
-  .jad{flex-wrap:wrap;gap:12px 14px;padding:26px 16px 20px}
-  .jad-brand{border-right:none;padding-right:0}.jad-brand img{width:38px;height:38px}
-  .jad-tiles{margin-left:auto}.jad-tiles i{width:34px;height:42px;border-radius:7px}.jad-tiles b{font-size:20px}
-  .jad-copy{flex:0 0 100%;order:3;height:84px}
-  .jad-h{font-size:16.5px;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-  .jad-s{font-size:12px;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-  .jad-cta{order:4;flex:0 0 100%;justify-content:center}
+  .jad{gap:11px;padding:0 12px}
+  .jad-brand{border-right:none;padding-right:0}.jad-brand img{width:26px;height:26px}
+  .jad-en{display:none}
+  .jad-h{font-size:13px}
+  .jad-cta{padding:6px 11px;font-size:12px}
 }
+@media(max-width:400px){ .jad-cta span{display:none} .jad-cta{padding:7px 9px} }
 .mchip.alt{background:linear-gradient(135deg,#8B2252,#722F37);color:var(--gold-l)}
 .mchip.free{background:linear-gradient(135deg,var(--gold),#b8901f);color:#231016}
 
@@ -649,6 +664,26 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
       <!-- ---------- VIEW: gold sentiment + ATR zones ---------- -->
       <section class="view on" id="viewDash">
 
+        <!-- ---------- HOUSE AD: บริการของ JP Trust Learning — แบนเนอร์เคลื่อนไหว (แทนการ์ด ADD-ON · EA) ----------
+             ยังใช้ id เดิมของการ์ด (#prodCard) เพราะเมนูซ้าย (prod:1) เลื่อนมาหา id นี้ · ข้อความทุกฉากอยู่ใน JAD_SCENES ของสคริปต์หลัก
+             ⚠️ ฉากสุดท้ายอ้างราคา ฿150 / ฿1,400 — เปลี่ยนราคาแพ็กเกจต้องแก้ที่นี่ด้วย -->
+        <a class="jad" id="prodCard" href="https://app.jptrustlearning.com/new" target="_blank" rel="noopener"
+           data-track="house-ad-services" aria-label="บริการของ JP Trust Learning — สมัครสมาชิก">
+          <span class="jad-bg" aria-hidden="true"></span>
+          <span class="jad-brand"><img id="jadLogo" alt="" hidden><span class="jad-bn">JP TRUST<span>LEARNING</span></span></span>
+          <span class="jad-copy" id="jadCopy">
+            <span class="jad-scene on">
+              <span class="jad-en">MOMENTUM LAB</span>
+              <span class="jad-h">ทดสอบกลยุทธ์ย้อนหลัง 8 กลยุทธ์</span>
+              <span class="jad-s">Backtest หุ้น S&amp;P 500 ด้วยข้อมูลจริง เทียบผลก่อนลงมือ</span>
+            </span>
+          </span>
+          <span class="jad-tiles" id="jadTiles" aria-hidden="true"><i><b>T</b></i><i><b>E</b></i><i><b>S</b></i><i><b>T</b></i></span>
+          <span class="jad-cta"><span>สมัครสมาชิก</span> <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          <span class="jad-bar" aria-hidden="true"><i id="jadBar"></i></span>
+          <span class="jad-tag">บริการของเรา</span>
+        </a>
+
         <!-- TradingView Ticker Tape Widget — แถบราคาวิ่ง (ชุดเดียวกับ Home ของแอปสมาชิก) -->
         <div class="ticker-tape-wrapper" id="tickerTape" data-no-track>
           <div class="tradingview-widget-container">
@@ -873,25 +908,6 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
         </div>
         <div class="mk-cap" id="mkDailyNote" style="margin-top:12px">ข้อมูลราคาปิดรายวัน อัปเดตวันละครั้งหลังตลาดปิด · เป็นข้อมูลประกอบการศึกษา ไม่ใช่คำแนะนำการลงทุน</div>
 
-        <!-- ---------- HOUSE AD: บริการของ JP Trust Learning — แบนเนอร์เคลื่อนไหว (แทนการ์ด ADD-ON · EA) ----------
-             ยังใช้ id เดิมของการ์ด (#prodCard) เพราะเมนูซ้าย (prod:1) เลื่อนมาหา id นี้ · ข้อความทุกฉากอยู่ใน JAD_SCENES ของสคริปต์หลัก
-             ⚠️ ฉากสุดท้ายอ้างราคา ฿150 / ฿1,400 — เปลี่ยนราคาแพ็กเกจต้องแก้ที่นี่ด้วย -->
-        <a class="jad" id="prodCard" href="https://app.jptrustlearning.com/new" target="_blank" rel="noopener"
-           data-track="house-ad-services" aria-label="บริการของ JP Trust Learning — สมัครสมาชิก">
-          <span class="jad-bg" aria-hidden="true"></span>
-          <span class="jad-brand"><img id="jadLogo" alt="" hidden><span class="jad-bn">JP TRUST<span>LEARNING</span></span></span>
-          <span class="jad-copy" id="jadCopy">
-            <span class="jad-scene on">
-              <span class="jad-en">MOMENTUM LAB</span>
-              <span class="jad-h">ทดสอบกลยุทธ์ย้อนหลัง 8 กลยุทธ์</span>
-              <span class="jad-s">Backtest หุ้น S&amp;P 500 ด้วยข้อมูลจริง เทียบผลก่อนลงมือ</span>
-            </span>
-          </span>
-          <span class="jad-tiles" id="jadTiles" aria-hidden="true"><i><b>T</b></i><i><b>E</b></i><i><b>S</b></i><i><b>T</b></i></span>
-          <span class="jad-cta">สมัครสมาชิก <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-          <span class="jad-bar" aria-hidden="true"><i id="jadBar"></i></span>
-          <span class="jad-tag">บริการของเรา</span>
-        </a>
 
       </section>
 
