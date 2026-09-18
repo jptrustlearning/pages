@@ -469,6 +469,15 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .insight-label{font-family:'Cinzel',serif;font-size:9.5px;font-weight:600;color:#8B6914;letter-spacing:0.32em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:6px}
 .insight-label-dot{width:5px;height:5px;background:#D4AF37;border-radius:50%;box-shadow:0 0 4px rgba(212,175,55,0.6)}
 .insight-text{font-family:'Anuphan',sans-serif;font-size:12px;color:var(--text-dark,#3D3228);line-height:1.6}
+/* โทนตลาดโดยรวม — แถบ 3 สีใต้ข้อความ Insight (สีชุดเดียวกับป้ายบนการ์ดข่าว: #2E7D32 / #C62828 / #8B6914) */
+.insight-tone{margin-top:10px;padding-top:9px;border-top:1px solid rgba(212,175,55,0.28);display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap}
+.it-lab{font-family:'Anuphan',sans-serif;font-size:12px;color:var(--text-dark,#3D3228);white-space:nowrap}
+.it-lab b{font-weight:600}
+.it-lab b.u{color:#2E7D32}.it-lab b.d{color:#C62828}.it-lab b.x{color:#8B6914}
+.it-bar{flex:1;min-width:90px;height:7px;border-radius:4px;overflow:hidden;display:flex;background:rgba(61,50,40,0.08)}
+.it-bar i{display:block;height:100%}
+.it-bar .u{background:#2E7D32}.it-bar .n{background:#CFC4AA}.it-bar .d{background:#C62828}
+.it-cnt{flex-basis:100%;font-family:'Anuphan',sans-serif;font-size:10.5px;color:var(--text-dark-muted,#8a7d6b);line-height:1.4}
 
 @media (max-width:380px){
   .story-meta{min-width:56px}
@@ -2776,10 +2785,21 @@ function renderInsight(latestBatch){
   }
   const total=pos+neg+neu;
   const tilt=pos>neg?'เชิงบวก':neg>pos?'เชิงลบ':'ผสม';
+  const tiltCls=pos>neg?'u':neg>pos?'d':'x';
   const summary=latestBatch.summary||'';
+  /* โทนตลาด: เดิมต่อท้ายข้อความเป็นวงเล็บ (20 positive · 7 negative …) → ย้ายมาเป็นแถบ .insight-tone ใต้ข้อความ
+     ชุดเดียวกับการ์ด Insight ใน Tool&Kit · วิธีนับไม่เปลี่ยน (tools/gen_news_latest.py ต้องนับแบบเดียวกันนี้เสมอ) */
   const text=summary
-    ? escapeText(summary)+' · โทนตลาดโดยรวม'+tilt+' ('+pos+' positive · '+neg+' negative · '+neu+' neutral จาก '+total+' tickers)'
-    : 'Batch ล่าสุดมี '+(latestBatch.headlines||[]).length+' headlines · โทนรวม'+tilt+' ('+pos+' positive · '+neg+' negative · '+neu+' neutral)';
+    ? escapeText(summary)
+    : 'Batch ล่าสุดมี '+(latestBatch.headlines||[]).length+' headlines';
+  const w=n=>(n/total*100).toFixed(1)+'%';
+  const tone=total>0
+    ? '<div class="insight-tone">'
+        +'<span class="it-lab">โทนตลาดโดยรวม <b class="'+tiltCls+'">'+tilt+'</b></span>'
+        +'<span class="it-bar" aria-hidden="true"><i class="u" style="width:'+w(pos)+'"></i><i class="n" style="width:'+w(neu)+'"></i><i class="d" style="width:'+w(neg)+'"></i></span>'
+        +'<span class="it-cnt">บวก '+pos+' · กลาง '+neu+' · ลบ '+neg+' · จาก '+total+' สินทรัพย์ที่ข่าวพูดถึง</span>'
+      +'</div>'
+    : '';
   root.innerHTML='<div class="insight-card">'
     +'<div class="insight-icon">'
       +'<svg viewBox="0 0 24 24"><path d="M9.5 2A2.5 2.5 0 0 0 7 4.5v.05A3 3 0 0 0 5 7.5v.5a3 3 0 0 0 1 2.236V13a3 3 0 0 0 1.5 2.6V18a2.5 2.5 0 0 0 2.5 2.5H10A1 1 0 0 0 11 22V12.5A2.5 2.5 0 0 1 13.5 10H14"/><path d="M14.5 2A2.5 2.5 0 0 1 17 4.5v.05A3 3 0 0 1 19 7.5v.5a3 3 0 0 1-1 2.236V13a3 3 0 0 1-1.5 2.6V18a2.5 2.5 0 0 1-2.5 2.5H14A1 1 0 0 1 13 22V12.5A2.5 2.5 0 0 0 10.5 10H10"/></svg>'
@@ -2787,6 +2807,7 @@ function renderInsight(latestBatch){
     +'<div class="insight-body">'
       +'<div class="insight-label"><span class="insight-label-dot"></span> Insight</div>'
       +'<div class="insight-text">'+text+'</div>'
+      +tone
     +'</div>'
   +'</div>';
 }
