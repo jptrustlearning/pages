@@ -75,10 +75,24 @@ body{background:var(--cream);color:var(--ink);font-family:var(--f-b);line-height
 .burger{display:none;background:none;border:1px solid var(--line);border-radius:8px;padding:7px 9px;cursor:pointer;color:var(--maroon)}
 .burger svg{width:18px;height:18px;display:block}
 .crumb{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);min-width:0}
-.crumb b{color:var(--maroon);font-weight:600}
+.crumb b{color:var(--maroon);font-weight:600;white-space:nowrap}
+.crumb{overflow:hidden}   /* พื้นที่เหลือน้อย (มีป้ายสปอนเซอร์/ปุ่ม) ให้ตัดท้าย ไม่ใช่ตกบรรทัดหรือทับปุ่ม */
 .crumb .sep{color:var(--line)}
 .crumb .cur{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .top-act{margin-left:auto;display:flex;align-items:center;gap:9px}
+/* ---- sponsor (แถบบน) — ป้าย "SPONSORED BY" ต้องอยู่คู่โลโก้เสมอ ห้ามเหลือโลโก้เปล่าโดยไม่มีคำว่าสปอนเซอร์ในจอกว้าง ---- */
+.sponsor{margin-left:auto;display:flex;align-items:center;gap:9px;flex-shrink:0}
+.sponsor img{height:34px;width:auto;display:block}
+.sp-t{display:flex;flex-direction:column;align-items:flex-end;line-height:1.15}
+.sp-k{font-family:var(--f-d);font-size:8.5px;letter-spacing:1.8px;color:var(--muted);font-weight:600;white-space:nowrap}
+.sp-t b{font-family:var(--f-d);font-size:14px;letter-spacing:1.6px;color:var(--maroon);font-weight:700}
+.sponsor + .top-act{margin-left:0}
+@media(max-width:640px){
+  .sponsor{gap:7px}.sponsor img{height:28px}
+  .sp-k{font-size:7.5px;letter-spacing:1.2px}.sp-t b{font-size:12px}
+  body.in-tool .sponsor{display:none}     /* จอแคบ + เปิดเครื่องมืออยู่ = มีปุ่มเพิ่ม 2 ปุ่ม ที่ไม่พอ (ล้นจอที่ 360px) — โชว์เฉพาะหน้าภาพรวม */
+}
+body:not(.in-tool) .top-act{display:none}  /* ปุ่มทั้งคู่ซ่อนอยู่แล้วตอนอยู่หน้าภาพรวม — ตัดกล่องเปล่าออก ป้ายสปอนเซอร์จะชิดขอบขวาพอดี */
 .btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:9px;padding:7px 13px;
   font-family:var(--f-b);font-size:12.5px;font-weight:500;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 .btn:hover{border-color:var(--gold);background:var(--gold-soft)}
@@ -397,6 +411,10 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
       </button>
       <div class="crumb">
         <b>หน้าหลัก</b><span class="sep">/</span><span class="cur" id="crumb">Sentiment ทองคำรายวัน</span>
+      </div>
+      <div class="sponsor" id="sponsor" title="Sponsored by FISG">
+        <span class="sp-t"><span class="sp-k">SPONSORED BY</span><b>FISG</b></span>
+        <img src="sponsor-fisg.png" alt="FISG" width="247" height="173">
       </div>
       <div class="top-act">
         <a class="btn hide" id="btnOpen" target="_blank" rel="noopener">เปิดในแท็บใหม่ ↗</a>
@@ -724,6 +742,7 @@ function markActive(sel){
 function openTool(url,title){
   frame.src=url;
   crumb.textContent=title;
+  document.body.classList.add('in-tool');
   viewDash.classList.remove('on'); viewTool.classList.add('on');
   btnOpen.href=url; btnOpen.classList.remove('hide'); btnBack.classList.remove('hide');
   markActive(nav.querySelector(`[data-tool="${CSS.escape(url)}"]`));
@@ -735,6 +754,7 @@ function openTool(url,title){
 function showDash(){
   frame.src='about:blank';
   crumb.textContent='Sentiment ทองคำรายวัน';
+  document.body.classList.remove('in-tool');
   viewTool.classList.remove('on'); viewDash.classList.add('on');
   btnOpen.classList.add('hide'); btnBack.classList.add('hide');
   markActive(nav.querySelector('[data-dash]'));
