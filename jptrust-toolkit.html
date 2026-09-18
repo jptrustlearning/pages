@@ -480,8 +480,6 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 .ses-lg{display:flex;align-items:center;gap:6px 14px;flex-wrap:wrap;margin-top:12px;font-size:11px;color:var(--muted);font-weight:300}
 .ses-lg span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 .ses-lg i{width:16px;height:9px;border-radius:2px;background:var(--c);display:inline-block;box-shadow:0 0 0 1px rgba(61,50,40,.1)}
-#sesNote b{font-weight:600;color:var(--maroon)}
-#sesNote .m{color:var(--muted);font-weight:300}
 @media(max-width:640px){
   .ses-clock{font-size:31px}
   .ses-liq{margin-left:0;width:100%;justify-content:center}
@@ -681,8 +679,6 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
           </div>
           <div class="ses-body" id="sesBody"><div class="empty-slot"><div class="e-t">SESSIONS</div><div class="e-d">กำลังคำนวณเวลา…</div></div></div>
           <div class="ses-lg" id="sesLg"></div>
-          <div class="mk-info" id="sesNote"><span class="m">&nbsp;</span></div>
-          <div class="mk-cap">เวลาทำการตามธรรมเนียมของแต่ละศูนย์กลางการเงิน (เวลาท้องถิ่น): ซิดนีย์ 07:00–16:00 · โตเกียว 09:00–18:00 · ลอนดอน 08:00–17:00 · นิวยอร์ก 08:00–17:00 แปลงเป็นเวลาไทยให้อัตโนมัติ รวมช่วงที่ต่างประเทศปรับเวลาฤดูร้อน (Daylight Saving) แล้ว · ตลาด Forex ซื้อขายต่อเนื่องตั้งแต่เช้าวันจันทร์ถึงเช้าวันเสาร์ตามเวลาไทย แถบเหล่านี้บอกว่าศูนย์กลางใดกำลังทำการ ซึ่งสัมพันธ์กับปริมาณซื้อขายและความผันผวน · แถบ “ปริมาณซื้อขาย” เป็นภาพโดยทั่วไป ไม่ใช่ข้อมูลปริมาณจริง · ไม่นับวันหยุดธนาคารของแต่ละประเทศ · เป็นข้อมูลประกอบการศึกษา ไม่ใช่คำแนะนำการลงทุน</div>
         </div>
 
         <!-- ---------- MARKET OVERVIEW: bars + heatmap (หุ้น / ทอง) ---------- -->
@@ -1735,8 +1731,6 @@ function sesIntervals(s,now){                      // ช่วงทำกา�
 function sesLevel(o){ return o.lon&&o.ny?4 : o.lon?3 : (o.ny||o.tok)?2 : o.syd?1 : 0; }
 const ses2=n=>String(n).padStart(2,'0');
 function sesHM(ms){ const p=sesParts(SES_TZ,ms); return ses2(p.h)+':'+ses2(p.mi); }
-function sesIn(ms){ let m=Math.max(1,Math.round(ms/6e4)); const d=Math.floor(m/1440); m-=d*1440; const h=Math.floor(m/60); m-=h*60;
-  return ('อีก '+(d?d+' วัน ':'')+(h?h+' ชม. ':'')+(!d&&m?m+' นาที':'')).trim(); }
 let sesTimer=0, sesOK=true;
 function mkSesRender(){
   const body=document.getElementById('sesBody'); if(!body||!sesOK) return;
@@ -1751,10 +1745,8 @@ function mkSesRender(){
     let h='<div class="ses-r ses-ax"><div class="ses-l"></div><div class="ses-tk">';
     for(let i=0;i<=24;i+=2) h+='<span'+(i===24?' class="e"':'')+' style="left:'+(i/24*100).toFixed(3)+'%">'+ses2(i)+'</span>';
     h+='<span class="ses-pin" style="left:'+nowX+'%"></span></div></div>';
-    const ev=[];                                              // เหตุการณ์เปิด/ปิดถัดไปของทุกเมือง
     rows.forEach(r=>{
       const cur=r.iv.find(v=>now>=v[0]&&now<v[1]), nxt=r.iv.find(v=>v[0]>now), ref=cur||nxt, lp=sesParts(r.s.tz,now);
-      if(cur) ev.push({t:cur[1],s:r.s,open:false}); if(nxt) ev.push({t:nxt[0],s:r.s,open:true});
       let bars='';
       const seg=(a,b,cls)=>{ const x=Math.max(a,T0), y=Math.min(b,T1); if(x<y) bars+='<span class="ses-b'+cls+'" style="left:'+pct(x)+'%;width:'+((y-x)/SES_D*100).toFixed(3)+'%"></span>'; };
       r.iv.forEach(v=>seg(v[0],v[1],''));
@@ -1773,13 +1765,6 @@ function mkSesRender(){
     liq.style.setProperty('--sl',SES_LV[lv].c); liq.querySelector('b').textContent=SES_LV[lv].t;
     document.getElementById('sesLg').innerHTML=SES_LV.slice(1).map(l=>'<span><i style="--c:'+l.c+'"></i>'+l.t+'</span>').join('')
       +'<span><i style="--c:linear-gradient(135deg,#EACD6A,#D4AF37)"></i>ลอนดอน–นิวยอร์กเปิดพร้อมกัน</span>';
-    ev.sort((a,b)=>a.t-b.t);
-    const e0=ev[0], names=rows.filter(r=>on[r.s.k]).map(r=>r.s.th), ep=e0&&sesParts(SES_TZ,e0.t);
-    const when=e0?(ep.d!==bp.d?'วัน'+SES_WDF[ep.wd]+' ':'')+sesHM(e0.t)+' น.':'';
-    const ov=ovs.find(v=>v[1]>now&&v[0]<T1);
-    document.getElementById('sesNote').innerHTML=(names.length?'<b>เปิดอยู่ตอนนี้</b><span>'+names.join(' · ')+'</span>':'<b>ตลาด Forex ปิดอยู่</b>')
-      +(e0?'<span class="m">ถัดไป: '+e0.s.th+(e0.open?'เปิด ':'ปิด ')+when+' ('+sesIn(e0.t-now)+')</span>':'')
-      +(ov&&names.length?'<span class="m">ลอนดอน–นิวยอร์กเปิดพร้อมกันวันนี้ '+sesHM(ov[0])+'–'+sesHM(ov[1])+' น.</span>':'');
   }catch(e){ sesOK=false; const c=document.getElementById('mkSes'); if(c) c.classList.add('mk-hide'); }   // เบราว์เซอร์เก่าที่ไม่รู้จักเขตเวลา — ถอดการ์ดเงียบๆ
 }
 function mkSesVisible(){ return !document.hidden&&document.getElementById('viewDash').classList.contains('on'); }
