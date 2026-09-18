@@ -1809,12 +1809,14 @@ function renderEqTf(){
 function setTf(t){ curTf=t; renderEqTf(); drawEquity(); }
 function renderEqMode(){
   const bar=$('eqMode'); if(!bar) return;
-  const opt=[['value','มูลค่าพอร์ต'],['dd','Drawdown']];
+  const opt=[['value','มูลค่าพอร์ต'],['dd','Drawdown'],['pnl','กำไรสะสม %']];
   bar.innerHTML=opt.map(o=>'<button class="eq-tf-btn'+(o[0]===eqMode?' active':'')+'" onclick="PR.setEqMode(\''+o[0]+'\')">'+o[1]+'</button>').join('');
-  const ttl=$('eqTitle'); if(ttl) ttl.textContent = eqMode==='dd' ? 'Drawdown' : 'Equity Curve';
+  const ttl=$('eqTitle'); if(ttl) ttl.textContent = eqMode==='dd' ? 'Drawdown' : (eqMode==='pnl' ? 'Cumulative P&L' : 'Equity Curve');
   const lg=$('eqLegend');
   if(lg) lg.innerHTML = eqMode==='dd'
     ? '<div class="eq-leg-item"><span class="eq-leg-dot" style="background:#C0392B"></span>ระยะห่างจากจุดสูงสุดที่เคยทำได้ (Time-Weighted)</div>'
+    : eqMode==='pnl'
+    ? '<div class="eq-leg-item"><span class="eq-leg-dot" style="background:#B8860B"></span>กำไร/ขาดทุนสะสม % (เงินจริง · ปลายเส้น = % การ์ดบน)</div>'
     : '<div class="eq-leg-item"><span class="eq-leg-dot" style="background:#D4AF37"></span>มูลค่าพอร์ต (ถือ + เงินสด)</div>'
      +'<div class="eq-leg-item"><span class="eq-leg-dot" style="background:#722F37"></span>เงินต้นสุทธิ</div>';
 }
@@ -1931,6 +1933,7 @@ function tfStart(tf){
 }
 function drawEquity(){
   if(eqMode==='dd') return drawDrawdown();
+  if(eqMode==='pnl') return drawCumPnl();
   const cv=$('eqCanvas'), empty=$('eqEmpty'), wrap=cv.parentElement;
   const curve=buildCurve(sel);
   if(!curve){ cv.style.display='none'; empty.classList.remove('hidden'); return; }
@@ -2031,6 +2034,75 @@ function drawDrawdown(){
     ctx.fillStyle='#922B21'; ctx.textAlign='left'; ctx.fillText(lbl, lx, ly);
     ctx.font='10px Anuphan';
   }
+}
+
+/* ---------- กำไรสะสม % (เงินจริง) ----------
+   = (มูลค่าพอร์ต − เงินต้นสุทธิ) ÷ เงินต้นสุทธิ ณ แต่ละวัน จากเส้นเดียวกับ Equity Curve
+   ปลายเส้น = (unreal+realized)/netBase = % บนการ์ด hero เป๊ะ (คนละตัวกับ TWR ที่ใช้ใน Drawdown/Vol)
+   คิดสะสมตั้งแต่ไม้แรกเสมอ แล้วค่อยตัดหน้าต่างเวลา — เปิด 1M แล้วเส้นไม่รีเซ็ตเป็น 0 */
+function drawCumPnl(){
+  const cv=$('eqCanvas'), empty=$('eqEmpty'), wrap=cv.parentElement;
+  const curve=buildCurve(sel);
+  if(!curve || curve.dates.length<2){
+    cv.style.display='none';
+    if(empty){ empty.classList.remove('hidden'); empty.textContent='บันทึกการซื้อครั้งแรกเพื่อดูกำไรสะสม'; }
+    return;
+  }
+  cv.style.display='block'; if(empty) empty.classList.add('hidden');
+  const pctAll=curve.val.map((v,i)=>{ const b=curve.inv[i]; return b>1e-9 ? (v-b)/b : 0; });
+  const start=tfStart(curTf);
+  let i0=curve.dates.findIndex(d=>d>=start); if(i0<0) i0=0; if(i0>0) i0--;
+  const ds=curve.dates.slice(i0), pc=pctAll.slice(i0);
+  const dpr=window.devicePixelRatio||1, W=wrap.clientWidth, H=wrap.clientHeight;
+  cv.width=W*dpr; cv.height=H*dpr; cv.style.width=W+'px'; cv.style.height=H+'px';
+  const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W,H);
+  const padL=46,padR=10,padT=12,padB=24;
+  let mn=Math.min(0,...pc), mx=Math.max(0,...pc);
+  if(mx-mn<0.01){ mx+=0.005; mn-=0.005; }
+  const pad=(mx-mn)*0.10; mn-=pad; mx+=pad;
+  const X=i=> padL + (ds.length<=1?0:(i/(ds.length-1))*(W-padL-padR));
+  const Y=v=> padT + (1-(v-mn)/(mx-mn))*(H-padT-padB);
+  const y0=Y(0);
+  ctx.font='10px Anuphan'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  for(let g=0;g<=4;g++){
+    const v=mn+(mx-mn)*g/4, y=Y(v);
+    ctx.strokeStyle='rgba(212,175,55,0.15)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(W-padR,y); ctx.stroke();
+    ctx.fillStyle='#7A6F62'; ctx.fillText((v*100).toFixed(1)+'%', 2, y+3);
+  }
+  // เส้นศูนย์ (+ป้าย 0.0% ถ้าไม่ชนป้าย gridline)
+  ctx.strokeStyle='rgba(114,47,55,0.45)'; ctx.lineWidth=1.2;
+  ctx.beginPath(); ctx.moveTo(padL,y0); ctx.lineTo(W-padR,y0); ctx.stroke();
+  let nearGrid=false; for(let g=0;g<=4;g++){ if(Math.abs(Y(mn+(mx-mn)*g/4)-y0)<14) nearGrid=true; }
+  if(!nearGrid){ ctx.fillStyle='#722F37'; ctx.fillText('0.0%', 2, y0+3); }
+  ctx.fillStyle='#7A6F62';
+  ctx.fillText(ds[0], padL, H-8);
+  const lastLbl=ds[ds.length-1], tw=ctx.measureText(lastLbl).width;
+  ctx.fillText(lastLbl, W-padR-tw, H-8);
+  // พื้นที่ระหว่างเส้นกับศูนย์: เหนือศูนย์เขียว / ใต้ศูนย์แดง (clip สองรอบบน path เดียวกัน)
+  const area=()=>{ ctx.beginPath(); ctx.moveTo(X(0),y0); pc.forEach((v,i)=>ctx.lineTo(X(i),Y(v))); ctx.lineTo(X(pc.length-1),y0); ctx.closePath(); };
+  ctx.save(); ctx.beginPath(); ctx.rect(padL,padT-2,W-padL-padR,Math.max(0,y0-(padT-2))); ctx.clip();
+  const gU=ctx.createLinearGradient(0,padT,0,y0); gU.addColorStop(0,'rgba(46,159,95,0.30)'); gU.addColorStop(1,'rgba(46,159,95,0.03)');
+  area(); ctx.fillStyle=gU; ctx.fill(); ctx.restore();
+  ctx.save(); ctx.beginPath(); ctx.rect(padL,y0,W-padL-padR,Math.max(0,(H-padB+2)-y0)); ctx.clip();
+  const gD=ctx.createLinearGradient(0,y0,0,H-padB); gD.addColorStop(0,'rgba(192,57,43,0.03)'); gD.addColorStop(1,'rgba(192,57,43,0.30)');
+  area(); ctx.fillStyle=gD; ctx.fill(); ctx.restore();
+  ctx.beginPath(); pc.forEach((v,i)=>{ const x=X(i),y=Y(v); i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+  ctx.strokeStyle='#B8860B'; ctx.lineWidth=2; ctx.stroke();
+  // จุดปลายเส้น + ป้าย % ปัจจุบัน (สีตามกำไร/ขาดทุน)
+  const li=pc.length-1, lv=pc[li], lx=X(li), ly=Y(lv);
+  const col = lv>0.00005? '#226F44' : (lv<-0.00005? '#922B21' : '#7A6F62');
+  ctx.beginPath(); ctx.arc(lx,ly,3.4,0,Math.PI*2); ctx.fillStyle=col; ctx.fill();
+  const lbl=(lv>=0?'+':'')+(lv*100).toFixed(1)+'%';
+  ctx.font='600 11px Anuphan';
+  const lw=ctx.measureText(lbl).width;
+  let tx=lx-lw-6; tx=Math.max(padL+2, Math.min(tx, W-padR-lw));
+  // เส้นวิ่งขึ้นมาหาจุดปลาย → วางป้ายด้านบน · วิ่งลงมา → วางด้านล่าง (ไม่ทับเส้น)
+  const prev=pc[Math.max(0,li-Math.max(1,Math.round(pc.length*0.06)))];
+  let ty= (lv>=prev) ? ly-9 : ly+16;  ty=Math.max(padT+9, Math.min(ty, H-padB-3));
+  ctx.fillStyle='rgba(255,254,248,0.85)'; ctx.fillRect(tx-3, ty-11, lw+6, 14);
+  ctx.fillStyle=col; ctx.fillText(lbl, tx, ty);
+  ctx.font='10px Anuphan';
 }
 
 /* ============================================================
