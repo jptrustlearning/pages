@@ -444,6 +444,62 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 @media(max-width:640px){.mk-fxbox{height:600px}}
 @media(max-width:520px){.mk-head .modeseg{min-width:0}}
 
+/* ค่าเงิน: ช่วงเวลาตลาด Forex (เวลาไทย) — คำนวณฝั่งเบราว์เซอร์ล้วน ไม่ดึงข้อมูลจากที่ไหน */
+#mkSes{scroll-margin-top:70px}
+.ses-top{display:flex;align-items:center;gap:13px;flex-wrap:wrap;margin-bottom:14px}
+.ses-clock{font-family:var(--f-n);font-size:36px;line-height:1;color:var(--maroon);font-variant-numeric:tabular-nums;letter-spacing:.5px}
+.ses-date{font-size:11.5px;color:var(--muted);font-weight:300;line-height:1.4}
+.ses-date b{display:block;font-weight:600;color:var(--ink);font-size:13px}
+.ses-liq{margin-left:auto;display:inline-flex;align-items:center;gap:7px;padding:6px 13px;border-radius:999px;border:1px solid var(--line);
+  background:#fff;font-size:12px;color:var(--muted);font-weight:300;white-space:nowrap}
+.ses-liq i{width:9px;height:9px;border-radius:50%;background:var(--sl,rgba(61,50,40,.18));flex-shrink:0;box-shadow:0 0 0 1px rgba(61,50,40,.12)}
+.ses-liq b{font-weight:600;color:var(--maroon)}
+.ses-body{display:flex;flex-direction:column;gap:9px}
+.ses-r{display:grid;grid-template-columns:188px minmax(0,1fr);gap:14px;align-items:center}
+.ses-l{min-width:0;line-height:1.3;display:grid;grid-template-columns:68px 1fr;column-gap:8px;row-gap:1px;align-items:baseline}
+.ses-l b{font-size:13.5px;font-weight:600;color:var(--ink)}
+.ses-lt{font-size:11.5px;color:var(--muted);font-weight:300;font-variant-numeric:tabular-nums}
+.ses-st{grid-column:1;justify-self:start;font-style:normal;font-size:10.5px;font-weight:600;padding:1px 8px;border-radius:999px;
+  background:rgba(61,50,40,.07);color:var(--muted)}
+.ses-rg{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ses-r.open .ses-st{background:rgba(46,158,91,.14);color:#23834A}
+.ses-r.open .ses-rg{color:var(--ink)}
+.ses-tk{position:relative;height:30px;border-radius:7px;border:1px solid var(--line);
+  background:repeating-linear-gradient(90deg,rgba(61,50,40,.075) 0 1px,transparent 1px calc(100% / 24)) #fff}
+.ses-b{position:absolute;top:4px;bottom:4px;border-radius:4px;background:linear-gradient(135deg,#5c2535,#3a1520);opacity:.34}
+.ses-b.ov{background:linear-gradient(135deg,#EACD6A,#D4AF37)}
+.ses-r.open .ses-b{opacity:1}
+.ses-now{position:absolute;top:-5px;bottom:-5px;width:2px;margin-left:-1px;border-radius:1px;background:var(--gold);
+  box-shadow:0 0 0 1px rgba(255,254,248,.9);z-index:2;pointer-events:none}
+.ses-ax .ses-tk{height:16px;border:none;background:none;border-radius:0}
+.ses-ax span{position:absolute;top:0;transform:translateX(-50%);font-size:10px;line-height:16px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ses-ax span:first-child{transform:none}
+.ses-ax span.e{transform:translateX(-100%)}
+.ses-ax .ses-pin{top:auto;bottom:-7px;width:0;height:0;border:5px solid transparent;border-top:6px solid var(--gold);border-bottom:none;transform:translateX(-50%)!important}
+.ses-ht .ses-tk{height:12px;border:none;background:none;display:flex;gap:1px;border-radius:4px;overflow:hidden}
+.ses-ht .ses-tk i{flex:1;min-width:0;background:var(--c)}
+.ses-ht .ses-l b{font-size:11.5px;font-weight:400;color:var(--muted)}
+.ses-ht .ses-now{top:-3px;bottom:-3px}
+.ses-lg{display:flex;align-items:center;gap:6px 14px;flex-wrap:wrap;margin-top:12px;font-size:11px;color:var(--muted);font-weight:300}
+.ses-lg span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.ses-lg i{width:16px;height:9px;border-radius:2px;background:var(--c);display:inline-block;box-shadow:0 0 0 1px rgba(61,50,40,.1)}
+#sesNote b{font-weight:600;color:var(--maroon)}
+#sesNote .m{color:var(--muted);font-weight:300}
+@media(max-width:640px){
+  .ses-clock{font-size:31px}
+  .ses-liq{margin-left:0;width:100%;justify-content:center}
+  .ses-body{gap:11px}
+  .ses-r{grid-template-columns:1fr;gap:4px}
+  .ses-l{display:flex;align-items:baseline;gap:7px}
+  .ses-l b{font-size:13px}
+  .ses-rg{margin-left:auto;order:3}
+  .ses-st{order:4}
+  .ses-ax .ses-l{display:none}
+  .ses-ht{margin-top:2px}
+  .ses-ax span{font-size:9.5px}
+  .ses-tk{height:26px}
+}
+
 /* gold: month × year table */
 .mk-tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .mk-tbl{width:100%;min-width:610px;border-collapse:separate;border-spacing:2px;font-variant-numeric:tabular-nums}
@@ -685,7 +741,22 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
           </div>
         </div>
         <div id="mkFx" class="mk-hide">
-          <div class="card">
+          <div class="card" id="mkSes">
+            <div class="card-h">
+              <h3>ช่วงเวลาตลาด Forex · เวลาไทย</h3>
+              <span class="mk-live"><span class="dotlive"></span>ตามเวลาจริง</span>
+            </div>
+            <div class="ses-top">
+              <div class="ses-clock" id="sesClock">--:--</div>
+              <div class="ses-date"><b id="sesDay">&nbsp;</b>เวลาประเทศไทย (GMT+7)</div>
+              <div class="ses-liq" id="sesLiq"><i></i>ปริมาณซื้อขายโดยทั่วไป <b>—</b></div>
+            </div>
+            <div class="ses-body" id="sesBody"><div class="empty-slot"><div class="e-t">SESSIONS</div><div class="e-d">กำลังคำนวณเวลา…</div></div></div>
+            <div class="ses-lg" id="sesLg"></div>
+            <div class="mk-info" id="sesNote"><span class="m">&nbsp;</span></div>
+            <div class="mk-cap">เวลาทำการตามธรรมเนียมของแต่ละศูนย์กลางการเงิน (เวลาท้องถิ่น): ซิดนีย์ 07:00–16:00 · โตเกียว 09:00–18:00 · ลอนดอน 08:00–17:00 · นิวยอร์ก 08:00–17:00 แปลงเป็นเวลาไทยให้อัตโนมัติ รวมช่วงที่ต่างประเทศปรับเวลาฤดูร้อน (Daylight Saving) แล้ว · ตลาด Forex ซื้อขายต่อเนื่องตั้งแต่เช้าวันจันทร์ถึงเช้าวันเสาร์ตามเวลาไทย แถบเหล่านี้บอกว่าศูนย์กลางใดกำลังทำการ ซึ่งสัมพันธ์กับปริมาณซื้อขายและความผันผวน · แถบ “ปริมาณซื้อขาย” เป็นภาพโดยทั่วไป ไม่ใช่ข้อมูลปริมาณจริง · ไม่นับวันหยุดธนาคารของแต่ละประเทศ · เป็นข้อมูลประกอบการศึกษา ไม่ใช่คำแนะนำการลงทุน</div>
+          </div>
+          <div class="card" style="margin-top:14px">
             <div class="card-h">
               <h3>ความแข็ง–อ่อนของสกุลเงิน · เทียบดอลลาร์สหรัฐ</h3>
               <div class="tools" id="mkStrPer">
@@ -793,7 +864,8 @@ const IC={
   dl:'<path d="M12 3v11m0 0 4-4M12 14l-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>',
   fx:'<path d="M4 8h15l-3.5-3.5M20 16H5l3.5 3.5"/>',
   spark:'<path d="M12 3l2.1 5.9L20 11l-5.9 2.1L12 19l-2.1-5.9L4 11l5.9-2.1z"/>',
-  candle:'<path d="M7 4v3M7 15v5M17 3v5M17 16v5"/><rect x="5" y="7" width="4" height="8" rx="1"/><rect x="15" y="8" width="4" height="8" rx="1"/>'
+  candle:'<path d="M7 4v3M7 15v5M17 3v5M17 16v5"/><rect x="5" y="7" width="4" height="8" rx="1"/><rect x="15" y="8" width="4" height="8" rx="1"/>',
+  clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.2V12l3.2 2"/>'
 };
 const svg=p=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
 const LOCK='<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+
@@ -804,6 +876,7 @@ const MENU=[
     {t:'Sentiment ทองคำรายวัน',ic:'grid',dash:true},
     {t:'Heatmap หุ้น · ทองคำ',ic:'chart',mk:1,chip:'ใหม่'},
     {t:'อัตราแลกเปลี่ยนสด',ic:'fx',mk:'fx',chip:'LIVE'},
+    {t:'เวลาตลาด Forex',ic:'clock',mk:'fx',to:'mkSes',chip:'ใหม่'},
     {t:'กราฟราคา',ic:'candle',mk:'chart',chip:'ใหม่'},
     {t:'หน้าหลักสมาชิก',ic:'home',url:'https://jptrustlearning.com',ext:true}
   ]},
@@ -861,7 +934,7 @@ MENU.forEach((g,gi)=>{
     }else{
       const attr = it.prod
         ? `href="#" data-prod="1" title="บริการของเรา"`
-        : it.mk ? `href="#" data-mk="${it.mk}"`
+        : it.mk ? `href="#" data-mk="${it.mk}"${it.to?` data-to="${it.to}"`:''}`
         : `href="${it.url}"${it.ext?' target="_blank" rel="noopener"':` data-tool="${it.url}" data-title="${it.t}"`}`;
       html+=`<a class="nav-i" ${attr}>${svg(IC[it.ic])}<span>${it.t}</span>${it.chip?`<span class="mchip ${it.chipCls||'alt'}">${it.chip}</span>`:''}</a>`;
     }
@@ -898,7 +971,7 @@ nav.addEventListener('click',e=>{
   if(mk){ e.preventDefault(); showDash();
     const mkBtn=document.querySelector('#mkAsset button[data-a="'+mk.dataset.mk+'"]');     // mk:'fx' / 'chart' = เปิดแท็บนั้น · mk:1 = ไม่เปลี่ยนแท็บ
     if(mkBtn) mkBtn.click(); else mkLoadStocks();
-    document.getElementById('mkSec').scrollIntoView({behavior:'smooth',block:'start'}); return; }
+    (document.getElementById(mk.dataset.to||'')||document.getElementById('mkSec')).scrollIntoView({behavior:'smooth',block:'start'}); return; }     // to = เลื่อนไปที่การ์ดเฉพาะใบในแท็บนั้น
   const d=e.target.closest('[data-dash]');
   if(d){ e.preventDefault(); showDash(); }
 });
@@ -1530,7 +1603,7 @@ function mkGoldRender(){
     document.getElementById('mkChart').classList.toggle('mk-hide',a!=='chart');
     document.getElementById('mkDailyNote').classList.toggle('mk-hide',a==='fx'||a==='chart');     // หมายเหตุ "ข้อมูลรายวัน" ไม่จริงสำหรับแท็บค่าเงิน/กราฟ
     if(a==='gold'){ mkGoldShown=true; mkGoldRender(); }
-    else if(a==='fx'){ mkStrLoad(); mkFxLoad(); }
+    else if(a==='fx'){ mkSesStart(); mkStrLoad(); mkFxLoad(); }
     else if(a==='chart'){ mkChLoad(); }
     else { mkLoadStocks(); mkRenderTree(); }
   });
@@ -1688,6 +1761,100 @@ document.addEventListener('visibilitychange',()=>{            // กลับจ
   const fx=document.getElementById('mkFx');
   if(!document.hidden&&fx&&!fx.classList.contains('mk-hide')&&document.getElementById('viewDash').classList.contains('on')) mkFxLoad(true);
 });
+
+/* =====================================================================
+   FOREX SESSIONS — ช่วงเวลาตลาด 4 ศูนย์กลาง บนแกนเวลาไทย 24 ชม. (#mkSes)
+   ไม่มีการดึงข้อมูล: นิยามเวลาทำการเป็น "เวลาท้องถิ่น" ของแต่ละเมือง แล้วให้ Intl แปลงเขตเวลา → DST ถูกเองทุกช่วงของปี
+   ตรรกะระดับปริมาณซื้อขาย (sesLevel) เป็นภาพโดยทั่วไป ไม่ใช่ข้อมูลจริง — เขียนบอกไว้ใต้การ์ดแล้ว
+   ===================================================================== */
+const SES_TZ='Asia/Bangkok';
+const SES=[
+  {k:'syd',th:'ซิดนีย์', tz:'Australia/Sydney', o:7,c:16},
+  {k:'tok',th:'โตเกียว', tz:'Asia/Tokyo',       o:9,c:18},
+  {k:'lon',th:'ลอนดอน',  tz:'Europe/London',    o:8,c:17},
+  {k:'ny', th:'นิวยอร์ก',tz:'America/New_York', o:8,c:17}
+];
+const SES_WD=['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'], SES_WDF=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+const SES_MO=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const SES_LV=[{t:'ตลาดปิด',c:'rgba(61,50,40,.09)'},{t:'เบาบาง',c:'#F4E4BA'},{t:'ปานกลาง',c:'#E3C566'},{t:'สูง',c:'#C28F2C'},{t:'สูงที่สุดของวัน',c:'#3a1520'}];
+const SES_H=36e5, SES_D=864e5;
+const sesFmt={};
+function sesParts(tz,ms){                          // เวลาบนหน้าปัดของเขตเวลานั้น ณ instant ที่ให้มา
+  const f=sesFmt[tz]||(sesFmt[tz]=new Intl.DateTimeFormat('en-US',{timeZone:tz,hourCycle:'h23',weekday:'short',year:'numeric',month:'numeric',day:'numeric',hour:'numeric',minute:'numeric'}));
+  const o={}; f.formatToParts(new Date(ms)).forEach(p=>{o[p.type]=p.value;});
+  return {y:+o.year,m:+o.month,d:+o.day,h:(+o.hour)%24,mi:+o.minute,wd:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(o.weekday)};
+}
+function sesOff(tz,ms){ const p=sesParts(tz,ms); return Date.UTC(p.y,p.m-1,p.d,p.h,p.mi)-Math.floor(ms/6e4)*6e4; }
+function sesAt(tz,y,m,d,h){ const g=Date.UTC(y,m-1,d,h); return g-sesOff(tz,g-sesOff(tz,g)); }      // instant ของ "วัน d เวลา h:00 ตามหน้าปัดเมืองนั้น" (วนสองรอบกันพลาดวันเปลี่ยน DST)
+function sesIntervals(s,now){                      // ช่วงทำการจริง [เริ่ม,จบ) ของเมืองนี้ ตั้งแต่ 2 วันก่อนถึง 6 วันหน้า
+  const p=sesParts(s.tz,now), base=Date.UTC(p.y,p.m-1,p.d), out=[];
+  for(let k=-2;k<=6;k++){
+    const u=new Date(base+k*SES_D), wd=u.getUTCDay(); if(wd===0||wd===6) continue;
+    let a=sesAt(s.tz,u.getUTCFullYear(),u.getUTCMonth()+1,u.getUTCDate(),s.o);
+    const b=sesAt(s.tz,u.getUTCFullYear(),u.getUTCMonth()+1,u.getUTCDate(),s.c);
+    const n=sesParts('America/New_York',a);        // สัปดาห์ซื้อขายเริ่มจริงวันอาทิตย์ 17:00 นิวยอร์ก — เช้าวันจันทร์ของซิดนีย์ช่วงหน้าร้อนออสเตรเลียจะมาก่อนเวลานั้น
+    if(n.wd===0&&n.h<17) a=sesAt('America/New_York',n.y,n.m,n.d,17);
+    if(a<b) out.push([a,b]);
+  }
+  return out;
+}
+function sesLevel(o){ return o.lon&&o.ny?4 : o.lon?3 : (o.ny||o.tok)?2 : o.syd?1 : 0; }
+const ses2=n=>String(n).padStart(2,'0');
+function sesHM(ms){ const p=sesParts(SES_TZ,ms); return ses2(p.h)+':'+ses2(p.mi); }
+function sesIn(ms){ let m=Math.max(1,Math.round(ms/6e4)); const d=Math.floor(m/1440); m-=d*1440; const h=Math.floor(m/60); m-=h*60;
+  return ('อีก '+(d?d+' วัน ':'')+(h?h+' ชม. ':'')+(!d&&m?m+' นาที':'')).trim(); }
+let sesTimer=0, sesOK=true;
+function mkSesRender(){
+  const body=document.getElementById('sesBody'); if(!body||!sesOK) return;
+  try{
+    const now=Date.now(), bp=sesParts(SES_TZ,now), T0=sesAt(SES_TZ,bp.y,bp.m,bp.d,0), T1=T0+SES_D;
+    const pct=ms=>((ms-T0)/SES_D*100).toFixed(3);
+    const rows=SES.map(s=>({s,iv:sesIntervals(s,now)}));
+    const openAt=ms=>{ const o={}; rows.forEach(r=>{o[r.s.k]=r.iv.some(v=>ms>=v[0]&&ms<v[1]);}); return o; };
+    const lon=rows[2].iv, ny=rows[3].iv, ovs=[];               // ช่วงที่ลอนดอนกับนิวยอร์กเปิดพร้อมกัน
+    lon.forEach(a=>ny.forEach(b=>{ const x=Math.max(a[0],b[0]), y=Math.min(a[1],b[1]); if(x<y) ovs.push([x,y]); }));
+    const nowX=pct(now), nowLine='<span class="ses-now" style="left:'+nowX+'%"></span>';
+    let h='<div class="ses-r ses-ax"><div class="ses-l"></div><div class="ses-tk">';
+    for(let i=0;i<=24;i+=2) h+='<span'+(i===24?' class="e"':'')+' style="left:'+(i/24*100).toFixed(3)+'%">'+ses2(i)+'</span>';
+    h+='<span class="ses-pin" style="left:'+nowX+'%"></span></div></div>';
+    const ev=[];                                              // เหตุการณ์เปิด/ปิดถัดไปของทุกเมือง
+    rows.forEach(r=>{
+      const cur=r.iv.find(v=>now>=v[0]&&now<v[1]), nxt=r.iv.find(v=>v[0]>now), ref=cur||nxt, lp=sesParts(r.s.tz,now);
+      if(cur) ev.push({t:cur[1],s:r.s,open:false}); if(nxt) ev.push({t:nxt[0],s:r.s,open:true});
+      let bars='';
+      const seg=(a,b,cls)=>{ const x=Math.max(a,T0), y=Math.min(b,T1); if(x<y) bars+='<span class="ses-b'+cls+'" style="left:'+pct(x)+'%;width:'+((y-x)/SES_D*100).toFixed(3)+'%"></span>'; };
+      r.iv.forEach(v=>seg(v[0],v[1],''));
+      if(r.s.k==='lon'||r.s.k==='ny') ovs.forEach(v=>seg(v[0],v[1],' ov'));
+      h+='<div class="ses-r'+(cur?' open':'')+'"><div class="ses-l"><b>'+r.s.th+'</b><span class="ses-lt">'+ses2(lp.h)+':'+ses2(lp.mi)+' '+SES_WD[lp.wd]+'</span>'
+        +'<em class="ses-st">'+(cur?'เปิดอยู่':'ปิด')+'</em><span class="ses-rg">'+(ref?sesHM(ref[0])+'–'+sesHM(ref[1])+' น.':'')+'</span></div>'
+        +'<div class="ses-tk" role="img" aria-label="'+r.s.th+' '+(cur?'เปิดอยู่':'ปิด')+(ref?' เวลาไทย '+sesHM(ref[0])+' ถึง '+sesHM(ref[1]):'')+'">'+bars+nowLine+'</div></div>';
+    });
+    h+='<div class="ses-r ses-ht"><div class="ses-l"><b>ปริมาณซื้อขายโดยทั่วไป</b></div><div class="ses-tk">';
+    for(let i=0;i<48;i++) h+='<i style="--c:'+SES_LV[sesLevel(openAt(T0+(i+.5)*SES_H/2))].c+'"></i>';
+    h+=nowLine+'</div></div>';
+    body.innerHTML=h;
+    document.getElementById('sesClock').textContent=ses2(bp.h)+':'+ses2(bp.mi);
+    document.getElementById('sesDay').textContent='วัน'+SES_WDF[bp.wd]+' '+bp.d+' '+SES_MO[bp.m-1];
+    const on=openAt(now), lv=sesLevel(on), liq=document.getElementById('sesLiq');
+    liq.style.setProperty('--sl',SES_LV[lv].c); liq.querySelector('b').textContent=SES_LV[lv].t;
+    document.getElementById('sesLg').innerHTML=SES_LV.slice(1).map(l=>'<span><i style="--c:'+l.c+'"></i>'+l.t+'</span>').join('')
+      +'<span><i style="--c:linear-gradient(135deg,#EACD6A,#D4AF37)"></i>ลอนดอน–นิวยอร์กเปิดพร้อมกัน</span>';
+    ev.sort((a,b)=>a.t-b.t);
+    const e0=ev[0], names=rows.filter(r=>on[r.s.k]).map(r=>r.s.th), ep=e0&&sesParts(SES_TZ,e0.t);
+    const when=e0?(ep.d!==bp.d?'วัน'+SES_WDF[ep.wd]+' ':'')+sesHM(e0.t)+' น.':'';
+    const ov=ovs.find(v=>v[1]>now&&v[0]<T1);
+    document.getElementById('sesNote').innerHTML=(names.length?'<b>เปิดอยู่ตอนนี้</b><span>'+names.join(' · ')+'</span>':'<b>ตลาด Forex ปิดอยู่</b>')
+      +(e0?'<span class="m">ถัดไป: '+e0.s.th+(e0.open?'เปิด ':'ปิด ')+when+' ('+sesIn(e0.t-now)+')</span>':'')
+      +(ov&&names.length?'<span class="m">ลอนดอน–นิวยอร์กเปิดพร้อมกันวันนี้ '+sesHM(ov[0])+'–'+sesHM(ov[1])+' น.</span>':'');
+  }catch(e){ sesOK=false; const c=document.getElementById('mkSes'); if(c) c.classList.add('mk-hide'); }   // เบราว์เซอร์เก่าที่ไม่รู้จักเขตเวลา — ถอดการ์ดเงียบๆ
+}
+function mkSesVisible(){ const fx=document.getElementById('mkFx');
+  return !document.hidden&&fx&&!fx.classList.contains('mk-hide')&&document.getElementById('viewDash').classList.contains('on'); }
+function mkSesStart(){
+  mkSesRender();
+  if(!sesTimer) sesTimer=setInterval(()=>{ if(mkSesVisible()) mkSesRender(); },15000);
+}
+document.addEventListener('visibilitychange',()=>{ if(sesTimer&&mkSesVisible()) mkSesRender(); });
 
 /* =====================================================================
    HOUSE AD — แบนเนอร์บริการของ JP Trust Learning (#prodCard)
