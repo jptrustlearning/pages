@@ -225,24 +225,61 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 .ps-c.s{color:#20693f;background:rgba(46,158,91,.08)}
 .ps-c.pp{color:var(--maroon);background:var(--gold-soft);font-weight:600}
 
-/* ---- product package ---- */
-.card.prod{margin-top:20px;background:linear-gradient(150deg,var(--maroon3),var(--maroon));
-  border-color:rgba(212,175,55,.4);color:var(--gold-l)}
-.card.prod.pulse{animation:prodPulse 1.5s ease 1}
+/* ---- house ad: แบนเนอร์บริการของ JP Trust Learning (แทนการ์ด ADD-ON · A89) ----
+   ทั้งแบนเนอร์เป็นลิงก์เดียวไปหน้าสมัคร · ฉากแรกฝังใน HTML (ไม่มี JS ก็ยังเป็นโฆษณาที่อ่านรู้เรื่อง) · JS สลับฉาก + พลิกตัวอักษรแบบป้ายสนามบิน */
 @keyframes prodPulse{0%,100%{box-shadow:0 0 0 0 rgba(212,175,55,0)}30%{box-shadow:0 0 0 5px rgba(212,175,55,.30)}}
-.prod-head{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:15px}
-.prod-eyebrow{font-family:var(--f-d);font-size:9.5px;letter-spacing:2.2px;color:var(--gold);font-weight:600}
-.prod-head h3{font-size:17px;font-weight:600;color:#fff;margin:4px 0 3px}
-.prod-head p{font-size:12.5px;color:rgba(244,228,186,.6);font-weight:300;max-width:420px}
-.prod-price{margin-left:auto;text-align:right;white-space:nowrap}
-.prod-price b{font-family:var(--f-n);font-size:31px;color:var(--gold);font-weight:400;line-height:1}
-.prod-price span{font-size:12px;color:rgba(244,228,186,.6);margin-left:4px}
-.prod-foot{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:15px;
-  padding-top:13px;border-top:1px solid rgba(212,175,55,.2)}
-.prod-head + .prod-foot{margin-top:2px}
-.prod-note{font-size:11.5px;color:rgba(244,228,186,.55);font-weight:300}
-.prod-foot .btn{margin-left:auto}
-@media(max-width:460px){.prod-price{margin-left:0}}
+.jad{position:relative;isolation:isolate;display:flex;align-items:center;gap:22px;margin-top:20px;padding:20px 22px 22px;min-height:118px;
+  border-radius:14px;overflow:hidden;text-decoration:none;color:var(--gold-l);border:1px solid rgba(212,175,55,.45);
+  background:linear-gradient(120deg,var(--maroon3) 0%,var(--maroon2) 45%,var(--maroon) 100%);box-shadow:0 6px 22px rgba(26,10,14,.22)}
+.jad.pulse{animation:prodPulse 1.5s ease 1}
+.jad-bg{position:absolute;inset:-16%;z-index:-1;pointer-events:none;   /* ใหญ่กว่ากรอบ แล้วขยับทั้งแผ่นด้วย transform — ขยับ background-position จะเห็นรอยต่อของ tile เป็นกรอบสี่เหลี่ยม */
+  background:radial-gradient(420px 160px at 12% 0%,rgba(212,175,55,.20),transparent 70%),radial-gradient(360px 180px at 88% 110%,rgba(139,34,82,.35),transparent 70%);
+  animation:jadDrift 9s ease-in-out infinite alternate}
+.jad-bg::after{content:"";position:absolute;top:-20%;bottom:-20%;left:0;width:22%;
+  background:linear-gradient(100deg,transparent,rgba(255,240,200,.13),transparent);transform:translateX(-160%) skewX(-16deg);animation:jadSheen 6.5s ease-in-out infinite}
+@keyframes jadDrift{to{transform:translate3d(4%,3%,0)}}
+@keyframes jadSheen{0%,35%{transform:translateX(-160%) skewX(-16deg)}100%{transform:translateX(620%) skewX(-16deg)}}
+.jad-brand{display:flex;align-items:center;gap:10px;flex-shrink:0;padding-right:20px;border-right:1px solid rgba(212,175,55,.25)}
+.jad-brand img{width:44px;height:44px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,.45))}
+.jad-bn{font-family:var(--f-d);font-size:13px;letter-spacing:1.6px;font-weight:600;color:var(--gold-l);line-height:1.3}
+.jad-bn span{display:block;font-size:9.5px;letter-spacing:2.4px;color:rgba(212,175,55,.8);font-weight:500}
+.jad-copy{position:relative;flex:1;min-width:0;height:72px}
+.jad-scene{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:3px;opacity:0;transform:translateY(16px);
+  transition:opacity .45s ease,transform .6s cubic-bezier(.22,.85,.2,1)}
+.jad-scene.on{opacity:1;transform:none}
+.jad-scene.out{opacity:0;transform:translateY(-16px);transition-duration:.35s,.4s}
+.jad-en{font-family:var(--f-d);font-size:10px;letter-spacing:2.4px;color:var(--gold);font-weight:600}
+.jad-h{font-size:19px;font-weight:600;color:#fff;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.jad-s{font-size:12.5px;font-weight:300;color:rgba(244,228,186,.72);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.jad-tiles{display:flex;gap:5px;flex-shrink:0;perspective:500px}
+.jad-tiles i{position:relative;display:grid;place-items:center;width:42px;height:52px;border-radius:8px;font-style:normal;
+  background:linear-gradient(180deg,#F3DE95 0%,#D4AF37 49%,#B8901F 51%,#C9A232 100%);box-shadow:0 4px 10px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.5);
+  transition:transform .17s ease-in;transform-origin:50% 50%}
+.jad-tiles i::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(58,21,32,.35)}
+.jad-tiles i.flip{transform:rotateX(90deg)}
+.jad-tiles b{font-family:var(--f-d);font-size:25px;font-weight:700;color:#2d1018;line-height:1}
+.jad-cta{flex-shrink:0;display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;color:#231016;white-space:nowrap;
+  background:linear-gradient(100deg,transparent 42%,rgba(255,255,255,.85) 50%,transparent 58%) no-repeat 160% 0/260% 100%,linear-gradient(135deg,#F0D68C,#D4AF37 50%,#B8860B);
+  box-shadow:0 6px 16px rgba(0,0,0,.35);animation:jadCta 3.4s ease-in-out infinite;transition:transform .2s ease}
+.jad:hover .jad-cta{transform:translateX(3px)}
+.jad-cta svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}
+@keyframes jadCta{0%,55%{background-position:160% 0,0 0}100%{background-position:-60% 0,0 0}}
+.jad-bar{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(212,175,55,.14)}
+.jad-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#B8860B,#F0D68C)}
+.jad-bar i.run{animation:jadBar var(--jad-dur,3600ms) linear forwards}
+.jad.paused .jad-bar i.run{animation-play-state:paused}
+@keyframes jadBar{to{width:100%}}
+.jad-tag{position:absolute;top:7px;right:10px;font-size:9.5px;letter-spacing:.6px;color:rgba(244,228,186,.45);font-weight:300}
+@media(max-width:1180px){.jad-brand .jad-bn{display:none}.jad-brand{padding-right:16px}}
+@media(max-width:760px){
+  .jad{flex-wrap:wrap;gap:12px 14px;padding:26px 16px 20px}
+  .jad-brand{border-right:none;padding-right:0}.jad-brand img{width:38px;height:38px}
+  .jad-tiles{margin-left:auto}.jad-tiles i{width:34px;height:42px;border-radius:7px}.jad-tiles b{font-size:20px}
+  .jad-copy{flex:0 0 100%;order:3;height:84px}
+  .jad-h{font-size:16.5px;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .jad-s{font-size:12px;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .jad-cta{order:4;flex:0 0 100%;justify-content:center}
+}
 .mchip.alt{background:linear-gradient(135deg,#8B2252,#722F37);color:var(--gold-l)}
 .mchip.free{background:linear-gradient(135deg,var(--gold),#b8901f);color:#231016}
 
@@ -454,7 +491,7 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 }
 @media(max-width:520px){.kpis{grid-template-columns:1fr}.kpi{min-height:96px}}
 .lad-scroll{display:none;font-size:11.5px;color:var(--muted);font-weight:300;text-align:right;margin-top:7px}
-@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
@@ -699,20 +736,25 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
         </div>
         <div class="mk-cap" id="mkDailyNote" style="margin-top:12px">ข้อมูลราคาปิดรายวัน อัปเดตวันละครั้งหลังตลาดปิด · เป็นข้อมูลประกอบการศึกษา ไม่ใช่คำแนะนำการลงทุน</div>
 
-        <div class="card prod" id="prodCard">
-          <div class="prod-head">
-            <div>
-              <div class="prod-eyebrow">ADD-ON PACKAGE</div>
-              <h3>แพ็กเกจเสริม · EA</h3>
-              <p>ระบบเทรดอัตโนมัติ ให้เช่าใช้งานรายเดือน แยกจากค่าสมาชิกหลัก</p>
-            </div>
-            <div class="prod-price"><b>฿150</b><span>/ เดือน</span></div>
-          </div>
-          <div class="prod-foot">
-            <span class="prod-note">เปิดใช้งานให้หลังยืนยันการเช่า · สอบถามรายละเอียดเพิ่มเติม LINE @jptrust</span>
-            <a class="btn gold" id="prodCta" href="https://line.me/R/ti/p/%40jptrust" target="_blank" rel="noopener">สอบถามทาง LINE ↗</a>
-          </div>
-        </div>
+        <!-- ---------- HOUSE AD: บริการของ JP Trust Learning — แบนเนอร์เคลื่อนไหว (แทนการ์ด ADD-ON · EA) ----------
+             ยังใช้ id เดิมของการ์ด (#prodCard) เพราะเมนูซ้าย (prod:1) เลื่อนมาหา id นี้ · ข้อความทุกฉากอยู่ใน JAD_SCENES ของสคริปต์หลัก
+             ⚠️ ฉากสุดท้ายอ้างราคา ฿150 / ฿1,400 — เปลี่ยนราคาแพ็กเกจต้องแก้ที่นี่ด้วย -->
+        <a class="jad" id="prodCard" href="https://app.jptrustlearning.com/new" target="_blank" rel="noopener"
+           data-track="house-ad-services" aria-label="บริการของ JP Trust Learning — สมัครสมาชิก">
+          <span class="jad-bg" aria-hidden="true"></span>
+          <span class="jad-brand"><img id="jadLogo" alt="" hidden><span class="jad-bn">JP TRUST<span>LEARNING</span></span></span>
+          <span class="jad-copy" id="jadCopy">
+            <span class="jad-scene on">
+              <span class="jad-en">MOMENTUM LAB</span>
+              <span class="jad-h">ทดสอบกลยุทธ์ย้อนหลัง 8 กลยุทธ์</span>
+              <span class="jad-s">Backtest หุ้น S&amp;P 500 ด้วยข้อมูลจริง เทียบผลก่อนลงมือ</span>
+            </span>
+          </span>
+          <span class="jad-tiles" id="jadTiles" aria-hidden="true"><i><b>T</b></i><i><b>E</b></i><i><b>S</b></i><i><b>T</b></i></span>
+          <span class="jad-cta">สมัครสมาชิก <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          <span class="jad-bar" aria-hidden="true"><i id="jadBar"></i></span>
+          <span class="jad-tag">บริการของเรา</span>
+        </a>
 
       </section>
 
@@ -750,6 +792,7 @@ const IC={
   bot:'<rect x="4" y="8" width="16" height="11" rx="3"/><path d="M12 4.5V8M9 13h.01M15 13h.01M9.5 16h5"/><circle cx="12" cy="3.6" r="1.1"/>',
   dl:'<path d="M12 3v11m0 0 4-4M12 14l-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>',
   fx:'<path d="M4 8h15l-3.5-3.5M20 16H5l3.5 3.5"/>',
+  spark:'<path d="M12 3l2.1 5.9L20 11l-5.9 2.1L12 19l-2.1-5.9L4 11l5.9-2.1z"/>',
   candle:'<path d="M7 4v3M7 15v5M17 3v5M17 16v5"/><rect x="5" y="7" width="4" height="8" rx="1"/><rect x="15" y="8" width="4" height="8" rx="1"/>'
 };
 const svg=p=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
@@ -790,7 +833,7 @@ const MENU=[
     {t:'Roadmap',ic:'map',url:'./roadmap.html'}
   ]},
   {cap:'ผลิตภัณฑ์',items:[
-    {t:'แพ็กเกจเสริม · EA',ic:'bot',chip:'เช่า',prod:1}
+    {t:'บริการของ JP Trust',ic:'spark',chip:'สมัคร',prod:1}
   ]}
 ];
 
@@ -808,7 +851,7 @@ MENU.forEach((g,gi)=>{
         </div><div class="grp-body">`;
       it.sub.forEach(s=>{
         const attr = s.prod
-          ? `href="#" data-prod="1" title="แพ็กเกจเสริม"`
+          ? `href="#" data-prod="1" title="บริการของเรา"`
           : `href="${s.url}" data-tool="${s.url}" data-title="${s.t}"${s.lock?' title="เฉพาะสมาชิก"':''}`;
         html+=`<a class="nav-s" ${attr}><span class="tick"></span><span class="ns-t">${s.t}</span>${s.lock?LOCK:''}</a>`;
       });
@@ -817,7 +860,7 @@ MENU.forEach((g,gi)=>{
       html+=`<a class="nav-i on" href="#" data-dash="1">${svg(IC[it.ic])}<span>${it.t}</span></a>`;
     }else{
       const attr = it.prod
-        ? `href="#" data-prod="1" title="แพ็กเกจเสริม"`
+        ? `href="#" data-prod="1" title="บริการของเรา"`
         : it.mk ? `href="#" data-mk="${it.mk}"`
         : `href="${it.url}"${it.ext?' target="_blank" rel="noopener"':` data-tool="${it.url}" data-title="${it.t}"`}`;
       html+=`<a class="nav-i" ${attr}>${svg(IC[it.ic])}<span>${it.t}</span>${it.chip?`<span class="mchip ${it.chipCls||'alt'}">${it.chip}</span>`:''}</a>`;
@@ -1645,6 +1688,57 @@ document.addEventListener('visibilitychange',()=>{            // กลับจ
   const fx=document.getElementById('mkFx');
   if(!document.hidden&&fx&&!fx.classList.contains('mk-hide')&&document.getElementById('viewDash').classList.contains('on')) mkFxLoad(true);
 });
+
+/* =====================================================================
+   HOUSE AD — แบนเนอร์บริการของ JP Trust Learning (#prodCard)
+   ข้อความทุกฉากยกมาจากแท็บ "บริการ" + "แพคเกจ" ของหน้าแรก public — แก้ที่นั่นเมื่อไหร่ควรแก้ที่นี่ด้วย
+   k = คำ 4 ตัวอักษรบนป้ายพลิก · หยุดเมื่อเมาส์ชี้/โฟกัส · หยุดเมื่ออยู่นอกจอหรือแท็บถูกซ่อน (ไม่เปลืองเครื่อง)
+   ===================================================================== */
+const JAD_SCENES=[
+  {k:'TEST',en:'MOMENTUM LAB',h:'ทดสอบกลยุทธ์ย้อนหลัง 8 กลยุทธ์',s:'Backtest หุ้น S&P 500 ด้วยข้อมูลจริง เทียบผลก่อนลงมือ'},
+  {k:'SCAN',en:'S&P 500 SCANNER',h:'จัดอันดับโมเมนตัมหุ้น 500+ ตัว',s:'กรองสถานะตลาด Bull / Neutral / Bear ในหน้าจอเดียว'},
+  {k:'NEWS',en:'NEWS & ANALYSIS',h:'สรุปตลาดรายวัน ภาษาไทย',s:'ข่าวการเงินและหุ้นสหรัฐฯ พร้อมมุมมองสำหรับนักลงทุนไทย'},
+  {k:'PORT',en:'PORT RECORDER',h:'บันทึกและติดตามพอร์ตได้ 5 พอร์ต',s:'กราฟ equity · อ่านสลิปอัตโนมัติ · ซิงก์บน Google Drive'},
+  {k:'GOLD',en:'GOLD & MACRO',h:'แดชบอร์ดทองคำและภาพรวมเศรษฐกิจ',s:'เชื่อมโยงน้ำมัน ดอลลาร์ และดอกเบี้ย'},
+  {k:'READ',en:'LIBRARY',h:'ห้องสมุดความรู้ เปิดอ่านฟรี',s:'บทความการลงทุน มาโครเศรษฐกิจ และการบริหารความเสี่ยง'},
+  {k:'JOIN',en:'MEMBERSHIP',h:'ทั้งหมดนี้ เริ่มต้น ฿150 ต่อเดือน',s:'จ่ายเดือนต่อเดือน ไม่มีสัญญาผูกมัด · หรือ ฿1,400 ต่อปี'}
+];
+(function(){
+  const ad=document.getElementById('prodCard'), copy=document.getElementById('jadCopy'), bar=document.getElementById('jadBar');
+  const tiles=[].slice.call(document.querySelectorAll('#jadTiles i')); if(!ad||!copy||!bar||tiles.length!==4) return;
+  const logo=document.getElementById('jadLogo'), mark=document.querySelector('.sb-mark');
+  if(logo&&mark){ logo.src=mark.src; logo.hidden=false; }                           // ใช้รูปเดียวกับ sidebar — ไม่โหลดไฟล์ซ้ำ
+  const reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const DUR=reduce?6000:3600; ad.style.setProperty('--jad-dur',DUR+'ms');
+  let idx=0, timer=null, left=DUR, started=0, hover=false, seen=true;
+  const esc=t=>String(t).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  function setTiles(word){
+    tiles.forEach((t,i)=>{ const ch=word[i]||' ', b=t.firstElementChild;
+      if(reduce||b.textContent===ch){ b.textContent=ch; return; }
+      setTimeout(()=>{ t.classList.add('flip'); setTimeout(()=>{ b.textContent=ch; t.classList.remove('flip'); },175); },i*85); });
+  }
+  function show(n){
+    const sc=JAD_SCENES[n], old=copy.querySelector('.jad-scene.on'), el=document.createElement('span');
+    el.className='jad-scene';
+    el.innerHTML='<span class="jad-en">'+esc(sc.en)+'</span><span class="jad-h">'+esc(sc.h)+'</span><span class="jad-s">'+esc(sc.s)+'</span>';
+    copy.appendChild(el); void el.offsetWidth; el.classList.add('on');
+    if(old){ old.classList.remove('on'); old.classList.add('out'); setTimeout(()=>old.remove(),reduce?0:450); }
+    setTiles(sc.k);
+    bar.classList.remove('run'); void bar.offsetWidth; bar.classList.add('run');
+  }
+  function arm(ms){ clearTimeout(timer); left=ms; started=Date.now(); timer=setTimeout(()=>{ idx=(idx+1)%JAD_SCENES.length; show(idx); arm(DUR); },ms); }
+  function sync(){                                                                   // เดิน/หยุดตามสถานะ: ชี้อยู่ · อยู่นอกจอ · แท็บถูกซ่อน
+    const run=!hover&&seen&&!document.hidden;
+    ad.classList.toggle('paused',!run);
+    if(run&&!timer){ arm(Math.max(400,left)); }
+    else if(!run&&timer){ clearTimeout(timer); timer=null; left=Math.max(0,left-(Date.now()-started)); }
+  }
+  ad.addEventListener('mouseenter',()=>{hover=true;sync();}); ad.addEventListener('mouseleave',()=>{hover=false;sync();});
+  ad.addEventListener('focusin',()=>{hover=true;sync();});    ad.addEventListener('focusout',()=>{hover=false;sync();});
+  document.addEventListener('visibilitychange',sync);
+  if('IntersectionObserver' in window){ seen=false; new IntersectionObserver(es=>{ seen=es.some(e=>e.isIntersecting); sync(); },{threshold:.15}).observe(ad); }
+  bar.classList.add('run'); sync();
+})();
 
 /* =====================================================================
    INSIGHT ล่าสุด — อ่าน news/news-latest.json (~1–2 KB · สำเนาย่อของ batch ข่าวบนสุด)
