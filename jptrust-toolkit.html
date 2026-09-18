@@ -329,9 +329,27 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 
 /* ---- ปฏิทินข่าวเศรษฐกิจสหรัฐฯ ผลกระทบสูง (#mkCal) ---- */
 #mkCal{margin-top:14px;scroll-margin-top:70px}
-.mk-calbox{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card);min-height:420px}
-.mk-calbox .tradingview-widget-container,.mk-calbox iframe{width:100%}
-.mk-calbox .tradingview-widget-copyright{display:none}
+.mk-calwrap{overflow-x:auto}
+.cal-tb{width:100%;border-collapse:collapse;font-size:12.5px}
+.cal-tb th{background:linear-gradient(180deg,var(--maroon),var(--maroon2));color:var(--gold-l);font-family:var(--f-d);
+  font-size:10.5px;letter-spacing:1.3px;font-weight:600;text-align:left;padding:8px 10px;white-space:nowrap}
+.cal-tb th.r,.cal-tb td.r{text-align:right}
+.cal-tb td{padding:9px 10px;border-bottom:1px solid rgba(212,175,55,.16);vertical-align:middle;text-align:left}
+.cal-tb tr:last-child td{border-bottom:0}
+@media(hover:hover){.cal-tb tbody tr:hover td{background:var(--gold-soft)}}
+.cal-d{white-space:nowrap;font-weight:600;color:var(--ink)}
+.cal-t{white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--muted)}
+.cal-src{display:inline-block;font-family:var(--f-d);font-size:9.5px;letter-spacing:1.2px;font-weight:600;
+  padding:2px 9px;border-radius:999px;white-space:nowrap}
+.cal-src.fed{background:rgba(114,47,55,.12);color:var(--maroon)}
+.cal-src.bls{background:var(--gold-soft);color:#9a7d1e}
+.cal-num{font-family:var(--f-n);font-variant-numeric:tabular-nums;white-space:nowrap}
+.cal-num.a{color:var(--maroon);font-weight:600}
+.cal-na{color:rgba(138,125,107,.55)}
+.cal-past td{opacity:.62}
+.cal-sep td{background:linear-gradient(90deg,var(--gold-soft),rgba(212,175,55,.03));padding:5px 10px;
+  font-family:var(--f-d);font-size:10px;letter-spacing:2px;color:#9a7d1e;font-weight:600;border-bottom:1px solid rgba(212,175,55,.35)}
+.cal-next td:first-child{box-shadow:inset 3px 0 0 var(--gold)}
 
 /* ---- market overview: bars + heatmap (หุ้น / ทอง) ---- */
 .mk-head{margin-top:28px;scroll-margin-top:70px}
@@ -709,14 +727,9 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
         <div class="card" id="mkCal">
           <div class="card-h">
             <h3>ปฏิทินข่าวเศรษฐกิจสหรัฐฯ · เฉพาะข่าวแรง</h3>
-            <span class="mk-live"><span class="dotlive"></span>ราคาสด</span>
           </div>
-          <div class="mk-calbox" id="mkCalBox" data-no-track>
-            <div class="tradingview-widget-container">
-              <div class="tradingview-widget-container__widget"></div>
-            </div>
-          </div>
-          <div class="mk-cap">กรองเฉพาะสหรัฐฯ และเฉพาะเหตุการณ์ที่ TradingView จัดเป็นผลกระทบสูง เช่น เฟด ตัวเลขจ้างงาน เงินเฟ้อ จีดีพี · เวลาแสดงตามเขตเวลาของเครื่องที่เปิด · ช่อง Actual จะขึ้นเมื่อประกาศแล้ว ก่อนหน้านั้นจะเห็นเฉพาะ Forecast กับ Previous</div>
+          <div class="mk-calwrap" id="mkCalBox"><div class="empty-slot"><div class="e-t">CALENDAR</div><div class="e-d">กำลังโหลดปฏิทิน…</div></div></div>
+          <div class="mk-cap" id="mkCalCap">เฉพาะสหรัฐฯ และเฉพาะรายการที่ขยับตลาดจริง — ดอกเบี้ยเฟด การจ้างงานนอกภาคเกษตร และเงินเฟ้อ CPI · <b>เวลาเป็นเวลาไทยเสมอ</b> ไม่ขึ้นกับเครื่องที่เปิด (คิด DST ของสหรัฐฯ ให้แล้ว ช่วงหลัง 1 พ.ย. ต่างกัน 12 ชม. ไม่ใช่ 11) · วันเวลามาจากตารางประกาศทางการของเฟดและ BLS ตัวเลขคาดการณ์จากฟีดสาธารณะ · ช่องผลจริงจะขึ้นหลังประกาศ</div>
         </div>
 
         <!-- ---------- MARKET OVERVIEW: bars + heatmap (หุ้น / ทอง) ---------- -->
@@ -1756,26 +1769,45 @@ document.addEventListener('visibilitychange',()=>{            // กลับจ
 });
 
 /* =====================================================================
-   ปฏิทินข่าวเศรษฐกิจสหรัฐฯ — TradingView economic calendar widget (#mkCal)
-   countryFilter 'us' + importanceFilter '1' = ผลกระทบสูงเท่านั้น (สเกลของ TradingView คือ -1 ต่ำ / 0 กลาง / 1 สูง)
-   โหลดครั้งเดียวตอนการ์ดเลื่อนเข้ามาในจอ · ไม่ฉีดซ้ำตอนกลับจากพื้นหลัง (ปฏิทินไม่ใช่ราคาที่ค้างได้)
-   ⛔ ตัว widget จริง render ใน sandbox ไม่ได้ ต้องเปิดดูบน production
+   ปฏิทินข่าวเศรษฐกิจสหรัฐฯ — ตารางของเราเอง อ่านจาก news/us-calendar.json (#mkCal)
+   เวลาในไฟล์แปลงเป็นเวลาไทยไว้แล้ว (คิด DST สหรัฐฯ ตอนเติมข้อมูล) ส่วน utc ใช้แค่ตัดสินว่าผ่านไปแล้วหรือยัง
+   เติมด้วยมือ — วันเวลาจาก federalreserve.gov + bls.gov · ตัวเลขคาดการณ์จากฟีดสาธารณะของ Forex Factory
+   โหลดครั้งเดียวตอนการ์ดเลื่อนเข้ามาใกล้จอ
    ===================================================================== */
-const MK_CAL_CFG={
-  width:'100%', height:420,
-  colorTheme:'light', isTransparent:true,
-  locale:'th_TH',
-  countryFilter:'us',
-  importanceFilter:'1'
-};
+const MK_CAL_URL='news/us-calendar.json';
+function mkCalEsc(x){return String(x==null?'':x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function mkCalRender(data){
+  const box=document.getElementById('mkCalBox'); if(!box) return;
+  const ev=(data&&data.events||[]).slice().sort((a,b)=>new Date(a.utc)-new Date(b.utc));
+  if(!ev.length){ box.innerHTML='<div class="empty-slot"><div class="e-t">CALENDAR</div><div class="e-d">ยังไม่มีรายการ</div></div>'; return; }
+  const now=Date.now();
+  const cell=v=>v?'<span class="cal-num">'+mkCalEsc(v)+'</span>':'<span class="cal-na">—</span>';
+  let sep=false, nextDone=false, rows='';
+  for(const e of ev){
+    const past=new Date(e.utc).getTime()<now;
+    if(!past&&!sep){ rows+='<tr class="cal-sep"><td colspan="6">กำลังจะถึง</td></tr>'; sep=true; }
+    const cls=(past?'cal-past':'')+(!past&&!nextDone?' cal-next':'');
+    if(!past) nextDone=true;
+    rows+='<tr class="'+cls.trim()+'">'
+      +'<td class="cal-d">'+mkCalEsc(e.d)+'</td>'
+      +'<td><span class="cal-src '+(e.src==='Fed'?'fed':'bls')+'">'+mkCalEsc(e.src)+'</span></td>'
+      +'<td>'+mkCalEsc(e.title)+'</td>'
+      +'<td class="cal-t r">'+mkCalEsc(e.t)+'</td>'
+      +'<td class="r">'+(e.actual?'<span class="cal-num a">'+mkCalEsc(e.actual)+'</span>':'<span class="cal-na">—</span>')+'</td>'
+      +'<td class="r">'+cell(e.forecast)+'</td>'
+      +'<td class="r">'+cell(e.previous)+'</td></tr>';
+  }
+  rows=rows.replace(/colspan="6"/g,'colspan="7"');
+  box.innerHTML='<table class="cal-tb"><thead><tr><th>วันที่</th><th>แหล่ง</th><th>เหตุการณ์</th>'
+    +'<th class="r">เวลาไทย</th><th class="r">ผลจริง</th><th class="r">คาดการณ์</th><th class="r">ครั้งก่อน</th></tr></thead>'
+    +'<tbody>'+rows+'</tbody></table>';
+}
 function mkCalLoad(){
-  const box=document.querySelector('#mkCalBox .tradingview-widget-container__widget'); if(!box) return;
-  if(box.dataset.tvLoaded==='1') return;
-  box.dataset.tvLoaded='1';
-  const sc=document.createElement('script'); sc.type='text/javascript'; sc.async=true;
-  sc.src='https://s3.tradingview.com/external-embedding/embed-widget-events.js';
-  sc.innerHTML=JSON.stringify(MK_CAL_CFG);
-  box.parentElement.appendChild(sc);
+  const box=document.getElementById('mkCalBox'); if(!box||box.dataset.loaded==='1') return;
+  box.dataset.loaded='1';
+  fetch(MK_CAL_URL,{cache:'no-store'}).then(r=>r.json()).then(mkCalRender).catch(()=>{
+    box.innerHTML='<div class="empty-slot"><div class="e-t">CALENDAR</div><div class="e-d">โหลดปฏิทินไม่สำเร็จ</div></div>';
+  });
 }
 (function(){
   const el=document.getElementById('mkCal'); if(!el) return;
