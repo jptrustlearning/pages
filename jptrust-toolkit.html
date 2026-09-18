@@ -327,6 +327,12 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 @keyframes tickerLiveBlink{0%,100%{background:#00E676;box-shadow:0 0 8px #00E676,0 0 12px rgba(0,230,118,.6);opacity:1}
   50%{background:#1B5E20;box-shadow:0 0 4px rgba(27,94,32,.5);opacity:.5}}
 
+/* ---- ปฏิทินข่าวเศรษฐกิจสหรัฐฯ ผลกระทบสูง (#mkCal) ---- */
+#mkCal{margin-top:14px;scroll-margin-top:70px}
+.mk-calbox{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card);min-height:420px}
+.mk-calbox .tradingview-widget-container,.mk-calbox iframe{width:100%}
+.mk-calbox .tradingview-widget-copyright{display:none}
+
 /* ---- market overview: bars + heatmap (หุ้น / ทอง) ---- */
 .mk-head{margin-top:28px;scroll-margin-top:70px}
 .mk-head .modeseg{margin:0 0 0 auto;min-width:240px}
@@ -699,6 +705,20 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
           <div class="ses-lg" id="sesLg"></div>
         </div>
 
+        <!-- ---------- ปฏิทินข่าวเศรษฐกิจสหรัฐฯ (ผลกระทบสูงเท่านั้น) ---------- -->
+        <div class="card" id="mkCal">
+          <div class="card-h">
+            <h3>ปฏิทินข่าวเศรษฐกิจสหรัฐฯ · เฉพาะข่าวแรง</h3>
+            <span class="mk-live"><span class="dotlive"></span>ราคาสด</span>
+          </div>
+          <div class="mk-calbox" id="mkCalBox" data-no-track>
+            <div class="tradingview-widget-container">
+              <div class="tradingview-widget-container__widget"></div>
+            </div>
+          </div>
+          <div class="mk-cap">กรองเฉพาะสหรัฐฯ และเฉพาะเหตุการณ์ที่ TradingView จัดเป็นผลกระทบสูง เช่น เฟด ตัวเลขจ้างงาน เงินเฟ้อ จีดีพี · เวลาแสดงตามเขตเวลาของเครื่องที่เปิด · ช่อง Actual จะขึ้นเมื่อประกาศแล้ว ก่อนหน้านั้นจะเห็นเฉพาะ Forecast กับ Previous</div>
+        </div>
+
         <!-- ---------- MARKET OVERVIEW: bars + heatmap (หุ้น / ทอง) ---------- -->
         <div class="sec-head mk-head" id="mkSec">
           <h2>ภาพรวมตลาด</h2>
@@ -896,6 +916,7 @@ const MENU=[
   {cap:'ภาพรวม',items:[
     {t:'Sentiment ทองคำรายวัน',ic:'grid',dash:true},
     {t:'เวลาตลาด Forex',ic:'clock',mk:1,to:'mkSes',chip:'ใหม่'},
+    {t:'ปฏิทินข่าว US',ic:'clock',mk:1,to:'mkCal',chip:'ใหม่'},
     {t:'Heatmap หุ้น · ทองคำ',ic:'chart',mk:1,chip:'ใหม่'},
     {t:'ทองไหลไปตลาดไหน',ic:'coin',mk:'gold',to:'mkBasis',chip:'ใหม่'},
     {t:'อัตราแลกเปลี่ยนสด',ic:'fx',mk:'fx',chip:'LIVE'},
@@ -1733,6 +1754,35 @@ document.addEventListener('visibilitychange',()=>{            // กลับจ
   const fx=document.getElementById('mkFx');
   if(!document.hidden&&fx&&!fx.classList.contains('mk-hide')&&document.getElementById('viewDash').classList.contains('on')) mkFxLoad(true);
 });
+
+/* =====================================================================
+   ปฏิทินข่าวเศรษฐกิจสหรัฐฯ — TradingView economic calendar widget (#mkCal)
+   countryFilter 'us' + importanceFilter '1' = ผลกระทบสูงเท่านั้น (สเกลของ TradingView คือ -1 ต่ำ / 0 กลาง / 1 สูง)
+   โหลดครั้งเดียวตอนการ์ดเลื่อนเข้ามาในจอ · ไม่ฉีดซ้ำตอนกลับจากพื้นหลัง (ปฏิทินไม่ใช่ราคาที่ค้างได้)
+   ⛔ ตัว widget จริง render ใน sandbox ไม่ได้ ต้องเปิดดูบน production
+   ===================================================================== */
+const MK_CAL_CFG={
+  width:'100%', height:420,
+  colorTheme:'light', isTransparent:true,
+  locale:'th_TH',
+  countryFilter:'us',
+  importanceFilter:'1'
+};
+function mkCalLoad(){
+  const box=document.querySelector('#mkCalBox .tradingview-widget-container__widget'); if(!box) return;
+  if(box.dataset.tvLoaded==='1') return;
+  box.dataset.tvLoaded='1';
+  const sc=document.createElement('script'); sc.type='text/javascript'; sc.async=true;
+  sc.src='https://s3.tradingview.com/external-embedding/embed-widget-events.js';
+  sc.innerHTML=JSON.stringify(MK_CAL_CFG);
+  box.parentElement.appendChild(sc);
+}
+(function(){
+  const el=document.getElementById('mkCal'); if(!el) return;
+  if(!('IntersectionObserver' in window)){ mkCalLoad(); return; }
+  const io=new IntersectionObserver(es=>{ if(es.some(e=>e.isIntersecting)){ io.disconnect(); mkCalLoad(); } },{rootMargin:'200px'});
+  io.observe(el);
+})();
 
 /* =====================================================================
    FOREX SESSIONS — ช่วงเวลาตลาด 4 ศูนย์กลาง บนแกนเวลาไทย 24 ชม. (#mkSes · อยู่ตรงที่เคยเป็นการ์ดกราฟทอง 60 วัน)
