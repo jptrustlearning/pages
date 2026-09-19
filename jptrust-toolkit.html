@@ -203,6 +203,26 @@ tr.lv-o td.num{color:var(--maroon)}
 .pbar{display:inline-block;width:56px;height:6px;border-radius:3px;background:rgba(138,125,107,.18);
   vertical-align:middle;margin-right:7px;overflow:hidden}
 .pbar i{display:block;height:100%;background:var(--gold);border-radius:3px}
+.zn{display:grid;grid-template-columns:minmax(290px,345px) minmax(0,1fr);gap:20px;align-items:start;margin-top:12px}
+.zn-map svg{width:100%;height:auto;display:block}
+.zn-axis{stroke:rgba(212,175,55,.35)}
+.zn-bar{fill:#9c3a2a;opacity:.86}
+.zn-bar.s{fill:#20693f}
+.zn-bar.hot{stroke:var(--gold);stroke-width:1.6}
+.zn-baseln{stroke:var(--gold);stroke-width:2}
+.zn-lab{font-family:var(--f-b);font-size:10px;font-weight:600;fill:var(--muted)}
+.zn-pct{font-family:var(--f-b);font-size:9.5px;fill:var(--muted)}
+.zn-px{font-family:var(--f-n);font-size:12.5px;fill:var(--ink)}
+.zn-basetx{fill:var(--maroon);font-weight:700}
+.zn-cap{font-size:11px;color:var(--muted);font-weight:300;line-height:1.6;margin-top:9px}
+.zn-piv{display:inline-block;font-size:10.5px;font-weight:600;color:#9a7d1e;background:var(--gold-soft);
+  border:1px solid var(--line);border-radius:20px;padding:1px 7px;white-space:nowrap;margin-left:5px}
+.zn-d{font-family:var(--f-b);font-size:12.5px;white-space:nowrap}
+.zn-dp{color:var(--muted);font-size:11px;margin-left:5px;font-weight:300}
+@media(max-width:900px){.zn{grid-template-columns:minmax(0,1fr);gap:14px}}
+@media(max-width:560px){.zn-ph,.zn-p{display:none}
+  table.lad{min-width:0}table.lad td,table.lad th{padding:8px 7px}
+  table.lad td.num{font-size:15px}.zn-d{font-size:12px}.zn-dp{font-size:10.5px;margin-left:4px}}
 td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 .lad-note{font-size:11.5px;color:var(--muted);font-weight:300;margin-top:10px;line-height:1.65}
 .bd-head{display:flex;align-items:baseline;gap:8px;margin-top:14px;padding-top:12px;
@@ -1371,26 +1391,57 @@ function calc(){
   for(const k of KS) rows.push({side:'S',k,px:open-k*ATR,prob:HIT[k].dn});
 
   const pv=Object.entries(PIV);
-  let h='<div class="tw"><table class="lad"><thead><tr>'+
-        '<th>ระดับ</th><th>ราคา</th><th>โอกาสแตะในวัน</th><th>โซนหนา</th></tr></thead><tbody>';
-  for(const r of rows){
+  const dec=rows.map(r=>{
     let bn='',bd=Infinity;
     for(const [nm,v] of pv){ const d=Math.abs(v-r.px); if(d<bd){bd=d;bn=nm;} }
-    const hot=bd<=TOL;
+    return {side:r.side,k:r.k,px:r.px,prob:r.prob,hot:bd<=TOL,piv:bn};
+  });
+
+  /* ---------- แผนที่ราคาแนวตั้ง (โปรไฟล์โอกาสแตะ) ----------
+     ความยาวแท่ง = โอกาสแตะ · ตำแหน่งแนวตั้ง = ราคาจริง ⇒ อ่านระยะห่างได้ด้วยตา
+     กรอบ ±1.75×ATR พอดีคลุมโซนไกลสุด (1.5×ATR) แล้วเหลือขอบหายใจ */
+  const W=360,H=448,PAD=22,AX=64,BARMAX=176,PMAX=55;
+  const span=1.75*ATR, yOf=p=>PAD+((open+span)-p)/(2*span)*(H-2*PAD);
+  let g='';
+  for(const r of dec){
+    const y=yOf(r.px).toFixed(1);
+    if(r.side==='O'){
+      g+=`<line class="zn-baseln" x1="${AX-12}" y1="${y}" x2="${W-92}" y2="${y}"/>`
+       + `<text class="zn-lab zn-basetx" x="${AX-9}" y="${+y+3.5}" text-anchor="end">ตั้งต้น</text>`
+       + `<text class="zn-px zn-basetx" x="${W-2}" y="${+y+4}" text-anchor="end">$${f0(r.px)}</text>`;
+      continue;
+    }
+    const rank=KS.indexOf(r.k)+1, len=Math.max(7,r.prob/PMAX*BARMAX).toFixed(1);
+    g+=`<rect class="zn-bar ${r.side==='R'?'r':'s'}${r.hot?' hot':''}" x="${AX}" y="${+y-6}" width="${len}" height="12" rx="3"/>`
+     + `<text class="zn-lab" x="${AX-9}" y="${+y+3.5}" text-anchor="end">${r.side}${rank}</text>`
+     + `<text class="zn-pct" x="${AX+ +len+7}" y="${+y+3.5}">${r.prob.toFixed(1)}%</text>`
+     + `<text class="zn-px" x="${W-2}" y="${+y+4}" text-anchor="end">${r.hot?'★ ':''}$${f0(r.px)}</text>`;
+  }
+  const map='<div class="zn-map"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="แผนที่โซนแนวรับแนวต้านของวันนี้">'
+    + `<line class="zn-axis" x1="${AX}" y1="${PAD-6}" x2="${AX}" y2="${H-PAD+6}"/>` + g + '</svg>'
+    + '<div class="zn-cap">ความยาวแท่ง = โอกาสที่ราคาจะแตะระดับนั้นภายในวัน · ตำแหน่งแนวตั้งคือราคาจริง · ★ = ซ้อนแนวพิวอต</div></div>';
+
+  let t='<div class="tw"><table class="lad"><thead><tr>'+
+        '<th>ระดับ</th><th>ราคา</th><th>ห่างจากราคา</th><th class="zn-ph">โอกาสแตะในวัน</th></tr></thead><tbody>';
+  for(const r of dec){
     const cls=r.side==='O'?'lv-o':r.side==='R'?'lv-r':'lv-s';
     const rank=KS.indexOf(r.k)+1;
     const name=r.side==='O'?'ราคาตั้งต้น':(r.side==='R'?'โซนต้าน ':'โซนรับ ')+rank;
-    h+=`<tr class="${cls}"><td>${name}</td>
+    const d=r.px-open, sg=d>0?'+':'−';
+    const dist=r.side==='O'?'—':`${sg}$${f0(Math.abs(d))}<span class="zn-dp">${sg}${Math.abs(d/open*100).toFixed(2)}%</span>`;
+    t+=`<tr class="${cls}"><td>${name}${r.hot?`<span class="zn-piv">★ ${r.piv}</span>`:''}</td>
         <td class="num">$${f0(r.px)}</td>
-        <td>${r.prob==null?'—':`<span class="pbar"><i style="width:${r.prob}%"></i></span><b>${r.prob.toFixed(1)}%</b>`}</td>
-        <td class="${hot?'hot':''}">${hot?'★ ซ้อนแนว '+bn:'—'}</td></tr>`;
+        <td class="zn-d">${dist}</td>
+        <td class="zn-p">${r.prob==null?'—':`<span class="pbar"><i style="width:${r.prob}%"></i></span><b>${r.prob.toFixed(1)}%</b>`}</td></tr>`;
   }
-  h+='</tbody></table></div><div class="lad-scroll">เลื่อนตารางไปทางขวาเพื่อดูแนวพิวอต →</div>';
+  t+='</tbody></table></div><div class="lad-scroll">เลื่อนตารางไปทางขวา →</div>';
+
+  let h='<div class="zn">'+map+'<div class="zn-tbl">'+t+'</div></div>';
   h+='<div class="pivstrip"><span class="ps-t">แนวพิวอตรายวัน</span>'+
      ['R3','R2','R1','PP','S1','S2','S3'].map(k=>
        `<span class="ps-c ${k==='PP'?'pp':k[0]==='R'?'r':'s'}">${k} $${f0(PIV[k])}</span>`).join('')+'</div>';
   h+=`<div class="lad-note">โอกาสแตะ = สถิติจริงจากราคาทองย้อนหลัง 3,433 วัน (2556–2569 · ปรับปรุง ส.ค. 69) — เป็นความถี่ที่เคยเกิดขึ้น ไม่ใช่การพยากรณ์<br>
-      ★ โซนหนา = ระดับนี้ซ้อนกับแนวพิวอตรายวันพอดี น้ำหนักมากกว่าระดับเดี่ยว · บางวันไม่มีเลยถือเป็นเรื่องปกติ</div>`;
+      ★ = ระดับนี้ซ้อนกับแนวพิวอตรายวันพอดี น้ำหนักมากกว่าระดับเดี่ยว · บางวันไม่มีเลยถือเป็นเรื่องปกติ</div>`;
   if(SPOT) h+=`<div class="lad-note">ราคาตั้งต้นเป็นราคาทองสด (XAU/USD) · แนวพิวอตปรับฐานมาที่ระนาบเดียวกันแล้ว</div>`;
   document.getElementById('ladder').innerHTML=h;
   ZONES={open,levels:rows};
