@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JP Trust Tool &amp; Kit — Sentiment ทองคำรายวัน</title>
+<title>JP Trust Tool &amp; Kit — Dashboard ทอง&amp;หุ้น</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;600&family=Cinzel:wght@500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
@@ -637,7 +637,7 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
         <span class="bw-t">กลับสู่เว็บไซต์</span>
       </a>
       <div class="crumb">
-        <b>หน้าหลัก</b><span class="sep">/</span><span class="cur" id="crumb">Sentiment ทองคำรายวัน</span>
+        <b>หน้าหลัก</b><span class="sep">/</span><span class="cur" id="crumb">Dashboard ทอง&amp;หุ้น</span>
       </div>
       <div class="sponsor" id="sponsor" title="Sponsored by FISG">
         <span class="sp-t"><span class="sp-k">SPONSORED BY</span><b>FISG</b></span>
@@ -926,7 +926,7 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 /* =====================================================================
    JP TRUST TOOL & KIT — คอนโซล
    ---------------------------------------------------------------------
-   หน้าแรก  : Sentiment ทองคำรายวัน + คำนวณโซน ATR จากราคาเปิด
+   หน้าแรก  : Dashboard ทอง&หุ้น (เดิม Sentiment ทองคำรายวัน) + คำนวณโซน ATR จากราคาเปิด
    เมนูซ้าย : เปิดเครื่องมือจริงในกรอบคอนโซล (deep link ผ่าน #ชื่อไฟล์.html)
    ข้อมูล   : gold_prices.csv + score_history.csv (repo jptrustlearning/gold)
               ถ้าดึงไม่ได้ จะใช้ข้อมูลสำรองที่ฝังไว้ 70 วันล่าสุด
@@ -956,7 +956,7 @@ const LOCK='<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor
 
 const MENU=[
   {cap:'ภาพรวม',items:[
-    {t:'Sentiment ทองคำรายวัน',ic:'grid',dash:true},
+    {t:'Dashboard ทอง&หุ้น',ic:'grid',dash:true},
     {t:'เวลาตลาด Forex',ic:'clock',mk:1,to:'mkSes',chip:'ใหม่'},
     {t:'ปฏิทินข่าว US',ic:'clock',mk:1,to:'mkCal',chip:'ใหม่'},
     {t:'Heatmap หุ้น · ทองคำ',ic:'chart',mk:1,chip:'ใหม่'},
@@ -1054,7 +1054,7 @@ function openTool(url,title){
 }
 function showDash(){
   frame.src='about:blank';
-  crumb.textContent='Sentiment ทองคำรายวัน';
+  crumb.textContent='Dashboard ทอง&หุ้น';
   document.body.classList.remove('in-tool');
   viewTool.classList.remove('on'); viewDash.classList.add('on');
   btnOpen.classList.add('hide'); btnBack.classList.add('hide');
