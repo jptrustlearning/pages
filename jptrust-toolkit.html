@@ -65,7 +65,8 @@ body{background:var(--cream);color:var(--ink);font-family:var(--f-b);line-height
 .sb-legend .lk{width:12px;height:12px;color:rgba(212,175,55,.7);flex-shrink:0}
 .mchip{margin-left:auto;font-family:var(--f-b);font-size:9.5px;font-weight:600;letter-spacing:.3px;
   color:#231016;background:linear-gradient(135deg,var(--gold),#c2971f);border-radius:20px;padding:2px 8px;flex-shrink:0}
-.grp>.nav-i .chev{margin-left:8px}
+.grp>.nav-i .chev{margin-left:auto}
+.grp>.nav-i .mchip+.chev{margin-left:8px}
 .nav-s.on .tick{background:var(--gold)}
 
 /* ---- main ---- */
@@ -965,7 +966,7 @@ const MENU=[
     {t:'หน้าหลักสมาชิก',ic:'home',url:'https://jptrustlearning.com',ext:true}
   ]},
   {cap:'ทองคำ',items:[
-    {t:'Gold Strategy',ic:'coin',open:true,member:true,sub:[
+    {t:'Gold Strategy',ic:'coin',open:true,sub:[
       {t:'Gold Momentum Dashboard',url:'./gold-momentum-app.html',lock:1},
       {t:'เปรียบเทียบกลยุทธ์ทองคำ',url:'./gold-strategy-compare.html',lock:1},
       {t:'Golden Cross',url:'./gold-golden-cross.html',lock:1},
@@ -978,7 +979,7 @@ const MENU=[
     ]}
   ]},
   {cap:'เครื่องมือ',items:[
-    {t:'เครื่องมือลงทุน',ic:'tools',member:true,sub:[
+    {t:'เครื่องมือลงทุน',ic:'tools',sub:[
       {t:'S&P 500 Scanner',url:'./Free_scannerSP500%20(6).html',lock:1},
       {t:'Sector Rotation',url:'./sector-rotation.html',lock:1},
       {t:'Port Recorder',url:'./port-recorder.html',lock:1},
@@ -1003,7 +1004,7 @@ MENU.forEach((g,gi)=>{
     if(it.sub){
       html+=`<div class="grp${it.open?' open':''}" id="g${gi}_${ii}">
         <div class="nav-i" data-grp="g${gi}_${ii}">${svg(IC[it.ic])}<span>${it.t}</span>
-          ${it.member?'<span class="mchip">สมาชิก</span>':''}${it.chip?`<span class="mchip alt">${it.chip}</span>`:''}
+          ${it.chip?`<span class="mchip alt">${it.chip}</span>`:''}
           <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
         </div><div class="grp-body">`;
       it.sub.forEach(s=>{
