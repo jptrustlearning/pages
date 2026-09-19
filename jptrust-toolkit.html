@@ -965,31 +965,6 @@ const MENU=[
     {t:'กราฟราคา',ic:'candle',mk:'chart',chip:'ใหม่'},
     {t:'หน้าหลักสมาชิก',ic:'home',url:'https://jptrustlearning.com',ext:true}
   ]},
-  {cap:'ทองคำ',items:[
-    {t:'Gold Strategy',ic:'coin',open:true,sub:[
-      {t:'Gold Momentum Dashboard',url:'./gold-momentum-app.html',lock:1},
-      {t:'เปรียบเทียบกลยุทธ์ทองคำ',url:'./gold-strategy-compare.html',lock:1},
-      {t:'Golden Cross',url:'./gold-golden-cross.html',lock:1},
-      {t:'โมเมนตัม 6 เดือน',url:'./gold-momentum-6m.html',lock:1},
-      {t:'Zone Trading · Backtest',url:'./gold-zone-backtest.html',lock:1},
-      {t:'Zone Trading · กติกา',url:'./gold-zone-strategy.html',lock:1},
-      {t:'ซื้อครั้งเดียว vs ออมทอง',url:'./gold-buyhold-dca.html',lock:1},
-      {t:'H1 Swing · Sensitivity',url:'./gold-swing-h1-sensitivity.html',lock:1},
-      {t:'SMC Patient Hunter',url:'./smc-patient-hunter-report.html',lock:1}
-    ]}
-  ]},
-  {cap:'เครื่องมือ',items:[
-    {t:'เครื่องมือลงทุน',ic:'tools',sub:[
-      {t:'S&P 500 Scanner',url:'./Free_scannerSP500%20(6).html',lock:1},
-      {t:'Sector Rotation',url:'./sector-rotation.html',lock:1},
-      {t:'Port Recorder',url:'./port-recorder.html',lock:1},
-      {t:'My Portfolio',url:'./my-portfolio.html',lock:1},
-      {t:'วางแผนพอร์ตการลงทุน',url:'./portfolio-planner.html',lock:1},
-      {t:'วางแผนการเงินส่วนบุคคล',url:'./finance-planner.html',lock:1}
-    ]},
-    {t:'คู่มือการใช้งาน',ic:'book',url:'./toolkit-guide.html'},
-    {t:'Roadmap',ic:'map',url:'./roadmap.html'}
-  ]},
   {cap:'ผลิตภัณฑ์',items:[
     {t:'บริการของ JP Trust',ic:'spark',chip:'สมัคร',prod:1}
   ]}
@@ -1025,7 +1000,7 @@ MENU.forEach((g,gi)=>{
     }
   });
 });
-nav.innerHTML=html+'<div class="sb-legend">'+LOCK+' เนื้อหาเฉพาะสมาชิก</div>'
+nav.innerHTML=html
   +'<div class="sb-build">รุ่น a2f46dc · 15/08/2026 21:23</div>';
 document.querySelectorAll('[data-lock]').forEach(el=>el.outerHTML=LOCK);
 /* favicon reuses the sidebar mark — no duplicate payload */
