@@ -1029,8 +1029,8 @@ MENU.forEach((g,gi)=>{
 nav.innerHTML=html
   +'<div class="sb-build">รุ่น a2f46dc · 15/08/2026 21:23</div>';
 document.querySelectorAll('[data-lock]').forEach(el=>el.outerHTML=LOCK);
-/* favicon reuses the sidebar mark — no duplicate payload */
-{const l=document.createElement('link');l.rel='icon';l.href=document.querySelector('.sb-mark').src;document.head.appendChild(l);}
+/* ไม่ตั้ง favicon เองแล้ว (A104) — เดิมสร้าง <link rel="icon"> ชี้ไป .sb-mark ทำให้แท็บของหน้านี้
+   เป็นโลโก้คนละตัวกับเว็บ · ตอนนี้ปล่อยให้เบราว์เซอร์หยิบ /favicon.ico ที่ root เหมือนทุกหน้า */
 
 /* ---------- routing ---------- */
 const sb=document.getElementById('sb'), scrim=document.getElementById('scrim');
