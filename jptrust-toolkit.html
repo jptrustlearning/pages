@@ -691,7 +691,8 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
       <section class="view on" id="viewDash">
 
         <!-- ---------- HOUSE AD: บริการของ JP Trust Learning — แบนเนอร์เคลื่อนไหว (แทนการ์ด ADD-ON · EA) ----------
-             ยังใช้ id เดิมของการ์ด (#prodCard) เพราะเมนูซ้าย (prod:1) เลื่อนมาหา id นี้ · ข้อความทุกฉากอยู่ใน JAD_SCENES ของสคริปต์หลัก
+             ยังใช้ id เดิมของการ์ด (#prodCard) · ⚠️ ตั้งแต่ A102 เมนูซ้ายลิงก์ออกไปแท็บแพคเกจของหน้าแรกโดยตรงแล้ว ไม่ได้เลื่อนมาหา id นี้อีก
+             (ตัวจัดการ data-prod ในสคริปต์ยังอยู่ แต่ไม่มีใครเรียก — เก็บไว้เผื่อย้อนกลับ) · ข้อความทุกฉากอยู่ใน JAD_SCENES ของสคริปต์หลัก
              ⚠️ ฉากสุดท้ายอ้างราคา ฿150 / ฿1,400 — เปลี่ยนราคาแพ็กเกจต้องแก้ที่นี่ด้วย -->
         <a class="jad" id="prodCard" href="https://app.jptrustlearning.com/new" target="_blank" rel="noopener"
            data-track="house-ad-services" aria-label="บริการของ JP Trust Learning — สมัครสมาชิก">
@@ -991,7 +992,7 @@ const MENU=[
     {t:'หน้าหลักสมาชิก',ic:'home',url:'https://jptrustlearning.com',ext:true}
   ]},
   {cap:'ผลิตภัณฑ์',items:[
-    {t:'บริการของ JP Trust',ic:'spark',chip:'สมัคร',prod:1}
+    {t:'บริการของ JP Trust',ic:'spark',chip:'สมัคร',url:'https://jptrustlearning.com/#pricing',ext:true}
   ]}
 ];
 
