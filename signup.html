@@ -615,28 +615,28 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
         <div class="success-ring">
             <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
         </div>
-        <h3>สมัครสำเร็จ</h3>
-        <p class="m-sub">บัญชีของคุณเปิดใช้งานแล้ว เริ่มต้นใช้งานได้ทันที<br>ทีมงานจะตรวจสอบการชำระเงินภายหลัง</p>
+        <h3 id="successTitle">ส่งใบสมัครสำเร็จ</h3>
+        <p class="m-sub" id="successSub">เราได้รับใบสมัครและหลักฐานการชำระเงินของคุณแล้ว<br>ทีมงานกำลังตรวจสอบ โดยปกติใช้เวลาไม่เกิน 24 ชั่วโมง</p>
         <div class="ref-badge" id="refCode"></div>
         <div class="ref-label">Reference Code</div>
-        <div class="ref-note">กรุณาจดรหัสอ้างอิงนี้ไว้ <br>หลังยืนยันแล้ว คุณจะสามารถเข้าสู่ระบบด้วยอีเมลที่สมัครได้ทันที</div>
+        <div class="ref-note" id="successNote">กรุณาจดรหัสอ้างอิงนี้ไว้ <br>เมื่ออนุมัติแล้วเราจะส่งอีเมลแจ้ง และคุณเข้าสู่ระบบด้วยอีเมลที่สมัครได้ทันที</div>
         <div class="sub-summary" id="subSummary" style="display:none">
             <div class="sub-summary-row"><span class="sub-summary-k">วันที่สมัคร</span><span class="sub-summary-v" id="ssStart">—</span></div>
             <div class="sub-summary-row" id="ssPromoRow" style="display:none"><span class="sub-summary-k">โปรโมชัน</span><span class="sub-summary-v" id="ssPromo">—</span></div>
-            <div class="sub-summary-row"><span class="sub-summary-k">สมาชิกหมดอายุ</span><span class="sub-summary-v exp" id="ssExpiry">—</span></div>
+            <div class="sub-summary-row"><span class="sub-summary-k" id="ssExpiryK">สถานะ</span><span class="sub-summary-v exp" id="ssExpiry">—</span></div>
             <div class="sub-summary-row" id="ssDaysRow" style="display:none"><span class="sub-summary-k">ระยะเวลาสมาชิก</span><span class="sub-summary-v days" id="ssDays">—</span></div>
         </div>
-        <!-- Account-preparation hold (30s) — prevents premature "user not found" while backend creates the auth user -->
+        <!-- Account-preparation hold (30s) — prevents premature "user not found" while backend creates the (held) auth user -->
         <div class="prep-box" id="prepBox">
-            <div class="prep-label" id="prepLabel">กำลังเตรียมบัญชีของคุณ • 30 วินาที</div>
+            <div class="prep-label" id="prepLabel">กำลังบันทึกใบสมัครของคุณ • 30 วินาที</div>
             <div class="prep-bar"><div class="prep-fill" id="prepFill"></div></div>
-            <div class="prep-hint">ระบบกำลังสร้างบัญชีให้คุณ กรุณารอสักครู่<br>เพื่อให้เข้าสู่ระบบด้วยอีเมลที่สมัครได้ทันที</div>
+            <div class="prep-hint">ระบบกำลังบันทึกใบสมัครของคุณ กรุณารอสักครู่<br>จากนั้นเข้าแอปเพื่อติดตามสถานะการตรวจสอบได้</div>
         </div>
         <div class="modal-actions">
             <button class="btn-pdf" onclick="downloadPDF()">ดาวน์โหลดใบยืนยัน</button>
         </div>
         <button class="btn-enter" id="enterAppBtn" type="button" onclick="goToLogin()">
-            เริ่มต้นใช้งาน<svg viewBox="0 0 24 24" width="15" height="15" style="vertical-align:-2px;margin-left:7px;stroke:currentColor;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            เข้าแอปเพื่อดูสถานะ<svg viewBox="0 0 24 24" width="15" height="15" style="vertical-align:-2px;margin-left:7px;stroke:currentColor;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
     </div>
 </div>
@@ -1194,7 +1194,12 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
             refCode: data.refCode,
             timestamp: data.timestamp || new Date().toISOString(),
             promoCode: promoCodeRaw.toUpperCase(),
-            expiresAt: data.expiresAt || null,
+            // A129: nothing is granted at submit — a founder approves after checking the
+            // slip. expiresAt is intentionally ignored even if an older webhook returns one.
+            pending: true,
+            kind: data.kind || (new URLSearchParams(location.search).get('renew') === '1' ? 'renew' : 'new'),
+            stillActive: !!data.stillActive,
+            expiresAt: null,
             startedAt: data.startedAt || data.timestamp || null,
             promoApplied: !!data.promoApplied
         };
@@ -1223,7 +1228,22 @@ function fmtThaiDate(iso, withTime){
 function renderSubSummary(r){
     var box = document.getElementById('subSummary'); if(!box) return;
     document.getElementById('ssStart').textContent = fmtThaiDate(r.startedAt || r.timestamp, true);
-    if(r.expiresAt){
+    if(r.pending){
+        // Under review: no expiry yet — days start counting when the payment is approved.
+        var isRenew = r.kind === 'renew';
+        var t = document.getElementById('successTitle'); if(t) t.textContent = isRenew ? 'ส่งคำขอต่ออายุสำเร็จ' : 'ส่งใบสมัครสำเร็จ';
+        if(isRenew && r.stillActive){
+            var sb = document.getElementById('successSub');
+            if(sb) sb.innerHTML = 'เราได้รับคำขอต่ออายุและหลักฐานการชำระเงินของคุณแล้ว<br>ระหว่างรอตรวจสอบ (ไม่เกิน 24 ชั่วโมง) คุณยังใช้งานแอปได้ตามปกติ';
+            var nt = document.getElementById('successNote');
+            if(nt) nt.innerHTML = 'กรุณาจดรหัสอ้างอิงนี้ไว้ <br>เมื่ออนุมัติแล้ววันสมาชิกจะต่อจากวันหมดอายุเดิมให้อัตโนมัติ ไม่เสียวันที่เหลือ';
+        }
+        document.getElementById('ssExpiryK').textContent = 'สถานะ';
+        document.getElementById('ssExpiry').textContent = 'รอตรวจสอบการชำระเงิน';
+        document.getElementById('ssDays').textContent = (r.plan === 'yearly' ? '365 วัน (≈ 1 ปี)' : '30 วัน') + ' · เริ่มนับเมื่ออนุมัติ';
+        document.getElementById('ssDaysRow').style.display = 'flex';
+    } else if(r.expiresAt){
+        document.getElementById('ssExpiryK').textContent = 'สมาชิกหมดอายุ';
         document.getElementById('ssExpiry').textContent = fmtThaiDate(r.expiresAt, false);
         // days remaining
         var ms = new Date(r.expiresAt).getTime() - new Date(r.startedAt || r.timestamp || Date.now()).getTime();
@@ -1248,7 +1268,7 @@ function downloadPDF() {
     const r = window._lastReg; if (!r) return;
     const regDate = new Date(r.startedAt || r.timestamp).toLocaleString('th-TH', {year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit'});
     const planLabel = r.plan === 'yearly' ? 'รายปี — ฿1,400 / ปี' : r.plan === 'monthly' ? 'รายเดือน — ฿150 / เดือน' : '—';
-    const expDate = r.expiresAt ? new Date(r.expiresAt).toLocaleDateString('th-TH', {year:'numeric', month:'long', day:'numeric'}) : 'ไม่มีกำหนด';
+    const expDate = r.pending ? 'เริ่มนับเมื่อได้รับการอนุมัติ' : (r.expiresAt ? new Date(r.expiresAt).toLocaleDateString('th-TH', {year:'numeric', month:'long', day:'numeric'}) : 'ไม่มีกำหนด');
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Member Registration - ${r.refCode}</title>
 <style>@import url('https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Cinzel:wght@500;600;700&family=DM+Serif+Display&family=Sarabun:wght@400;500;600;700&display=swap');
 @page{size:A4;margin:0}*{margin:0;padding:0;box-sizing:border-box}
@@ -1279,8 +1299,8 @@ ${r.promoCode?'.promo-badge{text-align:center;margin:12px 0}.promo-badge span{di
 <div style="position:fixed;top:16px;right:16px;z-index:99" class="no-print"><button onclick="window.print()" style="font-family:'Sarabun',sans-serif;padding:12px 28px;background:linear-gradient(135deg,#D4AF37,#B8860B);color:#1a0a0e;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(212,175,55,0.4)">Save as PDF</button><p style="color:#7A6F62;font-size:10px;margin-top:5px;text-align:center">เลือก "Save as PDF"</p></div>
 <div><div class="card"><div class="card-top"></div><div class="card-body">
 <div class="logo"><div class="logo-badge">✦ JP TRUST LEARNING ✦</div></div>
-<div class="title">ใบยืนยันการสมัครสมาชิก</div>
-<div class="subtitle">Member Registration Confirmation</div>
+<div class="title">ใบรับใบสมัครสมาชิก</div>
+<div class="subtitle">Member Registration Receipt · Pending Review</div>
 <div class="divider"></div>
 <div class="ref-box"><div class="ref-code">${r.refCode}</div><div class="ref-label">Reference Code</div></div>
 ${r.promoCode?`<div class="promo-badge"><span>PROMO: ${r.promoCode}</span></div>`:''}
@@ -1290,11 +1310,11 @@ ${r.promoCode?`<div class="promo-badge"><span>PROMO: ${r.promoCode}</span></div>
 <tr><td>แพ็กเกจ</td><td>${planLabel}</td></tr>
 <tr><td>อีเมล</td><td>${r.email}</td></tr>
 <tr><td>Ref Code</td><td style="color:#8B6914">${r.refCode}</td></tr>
-<tr><td>วันที่สมัคร</td><td>${regDate}</td></tr>
-<tr><td>สมาชิกหมดอายุ</td><td style="color:#1F7D49;font-weight:700">${expDate}</td></tr>
-<tr><td>สถานะ</td><td style="color:#1F7D49;font-weight:700">เปิดใช้งานแล้ว</td></tr>
+<tr><td>วันที่ส่งใบสมัคร</td><td>${regDate}</td></tr>
+<tr><td>วันสมาชิก</td><td style="color:#8B6914;font-weight:700">${expDate}</td></tr>
+<tr><td>สถานะ</td><td style="color:#8B6914;font-weight:700">รอตรวจสอบการชำระเงิน</td></tr>
 </table>
-<div class="notice"><div class="notice-t">ข้อมูลสำคัญ</div><p>บัญชีของคุณ<strong>เปิดใช้งานแล้ว</strong> เข้าสู่ระบบด้วยอีเมลที่สมัครได้ทันที<br>ทีมงาน JP Trust Learning จะตรวจสอบการชำระเงินภายหลัง<br>หากต้องการติดต่อ: <strong>jptrustlearning@gmail.com</strong> พร้อมแจ้ง Ref Code</p></div>
+<div class="notice"><div class="notice-t">ข้อมูลสำคัญ</div><p>ทีมงาน JP Trust Learning ได้รับใบสมัครและหลักฐานการชำระเงินของคุณแล้ว และ<strong>กำลังตรวจสอบ</strong> โดยปกติใช้เวลาไม่เกิน 24 ชั่วโมง<br>เมื่ออนุมัติแล้วจะมีอีเมลแจ้ง และเข้าสู่ระบบด้วยอีเมลที่สมัครได้ทันที วันสมาชิกเริ่มนับเมื่ออนุมัติ<br>หากต้องการติดต่อ: <strong>jptrustlearning@gmail.com</strong> พร้อมแจ้ง Ref Code</p></div>
 </div><div class="footer">© 2026 JP TRUST LEARNING — Member Registration<br>เอกสารสร้างโดยระบบอัตโนมัติ · ${new Date().toLocaleDateString('th-TH')}</div></div></div></body></html>`;
     const w = window.open('', '_blank');
     if (w) { w.document.write(html); w.document.close(); }
@@ -1319,8 +1339,8 @@ function startSignupPrep(){
     var enterBtn = document.getElementById('enterAppBtn');
     function render(){
         if(label) label.textContent = left > 0
-            ? ('กำลังเตรียมบัญชีของคุณ • ' + left + ' วินาที')
-            : 'บัญชีของคุณพร้อมแล้ว ✓';
+            ? ('กำลังบันทึกใบสมัครของคุณ • ' + left + ' วินาที')
+            : 'บันทึกใบสมัครเรียบร้อย ✓ รอการอนุมัติ';
         if(fill) fill.style.width = (((total - left) / total) * 100) + '%';
     }
     render();

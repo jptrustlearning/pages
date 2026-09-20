@@ -1,7 +1,14 @@
-// Supabase Edge Function: signup-webhook  (v3 — Resend)
-// Receives member signup data → (1) writes to jptrustlearning/payment GitHub repo,
-// (2) auto-creates Supabase auth user (email_confirm=true), (3) sends welcome email
-// via Resend HTTP API.
+// Supabase Edge Function: signup-webhook  (v4 — approve-by-email, A129 · 20 ก.ย. 2026)
+// Receives member signup / renewal data →
+//   (1) writes CSV + slip + JSON log to the jptrustlearning/payment GitHub repo
+//   (2) makes sure a Supabase auth user exists in a HELD state — NEVER grants access
+//   (3) queues a row in public.signup_requests (one-time approval token, hashed)
+//   (4) emails the customer "received, under review"
+//   (5) emails the founders the slip + Approve / Reject buttons (→ approve.html)
+// Access is granted ONLY when a founder confirms on approve.html, which calls the
+// `approve-signup` function → SQL jpt_decide_request(). Requires migration
+// supabase/migrations/jpt_signup_approval_v1.sql (if the table is missing the
+// signup still succeeds, held, and the founders' email falls back to the SQL hint).
 //
 // Deploy:      supabase functions deploy signup-webhook
 // Invoke:      POST https://<project>.supabase.co/functions/v1/signup-webhook
@@ -30,10 +37,11 @@ const PROMO_CODE = "JPTFREE2026";
 // 23:59:59 BKK = 2026-06-15T16:59:59Z. After this the fallback never grants.
 const PROMO_FALLBACK_UNTIL_MS = Date.parse("2026-06-15T16:59:59Z");
 const MAX_SLIP_BASE64 = 7 * 1024 * 1024; // ~5MB binary → ~6.7MB base64; pad to 7MB
-const APP_URL = "https://jptrustlearning.github.io/pages/member-dashboard.html";
+const APP_URL = "https://app.jptrustlearning.com/member-dashboard.html";
+const APPROVE_URL = "https://app.jptrustlearning.com/approve.html";
 const EMAIL_FROM_NAME = "JP Trust Learning";
-const EMAIL_SUBJECT = "ยินดีต้อนรับสู่ JP Trust Learning — เริ่มต้นใช้งานได้ทันที";
-// Founders notified on every new signup. Override via FOUNDER_EMAILS secret
+const EMAIL_SUBJECT_RECEIVED = "JP Trust Learning — ได้รับใบสมัครแล้ว กำลังตรวจสอบการชำระเงิน";
+// Founders who receive the approval email on every submit. Override via FOUNDER_EMAILS secret
 // (comma-separated) if it ever changes — falls back to these two otherwise.
 const FOUNDER_EMAILS_DEFAULT = "Joonstinn@gmail.com,Watcharaphon0619@gmail.com";
 
@@ -135,10 +143,20 @@ async function ghNextRunningNumber(pat: string): Promise<number> {
 }
 
 // ============ Supabase admin helper ============
-type GrantResult = { granted: boolean; alreadyExisted: boolean; expiresAt?: string | null; error?: string };
+// A129 (20 ก.ย. 2026): this function NO LONGER GRANTS ANYTHING.
+// It only (a) makes sure an auth user exists in a HELD state so the customer can
+// log in and see the "กำลังตรวจสอบการชำระเงิน" screen, and (b) stamps a small
+// `jpt_pending` marker. Membership days are granted ONLY by the SQL function
+// jpt_decide_request() when a founder presses Approve (approve-signup function).
+type PendingResult = {
+  ok: boolean;
+  alreadyExisted: boolean;
+  kind: "new" | "renew";
+  currentExpiry: string | null;   // existing member's expiry (renewals) — shown to founders
+  error?: string;
+};
 
-// Find an existing auth user id by email (paginated). Used on renewal /
-// re-signup so we can refresh the subscription metadata of an existing user.
+// Find an existing auth user id by email (paginated).
 // deno-lint-ignore no-explicit-any
 async function findUserIdByEmail(admin: any, email: string): Promise<string | null> {
   for (let page = 1; page <= 10; page++) {
@@ -153,138 +171,119 @@ async function findUserIdByEmail(admin: any, email: string): Promise<string | nu
   return null;
 }
 
-async function grantSupabaseUser(
-  email: string,
-  baseMeta: Record<string, unknown>,
-  durationDays: number,
-): Promise<GrantResult> {
+// deno-lint-ignore no-explicit-any
+function adminClient(): any | null {
   const supaUrl = Deno.env.get("SUPABASE_URL");
   const svcKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!supaUrl || !svcKey) {
-    return { granted: false, alreadyExisted: false, error: "missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY" };
+  if (!supaUrl || !svcKey) return null;
+  return createClient(supaUrl, svcKey, { auth: { autoRefreshToken: false, persistSession: false } });
+}
+
+async function registerPendingUser(
+  email: string,
+  profile: { username: string; age: number },
+  pending: Record<string, unknown>,          // { ref_code, plan, amount_due, submitted_at }
+): Promise<PendingResult> {
+  const admin = adminClient();
+  if (!admin) {
+    return { ok: false, alreadyExisted: false, kind: "new", currentExpiry: null, error: "missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY" };
   }
-
-  // Compute an expiry that EXTENDS from a base date (so renewals don't burn
-  // remaining days). base = max(now, existing_expiry). If durationDays is 0
-  // (legacy / no plan), expiry is null.
-  const nowMs = Date.now();
-  const computeExpiry = (existingExpiryISO: string | null | undefined): string | null => {
-    if (!durationDays) return null;
-    let baseMs = nowMs;
-    if (existingExpiryISO) {
-      const t = Date.parse(existingExpiryISO);
-      if (!isNaN(t) && t > baseMs) baseMs = t; // not yet expired → extend from old expiry
-    }
-    return new Date(baseMs + durationDays * 86400000).toISOString();
-  };
-
+  const holdAt = new Date().toISOString();
   try {
-    const admin = createClient(supaUrl, svcKey, {
-      auth: { autoRefreshToken: false, persistSession: false },
-    });
-
-    // ---- New user: expiry counts from now; started_at = now, never renewed ----
-    const freshMeta = { ...baseMeta, subscription_renewed_at: null, subscription_expires_at: computeExpiry(null) };
+    // ---- New user: created HELD. No subscription_expires_at at all → nothing to
+    // double-count later, and the app gate (status=revoked + jpt_hold) shows the
+    // "payment under review" screen. plan/amount are mirrored top-level only so
+    // that screen can display them.
     const { data, error } = await admin.auth.admin.createUser({
       email,
       email_confirm: true,
-      app_metadata: freshMeta,
+      app_metadata: {
+        username: profile.username,
+        age: profile.age,
+        plan: pending.plan ?? null,
+        amount_due: pending.amount_due ?? null,
+        subscription_status: "revoked",
+        jpt_hold: true,
+        jpt_hold_at: holdAt,
+        jpt_pending: { ...pending, kind: "new" },
+      },
     });
-    if (error) {
-      // Idempotent: if user already exists, treat as success (don't fail signup)
-      const msg = String(error.message || "").toLowerCase();
-      if (
-        msg.includes("already") ||
-        msg.includes("registered") ||
-        msg.includes("duplicate") ||
-        msg.includes("exists")
-      ) {
-        // ---- Renewal / re-signup: EXTEND from the user's current expiry ----
-        const id = await findUserIdByEmail(admin, email);
-        if (id) {
-          // Read current expiry to extend from it (don't lose remaining days)
-          // + read the original signup date so the renewal NEVER overwrites it.
-          let currentExpiry: string | null = null;
-          let existingStarted: string | null = null;
-          try {
-            const { data: got } = await admin.auth.admin.getUserById(id);
-            const m = (got?.user?.app_metadata || {}) as Record<string, unknown>;
-            currentExpiry = (m.subscription_expires_at as string) || null;
-            existingStarted = (m.subscription_started_at as string) || null;
-          } catch (_) { /* fall back to now */ }
-          const renewMeta: Record<string, unknown> = {
-            ...baseMeta,
-            subscription_renewed_at: new Date(nowMs).toISOString(),
-            subscription_expires_at: computeExpiry(currentExpiry),
-          };
-          // subscription_started_at = first-ever signup date. On renewal keep the
-          // stored value; if we couldn't read it (or it never existed — legacy
-          // beta accounts, later backfilled from auth.users.created_at), drop the
-          // key so the merge-based metadata update leaves it untouched.
-          if (existingStarted) {
-            renewMeta.subscription_started_at = existingStarted;
-          } else {
-            delete renewMeta.subscription_started_at;
-          }
-          const { error: upErr } = await admin.auth.admin.updateUserById(id, { app_metadata: renewMeta });
-          if (upErr) {
-            return { granted: true, alreadyExisted: true, expiresAt: renewMeta.subscription_expires_at as string | null, error: `metadata update failed: ${upErr.message}` };
-          }
-          return { granted: true, alreadyExisted: true, expiresAt: renewMeta.subscription_expires_at as string | null };
-        }
-        return { granted: true, alreadyExisted: true, expiresAt: null };
-      }
-      return { granted: false, alreadyExisted: false, error: error.message };
+    if (!error) {
+      return { ok: !!data?.user, alreadyExisted: false, kind: "new", currentExpiry: null };
     }
-    return { granted: !!data?.user, alreadyExisted: false, expiresAt: freshMeta.subscription_expires_at as string | null };
+
+    const msg = String(error.message || "").toLowerCase();
+    const exists = msg.includes("already") || msg.includes("registered") || msg.includes("duplicate") || msg.includes("exists");
+    if (!exists) {
+      return { ok: false, alreadyExisted: false, kind: "new", currentExpiry: null, error: error.message };
+    }
+
+    // ---- Existing account (renewal / re-submission): DO NOT touch status, plan
+    // or expiry. A member who still has days left keeps using the app while the
+    // slip is reviewed. We only flag the pending request (merge-based update).
+    const id = await findUserIdByEmail(admin, email);
+    if (!id) {
+      return { ok: false, alreadyExisted: true, kind: "renew", currentExpiry: null, error: "existing user not found by email" };
+    }
+    let currentExpiry: string | null = null;
+    let everMember = false;
+    try {
+      const { data: got } = await admin.auth.admin.getUserById(id);
+      const m = (got?.user?.app_metadata || {}) as Record<string, unknown>;
+      currentExpiry = (m.subscription_expires_at as string) || null;
+      everMember = !!(m.subscription_expires_at || m.subscription_started_at);
+    } catch (_) { /* best-effort */ }
+    const kind: "new" | "renew" = everMember ? "renew" : "new";
+    const { error: upErr } = await admin.auth.admin.updateUserById(id, {
+      app_metadata: {
+        jpt_hold: true,
+        jpt_hold_at: holdAt,
+        jpt_pending: { ...pending, kind },
+        jpt_rejected_at: null,      // null = delete key (GoTrue merge semantics)
+        jpt_reject_note: null,
+      },
+    });
+    if (upErr) {
+      return { ok: false, alreadyExisted: true, kind, currentExpiry, error: `metadata update failed: ${upErr.message}` };
+    }
+    return { ok: true, alreadyExisted: true, kind, currentExpiry };
   } catch (err) {
-    return {
-      granted: false,
-      alreadyExisted: false,
-      error: err instanceof Error ? err.message : String(err),
-    };
+    return { ok: false, alreadyExisted: false, kind: "new", currentExpiry: null, error: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+// ============ Approval queue ============
+function b64url(bytes: Uint8Array): string {
+  let bin = "";
+  bytes.forEach((b) => (bin += String.fromCharCode(b)));
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+async function sha256Hex(s: string): Promise<string> {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+type QueueResult = { ok: boolean; token: string | null; error?: string };
+
+// Inserts one row into public.signup_requests (service-role only table) and
+// returns the raw one-time token that goes into the founders' email link. Only
+// its SHA-256 is stored, so a DB leak can't be used to approve anything.
+async function queueApprovalRequest(row: Record<string, unknown>): Promise<QueueResult> {
+  const admin = adminClient();
+  if (!admin) return { ok: false, token: null, error: "missing service role" };
+  try {
+    const token = b64url(crypto.getRandomValues(new Uint8Array(32)));
+    const token_hash = await sha256Hex(token);
+    const { error } = await admin.from("signup_requests").insert({ ...row, token_hash });
+    if (error) return { ok: false, token: null, error: error.message };
+    return { ok: true, token };
+  } catch (err) {
+    return { ok: false, token: null, error: err instanceof Error ? err.message : String(err) };
   }
 }
 
 // ============ Email helpers ============
 type EmailResult = { sent: boolean; error?: string };
-
-function buildWelcomeEmailText(username: string): string {
-  const who = (username || "สมาชิก").trim();
-  return `เรียน คุณ${who}
-
-ขอขอบพระคุณที่ไว้วางใจสมัครสมาชิกกับ JP Trust Learning ค่ะ
-การสมัครของคุณเสร็จสมบูรณ์เรียบร้อยแล้ว และบัญชีของคุณพร้อมใช้งานทันที
-
-── ขั้นตอนการเข้าใช้งานครั้งแรก ──
-
-1. เปิด Application JPTrust บนมือถือ
-2. กรอก Email ที่ใช้สมัครสมาชิก (อีเมลฉบับนี้)
-3. ระบบจะส่ง รหัสผ่าน OTP 6 หลัก กลับมายังอีเมลของคุณภายใน 1–2 นาที
-4. นำรหัส OTP มากรอกเพื่อเข้าสู่ระบบ
-
-หลังจาก Log in ครั้งแรก ระบบจะให้คุณตั้งรหัส PIN 6 หลัก
-เพื่อใช้เปิดแอปในครั้งถัดไปได้อย่างสะดวก
-
-เปิดแอป: ${APP_URL}
-
-── สิ่งที่คุณจะได้รับ ──
-
-• Roadmap 90 วัน สู่พอร์ตการลงทุนที่ยั่งยืน
-• กลยุทธ์ Momentum & Gold Trading พร้อม Backtest
-• Gold Signal และ SP500 Scanner
-• Framework วางแผนการเงินและพอร์ตการลงทุนส่วนบุคคล
-
-หากไม่ได้รับรหัส OTP ภายใน 5 นาที กรุณาตรวจสอบในโฟลเดอร์ Junk / Spam
-หรือตอบกลับอีเมลฉบับนี้เพื่อแจ้งทีมงาน
-
-ขอต้อนรับเข้าสู่ครอบครัว JP Trust Learning ค่ะ
-
-ด้วยความเคารพ
-ทีมงาน JP Trust Learning
-www.jptrustlearning.com
-`;
-}
 
 function escapeHtml(s: string): string {
   return String(s)
@@ -295,141 +294,141 @@ function escapeHtml(s: string): string {
     .replace(/'/g, "&#39;");
 }
 
-function buildWelcomeEmailHtml(username: string): string {
-  const who = escapeHtml((username || "สมาชิก").trim());
-  return `<!DOCTYPE html>
-<html lang="th">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${escapeHtml(EMAIL_SUBJECT)}</title>
-</head>
-<body style="margin:0;padding:0;font-family:'Sarabun','Segoe UI',Arial,sans-serif;background:#FAF6ED;color:#3D3228;-webkit-text-size-adjust:100%;">
-  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#FAF6ED;padding:24px 0;">
-    <tr><td align="center">
-      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width:600px;width:100%;">
+// "We received your application" — sent to the CUSTOMER right after submit.
+// The real welcome mail ("บัญชีพร้อมใช้งาน") is sent by approve-signup AFTER a
+// founder approves the slip.
+interface ReceivedInfo { username: string; refCode: string; planLabel: string; amount: number; kind: "new" | "renew"; stillActive: boolean }
 
-        <!-- Header -->
-        <tr><td align="center" style="padding:28px 24px 24px;border-bottom:1.5px solid rgba(212,175,55,0.35);">
-          <div style="display:inline-block;width:64px;height:64px;background:linear-gradient(135deg,#722F37 0%,#5A1F26 100%);border-radius:50%;line-height:64px;color:#D4AF37;font-size:20px;font-weight:700;letter-spacing:2px;font-family:'Times New Roman',serif;">JPT</div>
-          <div style="margin-top:12px;font-size:11px;letter-spacing:3px;color:#8B6914;text-transform:uppercase;font-family:'Times New Roman',serif;">JP Trust Learning</div>
-        </td></tr>
-
-        <!-- Body -->
-        <tr><td style="padding:32px 28px 8px;background:#FFFEF8;">
-          <h1 style="margin:0 0 20px;font-size:22px;color:#5A3D20;font-weight:700;line-height:1.35;">ยินดีต้อนรับสู่ JP Trust Learning</h1>
-          <p style="font-size:15px;line-height:1.75;color:#3D3228;margin:0 0 12px;">เรียน คุณ${who}</p>
-          <p style="font-size:15px;line-height:1.75;color:#3D3228;margin:0 0 18px;">ขอขอบพระคุณที่ไว้วางใจสมัครสมาชิกกับ JP Trust Learning ค่ะ<br>การสมัครของคุณเสร็จสมบูรณ์เรียบร้อยแล้ว และบัญชีของคุณพร้อมใช้งานทันที</p>
-
-          <!-- Steps section -->
-          <div style="margin:24px 0 20px;padding:20px 22px;background:linear-gradient(180deg,#FFFEF8 0%,#F5EDD8 100%);border:1.5px solid rgba(212,175,55,0.40);border-radius:10px;">
-            <div style="font-size:11px;letter-spacing:2px;color:#8B6914;text-transform:uppercase;margin-bottom:12px;font-weight:600;">ขั้นตอนการเข้าใช้งานครั้งแรก</div>
-            <ol style="margin:0;padding-left:22px;font-size:14.5px;line-height:1.95;color:#3D3228;">
-              <li>เปิด Application JPTrust บนมือถือ</li>
-              <li>กรอก Email ที่ใช้สมัครสมาชิก (อีเมลฉบับนี้)</li>
-              <li>ระบบจะส่ง <strong style="color:#722F37;">รหัสผ่าน OTP 6 หลัก</strong> กลับมายังอีเมลของคุณภายใน 1–2 นาที</li>
-              <li>นำรหัส OTP มากรอกเพื่อเข้าสู่ระบบ</li>
-            </ol>
-          </div>
-
-          <p style="font-size:13.5px;line-height:1.7;color:#7A6F62;margin:0 0 24px;font-style:italic;">หลังจาก Log in ครั้งแรก ระบบจะให้คุณตั้งรหัส PIN 6 หลัก เพื่อใช้เปิดแอปในครั้งถัดไปได้อย่างสะดวก</p>
-
-          <!-- CTA -->
-          <div style="text-align:center;margin:28px 0 20px;">
-            <a href="${APP_URL}" style="display:inline-block;padding:14px 40px;background:linear-gradient(135deg,#722F37 0%,#5A1F26 100%);color:#E8D48B;text-decoration:none;border-radius:8px;font-size:14px;font-weight:700;letter-spacing:1.5px;font-family:'Sarabun','Segoe UI',sans-serif;">เริ่มต้นใช้งาน →</a>
-          </div>
-
-          <!-- Features -->
-          <div style="margin:24px 0 8px;padding:20px 22px;background:#FAF6ED;border-left:3px solid #D4AF37;border-radius:6px;">
-            <div style="font-size:11px;letter-spacing:2px;color:#8B6914;text-transform:uppercase;margin-bottom:12px;font-weight:600;">สิ่งที่คุณจะได้รับ</div>
-            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="font-size:14px;line-height:1.85;color:#3D3228;">
-              <tr><td style="padding:2px 0;"><span style="color:#D4AF37;margin-right:8px;">◆</span>Roadmap 90 วัน สู่พอร์ตการลงทุนที่ยั่งยืน</td></tr>
-              <tr><td style="padding:2px 0;"><span style="color:#D4AF37;margin-right:8px;">◆</span>กลยุทธ์ Momentum &amp; Gold Trading พร้อม Backtest</td></tr>
-              <tr><td style="padding:2px 0;"><span style="color:#D4AF37;margin-right:8px;">◆</span>Gold Signal และ SP500 Scanner</td></tr>
-              <tr><td style="padding:2px 0;"><span style="color:#D4AF37;margin-right:8px;">◆</span>Framework วางแผนการเงินและพอร์ตการลงทุนส่วนบุคคล</td></tr>
-            </table>
-          </div>
-
-          <p style="font-size:13px;line-height:1.7;color:#7A6F62;margin:24px 0 16px;">หากไม่ได้รับรหัส OTP ภายใน 5 นาที กรุณาตรวจสอบในโฟลเดอร์ Junk / Spam หรือตอบกลับอีเมลฉบับนี้เพื่อแจ้งทีมงาน</p>
-
-          <p style="font-size:14.5px;line-height:1.75;color:#3D3228;margin:20px 0 0;">ขอต้อนรับเข้าสู่ครอบครัว JP Trust Learning ค่ะ</p>
-        </td></tr>
-
-        <!-- Footer -->
-        <tr><td style="padding:20px 24px 28px;background:#FFFEF8;border-top:1px solid rgba(212,175,55,0.25);text-align:center;">
-          <div style="font-size:13px;color:#5A3D20;font-weight:600;">ด้วยความเคารพ<br>ทีมงาน JP Trust Learning</div>
-          <div style="font-size:11px;color:#8B6914;margin-top:8px;letter-spacing:1.5px;font-family:'Times New Roman',serif;">www.jptrustlearning.com</div>
-        </td></tr>
-
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+function receivedLines(i: ReceivedInfo): { head: string; body: string; note: string } {
+  const head = i.kind === "renew" ? "ได้รับคำขอต่ออายุสมาชิกแล้ว" : "ได้รับใบสมัครสมาชิกแล้ว";
+  const body = i.amount > 0
+    ? "เราได้รับข้อมูลและสลิปการโอนเงินของคุณเรียบร้อยแล้ว ขณะนี้ทีมงานกำลังตรวจสอบการชำระเงิน โดยปกติใช้เวลาไม่เกิน 24 ชั่วโมง"
+    : "เราได้รับข้อมูลการสมัครของคุณเรียบร้อยแล้ว ขณะนี้ทีมงานกำลังตรวจสอบสิทธิ์ โดยปกติใช้เวลาไม่เกิน 24 ชั่วโมง";
+  const note = i.stillActive
+    ? "ระหว่างนี้คุณยังใช้งานแอปได้ตามปกติ เมื่ออนุมัติแล้ววันสมาชิกจะถูกต่อจากวันหมดอายุเดิมให้อัตโนมัติ ไม่เสียวันที่เหลือ"
+    : "เมื่ออนุมัติแล้ว เราจะส่งอีเมลแจ้งอีกครั้งพร้อมขั้นตอนเข้าใช้งาน โดยวันสมาชิกจะเริ่มนับตั้งแต่วันที่อนุมัติ ไม่ต้องสมัครใหม่และไม่ต้องชำระเงินซ้ำ";
+  return { head, body, note };
 }
 
-async function sendWelcomeEmail(email: string, username: string): Promise<EmailResult> {
+function buildReceivedEmailText(i: ReceivedInfo): string {
+  const who = (i.username || "สมาชิก").trim();
+  const L = receivedLines(i);
+  return `เรียน คุณ${who}
+
+${L.head}
+${L.body}
+
+รหัสอ้างอิง: ${i.refCode}
+แพ็กเกจ: ${i.planLabel}
+ยอดชำระ: ฿${Number(i.amount || 0).toLocaleString("en-US")}
+
+${L.note}
+
+ตรวจสอบสถานะได้ที่: ${APP_URL}
+หากเกิน 24 ชั่วโมงแล้วยังไม่ได้รับอีเมลยืนยัน กรุณาตอบกลับอีเมลฉบับนี้พร้อมแจ้งรหัสอ้างอิง
+
+ด้วยความเคารพ
+ทีมงาน JP Trust Learning
+www.jptrustlearning.com
+`;
+}
+
+function buildReceivedEmailHtml(i: ReceivedInfo): string {
+  const who = escapeHtml((i.username || "สมาชิก").trim());
+  const L = receivedLines(i);
+  const row = (k: string, v: string) =>
+    `<tr><td style="padding:6px 0;color:#7A6F62;font-size:13.5px;">${k}</td><td style="padding:6px 0;color:#3D3228;font-size:14px;font-weight:600;text-align:right;">${v}</td></tr>`;
+  return `<!DOCTYPE html>
+<html lang="th"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${escapeHtml(EMAIL_SUBJECT_RECEIVED)}</title></head>
+<body style="margin:0;padding:0;font-family:'Sarabun','Segoe UI',Arial,sans-serif;background:#FAF6ED;color:#3D3228;-webkit-text-size-adjust:100%;">
+  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#FAF6ED;padding:24px 0;"><tr><td align="center">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width:600px;width:100%;">
+      <tr><td align="center" style="padding:28px 24px 24px;border-bottom:1.5px solid rgba(212,175,55,0.35);">
+        <div style="display:inline-block;width:64px;height:64px;background:linear-gradient(135deg,#722F37 0%,#5A1F26 100%);border-radius:50%;line-height:64px;color:#D4AF37;font-size:20px;font-weight:700;letter-spacing:2px;font-family:'Times New Roman',serif;">JPT</div>
+        <div style="margin-top:12px;font-size:11px;letter-spacing:3px;color:#8B6914;text-transform:uppercase;font-family:'Times New Roman',serif;">JP Trust Learning</div>
+      </td></tr>
+      <tr><td style="padding:32px 28px 12px;background:#FFFEF8;">
+        <div style="font-size:11px;letter-spacing:2.5px;color:#8B6914;text-transform:uppercase;font-weight:600;margin-bottom:8px;">Payment Under Review</div>
+        <h1 style="margin:0 0 18px;font-size:22px;color:#5A3D20;font-weight:700;line-height:1.35;">${escapeHtml(L.head)}</h1>
+        <p style="font-size:15px;line-height:1.75;margin:0 0 12px;">เรียน คุณ${who}</p>
+        <p style="font-size:15px;line-height:1.75;margin:0 0 18px;">${escapeHtml(L.body)}</p>
+        <div style="margin:20px 0;padding:16px 20px;background:linear-gradient(180deg,#FFFEF8 0%,#F5EDD8 100%);border:1.5px solid rgba(212,175,55,0.40);border-radius:10px;">
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+            ${row("รหัสอ้างอิง", escapeHtml(i.refCode))}
+            ${row("แพ็กเกจ", escapeHtml(i.planLabel))}
+            ${row("ยอดชำระ", "฿" + Number(i.amount || 0).toLocaleString("en-US"))}
+            ${row("สถานะ", '<span style="color:#8B6914;">รอตรวจสอบการชำระเงิน</span>')}
+          </table>
+        </div>
+        <p style="font-size:14px;line-height:1.75;color:#5A3D20;margin:0 0 22px;">${escapeHtml(L.note)}</p>
+        <div style="text-align:center;margin:24px 0 18px;">
+          <a href="${APP_URL}" style="display:inline-block;padding:13px 34px;background:linear-gradient(135deg,#722F37 0%,#5A1F26 100%);color:#E8D48B;text-decoration:none;border-radius:8px;font-size:14px;font-weight:700;letter-spacing:1px;">ตรวจสอบสถานะในแอป →</a>
+        </div>
+        <p style="font-size:13px;line-height:1.7;color:#7A6F62;margin:18px 0 12px;">หากเกิน 24 ชั่วโมงแล้วยังไม่ได้รับอีเมลยืนยัน กรุณาตอบกลับอีเมลฉบับนี้พร้อมแจ้งรหัสอ้างอิง</p>
+      </td></tr>
+      <tr><td style="padding:20px 24px 28px;background:#FFFEF8;border-top:1px solid rgba(212,175,55,0.25);text-align:center;">
+        <div style="font-size:13px;color:#5A3D20;font-weight:600;">ด้วยความเคารพ<br>ทีมงาน JP Trust Learning</div>
+        <div style="font-size:11px;color:#8B6914;margin-top:8px;letter-spacing:1.5px;font-family:'Times New Roman',serif;">www.jptrustlearning.com</div>
+      </td></tr>
+    </table>
+  </td></tr></table>
+</body></html>`;
+}
+
+async function sendReceivedEmail(email: string, info: ReceivedInfo): Promise<EmailResult> {
   const apiKey = Deno.env.get("RESEND_API_KEY");
   const from = Deno.env.get("RESEND_FROM") || `${EMAIL_FROM_NAME} <onboarding@resend.dev>`;
-  if (!apiKey) {
-    return { sent: false, error: "missing RESEND_API_KEY secret" };
-  }
-
+  if (!apiKey) return { sent: false, error: "missing RESEND_API_KEY secret" };
   try {
-    // Resend HTTP API — modern transactional email service. Handles UTF-8 (Thai)
-    // natively, no RFC 2047 encoding tricks needed. Returns { id } on success,
-    // structured error JSON on failure.
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
-      },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
       body: JSON.stringify({
         from,
         to: [email],
-        subject: EMAIL_SUBJECT,
-        text: buildWelcomeEmailText(username),
-        html: buildWelcomeEmailHtml(username),
-        // RFC 2369 / 8058 — signals to Gmail/Outlook this is a managed
-        // sender that respects user opt-out. Lowers spam-filter risk
-        // even for transactional welcome mail. mailto: form (no
-        // List-Unsubscribe-Post) because we don't have a one-click
-        // HTTP endpoint yet — admin processes opt-outs manually.
+        reply_to: "jptrustlearning@gmail.com",
+        subject: EMAIL_SUBJECT_RECEIVED,
+        text: buildReceivedEmailText(info),
+        html: buildReceivedEmailHtml(info),
         headers: {
           "List-Unsubscribe": "<mailto:jptrustlearning@gmail.com?subject=Unsubscribe%20JP%20Trust%20Learning>",
           "List-ID": "JP Trust Learning Membership <members.jptrustlearning.com>",
         },
       }),
     });
-
     if (!res.ok) {
       let detail = "";
-      try {
-        const j = await res.json();
-        detail = j.message || j.error || JSON.stringify(j);
-      } catch (_) {
-        detail = await res.text();
-      }
+      try { const j = await res.json(); detail = j.message || j.error || JSON.stringify(j); }
+      catch (_) { detail = await res.text(); }
       return { sent: false, error: `Resend ${res.status}: ${detail}` };
     }
-
     return { sent: true };
   } catch (err) {
     return { sent: false, error: err instanceof Error ? err.message : String(err) };
   }
 }
 
-// ============ Founder notification (internal) ============
-// Fires on every successful new signup so the founders see who joined, which
-// plan, how much is owed, and whether a slip was attached. Best-effort: never
-// blocks the signup response. reply-to = the customer so founders can reply
-// straight to them.
+// ============ Founder notification (internal) — now the APPROVAL email ============
+// Fires on every submit (new signup AND renewal). Carries the slip as an
+// attachment + two buttons that open the approval page (approve.html). Opening
+// the link does NOTHING by itself — the founder must press the confirm button on
+// that page (mail scanners / link prefetchers open links on their own, so a
+// one-click GET approve would let bots through unreviewed).
 interface FounderInfo {
   username: string; email: string; age: number | null; plan: string;
   basePrice: number; amount: number; promoCode: string; promoApplied: boolean;
-  refCode: string; slipName: string | null; expiresAt: string | null;
+  refCode: string; slipName: string | null;
   slipBase64: string | null;   // raw base64 (no data: prefix) — attached to the email
+  kind: "new" | "renew";
+  currentExpiry: string | null;
+  token: string | null;        // null = queue insert failed → no buttons, SQL fallback note
+  queueError: string | null;
+}
+function fmtBkk(iso: string | null): string {
+  if (!iso) return "—";
+  const t = Date.parse(iso);
+  if (isNaN(t)) return "—";
+  return new Date(t).toLocaleDateString("th-TH", { timeZone: "Asia/Bangkok", year: "numeric", month: "short", day: "numeric" });
 }
 async function sendFounderNotification(info: FounderInfo): Promise<EmailResult> {
   const apiKey = Deno.env.get("RESEND_API_KEY");
@@ -440,50 +439,79 @@ async function sendFounderNotification(info: FounderInfo): Promise<EmailResult> 
   if (recipients.length === 0) return { sent: false, error: "no founder recipients" };
 
   const planLabel = info.plan === "yearly" ? "รายปี (Yearly)" : info.plan === "monthly" ? "รายเดือน (Monthly)" : "—";
+  const kindLabel = info.kind === "renew" ? "ต่ออายุ" : "สมัครใหม่";
   const promoLine = info.promoApplied && info.promoCode ? `${info.promoCode} (ใช้งานแล้ว)` : "ไม่มี";
-  const slipLine = info.slipBase64 ? (info.slipName ? info.slipName + " (แนบมาในอีเมลนี้)" : "แนบมาในอีเมลนี้") : "ไม่มีสลิปแนบ";
+  const slipBytes = info.slipBase64 ? Math.floor(info.slipBase64.length * 3 / 4) : 0;
+  const slipKb = Math.max(1, Math.round(slipBytes / 1024));
+  // Real bank slips seen so far are 121KB–3.2MB; the Aug-2026 bot sent 4–11 byte
+  // and ~32KB files. Flag anything small — a hint for the reviewer, not a verdict.
+  const slipSuspicious = !!info.slipBase64 && slipBytes < 60 * 1024;
+  const slipLine = info.slipBase64
+    ? `${info.slipName || "slip"} · ${slipKb} KB (แนบมาในอีเมลนี้)`
+    : "ไม่มีสลิปแนบ (โค้ดโปรโมชันฟรี)";
   const fmtBaht = (n: number) => "฿" + Number(n || 0).toLocaleString("en-US");
-  const subject = `🔔 สมาชิกใหม่: ${info.username} · ${planLabel} · ${fmtBaht(info.amount)}`;
+  const subject = `🔔 รออนุมัติ · ${kindLabel}: ${info.username} · ${planLabel} · ${fmtBaht(info.amount)}`;
+  const approveUrl = info.token ? `${APPROVE_URL}?t=${info.token}` : "";
+  const rejectUrl = info.token ? `${APPROVE_URL}?t=${info.token}&a=reject` : "";
+  const fallbackLine = `อนุมัติผ่าน SQL Editor: SELECT * FROM jpt_approve('${info.email}');`;
 
   const text = [
-    "มีสมาชิกสมัครใหม่ใน JP Trust Learning",
+    `มีคำขอ${kindLabel}รออนุมัติ — JP Trust Learning`,
     "",
+    `ประเภท: ${kindLabel}`,
     `ชื่อผู้ใช้: ${info.username}`,
     `อีเมล: ${info.email}`,
     `อายุ: ${info.age ?? "—"}`,
     `แพ็กเกจ: ${planLabel}`,
     `ราคาปกติ: ${fmtBaht(info.basePrice)}`,
-    `ยอดที่ต้องชำระ: ${fmtBaht(info.amount)}`,
+    `ยอดที่ต้องได้รับ: ${fmtBaht(info.amount)}`,
     `โปรโมชัน: ${promoLine}`,
-    `สลิป: ${slipLine}`,
+    `สลิป: ${slipLine}${slipSuspicious ? "  ⚠️ ไฟล์เล็กผิดปกติ ตรวจให้ละเอียด" : ""}`,
     `รหัสอ้างอิง: ${info.refCode}`,
-    `สมาชิกหมดอายุ: ${info.expiresAt ?? "—"}`,
+    info.kind === "renew" ? `วันหมดอายุปัจจุบัน: ${fmtBkk(info.currentExpiry)}` : "",
+    "",
+    "ยังไม่มีการให้สิทธิ์ใดๆ — ตรวจสลิปที่แนบมา แล้วเปิดลิงก์เพื่อกดยืนยัน:",
+    info.token ? `อนุมัติ: ${approveUrl}` : `⚠️ สร้างลิงก์อนุมัติไม่สำเร็จ (${info.queueError || "unknown"})`,
+    info.token ? `ปฏิเสธ: ${rejectUrl}` : fallbackLine,
     "",
     "— ระบบแจ้งเตือนอัตโนมัติ JP Trust Learning",
-  ].join("\n");
+  ].filter((x) => x !== "").join("\n");
 
   const esc = (x: string) => escapeHtml(String(x ?? ""));
   const row = (k: string, v: string) =>
     `<tr><td style="padding:7px 14px;color:#7A6F62;font-size:13px;white-space:nowrap;vertical-align:top">${k}</td><td style="padding:7px 14px;color:#1a0a0e;font-size:14px;font-weight:600">${v}</td></tr>`;
+  const kindBadge = info.kind === "renew"
+    ? `<span style="display:inline-block;padding:2px 10px;border-radius:20px;background:#E8F0FA;color:#2C5E9E;font-size:12px;">ต่ออายุ</span>`
+    : `<span style="display:inline-block;padding:2px 10px;border-radius:20px;background:#E9F5EC;color:#1F7D49;font-size:12px;">สมัครใหม่</span>`;
+  const buttons = info.token
+    ? `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:6px 0 4px"><tr>
+         <td style="padding:0 6px 0 22px" width="62%"><a href="${approveUrl}" style="display:block;text-align:center;padding:14px 10px;background:#1F7D49;color:#FFFFFF;text-decoration:none;border-radius:10px;font-size:15px;font-weight:700">✓ ตรวจสลิปแล้ว — อนุมัติ</a></td>
+         <td style="padding:0 22px 0 6px"><a href="${rejectUrl}" style="display:block;text-align:center;padding:14px 10px;background:#FFFEF8;color:#A83232;text-decoration:none;border-radius:10px;font-size:15px;font-weight:700;border:1.5px solid #A83232">✕ ปฏิเสธ</a></td>
+       </tr></table>
+       <div style="padding:8px 22px 4px;color:#7A6F62;font-size:12px;line-height:1.6">กดแล้วจะเปิดหน้ายืนยันอีกชั้น — ยังไม่มีการให้สิทธิ์จนกว่าจะกดยืนยันในหน้านั้น · คนใดคนหนึ่งกดก็พอ กดซ้ำไม่บวกวันเพิ่ม</div>`
+    : `<div style="margin:6px 22px;padding:12px 14px;background:#FDF0EE;border:1px solid #E3B4AE;border-radius:10px;color:#8A2C22;font-size:13px;line-height:1.6">⚠️ สร้างลิงก์อนุมัติไม่สำเร็จ (${esc(info.queueError || "unknown")})<br>${esc(fallbackLine)}</div>`;
+
   const html = `<div style="font-family:'Sarabun',Arial,sans-serif;background:#FAF6ED;padding:24px">
     <div style="max-width:520px;margin:0 auto;background:#FFFEF8;border:1.5px solid rgba(212,175,55,0.4);border-radius:14px;overflow:hidden">
       <div style="background:linear-gradient(135deg,#1a0a0e,#722F37);padding:18px 22px">
-        <div style="color:#D4AF37;font-size:12px;letter-spacing:2px;text-transform:uppercase">JP Trust Learning</div>
-        <div style="color:#F4E4BA;font-size:19px;font-weight:700;margin-top:3px">🔔 มีสมาชิกสมัครใหม่</div>
+        <div style="color:#D4AF37;font-size:12px;letter-spacing:2px;text-transform:uppercase">JP Trust Learning · รออนุมัติ</div>
+        <div style="color:#F4E4BA;font-size:19px;font-weight:700;margin-top:3px">🔔 มีคำขอ${kindLabel}รอตรวจสลิป</div>
       </div>
       <table style="width:100%;border-collapse:collapse;margin:8px 0">
+        ${row("ประเภท", kindBadge)}
         ${row("ชื่อผู้ใช้", esc(info.username))}
         ${row("อีเมล", esc(info.email))}
         ${row("อายุ", info.age != null ? String(info.age) : "—")}
         ${row("แพ็กเกจ", esc(planLabel))}
         ${row("ราคาปกติ", fmtBaht(info.basePrice))}
-        ${row("ยอดที่ต้องชำระ", `<span style="color:#1F7D49">${fmtBaht(info.amount)}</span>`)}
+        ${row("ยอดที่ต้องได้รับ", `<span style="color:#1F7D49;font-size:16px">${fmtBaht(info.amount)}</span>`)}
         ${row("โปรโมชัน", esc(promoLine))}
-        ${row("สลิป", esc(slipLine))}
+        ${row("สลิป", esc(slipLine) + (slipSuspicious ? `<div style="color:#A83232;font-size:12.5px;margin-top:3px">⚠️ ไฟล์เล็กผิดปกติ (สลิปจริงมัก &gt; 100 KB) ตรวจให้ละเอียด</div>` : ""))}
         ${row("รหัสอ้างอิง", esc(info.refCode))}
-        ${row("สมาชิกหมดอายุ", esc(info.expiresAt ?? "—"))}
+        ${info.kind === "renew" ? row("วันหมดอายุปัจจุบัน", esc(fmtBkk(info.currentExpiry))) : ""}
       </table>
-      <div style="padding:10px 22px 18px;color:#A09B92;font-size:11.5px;border-top:1px solid rgba(212,175,55,0.2)">ระบบแจ้งเตือนอัตโนมัติ — ตอบกลับอีเมลนี้เพื่อติดต่อสมาชิกได้โดยตรง</div>
+      ${buttons}
+      <div style="padding:10px 22px 18px;margin-top:8px;color:#A09B92;font-size:11.5px;border-top:1px solid rgba(212,175,55,0.2)">ระบบแจ้งเตือนอัตโนมัติ — ตอบกลับอีเมลนี้เพื่อติดต่อผู้สมัครได้โดยตรง</div>
     </div>
   </div>`;
 
@@ -726,7 +754,7 @@ serve(async (req: Request) => {
     );
     if (!csvOk) throw new Error("CSV write failed");
 
-    // 2. Slip binary (if provided) — BEFORE grant so a slip failure aborts the whole signup
+    // 2. Slip binary (if provided) — BEFORE the account/queue step so a slip failure aborts the whole signup
     if (slipBase64) {
       const ext = (slipFilename || "").split(".").pop() || "jpg";
       const slipOk = await ghPutBinary(
@@ -743,7 +771,7 @@ serve(async (req: Request) => {
     // ───────────────────────────────────────────────────────────────────────
     // Right now slips are reviewed MANUALLY by an admin against `amount` above
     // (the price for the chosen `plan`). When ready to automate, plug a Thai
-    // slip-verify provider in HERE — verify BEFORE grantSupabaseUser() so a
+    // slip-verify provider in HERE — verify BEFORE registerPendingUser() so a
     // failed / short / forged slip blocks the account grant.
     //
     // Recommended: SlipOK or EasySlip. They re-check the slip's QR against the
@@ -761,63 +789,75 @@ serve(async (req: Request) => {
     //   }
     // ───────────────────────────────────────────────────────────────────────
 
-    // ---------- Compute subscription window ----------
-    // monthly = +30 days, yearly = +365 days. On RENEWAL the expiry EXTENDS from
-    // the user's existing expiry (computed inside grantSupabaseUser via
-    // max(now, existing_expiry) + durationDays) so remaining days aren't lost.
-    // If the old sub already lapsed, it counts from now instead.
+    // ---------- Subscription window (NOT applied here) ----------
+    // monthly = +30 days, yearly = +365 days. A129: the webhook only RECORDS the
+    // duration. jpt_decide_request() applies it when a founder approves:
+    //   new expiry = max(approval time, existing expiry) + durationDays
+    // so renewals never lose remaining days and nothing is granted before review.
     const SUB_DAYS: Record<string, number> = { monthly: 30, yearly: 365 };
     const durationDays = plan ? SUB_DAYS[plan] : 0;
-    const startedAt = timestamp;
-    const baseMeta: Record<string, unknown> = {
-      username,                   // registration name → used as the default member name in-app
-      age: ageNum,                // stored so the renew form can prefill a computed current age
-      plan: plan || null,
-      amount,                     // = amount_due (what they must actually pay)
-      amount_due: amount,
-      base_price: basePrice,
-      promo_applied: promoValid,
-      promo_code: promoCode || null,
-      promo_discount_type: promoDiscountType,
-      promo_discount_value: promoDiscountValue,
-      ref_code: refCode,
-      subscription_status: "active",
-      // First-ever signup date. Only persisted for NEW users (createUser);
-      // on renewal grantSupabaseUser preserves the stored value instead.
-      subscription_started_at: startedAt,
-    };
+    const slipExt = (slipFilename || "").split(".").pop() || "jpg";
+    const slipPath = slipBase64 ? `member-slips/slip_${runStr}_${safeEmail}.${slipExt}` : null;
+    const slipBytes = slipBase64 ? Math.floor(slipBase64.length * 3 / 4) : null;
 
-    // ---------- Auto-grant Supabase user (best-effort, never blocks signup) ----------
-    const grant = await grantSupabaseUser(email, baseMeta, durationDays);
-    // The authoritative expiry is whatever grant actually stored (extended on renewal)
-    const expiresAt = grant.expiresAt ?? null;
-    if (grant.granted) {
-      console.log(`[grant] ${email} — ${grant.alreadyExisted ? "renewed" : "created"} · expires ${expiresAt ?? "—"}`);
+    // ---------- Create/flag the account in HELD state (never grants) ----------
+    const reg = await registerPendingUser(
+      email,
+      { username, age: ageNum },
+      { ref_code: refCode, plan: plan || null, amount_due: amount, submitted_at: timestamp },
+    );
+    if (reg.ok) {
+      console.log(`[pending] ${email} — ${reg.kind}${reg.alreadyExisted ? " (existing account)" : ""} · awaiting approval`);
     } else {
-      console.error(`[grant] FAILED for ${email}: ${grant.error}`);
+      console.error(`[pending] FAILED for ${email}: ${reg.error}`);
     }
 
-    // ---------- Send welcome email (best-effort, never blocks signup) ----------
-    const mail = await sendWelcomeEmail(email, username);
+    // ---------- Queue the approval request (token goes into the founders' email) ----------
+    const queued = await queueApprovalRequest({
+      ref_code: refCode,
+      email,
+      username,
+      kind: reg.kind,
+      plan: plan || null,
+      duration_days: durationDays,
+      base_price: basePrice,
+      amount_due: amount,
+      promo_code: promoValid ? (promoCode || null) : null,
+      promo_discount_type: promoDiscountType,
+      promo_discount_value: promoDiscountValue,
+      slip_path: slipPath,
+      slip_bytes: slipBytes,
+    });
+    if (!queued.ok) console.error(`[queue] FAILED for ${refCode}: ${queued.error}`);
+
+    const stillActive = reg.kind === "renew" && !!reg.currentExpiry && Date.parse(reg.currentExpiry) > Date.now();
+    const planLabelTh = plan === "yearly" ? "รายปี" : plan === "monthly" ? "รายเดือน" : "—";
+
+    // ---------- Tell the customer we received it (best-effort) ----------
+    const mail = await sendReceivedEmail(email, {
+      username, refCode, planLabel: planLabelTh, amount, kind: reg.kind, stillActive,
+    });
     if (mail.sent) {
-      console.log(`[email] welcome sent to ${email}`);
+      console.log(`[email] received-notice sent to ${email}`);
     } else {
       console.error(`[email] FAILED for ${email}: ${mail.error}`);
     }
 
-    // ---------- Notify founders (best-effort, never blocks signup) ----------
+    // ---------- Ask the founders to approve (best-effort) ----------
     const founderMail = await sendFounderNotification({
       username, email, age: ageNum, plan, basePrice, amount,
       promoCode, promoApplied: promoValid, refCode,
-      slipName, expiresAt, slipBase64,
+      slipName, slipBase64,
+      kind: reg.kind, currentExpiry: reg.currentExpiry,
+      token: queued.token, queueError: queued.error || null,
     });
     if (founderMail.sent) {
-      console.log(`[email] founder notification sent for ${email}`);
+      console.log(`[email] approval request sent to founders for ${email}`);
     } else {
       console.error(`[email] founder notification FAILED for ${email}: ${founderMail.error}`);
     }
 
-    // 3. JSON log — written LAST so it captures grant + email outcomes
+    // 3. JSON log — written LAST so it captures queue + email outcomes
     const logData = {
       id: runStr,
       ref_code: refCode,
@@ -825,6 +865,7 @@ serve(async (req: Request) => {
       username,
       age: ageNum,
       email,
+      kind: reg.kind,
       promo_code: promoCode,
       promo_applied: promoValid,
       plan: plan || null,
@@ -834,26 +875,30 @@ serve(async (req: Request) => {
       promo_discount_type: promoDiscountType,
       promo_discount_value: promoDiscountValue,
       subscription: {
-        status: "active",
-        started_at: startedAt,
-        expires_at: expiresAt,
+        status: "pending_approval",
+        submitted_at: timestamp,
+        expires_at: null,               // decided at approval time
         duration_days: durationDays,
+        current_expiry_at_submit: reg.currentExpiry,
       },
       slip_filename: slipName,
+      slip_path: slipPath,
       status: "pending",
       confirmations: {
         slip_attached: !!slipBase64 || promoValid,
         payment_made: true,
       },
-      auto_grant: {
-        granted: grant.granted,
-        already_existed: grant.alreadyExisted,
-        error: grant.error || null,
+      pending_account: {
+        ok: reg.ok,
+        already_existed: reg.alreadyExisted,
+        error: reg.error || null,
       },
-      welcome_email: {
-        sent: mail.sent,
-        error: mail.error || null,
+      approval_request: {
+        queued: queued.ok,
+        error: queued.error || null,
       },
+      received_email: { sent: mail.sent, error: mail.error || null },
+      founder_email: { sent: founderMail.sent, error: founderMail.error || null },
     };
     const logOk = await ghPutText(
       `member-logs/member_regis_${runStr}_${safeEmail}.json`,
@@ -862,7 +907,6 @@ serve(async (req: Request) => {
       GITHUB_PAT,
     );
     if (!logOk) {
-      // Don't fail signup — user has already been created + email sent
       console.error(`[log] failed to write JSON log for ${refCode}`);
     }
 
@@ -870,12 +914,15 @@ serve(async (req: Request) => {
       ok: true,
       refCode,
       timestamp,
-      granted: grant.granted,
+      pending: true,          // A129: nothing is granted until a founder approves
+      granted: false,
+      kind: reg.kind,
+      stillActive,
       emailSent: mail.sent,
-      // Subscription details so the success page / PDF can show the expiry.
       plan: plan || null,
-      startedAt,
-      expiresAt,
+      startedAt: timestamp,
+      expiresAt: null,
+      currentExpiry: reg.currentExpiry,
       promoCode: promoValid ? (promoCode || null) : null,
       promoApplied: promoValid,
     });
