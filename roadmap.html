@@ -2043,9 +2043,10 @@ body > * { position: relative; z-index: 1; }
   font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 1.2px;
   color: var(--gold-deep); margin-left: 8px;
 }
-.cal-cell.program.done .cal-status { color: var(--emerald-dk); }
+.cal-cell.done .cal-status { color: var(--emerald-dk); }
 .cal-cell.program.done { border-color: rgba(46,159,95,0.45); }
-.cal-cell.program.missed .cal-status { color: #B23A3A; opacity: 0.75; }
+.cal-cell.today.done .cal-status { color: var(--emerald-dk); }
+.cal-cell.missed .cal-status { color: #B23A3A; opacity: 0.75; }
 </style>
   <!-- JP Trust hard auth-gate (redirect to login if no session) -->
   <script src="./jp-gate.js?v=1783134367"></script>
@@ -2156,9 +2157,9 @@ body > * { position: relative; z-index: 1; }
     </div>
     <div class="lg-item">
       <span class="lg-dot lg-locked">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5.5"/></svg>
       </span>
-      <span>Locked</span>
+      <span>ยังไม่ได้ทำ</span>
     </div>
     <div class="lg-item">
       <span class="lg-dot lg-missed">
@@ -2534,14 +2535,20 @@ function dayForToday() {
   return dayN;
 }
 
+function isDayDone(dayN) {
+  const rec = progress[String(dayN)];
+  return !!(rec && rec.done);
+}
+
 function getDayState(dayN) {
-  // A137 — reads progress[]: past + done = completed · past + not done = missed
+  // A137.1 — 'completed' wins over every other state, including today.
+  // (A137 checked sameDate() first, so today's cell could never show a tick.)
   const today = startOfDay(new Date());
   const dDate = dateForDay(dayN);
+  if (isDayDone(dayN)) return 'completed';
   if (sameDate(today, dDate)) return 'today';
-  const rec = progress[String(dayN)];
-  if (dDate < today) return (rec && rec.done) ? 'completed' : 'missed';
-  return (rec && rec.done) ? 'completed' : 'locked';
+  if (dDate < today) return 'missed';
+  return 'upcoming';
 }
 
 function getCurrentCycle() {
@@ -2609,8 +2616,9 @@ function statusIconSvg(state) {
   if (state === 'today') {
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.5" fill="currentColor"/></svg>';
   }
-  // locked (default)
-  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+  // upcoming (default) — A137.1: every day in the cycle can be opened and done,
+  // so a padlock was wrong. Hollow ring = not done yet.
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5.5"/></svg>';
 }
 
 // ========================================
@@ -2758,10 +2766,12 @@ function renderMonthGrid(year, month, cycleStartDay, cycleEndDay) {
     let dataDay = '';
 
     if (isToday && inThisCycle) {
+      const tState = getDayState(programDay);
       cls += ' today';
+      if (tState === 'completed') cls += ' done';
       inner += `<div class="cal-day-label">Day ${programDay}</div>`;
-      // Today keeps the inner status dot for the focal "you are here" indicator
-      inner += `<div class="cal-status">${statusIconSvg('today')}</div>`;
+      // Today keeps the gold "you are here" ring, but the icon follows real state
+      inner += `<div class="cal-status">${statusIconSvg(tState)}</div>`;
       click = `onclick="openDayModal(${programDay})"`;
       dataDay = ` data-day="${programDay}"`;
     } else if (inThisCycle) {
@@ -3090,7 +3100,12 @@ function escHtml(t) {
 }
 
 function dmToggleDone() {
-  document.getElementById('dmCheckWrap').classList.toggle('checked');
+  const on = document.getElementById('dmCheckWrap').classList.toggle('checked');
+  // A137.1 — persist right away so the calendar updates even if the user
+  // closes the sheet without pressing the save button.
+  dmSave({ silent: true, keepOpen: true }).then(() => {
+    jptToast(on ? 'ทำเครื่องหมายว่าทำแล้ว' : 'ยกเลิกเครื่องหมายแล้ว');
+  });
 }
 
 function dmNav(step) {
