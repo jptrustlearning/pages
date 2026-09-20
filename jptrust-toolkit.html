@@ -503,7 +503,7 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 .sb-port a{display:block;line-height:0;border-radius:8px;overflow:hidden;
   border:1px solid rgba(212,175,55,.28);background:rgba(255,254,248,.04)}
 .sb-port img{display:block;width:100%;height:auto}
-.sb-port .pn{margin-top:8px;font-size:10px;line-height:1.55;color:rgba(244,228,186,.42);font-weight:300}
+.sb-port .pcap{padding:0 0 8px}
 
 /* ---- Insight ล่าสุด (สรุปข่าวรายวันจาก news/news-latest.json) ---- */
 .card.ins{margin-bottom:20px;background:linear-gradient(150deg,#FFFDF4,#FBF3DE);border-color:rgba(212,175,55,.5);
@@ -1294,8 +1294,8 @@ MENU.forEach((g,gi)=>{
 });
 nav.innerHTML=html
   +'<div class="sb-port" id="sbPort" hidden>'
+  +  '<div class="sb-cap pcap">PORTFOLIO</div>'
   +  '<a id="sbPortLink" target="_blank" rel="noopener"><img id="sbPortImg" alt="สถิติพอร์ตจริงจาก Myfxbook"></a>'
-  +  '<div class="pn">บัญชีเงินจริงที่รัน EA · บัญชีทดสอบระบบของทีม ไม่ใช่ผลิตภัณฑ์ที่เปิดขาย</div>'
   +'</div>'
   +'<div class="sb-build">รุ่น a2f46dc · 15/08/2026 21:23</div>';
 
