@@ -506,6 +506,9 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 .pf-badge i{width:6px;height:6px;border-radius:50%;background:var(--gold);display:block}
 .pf-meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin:10px 0 14px;font-size:12.5px;color:var(--muted);font-weight:300}
 .pf-meta b{color:var(--ink);font-weight:500}
+.pf-tag{margin:-4px 0 14px;padding:9px 12px;border-radius:10px;font-size:12px;line-height:1.6;
+  color:var(--ink);background:rgba(212,175,55,.10);border:1px solid var(--line)}
+.pf-tag b{font-weight:600}
 .pf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .pf-t{background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:12px 13px;min-width:0}
 .pf-t .k{font-family:var(--f-d);font-size:9px;letter-spacing:1.6px;color:#B8860B;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1068,6 +1071,7 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
             <span>เริ่ม <b id="pfStart">&mdash;</b></span>
             <span>ติดตามโดย <b>Myfxbook</b></span>
           </div>
+          <div class="pf-tag">พอร์ตนี้เป็น<b>บัญชีทดสอบระบบของทีม JP Trust</b> ไม่ใช่ผลิตภัณฑ์ที่เปิดให้บริการอยู่ในขณะนี้ และไม่ใช่กลยุทธ์ที่อยู่ในห้องแล็บของสมาชิก</div>
           <div class="pf-grid" id="pfGrid"></div>
           <div class="pf-chart">
             <div class="pf-ct">RETURN VS RISK</div>
@@ -1317,7 +1321,6 @@ const MENU=[
     {t:'ค้นหาหุ้น S&P 500',ic:'chart',mk:1,to:'heroScanner',chip:'ใหม่'},
     {t:'เวลาตลาด Forex',ic:'clock',mk:1,to:'mkSes',chip:'ใหม่'},
     {t:'ปฏิทินข่าว US',ic:'clock',mk:1,to:'mkCal',chip:'ใหม่'},
-    {t:'ผลงานพอร์ตจริง',ic:'bot',mk:1,to:'mkPort',chip:'ใหม่'},
     {t:'Heatmap หุ้น · ทองคำ',ic:'chart',mk:1,chip:'ใหม่'},
     {t:'ทองไหลไปตลาดไหน',ic:'coin',mk:'gold',to:'mkBasis',chip:'ใหม่'},
     {t:'อัตราแลกเปลี่ยนสด',ic:'fx',mk:'fx',chip:'LIVE'},
@@ -1325,6 +1328,7 @@ const MENU=[
     {t:'หน้าหลักสมาชิก',ic:'home',url:'https://jptrustlearning.com',ext:true}
   ]},
   {cap:'ผลิตภัณฑ์',items:[
+    {t:'ผลงานพอร์ตจริง',ic:'bot',mk:1,to:'mkPort',chip:'ใหม่'},
     {t:'บริการของ JP Trust',ic:'spark',chip:'สมัคร',url:'https://jptrustlearning.com/#pricing',ext:true}
   ]}
 ];
