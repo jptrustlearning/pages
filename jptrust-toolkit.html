@@ -506,10 +506,27 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 .pf-badge i{width:6px;height:6px;border-radius:50%;background:var(--gold);display:block}
 .pf-meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin:10px 0 14px;font-size:12.5px;color:var(--muted);font-weight:300}
 .pf-meta b{color:var(--ink);font-weight:500}
-.pf-wrap{display:flex;justify-content:center;padding:14px 10px;border-radius:12px;
-  background:var(--cream);border:1px solid var(--line)}
-.pf-wrap a{display:block;line-height:0;max-width:100%}
-.pf-wrap img{max-width:100%;height:auto;display:block;border-radius:6px}
+.pf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pf-t{background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:12px 13px;min-width:0}
+.pf-t .k{font-family:var(--f-d);font-size:9px;letter-spacing:1.6px;color:#B8860B;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pf-t .v{font-family:var(--f-n);font-size:25px;line-height:1.15;margin-top:5px;color:var(--ink)}
+.pf-t .v.up{color:var(--up)} .pf-t .v.down{color:var(--down)}
+.pf-t .s{font-size:11px;color:var(--muted);font-weight:300;margin-top:3px}
+.pf-chart{margin-top:14px;background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:14px 15px}
+.pf-ct{font-family:var(--f-d);font-size:9.5px;letter-spacing:1.8px;color:#B8860B;font-weight:600;margin-bottom:11px}
+.pf-bar{display:grid;grid-template-columns:104px 1fr 62px;align-items:center;gap:10px;margin-bottom:9px}
+.pf-bar:last-child{margin-bottom:0}
+.pf-bar .lb{font-size:12px;color:var(--ink);white-space:nowrap}
+.pf-bar .tr{height:12px;border-radius:6px;background:rgba(61,50,40,.08);overflow:hidden}
+.pf-bar .tr i{display:block;height:100%;border-radius:6px}
+.pf-bar .nm{font-size:12.5px;text-align:right;font-weight:500;white-space:nowrap}
+.pf-note{margin-top:9px;font-size:11px;color:var(--muted);font-weight:300;line-height:1.6}
+@media(max-width:620px){
+  .pf-grid{grid-template-columns:repeat(2,1fr)}
+  .pf-t .v{font-size:22px}
+  .pf-bar{grid-template-columns:86px 1fr 56px;gap:8px}
+  .pf-bar .lb{font-size:11.5px}
+}
 .pf-cap{margin-top:12px;font-size:11.5px;line-height:1.65;color:var(--muted);font-weight:300}
 .pf-cap b{color:var(--ink);font-weight:500}
 @media(max-width:560px){ .pf-meta{gap:5px 14px;font-size:12px} .pf-wrap{padding:11px 6px} }
@@ -1051,43 +1068,71 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
             <span>เริ่ม <b id="pfStart">&mdash;</b></span>
             <span>ติดตามโดย <b>Myfxbook</b></span>
           </div>
-          <div class="pf-wrap">
-            <a id="pfLink" href="#" target="_blank" rel="noopener"><img id="pfImg" alt="สถิติพอร์ตจริงจาก Myfxbook"></a>
+          <div class="pf-grid" id="pfGrid"></div>
+          <div class="pf-chart">
+            <div class="pf-ct">RETURN VS RISK</div>
+            <div id="pfBars"></div>
+            <div class="pf-note">แท่งสองเส้นนี้ใช้สเกลเดียวกัน อ่านคู่กันเสมอ &mdash; ตัวบนคือกำไรที่ทำได้ ตัวล่างคือเงินที่ยอมให้ลดลงจากจุดสูงสุดระหว่างทางเพื่อให้ได้กำไรนั้นมา</div>
           </div>
-          <div class="pf-cap">ตัวเลขทั้งหมดมาจาก <b>Myfxbook</b> ซึ่งอ่านจากบัญชีโดยตรง JP Trust ไม่ได้กรอกเอง &middot; ยอดเงินในบัญชีตั้งเป็นส่วนตัว แสดงเฉพาะเปอร์เซ็นต์และสถิติ &middot; <b>ผลการดำเนินงานในอดีตไม่ได้รับประกันผลในอนาคต</b> การลงทุนมีความเสี่ยง เนื้อหานี้เป็นข้อมูลประกอบการศึกษา ไม่ใช่คำแนะนำการลงทุน</div>
+          <div class="pf-cap"><a id="pfLink" href="#" target="_blank" rel="noopener" style="color:#8B6914;font-weight:500">ตรวจสอบตัวเลขสดที่ Myfxbook &#8599;</a> &middot; ตัวเลขบนการ์ดนี้บันทึก ณ <b id="pfAsOf">&mdash;</b> จาก <b>Myfxbook</b> ซึ่งอ่านจากบัญชีโดยตรง &middot; ยอดเงินในบัญชีตั้งเป็นส่วนตัว แสดงเฉพาะเปอร์เซ็นต์และสถิติ &middot; <b>ผลการดำเนินงานในอดีตไม่ได้รับประกันผลในอนาคต</b> การลงทุนมีความเสี่ยง เนื้อหานี้เป็นข้อมูลประกอบการศึกษา ไม่ใช่คำแนะนำการลงทุน</div>
         </div>
         <script>
-        /* ---------- PORT: ตั้งค่าการ์ดผลงานพอร์ตจริง ----------
-           PORT_OID   = เลขท้าย ?accountOid= ในโค้ด widget ของ Myfxbook
-           PORT_TYPE  = เลขท้าย &type= (แบบของ widget)
-           PORT_URL   = ลิงก์หน้าบัญชีสาธารณะบน Myfxbook
-           PORT_SYS   = ชื่อระบบที่รันในบัญชีนี้ (หนึ่งบัญชี = หนึ่งระบบ)
-           PORT_START = วันเริ่มเดินบัญชี  (ว่าง = ไม่โชว์ช่องนี้)
-           PORT_OID หรือ PORT_URL ว่าง -> การ์ดไม่ขึ้นเลย ไม่มีกรอบเปล่าค้างบนหน้า */
+        /* ---------- PORT: การ์ดผลงานพอร์ตจริง ----------
+           ตัวเลขในบล็อก ST คัดลอกมาจากหน้าบัญชีบน Myfxbook ด้วยมือ -> ไม่อัปเดตเอง
+           อัปเมื่อไหร่ให้แก้ ST ทั้งก้อนพร้อมกัน แล้วแก้ ASOF ด้วยเสมอ
+           (วันที่บนการ์ดคือสิ่งเดียวที่บอกคนอ่านว่าตัวเลขสดแค่ไหน ห้ามลืม)
+           ถ้าอยากให้อัปเดตเอง -> ea/JPT_PortExport/ ใน jptrustdocs พร้อมใช้แล้ว
+           URL = หน้าบัญชีสาธารณะ ใช้เป็นปุ่มตรวจสอบต้นทาง */
         (function(){
-          var PORT_OID   = '12211037';
-          var PORT_TYPE  = '4';
-          var PORT_URL   = 'https://www.myfxbook.com/members/Papahfx/inv4433/12211037';
-          var PORT_SYS   = 'INV4433';
-          var PORT_START = '';
+          var URL  = 'https://www.myfxbook.com/members/Papahfx/inv4433/12211037';
+          var SYS  = 'INV4433';
+          var ASOF = '20 ก.ย. 2026';
+          var ST = {
+            gain:12.10,        /* Gain % สะสม */
+            dd:34.75,          /* Drawdown สูงสุด % */
+            monthly:7.62,      /* ผลตอบแทนเฉลี่ยต่อเดือน % */
+            trades:4950,
+            win:58.9,          /* % ไม้ที่ชนะ */
+            pf:1.03            /* Profit Factor */
+          };
 
           var card=document.getElementById('mkPort');
           if(!card) return;
-          if(!PORT_OID || !PORT_URL) return;
-          var img=document.getElementById('pfImg');
-          var lk=document.getElementById('pfLink');
-          if(!img||!lk) return;
-          /* widget เป็นไฟล์ภาพ ไม่มีเลขเวอร์ชันในลิงก์ -> เบราว์เซอร์แคชค้างได้
-             ต่อ v= รายชั่วโมงให้ไปหยิบของใหม่ (Myfxbook อัปทุก 2-4 ชม.) */
-          var d=new Date();
-          var pad=function(n){return (n<10?'0':'')+n;};
-          var v=''+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+pad(d.getHours());
-          img.onerror=function(){ card.remove(); };   /* โหลดไม่ได้ = ถอดการ์ดเงียบๆ ตามแบบการ์ดอื่นในหน้านี้ */
-          img.src='https://widget.mfbcdn.net/widget/widget.png?accountOid='+PORT_OID+'&type='+PORT_TYPE+'&v='+v;
-          lk.href=PORT_URL;
-          var sys=document.getElementById('pfSys'); if(sys) sys.textContent=PORT_SYS;
-          var st=document.getElementById('pfStart');
-          if(st){ if(PORT_START) st.textContent=PORT_START; else { var w=st.closest('span'); if(w) w.remove(); } }
+          var grid=document.getElementById('pfGrid'), bars=document.getElementById('pfBars');
+          if(!grid||!bars) return;
+
+          var esc=(window.mkEsc||function(x){return String(x);});
+          var num=function(n){ return n.toLocaleString('en-US'); };
+          var sign=function(n){ return (n>0?'+':'')+n.toFixed(2)+'%'; };
+
+          var tiles=[
+            {k:'CUMULATIVE GAIN', v:sign(ST.gain),        c:(ST.gain>=0?'up':'down'), s:'ตั้งแต่เปิดบัญชี'},
+            {k:'MAX DRAWDOWN',    v:ST.dd.toFixed(2)+'%', c:'down',                   s:'ลดลงจากจุดสูงสุดระหว่างทาง'},
+            {k:'PER MONTH',       v:sign(ST.monthly),     c:(ST.monthly>=0?'up':''),  s:'เฉลี่ยต่อเดือน'},
+            {k:'TRADES',          v:num(ST.trades),       c:'',                       s:'จำนวนไม้ทั้งหมด'},
+            {k:'WIN RATE',        v:ST.win.toFixed(1)+'%',c:'',                       s:'สัดส่วนไม้ที่ปิดกำไร'},
+            {k:'PROFIT FACTOR',   v:ST.pf.toFixed(2),     c:'',                       s:'กำไรรวม ÷ ขาดทุนรวม'}
+          ];
+          grid.innerHTML = tiles.map(function(t){
+            return '<div class="pf-t"><div class="k">'+t.k+'</div>'+
+                   '<div class="v '+t.c+'">'+t.v+'</div>'+
+                   '<div class="s">'+esc(t.s)+'</div></div>';
+          }).join('');
+
+          /* สองแท่งใช้สเกลเดียวกันเสมอ ไม่งั้นเทียบกันไม่ได้ */
+          var top=Math.max(ST.gain, ST.dd)*1.12;
+          var row=function(lb,val,col){
+            var w=Math.max(0,Math.min(100, val/top*100));
+            return '<div class="pf-bar"><span class="lb">'+esc(lb)+'</span>'+
+                   '<span class="tr"><i style="width:'+w.toFixed(1)+'%;background:'+col+'"></i></span>'+
+                   '<span class="nm" style="color:'+col+'">'+val.toFixed(2)+'%</span></div>';
+          };
+          bars.innerHTML = row('กำไรสะสม', ST.gain, '#2E9E5B') + row('ขาดทุนสูงสุด', ST.dd, '#C6472E');
+
+          var lk=document.getElementById('pfLink'); if(lk) lk.href=URL;
+          var sys=document.getElementById('pfSys'); if(sys) sys.textContent=SYS;
+          var ao=document.getElementById('pfAsOf'); if(ao) ao.textContent=ASOF;
+          var st=document.getElementById('pfStart'); if(st){ var w=st.closest('span'); if(w) w.remove(); }
           card.hidden=false;
         })();
         </script>
