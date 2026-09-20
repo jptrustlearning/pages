@@ -2047,6 +2047,60 @@ body > * { position: relative; z-index: 1; }
 .cal-cell.program.done { border-color: rgba(46,159,95,0.45); }
 .cal-cell.today.done .cal-status { color: var(--emerald-dk); }
 .cal-cell.missed .cal-status { color: #B23A3A; opacity: 0.75; }
+
+/* ===== A150 · task anime — หัวข้อที่กดดูแอนิเมชันได้ + popup ===== */
+.dm-task.has-anim {
+  align-items: center; cursor: pointer; margin: 4px 0 8px;
+  padding: 10px 10px 10px 12px; border-radius: 12px;
+  border: 1px solid rgba(212,175,55,0.55);
+  background: linear-gradient(135deg, rgba(244,228,186,0.34), rgba(244,228,186,0.12));
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s, border-color 0.2s;
+}
+.dm-task.has-anim:last-child { border-bottom: 1px solid rgba(212,175,55,0.55); }
+.dm-task.has-anim:hover { border-color: var(--gold); }
+.dm-task.has-anim:active { transform: scale(0.985); }
+.dm-task.has-anim:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.dm-task.has-anim .dm-task-dot { margin-top: 0; }
+.dm-task-body { flex: 1; min-width: 0; }
+.dm-anim-tag {
+  display: block; margin-top: 3px;
+  font-family: 'Cinzel', serif; font-size: 0.62rem; font-weight: 600;
+  letter-spacing: 1.3px; text-transform: uppercase; color: var(--gold-deep);
+}
+.dm-anim-play {
+  flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #FFF5E1; background: linear-gradient(135deg, #722F37, #9C2B2B);
+  box-shadow: 0 3px 10px rgba(90,31,38,0.3);
+}
+.dm-anim-play svg { width: 17px; height: 17px; margin-left: 2px; }
+
+.anim-pop {
+  position: fixed; inset: 0; z-index: 1100; display: none;
+  background: #0d0508; opacity: 0; transition: opacity 0.22s;
+}
+.anim-pop.open { display: block; }
+.anim-pop.show { opacity: 1; }
+.anim-frame {
+  position: absolute; inset: 0;
+  transform: scale(0.94); transition: transform 0.35s cubic-bezier(0.2,0.9,0.3,1.1);
+}
+.anim-pop.show .anim-frame { transform: none; }
+.anim-frame iframe { display: block; width: 100%; height: 100%; border: 0; background: #0d0508; }
+.anim-back {
+  position: absolute; top: 10px; left: 10px; z-index: 2;
+  display: flex; align-items: center; gap: 5px;
+  height: 36px; padding: 0 14px 0 9px; border-radius: 99px;
+  border: 1px solid rgba(212,175,55,0.55); background: rgba(26,10,14,0.84);
+  color: #F4E4BA; font-family: 'Anuphan', sans-serif; font-size: 0.86rem; font-weight: 600;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: background 0.3s, color 0.3s, border-color 0.3s;
+}
+.anim-back svg { width: 17px; height: 17px; }
+.anim-pop.ended .anim-back {
+  background: linear-gradient(90deg, #D4AF37, #F4E4BA); color: #1a0a0e; border-color: #F4E4BA;
+}
 </style>
   <!-- JP Trust hard auth-gate (redirect to login if no session) -->
   <script src="./jp-gate.js?v=1783134367"></script>
@@ -2278,6 +2332,14 @@ body > * { position: relative; z-index: 1; }
       </button>
     </div>
   </div>
+</div>
+<!-- ===== TASK ANIME POPUP (A150) ===== -->
+<div class="anim-pop" id="animPop" role="dialog" aria-modal="true" aria-label="แอนิเมชันประกอบหัวข้อ">
+  <button class="anim-back" id="animBack" type="button" onclick="closeTaskAnim()" aria-label="ย้อนกลับ" data-track="roadmap-anim back">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+    <span>ย้อนกลับ</span>
+  </button>
+  <div class="anim-frame" id="animFrameWrap"></div>
 </div>
 <!-- ===== ABOUT MODAL ===== -->
 <div class="about-modal" id="aboutModal" onclick="if(event.target===this) closeAboutModal()">
@@ -3063,9 +3125,18 @@ function openDayModal(day) {
   document.getElementById('dmGoal').textContent = mod.goal || '';
 
   const ul = document.getElementById('dmTasks');
-  ul.innerHTML = (mod.tasks || []).map(t =>
-    '<li class="dm-task"><span class="dm-task-dot"></span><span>' + escHtml(t) + '</span></li>'
-  ).join('');
+  // A150 — หัวข้อที่มีแอนิเมชันประกอบ (TASK_ANIMS) กดได้ → openTaskAnim()
+  ul.innerHTML = (mod.tasks || []).map((t, i) => {
+    const a = taskAnimFor(day, i);
+    if (!a) return '<li class="dm-task"><span class="dm-task-dot"></span><span>' + escHtml(t) + '</span></li>';
+    const call = 'openTaskAnim(' + Number(day) + ',' + i + ')';
+    return '<li class="dm-task has-anim" role="button" tabindex="0" data-track="roadmap-anim d' + Number(day) + '-t' + (i + 1) + '"' +
+      ' onclick="' + call + '" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();' + call + '}">' +
+      '<span class="dm-task-dot"></span>' +
+      '<span class="dm-task-body">' + escHtml(t) +
+        '<span class="dm-anim-tag">Animation &middot; ' + a.mins + ' min</span></span>' +
+      '<span class="dm-anim-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg></span></li>';
+  }).join('');
 
   document.getElementById('dmSrc').innerHTML =
     'ที่มา: <b>' + escHtml(mod.source || '') + '</b>';
@@ -3160,6 +3231,63 @@ async function dmSave(opts) {
 }
 
 // ========================================
+// TASK ANIME (A150) — หัวข้อที่มีแอนิเมชันประกอบ: แตะ → popup → เล่นเองทันที → ปุ่มย้อนกลับ
+// key = day → { index ของ task (เริ่ม 0) : { src, v (cache-bust), mins } }
+// รอบทดลอง: Day 1 หัวข้อแรก · ทำเพิ่ม = วางไฟล์ใน roadmap-anim/ แล้วเติมบรรทัดที่นี่
+// ========================================
+const TASK_ANIMS = {
+  '1': { 0: { src: 'roadmap-anim/d01-t1.html', v: '20260920a', mins: 1 } }
+};
+
+function taskAnimFor(day, idx) {
+  const d = TASK_ANIMS[String(day)];
+  return (d && d[idx]) ? d[idx] : null;
+}
+
+function openTaskAnim(day, idx) {
+  const a = taskAnimFor(day, idx);
+  if (!a) return;
+  const pop = document.getElementById('animPop');
+  const wrap = document.getElementById('animFrameWrap');
+  clearTimeout(pop._closeT);
+  wrap.innerHTML = '';
+  pop.classList.remove('ended');
+  pop.classList.add('open');
+  const f = document.createElement('iframe');
+  f.id = 'animFrame';
+  f.title = 'แอนิเมชันประกอบหัวข้อ';
+  wrap.appendChild(f);
+  f.src = a.src + '?v=' + a.v;   // ตั้ง src หลัง appendChild เสมอ (iOS Safari iframe ว่าง — บทเรียนเดียวกับ modal ใน Lab)
+  requestAnimationFrame(() => requestAnimationFrame(() => pop.classList.add('show')));
+  try { if (window.JPTtrack) window.JPTtrack('tool_open', 'roadmap-anim d' + day + '-t' + (idx + 1)); } catch (e) {}
+}
+
+function closeTaskAnim(opts) {
+  const pop = document.getElementById('animPop');
+  if (!pop || !pop.classList.contains('open')) return;
+  pop.classList.remove('show');
+  clearTimeout(pop._closeT);
+  pop._closeT = setTimeout(() => {
+    pop.classList.remove('open', 'ended');
+    document.getElementById('animFrameWrap').innerHTML = '';   // ทิ้ง iframe = หยุด timer ทั้งหมดของแอนิเมชัน
+  }, 230);
+  if (opts && opts.toJournal) {
+    const ta = document.getElementById('dmJournal');
+    if (ta) setTimeout(() => ta.scrollIntoView({ block: 'center', behavior: 'smooth' }), 260);
+  }
+}
+
+// ข้อความจากไฟล์แอนิเมชัน: ended = เล่นจบ (ปุ่มย้อนกลับเปลี่ยนเป็นสีทอง) · close = ผู้ใช้กด "กลับไปเขียน"
+window.addEventListener('message', (ev) => {
+  const d = ev.data;
+  if (!d || d.type !== 'jptAnim') return;
+  const f = document.getElementById('animFrame');
+  if (!f || ev.source !== f.contentWindow) return;
+  if (d.ev === 'close') closeTaskAnim({ toJournal: !!d.journal });
+  else if (d.ev === 'ended') document.getElementById('animPop').classList.add('ended');
+});
+
+// ========================================
 // PLANNING DASHBOARDS (placeholder for future)
 // ========================================
 function openPlanningDashboard(type) {
@@ -3252,6 +3380,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Close modals with Escape
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
+    const ap = document.getElementById('animPop');   // A150 — popup แอนิเมชันอยู่บนสุด ปิดตัวนี้ก่อน
+    if (ap && ap.classList.contains('open')) { closeTaskAnim(); return; }
     const about = document.getElementById('aboutModal');
     if (about && about.classList.contains('open')) closeAboutModal();
     const rms = document.getElementById('roadmapSettingsModal');
