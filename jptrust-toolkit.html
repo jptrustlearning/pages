@@ -587,6 +587,32 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 .mk-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:14px;align-items:start}
 @media(max-width:1080px){.mk-grid{grid-template-columns:1fr}}
 .mk-cap{font-size:11.5px;color:var(--muted);font-weight:300;margin-top:10px;line-height:1.55}
+/* ---- Risk-on / Risk-off: เข็มวัดความอยากเสี่ยง + คู่ต่อสู้ที่เป็นที่มาของคะแนน (A134) ---- */
+#mkRisk{scroll-margin-top:70px;margin-top:14px;--ron:#2E7D4F;--roff:#2C6E9E}
+.mkr-grid{display:grid;grid-template-columns:minmax(0,248px) minmax(0,1fr);gap:20px;align-items:start}
+.mkr-gauge svg{width:100%;max-width:248px;height:auto;display:block;margin:0 auto}
+.mkr-v{font-family:var(--f-n);font-size:33px;fill:var(--maroon)}
+.mkr-nd{stroke:var(--maroon);stroke-width:2.4;stroke-linecap:round}
+.mkr-e{font-family:var(--f-d);font-size:9.5px;letter-spacing:1.2px;font-weight:600}
+.mkr-zone{text-align:center;font-size:13px;font-weight:600;margin-top:1px;line-height:1.4}
+.mkr-say{font-size:13px;color:var(--ink);font-weight:300;line-height:1.7;margin:0 0 12px}
+.mkr-say b{font-weight:600;color:var(--maroon)}
+.mkr-p{padding:9px 0;border-top:1px solid rgba(212,175,55,.18)}
+.mkr-p:first-child{border-top:0;padding-top:0}
+.mkr-pn{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink);font-weight:500}
+.mkr-pn i{font-style:normal;color:var(--muted);font-weight:300}
+.mkr-pn em{margin-left:auto;font-style:normal;font-size:10.5px;color:var(--muted);font-weight:300;white-space:nowrap}
+.mkr-pb{position:relative;height:8px;border-radius:99px;background:rgba(61,50,40,.07);margin:7px 0 5px}
+.mkr-pb .mid{position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:rgba(61,50,40,.22)}
+.mkr-pb i{position:absolute;top:0;bottom:0;border-radius:99px}
+.mkr-pb i.on{left:50%;width:calc(var(--f) * 50%);background:var(--ron)}
+.mkr-pb i.off{right:50%;width:calc(var(--f) * 50%);background:var(--roff)}
+.mkr-pd{font-size:11.5px;color:var(--muted);font-weight:300;line-height:1.55}
+.mkr-pd b{font-weight:600}
+.mkr-pd b.on{color:var(--ron)} .mkr-pd b.off{color:var(--roff)} .mkr-pd b.mid{color:var(--muted)}
+.mkr-miss{font-size:11.5px;color:var(--muted);font-weight:300;margin-top:10px}
+@media(max-width:820px){.mkr-grid{grid-template-columns:1fr;gap:16px}.mkr-gauge svg{max-width:220px}}
+@media(max-width:560px){#mkRisk .card-h{flex-wrap:wrap}#mkRisk .card-h .tools{margin-left:0;width:100%}}
 /* ---- ส่วนต่างราคาทอง COMEX เทียบลอนดอน (การ์ด #mkBasis) ---- */
 #mkBasis{scroll-margin-top:70px}
 /* จุดบนแผนที่: วงกระเพื่อมวนซ้ำ นิวยอร์กกับกรุงเทพฯ สลับกันคนละครึ่งรอบ
@@ -997,6 +1023,21 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
           </div>
         </div>
 
+        <!-- Risk-on / Risk-off — เข็มวัดความอยากเสี่ยงของตลาด + คู่ต่อสู้ 4 คู่ที่เป็นที่มาของคะแนน (A134)
+             ข้อมูลมาจากท่อที่มีอยู่แล้วทั้งหมด (หุ้น mini CSV · ทอง gold_prices.csv · ค่าเงิน ECB) ไม่มีตัวเลขพิมพ์มือ -->
+        <div class="card" id="mkRisk">
+          <div class="card-h">
+            <h3>ตลาดโยกเงินไปไหน · Risk-on / Risk-off</h3>
+            <div class="tools" id="mkrPer">
+              <button type="button" class="mk-chip" data-n="1">1 วัน</button>
+              <button type="button" class="mk-chip on" data-n="5">5 วัน</button>
+              <button type="button" class="mk-chip" data-n="10">10 วัน</button>
+            </div>
+          </div>
+          <div id="mkrBody"><div class="empty-slot"><div class="e-t">RISK</div><div class="e-d">กำลังอ่านราคาปิดล่าสุด…</div></div></div>
+          <div class="mk-cap" id="mkrCap"></div>
+        </div>
+
         <div class="sec-head">
           <h2 id="ovTitle">โซนแนวรับ–แนวต้านทองคำ</h2>
           <span class="asof" id="asOf">กำลังโหลด…</span>
@@ -1246,6 +1287,7 @@ const MENU=[
   {cap:'ภาพรวม',items:[
     {t:'Dashboard ทอง&หุ้น',ic:'grid',dash:true},
     {t:'ค้นหาหุ้น S&P 500',ic:'chart',mk:1,to:'heroScanner',chip:'ใหม่'},
+    {t:'Risk-on / Risk-off',ic:'spark',mk:1,to:'mkRisk',chip:'ใหม่'},
     {t:'เวลาตลาด Forex',ic:'clock',mk:1,to:'mkSes',chip:'ใหม่'},
     {t:'ปฏิทินข่าว US',ic:'clock',mk:1,to:'mkCal',chip:'ใหม่'},
     {t:'Heatmap หุ้น · ทองคำ',ic:'chart',mk:1,chip:'ใหม่'},
@@ -1641,8 +1683,8 @@ function boot(){
     if(!px.c.length) throw new Error('อ่านไม่ออก');
     if(px.d[px.d.length-1] < LAST.date) throw new Error('เก่ากว่าที่มีอยู่');
     PX_RAW={d:px.d.slice(),c:px.c.slice()};        // ก่อน applySpotBasis — ผลตอบแทนรายเดือนต้องคิดจากราคาดิบ
-    PX=px; SPOT=spot; applySpotBasis(); renderAll(); setStatus('live'); mkGoldRender();
-  }).catch(()=>{ setStatus('stale'); if(!PX_RAW) PX_RAW={d:[],c:[]}; mkGoldRender(); });
+    PX=px; SPOT=spot; applySpotBasis(); renderAll(); setStatus('live'); mkGoldRender(); mkrRender();
+  }).catch(()=>{ setStatus('stale'); if(!PX_RAW) PX_RAW={d:[],c:[]}; mkGoldRender(); mkrRender(); });
 }
 
 /* ---------- KPI ---------- */
@@ -1822,11 +1864,20 @@ function mkParseStocks(miniT,mapT){
   if(list.length<100) throw new Error('ข้อมูลหุ้นน้อยผิดปกติ');
   return {asof,list};
 }
-function mkLoadStocks(){
-  if(mkState!=='idle') return; mkState='loading';
+/* โหลด CSV หุ้นครั้งเดียว ใช้ร่วมกันระหว่าง heatmap กับการ์ด Risk-on/Risk-off
+   (สองใบเรียกพร้อมกันได้ ได้ promise ก้อนเดียว = ดาวน์โหลดรอบเดียว) · ล้มแล้วล้าง cache ให้ลองใหม่ได้ */
+let MK_P=null;
+function mkData(){
+  if(MK_P) return MK_P;
   const txt=u=>fetch(u,{cache:'no-cache'}).then(r=>r.ok?r.text():Promise.reject(new Error('HTTP '+r.status)));
   const map=()=>txt(MK_MAPS[0]).catch(()=>txt(MK_MAPS[1]));
-  Promise.all([txt(MK_MINI),map()]).then(([a,b])=>{MK=mkParseStocks(a,b);mkState='ok';mkRenderStocks();})
+  MK_P=Promise.all([txt(MK_MINI),map()]).then(([a,b])=>mkParseStocks(a,b));
+  MK_P.catch(()=>{MK_P=null;});
+  return MK_P;
+}
+function mkLoadStocks(){
+  if(mkState!=='idle') return; mkState='loading';
+  mkData().then(d=>{MK=d;mkState='ok';mkRenderStocks();})
   .catch(e=>{mkState='idle';
     const msg='<div class="empty-slot"><div class="e-t">S&amp;P 500</div><div class="e-d">ดึงข้อมูลหุ้นไม่สำเร็จ ('+mkEsc(e&&e.message||'เครือข่าย')+') — ลองรีเฟรชอีกครั้ง</div></div>';
     document.getElementById('mkBars').innerHTML=msg; document.getElementById('mkTree').innerHTML='';
@@ -2051,12 +2102,20 @@ function mkStrColor(v,cl){                       // เหมือน mkColor()
   const N=[122,113,108], T=t>=0?[30,138,76]:[196,58,40];
   return 'rgb('+N.map((n,i)=>Math.round(n+(T[i]-n)*a)).join(',')+')';
 }
-function mkStrLoad(){
-  if(mkStrState!=='idle') return; mkStrState='loading';
+/* ดึงอัตรา ECB ครั้งเดียว ใช้ร่วมกันระหว่างแผงความแข็ง-อ่อน กับการ์ด Risk-on/Risk-off */
+let MK_STR_P=null;
+function mkStrData(){
+  if(MK_STR_P) return MK_STR_P;
   const t=new Date(); t.setUTCDate(t.getUTCDate()-50);
   const q='?from='+t.toISOString().slice(0,10)+'&quotes='+MK_STR_CCY.filter(c=>c!=='EUR').join(',').toLowerCase();   // EUR คือฐานของ ECB — parser ใส่ EUR=1 ให้จากฟิลด์ base
   const get=u=>fetch(u+q).then(r=>r.ok?r.json():Promise.reject(new Error('HTTP '+r.status))).then(mkStrParse);
-  get(MK_STR_API[0]).then(S=>(S.src='ECB',S)).catch(()=>get(MK_STR_API[1]).then(S=>(S.src='BLEND',S)))
+  MK_STR_P=get(MK_STR_API[0]).then(S=>(S.src='ECB',S)).catch(()=>get(MK_STR_API[1]).then(S=>(S.src='BLEND',S)));
+  MK_STR_P.catch(()=>{MK_STR_P=null;});
+  return MK_STR_P;
+}
+function mkStrLoad(){
+  if(mkStrState!=='idle') return; mkStrState='loading';
+  mkStrData()
   .then(S=>{MK_STR=S;mkStrState='ok';mkStrRender();})
   .catch(e=>{mkStrState='idle';
     document.getElementById('mkStr').innerHTML='<div class="empty-slot"><div class="e-t">CURRENCIES</div><div class="e-d">ดึงอัตราแลกเปลี่ยนไม่สำเร็จ ('+mkEsc(e&&e.message||'เครือข่าย')+') — ลองรีเฟรชอีกครั้ง</div></div>';});
@@ -2324,6 +2383,169 @@ const JAD_SCENES=[
   document.addEventListener('visibilitychange',sync);
   if('IntersectionObserver' in window){ seen=false; new IntersectionObserver(es=>{ seen=es.some(e=>e.isIntersecting); sync(); },{threshold:.15}).observe(ad); }
   bar.classList.add('run'); sync();
+})();
+
+/* =====================================================================
+   RISK-ON / RISK-OFF — "ตลาดโยกเงินไปไหน" (A134)
+   เข็มวัด 0–100 + คู่ต่อสู้ 4 คู่ที่เป็น "ที่มา" ของคะแนน — ตั้งใจให้เกจอธิบายตัวเองได้
+   ทุกตัวเลขคำนวณสดจากท่อที่หน้านี้มีอยู่แล้ว ไม่มีค่าพิมพ์มือสักตัว:
+     หุ้น    mkData()     = mini_sp500_last14days.csv + master_map.csv (ก้อนเดียวกับ heatmap)
+     ทอง    PX_RAW       = gold_prices.csv · GC=F · ตัดแถวเสาร์-อาทิตย์ (ก้อนเดียวกับ heatmap ทอง)
+     ค่าเงิน mkStrData()  = อัตราอ้างอิง ECB ผ่าน Frankfurter (ก้อนเดียวกับแผงความแข็ง-อ่อน)
+   ⚠️ ไม่มีขาพันธบัตร/เครดิต/VIX เพราะยังไม่มีฟีดฟรีที่ยิงจากเบราว์เซอร์ได้ — เขียนกำกับไว้ใต้การ์ด
+   ขาไหนข้อมูลไม่มา = ตัดขานั้นแล้วถ่วงน้ำหนักใหม่จากขาที่เหลือ + บอกว่าขาดอะไร (ไม่เดาแทน)
+   สเกล = clamp เชิงเส้น ไม่ใช่ tanh เพราะต้องเขียนบนการ์ดได้ว่า "ห่างกันเท่าไหร่ = เต็มสเกล"
+   ===================================================================== */
+const MKR_CYC=['Consumer Discretionary','Industrials','Financials','Information Technology','Materials'];
+const MKR_DEF=['Consumer Staples','Utilities','Health Care'];
+/* พลังงาน · สื่อสาร · อสังหาฯ ไม่อยู่ทั้งสองฝั่ง — ขยับตามเรื่องเฉพาะตัว (น้ำมัน/ดอกเบี้ย) มากกว่าความอยากเสี่ยง */
+const MKR_SC={cyc:{1:1.0,5:2.0,10:3.0},gold:{1:1.5,5:3.0,10:4.5},fx:{1:.6,5:1.2,10:1.8},brd:25};
+const MKR_ZONE=[[28,'หลบเข้าที่ปลอดภัย','off'],[40,'เอียงไปฝั่งหลบภัย','off'],
+                [60,'ก้ำกึ่ง','mid'],[72,'เอียงไปฝั่งเสี่ยง','on'],[101,'เปิดรับความเสี่ยง','on']];
+const MKR_BAND=[[0,28,'#2C6E9E'],[28,40,'#7FA8C4'],[40,60,'#C9BFAE'],[60,72,'#86B394'],[72,100,'#2E7D4F']];
+const MKR_PER={1:'ช่วงวันทำการล่าสุด',5:'ช่วง 5 วันทำการล่าสุด',10:'ช่วง 10 วันทำการล่าสุด'};
+let MKR={n:5,mk:null,fx:null,errs:[]};
+
+const mkrCl=v=>Math.max(-1,Math.min(1,v));
+/* ดุมเข็มอยู่ที่ (120,96) — เข็มกวาดได้เฉพาะครึ่งบน ทุกอย่างที่วางใต้ y=100 จึงปลอดจากเข็มเสมอ */
+const mkrPt=(v,r)=>{const a=(180-v*1.8)*Math.PI/180;return [120+r*Math.cos(a),96-r*Math.sin(a)];};
+function mkrArc(v1,v2,r){const p=mkrPt(v1,r),q=mkrPt(v2,r);
+  return 'M'+p[0].toFixed(1)+' '+p[1].toFixed(1)+'A'+r+' '+r+' 0 0 1 '+q[0].toFixed(1)+' '+q[1].toFixed(1);}
+const mkrZone=g=>MKR_ZONE.find(z=>g<z[0])||MKR_ZONE[MKR_ZONE.length-1];
+
+function mkrStocks(n){
+  const D=MKR.mk; if(!D) return null;
+  const avg=a=>a.reduce((s,x)=>s+x,0)/a.length, bySec={}, all=[];
+  for(const s of D.list){ const v=s.r[n]; if(v==null) continue;
+    (bySec[s.sec]=bySec[s.sec]||[]).push(v); all.push(v); }
+  if(all.length<100) return null;
+  /* ถ่วงน้ำหนักเท่ากันรายกลุ่ม ไม่ใช่รายตัว — ไม่งั้นกลุ่มที่มีหุ้นเยอะ (การเงิน) กินน้ำหนักทั้งฝั่ง */
+  const grp=L=>{const a=L.map(k=>bySec[k]).filter(x=>x&&x.length).map(avg); return a.length===L.length?avg(a):null;};
+  return {cyc:grp(MKR_CYC),def:grp(MKR_DEF),mkt:avg(all),
+          up:all.filter(v=>v>0).length,dn:all.filter(v=>v<0).length,n:all.length,asof:D.asof};
+}
+function mkrGold(n,asof){
+  const P=PX_RAW; if(!P||!P.d||!P.d.length) return null;
+  const d=[],c=[];
+  for(let i=0;i<P.d.length;i++){
+    const wd=new Date(P.d[i]+'T00:00:00Z').getUTCDay(); if(wd===0||wd===6) continue;   // แถวเสาร์-อาทิตย์ของฟิวเจอร์สไม่ใช่ราคาปิดวัน
+    if(asof&&P.d[i]>asof) continue;                                                    // ตัดให้จบวันเดียวกับหุ้น ไม่งั้นเทียบคนละช่วง
+    d.push(P.d[i]); c.push(P.c[i]);
+  }
+  const L=c.length-1; if(L<n) return null;
+  if(asof&&(new Date(asof+'T00:00:00Z')-new Date(d[L]+'T00:00:00Z'))/864e5>5) return null;  // ทองค้างหลายวัน = เทียบไม่ได้ ตัดขาทิ้ง
+  return {r:(c[L]/c[L-n]-1)*100,last:d[L],ref:d[L-n]};
+}
+function mkrFx(n){
+  const S=MKR.fx; if(!S) return null;
+  const D=S.dates, L=D.length-1; if(L<n) return null;
+  const ch=c=>{const a=mkStrVal(S,D[L],c),b=mkStrVal(S,D[L-n],c); return (a>0&&b>0)?(a/b-1)*100:null;};
+  const aud=ch('AUD'),jpy=ch('JPY'),chf=ch('CHF');
+  if(aud==null||jpy==null||chf==null) return null;
+  return {aud,safe:(jpy+chf)/2,jpy,chf,last:D[L],ref:D[L-n]};
+}
+
+/* คู่ต่อสู้: m เป็นบวก = ฝั่งเสี่ยงชนะ · s = คะแนน −100…+100 ของคู่นั้น */
+function mkrLegs(n){
+  const S=mkrStocks(n), G=S?mkrGold(n,S.asof):null, F=mkrFx(n), legs=[], miss=[];
+  if(S&&S.cyc!=null&&S.def!=null){
+    const m=S.cyc-S.def, sc=MKR_SC.cyc[n];
+    legs.push({w:35,m,s:mkrCl(m/sc)*100,a:'หุ้นวัฏจักร',b:'หุ้นหลบภัย',sc:sc,
+      d:'วัฏจักร '+mkPct(S.cyc)+' · หลบภัย '+mkPct(S.def),
+      say:(m>=0?'กลุ่มวัฏจักรนำกลุ่มหลบภัย ':'กลุ่มหลบภัยนำกลุ่มวัฏจักร ')+Math.abs(m).toFixed(2)+'%'});
+  } else miss.push('หุ้นรายกลุ่ม');
+  if(S&&G){
+    const m=S.mkt-G.r, sc=MKR_SC.gold[n];
+    legs.push({w:25,m,s:mkrCl(m/sc)*100,a:'หุ้นสหรัฐฯ',b:'ทองคำ',sc:sc,
+      d:'หุ้นเฉลี่ยทั้งตลาด '+mkPct(S.mkt)+' · ทอง '+mkPct(G.r),
+      say:(m>=0?'หุ้นแรงกว่าทอง ':'ทองแรงกว่าหุ้น ')+Math.abs(m).toFixed(2)+'%'});
+  } else miss.push('ทองคำ');
+  if(F){
+    const m=F.aud-F.safe, sc=MKR_SC.fx[n];
+    legs.push({w:20,m,s:mkrCl(m/sc)*100,a:'ดอลลาร์ออสเตรเลีย',b:'เยน + ฟรังก์',sc:sc,
+      d:'ออสซี่ '+mkPct(F.aud)+' · เยน '+mkPct(F.jpy)+' · ฟรังก์ '+mkPct(F.chf),
+      say:(m>=0?'ค่าเงินฝั่งเสี่ยงแข็งกว่าฝั่งหลบภัย ':'เยนกับฟรังก์แข็งกว่าออสซี่ ')+Math.abs(m).toFixed(2)+'%'});
+  } else miss.push('ค่าเงิน');
+  if(S&&S.up+S.dn>0){
+    const pct=S.up/(S.up+S.dn)*100, m=pct-50;
+    legs.push({w:20,m,s:mkrCl(m/MKR_SC.brd)*100,a:'หุ้นที่ขึ้น',b:'หุ้นที่ลง',sc:MKR_SC.brd,brd:1,
+      d:'ขึ้น '+S.up+' ตัว · ลง '+S.dn+' ตัว จาก '+S.n+' ตัว',
+      say:(m>=0?'หุ้นขึ้นมากกว่าหุ้นลง ':'หุ้นลงมากกว่าหุ้นขึ้น ')+Math.abs(S.up-S.dn)+' ตัว'});
+  }
+  return {legs,miss,S,G,F};
+}
+
+function mkrRender(){
+  const body=document.getElementById('mkrBody'), cap=document.getElementById('mkrCap'); if(!body) return;
+  const n=MKR.n, R=mkrLegs(n);
+  if(!R.legs.length){
+    const bad=MKR.errs.length;
+    body.innerHTML='<div class="empty-slot"><div class="e-t">RISK</div><div class="e-d">'
+      +(bad?'ดึงข้อมูล'+MKR.errs.join(' และ ')+'ไม่สำเร็จ — ลองรีเฟรชอีกครั้ง':'กำลังอ่านราคาปิดล่าสุด…')+'</div></div>';
+    if(cap) cap.textContent=''; return;
+  }
+  const tw=R.legs.reduce((a,x)=>a+x.w,0);
+  const g=Math.max(0,Math.min(100,Math.round(50+R.legs.reduce((a,x)=>a+x.w*x.s,0)/tw/2)));
+  const z=mkrZone(g), np=mkrPt(g,66);
+
+  const zc=z[2]==='on'?'#2E7D4F':z[2]==='off'?'#2C6E9E':'#8a7d6b';
+  let sv='<svg viewBox="0 0 240 136" role="img" aria-label="เข็มวัด Risk-on / Risk-off อยู่ที่ '+g+' จาก 100 — '+z[1]+'">';
+  for(const b of MKR_BAND) sv+='<path d="'+mkrArc(b[0]+(b[0]?0.7:0),b[1],84)+'" fill="none" stroke="'+b[2]+'" stroke-width="15"/>';
+  sv+='<text class="mkr-e" x="36" y="116" text-anchor="middle" fill="#2C6E9E">RISK-OFF</text>'
+    +'<text class="mkr-e" x="204" y="116" text-anchor="middle" fill="#2E7D4F">RISK-ON</text>'
+    +'<text class="mkr-v" x="120" y="130" text-anchor="middle">'+g+'</text>'
+    +'<line class="mkr-nd" x1="120" y1="96" x2="'+np[0].toFixed(1)+'" y2="'+np[1].toFixed(1)+'"/>'
+    +'<circle cx="120" cy="96" r="4.5" fill="var(--maroon)"/></svg>'
+    +'<div class="mkr-zone" style="color:'+zc+'">'+mkEsc(z[1])+'</div>';
+
+  const top=R.legs.slice().sort((a,b)=>Math.abs(b.s)-Math.abs(a.s)).slice(0,2);
+  /* ไม่พูดคำโซนซ้ำ — ป้ายใต้เกจบอกไปแล้ว บนมือถือสองอันอยู่ห่างกันไม่ถึงนิ้ว */
+  let say=MKR_PER[n]+' เข็มอยู่ที่ <b>'+g+'</b> จาก 100 · ตัวที่ดึงแรงที่สุดคือ '
+    +mkEsc(top[0].say)+(top[1]?' และ '+mkEsc(top[1].say):'');
+
+  let pr='';
+  for(const L of R.legs){
+    const side=L.s>=0?'on':'off', f=(Math.abs(L.s)/100).toFixed(3);
+    const win=Math.abs(L.s)<4?'<b class="mid">เสมอกัน</b>':'<b class="'+side+'">'+mkEsc(L.say)+'</b>';
+    pr+='<div class="mkr-p"><div class="mkr-pn"><span>'+mkEsc(L.a)+'</span><i>↔</i><span>'+mkEsc(L.b)+'</span>'
+      +'<em>'+L.w+'% · เต็มสเกลที่ '+(L.brd?'75%':L.sc.toFixed(1)+'%')+'</em></div>'
+      +'<div class="mkr-pb"><span class="mid"></span><i class="'+side+'" style="--f:'+f+'"></i></div>'
+      +'<div class="mkr-pd">'+mkEsc(L.d)+' · '+win+'</div></div>';
+  }
+  if(R.miss.length) pr+='<div class="mkr-miss">ยังไม่ได้นับ: '+mkEsc(R.miss.join(' · '))
+    +' — คะแนนคิดจาก '+R.legs.length+' คู่ที่เหลือ (ถ่วงน้ำหนักใหม่แล้ว)</div>';
+
+  body.innerHTML='<div class="mkr-grid"><div class="mkr-gauge">'+sv+'</div>'
+    +'<div><p class="mkr-say">'+say+'</p><div class="mkr-pairs">'+pr+'</div></div></div>';
+
+  if(cap){
+    const src=[];
+    if(R.S) src.push('หุ้น S&P 500 ปิด '+thDate(R.S.asof)+' ('+R.S.n+' ตัว)');
+    if(R.G) src.push('ทอง GC=F ปิด '+thDate(R.G.last));
+    if(R.F) src.push('ค่าเงินอ้างอิง ECB '+thDate(R.F.last));
+    cap.innerHTML='คะแนนรวม = ค่าเฉลี่ยถ่วงน้ำหนักของคู่ด้านบน แล้วแปลงเป็นสเกล 0–100 (50 = ก้ำกึ่ง) · '
+      +'แต่ละคู่เต็มสเกลเมื่อห่างกันถึงเกณฑ์ที่กำกับไว้ท้ายชื่อคู่ ห่างมากกว่านั้นไม่ทำให้คะแนนเกิน · '
+      +'กลุ่มพลังงาน สื่อสาร และอสังหาฯ ไม่ถูกนับในคู่แรก เพราะขยับตามเรื่องเฉพาะตัวมากกว่าความอยากเสี่ยงของตลาด · '
+      +(src.length?'ข้อมูล: '+src.join(' · ')+' · ':'')
+      +'<b style="font-weight:600">เกจนี้ไม่มีขาพันธบัตร เครดิต และ VIX</b> เพราะยังไม่มีฟีดฟรีที่ดึงได้จากหน้าเว็บ — '
+      +'อ่านเป็นภาพรวมความอยากเสี่ยงของตลาด ไม่ใช่สัญญาณซื้อขาย';
+  }
+}
+
+(function(){
+  if(!document.getElementById('mkRisk')) return;
+  document.getElementById('mkrPer').addEventListener('click',e=>{
+    const b=e.target.closest('.mk-chip'); if(!b) return;
+    document.querySelectorAll('#mkrPer .mk-chip').forEach(x=>x.classList.toggle('on',x===b));
+    MKR.n=+b.dataset.n; mkrRender();
+  });
+  /* CSV หุ้น ~350 KB — รอหน้าวาดเสร็จก่อน แล้วค่อยดึง (ก้อนเดียวกับที่ heatmap จะใช้ต่อ ไม่โหลดซ้ำ) */
+  const go=()=>{
+    mkData().then(d=>{MKR.mk=d;mkrRender();}).catch(()=>{MKR.errs.push('หุ้น');mkrRender();});
+    mkStrData().then(S=>{MKR.fx=S;mkrRender();}).catch(()=>{MKR.errs.push('ค่าเงิน');mkrRender();});
+  };
+  const idle=()=>('requestIdleCallback' in window)?requestIdleCallback(go,{timeout:3000}):setTimeout(go,700);
+  if(document.readyState==='complete') idle(); else window.addEventListener('load',idle,{once:true});
 })();
 
 /* =====================================================================
