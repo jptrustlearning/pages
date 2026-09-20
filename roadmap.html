@@ -2020,6 +2020,32 @@ body > * { position: relative; z-index: 1; }
 }
 
 
+
+/* ===== A133 · day modal content + calendar states ===== */
+.dm-topic { font-size: 0.82rem; color: var(--text-muted); margin-top: 6px; }
+.dm-tasks { margin: 0 0 18px; padding: 0; list-style: none; }
+.dm-task {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 9px 2px; line-height: 1.65; font-size: 0.95rem;
+  border-bottom: 1px solid rgba(212,175,55,0.16);
+}
+.dm-task:last-child { border-bottom: none; }
+.dm-task-dot {
+  flex-shrink: 0; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--gold); margin-top: 9px;
+}
+.dm-src {
+  font-size: 0.8rem; color: var(--text-muted);
+  margin-bottom: 20px; padding-left: 2px;
+}
+.dm-src b { color: var(--gold-deep); font-weight: 600; }
+.dm-minutes {
+  font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 1.2px;
+  color: var(--gold-deep); margin-left: 8px;
+}
+.cal-cell.program.done .cal-status { color: var(--emerald-dk); }
+.cal-cell.program.done { border-color: rgba(46,159,95,0.45); }
+.cal-cell.program.missed .cal-status { color: #B23A3A; opacity: 0.75; }
 </style>
   <!-- JP Trust hard auth-gate (redirect to login if no session) -->
   <script src="./jp-gate.js?v=1783134367"></script>
@@ -2212,6 +2238,46 @@ body > * { position: relative; z-index: 1; }
 
 
 <!-- ===== DAY DETAIL MODAL ===== -->
+<div class="day-modal" id="dayModal" onclick="if(event.target===this) closeDayModal()">
+  <div class="day-modal-inner">
+    <button class="dm-close" onclick="closeDayModal()" aria-label="ปิด">&#10005;</button>
+
+    <div class="day-modal-head">
+      <div class="dm-day-big" id="dmDayBig">01</div>
+      <div class="dm-head-meta">
+        <span class="dm-phase-tag phase-J" id="dmPhaseTag">Journal &amp; Justify</span>
+        <span class="dm-minutes" id="dmMinutes"></span>
+        <div class="dm-title" id="dmTitle">&mdash;</div>
+        <div class="dm-topic" id="dmTopic"></div>
+      </div>
+    </div>
+
+    <div class="dm-desc" id="dmGoal"></div>
+    <ul class="dm-tasks" id="dmTasks"></ul>
+    <div class="dm-src" id="dmSrc"></div>
+
+    <div class="dm-check-wrap" id="dmCheckWrap" onclick="dmToggleDone()">
+      <div class="dm-check"></div>
+      <div class="dm-check-label">ทำครบแล้ว</div>
+    </div>
+
+    <label class="dm-journal-label" for="dmJournal">Journal</label>
+    <textarea class="dm-journal" id="dmJournal"
+      placeholder="บันทึกสิ่งที่ทำ สิ่งที่คิด และสิ่งที่ยังไม่เข้าใจ"></textarea>
+    <div class="dm-journal-hint">บันทึกนี้เก็บไว้ในบัญชีของคุณ ใช้ทบทวนตอนปิดรอบ</div>
+    <div class="dm-journal-ts" id="dmJournalTs"></div>
+
+    <div class="dm-footer">
+      <button class="dm-nav" id="dmPrev" onclick="dmNav(-1)" aria-label="วันก่อนหน้า">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+      </button>
+      <button class="dm-save" onclick="dmSave()">บันทึก</button>
+      <button class="dm-nav" id="dmNext" onclick="dmNav(1)" aria-label="วันถัดไป">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
 <!-- ===== ABOUT MODAL ===== -->
 <div class="about-modal" id="aboutModal" onclick="if(event.target===this) closeAboutModal()">
   <div class="about-inner">
@@ -2352,6 +2418,7 @@ const CYCLE_META = {
 // STATE
 // ========================================
 let progress = {}; // { "1": {done: true, journal: "...", at: "..."}, ... }
+const PROGRESS_KEY = 'jpt_roadmap_progress_v1'; // local mirror (A133)
 let currentModalDay = null;
 
 // ========================================
@@ -2468,15 +2535,13 @@ function dayForToday() {
 }
 
 function getDayState(dayN) {
-  // Currently all days are LOCKED except today (per Joon's spec — content not built yet)
-  // Future: when content is built, switch logic to read from progress[]:
-  //   - past dates with progress.done = 'completed', without = 'missed'
-  //   - today = 'today'
-  //   - future = 'locked'
+  // A133 — reads progress[]: past + done = completed · past + not done = missed
   const today = startOfDay(new Date());
   const dDate = dateForDay(dayN);
   if (sameDate(today, dDate)) return 'today';
-  return 'locked';
+  const rec = progress[String(dayN)];
+  if (dDate < today) return (rec && rec.done) ? 'completed' : 'missed';
+  return (rec && rec.done) ? 'completed' : 'locked';
 }
 
 function getCurrentCycle() {
@@ -2700,10 +2765,13 @@ function renderMonthGrid(year, month, cycleStartDay, cycleEndDay) {
       click = `onclick="openDayModal(${programDay})"`;
       dataDay = ` data-day="${programDay}"`;
     } else if (inThisCycle) {
+      const dState = getDayState(programDay);
       cls += isJpDay ? ' program jp-day' : ' program';
+      if (dState === 'completed') cls += ' done';
+      else if (dState === 'missed') cls += ' missed';
       inner += `<div class="cal-day-label">Day ${programDay}</div>`;
-      // Small lock icon at the bottom — Joon prefers the inline indicator over a bg watermark
-      inner += `<div class="cal-status">${statusIconSvg('locked')}</div>`;
+      // Small status icon at the bottom — Joon prefers the inline indicator over a bg watermark
+      inner += `<div class="cal-status">${statusIconSvg(dState)}</div>`;
       click = `onclick="openDayModal(${programDay})"`;
       dataDay = ` data-day="${programDay}"`;
     } else if (inProgram) {
@@ -2845,7 +2913,7 @@ function onTodayClick() {
   if (t != null) {
     openDayModal(t);
   } else {
-    jptToast('🔒 Roadmap ยังไม่เริ่มหรือจบแล้ว — ตั้งค่าวันเริ่มต้นใหม่ได้ที่ปุ่ม ⚙️');
+    jptToast('Roadmap ยังไม่เริ่มหรือจบแล้ว — ตั้งค่าวันเริ่มต้นใหม่ได้ที่ปุ่มตั้งค่า');
   }
 }
 
@@ -2931,8 +2999,149 @@ function switchCycle(n) {
 // ========================================
 // DAY MODAL (currently locked — content coming later)
 // ========================================
+// ========================================
+// DAY CONTENT — 90 modules (A133)
+// Source: roadmap-90-modules.json (same-origin, static file in this repo)
+// ========================================
+let MODULES = null;
+let modulesPromise = null;
+
+function loadModules() {
+  if (modulesPromise) return modulesPromise;
+  modulesPromise = fetch('roadmap-90-modules.json?v=20260920')
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(j => {
+      const map = {};
+      (j.modules || []).forEach(m => { map[String(m.day)] = m; });
+      MODULES = map;
+      return MODULES;
+    })
+    .catch(e => {
+      console.warn('[roadmap] modules load failed:', e);
+      modulesPromise = null;   // allow a retry on the next tap
+      return null;
+    });
+  return modulesPromise;
+}
+
+const PHASE_TAG = {
+  J: 'Journal & Justify',
+  P: 'Plan & Power',
+  T: 'Trade & Trust'
+};
+
 function openDayModal(day) {
-  jptToast('🔒 Day ' + day + ' · เนื้อหากำลังพัฒนา เร็วๆ นี้');
+  if (!MODULES) {
+    jptToast('กำลังโหลดเนื้อหา Day ' + day + ' …');
+    loadModules().then(m => { if (m) openDayModal(day); else jptToast('โหลดเนื้อหาไม่สำเร็จ ลองใหม่อีกครั้ง'); });
+    return;
+  }
+  const mod = MODULES[String(day)];
+  if (!mod) { jptToast('ยังไม่มีเนื้อหาสำหรับ Day ' + day); return; }
+
+  currentModalDay = day;
+  const rec = progress[String(day)] || {};
+
+  document.getElementById('dmDayBig').textContent = String(day).padStart(2, '0');
+  const tag = document.getElementById('dmPhaseTag');
+  tag.className = 'dm-phase-tag phase-' + mod.phase;
+  tag.textContent = PHASE_TAG[mod.phase] || mod.phaseTitle || mod.phase;
+  document.getElementById('dmMinutes').textContent = (mod.minutes || 20) + ' MIN';
+  document.getElementById('dmTitle').textContent = mod.title || '';
+  document.getElementById('dmTopic').textContent =
+    'ชุดที่ ' + mod.block + ' · ' + mod.topic + '  ·  ' + (mod.cycleName || '');
+  document.getElementById('dmGoal').textContent = mod.goal || '';
+
+  const ul = document.getElementById('dmTasks');
+  ul.innerHTML = (mod.tasks || []).map(t =>
+    '<li class="dm-task"><span class="dm-task-dot"></span><span>' + escHtml(t) + '</span></li>'
+  ).join('');
+
+  document.getElementById('dmSrc').innerHTML =
+    'ที่มา: <b>' + escHtml(mod.source || '') + '</b>';
+
+  const wrap = document.getElementById('dmCheckWrap');
+  wrap.classList.toggle('checked', !!rec.done);
+
+  const ta = document.getElementById('dmJournal');
+  ta.value = rec.journal || '';
+  const ts = document.getElementById('dmJournalTs');
+  ts.textContent = rec.at ? ('บันทึกล่าสุด ' + formatThaiDate(new Date(rec.at))) : '';
+
+  document.getElementById('dmPrev').disabled = (day <= 1);
+  document.getElementById('dmNext').disabled = (day >= ROADMAP_CONFIG.totalDays);
+
+  const modal = document.getElementById('dayModal');
+  modal.classList.add('open');
+  const inner = modal.querySelector('.day-modal-inner');
+  if (inner) inner.scrollTop = 0;   // always open at the head, not where we left off
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDayModal() {
+  document.getElementById('dayModal').classList.remove('open');
+  document.body.style.overflow = '';
+  currentModalDay = null;
+}
+
+function escHtml(t) {
+  return String(t).replace(/[&<>"]/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+
+function dmToggleDone() {
+  document.getElementById('dmCheckWrap').classList.toggle('checked');
+}
+
+function dmNav(step) {
+  const d = currentModalDay;
+  if (d == null) return;
+  const next = d + step;
+  if (next < 1 || next > ROADMAP_CONFIG.totalDays) return;
+  dmSave({ silent: true, keepOpen: true }).then(() => openDayModal(next));
+}
+
+// Update one calendar cell in place — avoids a full re-render,
+// which would reset the month slider (see A71 §5).
+function refreshDayCell(day) {
+  const st = getDayState(day);
+  document.querySelectorAll('[data-day="' + day + '"]').forEach(el => {
+    el.classList.remove('done', 'missed');
+    if (st === 'completed') el.classList.add('done');
+    else if (st === 'missed') el.classList.add('missed');
+    const s = el.querySelector('.cal-status');
+    if (s) s.innerHTML = statusIconSvg(st);
+  });
+}
+
+async function dmSave(opts) {
+  opts = opts || {};
+  const day = currentModalDay;
+  if (day == null) return;
+  const key = String(day);
+  const rec = progress[key] || {};
+  rec.done = document.getElementById('dmCheckWrap').classList.contains('checked');
+  rec.journal = document.getElementById('dmJournal').value || '';
+  rec.at = new Date().toISOString();
+  if (!rec.done && !rec.journal) delete progress[key];
+  else progress[key] = rec;
+
+  try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress)); } catch (e) {}
+
+  let cloud = false;
+  if (window.JPSettings && typeof window.JPSettings.patch === 'function') {
+    try {
+      // CRITICAL: patch() not save() — save() overwrites the whole data column
+      await window.JPSettings.patch({ roadmap: progress });
+      cloud = true;
+    } catch (e) { console.warn('[roadmap] save error:', e); }
+  }
+
+  refreshDayCell(day);
+  if (!opts.silent) {
+    jptToast(cloud ? 'บันทึกแล้ว' : 'บันทึกในเครื่องแล้ว · เข้าระบบเพื่อซิงก์');
+  }
+  if (!opts.keepOpen) closeDayModal();
 }
 
 // ========================================
@@ -2970,11 +3179,20 @@ function closeAboutModal() {
 // LOAD ON START
 // ========================================
 async function loadProgress() {
+  // Local mirror first, so the calendar is correct even when signed out (A133)
+  try {
+    const raw = localStorage.getItem(PROGRESS_KEY);
+    if (raw) {
+      const p = JSON.parse(raw);
+      if (p && typeof p === 'object') progress = p;
+    }
+  } catch (e) {}
   if (!window.JPSettings) return;
   try {
     const data = await window.JPSettings.load();
-    if (data && data.roadmap) {
-      progress = data.roadmap;
+    if (data && data.roadmap && Object.keys(data.roadmap).length) {
+      progress = data.roadmap;   // cloud wins when it has content
+      try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress)); } catch (e) {}
       console.log('[roadmap] loaded progress from cloud');
     }
     // Pull saved roadmap start date from cloud (overrides localStorage if newer)
@@ -2998,6 +3216,8 @@ async function loadProgress() {
 // INIT
 // ========================================
 document.addEventListener('DOMContentLoaded', async () => {
+  // Day content — fire early, don't block first paint (A133)
+  loadModules();
   // Load progress + start date from cloud first (best-effort)
   await loadProgress();
   // Render with current dates
@@ -3021,6 +3241,8 @@ document.addEventListener('keydown', (e) => {
     if (about && about.classList.contains('open')) closeAboutModal();
     const rms = document.getElementById('roadmapSettingsModal');
     if (rms && rms.classList.contains('show')) closeRoadmapSettings();
+    const dm = document.getElementById('dayModal');
+    if (dm && dm.classList.contains('open')) closeDayModal();
   }
 });
 </script>
