@@ -498,26 +498,12 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 .mchip.alt{background:linear-gradient(135deg,#8B2252,#722F37);color:var(--gold-l)}
 .mchip.free{background:linear-gradient(135deg,var(--gold),#b8901f);color:#231016}
 
-/* ---- ผลงานพอร์ตจริงที่รัน EA (#mkPort · widget ภาพจาก Myfxbook) ---- */
-#mkPort{margin-top:14px;scroll-margin-top:70px}
-.pf-badge{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;
-  padding:4px 9px;border-radius:999px;background:linear-gradient(135deg,var(--maroon),var(--maroon2));
-  color:var(--gold-l);white-space:nowrap}
-.pf-badge i{width:6px;height:6px;border-radius:50%;background:var(--gold);display:block}
-.pf-meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin:10px 0 14px;font-size:12.5px;color:var(--muted);font-weight:300}
-.pf-meta b{color:var(--ink);font-weight:500}
-.pf-tag{margin:-4px 0 14px;padding:9px 12px;border-radius:10px;font-size:12px;line-height:1.6;
-  color:var(--ink);background:rgba(212,175,55,.10);border:1px solid var(--line)}
-.pf-tag b{font-weight:600}
-.pf-wrap{display:flex;justify-content:center;padding:14px 10px;border-radius:12px;
-  background:var(--cream);border:1px solid var(--line)}
-.pf-wrap a{display:block;line-height:0;max-width:100%}
-.pf-wrap img{max-width:100%;height:auto;display:block;border-radius:6px}
-@media(max-width:560px){ .pf-wrap{padding:11px 6px} }
-}
-.pf-cap{margin-top:12px;font-size:11.5px;line-height:1.65;color:var(--muted);font-weight:300}
-.pf-cap b{color:var(--ink);font-weight:500}
-@media(max-width:560px){ .pf-meta{gap:5px 14px;font-size:12px} .pf-wrap{padding:11px 6px} }
+/* ---- ผลงานพอร์ตจริง: widget Myfxbook ในแถบข้าง (ใต้กลุ่มผลิตภัณฑ์) ---- */
+.sb-port{margin:14px 20px 0;padding-top:14px;border-top:1px solid rgba(212,175,55,.16)}
+.sb-port a{display:block;line-height:0;border-radius:8px;overflow:hidden;
+  border:1px solid rgba(212,175,55,.28);background:rgba(255,254,248,.04)}
+.sb-port img{display:block;width:100%;height:auto}
+.sb-port .pn{margin-top:8px;font-size:10px;line-height:1.55;color:rgba(244,228,186,.42);font-weight:300}
 
 /* ---- Insight ล่าสุด (สรุปข่าวรายวันจาก news/news-latest.json) ---- */
 .card.ins{margin-bottom:20px;background:linear-gradient(150deg,#FFFDF4,#FBF3DE);border-color:rgba(212,175,55,.5);
@@ -1043,56 +1029,6 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
           <div class="mk-cap" id="mkCalCap">เฉพาะสหรัฐฯ และเฉพาะรายการที่ขยับตลาดจริง — ดอกเบี้ยเฟด การจ้างงานนอกภาคเกษตร และเงินเฟ้อ CPI · <b>เวลาเป็นเวลาไทยเสมอ</b> ไม่ขึ้นกับเครื่องที่เปิด (คิด DST ของสหรัฐฯ ให้แล้ว ช่วงหลัง 1 พ.ย. ต่างกัน 12 ชม. ไม่ใช่ 11) · วันเวลามาจากตารางประกาศทางการของเฟดและ BLS ตัวเลขคาดการณ์จากฟีดสาธารณะ · ช่องผลจริงจะขึ้นหลังประกาศ</div>
         </div>
 
-        <!-- ---------- ผลงานพอร์ตจริงที่รัน EA · widget ภาพจาก Myfxbook ----------
-             ตั้งค่าที่บล็อก PORT ใต้ markup นี้ที่เดียว · PORT_OID ว่าง = การ์ดไม่ขึ้นเลย -->
-        <div class="card" id="mkPort" hidden>
-          <div class="card-h">
-            <h3>ผลงานพอร์ตจริงที่รัน EA</h3>
-            <span class="pf-badge"><i></i>บัญชีเงินจริง</span>
-          </div>
-          <div class="pf-meta">
-            <span>ระบบ <b id="pfSys">&mdash;</b></span>
-            <span>ประเภท <b>บัญชีเซ็นต์ (USC) &middot; MT5</b></span>
-            <span>เริ่ม <b id="pfStart">&mdash;</b></span>
-            <span>ติดตามโดย <b>Myfxbook</b></span>
-          </div>
-          <div class="pf-tag">พอร์ตนี้เป็น<b>บัญชีทดสอบระบบของทีม JP Trust</b> ไม่ใช่ผลิตภัณฑ์ที่เปิดให้บริการอยู่ในขณะนี้ และไม่ใช่กลยุทธ์ที่อยู่ในห้องแล็บของสมาชิก</div>
-          <div class="pf-wrap">
-            <a id="pfLink" href="#" target="_blank" rel="noopener"><img id="pfImg" alt="สถิติพอร์ตจริงจาก Myfxbook"></a>
-          </div>
-          <div class="pf-cap">กดที่กล่องด้านบนเพื่อดูสถิติเต็มบน <b>Myfxbook</b> &middot; ตัวเลขอัปเดตเองตาม Myfxbook ซึ่งอ่านจากบัญชีโดยตรง &middot; ยอดเงินในบัญชีตั้งเป็นส่วนตัว แสดงเฉพาะเปอร์เซ็นต์และสถิติ &middot; <b>ผลการดำเนินงานในอดีตไม่ได้รับประกันผลในอนาคต</b> การลงทุนมีความเสี่ยง เนื้อหานี้เป็นข้อมูลประกอบการศึกษา ไม่ใช่คำแนะนำการลงทุน</div>
-        </div>
-        <script>
-        /* ---------- PORT: การ์ดผลงานพอร์ตจริง ----------
-           กล่องสถิติเป็น widget ภาพของ Myfxbook -> อัปเดตเองตามบัญชี เราไม่ต้องแตะ
-           OID  = เลขท้าย ?accountOid= ในโค้ด widget ของ Myfxbook
-           TYPE = เลขท้าย &type= (เปลี่ยนแบบ widget ได้ที่บรรทัดเดียวนี้)
-           URL  = หน้าบัญชีสาธารณะ ใช้เป็นลิงก์ของกล่อง
-           OID หรือ URL ว่าง -> การ์ดไม่ขึ้นเลย · โหลดภาพไม่ได้ -> การ์ดถอดตัวเองเงียบๆ */
-        (function(){
-          var OID  = '12211037';
-          var TYPE = '4';
-          var URL  = 'https://www.myfxbook.com/members/Papahfx/inv4433/12211037';
-          var SYS  = 'INV4433';
-
-          var card=document.getElementById('mkPort');
-          if(!card) return;
-          if(!OID || !URL) return;
-          var img=document.getElementById('pfImg'), lk=document.getElementById('pfLink');
-          if(!img||!lk) return;
-          /* widget เป็นไฟล์ภาพที่ลิงก์ไม่มีเลขเวอร์ชัน เบราว์เซอร์แคชค้างได้
-             ต่อ v= รายชั่วโมงให้ไปหยิบของใหม่ (Myfxbook อัปทุก 2-4 ชม.) */
-          var d=new Date(), pad=function(n){return (n<10?'0':'')+n;};
-          var v=''+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+pad(d.getHours());
-          img.onerror=function(){ card.remove(); };
-          img.src='https://widget.mfbcdn.net/widget/widget.png?accountOid='+OID+'&type='+TYPE+'&v='+v;
-          lk.href=URL;
-          var sys=document.getElementById('pfSys'); if(sys) sys.textContent=SYS;
-          var st=document.getElementById('pfStart'); if(st){ var w=st.closest('span'); if(w) w.remove(); }
-          card.hidden=false;
-        })();
-        </script>
-
         <!-- ---------- MARKET OVERVIEW: bars + heatmap (หุ้น / ทอง) ---------- -->
         <div class="sec-head mk-head" id="mkSec">
           <h2>ภาพรวมตลาด</h2>
@@ -1280,7 +1216,6 @@ const MENU=[
     {t:'หน้าหลักสมาชิก',ic:'home',url:'https://jptrustlearning.com',ext:true}
   ]},
   {cap:'ผลิตภัณฑ์',items:[
-    {t:'ผลงานพอร์ตจริง',ic:'bot',mk:1,to:'mkPort',chip:'ใหม่'},
     {t:'บริการของ JP Trust',ic:'spark',chip:'สมัคร',url:'https://jptrustlearning.com/#pricing',ext:true}
   ]}
 ];
@@ -1316,7 +1251,36 @@ MENU.forEach((g,gi)=>{
   });
 });
 nav.innerHTML=html
+  +'<div class="sb-port" id="sbPort" hidden>'
+  +  '<a id="sbPortLink" target="_blank" rel="noopener"><img id="sbPortImg" alt="สถิติพอร์ตจริงจาก Myfxbook"></a>'
+  +  '<div class="pn">บัญชีเงินจริงที่รัน EA · บัญชีทดสอบระบบของทีม ไม่ใช่ผลิตภัณฑ์ที่เปิดขาย</div>'
+  +'</div>'
   +'<div class="sb-build">รุ่น a2f46dc · 15/08/2026 21:23</div>';
+
+/* ---------- PORT: widget ผลงานพอร์ตจริงในแถบข้าง ----------
+   กล่องเป็นภาพจาก Myfxbook -> อัปเดตเองตามบัญชี เราไม่ต้องแตะตัวเลข
+   OID  = เลขท้าย ?accountOid= ในโค้ด widget ของ Myfxbook
+   TYPE = เลขท้าย &type= (เปลี่ยนแบบ widget ได้ที่บรรทัดเดียวนี้)
+   OID/URL ว่าง -> กล่องไม่ขึ้น · โหลดภาพไม่ได้ -> กล่องถอดตัวเองเงียบๆ */
+(function(){
+  var OID  = '12211037';
+  var TYPE = '4';
+  var URL  = 'https://www.myfxbook.com/members/Papahfx/inv4433/12211037';
+
+  var box=document.getElementById('sbPort');
+  if(!box) return;
+  if(!OID || !URL){ box.remove(); return; }
+  var img=document.getElementById('sbPortImg'), lk=document.getElementById('sbPortLink');
+  if(!img||!lk){ box.remove(); return; }
+  /* widget เป็นไฟล์ภาพที่ลิงก์ไม่มีเลขเวอร์ชัน เบราว์เซอร์แคชค้างได้
+     ต่อ v= รายชั่วโมงให้ไปหยิบของใหม่ (Myfxbook อัปทุก 2-4 ชม.) */
+  var d=new Date(), pad=function(n){return (n<10?'0':'')+n;};
+  var v=''+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+pad(d.getHours());
+  img.onerror=function(){ box.remove(); };
+  img.src='https://widget.mfbcdn.net/widget/widget.png?accountOid='+OID+'&type='+TYPE+'&v='+v;
+  lk.href=URL;
+  box.hidden=false;
+})();
 document.querySelectorAll('[data-lock]').forEach(el=>el.outerHTML=LOCK);
 /* ไม่ตั้ง favicon เองแล้ว (A104) — เดิมสร้าง <link rel="icon"> ชี้ไป .sb-mark ทำให้แท็บของหน้านี้
    เป็นโลโก้คนละตัวกับเว็บ · ตอนนี้ปล่อยให้เบราว์เซอร์หยิบ /favicon.ico ที่ root เหมือนทุกหน้า */
