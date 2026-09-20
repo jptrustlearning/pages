@@ -498,12 +498,9 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 .mchip.alt{background:linear-gradient(135deg,#8B2252,#722F37);color:var(--gold-l)}
 .mchip.free{background:linear-gradient(135deg,var(--gold),#b8901f);color:#231016}
 
-/* ---- ผลงานพอร์ตจริง: widget Myfxbook ในแถบข้าง (ใต้กลุ่มผลิตภัณฑ์) ---- */
-.sb-port{margin:14px 20px 0;padding-top:14px;border-top:1px solid rgba(212,175,55,.16)}
-.sb-port a{display:block;line-height:0;border-radius:8px;overflow:hidden;
-  border:1px solid rgba(212,175,55,.28);background:rgba(255,254,248,.04)}
-.sb-port img{display:block;width:100%;height:auto}
-.sb-port .pcap{padding:0 0 8px}
+/* ---- ผลงานพอร์ตจริง: รายการ Portfolio ในแถบข้าง -> เปิด popup ---- */
+.sb-port .nav-i{cursor:pointer}
+.sb-port .mchip{margin-left:auto}
 
 /* ---- Insight ล่าสุด (สรุปข่าวรายวันจาก news/news-latest.json) ---- */
 .card.ins{margin-bottom:20px;background:linear-gradient(150deg,#FFFDF4,#FBF3DE);border-color:rgba(212,175,55,.5);
@@ -1294,34 +1291,30 @@ MENU.forEach((g,gi)=>{
 });
 nav.innerHTML=html
   +'<div class="sb-port" id="sbPort" hidden>'
-  +  '<div class="sb-cap pcap">PORTFOLIO</div>'
-  +  '<a id="sbPortLink" target="_blank" rel="noopener"><img id="sbPortImg" alt="สถิติพอร์ตจริงจาก Myfxbook"></a>'
+  +  '<a class="nav-i" id="sbPortLink" target="_blank" rel="noopener">'+svg(IC.bot)+'<span>Portfolio</span><span class="mchip alt">ใหม่</span></a>'
   +'</div>'
   +'<div class="sb-build">รุ่น a2f46dc · 15/08/2026 21:23</div>';
 
-/* ---------- PORT: widget ผลงานพอร์ตจริงในแถบข้าง ----------
-   กล่องเป็นภาพจาก Myfxbook -> อัปเดตเองตามบัญชี เราไม่ต้องแตะตัวเลข
-   OID  = เลขท้าย ?accountOid= ในโค้ด widget ของ Myfxbook
-   TYPE = เลขท้าย &type= (เปลี่ยนแบบ widget ได้ที่บรรทัดเดียวนี้)
-   OID/URL ว่าง -> กล่องไม่ขึ้น · โหลดภาพไม่ได้ -> กล่องถอดตัวเองเงียบๆ */
+/* ---------- PORT: รายการ Portfolio ในแถบข้าง -> popup ----------
+   แถบข้างมีแค่รายการเมนู · widget ภาพของ Myfxbook อยู่ใน popup และโหลดตอนกดครั้งแรก
+   OID   = เลขท้าย ?accountOid= ในโค้ด widget ของ Myfxbook
+   MTYPE = เลขท้าย &type= ของ widget ที่จะโชว์ใน popup (เปลี่ยนแบบได้ที่บรรทัดเดียวนี้)
+   OID/URL ว่าง -> รายการไม่ขึ้น · โหลดภาพไม่ได้ -> popup แจ้งแล้วให้กดไปดูที่ต้นทาง */
 (function(){
   var OID   = '12211037';
-  var TYPE  = '4';   /* กล่องเล็กในแถบข้าง (กว้าง ~227px) */
-  var MTYPE = '5';   /* กล่องใหญ่ใน popup */
+  var MTYPE = '5';   /* แบบ widget ที่โชว์ใน popup */
   var URL   = 'https://www.myfxbook.com/members/Papahfx/inv4433/12211037';
 
   var box=document.getElementById('sbPort');
   if(!box) return;
   if(!OID || !URL){ box.remove(); return; }
-  var img=document.getElementById('sbPortImg'), lk=document.getElementById('sbPortLink');
-  if(!img||!lk){ box.remove(); return; }
+  var lk=document.getElementById('sbPortLink');
+  if(!lk){ box.remove(); return; }
   /* widget เป็นไฟล์ภาพที่ลิงก์ไม่มีเลขเวอร์ชัน เบราว์เซอร์แคชค้างได้
      ต่อ v= รายชั่วโมงให้ไปหยิบของใหม่ (Myfxbook อัปทุก 2-4 ชม.) */
   var d=new Date(), pad=function(n){return (n<10?'0':'')+n;};
   var v=''+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+pad(d.getHours());
   var wurl=function(t){ return 'https://widget.mfbcdn.net/widget/widget.png?accountOid='+OID+'&type='+t+'&v='+v; };
-  img.onerror=function(){ box.remove(); };
-  img.src=wurl(TYPE);
   lk.href=URL;
   box.hidden=false;
 
@@ -1332,7 +1325,10 @@ nav.innerHTML=html
   if(pmLink) pmLink.href=URL;
   var loaded=false, lastFocus=null;
   var open=function(){
-    if(!loaded){ pmImg.src=wurl(MTYPE); loaded=true; }   /* โหลดภาพใหญ่ตอนเปิดครั้งแรกเท่านั้น */
+    if(!loaded){
+      pmImg.onerror=function(){ var w=pmImg.closest('.pm-w'); if(w) w.remove(); };
+      pmImg.src=wurl(MTYPE); loaded=true;                 /* โหลดภาพตอนกดเปิดครั้งแรกเท่านั้น */
+    }
     lastFocus=document.activeElement;
     pm.hidden=false; pm.classList.add('on');
     document.body.style.overflow='hidden';
