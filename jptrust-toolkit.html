@@ -595,6 +595,19 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 .mkr-nd{stroke:var(--maroon);stroke-width:2.4;stroke-linecap:round}
 .mkr-e{font-family:var(--f-d);font-size:9.5px;letter-spacing:1.2px;font-weight:600}
 .mkr-zone{text-align:center;font-size:13px;font-weight:600;margin-top:1px;line-height:1.4}
+.mkr-dest{margin-top:14px;border-top:1px solid rgba(212,175,55,.18);padding-top:10px}
+.mkr-dh{font-size:11px;color:var(--muted);font-weight:300;line-height:1.5;margin-bottom:8px}
+.mkr-dh b{font-weight:600;color:var(--ink)}
+.mkr-d{display:flex;align-items:center;gap:8px;margin-top:7px}
+.mkr-d .n{font-size:11px;color:var(--ink);width:76px;flex:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mkr-d .b{position:relative;flex:1;min-width:0;height:7px;border-radius:99px;background:rgba(61,50,40,.07)}
+.mkr-d .b .mid{position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:rgba(61,50,40,.22)}
+.mkr-d .b i{position:absolute;top:0;bottom:0;border-radius:99px}
+.mkr-d .b i.up{left:50%;width:calc(var(--f) * 50%)}
+.mkr-d .b i.dn{right:50%;width:calc(var(--f) * 50%)}
+.mkr-d .b i.on{background:var(--ron)} .mkr-d .b i.off{background:var(--roff)}
+.mkr-d .v{font-size:11px;font-weight:600;width:32px;flex:none;text-align:right;font-variant-numeric:tabular-nums}
+.mkr-d .v.on{color:var(--ron)} .mkr-d .v.off{color:var(--roff)}
 .mkr-say{font-size:13px;color:var(--ink);font-weight:300;line-height:1.7;margin:0 0 12px}
 .mkr-say b{font-weight:600;color:var(--maroon)}
 .mkr-p{padding:9px 0;border-top:1px solid rgba(212,175,55,.18)}
@@ -1862,7 +1875,15 @@ function mkParseStocks(miniT,mapT){
     list.push({t,sec:sec[t],c:r[n-1].c,r:ret,w:Math.sqrt(Math.max(dv,1))});   // √ ของมูลค่าซื้อขาย กันไม่ให้ตัวใหญ่ไม่กี่ตัวกินทั้งแผนที่
   }
   if(list.length<100) throw new Error('ข้อมูลหุ้นน้อยผิดปกติ');
-  return {asof,list};
+  /* ชุด % เปลี่ยนแปลงรายวันของตลาด (ถ่วงน้ำหนักเท่ากันทุกตัว) — ใช้หาความผันผวนของหุ้นในแผง "เงินไหลไปไหน"
+     ต้องคิดตรงนี้เพราะ list เก็บแต่ผลตอบแทน 1/5/10 วัน ไม่ได้เก็บราคาย้อนหลังไว้ */
+  const agg={};
+  for(const t in by){
+    const r=by[t]; if(r[r.length-1].d!==asof||!MK_SEC[sec[t]]) continue;
+    for(let i=1;i<r.length;i++){ const g=agg[r[i].d]=agg[r[i].d]||{s:0,n:0}; g.s+=(r[i].c/r[i-1].c-1)*100; g.n++; }
+  }
+  const mkt=Object.keys(agg).sort().map(d=>agg[d].s/agg[d].n);
+  return {asof,list,mkt};
 }
 /* โหลด CSV หุ้นครั้งเดียว ใช้ร่วมกันระหว่าง heatmap กับการ์ด Risk-on/Risk-off
    (สองใบเรียกพร้อมกันได้ ได้ promise ก้อนเดียว = ดาวน์โหลดรอบเดียว) · ล้มแล้วล้าง cache ให้ลองใหม่ได้ */
@@ -2445,6 +2466,57 @@ function mkrFx(n){
   return {aud,safe:(jpy+chf)/2,jpy,chf,last:D[L],ref:D[L-n]};
 }
 
+/* ---------- แผง "เงินไหลไปไหน" (A135) ----------
+   ปัญหา: เทียบ % ดิบข้ามสินทรัพย์ไม่ได้ — ทอง +0.36% กับบิตคอยน์ +0.36% คนละความหมาย
+   วิธี: ผลตอบแทนช่วงนั้น ÷ (ความผันผวนรายวันของตัวเอง × √จำนวนวัน) = "แรงกว่าปกติของตัวเองกี่เท่า"
+   ⭐ ความผันผวนใช้ **จำนวนวันเท่ากันทุกสินทรัพย์** = เท่าที่ตัวที่สั้นที่สุดมี (ตอนนี้คือหุ้น ~13 วันจากไฟล์ mini)
+      ทดสอบแล้วเปลี่ยน lookback 13/20/35/60/120 วัน ค่า z ขยับแค่ ±0.1 — ความเท่ากันสำคัญกว่าความยาว
+   ค่าเงินวัดเป็นดัชนี: ดอลลาร์ = 1/ค่าเฉลี่ยของสกุลหลัก 7 สกุล · เยน+ฟรังก์ = ค่าเฉลี่ยของสองสกุลนั้นในรูปดอลลาร์ */
+const MKR_DEST_CAP=2.0;                       // |z| ที่ทำให้แท่งเต็มราง
+const MKR_DEST_MAJ=['EUR','GBP','JPY','CHF','CAD','AUD','NZD'];   // ตะกร้าที่ใช้วัดดอลลาร์ (ไม่เอา THB — ไม่ใช่ปลายทางของเงินโลก)
+const mkrStd=a=>{const m=a.reduce((x,y)=>x+y,0)/a.length; return Math.sqrt(a.reduce((x,y)=>x+(y-m)*(y-m),0)/a.length);};
+const mkrDiff=a=>a.slice(1).map((v,i)=>(v/a[i]-1)*100);
+
+function mkrFxIdx(){                          // คืนดัชนีดอลลาร์ และดัชนีเยน+ฟรังก์ เรียงตามวัน
+  const S=MKR.fx; if(!S) return null;
+  const base={}, usd=[], safe=[];
+  for(const c of MKR_DEST_MAJ){ const v=mkStrVal(S,S.dates[0],c); if(!(v>0)) return null; base[c]=v; }
+  for(const d of S.dates){
+    const n={}; for(const c of MKR_DEST_MAJ){ const v=mkStrVal(S,d,c); if(!(v>0)) return null; n[c]=v/base[c]; }
+    usd.push(1/(MKR_DEST_MAJ.reduce((a,c)=>a+n[c],0)/MKR_DEST_MAJ.length));
+    safe.push((n.JPY+n.CHF)/2);
+  }
+  return {usd,safe};
+}
+function mkrGoldSeries(asof){
+  const P=PX_RAW; if(!P||!P.d) return null; const c=[];
+  for(let i=0;i<P.d.length;i++){
+    const wd=new Date(P.d[i]+'T00:00:00Z').getUTCDay(); if(wd===0||wd===6) continue;
+    if(asof&&P.d[i]>asof) continue; c.push(P.c[i]);
+  }
+  return c.length>12?c.slice(-200):null;    // เอาแค่ท้ายพอหาความผันผวน — ไฟล์ทองยาว 13 ปี ไม่ต้อง diff ทั้งชุดทุกครั้งที่กดชิป
+}
+function mkrDest(n,S,G){
+  const pool=[], F=mkrFxIdx();
+  if(S&&MKR.mk&&MKR.mk.mkt&&MKR.mk.mkt.length>11)
+    pool.push({name:'หุ้นสหรัฐฯ',side:'on',ret:S.mkt,dr:MKR.mk.mkt});          // mkt เป็น % รายวันอยู่แล้ว
+  const gc=S?mkrGoldSeries(S.asof):null;
+  if(G&&gc) pool.push({name:'ทองคำ',side:'off',ret:G.r,dr:mkrDiff(gc)});
+  if(F){
+    const L=F.usd.length-1;
+    if(L>n+10){
+      pool.push({name:'ดอลลาร์',side:'off',ret:(F.usd[L]/F.usd[L-n]-1)*100,dr:mkrDiff(F.usd)});
+      pool.push({name:'เยน + ฟรังก์',side:'off',ret:(F.safe[L]/F.safe[L-n]-1)*100,dr:mkrDiff(F.safe)});
+    }
+  }
+  if(pool.length<2) return null;
+  const lb=Math.min(60,...pool.map(p=>p.dr.length));
+  if(lb<10) return null;
+  for(const p of pool){ const v=mkrStd(p.dr.slice(-lb)); p.z=v>0?p.ret/(v*Math.sqrt(n)):0; }
+  pool.sort((a,b)=>b.z-a.z);
+  return {rows:pool,lb};
+}
+
 /* คู่ต่อสู้: m เป็นบวก = ฝั่งเสี่ยงชนะ · s = คะแนน −100…+100 ของคู่นั้น */
 function mkrLegs(n){
   const S=mkrStocks(n), G=S?mkrGold(n,S.asof):null, F=mkrFx(n), legs=[], miss=[];
@@ -2498,6 +2570,18 @@ function mkrRender(){
     +'<circle cx="120" cy="96" r="4.5" fill="var(--maroon)"/></svg>'
     +'<div class="mkr-zone" style="color:'+zc+'">'+mkEsc(z[1])+'</div>';
 
+  const DS=mkrDest(n,R.S,R.G);
+  if(DS){
+    sv+='<div class="mkr-dest"><div class="mkr-dh">เงินไหลไปไหน · ตัวเลขคือ<b>แรงกว่าปกติของตัวเองกี่เท่า</b> ใน'+MKR_PER[n].replace('ช่วง','')+'</div>';
+    for(const d of DS.rows){
+      const dir=d.z>=0?'up':'dn', f=Math.min(1,Math.abs(d.z)/MKR_DEST_CAP).toFixed(3);
+      sv+='<div class="mkr-d"><span class="n">'+mkEsc(d.name)+'</span>'
+        +'<span class="b"><i class="mid"></i><i class="'+dir+' '+d.side+'" style="--f:'+f+'"></i></span>'
+        +'<span class="v '+d.side+'">'+(d.z>=0?'+':'−')+Math.abs(d.z).toFixed(1)+'</span></div>';
+    }
+    sv+='</div>';
+  }
+
   const top=R.legs.slice().sort((a,b)=>Math.abs(b.s)-Math.abs(a.s)).slice(0,2);
   /* ไม่พูดคำโซนซ้ำ — ป้ายใต้เกจบอกไปแล้ว บนมือถือสองอันอยู่ห่างกันไม่ถึงนิ้ว */
   let say=MKR_PER[n]+' เข็มอยู่ที่ <b>'+g+'</b> จาก 100 · ตัวที่ดึงแรงที่สุดคือ '
@@ -2526,6 +2610,9 @@ function mkrRender(){
     cap.innerHTML='คะแนนรวม = ค่าเฉลี่ยถ่วงน้ำหนักของคู่ด้านบน แล้วแปลงเป็นสเกล 0–100 (50 = ก้ำกึ่ง) · '
       +'แต่ละคู่เต็มสเกลเมื่อห่างกันถึงเกณฑ์ที่กำกับไว้ท้ายชื่อคู่ ห่างมากกว่านั้นไม่ทำให้คะแนนเกิน · '
       +'กลุ่มพลังงาน สื่อสาร และอสังหาฯ ไม่ถูกนับในคู่แรก เพราะขยับตามเรื่องเฉพาะตัวมากกว่าความอยากเสี่ยงของตลาด · '
+      +'แผง "เงินไหลไปไหน" วัดคนละแบบกับคู่ด้านขวา: เอาผลตอบแทนหารด้วยความผันผวนของสินทรัพย์นั้นเอง '
+      +'เพราะทองขยับ 1% กับหุ้นขยับ 1% ไม่ได้แปลว่าเงินไหลเท่ากัน · แท่งเขียว = สินทรัพย์เสี่ยง แท่งน้ำเงิน = ที่หลบภัย · '
+      +'ดอลลาร์วัดเทียบตะกร้าสกุลหลัก 7 สกุล · เยน+ฟรังก์วัดในรูปดอลลาร์ · '
       +(src.length?'ข้อมูล: '+src.join(' · ')+' · ':'')
       +'<b style="font-weight:600">เกจนี้ไม่มีขาพันธบัตร เครดิต และ VIX</b> เพราะยังไม่มีฟีดฟรีที่ดึงได้จากหน้าเว็บ — '
       +'อ่านเป็นภาพรวมความอยากเสี่ยงของตลาด ไม่ใช่สัญญาณซื้อขาย';
