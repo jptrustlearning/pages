@@ -498,6 +498,22 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 .mchip.alt{background:linear-gradient(135deg,#8B2252,#722F37);color:var(--gold-l)}
 .mchip.free{background:linear-gradient(135deg,var(--gold),#b8901f);color:#231016}
 
+/* ---- ผลงานพอร์ตจริงที่รัน EA (#mkPort · widget ภาพจาก Myfxbook) ---- */
+#mkPort{margin-top:14px;scroll-margin-top:70px}
+.pf-badge{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;
+  padding:4px 9px;border-radius:999px;background:linear-gradient(135deg,var(--maroon),var(--maroon2));
+  color:var(--gold-l);white-space:nowrap}
+.pf-badge i{width:6px;height:6px;border-radius:50%;background:var(--gold);display:block}
+.pf-meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin:10px 0 14px;font-size:12.5px;color:var(--muted);font-weight:300}
+.pf-meta b{color:var(--ink);font-weight:500}
+.pf-wrap{display:flex;justify-content:center;padding:14px 10px;border-radius:12px;
+  background:var(--cream);border:1px solid var(--line)}
+.pf-wrap a{display:block;line-height:0;max-width:100%}
+.pf-wrap img{max-width:100%;height:auto;display:block;border-radius:6px}
+.pf-cap{margin-top:12px;font-size:11.5px;line-height:1.65;color:var(--muted);font-weight:300}
+.pf-cap b{color:var(--ink);font-weight:500}
+@media(max-width:560px){ .pf-meta{gap:5px 14px;font-size:12px} .pf-wrap{padding:11px 6px} }
+
 /* ---- Insight ล่าสุด (สรุปข่าวรายวันจาก news/news-latest.json) ---- */
 .card.ins{margin-bottom:20px;background:linear-gradient(150deg,#FFFDF4,#FBF3DE);border-color:rgba(212,175,55,.5);
   box-shadow:0 3px 16px rgba(212,175,55,.12);padding:16px 18px}
@@ -1022,6 +1038,60 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
           <div class="mk-cap" id="mkCalCap">เฉพาะสหรัฐฯ และเฉพาะรายการที่ขยับตลาดจริง — ดอกเบี้ยเฟด การจ้างงานนอกภาคเกษตร และเงินเฟ้อ CPI · <b>เวลาเป็นเวลาไทยเสมอ</b> ไม่ขึ้นกับเครื่องที่เปิด (คิด DST ของสหรัฐฯ ให้แล้ว ช่วงหลัง 1 พ.ย. ต่างกัน 12 ชม. ไม่ใช่ 11) · วันเวลามาจากตารางประกาศทางการของเฟดและ BLS ตัวเลขคาดการณ์จากฟีดสาธารณะ · ช่องผลจริงจะขึ้นหลังประกาศ</div>
         </div>
 
+        <!-- ---------- ผลงานพอร์ตจริงที่รัน EA · widget ภาพจาก Myfxbook ----------
+             ตั้งค่าที่บล็อก PORT ใต้ markup นี้ที่เดียว · PORT_OID ว่าง = การ์ดไม่ขึ้นเลย -->
+        <div class="card" id="mkPort" hidden>
+          <div class="card-h">
+            <h3>ผลงานพอร์ตจริงที่รัน EA</h3>
+            <span class="pf-badge"><i></i>บัญชีเงินจริง</span>
+          </div>
+          <div class="pf-meta">
+            <span>ระบบ <b id="pfSys">&mdash;</b></span>
+            <span>ประเภท <b>บัญชีเซ็นต์ (USC) &middot; MT5</b></span>
+            <span>เริ่ม <b id="pfStart">&mdash;</b></span>
+            <span>ติดตามโดย <b>Myfxbook</b></span>
+          </div>
+          <div class="pf-wrap">
+            <a id="pfLink" href="#" target="_blank" rel="noopener"><img id="pfImg" alt="สถิติพอร์ตจริงจาก Myfxbook"></a>
+          </div>
+          <div class="pf-cap">ตัวเลขทั้งหมดมาจาก <b>Myfxbook</b> ซึ่งอ่านจากบัญชีโดยตรง JP Trust ไม่ได้กรอกเอง &middot; ยอดเงินในบัญชีตั้งเป็นส่วนตัว แสดงเฉพาะเปอร์เซ็นต์และสถิติ &middot; <b>ผลการดำเนินงานในอดีตไม่ได้รับประกันผลในอนาคต</b> การลงทุนมีความเสี่ยง เนื้อหานี้เป็นข้อมูลประกอบการศึกษา ไม่ใช่คำแนะนำการลงทุน</div>
+        </div>
+        <script>
+        /* ---------- PORT: ตั้งค่าการ์ดผลงานพอร์ตจริง ----------
+           PORT_OID   = เลขท้าย ?accountOid= ในโค้ด widget ของ Myfxbook
+           PORT_TYPE  = เลขท้าย &type= (แบบของ widget)
+           PORT_URL   = ลิงก์หน้าบัญชีสาธารณะบน Myfxbook
+           PORT_SYS   = ชื่อระบบที่รันในบัญชีนี้ (หนึ่งบัญชี = หนึ่งระบบ)
+           PORT_START = วันเริ่มเดินบัญชี  (ว่าง = ไม่โชว์ช่องนี้)
+           PORT_OID หรือ PORT_URL ว่าง -> การ์ดไม่ขึ้นเลย ไม่มีกรอบเปล่าค้างบนหน้า */
+        (function(){
+          var PORT_OID   = '12211037';
+          var PORT_TYPE  = '4';
+          var PORT_URL   = 'https://www.myfxbook.com/members/Papahfx/inv4433/12211037';
+          var PORT_SYS   = 'INV4433';
+          var PORT_START = '';
+
+          var card=document.getElementById('mkPort');
+          if(!card) return;
+          if(!PORT_OID || !PORT_URL) return;
+          var img=document.getElementById('pfImg');
+          var lk=document.getElementById('pfLink');
+          if(!img||!lk) return;
+          /* widget เป็นไฟล์ภาพ ไม่มีเลขเวอร์ชันในลิงก์ -> เบราว์เซอร์แคชค้างได้
+             ต่อ v= รายชั่วโมงให้ไปหยิบของใหม่ (Myfxbook อัปทุก 2-4 ชม.) */
+          var d=new Date();
+          var pad=function(n){return (n<10?'0':'')+n;};
+          var v=''+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+pad(d.getHours());
+          img.onerror=function(){ card.remove(); };   /* โหลดไม่ได้ = ถอดการ์ดเงียบๆ ตามแบบการ์ดอื่นในหน้านี้ */
+          img.src='https://widget.mfbcdn.net/widget/widget.png?accountOid='+PORT_OID+'&type='+PORT_TYPE+'&v='+v;
+          lk.href=PORT_URL;
+          var sys=document.getElementById('pfSys'); if(sys) sys.textContent=PORT_SYS;
+          var st=document.getElementById('pfStart');
+          if(st){ if(PORT_START) st.textContent=PORT_START; else { var w=st.closest('span'); if(w) w.remove(); } }
+          card.hidden=false;
+        })();
+        </script>
+
         <!-- ---------- MARKET OVERVIEW: bars + heatmap (หุ้น / ทอง) ---------- -->
         <div class="sec-head mk-head" id="mkSec">
           <h2>ภาพรวมตลาด</h2>
@@ -1202,6 +1272,7 @@ const MENU=[
     {t:'ค้นหาหุ้น S&P 500',ic:'chart',mk:1,to:'heroScanner',chip:'ใหม่'},
     {t:'เวลาตลาด Forex',ic:'clock',mk:1,to:'mkSes',chip:'ใหม่'},
     {t:'ปฏิทินข่าว US',ic:'clock',mk:1,to:'mkCal',chip:'ใหม่'},
+    {t:'ผลงานพอร์ตจริง',ic:'bot',mk:1,to:'mkPort',chip:'ใหม่'},
     {t:'Heatmap หุ้น · ทองคำ',ic:'chart',mk:1,chip:'ใหม่'},
     {t:'ทองไหลไปตลาดไหน',ic:'coin',mk:'gold',to:'mkBasis',chip:'ใหม่'},
     {t:'อัตราแลกเปลี่ยนสด',ic:'fx',mk:'fx',chip:'LIVE'},
