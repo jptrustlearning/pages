@@ -332,14 +332,14 @@ async function sendFounderDecisionNote(d: Record<string, unknown>, mailSent: boo
     .split(",").map((x) => x.trim()).filter(Boolean);
   if (recipients.length === 0) return { sent: false, error: "no founder recipients" };
   const approved = d.status === "approved";
-  const head = approved ? "✅ อนุมัติแล้ว" : "⛔ ปฏิเสธแล้ว";
+  const head = approved ? "[อนุมัติแล้ว]" : "[ปฏิเสธแล้ว]";
   const lines = [
     `${head}: ${d.username || "—"} <${d.email}>`,
     `รหัสอ้างอิง: ${d.ref_code}`,
     `ประเภท: ${d.kind === "renew" ? "ต่ออายุ" : "สมัครใหม่"} · แพ็กเกจ: ${d.plan || "—"} · ยอด: ฿${Number(d.amount_due || 0).toLocaleString("en-US")}`,
     approved ? `สมาชิกถึง: ${fmtThaiDate((d.expires_at as string) || null)}` : `เหตุผล: ${d.decided_note || "—"}`,
     `อีเมลแจ้งลูกค้า: ${mailSent ? "ส่งแล้ว" : "ส่งไม่สำเร็จ — กรุณาแจ้งลูกค้าเอง"}`,
-    Number(d.other_pending || 0) > 0 ? `⚠️ อีเมลนี้ยังมีคำขอค้างอีก ${d.other_pending} รายการ` : "",
+    Number(d.other_pending || 0) > 0 ? `[โปรดระวัง] อีเมลนี้ยังมีคำขอค้างอีก ${d.other_pending} รายการ` : "",
   ].filter(Boolean);
   return await resendSend({
     to: recipients,

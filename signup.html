@@ -1340,7 +1340,7 @@ function startSignupPrep(){
     function render(){
         if(label) label.textContent = left > 0
             ? ('กำลังบันทึกใบสมัครของคุณ • ' + left + ' วินาที')
-            : 'บันทึกใบสมัครเรียบร้อย ✓ รอการอนุมัติ';
+            : 'บันทึกใบสมัครเรียบร้อย · รอการอนุมัติ';
         if(fill) fill.style.width = (((total - left) / total) * 100) + '%';
     }
     render();

@@ -466,12 +466,12 @@ async function sendFounderNotification(info: FounderInfo): Promise<EmailResult> 
     `ราคาปกติ: ${fmtBaht(info.basePrice)}`,
     `ยอดที่ต้องได้รับ: ${fmtBaht(info.amount)}`,
     `โปรโมชัน: ${promoLine}`,
-    `สลิป: ${slipLine}${slipSuspicious ? "  ⚠️ ไฟล์เล็กผิดปกติ ตรวจให้ละเอียด" : ""}`,
+    `สลิป: ${slipLine}${slipSuspicious ? "  [โปรดระวัง] ไฟล์เล็กผิดปกติ ตรวจให้ละเอียด" : ""}`,
     `รหัสอ้างอิง: ${info.refCode}`,
     info.kind === "renew" ? `วันหมดอายุปัจจุบัน: ${fmtBkk(info.currentExpiry)}` : "",
     "",
     "ยังไม่มีการให้สิทธิ์ใดๆ — ตรวจสลิปที่แนบมา แล้วเปิดลิงก์เพื่อกดยืนยัน:",
-    info.token ? `อนุมัติ: ${approveUrl}` : `⚠️ สร้างลิงก์อนุมัติไม่สำเร็จ (${info.queueError || "unknown"})`,
+    info.token ? `อนุมัติ: ${approveUrl}` : `[ข้อผิดพลาด] สร้างลิงก์อนุมัติไม่สำเร็จ (${info.queueError || "unknown"})`,
     info.token ? `ปฏิเสธ: ${rejectUrl}` : fallbackLine,
     "",
     "— ระบบแจ้งเตือนอัตโนมัติ JP Trust Learning",
@@ -485,11 +485,11 @@ async function sendFounderNotification(info: FounderInfo): Promise<EmailResult> 
     : `<span style="display:inline-block;padding:2px 10px;border-radius:20px;background:#E9F5EC;color:#1F7D49;font-size:12px;">สมัครใหม่</span>`;
   const buttons = info.token
     ? `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:6px 0 4px"><tr>
-         <td style="padding:0 6px 0 22px" width="62%"><a href="${approveUrl}" style="display:block;text-align:center;padding:14px 10px;background:#1F7D49;color:#FFFFFF;text-decoration:none;border-radius:10px;font-size:15px;font-weight:700">✓ ตรวจสลิปแล้ว — อนุมัติ</a></td>
-         <td style="padding:0 22px 0 6px"><a href="${rejectUrl}" style="display:block;text-align:center;padding:14px 10px;background:#FFFEF8;color:#A83232;text-decoration:none;border-radius:10px;font-size:15px;font-weight:700;border:1.5px solid #A83232">✕ ปฏิเสธ</a></td>
+         <td style="padding:0 6px 0 22px" width="62%"><a href="${approveUrl}" style="display:block;text-align:center;padding:14px 10px;background:#1F7D49;color:#FFFFFF;text-decoration:none;border-radius:10px;font-size:15px;font-weight:700">ตรวจสลิปแล้ว — อนุมัติ</a></td>
+         <td style="padding:0 22px 0 6px"><a href="${rejectUrl}" style="display:block;text-align:center;padding:14px 10px;background:#FFFEF8;color:#A83232;text-decoration:none;border-radius:10px;font-size:15px;font-weight:700;border:1.5px solid #A83232">ปฏิเสธ</a></td>
        </tr></table>
        <div style="padding:8px 22px 4px;color:#7A6F62;font-size:12px;line-height:1.6">กดแล้วจะเปิดหน้ายืนยันอีกชั้น — ยังไม่มีการให้สิทธิ์จนกว่าจะกดยืนยันในหน้านั้น · คนใดคนหนึ่งกดก็พอ กดซ้ำไม่บวกวันเพิ่ม</div>`
-    : `<div style="margin:6px 22px;padding:12px 14px;background:#FDF0EE;border:1px solid #E3B4AE;border-radius:10px;color:#8A2C22;font-size:13px;line-height:1.6">⚠️ สร้างลิงก์อนุมัติไม่สำเร็จ (${esc(info.queueError || "unknown")})<br>${esc(fallbackLine)}</div>`;
+    : `<div style="margin:6px 22px;padding:12px 14px;background:#FDF0EE;border:1px solid #E3B4AE;border-radius:10px;color:#8A2C22;font-size:13px;line-height:1.6"><strong>สร้างลิงก์อนุมัติไม่สำเร็จ</strong> (${esc(info.queueError || "unknown")})<br>${esc(fallbackLine)}</div>`;
 
   const html = `<div style="font-family:'Sarabun',Arial,sans-serif;background:#FAF6ED;padding:24px">
     <div style="max-width:520px;margin:0 auto;background:#FFFEF8;border:1.5px solid rgba(212,175,55,0.4);border-radius:14px;overflow:hidden">
@@ -506,7 +506,7 @@ async function sendFounderNotification(info: FounderInfo): Promise<EmailResult> 
         ${row("ราคาปกติ", fmtBaht(info.basePrice))}
         ${row("ยอดที่ต้องได้รับ", `<span style="color:#1F7D49;font-size:16px">${fmtBaht(info.amount)}</span>`)}
         ${row("โปรโมชัน", esc(promoLine))}
-        ${row("สลิป", esc(slipLine) + (slipSuspicious ? `<div style="color:#A83232;font-size:12.5px;margin-top:3px">⚠️ ไฟล์เล็กผิดปกติ (สลิปจริงมัก &gt; 100 KB) ตรวจให้ละเอียด</div>` : ""))}
+        ${row("สลิป", esc(slipLine) + (slipSuspicious ? `<div style="color:#A83232;font-size:12.5px;margin-top:3px"><strong>โปรดระวัง:</strong> ไฟล์เล็กผิดปกติ (สลิปจริงมัก &gt; 100 KB) ตรวจให้ละเอียด</div>` : ""))}
         ${row("รหัสอ้างอิง", esc(info.refCode))}
         ${info.kind === "renew" ? row("วันหมดอายุปัจจุบัน", esc(fmtBkk(info.currentExpiry))) : ""}
       </table>

@@ -46,6 +46,8 @@ dt{color:var(--muted);white-space:nowrap}
 dd{font-weight:600;text-align:right;word-break:break-word}
 .tag{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600}
 .tag.new{background:#E9F5EC;color:var(--green)}.tag.renew{background:#E8F0FA;color:#2C5E9E}
+.wi{width:15px;height:15px;vertical-align:-2.5px;margin-right:6px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.bi{width:17px;height:17px;vertical-align:-3px;margin-right:8px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
 .warn{margin-top:12px;padding:11px 14px;border-radius:10px;background:#FDF0EE;border:1px solid #E3B4AE;color:#8A2C22;font-size:13px;line-height:1.55}
 .note{margin-top:12px;padding:11px 14px;border-radius:10px;background:#F2F6FB;border:1px solid #C9D8EA;color:#2C4A6E;font-size:13px;line-height:1.55}
 .slip{margin-top:16px}
@@ -108,6 +110,9 @@ function dThai(iso,withTime){if(!iso)return '—';var d=new Date(iso);if(isNaN(d
   var o={timeZone:'Asia/Bangkok',year:'numeric',month:'short',day:'numeric'};if(withTime){o.hour='2-digit';o.minute='2-digit';}
   return d.toLocaleString('th-TH',o);}
 function planLabel(p){return p==='yearly'?'รายปี (365 วัน)':p==='monthly'?'รายเดือน (30 วัน)':'—';}
+var WARN='<svg class="wi" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 2.8 19.5h18.4L12 3.5z"/><path d="M12 10v4.5"/><path d="M12 17.3v.2"/></svg>';
+var BI={ok:'<svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>',no:'<svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>'};
+var LBL_OK=BI.ok+'ตรวจสลิปแล้ว — ยืนยันอนุมัติ', LBL_REJ='ยืนยันปฏิเสธ + ส่งอีเมลแจ้งลูกค้า';
 var ICON={ok:'<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>',no:'<svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>',wait:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>'};
 
 function call(action,extra){
@@ -149,14 +154,14 @@ function render(){
   if(st==='approved')h+='<div><dt>อนุมัติเมื่อ</dt><dd>'+dThai(q.decided_at,true)+'</dd></div><div><dt>สมาชิกใช้ได้ถึง</dt><dd style="color:var(--green)">'+dThai(q.granted_expires_at)+'</dd></div>';
   if(st==='rejected')h+='<div><dt>ปฏิเสธเมื่อ</dt><dd>'+dThai(q.decided_at,true)+'</dd></div>'+(q.decided_note?'<div><dt>เหตุผล</dt><dd>'+esc(q.decided_note)+'</dd></div>':'');
   h+='</dl>';
-  if(st==='pending'&&INFO.other_pending>0)h+='<div class="warn">⚠️ อีเมลนี้มีคำขอค้างอีก <b>'+INFO.other_pending+'</b> รายการ — อาจเป็นการส่งซ้ำ อนุมัติแต่ละรายการจะบวกวันแยกกัน ตรวจว่าโอนจริงกี่ครั้งก่อนกด</div>';
-  if(st==='pending'&&q.has_slip&&q.slip_bytes!=null&&Number(q.slip_bytes)<60*1024)h+='<div class="warn">⚠️ ไฟล์สลิปเล็กผิดปกติ ('+Math.max(1,Math.round(q.slip_bytes/1024))+' KB) — สลิปธนาคารจริงมักใหญ่กว่า 100 KB ตรวจให้ละเอียด</div>';
+  if(st==='pending'&&INFO.other_pending>0)h+='<div class="warn">'+WARN+'อีเมลนี้มีคำขอค้างอีก <b>'+INFO.other_pending+'</b> รายการ — อาจเป็นการส่งซ้ำ อนุมัติแต่ละรายการจะบวกวันแยกกัน ตรวจว่าโอนจริงกี่ครั้งก่อนกด</div>';
+  if(st==='pending'&&q.has_slip&&q.slip_bytes!=null&&Number(q.slip_bytes)<60*1024)h+='<div class="warn">'+WARN+'ไฟล์สลิปเล็กผิดปกติ ('+Math.max(1,Math.round(q.slip_bytes/1024))+' KB) — สลิปธนาคารจริงมักใหญ่กว่า 100 KB ตรวจให้ละเอียด</div>';
   if(st==='pending'&&!q.has_slip)h+='<div class="note">คำขอนี้ใช้โค้ดโปรโมชันแบบฟรี จึงไม่มีสลิปแนบ — ตรวจว่าโค้ดและผู้สมัครถูกต้องก่อนอนุมัติ</div>';
   if(q.has_slip)h+='<div class="slip"><div class="h">Payment Slip</div><div class="box" id="slipBox">กำลังโหลดสลิป…</div><div class="meta" id="slipMeta"></div></div>';
   if(st==='pending'){
     h+='<div class="actions">'+
-       '<button class="b-ok" id="btnApprove">✓ ตรวจสลิปแล้ว — ยืนยันอนุมัติ</button>'+
-       '<button class="b-no" id="btnReject">✕ ปฏิเสธคำขอนี้</button>'+
+       '<button class="b-ok" id="btnApprove">'+LBL_OK+'</button>'+
+       '<button class="b-no" id="btnReject">'+BI.no+'ปฏิเสธคำขอนี้</button>'+
        '<div id="rejectPanel"><label for="rejNote">เหตุผล (ลูกค้าจะเห็นข้อความนี้ในอีเมล · เว้นว่างได้)</label>'+
          '<div class="chips"><span>ยอดโอนไม่ตรงกับแพ็กเกจ</span><span>ไม่พบรายการโอนเข้าบัญชี</span><span>ไฟล์ที่แนบไม่ใช่สลิปการโอน</span><span>สลิปซ้ำกับรายการก่อนหน้า</span></div>'+
          '<textarea id="rejNote" maxlength="500" placeholder="เช่น ยอดโอน 100 บาท ไม่ตรงกับแพ็กเกจรายเดือน 150 บาท"></textarea>'+
@@ -200,10 +205,10 @@ function decide(action,note){
 }
 function alertBar(msg){
   Array.prototype.forEach.call(root.querySelectorAll('button'),function(b){b.disabled=false;});
-  var a=document.getElementById('btnApprove');if(a)a.textContent='✓ ตรวจสลิปแล้ว — ยืนยันอนุมัติ';
-  var c=document.getElementById('btnRejectConfirm');if(c)c.textContent='ยืนยันปฏิเสธ + ส่งอีเมลแจ้งลูกค้า';
+  var a=document.getElementById('btnApprove');if(a)a.innerHTML=LBL_OK;
+  var c=document.getElementById('btnRejectConfirm');if(c)c.textContent=LBL_REJ;
   var w=document.getElementById('errBar');if(!w){w=document.createElement('div');w.id='errBar';w.className='warn';root.appendChild(w);}
-  w.textContent='⚠️ '+msg;w.scrollIntoView({block:'center'});
+  w.innerHTML=WARN+esc(msg);w.scrollIntoView({block:'center'});
 }
 function showResult(r){
   var d=r.decision||{},ok=d.status==='approved',h='<div class="result">';
@@ -217,7 +222,7 @@ function showResult(r){
     h+='<div class="ring no">'+ICON.no+'</div><h1>ปฏิเสธคำขอแล้ว</h1><p style="margin-top:8px">ไม่มีการเปิดสิทธิ์ให้ <b>'+esc(d.username||d.email)+'</b></p>';
   }
   if(r.changed)h+=r.emailSent?'<div class="note" style="text-align:left">ส่งอีเมลแจ้งลูกค้าแล้ว ('+esc(d.email)+')</div>'
-                              :'<div class="warn" style="text-align:left">⚠️ ดำเนินการสำเร็จ แต่ส่งอีเมลแจ้งลูกค้าไม่สำเร็จ'+(r.emailError?' ('+esc(r.emailError)+')':'')+' — กรุณาแจ้งลูกค้าเองที่ '+esc(d.email)+'</div>';
+                              :'<div class="warn" style="text-align:left">'+WARN+'ดำเนินการสำเร็จ แต่ส่งอีเมลแจ้งลูกค้าไม่สำเร็จ'+(r.emailError?' ('+esc(r.emailError)+')':'')+' — กรุณาแจ้งลูกค้าเองที่ '+esc(d.email)+'</div>';
   if(r.changed&&Number(d.other_pending||0)>0)h+='<div class="warn" style="text-align:left">อีเมลนี้ยังมีคำขอค้างอีก '+d.other_pending+' รายการ — เปิดจากอีเมลแจ้งเตือนฉบับอื่นเพื่อจัดการ</div>';
   h+='<div class="actions"><button class="b-ghost" onclick="location.reload()">ดูรายละเอียดคำขอ</button></div></div>';
   root.innerHTML=h;window.scrollTo(0,0);
