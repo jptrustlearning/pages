@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="maroon">
+<!--
+  JPT Roadmap · Task anime — Day 01 · หัวข้อ 2 "ผลลัพธ์ 12 เดือน"            (A151 · 21 ก.ย. 2026)
+  ─────────────────────────────────────────────────────────────────────────
+  ล้อทรง d01-t1.html ทุกจุด (CSS · engine · กติกา) — ต่างแค่เนื้อเรื่องและ component .twin
+  สูตร/เครื่องมือ: jptrustdocs/htmlanim/roadmap-task/README.md
+  ต่างจาก template:
+   · ไม่มีจอ "แตะเพื่อเริ่ม" — เล่นเองทันทีที่เปิด (รอฟอนต์ไม่เกิน 1.2 วิ)
+   · ขนาดตัวอักษรเป็น cqh ล้วน (ไม่มี clamp) — เวทีล็อก 9:16 อยู่แล้ว ภาพจึงเหมือนกันทุกขนาดจอ
+     (ในแอพ เวทีเหลือราว 361×642 เพราะ roadmap.html อยู่ใน iframe ของ dashboard)
+   · ปุ่มย้อนกลับอยู่ที่ตัว popup ใน roadmap.html (มุมซ้ายบน) — ในไฟล์นี้จึงเว้นมุมซ้ายบนไว้
+   · แตะซ้าย = ย้อน · แตะขวา = ถัดไป · แตะกลาง = หยุด/เล่นต่อ
+   · จบแล้วส่ง postMessage {type:'jptAnim',ev:'ended'|'close'} ให้หน้าแม่
+   · ไม่มี @keyframes ที่ขยับ box-shadow / background-position / filter (กติกา A132)
+  เปิดตรงๆ นอกแอพ = เด้งไปหน้า login (gate ด้านล่าง — เล่นได้เฉพาะเมื่อถูกฝังใน roadmap.html)
+-->
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Day 01 · ผลลัพธ์ 12 เดือน | JPT Roadmap</title>
+<!--GATE--><script>
+(function(){var ok=false;try{ok=window.parent!==window&&!!window.parent.document.getElementById('animPop')}catch(e){}
+if(!ok){try{window.top.location.replace('/member-dashboard.html')}catch(e){location.replace('/member-dashboard.html')}}})();
+</script><!--/GATE-->
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;600;700&family=Cinzel:wght@600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+[data-theme=maroon]{--bg0:#0d0508;--bg1:#1a0a0e;--bg2:#2c1018;--bg3:#3a1520;--ink:#FAF6ED;
+  --glow:212,175,55;--grid:212,175,55;--dust:#F4E4BA;--card:26,10,14;--ring:244,228,186}
+:root{--gold:#D4AF37;--gold2:#F4E4BA;--gold-deep:#8B6914;--gold-rgb:212,175,55;--pink:#E8879C;--pink-rgb:232,135,156;
+  --red:#FF8A9A;--red-rgb:232,70,90;--green:#7FE0A8;--amber:#FFC450;--maroon:#722F37}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg0);color:var(--ink);font-family:'Anuphan','Sarabun','Noto Sans Thai',system-ui,sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+body{display:flex;align-items:center;justify-content:center}
+
+/* ── stage 9:16 ── */
+#stage{position:relative;height:min(100vh,calc(100vw*16/9));aspect-ratio:9/16;container-type:size;overflow:hidden;
+  background:linear-gradient(170deg,var(--bg1) 0%,var(--bg2) 48%,var(--bg3) 100%)}
+@supports (height:100dvh){#stage{height:min(100dvh,calc(100vw*16/9))}}
+#stage::before{content:'';position:absolute;inset:-30%;background:radial-gradient(ellipse at 50% 40%,rgba(var(--glow),.22),transparent 55%);animation:lightSpin 26s linear infinite}
+@keyframes lightSpin{to{transform:rotate(360deg)}}
+.gridbg{position:absolute;inset:0;background-image:linear-gradient(rgba(var(--grid),.06) 1px,transparent 1px),linear-gradient(90deg,rgba(var(--grid),.06) 1px,transparent 1px);
+  background-size:9cqh 9cqh;mask-image:radial-gradient(ellipse at 50% 55%,#000 30%,transparent 80%);-webkit-mask-image:radial-gradient(ellipse at 50% 55%,#000 30%,transparent 80%)}
+.vig{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(0,0,0,.55) 100%);pointer-events:none}
+.dust{position:absolute;width:.55cqh;height:.55cqh;border-radius:50%;background:var(--dust);opacity:0;animation:dust 9s linear infinite}
+@keyframes dust{0%{transform:translateY(0);opacity:0}15%{opacity:.55}85%{opacity:.35}100%{transform:translateY(-26cqh);opacity:0}}
+
+/* ── วงแสงกลางจอ (จุดโฟกัสแทนผู้บรรยาย) ── */
+#focus{position:absolute;left:50%;top:50%;width:80cqw;height:80cqw;transform:translate(-50%,-50%);z-index:1;pointer-events:none;transition:opacity .5s;
+  background:radial-gradient(circle,rgba(var(--glow),.26),rgba(var(--glow),.07) 45%,transparent 70%);animation:ringPulse 2.4s ease-in-out infinite}
+@keyframes ringPulse{50%{transform:translate(-50%,-50%) scale(1.07);opacity:.8}}
+#focus::after{content:'';position:absolute;inset:4%;border-radius:50%;border:1px dashed rgba(var(--ring),.3);animation:ringSpin 14s linear infinite}
+@keyframes ringSpin{to{transform:rotate(360deg)}}
+#focus.gold{background:radial-gradient(circle,rgba(var(--gold-rgb),.36),rgba(var(--gold-rgb),.08) 45%,transparent 70%)}
+#focus.off{opacity:0}
+
+/* ── scenes · 3 zones (มุมซ้ายบนเว้นให้ปุ่มย้อนกลับของ popup) ── */
+.scene{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .35s;z-index:4}
+.scene.cur{opacity:1;pointer-events:auto}
+.zone{position:absolute;left:5%;right:5%;display:flex;flex-direction:column;align-items:center;text-align:center}
+.top{top:8cqh;height:23cqh;justify-content:flex-end}
+.mid{top:33cqh;height:36cqh;justify-content:center}
+.bot{bottom:4.5cqh;height:25cqh;justify-content:flex-start}
+.zone>[data-beat]{margin-block:.9cqh;max-height:40cqh;opacity:0;transform:translateY(2.2cqh);flex-shrink:0;
+  transition:opacity .5s,transform .55s cubic-bezier(.2,.9,.3,1.2),max-height .35s,margin .35s}
+.zone>[data-beat]:not(.on){max-height:0;margin-block:0;overflow:hidden;padding-top:0;padding-bottom:0;border-top-width:0;border-bottom-width:0}
+.zone>[data-beat].on{opacity:1;transform:none}
+[data-anim=pop]{transform:scale(.72)}
+[data-anim=left]{transform:translateX(-8cqw)}
+[data-anim=right]{transform:translateX(8cqw)}
+
+/* ── ตัวอักษร (cqh ล้วน = สัดส่วนเดียวกันทุกขนาดเวที) ── */
+.eyebrow{font-family:'Cinzel','Anuphan',serif;font-size:2.05cqh;font-weight:600;letter-spacing:.24em;color:var(--gold);white-space:nowrap}
+.h{font-size:5.4cqh;font-weight:700;line-height:1.25;color:var(--ink)}
+.h.md{font-size:4.6cqh}
+.h.xl{font-size:7.3cqh;line-height:1.1}
+.body{font-size:3.9cqh;font-weight:600;line-height:1.35;color:var(--ink)}
+.sub{font-size:2.9cqh;font-weight:600;color:var(--gold)}
+.big{font-family:'DM Serif Display',serif;font-size:13cqh;line-height:.95;color:var(--gold2);text-shadow:0 0 3cqh rgba(var(--gold-rgb),.45);white-space:nowrap}
+.big small{font-family:'Cinzel',serif;font-weight:700;font-size:.3em;letter-spacing:.3em;color:var(--gold);vertical-align:.95em;margin-right:.35em;text-shadow:none}
+.ln{display:block;opacity:0;transform:translateY(1.4cqh);transition:opacity .45s,transform .5s cubic-bezier(.2,.9,.3,1.1)}
+[data-beat].on .ln{opacity:1;transform:none}
+[data-beat].on .ln:nth-child(2){transition-delay:.7s}[data-beat].on .ln:nth-child(3){transition-delay:1.4s}
+.hi{white-space:nowrap;color:var(--gold2);background:linear-gradient(transparent 62%,rgba(var(--gold-rgb),.35) 62%)}
+.nw{white-space:nowrap}
+
+/* ── การ์ด ── */
+.card{width:100%;background:rgba(var(--card),.72);border:1px solid rgba(var(--gold-rgb),.45);border-radius:1.8cqh;padding:1.8cqh 2.4cqw}
+.card.gold{box-shadow:0 0 2.5cqh rgba(var(--gold-rgb),.3)}
+.card.warn{border-color:rgba(255,196,80,.75);box-shadow:0 0 2.5cqh rgba(255,196,80,.2)}
+.card .t{font-size:4.2cqh;font-weight:700;line-height:1.25;color:var(--gold2)}
+.card.warn .t{color:var(--amber)}
+.card .s{font-size:3.2cqh;line-height:1.35;font-weight:600;color:var(--ink);opacity:.92;margin-top:.6cqh}
+
+/* ── กล่องเทียบซ้าย-ขวา ── */
+.twin{display:flex;gap:2.4cqw;width:100%;align-items:stretch}
+.twin .b{flex:1;background:rgba(var(--card),.75);border:1px solid rgba(var(--gold-rgb),.5);border-radius:1.6cqh;padding:2.6cqh 1.8cqw;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;opacity:0;transform:translateY(1.6cqh);transition:opacity .45s,transform .45s}
+.twin.on .b{opacity:1;transform:none}.twin.on .b:nth-child(2){transition-delay:.55s}
+.twin .b.dim{border-color:rgba(244,228,186,.22);background:rgba(var(--card),.45)}
+.twin .sign{font-family:'DM Serif Display',serif;font-size:7cqh;line-height:1;color:var(--green)}
+.twin .b.dim .sign{color:rgba(250,246,237,.42)}
+.twin .k{font-size:3.2cqh;font-weight:700;color:var(--gold2);margin-top:.8cqh;white-space:nowrap}
+.twin .b.dim .k{color:rgba(250,246,237,.6)}
+.twin .v{font-size:2.8cqh;font-weight:600;line-height:1.3;margin-top:.9cqh;opacity:.9}
+/* ── chips ── */
+.chips{display:flex;flex-direction:column;align-items:stretch;gap:1.4cqh;width:84%}
+.chip{display:flex;align-items:center;gap:2.4cqw;font-size:3.5cqh;font-weight:700;color:var(--gold2);border:1px solid rgba(var(--gold-rgb),.6);border-radius:99px;padding:.9cqh 4.4cqw .9cqh 2cqw;
+  background:rgba(var(--card),.72);opacity:0;transform:translateY(1.5cqh);transition:opacity .45s,transform .45s;white-space:nowrap}
+.chip i{font-style:normal;font-family:'DM Serif Display',serif;font-size:3.1cqh;line-height:1;width:5cqh;height:5cqh;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;color:var(--bg1);background:linear-gradient(135deg,var(--gold2),var(--gold))}
+.chips.on .chip{opacity:1;transform:none}
+.chips.on .chip:nth-child(2){transition-delay:.45s}.chips.on .chip:nth-child(3){transition-delay:.9s}
+
+/* ── กระดาษ 5 บรรทัด (ภาพหลักของเรื่อง) ── */
+.paper{width:92%;background:linear-gradient(180deg,#FFFEF8,#FAF6ED);border:1px solid rgba(var(--gold-rgb),.8);border-radius:1.5cqh;
+  padding:1.8cqh 3.6cqw 2.2cqh;text-align:left;position:relative;box-shadow:0 1.6cqh 4cqh rgba(0,0,0,.5)}
+.zone>.paper[data-beat]{transform:translateY(2.2cqh) rotate(-3deg)}
+.zone>.paper[data-beat].on{transform:rotate(-1.3deg)}
+.paper .ph{display:flex;justify-content:space-between;align-items:baseline;font-family:'Cinzel',serif;font-weight:700;font-size:1.7cqh;letter-spacing:.26em;color:var(--gold-deep);margin-bottom:.4cqh}
+.paper .ph b{font-family:'DM Serif Display',serif;font-weight:400;font-size:2.4cqh;letter-spacing:0;color:var(--maroon)}
+.paper .row{display:flex;align-items:flex-end;gap:2.2cqw;height:5cqh;padding-bottom:.95cqh;border-bottom:1px solid rgba(139,105,20,.38);position:relative}
+.paper .no{font-family:'DM Serif Display',serif;font-size:2.8cqh;line-height:1.1;color:var(--maroon);width:3.6cqw;flex-shrink:0;text-align:center}
+.paper .row.why .no{color:var(--gold-deep)}
+.paper.wide{width:98%}
+/* เส้นขยุกขยิก = "กำลังเขียน" (กระดาษเปล่าในฉากเปิด) */
+.paper .ink{height:.42cqh;border-radius:99px;background:var(--maroon);opacity:.78;margin-bottom:.7cqh;transform:scaleX(0);transform-origin:left center;transition:transform .7s cubic-bezier(.5,0,.2,1)}
+.paper .row.why .ink{background:var(--gold-deep)}
+.paper .row.w .ink{transform:scaleX(1)}
+/* ข้อความที่ "ถูกเขียน" จากซ้ายไปขวา */
+.paper .tx{font-size:2.95cqh;font-weight:600;line-height:1.15;color:#3a1520;white-space:nowrap;clip-path:inset(-20% 100% -20% 0);transition:clip-path .85s cubic-bezier(.4,0,.2,1)}
+.paper .tx em{font-style:normal;color:rgba(58,21,32,.4);letter-spacing:.12em}
+.paper .row.w .tx{clip-path:inset(-20% 0 -20% 0)}
+/* ป้ายจัดกลุ่มด้านขวา: 1–3 = วิธี · 4–5 = เหตุผล */
+.paper .grp{position:absolute;right:-2.2cqw;margin-top:-1.85cqh;display:flex;align-items:center;opacity:0;transform:translateX(3cqw);transition:opacity .45s,transform .5s cubic-bezier(.34,1.4,.5,1)}
+.paper .grp.show{opacity:1;transform:none}
+.paper .grp span{font-size:2.3cqh;font-weight:700;line-height:1;padding:.7cqh 2.2cqw;border-radius:99px;color:#FFF5E1;white-space:nowrap;box-shadow:0 .5cqh 1.2cqh rgba(0,0,0,.3)}
+.paper .grp.a span{background:linear-gradient(135deg,#722F37,#9C2B2B)}
+.paper .grp.b span{background:linear-gradient(135deg,#8B6914,#B8922A)}
+
+/* ── ฉากปิด ── */
+.endtxt{font-size:3.3cqh;font-weight:600;line-height:1.4;color:var(--ink)}
+.endbtns{display:flex;gap:2.4cqw;justify-content:center;width:100%}
+.endbtns button{font:inherit;font-size:2.9cqh;font-weight:700;border-radius:99px;padding:1.25cqh 4.2cqw;cursor:pointer;display:flex;align-items:center;gap:1.6cqw;white-space:nowrap}
+.endbtns svg{width:2.7cqh;height:2.7cqh;flex-shrink:0}
+.endbtns .ghost{background:rgba(var(--card),.75);border:1px solid rgba(var(--gold-rgb),.6);color:var(--gold2)}
+.endbtns .solid{background:linear-gradient(90deg,var(--gold),var(--gold2));border:1px solid var(--gold2);color:var(--bg1)}
+
+/* ── HUD ── */
+#prog{position:absolute;top:0;left:0;height:.7cqh;width:100%;transform:scaleX(0);transform-origin:left center;background:linear-gradient(90deg,var(--gold),var(--gold2));z-index:9}
+#brand{position:absolute;bottom:1.3cqh;left:0;right:0;text-align:center;z-index:9;font-family:'Cinzel',serif;font-size:1.55cqh;letter-spacing:.35em;color:var(--gold);opacity:.55;pointer-events:none}
+#hud{position:absolute;top:1.7cqh;right:2.4cqw;z-index:10;transition:opacity .3s;display:flex;gap:1.2cqw;align-items:center;font-size:1.9cqh;color:var(--gold);font-family:'Cinzel',serif;letter-spacing:.08em}
+#hud button{background:rgba(var(--card),.8);border:1px solid rgba(var(--gold-rgb),.5);color:var(--gold2);border-radius:50%;width:5.2cqh;height:5.2cqh;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#hud svg{width:2.4cqh;height:2.4cqh}
+#hud.auto{opacity:0;pointer-events:none}
+#pausedTag{position:absolute;left:50%;top:50%;z-index:12;transform:translate(-50%,-50%) scale(.7);opacity:0;pointer-events:none;width:11cqh;height:11cqh;border-radius:50%;
+  background:rgba(var(--card),.82);border:1px solid rgba(var(--gold-rgb),.7);display:flex;align-items:center;justify-content:center;color:var(--gold2);transition:opacity .25s,transform .25s}
+#pausedTag svg{width:4.6cqh;height:4.6cqh}
+#pausedTag.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+#flash{position:absolute;inset:0;z-index:15;pointer-events:none;background:radial-gradient(circle at 50% 50%,rgba(var(--gold-rgb),.7),transparent 65%);opacity:0}
+#flash.go{animation:flashA .55s ease-out}
+@keyframes flashA{0%{opacity:0}18%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="gridbg"></div><div class="vig"></div><div id="dust"></div><div id="prog"></div>
+  <div id="focus"></div>
+
+  <!-- S0 เปิดเรื่อง -->
+  <section class="scene">
+    <div class="zone top">
+      <div data-beat="0" class="eyebrow">DAY 01 · JOURNAL &amp; JUSTIFY</div>
+      <div data-beat="0" class="h xl">12 เดือน<br><span class="hi">ที่ผ่านมา</span></div>
+    </div>
+    <div class="zone mid">
+      <div data-beat="1" class="paper" id="p0">
+        <div class="ph"><span>12-MONTH REVIEW</span><b>Day 01</b></div>
+        <div class="row"><div class="no">1</div><div class="ink" style="width:72%"></div></div>
+        <div class="row"><div class="no">2</div><div class="ink" style="width:58%"></div></div>
+        <div class="row"><div class="no">3</div><div class="ink" style="width:66%"></div></div>
+        <div class="row why"><div class="no">4</div><div class="ink" style="width:80%"></div></div>
+        <div class="row why"><div class="no">5</div><div class="ink" style="width:52%"></div></div>
+      </div>
+    </div>
+    <div class="zone bot">
+      <div data-beat="2" class="h md"><span class="ln">เขียนผลลัพธ์ปีที่ผ่านมา</span><span class="ln">ตามจริง</span><span class="ln"><span class="hi">ทั้งที่ดีและที่แย่</span></span></div>
+    </div>
+  </section>
+
+  <!-- S1 ทำไมต้องเขียนทั้งสองฝั่ง -->
+  <section class="scene">
+    <div class="zone top">
+      <div data-beat="3" class="h"><span class="ln">ความจำ</span><span class="ln"><span class="hi">เข้าข้างเราเสมอ</span></span></div>
+    </div>
+    <div class="zone mid">
+      <div data-beat="4" class="twin" id="tw">
+        <div class="b"><div class="sign">+</div><div class="k">ไม้ที่ได้</div><div class="v">จำได้แม่น<br>ทุกรายละเอียด</div></div>
+        <div class="b dim"><div class="sign">&minus;</div><div class="k">ไม้ที่เสีย</div><div class="v">เลือนไปเอง<br>โดยไม่รู้ตัว</div></div>
+      </div>
+    </div>
+    <div class="zone bot">
+      <div data-beat="5" data-anim="right" class="card warn"><div class="t">จดฝั่งเดียว = ภาพลวง</div><div class="s"><span class="ln">ถ้าจดแต่ไม้ที่ชนะ</span><span class="ln">เราจะคิดว่าวิธีที่ใช้อยู่ ดีกว่าความจริง</span></div></div>
+    </div>
+  </section>
+
+  <!-- S2 ส่วนที่ 1 · ตัวเลข -->
+  <section class="scene">
+    <div class="zone top">
+      <div data-beat="6" class="eyebrow">ส่วนที่ 1 · สามบรรทัดแรก</div>
+      <div data-beat="6" class="h"><span class="ln">ตัวเลข</span><span class="ln">ของ <span class="hi">ปีที่ผ่านมา</span></span></div>
+    </div>
+    <div class="zone mid">
+      <div data-beat="7" class="chips">
+        <div class="chip"><i>1</i>ผลรวมทั้งพอร์ต</div>
+        <div class="chip"><i>2</i>ไม้ที่ได้มากที่สุด</div>
+        <div class="chip"><i>3</i>ไม้ที่เสียมากที่สุด</div>
+      </div>
+    </div>
+    <div class="zone bot">
+      <div data-beat="8" data-anim="pop" class="body"><span class="ln">นับไม้ที่ยังไม่ขายด้วย</span><span class="ln">ของที่ยังถืออยู่ <span class="hi">ก็คือผลลัพธ์</span></span></div>
+    </div>
+  </section>
+
+  <!-- S3 ส่วนที่ 2 · บทเรียน -->
+  <section class="scene">
+    <div class="zone top">
+      <div data-beat="9" class="eyebrow">ส่วนที่ 2 · สองบรรทัดหลัง</div>
+      <div data-beat="9" class="h"><span class="ln">แล้ว</span><span class="ln"><span class="hi">อะไรทำให้เป็นแบบนั้น</span></span></div>
+    </div>
+    <div class="zone mid">
+      <div data-beat="10" class="chips">
+        <div class="chip"><i>4</i>สิ่งที่ทำแล้วได้ผล</div>
+        <div class="chip"><i>5</i>สิ่งที่ทำแล้วเจ็บ</div>
+      </div>
+    </div>
+    <div class="zone bot">
+      <div data-beat="11" data-anim="left" class="card gold"><div class="t">ตัวเลขบอกว่าเกิดอะไร</div><div class="s"><span class="ln">สองบรรทัดนี้บอกว่า</span><span class="ln"><span class="hi">เพราะอะไร</span></span></div></div>
+    </div>
+  </section>
+
+  <!-- S4 ครบ 5 บรรทัด -->
+  <section class="scene">
+    <div class="zone top">
+      <div data-beat="12" class="h md"><span class="ln">ครบแล้ว</span><span class="ln">หน้าตา <span class="hi">ประมาณนี้</span></span></div>
+    </div>
+    <div class="zone mid">
+      <div data-beat="13" class="paper wide" id="p1">
+        <div class="ph"><span>12-MONTH REVIEW</span><b>Day 01</b></div>
+        <div class="row"><div class="no">1</div><div class="tx">พอร์ตรวมปีนี้ <em>…</em></div></div>
+        <div class="row"><div class="no">2</div><div class="tx">ไม้ที่ได้มากสุดคือ <em>…</em></div></div>
+        <div class="row"><div class="no">3</div><div class="tx">ไม้ที่เสียมากสุดคือ <em>…</em></div></div>
+        <div class="row why"><div class="no">4</div><div class="tx">ที่ได้ผลเพราะ <em>…</em></div></div>
+        <div class="row why"><div class="no">5</div><div class="tx">ที่เจ็บเพราะ <em>…</em></div></div>
+        <div class="grp a" id="gA"><span>ตัวเลข</span></div>
+        <div class="grp b" id="gB"><span>บทเรียน</span></div>
+      </div>
+    </div>
+    <div class="zone bot">
+      <div data-beat="14" class="body"><span class="ln">ไม่ต้องสวย</span><span class="ln">ขอแค่ <span class="hi">ไม่เข้าข้างตัวเอง</span></span></div>
+    </div>
+  </section>
+
+  <!-- S5 ปิด -->
+  <section class="scene">
+    <div class="zone top">
+      <div data-beat="15" class="h"><span class="ln">ตัวเลขชุดนี้</span><span class="ln">ไม่ได้มีไว้ <span class="hi">ตัดสินใคร</span></span></div>
+    </div>
+    <div class="zone mid">
+      <div data-beat="16" data-anim="pop" class="card gold" style="text-align:center"><div class="t">มีไว้เป็นเส้นเริ่มต้น</div><div class="s"><span class="ln">อีก <span class="hi">89 วัน</span> ค่อยกลับมาวัดกันใหม่</span><span class="ln">ด้วยไม้บรรทัดอันเดิม</span></div></div>
+    </div>
+    <div class="zone bot">
+      <div data-beat="17" class="endtxt">ย้อนกลับไปที่หน้า Day 01<br>แล้วเขียนลงในช่อง <span class="hi">Journal</span> ได้เลย</div>
+      <div data-beat="17" class="endbtns">
+        <button class="ghost" id="bReplay" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 9 8 9"/></svg>ดูอีกครั้ง</button>
+        <button class="solid" id="bBack" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>กลับไปเขียน</button>
+      </div>
+    </div>
+  </section>
+
+  <div id="flash"></div>
+  <div id="pausedTag"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></div>
+  <div id="hud" class="auto"><span id="ctr">0 / 0</span>
+    <button id="bPrev" type="button" aria-label="ย้อน"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg></button>
+    <button id="bPlay" type="button" aria-label="เล่นต่อ"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg></button>
+    <button id="bNext" type="button" aria-label="ถัดไป"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"/></svg></button>
+  </div>
+  <div id="brand">JPTRUST · ROADMAP</div>
+</div>
+<script>
+(function(){
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const stage=$('#stage'),focus=$('#focus'),prog=$('#prog'),flashEl=$('#flash'),hud=$('#hud'),pausedTag=$('#pausedTag');
+
+/* ── เอฟเฟกต์ (เรียกซ้ำได้ ไม่ค้าง) ── */
+function flash(){flashEl.classList.remove('go');void flashEl.offsetWidth;flashEl.classList.add('go')}
+function twin(id){const el=$(id);el.classList.remove('on');void el.offsetWidth;el.classList.add('on')}
+/* กระดาษ: เขียนทีละบรรทัด · groups = [{id, from, to, at}] วางป้ายกลุ่มกึ่งกลางแถว from..to */
+function paperWrite(id,step,start,groups){const el=$(id);(el._t||[]).forEach(clearTimeout);el._t=[];
+  const rows=[...el.querySelectorAll('.row')];rows.forEach(r=>r.classList.remove('w'));
+  (groups||[]).forEach(g=>$(g.id).classList.remove('show'));void el.offsetWidth;
+  rows.forEach((r,i)=>el._t.push(setTimeout(()=>r.classList.add('w'),start+i*step)));
+  (groups||[]).forEach(g=>el._t.push(setTimeout(()=>{const a=rows[g.from],b=rows[g.to],t=$(g.id);
+    t.style.top=((a.offsetTop+b.offsetTop+b.offsetHeight)/2/el.offsetHeight*100)+'%';t.classList.add('show')},g.at)))}
+
+/* ฝุ่นลอย */
+const dust=$('#dust');for(let i=0;i<14;i++){const d=document.createElement('i');d.className='dust';d.style.left=Math.random()*100+'%';d.style.top=(60+Math.random()*40)+'%';d.style.animationDelay=(Math.random()*9)+'s';d.style.animationDuration=(7+Math.random()*6)+'s';dust.appendChild(d)}
+
+/* ═══ จังหวะ — s:ฉาก · el:สิ่งที่โผล่ · d:ms · glow:''|'gold'|'off' · fn:เอฟเฟกต์ ═══ */
+const beats=[
+ {s:0,el:'[data-beat="0"]',d:2600,glow:'',fn:flash},
+ {s:0,el:'[data-beat="1"]',d:3600,glow:'gold',fn:()=>paperWrite('#p0',380,450)},
+ {s:0,el:'[data-beat="2"]',d:4600,glow:'gold'},
+ {s:1,el:'[data-beat="3"]',d:2800,glow:''},
+ {s:1,el:'[data-beat="4"]',d:4400,glow:'gold',fn:()=>twin('#tw')},
+ {s:1,el:'[data-beat="5"]',d:5000,glow:'gold'},
+ {s:2,el:'[data-beat="6"]',d:3200,glow:''},
+ {s:2,el:'[data-beat="7"]',d:4200,glow:'gold'},
+ {s:2,el:'[data-beat="8"]',d:4200,glow:'gold'},
+ {s:3,el:'[data-beat="9"]',d:3000,glow:''},
+ {s:3,el:'[data-beat="10"]',d:3800,glow:'gold'},
+ {s:3,el:'[data-beat="11"]',d:4600,glow:'gold',fn:flash},
+ {s:4,el:'[data-beat="12"]',d:2800,glow:''},
+ {s:4,el:'[data-beat="13"]',d:6200,glow:'off',fn:()=>paperWrite('#p1',800,500,[{id:'#gA',from:0,to:2,at:3000},{id:'#gB',from:3,to:4,at:4700}])},
+ {s:4,el:'[data-beat="14"]',d:4000,glow:'off'},
+ {s:5,el:'[data-beat="15"]',d:3000,glow:''},
+ {s:5,el:'[data-beat="16"]',d:4800,glow:'gold'},
+ {s:5,el:'[data-beat="17"]',d:3000,glow:'gold'},
+];
+
+/* ═══ engine ═══ */
+const total=beats.length;let cursor=-1,auto=false,autoTimer=null,ended=false;
+const durMs=beats.reduce((a,b)=>a+(b.d||2800),0);
+function tell(ev,journal){try{if(window.parent&&window.parent!==window)window.parent.postMessage({type:'jptAnim',ev:ev,id:'d01-t2',journal:!!journal},'*')}catch(e){}}
+function applyState(){
+  const b=beats[cursor];const scene=b?b.s:-1;
+  $$('.scene').forEach((sc,i)=>sc.classList.toggle('cur',i===scene));
+  $$('[data-beat]').forEach(e=>e.classList.remove('on'));
+  if(!b){focus.className='';return}
+  const first=beats.findIndex(x=>x.s===scene);
+  for(let i=first;i<=cursor;i++){const x=beats[i];
+    $$(x.el).forEach(e=>e.classList.add('on'));
+    if(x.off)$$(x.off).forEach(e=>e.classList.remove('on'));
+    if(i===cursor&&x.fn)x.fn();
+  }
+  focus.className=b.glow||'';
+  $('#ctr').textContent=(cursor+1)+' / '+total;
+}
+function setProg(frac,ms){prog.style.transition=ms?('transform '+ms+'ms linear'):'none';prog.style.transform='scaleX('+frac+')'}
+function go(n){cursor=Math.max(0,Math.min(total-1,n));ended=false;applyState();if(auto)schedule();else setProg((cursor+1)/total,0)}
+function next(){if(cursor>=total-1){finish();return}go(cursor+1)}
+function prev(){setAuto(false);go(cursor-1)}
+function finish(){setAuto(false,true);setProg(1,0);if(!ended){ended=true;tell('ended')}}
+function schedule(){clearTimeout(autoTimer);const d=beats[cursor].d||2800;
+  setProg(cursor/total,0);void prog.offsetWidth;setProg((cursor+1)/total,d);
+  autoTimer=setTimeout(next,d)}
+function setAuto(v,quiet){auto=v;hud.classList.toggle('auto',v||!!quiet);pausedTag.classList.remove('show');
+  if(v)schedule();else{clearTimeout(autoTimer);const w=getComputedStyle(prog).transform;prog.style.transition='none';prog.style.transform=w}}
+function togglePlay(){if(auto){setAuto(false);pausedTag.classList.add('show')}else if(ended||cursor>=total-1){go(0);setAuto(true)}else setAuto(true)}
+
+$('#bNext').onclick=e=>{e.stopPropagation();setAuto(false);next()};
+$('#bPrev').onclick=e=>{e.stopPropagation();prev()};
+$('#bPlay').onclick=e=>{e.stopPropagation();togglePlay()};
+$('#bReplay').onclick=e=>{e.stopPropagation();go(0);setAuto(true)};
+$('#bBack').onclick=e=>{e.stopPropagation();tell('close',true)};
+stage.addEventListener('click',e=>{if(e.target.closest('#hud')||e.target.closest('.endbtns'))return;
+  const x=(e.clientX-stage.getBoundingClientRect().left)/stage.clientWidth;
+  if(x<.26)prev();else if(x>.74){setAuto(false);next()}else togglePlay()});
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'){e.preventDefault();setAuto(false);next()}
+  else if(e.key==='ArrowLeft')prev();
+  else if(e.key===' '||e.key==='p'||e.key==='P'){e.preventDefault();togglePlay()}
+  else if(e.key==='r'||e.key==='R'){go(0);setAuto(true)}
+  else if(e.key==='Escape')tell('close')});
+/* พับจอ/สลับแอพ = หยุด · กลับมา = เล่นต่อ */
+let wasAuto=false;
+document.addEventListener('visibilitychange',()=>{if(document.hidden){wasAuto=auto;if(auto)setAuto(false,true)}else if(wasAuto&&!ended){setAuto(true)}});
+
+/* เล่นเองทันที — รอฟอนต์ไม่เกิน 1.2 วิ กันตัวอักษรกระตุกตอนเปิด */
+let started=false;function start(){if(started)return;started=true;go(0);setAuto(true)}
+if(!new URLSearchParams(location.search).has('noauto')){
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(start);setTimeout(start,1200)}
+window.__anim={go,next,setAuto,total,durMs,start};
+})();
+</script>
+</body>
+</html>
