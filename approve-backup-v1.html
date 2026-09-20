@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<title>อนุมัติสมาชิก · JP Trust Learning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Cinzel:wght@500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<!--
+  approve.html — A129 (20 ก.ย. 2026)
+  หน้าปลายทางของปุ่ม "อนุมัติ / ปฏิเสธ" ในอีเมลแจ้ง founder
+  • เปิดลิงก์เฉยๆ = ไม่มีอะไรเกิดขึ้น (กันตัวสแกนลิงก์ของเมล) ต้องกดปุ่มยืนยันในหน้านี้
+  • token ใน ?t= คือกุญแจ · หน้านี้เรียก Edge Function approve-signup (POST) เท่านั้น
+  • ไม่ฝัง jpt-track.js / ไม่มี script ภายนอก — URL มี token ห้ามรั่วไปที่อื่น
+-->
+<style>
+:root{--maroon:#722F37;--maroon-d:#5A1F26;--bg1:#1a0a0e;--bg2:#2d1018;--bg3:#3a1520;--cream:#FAF6ED;--card:#FFFEF8;--gold:#D4AF37;--gold-d:#8B6914;--ink:#3D3228;--muted:#7A6F62;--green:#1F7D49;--red:#A83232}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg1)}
+body{min-height:100vh;font-family:'Anuphan',sans-serif;color:var(--ink);background:linear-gradient(160deg,var(--bg1),var(--bg2) 45%,var(--bg3) 65%,var(--bg1));padding:calc(20px + env(safe-area-inset-top,0px)) 16px calc(28px + env(safe-area-inset-bottom,0px));-webkit-text-size-adjust:100%}
+.wrap{max-width:480px;margin:0 auto}
+.brand{text-align:center;margin:6px 0 16px}
+.brand .k{font-family:'Cinzel',serif;font-size:11px;letter-spacing:3.5px;color:var(--gold);text-transform:uppercase}
+.brand .t{font-size:13px;color:rgba(244,228,186,.7);margin-top:4px}
+.card{background:var(--card);border:1.5px solid rgba(212,175,55,.4);border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.bar{height:4px;background:linear-gradient(90deg,#E8D48B,#D4AF37,#B8860B,#D4AF37,#E8D48B)}
+.body{padding:24px 22px 22px}
+.state{display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border-radius:30px;font-size:12.5px;font-weight:600;margin-bottom:12px}
+.state.pending{background:#FBF3DC;color:var(--gold-d)}
+.state.approved{background:#E9F5EC;color:var(--green)}
+.state.rejected{background:#FBEBEA;color:var(--red)}
+.state i{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block}
+h1{font-family:'DM Serif Display','Anuphan',serif;font-weight:400;font-size:24px;color:var(--maroon);line-height:1.25;margin-bottom:4px;word-break:break-word}
+.sub{font-size:13.5px;color:var(--muted);word-break:break-all}
+.amount{margin:18px 0 6px;padding:16px 18px;border-radius:14px;background:linear-gradient(180deg,#FFFEF8,#F5EDD8);border:1px solid rgba(212,175,55,.4);display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.amount .l{font-size:13px;color:var(--muted)}
+.amount .v{font-family:'DM Serif Display',serif;font-size:32px;color:var(--green);line-height:1}
+.amount .v small{font-family:'Anuphan',sans-serif;font-size:13px;color:var(--muted);margin-left:6px;text-decoration:line-through}
+dl{margin:10px 0 0}
+dl div{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-top:1px solid rgba(212,175,55,.2);font-size:14px}
+dl div:first-child{border-top:none}
+dt{color:var(--muted);white-space:nowrap}
+dd{font-weight:600;text-align:right;word-break:break-word}
+.tag{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.tag.new{background:#E9F5EC;color:var(--green)}.tag.renew{background:#E8F0FA;color:#2C5E9E}
+.warn{margin-top:12px;padding:11px 14px;border-radius:10px;background:#FDF0EE;border:1px solid #E3B4AE;color:#8A2C22;font-size:13px;line-height:1.55}
+.note{margin-top:12px;padding:11px 14px;border-radius:10px;background:#F2F6FB;border:1px solid #C9D8EA;color:#2C4A6E;font-size:13px;line-height:1.55}
+.slip{margin-top:16px}
+.slip .h{font-family:'Cinzel',serif;font-size:10.5px;letter-spacing:2.5px;color:var(--gold-d);text-transform:uppercase;margin-bottom:8px}
+.slip .box{border:1px dashed rgba(139,105,20,.45);border-radius:12px;background:var(--cream);min-height:88px;display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--muted);font-size:13px;text-align:center;padding:10px}
+.slip img{max-width:100%;display:block;border-radius:8px;cursor:zoom-in}
+.slip .meta{font-size:12px;color:var(--muted);margin-top:6px}
+.actions{margin-top:20px;display:grid;gap:10px}
+button{font-family:'Anuphan',sans-serif;font-size:16px;font-weight:700;border-radius:12px;padding:15px 14px;cursor:pointer;border:none;width:100%;-webkit-tap-highlight-color:transparent}
+button:disabled{opacity:.55;cursor:default}
+.b-ok{background:var(--green);color:#fff;box-shadow:0 6px 18px rgba(31,125,73,.3)}
+.b-no{background:var(--card);color:var(--red);border:1.5px solid var(--red)}
+.b-ghost{background:#F5EDD8;color:#5A3D20;border:1px solid rgba(212,175,55,.35);font-size:14px;font-weight:600;padding:12px}
+.hint{font-size:12.5px;color:var(--muted);line-height:1.6;text-align:center;margin-top:4px}
+#rejectPanel{display:none;margin-top:4px;padding:14px;border:1.5px solid rgba(168,50,50,.35);border-radius:12px;background:#FFF9F8}
+#rejectPanel label{font-size:13px;color:#5A3D20;font-weight:600;display:block;margin-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.chips span{font-size:12.5px;padding:5px 10px;border-radius:20px;border:1px solid rgba(168,50,50,.35);color:var(--red);cursor:pointer;background:#fff}
+textarea{width:100%;min-height:74px;border:1px solid rgba(139,105,20,.4);border-radius:10px;padding:10px 12px;font-family:'Anuphan',sans-serif;font-size:14.5px;color:var(--ink);background:#fff;resize:vertical}
+textarea:focus{outline:2px solid rgba(212,175,55,.6);border-color:var(--gold)}
+.result{text-align:center;padding:6px 0 2px}
+.ring{width:66px;height:66px;border-radius:50%;margin:4px auto 14px;display:flex;align-items:center;justify-content:center}
+.ring.ok{background:linear-gradient(135deg,#2E9F5F,#1F7D49)}.ring.no{background:linear-gradient(135deg,#C24A4A,#A83232)}.ring.wait{background:linear-gradient(135deg,#B8860B,#8B6914)}
+.ring svg{width:30px;height:30px;stroke:#fff;stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.result p{font-size:14px;line-height:1.7;color:#5A3D20}
+.center{text-align:center;padding:34px 10px;color:var(--muted);font-size:14px}
+.spin{width:30px;height:30px;border:3px solid rgba(212,175,55,.3);border-top-color:var(--gold);border-radius:50%;margin:0 auto 14px;animation:sp 0.9s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+.foot{text-align:center;font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:2px;color:rgba(244,228,186,.45);margin-top:18px}
+#zoom{display:none;position:fixed;inset:0;z-index:50;background:rgba(10,4,6,.94);overflow:auto;padding:16px;cursor:zoom-out}
+#zoom img{display:block;margin:0 auto;max-width:none;width:min(1000px,160%)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><div class="k">JP Trust Learning</div><div class="t">ตรวจสลิปและอนุมัติสมาชิก</div></div>
+  <div class="card"><div class="bar"></div><div class="body" id="root">
+    <div class="center"><div class="spin"></div>กำลังโหลดคำขอ…</div>
+  </div></div>
+  <div class="foot">INTERNAL · FOUNDERS ONLY</div>
+</div>
+<div id="zoom" onclick="this.style.display='none'"><img id="zoomImg" alt=""></div>
+
+<script>
+(function(){
+'use strict';
+var SUPABASE_URL='https://rcdukwwcbyryauhqlzmx.supabase.co';
+var SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZHVrd3djYnlyeWF1aHFsem14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MTY0MDAsImV4cCI6MjA4NTQ5MjQwMH0.rprPmudJYyb6dyhXb9Z9GrtQWEeIX99A2Wrj55PvS54';
+var ENDPOINT=SUPABASE_URL+'/functions/v1/approve-signup';
+var qs=new URLSearchParams(location.search);
+var TOKEN=(qs.get('t')||'').trim();
+var OPEN_REJECT=qs.get('a')==='reject';
+var root=document.getElementById('root');
+var INFO=null, BUSY=false;
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function baht(n){return '฿'+Number(n||0).toLocaleString('en-US');}
+function dThai(iso,withTime){if(!iso)return '—';var d=new Date(iso);if(isNaN(d.getTime()))return '—';
+  var o={timeZone:'Asia/Bangkok',year:'numeric',month:'short',day:'numeric'};if(withTime){o.hour='2-digit';o.minute='2-digit';}
+  return d.toLocaleString('th-TH',o);}
+function planLabel(p){return p==='yearly'?'รายปี (365 วัน)':p==='monthly'?'รายเดือน (30 วัน)':'—';}
+var ICON={ok:'<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>',no:'<svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>',wait:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>'};
+
+function call(action,extra){
+  var body={token:TOKEN,action:action};if(extra){for(var k in extra)body[k]=extra[k];}
+  return fetch(ENDPOINT,{method:'POST',cache:'no-store',
+    headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON,'Authorization':'Bearer '+SUPABASE_ANON},
+    body:JSON.stringify(body)})
+  .then(function(r){return r.json().catch(function(){return{ok:false,error:'เซิร์ฟเวอร์ไม่ตอบกลับ (HTTP '+r.status+')'};});});
+}
+function fail(msg){
+  root.innerHTML='<div class="result"><div class="ring no">'+ICON.no+'</div><h1>เปิดคำขอไม่ได้</h1><p style="margin-top:8px">'+esc(msg)+'</p>'+
+    '<div class="actions"><button class="b-ghost" onclick="location.reload()">ลองใหม่</button></div></div>';
+}
+
+// วันหมดอายุที่ "จะได้" ถ้าอนุมัติตอนนี้ — สูตรเดียวกับ SQL: max(ตอนนี้, วันเดิม) + จำนวนวัน
+function projectedExpiry(){
+  var days=Number(INFO.request.duration_days||0);if(!days)return null;
+  var base=Date.now(),cur=Date.parse(INFO.current_expiry||'');
+  if(!isNaN(cur)&&cur>base)base=cur;
+  return new Date(base+days*86400000).toISOString();
+}
+
+function render(){
+  var q=INFO.request,st=q.status;
+  var stateTxt=st==='approved'?'อนุมัติแล้ว':st==='rejected'?'ปฏิเสธแล้ว':'รออนุมัติ';
+  var discounted=Number(q.base_price||0)>Number(q.amount_due||0);
+  var h='';
+  h+='<span class="state '+st+'"><i></i>'+stateTxt+'</span>';
+  h+='<h1>'+esc(q.username||'—')+'</h1><div class="sub">'+esc(q.email)+'</div>';
+  h+='<div class="amount"><span class="l">ยอดที่ต้องได้รับ</span><span class="v">'+baht(q.amount_due)+(discounted?'<small>'+baht(q.base_price)+'</small>':'')+'</span></div>';
+  h+='<dl>';
+  h+='<div><dt>ประเภท</dt><dd><span class="tag '+(q.kind==='renew'?'renew':'new')+'">'+(q.kind==='renew'?'ต่ออายุ':'สมัครใหม่')+'</span></dd></div>';
+  h+='<div><dt>แพ็กเกจ</dt><dd>'+planLabel(q.plan)+'</dd></div>';
+  h+='<div><dt>โปรโมชัน</dt><dd>'+(q.promo_code?esc(q.promo_code):'ไม่มี')+'</dd></div>';
+  h+='<div><dt>รหัสอ้างอิง</dt><dd>'+esc(q.ref_code)+'</dd></div>';
+  h+='<div><dt>ส่งคำขอเมื่อ</dt><dd>'+dThai(q.created_at,true)+'</dd></div>';
+  if(q.kind==='renew'||INFO.current_expiry)h+='<div><dt>วันหมดอายุปัจจุบัน</dt><dd>'+dThai(INFO.current_expiry)+'</dd></div>';
+  if(st==='pending'){var pe=projectedExpiry();if(pe)h+='<div><dt>ถ้าอนุมัติตอนนี้ ใช้ได้ถึง</dt><dd style="color:var(--green)">'+dThai(pe)+'</dd></div>';}
+  if(st==='approved')h+='<div><dt>อนุมัติเมื่อ</dt><dd>'+dThai(q.decided_at,true)+'</dd></div><div><dt>สมาชิกใช้ได้ถึง</dt><dd style="color:var(--green)">'+dThai(q.granted_expires_at)+'</dd></div>';
+  if(st==='rejected')h+='<div><dt>ปฏิเสธเมื่อ</dt><dd>'+dThai(q.decided_at,true)+'</dd></div>'+(q.decided_note?'<div><dt>เหตุผล</dt><dd>'+esc(q.decided_note)+'</dd></div>':'');
+  h+='</dl>';
+  if(st==='pending'&&INFO.other_pending>0)h+='<div class="warn">⚠️ อีเมลนี้มีคำขอค้างอีก <b>'+INFO.other_pending+'</b> รายการ — อาจเป็นการส่งซ้ำ อนุมัติแต่ละรายการจะบวกวันแยกกัน ตรวจว่าโอนจริงกี่ครั้งก่อนกด</div>';
+  if(st==='pending'&&q.has_slip&&q.slip_bytes!=null&&Number(q.slip_bytes)<60*1024)h+='<div class="warn">⚠️ ไฟล์สลิปเล็กผิดปกติ ('+Math.max(1,Math.round(q.slip_bytes/1024))+' KB) — สลิปธนาคารจริงมักใหญ่กว่า 100 KB ตรวจให้ละเอียด</div>';
+  if(st==='pending'&&!q.has_slip)h+='<div class="note">คำขอนี้ใช้โค้ดโปรโมชันแบบฟรี จึงไม่มีสลิปแนบ — ตรวจว่าโค้ดและผู้สมัครถูกต้องก่อนอนุมัติ</div>';
+  if(q.has_slip)h+='<div class="slip"><div class="h">Payment Slip</div><div class="box" id="slipBox">กำลังโหลดสลิป…</div><div class="meta" id="slipMeta"></div></div>';
+  if(st==='pending'){
+    h+='<div class="actions">'+
+       '<button class="b-ok" id="btnApprove">✓ ตรวจสลิปแล้ว — ยืนยันอนุมัติ</button>'+
+       '<button class="b-no" id="btnReject">✕ ปฏิเสธคำขอนี้</button>'+
+       '<div id="rejectPanel"><label for="rejNote">เหตุผล (ลูกค้าจะเห็นข้อความนี้ในอีเมล · เว้นว่างได้)</label>'+
+         '<div class="chips"><span>ยอดโอนไม่ตรงกับแพ็กเกจ</span><span>ไม่พบรายการโอนเข้าบัญชี</span><span>ไฟล์ที่แนบไม่ใช่สลิปการโอน</span><span>สลิปซ้ำกับรายการก่อนหน้า</span></div>'+
+         '<textarea id="rejNote" maxlength="500" placeholder="เช่น ยอดโอน 100 บาท ไม่ตรงกับแพ็กเกจรายเดือน 150 บาท"></textarea>'+
+         '<div class="actions" style="margin-top:10px"><button class="b-no" id="btnRejectConfirm" style="background:var(--red);color:#fff">ยืนยันปฏิเสธ + ส่งอีเมลแจ้งลูกค้า</button><button class="b-ghost" id="btnRejectCancel">ยกเลิก</button></div></div>'+
+       '<div class="hint">อนุมัติ = เปิดสิทธิ์ทันที + ส่งอีเมลต้อนรับให้ลูกค้าอัตโนมัติ<br>คนใดคนหนึ่งกดก็พอ · กดซ้ำไม่บวกวันเพิ่ม</div>'+
+       '</div>';
+  }
+  root.innerHTML=h;
+  if(q.has_slip)loadSlip();
+  if(st==='pending'){
+    document.getElementById('btnApprove').onclick=function(){decide('approve');};
+    var panel=document.getElementById('rejectPanel');
+    document.getElementById('btnReject').onclick=function(){panel.style.display='block';this.style.display='none';document.getElementById('rejNote').focus();};
+    document.getElementById('btnRejectCancel').onclick=function(){panel.style.display='none';document.getElementById('btnReject').style.display='';};
+    document.getElementById('btnRejectConfirm').onclick=function(){decide('reject',document.getElementById('rejNote').value);};
+    Array.prototype.forEach.call(panel.querySelectorAll('.chips span'),function(c){c.onclick=function(){document.getElementById('rejNote').value=c.textContent;};});
+    if(OPEN_REJECT)document.getElementById('btnReject').click();
+  }
+}
+
+function loadSlip(){
+  call('slip').then(function(r){
+    var box=document.getElementById('slipBox');if(!box)return;
+    if(!r||!r.ok||!r.slip){box.textContent='โหลดสลิปไม่ได้ — ดูไฟล์แนบในอีเมลแทน';return;}
+    if(r.slip.indexOf('data:application/pdf')===0){box.innerHTML='<a href="'+r.slip+'" download="slip.pdf" style="color:var(--maroon);font-weight:600">สลิปเป็นไฟล์ PDF — แตะเพื่อดาวน์โหลด</a>';}
+    else{var img=new Image();img.alt='สลิปการโอนเงิน';img.src=r.slip;img.onclick=function(){document.getElementById('zoomImg').src=r.slip;document.getElementById('zoom').style.display='block';};
+      img.onerror=function(){box.textContent='ไฟล์ที่แนบมาเปิดเป็นรูปไม่ได้ — อาจไม่ใช่สลิปจริง';};box.innerHTML='';box.style.padding='6px';box.appendChild(img);}
+    var m=document.getElementById('slipMeta');if(m&&r.bytes)m.textContent='ขนาดไฟล์ '+Math.max(1,Math.round(r.bytes/1024)).toLocaleString('en-US')+' KB · แตะรูปเพื่อขยาย';
+  }).catch(function(){var box=document.getElementById('slipBox');if(box)box.textContent='โหลดสลิปไม่ได้ — ดูไฟล์แนบในอีเมลแทน';});
+}
+
+function decide(action,note){
+  if(BUSY)return;BUSY=true;
+  Array.prototype.forEach.call(root.querySelectorAll('button'),function(b){b.disabled=true;});
+  var btn=document.getElementById(action==='approve'?'btnApprove':'btnRejectConfirm');if(btn)btn.textContent='กำลังดำเนินการ…';
+  call(action,{note:note||''}).then(function(r){
+    BUSY=false;
+    if(!r||!r.ok){alertBar(r&&r.error?r.error:'ดำเนินการไม่สำเร็จ กรุณาลองใหม่');return;}
+    showResult(r);
+  }).catch(function(e){BUSY=false;alertBar('เชื่อมต่อไม่สำเร็จ: '+(e&&e.message?e.message:e));});
+}
+function alertBar(msg){
+  Array.prototype.forEach.call(root.querySelectorAll('button'),function(b){b.disabled=false;});
+  var a=document.getElementById('btnApprove');if(a)a.textContent='✓ ตรวจสลิปแล้ว — ยืนยันอนุมัติ';
+  var c=document.getElementById('btnRejectConfirm');if(c)c.textContent='ยืนยันปฏิเสธ + ส่งอีเมลแจ้งลูกค้า';
+  var w=document.getElementById('errBar');if(!w){w=document.createElement('div');w.id='errBar';w.className='warn';root.appendChild(w);}
+  w.textContent='⚠️ '+msg;w.scrollIntoView({block:'center'});
+}
+function showResult(r){
+  var d=r.decision||{},ok=d.status==='approved',h='<div class="result">';
+  if(!r.changed){
+    h+='<div class="ring '+(ok?'ok':'no')+'">'+(ok?ICON.ok:ICON.no)+'</div><h1>คำขอนี้ถูก'+(ok?'อนุมัติ':'ปฏิเสธ')+'ไปแล้ว</h1>'+
+       '<p style="margin-top:8px">เมื่อ '+dThai(d.decided_at,true)+(ok&&d.expires_at?'<br>สมาชิกใช้ได้ถึง '+dThai(d.expires_at):'')+'<br>ไม่มีการเปลี่ยนแปลงเพิ่มเติม</p>';
+  }else if(ok){
+    h+='<div class="ring ok">'+ICON.ok+'</div><h1>อนุมัติเรียบร้อย</h1>'+
+       '<p style="margin-top:8px"><b>'+esc(d.username||d.email)+'</b> เข้าใช้งานได้ทันที'+(d.expires_at?'<br>สมาชิกใช้ได้ถึง <b style="color:var(--green)">'+dThai(d.expires_at)+'</b>':'')+'</p>';
+  }else{
+    h+='<div class="ring no">'+ICON.no+'</div><h1>ปฏิเสธคำขอแล้ว</h1><p style="margin-top:8px">ไม่มีการเปิดสิทธิ์ให้ <b>'+esc(d.username||d.email)+'</b></p>';
+  }
+  if(r.changed)h+=r.emailSent?'<div class="note" style="text-align:left">ส่งอีเมลแจ้งลูกค้าแล้ว ('+esc(d.email)+')</div>'
+                              :'<div class="warn" style="text-align:left">⚠️ ดำเนินการสำเร็จ แต่ส่งอีเมลแจ้งลูกค้าไม่สำเร็จ'+(r.emailError?' ('+esc(r.emailError)+')':'')+' — กรุณาแจ้งลูกค้าเองที่ '+esc(d.email)+'</div>';
+  if(r.changed&&Number(d.other_pending||0)>0)h+='<div class="warn" style="text-align:left">อีเมลนี้ยังมีคำขอค้างอีก '+d.other_pending+' รายการ — เปิดจากอีเมลแจ้งเตือนฉบับอื่นเพื่อจัดการ</div>';
+  h+='<div class="actions"><button class="b-ghost" onclick="location.reload()">ดูรายละเอียดคำขอ</button></div></div>';
+  root.innerHTML=h;window.scrollTo(0,0);
+}
+
+if(!/^[A-Za-z0-9_-]{30,80}$/.test(TOKEN)){fail('ลิงก์ไม่ถูกต้องหรือไม่ครบ — กรุณาเปิดจากปุ่มในอีเมลแจ้งเตือนอีกครั้ง');return;}
+call('info').then(function(r){
+  if(!r||!r.ok){fail(r&&r.error?r.error:'โหลดคำขอไม่สำเร็จ');return;}
+  INFO=r;render();
+}).catch(function(e){fail('เชื่อมต่อไม่สำเร็จ: '+(e&&e.message?e.message:e));});
+})();
+</script>
+</body>
+</html>
