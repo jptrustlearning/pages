@@ -2021,7 +2021,7 @@ body > * { position: relative; z-index: 1; }
 
 
 
-/* ===== A133 · day modal content + calendar states ===== */
+/* ===== A137 · day modal content + calendar states ===== */
 .dm-topic { font-size: 0.82rem; color: var(--text-muted); margin-top: 6px; }
 .dm-tasks { margin: 0 0 18px; padding: 0; list-style: none; }
 .dm-task {
@@ -2418,7 +2418,7 @@ const CYCLE_META = {
 // STATE
 // ========================================
 let progress = {}; // { "1": {done: true, journal: "...", at: "..."}, ... }
-const PROGRESS_KEY = 'jpt_roadmap_progress_v1'; // local mirror (A133)
+const PROGRESS_KEY = 'jpt_roadmap_progress_v1'; // local mirror (A137)
 let currentModalDay = null;
 
 // ========================================
@@ -2535,7 +2535,7 @@ function dayForToday() {
 }
 
 function getDayState(dayN) {
-  // A133 — reads progress[]: past + done = completed · past + not done = missed
+  // A137 — reads progress[]: past + done = completed · past + not done = missed
   const today = startOfDay(new Date());
   const dDate = dateForDay(dayN);
   if (sameDate(today, dDate)) return 'today';
@@ -3000,7 +3000,7 @@ function switchCycle(n) {
 // DAY MODAL (currently locked — content coming later)
 // ========================================
 // ========================================
-// DAY CONTENT — 90 modules (A133)
+// DAY CONTENT — 90 modules (A137)
 // Source: roadmap-90-modules.json (same-origin, static file in this repo)
 // ========================================
 let MODULES = null;
@@ -3179,7 +3179,7 @@ function closeAboutModal() {
 // LOAD ON START
 // ========================================
 async function loadProgress() {
-  // Local mirror first, so the calendar is correct even when signed out (A133)
+  // Local mirror first, so the calendar is correct even when signed out (A137)
   try {
     const raw = localStorage.getItem(PROGRESS_KEY);
     if (raw) {
@@ -3216,7 +3216,7 @@ async function loadProgress() {
 // INIT
 // ========================================
 document.addEventListener('DOMContentLoaded', async () => {
-  // Day content — fire early, don't block first paint (A133)
+  // Day content — fire early, don't block first paint (A137)
   loadModules();
   // Load progress + start date from cloud first (best-effort)
   await loadProgress();
