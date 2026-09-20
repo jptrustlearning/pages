@@ -548,6 +548,10 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .expiry-banner.expired .expiry-banner-btn{background:linear-gradient(135deg,#E07A6E,#C0392B);color:#fff;box-shadow:0 3px 10px rgba(192,57,43,0.3)}
 .settings-badge.warn{background:rgba(212,175,55,0.15);color:var(--gold-deep,#8B6914);border-color:rgba(212,175,55,0.4)}
 .settings-badge.expired{background:rgba(234,106,94,0.12);color:#C0392B;border-color:rgba(234,106,94,0.4)}
+.settings-badge.pending{background:rgba(44,110,158,0.10);color:#2C5E9E;border-color:rgba(44,110,158,0.35)}
+.expiry-banner.pending{background:linear-gradient(135deg,rgba(44,110,158,0.10),rgba(44,110,158,0.05));border-color:rgba(44,110,158,0.40)}
+.expiry-banner.pending .expiry-banner-icon{background:linear-gradient(135deg,#3F7FB5,#2C5E9E);color:#fff}
+.expiry-banner.pending .expiry-banner-btn{background:#fff;color:#2C5E9E;border:1.5px solid rgba(44,110,158,0.45);box-shadow:none}
 .settings-item:last-child{border-bottom:none}.settings-item:active{background:var(--cream-warm)}
 .settings-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.settings-icon .jpt-icon svg{width:18px;height:18px;color:#FFF0D4;stroke:#FFF0D4}
 .settings-info{flex:1}.settings-label{font-size:14px;font-weight:500;color:var(--text-dark)}.settings-desc{font-size:12px;color:var(--text-dark-muted)}
@@ -1133,7 +1137,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             <div class="expiry-banner" id="expiryBanner" style="display:none" onclick="goRenew()">
                 <div class="expiry-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
                 <div class="expiry-banner-text"><div class="expiry-banner-title" id="expiryBannerTitle">สมาชิกของคุณใกล้หมดอายุ</div><div class="expiry-banner-desc" id="expiryBannerDesc">—</div></div>
-                <button class="expiry-banner-btn" type="button">ต่ออายุ</button>
+                <button class="expiry-banner-btn" id="expiryBannerBtn" type="button">ต่ออายุ</button>
             </div>
             <div class="install-banner-home" id="installBanner" onclick="handleInstallClick()">
                 <div class="install-banner-icon"><span class="jpt-icon" style="width:22px;height:22px;display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="8" x2="12" y2="14"/><polyline points="9 12 12 15 15 12"/><line x1="9" y1="18" x2="15" y2="18"/></svg></span></div>
@@ -1607,7 +1611,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             <div class="settings-item" id="memRenewedItem" style="cursor:default;display:none"><div class="settings-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/><polyline points="12 7 12 12 15 14"/></svg></span></div><div class="settings-info"><div class="settings-label">ต่ออายุล่าสุด</div><div class="settings-desc" id="memRenewed">—</div></div></div>
             <div class="settings-item" id="memPromoItem" style="cursor:default;display:none"><div class="settings-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span></div><div class="settings-info"><div class="settings-label">โปรโมชันที่ใช้</div><div class="settings-desc" id="memPromo">—</div></div></div>
             <div class="settings-item" style="cursor:default"><div class="settings-icon" style="background:linear-gradient(135deg,#722F37,#8B2252,#D4AF37);color:#FFF0D4"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span></div><div class="settings-info"><div class="settings-label">สมาชิกหมดอายุ</div><div class="settings-desc" id="memExpiry">—</div></div><div class="settings-badge" id="memDaysBadge" style="display:none"></div></div>
-            <div class="settings-item" onclick="goRenew()"><div class="settings-icon" style="background:linear-gradient(135deg,#D4AF37,#B8860B);color:#1a0a0e"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></span></div><div class="settings-info"><div class="settings-label">ต่ออายุสมาชิก</div><div class="settings-desc">ขยายอายุสมาชิก — นับต่อจากวันหมดอายุเดิม</div></div><div class="settings-arrow">›</div></div>
+            <div class="settings-item" id="memRenewRow" onclick="goRenew()"><div class="settings-icon" style="background:linear-gradient(135deg,#D4AF37,#B8860B);color:#1a0a0e"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></span></div><div class="settings-info"><div class="settings-label">ต่ออายุสมาชิก</div><div class="settings-desc" id="memRenewDesc">ขยายอายุสมาชิก — นับต่อจากวันหมดอายุเดิม</div></div><div class="settings-badge" id="memRenewBadge" style="display:none"></div><div class="settings-arrow" id="memRenewArrow">›</div></div>
         </div>
 
         <div class="section-header"><div class="section-title">ตั้งค่าแอป</div></div>
@@ -1955,7 +1959,59 @@ function backToEmail(){
 // already fetched — no extra getUser() call.
 var _renewEmail = '';
 var _renewMeta = {};
+// A130: renewal submitted and awaiting founder approval (webhook flags jpt_hold +
+// jpt_pending and leaves status/expiry untouched, so an unexpired member is still
+// inside the app). Surface that state everywhere a "renew" entry point lives, and
+// stop a second submit — approving two requests would add the days twice.
+var _renewState = {pending:false, rejected:false, plan:'', submittedAt:'', note:''};
+function computeRenewState(meta){
+  meta = meta || {};
+  var st = {pending:false, rejected:false, plan:'', submittedAt:'', note:''};
+  var p = (meta.jpt_pending && typeof meta.jpt_pending === 'object') ? meta.jpt_pending : null;
+  if(meta.jpt_hold === true || meta.jpt_hold === 'true'){
+    st.pending = true;
+    st.plan = (p && p.plan) || '';
+    st.submittedAt = (p && p.submitted_at) || meta.jpt_hold_at || '';
+  } else if(meta.jpt_rejected_at){
+    var rj = Date.parse(meta.jpt_rejected_at);
+    if(!isNaN(rj) && (Date.now() - rj) < 14*86400000){ st.rejected = true; st.note = meta.jpt_reject_note ? String(meta.jpt_reject_note) : ''; }
+  }
+  return st;
+}
+function renewPlanLabel(plan){ return plan === 'yearly' ? 'รายปี' : plan === 'monthly' ? 'รายเดือน' : ''; }
+function renewSubmittedLabel(iso){
+  if(!iso) return ''; var d = new Date(iso); if(isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('th-TH',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+function showRenewPendingInfo(){
+  if(document.getElementById('jptRenewPendingInfo')) return;
+  var st = _renewState, pl = renewPlanLabel(st.plan), when = renewSubmittedLabel(st.submittedAt);
+  var o = document.createElement('div');
+  o.id = 'jptRenewPendingInfo';
+  o.style.cssText = 'position:fixed;inset:0;z-index:99990;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(26,10,14,0.62);font-family:Sarabun,Anuphan,sans-serif;';
+  o.innerHTML = '' +
+    '<div style="max-width:380px;width:100%;background:#FFFEF8;border:1.5px solid rgba(212,175,55,0.4);border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.45);">' +
+      '<div style="height:4px;background:linear-gradient(90deg,#E8D48B,#D4AF37,#B8860B,#D4AF37,#E8D48B);"></div>' +
+      '<div style="padding:26px 22px 20px;text-align:center;">' +
+        '<div style="width:56px;height:56px;margin:0 auto 14px;border-radius:50%;background:linear-gradient(135deg,#3F7FB5,#2C5E9E);display:flex;align-items:center;justify-content:center;">' +
+          '<svg viewBox="0 0 24 24" width="27" height="27" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>' +
+        '</div>' +
+        '<div style="font-family:\'DM Serif Display\',serif;font-size:20px;color:#722F37;margin-bottom:8px;">ส่งคำขอต่ออายุแล้ว</div>' +
+        '<p style="font-size:13.5px;color:#5A3D20;line-height:1.65;margin:0 0 12px;">ทีมงานกำลังตรวจสอบการชำระเงิน โดยปกติใช้เวลาไม่เกิน 24 ชั่วโมง ระหว่างนี้คุณใช้งานได้ตามปกติ</p>' +
+        ((pl || when) ? '<div style="background:linear-gradient(180deg,#FFFEF8,#F5EDD8);border:1px solid rgba(212,175,55,0.35);border-radius:12px;padding:10px 14px;margin:0 0 12px;font-size:13px;color:#3D3228;text-align:left;">' +
+          (pl ? '<div style="display:flex;justify-content:space-between;padding:3px 0;"><span style="color:#7A6F62;">แพ็กเกจที่ขอต่อ</span><span style="font-weight:600;">' + pl + '</span></div>' : '') +
+          (when ? '<div style="display:flex;justify-content:space-between;padding:3px 0;"><span style="color:#7A6F62;">ส่งเมื่อ</span><span style="font-weight:600;">' + when + '</span></div>' : '') +
+        '</div>' : '') +
+        '<p style="font-size:12.5px;color:#7A6F62;line-height:1.6;margin:0 0 16px;">เมื่ออนุมัติแล้ววันสมาชิกจะต่อจากวันหมดอายุเดิมให้อัตโนมัติ ไม่ต้องส่งซ้ำ<br>มีข้อสงสัยติดต่อ <strong>jptrustlearning@gmail.com</strong></p>' +
+        '<button id="jptRenewPendingOk" style="width:100%;padding:13px;border:none;border-radius:12px;background:linear-gradient(135deg,#D4AF37,#B8860B);color:#1a0a0e;font-family:Sarabun,sans-serif;font-size:15px;font-weight:700;cursor:pointer;">รับทราบ</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(o);
+  o.onclick = function(e){ if(e.target === o) o.remove(); };
+  document.getElementById('jptRenewPendingOk').onclick = function(){ o.remove(); };
+}
 function goRenew(){
+  if(_renewState.pending){ try{logEvent('renew_click_pending');}catch(e){} showRenewPendingInfo(); return; }
   var em = _renewEmail || (userSettings && userSettings.email) || '';
   try{logEvent('renew_click');}catch(e){}
   var q = 'signup.html?v=1783496563' + (em ? ('&email=' + encodeURIComponent(em)) : '') + '&renew=1';
@@ -1979,6 +2035,24 @@ function goRenew(){
 function renderHomeExpiryBanner(daysLeft, expStr){
   var b=document.getElementById('expiryBanner'); if(!b) return;
   var title=document.getElementById('expiryBannerTitle'), desc=document.getElementById('expiryBannerDesc');
+  var btn=document.getElementById('expiryBannerBtn');
+  // A130: a renewal under review (or just rejected) always shows, whatever the days left.
+  if(_renewState.pending){
+    var pl=renewPlanLabel(_renewState.plan), when=renewSubmittedLabel(_renewState.submittedAt);
+    b.className='expiry-banner pending';
+    if(title)title.textContent='ส่งคำขอต่ออายุแล้ว';
+    if(desc)desc.textContent=(pl?('แพ็ก'+pl+' · '):'')+(when?(when+' · '):'')+'รอทีมงานตรวจสอบ';
+    if(btn)btn.textContent='รอตรวจสอบ';
+    b.style.display='flex';return;
+  }
+  if(_renewState.rejected){
+    b.className='expiry-banner expired';
+    if(title)title.textContent='คำขอต่ออายุไม่ผ่านการตรวจสอบ';
+    if(desc)desc.textContent=(_renewState.note?(_renewState.note+' · '):'')+'แตะเพื่อส่งสลิปใหม่';
+    if(btn)btn.textContent='ส่งใหม่';
+    b.style.display='flex';return;
+  }
+  if(btn)btn.textContent='ต่ออายุ';
   // Show only when expiring within 14 days, or already past (pre-revoke grace).
   if(daysLeft===null||daysLeft>14){b.style.display='none';return;}
   b.className='expiry-banner'+(daysLeft<0?' expired':'');
@@ -1996,6 +2070,22 @@ function renderMembershipCard(meta){
   _renewMeta=meta;
   _notifState.days=null;_notifState.expStr=null;_notifState.renewedAt=meta.subscription_renewed_at||null;
   _renewEmail=(meta && meta.email) || _renewEmail;
+  _renewState=computeRenewState(meta);
+  (function(){
+    var d=document.getElementById('memRenewDesc'),bd=document.getElementById('memRenewBadge'),ar=document.getElementById('memRenewArrow');
+    if(!d||!bd)return;
+    bd.style.display='none';bd.className='settings-badge';if(ar)ar.style.display='';
+    if(_renewState.pending){
+      var pl=renewPlanLabel(_renewState.plan),when=renewSubmittedLabel(_renewState.submittedAt);
+      d.textContent='ส่งคำขอแล้ว'+(pl?(' · แพ็ก'+pl):'')+(when?(' · '+when):'');
+      bd.textContent='รอตรวจสอบ';bd.className='settings-badge pending';bd.style.display='inline-block';if(ar)ar.style.display='none';
+    }else if(_renewState.rejected){
+      d.textContent='คำขอล่าสุดไม่ผ่านการตรวจสอบ — แตะเพื่อส่งสลิปใหม่';
+      bd.textContent='ไม่ผ่าน';bd.className='settings-badge expired';bd.style.display='inline-block';
+    }else{
+      d.textContent='ขยายอายุสมาชิก — นับต่อจากวันหมดอายุเดิม';
+    }
+  })();
   function thai(iso,withTime){if(!iso)return null;var d=new Date(iso);if(isNaN(d.getTime()))return null;return d.toLocaleDateString('th-TH',withTime?{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}:{year:'numeric',month:'long',day:'numeric'});}
   var elS=document.getElementById('memStarted');
   if(elS)elS.textContent=thai(meta.subscription_started_at,true)||'\u2014';
@@ -3055,7 +3145,7 @@ function buildNotifBodyHTML(){
           '</div>' +
           '<div style="flex:1;min-width:0;">' +
             '<div style="font-size:14px;font-weight:700;color:#722F37;">' + title + '</div>' +
-            '<div style="font-size:12.5px;color:#5A3D20;margin-top:2px;">หมดอายุ ' + (s.expStr || '—') + ' · แตะเพื่อต่ออายุ</div>' +
+            '<div style="font-size:12.5px;color:#5A3D20;margin-top:2px;">หมดอายุ ' + (s.expStr || '—') + (_renewState.pending ? ' · ส่งคำขอต่ออายุแล้ว รอตรวจสอบ' : ' · แตะเพื่อต่ออายุ') + '</div>' +
             '<div id="jptNotifPromo" style="display:none;font-size:12px;color:#8B6914;font-weight:600;margin-top:6px;line-height:1.5;"></div>' +
           '</div>' +
           '<div style="color:#B8860B;font-size:18px;line-height:1;align-self:center;">›</div>' +
@@ -3094,7 +3184,7 @@ function attachNotifHandlers(o){
   var expItem = document.getElementById('jptNotifExpItem');
   if(expItem){
     expItem.onclick = function(){ o.remove(); goRenew(); };
-    fetchRenewPromoHint().then(function(t){
+    if(!_renewState.pending) fetchRenewPromoHint().then(function(t){
       var el = document.getElementById('jptNotifPromo');
       if(el && t){ el.textContent = t; el.style.display = 'block'; }
     }).catch(function(){});
