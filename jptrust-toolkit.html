@@ -19,7 +19,8 @@
   var d=document.documentElement, q=/[?&]app=1(&|$)/.test(location.search), s=false;
   try{ s=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true; }catch(e){}
   if(!q&&!s) return;
-  d.classList.add('tk-app'); d.setAttribute('data-tab','home');   /* A154.1 · แอปเปิดที่หน้าภาพรวมเสมอ */
+  d.classList.add('tk-app'); d.setAttribute('data-tab','home');
+  if(s) d.classList.add('tk-installed');   /* A154.4 · เปิดจากไอคอนจริง (ไม่ใช่ลิงก์ดูตัวอย่าง ?app=1) */   /* A154.1 · แอปเปิดที่หน้าภาพรวมเสมอ */
   var v=document.querySelector('meta[name="viewport"]'); if(v) v.setAttribute('content','width=device-width, initial-scale=1.0, viewport-fit=cover');
   var t=document.querySelector('meta[name="theme-color"]'); if(t) t.setAttribute('content','#EFE8DE');
 })();
@@ -3084,8 +3085,10 @@ if(h0){
 
   if(isApp){
     window.addEventListener('load',function(){ track('app-open'); });
-    /* A154.3 · จดเวลาที่เปิดจากแอปล่าสุด — หน้าเว็บใช้ตัดสินว่าไม่ต้องชวนติดตั้ง (หมดอายุ 30 วัน เผื่อถอนการติดตั้ง) */
-    try{ localStorage.setItem('jpt_tk_app_seen',String(Date.now())); }catch(e){}
+    /* A154.3 · จดเวลาที่เปิดจากแอปล่าสุด — หน้าเว็บใช้ตัดสินว่าไม่ต้องชวนติดตั้ง (หมดอายุ 30 วัน เผื่อถอนการติดตั้ง)
+       A154.4 · จดเฉพาะตอนเปิดจากไอคอนจริง — ลิงก์ ?app=1 ที่เปิดในเบราว์เซอร์ในแอป (Custom Tab ใช้ storage ร่วมกับ Chrome)
+       เคยทำให้แถบติดตั้งหายทั้งที่ยังไม่ได้ติดตั้ง · เปลี่ยนชื่อคีย์เป็น v2 เพื่อทิ้งค่าที่จดผิดไปแล้ว */
+    if(root.classList.contains('tk-installed')) try{ localStorage.setItem('jpt_tk_app_seen2',String(Date.now())); }catch(e){}
 
     /* คำทักทายตามเวลาไทย (ไม่ใช่เวลาเครื่อง) */
     var hi=document.getElementById('ahHi');
@@ -3184,7 +3187,7 @@ if(h0){
   var bar=document.getElementById('pwaBar'); if(!bar) return;
   var KEY='jpt_tk_pwa_x', DAYS=14;
   try{ var t=+localStorage.getItem(KEY)||0; if(Date.now()-t<DAYS*864e5) return; }catch(e){}
-  try{ var seen=+localStorage.getItem('jpt_tk_app_seen')||0; if(Date.now()-seen<30*864e5) return; }catch(e){}
+  try{ var seen=+localStorage.getItem('jpt_tk_app_seen2')||0; if(Date.now()-seen<30*864e5) return; }catch(e){}
   if(!matchMedia('(max-width:900px)').matches && !matchMedia('(pointer:coarse)').matches) return;
   var ua=navigator.userAgent;
   var ios=/iPad|iPhone|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -3233,7 +3236,7 @@ if(h0){
       : Promise.resolve(false);
     chk.then(function(installed){ if(!installed) reveal(); });
   }
-  window.addEventListener('appinstalled',function(){ bar.hidden=true; track('pwa-installed'); try{ localStorage.setItem('jpt_tk_app_seen',String(Date.now())); }catch(e){} });
+  window.addEventListener('appinstalled',function(){ bar.hidden=true; track('pwa-installed'); try{ localStorage.setItem('jpt_tk_app_seen2',String(Date.now())); }catch(e){} });
   x.addEventListener('click',function(){ bar.hidden=true; try{ localStorage.setItem(KEY,String(Date.now())); }catch(e){} });
 })();
 </script>
