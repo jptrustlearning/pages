@@ -933,6 +933,9 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 .pwab-how ol{margin:0;padding-left:20px}
 .pwab-how li+li{margin-top:3px}
 .pwab-how svg{width:15px;height:15px;vertical-align:-2px;fill:none;stroke:var(--maroon);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.pwab-how svg circle{fill:var(--maroon);stroke:none}   /* A154.3 · จุดเมนู ⋮ */
+.pwab-how p{margin:0}
+a.pwab-go,.pwab a.btn{text-decoration:none}
 
 /* ================= A154 · โหมดแอป (html.tk-app = standalone หรือ ?app=1) =================
    ทุกกฎอยู่ใต้ html.tk-app — หน้าเว็บปกติไม่เปลี่ยน · โทนตามภาพอ้างอิงที่จูนส่ง 21 ก.ย. 69:
@@ -3081,6 +3084,8 @@ if(h0){
 
   if(isApp){
     window.addEventListener('load',function(){ track('app-open'); });
+    /* A154.3 · จดเวลาที่เปิดจากแอปล่าสุด — หน้าเว็บใช้ตัดสินว่าไม่ต้องชวนติดตั้ง (หมดอายุ 30 วัน เผื่อถอนการติดตั้ง) */
+    try{ localStorage.setItem('jpt_tk_app_seen',String(Date.now())); }catch(e){}
 
     /* คำทักทายตามเวลาไทย (ไม่ใช่เวลาเครื่อง) */
     var hi=document.getElementById('ahHi');
@@ -3173,30 +3178,62 @@ if(h0){
     return;
   }
 
-  /* ---------- หน้าเว็บปกติ: แถบชวนติดตั้ง ---------- */
+  /* ---------- หน้าเว็บปกติ: แถบชวนติดตั้ง (A154.3) ----------
+     ขึ้นทันทีบนมือถือทุกเครื่องที่ยังไม่ได้ติดตั้ง · ปิด × = ไม่ขึ้น 14 วัน
+     iPhone = วิธีเพิ่มไปหน้าจอโฮม · Android = ปุ่มติดตั้งจริงเมื่อเบราว์เซอร์พร้อม ไม่งั้นวิธีผ่านเมนู */
   var bar=document.getElementById('pwaBar'); if(!bar) return;
   var KEY='jpt_tk_pwa_x', DAYS=14;
   try{ var t=+localStorage.getItem(KEY)||0; if(Date.now()-t<DAYS*864e5) return; }catch(e){}
+  try{ var seen=+localStorage.getItem('jpt_tk_app_seen')||0; if(Date.now()-seen<30*864e5) return; }catch(e){}
   if(!matchMedia('(max-width:900px)').matches && !matchMedia('(pointer:coarse)').matches) return;
   var ua=navigator.userAgent;
   var ios=/iPad|iPhone|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  var android=/Android/i.test(ua);
   var inapp=/Line\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger/i.test(ua);
   var go=document.getElementById('pwaGo'), how=document.getElementById('pwaHow'), x=document.getElementById('pwaX');
   var deferred=null;
+  var DOTS='<svg viewBox="0 0 24 24" aria-label="ปุ่มเมนู"><circle cx="12" cy="5.5" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="12" cy="18.5" r="1.2"/></svg>';
+  var toggleHow=function(){ how.hidden=!how.hidden; if(!how.hidden) track('pwa-install-how'); };
+  go.addEventListener('click',function(e){
+    if(deferred){
+      e.preventDefault();
+      deferred.prompt(); track('pwa-install-click');
+      deferred.userChoice.then(function(r){ if(r&&r.outcome==='accepted') bar.hidden=true; deferred=null; }).catch(function(){});
+      return;
+    }
+    toggleHow();
+  });
+  var reveal=function(){ bar.hidden=false; };
   if(ios){
     go.textContent='วิธีติดตั้ง';
     if(inapp) how.innerHTML='<p>เปิดหน้านี้ใน Safari ก่อน (แอปที่เปิดลิงก์อยู่ตอนนี้เพิ่มไปหน้าจอโฮมไม่ได้) แล้วแตะปุ่มแชร์ เลือก “เพิ่มไปยังหน้าจอโฮม”</p>';
-    go.addEventListener('click',function(){ how.hidden=!how.hidden; if(!how.hidden) track('pwa-install-how'); });
-    bar.hidden=false;
+    reveal();
   }else{
-    window.addEventListener('beforeinstallprompt',function(e){ e.preventDefault(); deferred=e; bar.hidden=false; });
-    go.addEventListener('click',function(){
-      if(!deferred) return;
-      deferred.prompt(); track('pwa-install-click');
-      deferred.userChoice.then(function(r){ if(r&&r.outcome==='accepted') bar.hidden=true; deferred=null; }).catch(function(){});
+    if(android&&inapp){
+      /* แอปในแอปติดตั้งไม่ได้ — ส่งไปเปิดใน Chrome ด้วย intent URL (ไม่มี Chrome = ใช้วิธีเขียนด้านล่างแทน) */
+      var a=document.createElement('a'); a.className=go.className; a.id=go.id; a.textContent='เปิดใน Chrome';
+      a.href='intent://'+location.host+location.pathname+'#Intent;scheme=https;package=com.android.chrome;end';
+      a.addEventListener('click',function(){ track('pwa-open-chrome'); });
+      go.replaceWith(a); go=a;
+      how.innerHTML='<p>ติดตั้งจากแอปที่เปิดลิงก์อยู่ตอนนี้ไม่ได้ ให้แตะเมนู '+DOTS+' ของแอปแล้วเลือกเปิดในเบราว์เซอร์ (Chrome) จากนั้นแถบนี้จะมีปุ่มติดตั้ง</p>';
+      how.hidden=false;
+    }else{
+      go.textContent='วิธีติดตั้ง';
+      how.innerHTML='<ol><li>แตะเมนู '+DOTS+' ของเบราว์เซอร์ (Chrome อยู่มุมขวาบน)</li><li>เลือก “ติดตั้งแอป” หรือ “เพิ่มลงในหน้าจอหลัก”</li></ol>';
+    }
+    /* เบราว์เซอร์พร้อมให้ติดตั้งเมื่อไหร่ ปุ่มกลายเป็นติดตั้งจริงทันที */
+    window.addEventListener('beforeinstallprompt',function(e){
+      e.preventDefault(); deferred=e;
+      if(go.tagName==='BUTTON'){ go.textContent='ติดตั้ง'; how.hidden=true; }
+      reveal();
     });
+    /* ติดตั้งแล้วแต่เปิดลิงก์ในเบราว์เซอร์ = ไม่ต้องชวน (Chrome Android อ่านจาก related_applications ใน manifest) */
+    var chk = (navigator.getInstalledRelatedApps && !inapp)
+      ? navigator.getInstalledRelatedApps().then(function(l){ return l&&l.length>0; }).catch(function(){ return false; })
+      : Promise.resolve(false);
+    chk.then(function(installed){ if(!installed) reveal(); });
   }
-  window.addEventListener('appinstalled',function(){ bar.hidden=true; track('pwa-installed'); });
+  window.addEventListener('appinstalled',function(){ bar.hidden=true; track('pwa-installed'); try{ localStorage.setItem('jpt_tk_app_seen',String(Date.now())); }catch(e){} });
   x.addEventListener('click',function(){ bar.hidden=true; try{ localStorage.setItem(KEY,String(Date.now())); }catch(e){} });
 })();
 </script>
