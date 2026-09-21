@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>ทดสอบสัญลักษณ์ S&amp;P / Nasdaq · Tool&amp;Kit</title>
+<!-- หน้าทดสอบชั่วคราว (A160.2) — หาสัญลักษณ์ S&P 500 / Nasdaq ที่ widget TradingView ยอมโชว์ราคา · ลบหลังเลือกได้ -->
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#F5F3EF;color:#1F1B1C;padding:calc(16px + env(safe-area-inset-top,0px)) 12px 40px;max-width:720px;margin:0 auto}
+h1{font-size:19px;margin-bottom:4px} p.l{font-size:13px;color:#857E78;line-height:1.55;margin-bottom:12px}
+.g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.t{background:#fff;border-radius:14px;padding:8px 6px 4px;min-width:0}
+.lb{font-size:11.5px;font-weight:600;padding:0 4px 4px;line-height:1.35}
+.lb b{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#3A1520;color:#fff;font-size:11px;margin-right:5px}
+.lb span{display:block;font-weight:400;color:#857E78;font-size:11px}
+.tp{background:#fff;border-radius:14px;padding:8px;margin-top:10px}
+.tp h2{font-size:13px;margin:0 4px 6px}
+</style></head><body>
+<h1>ทดสอบสัญลักษณ์ S&amp;P 500 / Nasdaq</h1>
+<p class="l">รอ 5–10 วินาที แล้วส่งภาพทั้งหน้า (เลื่อนลงให้เห็นแถบวิ่งด้านล่างด้วย) · ช่องไหนขึ้นราคา = ใช้ได้ · ช่อง 12 ทองเป็นตัวเทียบ ถ้าช่อง 12 ก็ไม่ขึ้น แปลว่า widget แบบนี้ใช้ไม่ได้ทั้งแบบ</p>
+<div class="g">
+  <div class="t"><div class="lb"><b>1</b>FOREXCOM:SPX500<span>ที่ใช้อยู่ตอนนี้</span></div>
+    <div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>{"symbol": "FOREXCOM:SPX500", "width": "100%", "isTransparent": true, "colorTheme": "light", "locale": "en"}</script></div></div>
+  <div class="t"><div class="lb"><b>2</b>FOREXCOM:SPXUSD<span>S&P · Forex.com</span></div>
+    <div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>{"symbol": "FOREXCOM:SPXUSD", "width": "100%", "isTransparent": true, "colorTheme": "light", "locale": "en"}</script></div></div>
+  <div class="t"><div class="lb"><b>3</b>OANDA:SPX500USD<span>S&P · OANDA</span></div>
+    <div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>{"symbol": "OANDA:SPX500USD", "width": "100%", "isTransparent": true, "colorTheme": "light", "locale": "en"}</script></div></div>
+  <div class="t"><div class="lb"><b>4</b>CAPITALCOM:US500<span>S&P · Capital.com</span></div>
+    <div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>{"symbol": "CAPITALCOM:US500", "width": "100%", "isTransparent": true, "colorTheme": "light", "locale": "en"}</script></div></div>
+  <div class="t"><div class="lb"><b>5</b>PEPPERSTONE:US500<span>S&P · Pepperstone</span></div>
+    <div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>{"symbol": "PEPPERSTONE:US500", "width": "100%", "isTransparent": true, "colorTheme": "light", "locale": "en"}</script></div></div>
+  <div class="t"><div class="lb"><b>6</b>SP:SPX<span>ดัชนีจริง S&P 500</span></div>
+    <div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>{"symbol": "SP:SPX", "width": "100%", "isTransparent": true, "colorTheme": "light", "locale": "en"}</script></div></div>
+  <div class="t"><div class="lb"><b>7</b>FOREXCOM:NSXUSD<span>ที่ใช้อยู่ตอนนี้</span></div>
+    <div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>{"symbol": "FOREXCOM:NSXUSD", "width": "100%", "isTransparent": true, "colorTheme": "light", "locale": "en"}</script></div></div>
+  <div class="t"><div class="lb"><b>8</b>OANDA:NAS100USD<span>Nasdaq · OANDA</span></div>
+    <div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>{"symbol": "OANDA:NAS100USD", "width": "100%", "isTransparent": true, "colorTheme": "light", "locale": "en"}</script></div></div>
+  <div class="t"><div class="lb"><b>9</b>CAPITALCOM:US100<span>Nasdaq · Capital.com</span></div>
+    <div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>{"symbol": "CAPITALCOM:US100", "width": "100%", "isTransparent": true, "colorTheme": "light", "locale": "en"}</script></div></div>
+  <div class="t"><div class="lb"><b>10</b>PEPPERSTONE:NAS100<span>Nasdaq · Pepperstone</span></div>
+    <div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>{"symbol": "PEPPERSTONE:NAS100", "width": "100%", "isTransparent": true, "colorTheme": "light", "locale": "en"}</script></div></div>
+  <div class="t"><div class="lb"><b>11</b>NASDAQ:NDX<span>ดัชนีจริง Nasdaq 100</span></div>
+    <div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>{"symbol": "NASDAQ:NDX", "width": "100%", "isTransparent": true, "colorTheme": "light", "locale": "en"}</script></div></div>
+  <div class="t"><div class="lb"><b>12</b>OANDA:XAUUSD<span>ตัวเทียบ · ทองที่เคยวิ่ง</span></div>
+    <div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>{"symbol": "OANDA:XAUUSD", "width": "100%", "isTransparent": true, "colorTheme": "light", "locale": "en"}</script></div></div>
+</div>
+<div class="tp"><h2>แถบวิ่ง (แบบที่เคยใช้ได้ในหน้านี้)</h2>
+<div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
+<script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>{"symbols": [{"description": "1 SPX500", "proName": "FOREXCOM:SPX500"}, {"description": "3 OANDA S&P", "proName": "OANDA:SPX500USD"}, {"description": "4 CAPITAL S&P", "proName": "CAPITALCOM:US500"}, {"description": "8 OANDA NAS", "proName": "OANDA:NAS100USD"}, {"description": "9 CAPITAL NAS", "proName": "CAPITALCOM:US100"}, {"description": "GOLD", "proName": "OANDA:XAUUSD"}], "showSymbolLogo": true, "displayMode": "adaptive", "locale": "en", "isTransparent": true, "colorTheme": "light"}</script></div></div>
+</body></html>
