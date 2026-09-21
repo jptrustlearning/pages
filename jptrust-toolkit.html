@@ -3,6 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#FAF6ED">
+<!-- A154 · ติดตั้งเป็นแอปได้ (PWA) — manifest/sw แยกจากแอปสมาชิก · ไอคอนชุดเดียวกับแอปสมาชิก -->
+<link rel="manifest" href="/toolkit-manifest.json">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tool&amp;Kit">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<script>
+/* A154 · โหมดแอป = เปิดจากไอคอนบนหน้าจอโฮม (standalone) หรือดูตัวอย่างด้วย ?app=1
+   ใส่คลาส .tk-app ที่ <html> (ห้ามใช้ชื่อ .app — ชนกับ div.app ของเลย์เอาต์ ทำให้ <html> กลายเป็น flex) ก่อนหน้าวาด ไม่งั้นจะเห็นหน้าเว็บแวบหนึ่งก่อนเปลี่ยน
+   viewport-fit=cover เฉพาะโหมดแอป (แถบเมนูล่างต้องหลบขีด home ของ iPhone) — หน้าเว็บปกติไม่แตะ */
+(function(){
+  var d=document.documentElement, q=/[?&]app=1(&|$)/.test(location.search), s=false;
+  try{ s=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true; }catch(e){}
+  if(!q&&!s) return;
+  d.classList.add('tk-app');
+  var v=document.querySelector('meta[name="viewport"]'); if(v) v.setAttribute('content','width=device-width, initial-scale=1.0, viewport-fit=cover');
+  var t=document.querySelector('meta[name="theme-color"]'); if(t) t.setAttribute('content','#EFE8DE');
+})();
+</script>
 <title>JP Trust Tool &amp; Kit — Dashboard ทอง&amp;หุ้น</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -895,6 +916,189 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 @media(max-width:520px){.kpis{grid-template-columns:1fr}.kpi{min-height:96px}}
 .lad-scroll{display:none;font-size:11.5px;color:var(--muted);font-weight:300;text-align:right;margin-top:7px}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+
+/* ================= A154 · ปุ่มติดตั้งแอป (หน้าเว็บปกติ บนมือถือเท่านั้น) ================= */
+.pwab{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);
+  border-radius:14px;padding:11px 10px 11px 12px;margin-bottom:14px}
+.pwab[hidden]{display:none}
+.pwab>img{width:40px;height:40px;border-radius:11px;flex-shrink:0}
+.pwab-t{flex:1;min-width:0;line-height:1.35}
+.pwab-t b{display:block;font-size:14px;color:var(--maroon);font-weight:600}
+.pwab-t span{font-size:12px;color:var(--muted);font-weight:300}
+.pwab .btn{flex-shrink:0}
+.pwab-x{border:0;background:none;width:32px;height:32px;display:grid;place-items:center;color:var(--muted);cursor:pointer;border-radius:50%;flex-shrink:0}
+.pwab-x svg{width:16px;height:16px}
+.pwab-how{flex-basis:100%;font-size:13px;color:var(--ink);padding:10px 2px 2px;border-top:1px solid var(--line);line-height:1.6}
+.pwab-how[hidden]{display:none}
+.pwab-how ol{margin:0;padding-left:20px}
+.pwab-how li+li{margin-top:3px}
+.pwab-how svg{width:15px;height:15px;vertical-align:-2px;fill:none;stroke:var(--maroon);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* ================= A154 · โหมดแอป (html.tk-app = standalone หรือ ?app=1) =================
+   ทุกกฎอยู่ใต้ html.tk-app — หน้าเว็บปกติไม่เปลี่ยน · โทนตามภาพอ้างอิงที่จูนส่ง 21 ก.ย. 69:
+   พื้นทรายไล่ขาว · การ์ดขาวมุมมนไม่มีขอบทอง · ตัวเลขใหญ่แบบแอปการเงิน · แถบเมนูลอยด้านล่าง
+   ลำดับการ์ดจัดด้วย CSS order ล้วน (ไม่ย้าย DOM) — สคริปต์เดิมหา element ด้วย id ได้เหมือนเดิม */
+.ah,.anav,.aj{display:none}
+html.tk-app{
+  --a-bg1:#EFE8DE; --a-bg2:#F5F3EF; --a-card:#FFFFFF; --a-fill:#F2EFEA;
+  --a-ink:#1F1B1C; --a-sub:#857E78; --a-line:rgba(31,27,28,.07);
+  --a-acc:#3A1520; --a-up:#1E9A5F; --a-dn:#D14B45;
+  --a-sh:0 1px 2px rgba(31,27,28,.04),0 12px 28px -14px rgba(31,27,28,.14);
+  --ink:var(--a-ink); --muted:var(--a-sub); --line:var(--a-line); --card:var(--a-card);
+  --gold-soft:rgba(31,27,28,.04);
+  --f-d:var(--f-b); --f-n:var(--f-b);          /* Cinzel / DM Serif → Anuphan: ตัวอักษรชุดเดียวทั้งแอป */
+  scroll-padding-top:12px;
+}
+html.tk-app body{background:var(--a-bg2) linear-gradient(180deg,var(--a-bg1) 0,var(--a-bg2) 460px) no-repeat;color:var(--a-ink)}
+html.tk-app .sb,html.tk-app .top,html.tk-app .scrim,html.tk-app #prodCard,html.tk-app #pwaBar{display:none!important}
+html.tk-app .main{margin-left:0}
+html.tk-app .content{padding:0 16px calc(118px + env(safe-area-inset-bottom,0px));max-width:720px;margin:0 auto;width:100%}
+html.tk-app #viewDash.on{display:flex;flex-direction:column}
+/* ลำดับในแอป: ราคาทอง → แถบราคา → Insight → Risk → ค้นหาหุ้น → โซนทอง → ภาพรวมตลาด → ปฏิทิน → เวลาตลาด → สมาชิก */
+html.tk-app #kpis{order:-4} html.tk-app #tickerTape{order:-3} html.tk-app #insCard{order:-2} html.tk-app #mkRisk{order:-1}
+html.tk-app #mkCal{order:1} html.tk-app #mkSes{order:2} html.tk-app #appJoin{order:3}
+html.tk-app #mkCal,html.tk-app #mkSes{margin-top:18px}
+
+/* ---- หัวแอป ---- */
+html.tk-app .ah{display:block;max-width:720px;margin:0 auto;width:100%;padding:calc(16px + env(safe-area-inset-top,0px)) 18px 0}
+.ah-row{display:flex;align-items:center;gap:12px}
+.ah-logo{width:44px;height:44px;border-radius:14px;flex-shrink:0;box-shadow:0 3px 10px -3px rgba(58,21,32,.35)}
+.ah-t{display:flex;flex-direction:column;line-height:1.3;min-width:0}
+.ah-hi{font-size:12.5px;color:var(--a-sub)}
+.ah-t b{font-size:17px;font-weight:600;color:var(--a-ink)}
+.ah-act{margin-left:auto;display:flex;gap:8px}
+.ah-btn{width:42px;height:42px;border-radius:50%;background:var(--a-card);border:0;display:grid;place-items:center;
+  color:var(--a-ink);box-shadow:var(--a-sh);cursor:pointer;text-decoration:none;-webkit-tap-highlight-color:transparent}
+.ah-btn[hidden]{display:none}
+.ah-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ah-btn:focus-visible,.anav button:focus-visible,.aj:focus-visible{outline:2px solid var(--a-acc);outline-offset:2px}
+
+/* ---- ราคาทอง = ตัวเลขหลักของแอป (การ์ด KPI เดิม ถอดพื้นเขียวออก) ---- */
+html.tk-app .kpis{display:block;margin:22px 2px 18px;position:relative}
+html.tk-app .kpi{background:none!important;color:var(--a-ink);padding:0;min-height:0;border-radius:0;overflow:visible;display:block}
+html.tk-app .kpi .k-art{display:none}
+html.tk-app .kpi .k-l{font-size:13px;font-weight:400;color:var(--a-sub);opacity:1}
+html.tk-app .kpi .k-v{font-size:44px;font-weight:600;line-height:1.08;letter-spacing:-.6px;margin:4px 0 5px;font-variant-numeric:tabular-nums}
+html.tk-app .kpi .k-d{font-size:12.5px;color:var(--a-sub);opacity:1}
+html.tk-app .kpi .k-tag{font-size:10.5px;padding:2px 8px}
+html.tk-app .kpi .k-tag.live{background:rgba(30,154,95,.11);color:var(--a-up)}
+html.tk-app .kpi .k-tag.live .dt{background:var(--a-up);animation:none}
+html.tk-app .kpi .k-tag.asof{background:var(--a-fill);color:var(--a-sub)}
+/* สปอนเซอร์ FISG: สร้างด้วยสคริปต์เป็นพี่น้องก่อน #kpis (kpis ถูกเขียนทับทุกครั้งที่ราคาอัปเดต)
+   สูง 0 แล้วเกาะขวา — ลอยทับมุมขวาของบล็อกราคา โดยไม่ดันเลย์เอาต์ */
+html.tk-app .ah-sp{order:-4;align-self:flex-end;height:0;position:relative;top:24px;z-index:1;overflow:visible;
+  display:flex;flex-direction:column;align-items:flex-end;gap:3px;font-size:9.5px;color:var(--a-sub);letter-spacing:.02em;line-height:1}
+html.tk-app .ah-sp img{height:30px;width:auto;display:block}
+
+/* ---- การ์ด ---- */
+html.tk-app .card{background:var(--a-card);border:0;border-radius:22px;padding:18px;box-shadow:var(--a-sh)}
+html.tk-app .card-h{margin-bottom:14px}
+html.tk-app .card-h h3{font-size:15.5px;font-weight:600;color:var(--a-ink);line-height:1.4}
+html.tk-app .sec-head{margin:14px 2px 12px}
+html.tk-app .sec-head h2{font-size:18px;color:var(--a-ink)}
+html.tk-app .sec-head h2::before{display:none}
+html.tk-app .row{margin-bottom:18px}
+html.tk-app .mk-cap,html.tk-app .asof{color:var(--a-sub)}
+html.tk-app .empty-slot{border:1px dashed rgba(31,27,28,.13);border-radius:16px}
+html.tk-app .empty-slot .e-t{letter-spacing:.4px;font-size:11px;color:var(--a-sub)}
+html.tk-app .dotlive{animation:none}
+
+/* ปุ่ม · ชิป · สวิตช์ — ทรงเม็ดยา พื้นเทาอุ่น ตัวที่เลือกเป็นสีเข้ม */
+html.tk-app .btn{border:0;background:var(--a-fill);color:var(--a-ink);border-radius:999px;padding:9px 16px}
+html.tk-app .btn.gold{background:var(--a-acc);color:#fff;font-weight:600}
+html.tk-app .mk-chip{border:0;background:var(--a-fill);color:var(--a-ink)}
+html.tk-app .mk-chip.on{background:var(--a-acc);color:#fff}
+html.tk-app .modeseg{background:var(--a-fill);border:0;border-radius:14px;padding:4px;gap:4px}
+html.tk-app .modeseg button{border-radius:11px;color:var(--a-sub)}
+html.tk-app .modeseg button+button{border-left:0}
+html.tk-app .modeseg button.on{background:var(--a-card);color:var(--a-ink);box-shadow:0 1px 3px rgba(31,27,28,.12)}
+html.tk-app thead th{background:var(--a-fill);color:var(--a-sub);font-weight:600}
+html.tk-app input[type=number]{background:var(--a-fill);border-color:transparent;border-radius:12px}
+
+/* popup ผลงานพอร์ต */
+html.tk-app .pm-bg{background:rgba(31,27,28,.45)}
+html.tk-app .pm-box{background:var(--a-card);border:0;border-radius:24px;box-shadow:0 24px 60px -20px rgba(31,27,28,.4)}
+html.tk-app .pm-h h3{color:var(--a-ink)}
+html.tk-app .pm-x{background:var(--a-fill);border:0;border-radius:50%;color:var(--a-ink)}
+html.tk-app .pm-w,html.tk-app .pm-note{background:var(--a-fill);border:0}
+
+/* แถบราคาวิ่ง → การ์ดขาว (widget สลับเป็นธีมสว่างในสคริปต์) */
+html.tk-app .ticker-tape-wrapper{background:var(--a-card);border:0;border-radius:18px;box-shadow:var(--a-sh);margin:0 0 16px}
+html.tk-app .ticker-owl-badge{background:linear-gradient(270deg,#fff 40%,rgba(255,255,255,0))}
+html.tk-app .ticker-live-text{color:var(--a-ink);text-shadow:none;font-size:10.5px;letter-spacing:1.5px}
+html.tk-app .ticker-live-dot{background:var(--a-up);box-shadow:none;animation:none}
+
+/* Insight */
+html.tk-app .card.ins{background:var(--a-card);border:0;box-shadow:var(--a-sh);padding:18px;margin-bottom:16px}
+html.tk-app .ins-ic{background:var(--a-fill);color:var(--a-acc);border-radius:50%}
+html.tk-app .ins-k{display:none}
+html.tk-app .ins-tt h3{color:var(--a-ink);margin-top:0}
+html.tk-app .ins-li::before{width:5px;height:5px;border-radius:50%;margin-top:9px;background:#C8C0B8;transform:none}
+html.tk-app .ins-tone{border-top-color:var(--a-line)}
+html.tk-app .ins-sk{background:linear-gradient(90deg,#F2EFEA,#E9E5DF,#F2EFEA)}
+
+/* Risk-on / Risk-off */
+html.tk-app #mkRisk{margin-bottom:16px}
+html.tk-app .mkr-v{fill:var(--a-ink)}
+html.tk-app .mkr-nd{stroke:var(--a-ink)}
+html.tk-app .mkr-say b{color:var(--a-ink)}
+html.tk-app .mkr-dest,html.tk-app .mkr-p{border-top-color:var(--a-line)}
+
+/* ค้นหาหุ้น (Sector Scanner) — ถอดพื้นทองจางกับขอบทองของทุกส่วน · สีสถานะ 4 กลุ่มคงเดิม */
+html.tk-app .scn{margin-bottom:18px}
+html.tk-app .scn-box,html.tk-app .scn-panel{background:var(--a-card);border:0;border-radius:22px;box-shadow:var(--a-sh)}
+html.tk-app .scn-top{background:transparent;border-bottom-color:var(--a-line);padding:14px 18px 12px}
+html.tk-app .scn-brand{font-size:14px;letter-spacing:0;color:var(--a-ink)}
+html.tk-app .scn-t em,html.tk-app .scn-idle em,html.tk-app .scn-stats em,html.tk-app .scn-etfs em,html.tk-app .scn-peers em,
+html.tk-app .scn-dstats em,html.tk-app .scn-thead span,html.tk-app .scn-rrgwrap span{letter-spacing:.3px;color:var(--a-sub)}
+html.tk-app .scn .hot{color:var(--a-ink)}
+html.tk-app .scn-inrow{background:var(--a-fill);border-color:transparent;border-radius:14px;margin:14px 18px 12px}
+html.tk-app .scn-inrow:focus-within{background:var(--a-card);border-color:rgba(58,21,32,.28);box-shadow:0 0 0 3px rgba(58,21,32,.07)}
+html.tk-app .scn-mag{stroke:var(--a-sub)}
+html.tk-app .scn-pick,html.tk-app .scn-clear,html.tk-app .scn-back{border-color:transparent;background:var(--a-fill);border-radius:999px}
+html.tk-app .scn-idle{background:transparent;border-top-color:var(--a-line)}
+html.tk-app .scn-thead{background:var(--a-fill);border-bottom-color:var(--a-line)}
+html.tk-app .scn-row,html.tk-app .scn-pfoot{border-top-color:var(--a-line)}
+html.tk-app .scn-logo{background:var(--a-fill);border-color:transparent}
+html.tk-app .scn-logo i{color:var(--a-sub)}
+html.tk-app .scn-gcard{background:var(--a-fill);border:0}
+html.tk-app .scn-etfs span{border:0;background:var(--a-fill);color:var(--a-ink)}
+html.tk-app .scn-peer{border-color:var(--a-line)}
+html.tk-app .scn-peer.me{background:var(--a-fill);border-color:var(--a-acc)}
+html.tk-app .scn-pfoot a,html.tk-app .scn-dfoot a{color:var(--a-acc)}
+html.tk-app .scn-cta{background:var(--a-acc);color:#fff!important}
+
+/* heatmap: พื้นหลังระหว่างกล่อง → เทาอุ่นแทนเลือดหมู */
+html.tk-app .mk-tree{background:#E9E5DF;border-radius:16px}
+html.tk-app .mk-t{border-color:#F5F3EF}
+
+/* ช่วงเวลาตลาด */
+html.tk-app .ses-clock{color:var(--a-ink);font-weight:600}
+html.tk-app .ses-liq{background:var(--a-fill);border-color:transparent}
+html.tk-app .ses-liq b{color:var(--a-ink)}
+
+/* ---- การ์ดสมาชิก (แทนแบนเนอร์เคลื่อนไหวซึ่งซ่อนในโหมดแอป) ---- */
+html.tk-app .aj{display:flex;align-items:center;gap:14px;margin-top:18px;text-decoration:none;color:var(--a-ink)}
+.aj-t{flex:1;min-width:0;line-height:1.45}
+.aj-t b{display:block;font-size:15px;font-weight:600}
+.aj-t span{font-size:12.5px;color:var(--a-sub)}
+.aj-go{flex-shrink:0;background:var(--a-acc);color:#fff;border-radius:999px;padding:9px 15px;font-size:13px;font-weight:600;white-space:nowrap}
+
+/* ---- แถบเมนูลอยด้านล่าง ---- */
+html.tk-app .anav{display:flex;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:50;
+  width:min(calc(100% - 28px),420px);height:66px;padding:0 8px;border-radius:33px;align-items:center;
+  background:rgba(255,255,255,.9);-webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%);
+  box-shadow:0 14px 34px -10px rgba(31,27,28,.28),0 0 0 1px rgba(31,27,28,.05)}
+.anav button{flex:1;min-width:0;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;
+  color:var(--a-sub);font-family:var(--f-b);font-size:10.5px;line-height:1.1;cursor:pointer;padding:6px 0;border-radius:18px;
+  -webkit-tap-highlight-color:transparent}
+.anav button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.anav button.on{color:var(--a-ink);font-weight:600}
+.anav button.on svg{stroke-width:2}
+.anav .an-c{flex:0 0 54px;height:54px;border-radius:50%;background:var(--a-acc);color:#fff;justify-content:center;margin:0 6px;
+  box-shadow:0 8px 18px -6px rgba(58,21,32,.55)}
+.anav .an-c svg{width:23px;height:23px;stroke-width:2}
+@media(min-width:760px){ html.tk-app .content{padding-left:24px;padding-right:24px} html.tk-app .ah{padding-left:26px;padding-right:26px} }
 </style>
 </head>
 <body>
@@ -964,10 +1168,42 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
     })();
     </script>
 
+    <!-- A154 · หัวแอป — โชว์เฉพาะโหมดแอป (แถบบนเดิมกับแถบข้างซ่อน) -->
+    <header class="ah" id="appHead">
+      <div class="ah-row">
+        <img class="ah-logo" src="/pwa-icons/icon-192x192.png" alt="" width="44" height="44">
+        <div class="ah-t"><span class="ah-hi" id="ahHi">สวัสดี</span><b>Tool&amp;Kit</b></div>
+        <div class="ah-act">
+          <button type="button" class="ah-btn" id="ahPort" aria-label="ผลงานพอร์ตจริง" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16"/><path d="M5 15l4-4 3 3 6-7"/><path d="M15 7h3v3"/></svg>
+          </button>
+          <a class="ah-btn" href="https://jptrustlearning.com" target="_blank" rel="noopener" aria-label="เว็บไซต์ JP Trust Learning">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18"/></svg>
+          </a>
+        </div>
+      </div>
+    </header>
+
     <div class="content">
 
       <!-- ---------- VIEW: gold sentiment + ATR zones ---------- -->
       <section class="view on" id="viewDash">
+
+        <!-- A154 · ชวนติดตั้งเป็นแอป — ซ่อนไว้ก่อน สคริปต์เปิดเองเฉพาะมือถือที่ติดตั้งได้ · ปิดแล้วไม่ขึ้นอีก 14 วัน -->
+        <div class="pwab" id="pwaBar" hidden>
+          <img src="/pwa-icons/icon-96x96.png" alt="" width="40" height="40">
+          <div class="pwab-t"><b>ติดตั้ง Tool&amp;Kit เป็นแอป</b><span>เปิดจากหน้าจอโฮมได้ทันที ไม่ต้องพิมพ์ลิงก์</span></div>
+          <button type="button" class="btn gold" id="pwaGo">ติดตั้ง</button>
+          <button type="button" class="pwab-x" id="pwaX" aria-label="ปิด">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+          <div class="pwab-how" id="pwaHow" hidden>
+            <ol>
+              <li>แตะปุ่มแชร์ <svg viewBox="0 0 24 24" aria-label="ปุ่มแชร์"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M6 11v9h12v-9"/></svg> ใน Safari (บางรุ่นอยู่ในเมนูจุดสามจุด)</li>
+              <li>เลือก “เพิ่มไปยังหน้าจอโฮม” แล้วกด “เพิ่ม”</li>
+            </ol>
+          </div>
+        </div>
 
         <!-- ---------- HOUSE AD: บริการของ JP Trust Learning — แบนเนอร์เคลื่อนไหว (แทนการ์ด ADD-ON · EA) ----------
              ยังใช้ id เดิมของการ์ด (#prodCard) · ⚠️ ตั้งแต่ A103 เมนูซ้ายลิงก์ออกไปแท็บแพคเกจของหน้าแรกโดยตรงแล้ว ไม่ได้เลื่อนมาหา id นี้อีก
@@ -1250,6 +1486,11 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
           </div>
         </div>
         <div class="mk-cap" id="mkDailyNote" style="margin-top:12px">ข้อมูลราคาปิดรายวัน อัปเดตวันละครั้งหลังตลาดปิด · เป็นข้อมูลประกอบการศึกษา ไม่ใช่คำแนะนำการลงทุน</div>
+        <!-- A154 · การ์ดสมาชิกของโหมดแอป — แทนแบนเนอร์เคลื่อนไหว #prodCard ที่ซ่อนในแอป (ลิงก์ที่เดียวกัน) -->
+        <a class="card aj" id="appJoin" href="https://app.jptrustlearning.com/new" target="_blank" rel="noopener" data-track="house-ad-services-app">
+          <span class="aj-t"><b>เป็นสมาชิก JP Trust Learning</b><span>ทดสอบกลยุทธ์ย้อนหลัง 8 กลยุทธ์ด้วยข้อมูลจริง สแกนหุ้น S&amp;P 500 และอ่านข่าววิเคราะห์ทุกเช้า</span></span>
+          <span class="aj-go">สมัครสมาชิก</span>
+        </a>
 
 
       </section>
@@ -2715,7 +2956,10 @@ function mkChLoad(sym){
       {description:'Silver',proName:'OANDA:XAGUSD'},{description:'Oil WTI',proName:'TVC:USOIL'},
       {description:'US Dollar',proName:'CAPITALCOM:DXY'},{description:'VIX',proName:'CAPITALCOM:VIX'},
       {description:'20Y Bonds',proName:'NASDAQ:TLT'}],
-    showSymbolLogo:true,isTransparent:false,displayMode:'adaptive',colorTheme:'dark',locale:'en'};
+    showSymbolLogo:true,displayMode:'adaptive',locale:'en',
+    /* A154 · โหมดแอปพื้นขาว — ใช้ธีมสว่างโปร่งใส ไม่งั้นเป็นแถบดำก้อนเดียวในหน้าสว่าง */
+    isTransparent:document.documentElement.classList.contains('tk-app'),
+    colorTheme:document.documentElement.classList.contains('tk-app')?'light':'dark'};
   function render(){
     if(box.dataset.tvLoaded==='1') return;
     box.dataset.tvLoaded='1'; last=Date.now();
@@ -2748,6 +2992,118 @@ if(h0){
 }
 </script>
 
+
+<!-- A154 · แถบเมนูลอยของโหมดแอป — แต่ละปุ่มเลื่อนไปการ์ดในหน้าเดียวกัน (ไม่มีหน้าแยก) -->
+<nav class="anav" id="appNav" aria-label="เมนูแอป">
+  <button type="button" data-go="top" class="on"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-6.5 8 6.5"/><path d="M6 9.5V19h12V9.5"/><path d="M10 19v-5h4v5"/></svg><span>ภาพรวม</span></button>
+  <button type="button" data-go="zones"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7.5h6l1.6 4.5H7.4z"/><path d="M4.2 12h6l1.6 4.5H2.6z"/><path d="M13.8 12h6l1.6 4.5H12.2z"/></svg><span>ทองคำ</span></button>
+  <button type="button" data-go="heroScanner" class="an-c" aria-label="ค้นหาหุ้น"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></button>
+  <button type="button" data-go="mkSec"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="9" rx="1.5"/><rect x="13" y="4" width="7" height="5" rx="1.5"/><rect x="13" y="11" width="7" height="9" rx="1.5"/><rect x="4" y="15" width="7" height="5" rx="1.5"/></svg><span>ตลาด</span></button>
+  <button type="button" data-go="mkCal"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16"/><path d="M8.5 3.5v4M15.5 3.5v4"/></svg><span>ปฏิทิน</span></button>
+</nav>
+
+<script>
+/* =====================================================================
+   A154 · แอป Tool&Kit
+   1) service worker ของหน้านี้ (scope /jptrust-toolkit) — ทำให้ติดตั้งได้ และเปิดตอนไม่มีเน็ตแล้วขึ้นหน้าล่าสุด
+   2) โหมดแอป: คำทักทาย · สปอนเซอร์ข้างราคาทอง · ปุ่มพอร์ต · แถบเมนูล่าง (เลื่อนไปการ์ด + ไฮไลต์ตามตำแหน่ง)
+   3) หน้าเว็บปกติบนมือถือ: แถบชวนติดตั้ง (Android = ปุ่มติดตั้งจริง · iPhone = วิธีเพิ่มไปหน้าจอโฮม)
+   ===================================================================== */
+(function(){
+  var root=document.documentElement, isApp=root.classList.contains('tk-app');
+  var track=function(l){ try{ if(window.JPTtrack) window.JPTtrack('tool_open',l); }catch(e){} };
+
+  if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='127.0.0.1'||location.hostname==='localhost')){
+    window.addEventListener('load',function(){ navigator.serviceWorker.register('/toolkit-sw.js',{scope:'/jptrust-toolkit'}).catch(function(){}); });
+  }
+
+  if(isApp){
+    window.addEventListener('load',function(){ track('app-open'); });
+
+    /* คำทักทายตามเวลาไทย (ไม่ใช่เวลาเครื่อง) */
+    var hi=document.getElementById('ahHi');
+    if(hi){
+      var h=12; try{ h=parseInt(new Intl.DateTimeFormat('en-GB',{hour:'numeric',hourCycle:'h23',timeZone:'Asia/Bangkok'}).format(new Date()),10); }catch(e){}
+      hi.textContent = h>=5&&h<12 ? 'สวัสดีตอนเช้า' : h>=12&&h<17 ? 'สวัสดีตอนบ่าย' : h>=17&&h<21 ? 'สวัสดีตอนเย็น' : 'สวัสดีตอนค่ำ';
+    }
+
+    /* สปอนเซอร์ FISG — ย้ายจากแถบบน (ซ่อนในแอป) มาไว้มุมขวาของราคาทอง ให้อยู่ในจอแรกเสมอ */
+    var kp=document.getElementById('kpis');
+    if(kp){
+      var sp=document.createElement('div'); sp.className='ah-sp'; sp.title='Sponsored by FISG';
+      sp.innerHTML='<span>Sponsored by</span><img src="sponsor-fisg.png" alt="FISG" width="247" height="173">';
+      kp.parentNode.insertBefore(sp,kp);
+    }
+
+    /* ป้ายการ์ดค้นหาหุ้นเป็นภาษาไทยในแอป (หน้าเว็บยังเป็น SECTOR SCANNER) */
+    var sb2=document.querySelector('#heroScanner .scn-brand span:last-child'); if(sb2) sb2.textContent='ค้นหาหุ้น S&P 500';
+
+    /* ปุ่มพอร์ต = ใช้ popup เดิมของรายการ Portfolio ในแถบข้าง (แถบข้างซ่อนในแอป) */
+    var pb=document.getElementById('ahPort'), pl=document.getElementById('sbPortLink'), pbox=document.getElementById('sbPort');
+    if(pb&&pl&&pbox&&!pbox.hidden){ pb.hidden=false; pb.addEventListener('click',function(){ pl.click(); }); }
+
+    /* แถบเมนูล่าง */
+    var navEl=document.getElementById('appNav'); if(!navEl) return;
+    var zones=document.getElementById('ovTitle'); zones=zones&&zones.closest('.sec-head');
+    var target=function(k){ return k==='top'?null : k==='zones'?zones : document.getElementById(k); };
+    var smooth=!matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var btns=[].slice.call(navEl.querySelectorAll('button[data-go]'));
+    var lock=0;
+    var setOn=function(k){ btns.forEach(function(b){ b.classList.toggle('on', b.dataset.go===k); }); };
+    navEl.addEventListener('click',function(e){
+      var b=e.target.closest('button[data-go]'); if(!b) return;
+      var k=b.dataset.go, el=target(k);
+      var y = el ? el.getBoundingClientRect().top + window.pageYOffset - 12 : 0;
+      window.scrollTo({top:Math.max(0,y), behavior:smooth?'smooth':'auto'});
+      if(k!=='heroScanner'){ setOn(k); lock=Date.now(); }
+      else{
+        var inp=document.getElementById('scnInput');
+        if(inp) setTimeout(function(){ try{ inp.focus({preventScroll:true}); }catch(err){ inp.focus(); } }, smooth?450:0);
+      }
+    });
+    /* ไฮไลต์ตามตำแหน่งที่เลื่อนถึง — ส่วนที่หัวข้อผ่านเส้น 35% ของจอเป็นตัวล่าสุด */
+    var order=['zones','mkSec','mkCal'];
+    var tick=0;
+    var onScroll=function(){
+      if(tick) return; tick=requestAnimationFrame(function(){
+        tick=0; if(Date.now()-lock<900) return;
+        var line=window.innerHeight*0.35, cur='top';
+        order.forEach(function(k){ var el=target(k); if(el&&el.offsetParent!==null&&el.getBoundingClientRect().top<line) cur=k; });
+        if((window.innerHeight+window.pageYOffset)>=document.documentElement.scrollHeight-4) cur='mkCal';
+        setOn(cur);
+      });
+    };
+    window.addEventListener('scroll',onScroll,{passive:true});
+    return;
+  }
+
+  /* ---------- หน้าเว็บปกติ: แถบชวนติดตั้ง ---------- */
+  var bar=document.getElementById('pwaBar'); if(!bar) return;
+  var KEY='jpt_tk_pwa_x', DAYS=14;
+  try{ var t=+localStorage.getItem(KEY)||0; if(Date.now()-t<DAYS*864e5) return; }catch(e){}
+  if(!matchMedia('(max-width:900px)').matches && !matchMedia('(pointer:coarse)').matches) return;
+  var ua=navigator.userAgent;
+  var ios=/iPad|iPhone|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  var inapp=/Line\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger/i.test(ua);
+  var go=document.getElementById('pwaGo'), how=document.getElementById('pwaHow'), x=document.getElementById('pwaX');
+  var deferred=null;
+  if(ios){
+    go.textContent='วิธีติดตั้ง';
+    if(inapp) how.innerHTML='<p>เปิดหน้านี้ใน Safari ก่อน (แอปที่เปิดลิงก์อยู่ตอนนี้เพิ่มไปหน้าจอโฮมไม่ได้) แล้วแตะปุ่มแชร์ เลือก “เพิ่มไปยังหน้าจอโฮม”</p>';
+    go.addEventListener('click',function(){ how.hidden=!how.hidden; if(!how.hidden) track('pwa-install-how'); });
+    bar.hidden=false;
+  }else{
+    window.addEventListener('beforeinstallprompt',function(e){ e.preventDefault(); deferred=e; bar.hidden=false; });
+    go.addEventListener('click',function(){
+      if(!deferred) return;
+      deferred.prompt(); track('pwa-install-click');
+      deferred.userChoice.then(function(r){ if(r&&r.outcome==='accepted') bar.hidden=true; deferred=null; }).catch(function(){});
+    });
+  }
+  window.addEventListener('appinstalled',function(){ bar.hidden=true; track('pwa-installed'); });
+  x.addEventListener('click',function(){ bar.hidden=true; try{ localStorage.setItem(KEY,String(Date.now())); }catch(e){} });
+})();
+</script>
 
 <script defer src="/lib/jpt-track.js" data-page="jptrust-toolkit"></script>
 <script src="hero-scanner.js" defer></script>
