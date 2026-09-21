@@ -1131,7 +1131,7 @@ html.tk-app #mkRisk:not(.tk-more) .mkr-dest::before{content:'เงินไห�
 html.tk-app #mkRisk:not(.tk-more) .mkr-grid{gap:0;grid-template-columns:minmax(0,1fr)}
 html.tk-app .mkr-p{padding:7px 0}
 /* โซนทอง: แผนที่ราคาอย่างเดียว · ตาราง ตัวเลือกพิมพ์ราคาเอง แนวพิวอต อยู่ในรายละเอียด */
-html.tk-app #zonesRow .card:not(.tk-more) :is(.openbar,.zn-tbl){display:none}
+html.tk-app #zonesRow .card:not(.tk-more) .openbar{display:none}   /* A157 · .zn-tbl อยู่ในสไลด์ 2 แล้ว ไม่ซ่อน */
 html.tk-app .openrow:has(#openIn.locked){display:none}
 html.tk-app .openbar{background:none;border:0;padding:0;margin-bottom:6px}
 html.tk-app #zonesRow .card:not(.tk-more) .zn{display:block}
@@ -1192,6 +1192,25 @@ html.tk-app #insCard .ins-tone[hidden]{display:none}
 @media(min-width:600px){.ins-sl{flex-basis:calc(50% - 22px)} a.ins-cta{flex-basis:26%}}
 @media(min-width:760px){.ins-rail{margin:0 -24px;padding-left:24px;padding-right:24px;scroll-padding:0 24px}}
 @media(prefers-reduced-motion:reduce){.ins-dots button{transition:none}}
+/* ================= A157 · แท็บทองคำ: โซนแนวรับ–แนวต้าน = สไลด์ข้าง 3 ใบ (ทรงเดียวกับ Insight A155) =================
+   แผนที่ราคา · ระดับราคาทั้งหมด · แนวพิวอตรายวัน — ใช้ .ins-rail/.ins-sl/.ins-dots ร่วม · สไลด์กว้างกว่า Insight ให้แผนที่ยังอ่านออก
+   ปุ่ม ดูรายละเอียด เหลือ: ใช้ราคาล่าสุด/พิมพ์เอง (.openbar) + คำอธิบายใต้แผนที่/ท้ายการ์ด · ตารางไม่ต้องกางแล้ว */
+html.tk-app #zonesRow .card{background:none;box-shadow:none;border-radius:0;padding:0}
+html.tk-app #zonesRow .card-h{margin:0 2px 8px}
+html.tk-app #zonesRow .card-h h3{font-size:17px}
+html.tk-app #zonesRow .card.tk-more .openbar{background:var(--a-card);border-radius:18px;box-shadow:var(--a-sh);padding:14px;margin-bottom:12px}
+html.tk-app #zonesRow .tk-mb{width:100%;margin:12px 0 0;border:0;border-radius:16px;background:var(--a-card);box-shadow:var(--a-sh)}
+html.tk-app #zonesRow .tk-note,html.tk-app #zonesRow .lad-note{margin-left:2px;margin-right:2px}
+.zn-sl{flex-basis:calc(100% - 22px);padding:15px 14px 12px;scroll-snap-stop:always}   /* ปัดแรงก็ไปทีละใบ ไม่ข้ามตาราง */
+.zn-sl .ins-sl-h{margin:0 3px 8px}
+.zn-sl .zn-map{margin:auto 0}
+.zn-sl .zn-cap{margin:6px 3px 0}
+.zn-sl .tw{overflow:visible}
+.zn-sl table.lad{min-width:0;width:100%}
+.zn-sl table.lad td,.zn-sl table.lad th{padding:7px 7px}
+.zn-sl :is(.zn-ph,.zn-p,.lad-scroll){display:none!important}
+.zn-sl-nt{margin-top:auto;padding:12px 3px 0;font-size:12px;line-height:1.55;color:var(--a-sub)}
+@media(min-width:600px){.zn-sl{flex-basis:calc(50% - 22px)}}
 /* ปุ่มค้นหาตรงกลาง: ตอนเป็นแท็บที่เลือก ไอคอนต้องยังขาว (กฎ .on ทั่วไปเปลี่ยนเป็นสีหมึก) */
 .anav .an-c.on{color:#fff;box-shadow:0 0 0 4px rgba(58,21,32,.14),0 8px 18px -6px rgba(58,21,32,.55)}
 /* ชื่อหน้าจออยู่ที่หัวแอปแล้ว — ป้ายในการ์ดค้นหาซ้ำ */
@@ -2072,6 +2091,28 @@ function paintKPIs(){
 }
 
 
+/* ---------- A157 · จุดบอกตำแหน่งใต้รางสไลด์ (โซนทอง) ----------
+   จุดที่ k = สไลด์ที่ขอบซ้ายใกล้ต้นรางที่สุด · ปัดสุดราง = จุดสุดท้าย · กดจุด = เลื่อนไปสไลด์นั้น */
+function tkRailDots(rail,wrap){
+  if(!rail||!wrap) return;
+  const sl=[].slice.call(rail.children), dots=[].slice.call(wrap.children);
+  const pad=()=>parseFloat(getComputedStyle(rail).scrollPaddingLeft)||0;
+  let raf=0;
+  const sync=()=>{ raf=0; if(!rail.clientWidth) return;   /* แท็บยังซ่อน (display:none) = วัดไม่ได้ อย่าเดา */
+    const x=rail.scrollLeft, p=pad(); let k=0;
+    if(x>=rail.scrollWidth-rail.clientWidth-2) k=sl.length-1;
+    else sl.forEach((el,i)=>{ if(el.offsetLeft-p-x<=el.offsetWidth/2) k=i; });
+    dots.forEach((b,i)=>{ b.classList.toggle('on',i===k); b.setAttribute('aria-current',i===k?'true':'false'); }); };
+  rail.addEventListener('scroll',()=>{ if(!raf) raf=requestAnimationFrame(sync); },{passive:true});
+  dots.forEach((b,i)=>b.addEventListener('click',()=>rail.scrollTo({left:sl[i].offsetLeft-pad(),
+    behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})));
+  if(!dots.some(b=>b.classList.contains('on'))&&dots[0]) dots[0].classList.add('on');
+  /* โซนถูกวาดตอนแท็บทองยังซ่อน → กดแท็บแล้วรางเพิ่งมีขนาด: ResizeObserver จับจังหวะนั้น (รางเก่าที่ถูกวาดทับ ปลดทิ้ง) */
+  if(tkRailDots.ro) tkRailDots.ro.disconnect();
+  if(window.ResizeObserver){ tkRailDots.ro=new ResizeObserver(()=>sync()); tkRailDots.ro.observe(rail); }
+  sync();
+}
+
 /* ---------- ATR zone ladder ---------- */
 let ZONES=null;                           // เคยป้อนเส้นประให้กราฟทอง 60 วัน (ถอด A92) — ตอนนี้ไม่มีใครอ่าน เก็บไว้เผื่อคืนกราฟ
 function calc(){
@@ -2139,14 +2180,24 @@ function calc(){
   }
   t+='</tbody></table></div><div class="lad-scroll">เลื่อนตารางไปทางขวา →</div>';
 
-  let h='<div class="zn">'+map+'<div class="zn-tbl">'+t+'</div></div>';
-  h+='<div class="pivstrip"><span class="ps-t">แนวพิวอตรายวัน</span>'+
-     ['R3','R2','R1','PP','S1','S2','S3'].map(k=>
-       `<span class="ps-c ${k==='PP'?'pp':k[0]==='R'?'r':'s'}">${k} $${f0(PIV[k])}</span>`).join('')+'</div>';
+  /* A157 · สไลด์ข้าง 3 ใบ: แผนที่ · ตาราง · แนวพิวอต (เดิม = แผนที่ + ตารางต่อกันลงล่าง + แถบชิปพิวอต) */
+  let pv3='<div class="tw"><table class="lad"><thead><tr><th>แนว</th><th>ราคา</th><th>ห่างจากราคา</th></tr></thead><tbody>';
+  for(const k of ['R3','R2','R1','PP','S1','S2','S3']){
+    const v=PIV[k], d=v-open, sg=d>0?'+':'−', cls=k==='PP'?'lv-o':k[0]==='R'?'lv-r':'lv-s';
+    pv3+=`<tr class="${cls}"><td>${k}</td><td class="num">$${f0(v)}</td>`
+        +`<td class="zn-d">${sg}$${f0(Math.abs(d))}<span class="zn-dp">${sg}${Math.abs(d/open*100).toFixed(2)}%</span></td></tr>`;
+  }
+  pv3+='</tbody></table></div><div class="zn-sl-nt">★ ในแผนที่และตาราง = โซนที่ซ้อนกับแนวพิวอตรายวันพอดี</div>';
+  const SL=[['แผนที่ราคา',map],['ระดับราคาทั้งหมด','<div class="zn-tbl">'+t+'</div>'],['แนวพิวอตรายวัน',pv3]];
+  const oldRail=document.getElementById('znRail'), keepX=oldRail?oldRail.scrollLeft:0;   /* วาดซ้ำ (ราคาสดมา/กดคำนวณ) ไม่ดีดกลับใบแรก */
+  let h='<div class="ins-rail zn-rail" id="znRail" tabindex="0" aria-label="โซนแนวรับ–แนวต้าน — ปัดซ้ายขวาเพื่อดูแผนที่ ตาราง และแนวพิวอต">'
+    +SL.map((x,i)=>'<section class="ins-sl zn-sl"><div class="ins-sl-h"><b>'+x[0]+'</b><span>'+(i+1)+'/'+SL.length+'</span></div>'+x[1]+'</section>').join('')
+    +'</div><div class="ins-dots" id="znDots">'+SL.map(x=>'<button type="button" aria-label="ไปที่'+x[0]+'"></button>').join('')+'</div>';
   h+=`<div class="lad-note">โอกาสแตะ = สถิติจริงจากราคาทองย้อนหลัง 3,433 วัน (2556–2569 · ปรับปรุง ส.ค. 69) — เป็นความถี่ที่เคยเกิดขึ้น ไม่ใช่การพยากรณ์<br>
       ★ = ระดับนี้ซ้อนกับแนวพิวอตรายวันพอดี น้ำหนักมากกว่าระดับเดี่ยว · บางวันไม่มีเลยถือเป็นเรื่องปกติ</div>`;
   if(SPOT) h+=`<div class="lad-note">ราคาตั้งต้นเป็นราคาทองสด (XAU/USD) · แนวพิวอตปรับฐานมาที่ระนาบเดียวกันแล้ว</div>`;
   document.getElementById('ladder').innerHTML=h;
+  const rail=document.getElementById('znRail'); if(rail){ rail.scrollLeft=keepX; tkRailDots(rail,document.getElementById('znDots')); }
   ZONES={open,levels:rows};
 }
 document.getElementById('btnCalc').onclick=calc;
