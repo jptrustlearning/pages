@@ -1155,6 +1155,43 @@ html.tk-app .card.tk-more .tk-note{display:none}
 .tk-mb svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
 .card.tk-more .tk-mb svg{transform:rotate(180deg)}
 .tk-mb:focus-visible{outline:2px solid var(--a-acc);outline-offset:-3px}
+/* ================= A155 · Insight = สไลด์เลื่อนแนวนอน (แบบการ์ดข่าวในแอปการเงินที่จูนส่ง 21 ก.ย.) =================
+   หัวข้ออยู่บนพื้นทราย · ประเด็นละการ์ดขาว ปัดซ้าย–ขวา เห็นขอบการ์ดถัดไป · การ์ดท้าย = อ่านข่าวเต็มในแอปสมาชิก
+   ไม่มีปุ่ม "อ่านทั้งหมด" แล้ว (ทุกประเด็นอยู่ในสไลด์ · ถอด insCard ออกจาก FORCE) · โทนตลาด = แถบขาวใต้สไลด์
+   ⚠️ รางสไลด์ยื่นออกเท่า padding ของ .content (16px · ≥760px = 24px) ให้ปัดได้ถึงขอบจอ — เปลี่ยน padding ต้องแก้คู่กัน */
+html.tk-app #insCard{background:none;box-shadow:none;border-radius:0;padding:0}
+html.tk-app #insCard .ins-h{margin:0 2px 8px}
+html.tk-app #insCard .ins-ic{background:var(--a-card);box-shadow:var(--a-sh)}
+html.tk-app #insCard .ins-tt h3{font-size:17px}
+.ins-cnt{margin-left:auto;font-size:12px;color:var(--a-sub);white-space:nowrap}
+.ins-rail{position:relative;display:flex;gap:12px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;
+  scroll-padding:0 16px;margin:0 -16px;padding:6px 16px 18px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.ins-rail::-webkit-scrollbar{display:none}
+.ins-rail:focus-visible{outline:2px solid var(--a-acc);outline-offset:-2px;border-radius:22px}
+.ins-sl{flex:0 0 84%;min-width:0;scroll-snap-align:start;display:flex;flex-direction:column;
+  background:var(--a-card);border-radius:20px;box-shadow:var(--a-sh);padding:15px 17px 14px}
+.ins-sl-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:7px}
+.ins-sl-h b{font-size:14px;font-weight:600;color:var(--a-acc)}
+.ins-sl-h span{font-size:12px;color:var(--a-sub);font-variant-numeric:tabular-nums}
+.ins-sl-t{flex:1;margin:0;font-size:14.5px;line-height:1.62;color:var(--a-ink)}
+.ins-sl-f{margin-top:12px;font-size:12px;color:var(--a-sub)}
+.ins-sl-sk{min-height:150px;justify-content:center}
+a.ins-cta{flex-basis:40%;justify-content:space-between;gap:14px;background:var(--a-acc);color:#fff;text-decoration:none;-webkit-tap-highlight-color:transparent}
+a.ins-cta:focus-visible{outline:2px solid var(--a-acc);outline-offset:2px}
+.ins-cta-ic{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.14);display:grid;place-items:center}
+.ins-cta-ic svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ins-cta b{font-size:14.5px;font-weight:600;line-height:1.45}
+.ins-cta small{display:block;font-size:12px;font-weight:400;color:rgba(255,255,255,.72)}
+.ins-dots{display:flex;justify-content:center;gap:6px;margin:-6px 0 12px}
+.ins-dots button{position:relative;width:6px;height:6px;padding:0;border:0;border-radius:3px;background:#D5CEC5;cursor:pointer;
+  transition:width .25s,background .25s;-webkit-tap-highlight-color:transparent}
+.ins-dots button::after{content:'';position:absolute;inset:-9px -4px}
+.ins-dots button.on{width:18px;background:var(--a-acc)}
+html.tk-app #insCard .ins-tone{margin-top:0;padding:13px 16px;border:0;background:var(--a-card);border-radius:18px;box-shadow:var(--a-sh)}
+html.tk-app #insCard .ins-tone[hidden]{display:none}
+@media(min-width:600px){.ins-sl{flex-basis:calc(50% - 22px)} a.ins-cta{flex-basis:26%}}
+@media(min-width:760px){.ins-rail{margin:0 -24px;padding-left:24px;padding-right:24px;scroll-padding:0 24px}}
+@media(prefers-reduced-motion:reduce){.ins-dots button{transition:none}}
 /* ปุ่มค้นหาตรงกลาง: ตอนเป็นแท็บที่เลือก ไอคอนต้องยังขาว (กฎ .on ทั่วไปเปลี่ยนเป็นสีหมึก) */
 .anav .an-c.on{color:#fff;box-shadow:0 0 0 4px rgba(58,21,32,.14),0 8px 18px -6px rgba(58,21,32,.55)}
 /* ชื่อหน้าจออยู่ที่หัวแอปแล้ว — ป้ายในการ์ดค้นหาซ้ำ */
@@ -1335,9 +1372,9 @@ html.tk-app .af{display:block;order:9;text-align:center;font-size:11.5px;color:v
             <div class="ins-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
               <path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.4 1.1 2.2h5c0-.8.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/></svg></div>
             <div class="ins-tt"><span class="ins-k"><span class="dotlive"></span>INSIGHT</span><h3 id="insTitle">Insight ล่าสุด</h3></div>
-            <span class="ins-when" id="insWhen"></span>
+            <span class="ins-when" id="insWhen"></span><span class="ins-cnt" id="insCnt"></span>
           </div>
-          <div id="insBody"><div class="ins-sk"></div><div class="ins-sk"></div><div class="ins-sk"></div></div>
+          <div id="insBody"><div class="ins-rail" aria-hidden="true"><div class="ins-sl ins-sl-sk"><div class="ins-sk"></div><div class="ins-sk"></div><div class="ins-sk"></div></div><div class="ins-sl ins-sl-sk"><div class="ins-sk"></div><div class="ins-sk"></div><div class="ins-sk"></div></div></div></div>
           <div class="ins-tone" id="insTone" hidden></div>
           <div class="ins-foot">
             <span class="ins-note">สรุปจากข่าวและบทวิเคราะห์รายวันของ JP Trust Learning · เป็นข้อมูลประกอบการศึกษา ไม่ใช่คำแนะนำการลงทุน</span>
@@ -2966,15 +3003,40 @@ function mkrRender(){
   const ago=d=>{ const m=(Date.now()-d.getTime())/60000;
     if(m<0) return ''; if(m<60) return Math.max(1,Math.floor(m))+' นาทีที่แล้ว';
     if(m<1440) return Math.floor(m/60)+' ชม.ที่แล้ว'; return Math.floor(m/1440)+' วันที่แล้ว'; };
+  /* A155 · จุดใต้สไลด์: จุดที่ k = สไลด์ที่ขอบซ้ายอยู่ใกล้ต้นรางที่สุด · ปัดสุดราง (เห็นการ์ดท้าย) = จุดสุดท้าย */
+  function insRail(){
+    const rail=document.getElementById('insRail'), dots=[].slice.call(card.querySelectorAll('.ins-dots button'));
+    if(!rail||!dots.length) return;
+    const sl=[].slice.call(rail.querySelectorAll('.ins-sl:not(.ins-cta)'));
+    const pad=()=>parseFloat(getComputedStyle(rail).scrollPaddingLeft)||0;
+    let raf=0;
+    const sync=()=>{ raf=0; const x=rail.scrollLeft, p=pad(); let k=0;
+      if(x>=rail.scrollWidth-rail.clientWidth-2) k=sl.length-1;
+      else sl.forEach((el,i)=>{ if(el.offsetLeft-p-x<=el.offsetWidth/2) k=i; });
+      dots.forEach((bt,i)=>{ bt.classList.toggle('on',i===k); bt.setAttribute('aria-current',i===k?'true':'false'); }); };
+    rail.addEventListener('scroll',()=>{ if(!raf) raf=requestAnimationFrame(sync); },{passive:true});
+    dots.forEach((bt,i)=>bt.addEventListener('click',()=>rail.scrollTo({left:sl[i].offsetLeft-pad(),
+      behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})));
+    sync();
+  }
   get(URLS[0]).catch(()=>get(URLS[1])).then(j=>{
     const b=j&&j.batch; if(!b||!b.summary) throw new Error('ว่าง');
     const d=when(b.date), bkk=x=>new Date(x.getTime()+7*3600e3).toISOString().slice(0,10);
     document.getElementById('insTitle').textContent=(d&&bkk(d)===bkk(new Date()))?'Insight วันนี้':'Insight ล่าสุด';
     document.getElementById('insWhen').innerHTML='อัปเดต '+mkEsc(b.date_display||'')+(d&&ago(d)?'<br>'+ago(d):'');
     const seg=String(b.summary).split(' · ').map(x=>x.trim()).filter(Boolean);
-    document.getElementById('insBody').innerHTML=seg.length>1
-      ?'<div class="ins-list">'+seg.map(x=>'<div class="ins-li"><span>'+mkEsc(x)+'</span></div>').join('')+'</div>'
-      :'<div class="ins-p">'+mkEsc(seg[0]||'')+'</div>';
+    /* A155 · ประเด็นละสไลด์ (ปัดซ้าย–ขวา) + การ์ดท้ายไปอ่านข่าวเต็มในแอปสมาชิก (ลิงก์เดิมของปุ่มใน .ins-foot) */
+    const n=seg.length, ag=d?ago(d):'', meta='สรุปข่าว JP Trust · '+(ag||mkEsc(b.date_display||''));
+    document.getElementById('insCnt').textContent=n>1?n+' ประเด็น':'';
+    document.getElementById('insBody').innerHTML=
+      '<div class="ins-rail" id="insRail" tabindex="0" aria-label="Insight — ปัดซ้ายขวาเพื่อดูทีละประเด็น">'
+      +seg.map((x,i)=>'<article class="ins-sl"><div class="ins-sl-h"><b>ประเด็นที่ '+(i+1)+'</b>'+(n>1?'<span>'+(i+1)+'/'+n+'</span>':'')+'</div>'
+        +'<p class="ins-sl-t">'+mkEsc(x)+'</p><div class="ins-sl-f">'+meta+'</div></article>').join('')
+      +'<a class="ins-sl ins-cta" href="https://app.jptrustlearning.com" target="_blank" rel="noopener">'
+        +'<span class="ins-cta-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>'
+        +'<b>อ่านข่าวเต็ม<small>ในแอปสมาชิก</small></b></a></div>'
+      +(n>1?'<div class="ins-dots">'+seg.map((x,i)=>'<button type="button" aria-label="ไปประเด็นที่ '+(i+1)+'"></button>').join('')+'</div>':'');
+    insRail();
     const t=b.tone||{}, tot=t.total||0, el=document.getElementById('insTone');
     if(tot>0){
       const tilt=t.positive>t.negative?['เชิงบวก','u']:t.negative>t.positive?['เชิงลบ','d']:['ผสม','x'], w=n=>(n/tot*100).toFixed(1)+'%';
@@ -3136,7 +3198,7 @@ if(h0){
        ซ่อนด้วย CSS จนกว่าจะกด "ดูรายละเอียด" ท้ายการ์ด (การ์ดได้คลาส .tk-more)
        ⚠️ CAP = คำอธิบายที่มีอยู่ในหน้าตั้งแต่โหลด ต้องตรงกับรายการใน CSS · FORCE = การ์ดที่เนื้อหาถูกวาดทีหลัง */
     var CAP='.mk-cap,.openhint,.lad-note,.pivstrip,.gbs-drv,.gbs-nt';
-    var FORCE={insCard:'อ่านทั้งหมด',mkRisk:1,mkSes:1,mkCal:1};
+    var FORCE={mkRisk:1,mkSes:1,mkCal:1};   /* A155 · insCard เป็นสไลด์แล้ว ไม่มีปุ่มอ่านทั้งหมด */
     var IC_V='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
     var rt=document.querySelector('#mkRisk .card-h h3'); if(rt) rt.textContent='ตลาดโยกเงินไปไหน';
     var zc=document.querySelector('#zonesRow .card'); if(zc) FORCE.__zones=zc;
