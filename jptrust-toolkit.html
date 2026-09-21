@@ -1192,6 +1192,16 @@ html.tk-app #insCard .ins-tone[hidden]{display:none}
 @media(min-width:600px){.ins-sl{flex-basis:calc(50% - 22px)} a.ins-cta{flex-basis:26%}}
 @media(min-width:760px){.ins-rail{margin:0 -24px;padding-left:24px;padding-right:24px;scroll-padding:0 24px}}
 @media(prefers-reduced-motion:reduce){.ins-dots button{transition:none}}
+/* A162 · Insight มีสีสันขึ้นนิดหนึ่ง (เฉพาะ #insCard — สไลด์โซนทอง A157 ใช้ .ins-sl ร่วมแต่ไม่โดน) */
+#insCard .ins-sl:not(.ins-cta){position:relative;overflow:hidden;
+  background:linear-gradient(155deg,rgba(var(--ac-rgb),.14) 0%,rgba(var(--ac-rgb),.05) 45%,var(--a-card) 78%)}
+#insCard .ins-sl-h{position:relative;min-height:28px}
+#insCard .ins-sl-h b{display:inline-flex;align-items:center;gap:6px;padding:4px 11px 4px 9px;border-radius:999px;
+  background:rgba(var(--ac-rgb),.14);color:var(--ac);font-size:13px;font-weight:600}
+#insCard .ins-sl-h b::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+#insCard .ins-no{position:absolute;right:-2px;top:-10px;font-size:52px;font-weight:600;line-height:1;letter-spacing:-1.5px;
+  color:rgba(var(--ac-rgb),.16);font-variant-numeric:tabular-nums;pointer-events:none}
+#insCard .ins-sl-t{position:relative}
 /* ================= A157 · แท็บทองคำ: โซนแนวรับ–แนวต้าน = สไลด์ข้าง 3 ใบ (ทรงเดียวกับ Insight A155) =================
    แผนที่ราคา · ระดับราคาทั้งหมด · แนวพิวอตรายวัน — ใช้ .ins-rail/.ins-sl/.ins-dots ร่วม · สไลด์กว้างกว่า Insight ให้แผนที่ยังอ่านออก
    ปุ่ม ดูรายละเอียด เหลือ: ใช้ราคาล่าสุด/พิมพ์เอง (.openbar) + คำอธิบายใต้แผนที่/ท้ายการ์ด · ตารางไม่ต้องกางแล้ว */
@@ -3104,6 +3114,8 @@ function mkrRender(){
   const ago=d=>{ const m=(Date.now()-d.getTime())/60000;
     if(m<0) return ''; if(m<60) return Math.max(1,Math.floor(m))+' นาทีที่แล้ว';
     if(m<1440) return Math.floor(m/60)+' ชม.ที่แล้ว'; return Math.floor(m/1440)+' วันที่แล้ว'; };
+  /* A162 · สีประจำประเด็นวนตามลำดับ — เลือกเลี่ยงแดง/เขียว (ในหน้าการเงินอ่านเป็นลบ/บวก) · เลือดหมูอมชมพูของแบรนด์ขึ้นก่อน */
+  const INS_AC=[['#9A3B5B','154,59,91'],['#B07A00','176,122,0'],['#2C6E9E','44,110,158'],['#7A4E8C','122,78,140'],['#1F7A7A','31,122,122']];
   /* A155 · จุดใต้สไลด์: จุดที่ k = สไลด์ที่ขอบซ้ายอยู่ใกล้ต้นรางที่สุด · ปัดสุดราง (เห็นการ์ดท้าย) = จุดสุดท้าย */
   function insRail(){
     const rail=document.getElementById('insRail'), dots=[].slice.call(card.querySelectorAll('.ins-dots button'));
@@ -3131,8 +3143,10 @@ function mkrRender(){
     document.getElementById('insCnt').textContent=n>1?n+' ประเด็น':'';
     document.getElementById('insBody').innerHTML=
       '<div class="ins-rail" id="insRail" tabindex="0" aria-label="Insight — ปัดซ้ายขวาเพื่อดูทีละประเด็น">'
-      +seg.map((x,i)=>'<article class="ins-sl"><div class="ins-sl-h"><b>ประเด็นที่ '+(i+1)+'</b>'+(n>1?'<span>'+(i+1)+'/'+n+'</span>':'')+'</div>'
-        +'<p class="ins-sl-t">'+mkEsc(x)+'</p><div class="ins-sl-f">'+meta+'</div></article>').join('')
+      +seg.map((x,i)=>{ const c=INS_AC[i%INS_AC.length];   /* A162 · สีประจำประเด็น */
+        return '<article class="ins-sl" style="--ac:'+c[0]+';--ac-rgb:'+c[1]+'"><div class="ins-sl-h"><b>ประเด็นที่ '+(i+1)+'</b>'
+        +(n>1?'<span class="ins-no" aria-hidden="true">'+String(i+1).padStart(2,'0')+'</span>':'')+'</div>'
+        +'<p class="ins-sl-t">'+mkEsc(x)+'</p><div class="ins-sl-f">'+meta+'</div></article>'; }).join('')
       +'<a class="ins-sl ins-cta" href="https://app.jptrustlearning.com" target="_blank" rel="noopener">'
         +'<span class="ins-cta-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>'
         +'<b>อ่านข่าวเต็ม<small>ในแอปสมาชิก</small></b></a></div>'
