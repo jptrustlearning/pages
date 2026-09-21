@@ -19,7 +19,7 @@
   var d=document.documentElement, q=/[?&]app=1(&|$)/.test(location.search), s=false;
   try{ s=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true; }catch(e){}
   if(!q&&!s) return;
-  d.classList.add('tk-app');
+  d.classList.add('tk-app'); d.setAttribute('data-tab','home');   /* A154.1 · แอปเปิดที่หน้าภาพรวมเสมอ */
   var v=document.querySelector('meta[name="viewport"]'); if(v) v.setAttribute('content','width=device-width, initial-scale=1.0, viewport-fit=cover');
   var t=document.querySelector('meta[name="theme-color"]'); if(t) t.setAttribute('content','#EFE8DE');
 })();
@@ -1099,6 +1099,43 @@ html.tk-app .anav{display:flex;position:fixed;left:50%;transform:translateX(-50%
   box-shadow:0 8px 18px -6px rgba(58,21,32,.55)}
 .anav .an-c svg{width:23px;height:23px;stroke-width:2}
 @media(min-width:760px){ html.tk-app .content{padding-left:24px;padding-right:24px} html.tk-app .ah{padding-left:26px;padding-right:26px} }
+
+/* ================= A154.1 · หน้าจอแยกตามแท็บ + ตัวหนังสือน้อยลง (โหมดแอปเท่านั้น) ================= */
+html.tk-app:not([data-tab=home]) :is(#kpis,.ah-sp,#tickerTape,#insCard,#mkRisk,#appJoin){display:none!important}
+html.tk-app:not([data-tab=gold]) :is(#zonesHead,#zonesRow){display:none!important}
+html.tk-app:not([data-tab=search]) #heroScanner{display:none!important}
+html.tk-app:not([data-tab=market]) :is(#mkSec,#mkStock,#mkGold,#mkFx,#mkChart){display:none!important}
+html.tk-app:not([data-tab=cal]) :is(#mkCal,#mkSes){display:none!important}
+html.tk-app #mkDailyNote{display:none!important}
+html.tk-app #mkCal{margin-top:16px}
+html.tk-app #heroScanner{margin-top:16px}
+/* ชื่อหน้าจออยู่ที่หัวแอปแล้ว — ถอดหัวข้อซ้ำในหน้า */
+html.tk-app #zonesHead h2,html.tk-app #mkSec h2{display:none}
+html.tk-app #zonesHead{margin:16px 2px 10px}
+html.tk-app #zonesHead .asof{margin-left:0}
+html.tk-app #mkSec{margin:16px 0 12px}
+html.tk-app:not([data-tab=home]) .ah-t b{font-size:24px;letter-spacing:-.2px}
+/* คำอธิบายยาว: ซ่อนจนกว่าจะกดปุ่ม i ของการ์ด */
+html.tk-app .card:not(.tk-more) :is(.mk-cap,.openhint,.lad-note,.lad-scroll,.pivstrip,.zn-cap,.mkr-dh,.mkr-pd,.mkr-pn em,.gbs-drv,.gbs-nt){display:none}
+html.tk-app .card:not(.tk-more) .mkr-dest::before{content:'เงินไหลไปไหน';display:block;font-size:12.5px;font-weight:600;color:var(--a-ink);margin-bottom:2px}
+html.tk-app .card.tk-more .tk-note{display:none}
+html.tk-app :is(.ins-note,.ins-tone .cnt){display:none}
+html.tk-app .openrow:has(#openIn.locked){display:none}
+html.tk-app .openbar{background:none;border:0;padding:0;margin-bottom:6px}
+html.tk-app .mkr-p{padding:7px 0}
+.tk-i{flex-shrink:0;width:26px;height:26px;border-radius:50%;border:0;padding:0;background:var(--a-fill);color:var(--a-sub);
+  display:inline-grid;place-items:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.tk-i svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+.card.tk-more .tk-i{background:var(--a-acc);color:#fff}
+.tk-i:focus-visible{outline:2px solid var(--a-acc);outline-offset:2px}
+/* ปุ่มค้นหาตรงกลาง: ตอนเป็นแท็บที่เลือก ไอคอนต้องยังขาว (กฎ .on ทั่วไปเปลี่ยนเป็นสีหมึก) */
+.anav .an-c.on{color:#fff;box-shadow:0 0 0 4px rgba(58,21,32,.14),0 8px 18px -6px rgba(58,21,32,.55)}
+/* ชื่อหน้าจออยู่ที่หัวแอปแล้ว — ป้ายในการ์ดค้นหาซ้ำ */
+html.tk-app #heroScanner .scn-brand{display:none}
+html.tk-app #heroScanner .scn-top{justify-content:flex-start}
+.tk-note{font-size:11.5px;color:var(--a-sub);margin-top:10px;line-height:1.5}
+.af{display:none}
+html.tk-app .af{display:block;order:9;text-align:center;font-size:11.5px;color:var(--a-sub);margin:22px 12px 0}
 </style>
 </head>
 <body>
@@ -1287,14 +1324,14 @@ html.tk-app .anav{display:flex;position:fixed;left:50%;transform:translateX(-50%
           <div class="mk-cap" id="mkrCap"></div>
         </div>
 
-        <div class="sec-head">
+        <div class="sec-head" id="zonesHead">
           <h2 id="ovTitle">โซนแนวรับ–แนวต้านทองคำ</h2>
           <span class="asof" id="asOf">กำลังโหลด…</span>
         </div>
 
         <div class="kpis" id="kpis"></div>
 
-        <div class="row">
+        <div class="row" id="zonesRow">
 
           <div class="card">
             <div class="card-h">
@@ -1491,6 +1528,8 @@ html.tk-app .anav{display:flex;position:fixed;left:50%;transform:translateX(-50%
           <span class="aj-t"><b>เป็นสมาชิก JP Trust Learning</b><span>ทดสอบกลยุทธ์ย้อนหลัง 8 กลยุทธ์ด้วยข้อมูลจริง สแกนหุ้น S&amp;P 500 และอ่านข่าววิเคราะห์ทุกเช้า</span></span>
           <span class="aj-go">สมัครสมาชิก</span>
         </a>
+        <!-- A154.1 · คำเตือนของโหมดแอปรวมไว้ที่เดียว (หน้าเว็บยังมีครบทุกการ์ดตามเดิม) -->
+        <p class="af" id="appFoot">ข้อมูลประกอบการศึกษา ไม่ใช่คำแนะนำการลงทุน</p>
 
 
       </section>
@@ -2993,13 +3032,13 @@ if(h0){
 </script>
 
 
-<!-- A154 · แถบเมนูลอยของโหมดแอป — แต่ละปุ่มเลื่อนไปการ์ดในหน้าเดียวกัน (ไม่มีหน้าแยก) -->
+<!-- A154 · แถบเมนูลอยของโหมดแอป — A154.1: แต่ละปุ่ม = หนึ่งหน้าจอ (ซ่อน/แสดงการ์ดด้วย html[data-tab]) -->
 <nav class="anav" id="appNav" aria-label="เมนูแอป">
-  <button type="button" data-go="top" class="on"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-6.5 8 6.5"/><path d="M6 9.5V19h12V9.5"/><path d="M10 19v-5h4v5"/></svg><span>ภาพรวม</span></button>
-  <button type="button" data-go="zones"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7.5h6l1.6 4.5H7.4z"/><path d="M4.2 12h6l1.6 4.5H2.6z"/><path d="M13.8 12h6l1.6 4.5H12.2z"/></svg><span>ทองคำ</span></button>
-  <button type="button" data-go="heroScanner" class="an-c" aria-label="ค้นหาหุ้น"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></button>
-  <button type="button" data-go="mkSec"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="9" rx="1.5"/><rect x="13" y="4" width="7" height="5" rx="1.5"/><rect x="13" y="11" width="7" height="9" rx="1.5"/><rect x="4" y="15" width="7" height="5" rx="1.5"/></svg><span>ตลาด</span></button>
-  <button type="button" data-go="mkCal"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16"/><path d="M8.5 3.5v4M15.5 3.5v4"/></svg><span>ปฏิทิน</span></button>
+  <button type="button" data-tab="home" class="on" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-6.5 8 6.5"/><path d="M6 9.5V19h12V9.5"/><path d="M10 19v-5h4v5"/></svg><span>ภาพรวม</span></button>
+  <button type="button" data-tab="gold"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7.5h6l1.6 4.5H7.4z"/><path d="M4.2 12h6l1.6 4.5H2.6z"/><path d="M13.8 12h6l1.6 4.5H12.2z"/></svg><span>ทองคำ</span></button>
+  <button type="button" data-tab="search" class="an-c" aria-label="ค้นหาหุ้น"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></button>
+  <button type="button" data-tab="market"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="9" rx="1.5"/><rect x="13" y="4" width="7" height="5" rx="1.5"/><rect x="13" y="11" width="7" height="9" rx="1.5"/><rect x="4" y="15" width="7" height="5" rx="1.5"/></svg><span>ตลาด</span></button>
+  <button type="button" data-tab="cal"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16"/><path d="M8.5 3.5v4M15.5 3.5v4"/></svg><span>ปฏิทิน</span></button>
 </nav>
 
 <script>
@@ -3042,38 +3081,59 @@ if(h0){
     var pb=document.getElementById('ahPort'), pl=document.getElementById('sbPortLink'), pbox=document.getElementById('sbPort');
     if(pb&&pl&&pbox&&!pbox.hidden){ pb.hidden=false; pb.addEventListener('click',function(){ pl.click(); }); }
 
-    /* แถบเมนูล่าง */
+    /* ---------- A154.1 · หน้าจอแยกตามแท็บ ----------
+       ปุ่มในแถบล่าง = หนึ่งหน้าจอ · CSS ซ่อน/แสดงการ์ดตาม html[data-tab] ไม่ย้าย DOM
+       ปุ่มย้อนกลับ (Android) = กลับหน้าภาพรวมก่อน แล้วค่อยออกจากแอป — แบบแถบเมนูของแอปทั่วไป */
     var navEl=document.getElementById('appNav'); if(!navEl) return;
-    var zones=document.getElementById('ovTitle'); zones=zones&&zones.closest('.sec-head');
-    var target=function(k){ return k==='top'?null : k==='zones'?zones : document.getElementById(k); };
-    var smooth=!matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var btns=[].slice.call(navEl.querySelectorAll('button[data-go]'));
-    var lock=0;
-    var setOn=function(k){ btns.forEach(function(b){ b.classList.toggle('on', b.dataset.go===k); }); };
-    navEl.addEventListener('click',function(e){
-      var b=e.target.closest('button[data-go]'); if(!b) return;
-      var k=b.dataset.go, el=target(k);
-      var y = el ? el.getBoundingClientRect().top + window.pageYOffset - 12 : 0;
-      window.scrollTo({top:Math.max(0,y), behavior:smooth?'smooth':'auto'});
-      if(k!=='heroScanner'){ setOn(k); lock=Date.now(); }
-      else{
-        var inp=document.getElementById('scnInput');
-        if(inp) setTimeout(function(){ try{ inp.focus({preventScroll:true}); }catch(err){ inp.focus(); } }, smooth?450:0);
+    var TITLES={home:null,gold:'ทองคำ',search:'ค้นหาหุ้น',market:'ภาพรวมตลาด',cal:'ปฏิทิน'};
+    var hiText=hi?hi.textContent:'', ttl=document.querySelector('#appHead .ah-t b');
+    var btns=[].slice.call(navEl.querySelectorAll('button[data-tab]'));
+    var cur='home';
+    var show=function(k){
+      if(!Object.prototype.hasOwnProperty.call(TITLES,k)) k='home';
+      var changed=k!==cur; cur=k;
+      root.setAttribute('data-tab',k);
+      btns.forEach(function(b){ var on=b.dataset.tab===k; b.classList.toggle('on',on); if(on) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
+      if(hi&&ttl){ if(TITLES[k]){ hi.textContent='Tool&Kit'; ttl.textContent=TITLES[k]; } else { hi.textContent=hiText; ttl.textContent='Tool&Kit'; } }
+      window.scrollTo(0,0);
+      if(changed){
+        /* heatmap วาดตามความกว้างกล่อง — โผล่จากที่ซ่อนแล้วต้องวาดใหม่ (ตัวจัดการ resize เดิมของหน้าทำให้) */
+        setTimeout(function(){ try{ window.dispatchEvent(new Event('resize')); }catch(e){} },40);
+        track('app-tab-'+k);
       }
-    });
-    /* ไฮไลต์ตามตำแหน่งที่เลื่อนถึง — ส่วนที่หัวข้อผ่านเส้น 35% ของจอเป็นตัวล่าสุด */
-    var order=['zones','mkSec','mkCal'];
-    var tick=0;
-    var onScroll=function(){
-      if(tick) return; tick=requestAnimationFrame(function(){
-        tick=0; if(Date.now()-lock<900) return;
-        var line=window.innerHeight*0.35, cur='top';
-        order.forEach(function(k){ var el=target(k); if(el&&el.offsetParent!==null&&el.getBoundingClientRect().top<line) cur=k; });
-        if((window.innerHeight+window.pageYOffset)>=document.documentElement.scrollHeight-4) cur='mkCal';
-        setOn(cur);
-      });
+      return changed;
     };
-    window.addEventListener('scroll',onScroll,{passive:true});
+    try{ history.replaceState({tk:'home'},''); }catch(e){}
+    window.addEventListener('popstate',function(e){ show((e.state&&e.state.tk)||'home'); });
+    navEl.addEventListener('click',function(e){
+      var b=e.target.closest('button[data-tab]'); if(!b) return;
+      var k=b.dataset.tab;
+      if(k===cur){ window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}); }
+      else if(k==='home'){ if(history.state&&history.state.tk&&history.state.tk!=='home') history.back(); else show('home'); }
+      else{
+        try{ if(cur==='home') history.pushState({tk:k},''); else history.replaceState({tk:k},''); }catch(err){}
+        show(k);
+      }
+      if(k==='search'){ var inp=document.getElementById('scnInput'); if(inp) setTimeout(function(){ try{ inp.focus({preventScroll:true}); }catch(err){ inp.focus(); } },60); }
+    });
+
+    /* ---------- A154.1 · ตัวหนังสือน้อยลง ----------
+       คำอธิบายยาวของแต่ละการ์ดซ่อนไว้ (CSS) · ปุ่ม i ที่หัวการ์ดเปิดดูได้ · คงหมายเหตุบรรทัดเดียวที่กันอ่านผิด */
+    var CAP='.mk-cap,.openhint,.lad-note,.pivstrip,.zn-cap,.mkr-dh,.mkr-pd,.gbs-drv,.gbs-nt';
+    var IC_I='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><path d="M12 7.6v.1"/></svg>';
+    [].forEach.call(document.querySelectorAll('#viewDash .card'),function(c){
+      var h=c.querySelector(':scope > .card-h'), h3=h&&h.querySelector('h3');
+      if(!h3||!c.querySelector(CAP)) return;
+      var b=document.createElement('button'); b.type='button'; b.className='tk-i';
+      b.setAttribute('aria-label','วิธีอ่านการ์ดนี้'); b.setAttribute('aria-expanded','false'); b.innerHTML=IC_I;
+      b.addEventListener('click',function(){ var on=c.classList.toggle('tk-more'); b.setAttribute('aria-expanded',on?'true':'false'); });
+      h3.insertAdjacentElement('afterend',b);
+    });
+    var note=function(anchor,txt){ if(!anchor) return; var p=document.createElement('p'); p.className='tk-note'; p.textContent=txt; anchor.insertAdjacentElement('afterend',p); };
+    note(document.getElementById('ladder'),'โอกาสแตะคือความถี่จากสถิติย้อนหลัง ไม่ใช่การพยากรณ์');
+    note(document.getElementById('mkStrInfo'),'ข้อมูลรายวันจากธนาคารกลางยุโรป ไม่ใช่ราคาสด');
+    note(document.getElementById('mkFxBox'),'อัตรากลางของตลาด ไม่ใช่ราคารับซื้อ–ขายของธนาคาร');
+    note(document.getElementById('mkCalBox'),'เวลาในตารางเป็นเวลาไทย');
     return;
   }
 
