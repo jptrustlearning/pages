@@ -1,0 +1,16 @@
+{
+  "id": "/jptrust-toolkit",
+  "name": "JP Trust Tool&Kit",
+  "short_name": "Tool&Kit",
+  "description": "แดชบอร์ดทองคำ หุ้น และค่าเงิน จาก JP Trust Learning",
+  "lang": "th",
+  "start_url": "/jptrust-toolkit?source=pwa",
+  "scope": "/jptrust-toolkit",
+  "display": "standalone",
+  "background_color": "#F5F3EF",
+  "theme_color": "#EFE8DE",
+  "icons": [
+    { "src": "/pwa-icons/icon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/pwa-icons/icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
