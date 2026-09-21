@@ -1306,6 +1306,13 @@ div.wl-go{cursor:default}
 .anav button.on svg,.anav button:active svg{stroke:#D4AF37}
 .anav .an-c.on,.anav .an-c:active{color:#D4AF37;box-shadow:0 0 0 4px rgba(212,175,55,.32),0 8px 18px -6px rgba(58,21,32,.55)}
 .anav .an-c.on svg,.anav .an-c:active svg{stroke:#D4AF37}
+/* A164 · ปุ่มที่เลือก = ไอคอนทึบทั้งตัว (svg.i-f) สีทอง · ไม่ได้เลือก = เส้น (svg.i-o) · ช่องว่างในไอคอน (ประตู/วันที่) ใช้สีพื้นแถบ */
+.anav .i-f{display:none}
+.anav button.on .i-o{display:none}
+.anav button.on .i-f{display:block;fill:#D4AF37;stroke:#D4AF37;stroke-width:1}
+.anav button.on .i-f .k{fill:none;stroke-width:2.2}
+.anav button.on .i-f .w{fill:#fff;stroke:#fff;stroke-width:1.4}
+.anav button.on .i-f circle.w{stroke:none}
 /* ชื่อหน้าจออยู่ที่หัวแอปแล้ว — ป้ายในการ์ดค้นหาซ้ำ */
 html.tk-app #heroScanner .scn-brand{display:none}
 html.tk-app #heroScanner .scn-top{justify-content:flex-start}
@@ -3220,11 +3227,11 @@ if(h0){
 
 <!-- A154 · แถบเมนูลอยของโหมดแอป — A154.1: แต่ละปุ่ม = หนึ่งหน้าจอ (ซ่อน/แสดงการ์ดด้วย html[data-tab]) -->
 <nav class="anav" id="appNav" aria-label="เมนูแอป">
-  <button type="button" data-tab="home" class="on" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-6.5 8 6.5"/><path d="M6 9.5V19h12V9.5"/><path d="M10 19v-5h4v5"/></svg><span>ภาพรวม</span></button>
-  <button type="button" data-tab="gold"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7.5h6l1.6 4.5H7.4z"/><path d="M4.2 12h6l1.6 4.5H2.6z"/><path d="M13.8 12h6l1.6 4.5H12.2z"/></svg><span>ทองคำ</span></button>
+  <button type="button" data-tab="home" class="on" aria-current="page"><svg class="i-o" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-6.5 8 6.5"/><path d="M6 9.5V19h12V9.5"/><path d="M10 19v-5h4v5"/></svg><svg class="i-f" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.6 3.9a1 1 0 0 0-1.2 0L3.9 10a.8.8 0 0 0 .5 1.4H6V19a1.2 1.2 0 0 0 1.2 1.2h3.3V15h3v5.2h3.3A1.2 1.2 0 0 0 18 19v-7.6h1.6a.8.8 0 0 0 .5-1.4z"/></svg><span>ภาพรวม</span></button>
+  <button type="button" data-tab="gold"><svg class="i-o" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7.5h6l1.6 4.5H7.4z"/><path d="M4.2 12h6l1.6 4.5H2.6z"/><path d="M13.8 12h6l1.6 4.5H12.2z"/></svg><svg class="i-f" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.2 6.6h5.6l1.5 4.2H7.7z"/><path d="M4.4 12.6h5.6l1.5 4.3H2.9z"/><path d="M14 12.6h5.6l1.5 4.3h-8.6z"/></svg><span>ทองคำ</span></button>
   <button type="button" data-tab="search" class="an-c" aria-label="ค้นหาหุ้น"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></button>
-  <button type="button" data-tab="market"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="9" rx="1.5"/><rect x="13" y="4" width="7" height="5" rx="1.5"/><rect x="13" y="11" width="7" height="9" rx="1.5"/><rect x="4" y="15" width="7" height="5" rx="1.5"/></svg><span>ตลาด</span></button>
-  <button type="button" data-tab="cal"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16"/><path d="M8.5 3.5v4M15.5 3.5v4"/></svg><span>ปฏิทิน</span></button>
+  <button type="button" data-tab="market"><svg class="i-o" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="9" rx="1.5"/><rect x="13" y="4" width="7" height="5" rx="1.5"/><rect x="13" y="11" width="7" height="9" rx="1.5"/><rect x="4" y="15" width="7" height="5" rx="1.5"/></svg><svg class="i-f" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="9" rx="1.5"/><rect x="13" y="4" width="7" height="5" rx="1.5"/><rect x="13" y="11" width="7" height="9" rx="1.5"/><rect x="4" y="15" width="7" height="5" rx="1.5"/></svg><span>ตลาด</span></button>
+  <button type="button" data-tab="cal"><svg class="i-o" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16"/><path d="M8.5 3.5v4M15.5 3.5v4"/></svg><svg class="i-f" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.6" y="5.2" width="16.8" height="15.2" rx="2.8"/><path class="k" d="M8.5 3.2v3.6M15.5 3.2v3.6"/><path class="w" d="M3.6 10.2h16.8"/><circle class="w" cx="8.6" cy="14.4" r="1.15"/><circle class="w" cx="12" cy="14.4" r="1.15"/><circle class="w" cx="15.4" cy="14.4" r="1.15"/><circle class="w" cx="8.6" cy="17.4" r="1.15"/><circle class="w" cx="12" cy="17.4" r="1.15"/></svg><span>ปฏิทิน</span></button>
 </nav>
 
 <script>
@@ -3416,7 +3423,7 @@ if(h0){
 <script>
 /* =====================================================================
    A160 · S&P 500 / Nasdaq 100 ใต้ราคาทอง (หน้าภาพรวม)
-   - A163: 2 แถว แถวละ Tickers widget 1 ตัว + ป้าย Pre-market/After-hours ของเรา (A160 Tickers 2 ตัว → A160.1 Single Ticker 2 ช่อง → A163) · CFD FOREXCOM:SPX500 / FOREXCOM:NSXUSD (ชุดเดียวกับ renderTickerTape ในแอปสมาชิก)
+   - A164: 2 แถว แถวละ Single Ticker 1 ตัว (A163 ลอง Tickers แถวละตัว — ค้างโครงโหลด) + ป้าย Pre-market/After-hours ของเรา (A160 Tickers 2 ตัว → A160.1 Single Ticker 2 ช่อง → A163) · CFD FOREXCOM:SPX500 / FOREXCOM:NSXUSD (ชุดเดียวกับ renderTickerTape ในแอปสมาชิก)
      % เปลี่ยนแปลงเทียบรอบวันของ CFD (ตัดวันราว 17:00 นิวยอร์ก) ไม่ใช่ราคาปิดดัชนีจริง 16:00 — ใกล้เคียง ใช้ดูทิศทาง
    - ฉีดหลัง window load (ไม่ถ่วงหน้า) · กลับจากพื้นหลังเกิน 60 วิ = ฉีดใหม่ (ไม่ถี่กว่า 30 วิ) เพราะ socket ของ widget หลับบนมือถือ
    - ป้ายสถานะ: เวลานิวยอร์กผ่าน Intl (DST อัตโนมัติ) + วันหยุด NYSE 2026–2027 · ไม่คิดวันปิดครึ่งวัน · ⚠️ ต่อรายการวันหยุดก่อนสิ้นปี 2027
@@ -3427,7 +3434,8 @@ if(h0){
   /* A160.1 · Single Ticker ช่องละตัว — Tickers widget เดิมแคบเกินใส่ 2 ตัว (เห็นตัวเดียว) และค้างที่โครงโหลด
      locale 'en' เหมือน ticker tape (A75) ที่ยืนยันแล้วว่า FOREXCOM:SPX500 / NSXUSD วิ่งในหน้านี้ */
   /* A163 · แถวละ Tickers widget 1 ตัว (Single Ticker ในช่อง 161px ตัด % ทิ้ง) · title = ชื่อไทยอ่านง่าย */
-  var CFG=function(sym,nm){ return {symbols:[{proName:sym,title:nm}],colorTheme:'light',locale:'en',isTransparent:true,showSymbolLogo:true,largeChartUrl:''}; };
+  /* A164 · กลับ Single Ticker (Tickers ค้างโครงโหลด 2 ครั้ง 21:43 / 22:13 ขณะ Single Ticker ขึ้นราคา 22:04) · เต็มแถวให้มีที่แสดง % */
+  var CFG=function(sym){ return {symbol:sym,width:'100%',isTransparent:true,colorTheme:'light',locale:'en'}; };
   var ICO={sun:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></svg>',
            moon:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>'};
   var HOL={'2026-01-01':1,'2026-01-19':1,'2026-02-16':1,'2026-04-03':1,'2026-05-25':1,'2026-06-19':1,'2026-07-03':1,'2026-09-07':1,'2026-11-26':1,'2026-12-25':1,
@@ -3438,8 +3446,8 @@ if(h0){
       c.querySelectorAll('script').forEach(function(x){ x.remove(); });
       c.innerHTML='<div class="tradingview-widget-container__widget"></div>';
       var sc=document.createElement('script'); sc.type='text/javascript'; sc.async=true;
-      sc.src='https://s3.tradingview.com/external-embedding/embed-widget-tickers.js';
-      sc.innerHTML=JSON.stringify(CFG(c.dataset.sym,c.dataset.nm)); c.appendChild(sc);
+      sc.src='https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js';
+      sc.innerHTML=JSON.stringify(CFG(c.dataset.sym)); c.appendChild(sc);
     });
     last=Date.now();
   }
