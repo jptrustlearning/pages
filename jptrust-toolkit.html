@@ -1277,6 +1277,13 @@ div.wl-go{cursor:default}
 .us-nt{font-size:11px;color:var(--a-sub);margin:2px 2px 0}
 /* ปุ่มค้นหาตรงกลาง: ตอนเป็นแท็บที่เลือก ไอคอนต้องยังขาว (กฎ .on ทั่วไปเปลี่ยนเป็นสีหมึก) */
 .anav .an-c.on{color:#fff;box-shadow:0 0 0 4px rgba(58,21,32,.14),0 8px 18px -6px rgba(58,21,32,.55)}
+/* A161 · ปุ่มที่เลือก + ตอนกด = สีเหลืองทอง (จูนสั่ง 21 ก.ย.) — ไอคอนทองแบรนด์ #D4AF37
+   ป้ายชื่อเข้มกว่าหนึ่งระดับ #B08A1E (บนพื้นขาว #D4AF37 contrast 2.1 อ่านยาก · #B08A1E = 3.2) · ปุ่มค้นหากลาง: ไอคอนทองบนเลือดหมู + วงแหวนทอง */
+.anav button{transition:color .18s}
+.anav button.on,.anav button:active{color:#B08A1E}
+.anav button.on svg,.anav button:active svg{stroke:#D4AF37}
+.anav .an-c.on,.anav .an-c:active{color:#D4AF37;box-shadow:0 0 0 4px rgba(212,175,55,.32),0 8px 18px -6px rgba(58,21,32,.55)}
+.anav .an-c.on svg,.anav .an-c:active svg{stroke:#D4AF37}
 /* ชื่อหน้าจออยู่ที่หัวแอปแล้ว — ป้ายในการ์ดค้นหาซ้ำ */
 html.tk-app #heroScanner .scn-brand{display:none}
 html.tk-app #heroScanner .scn-top{justify-content:flex-start}
