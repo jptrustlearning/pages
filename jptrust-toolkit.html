@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" class="tk-app" data-tab="home">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#FAF6ED">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#EFE8DE">
 <!-- A154 · ติดตั้งเป็นแอปได้ (PWA) — manifest/sw แยกจากแอปสมาชิก · ไอคอนชุดเดียวกับแอปสมาชิก -->
 <link rel="manifest" href="/toolkit-manifest.json">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -12,17 +12,12 @@
 <meta name="apple-mobile-web-app-title" content="Tool&amp;Kit">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script>
-/* A154 · โหมดแอป = เปิดจากไอคอนบนหน้าจอโฮม (standalone) หรือดูตัวอย่างด้วย ?app=1
-   ใส่คลาส .tk-app ที่ <html> (ห้ามใช้ชื่อ .app — ชนกับ div.app ของเลย์เอาต์ ทำให้ <html> กลายเป็น flex) ก่อนหน้าวาด ไม่งั้นจะเห็นหน้าเว็บแวบหนึ่งก่อนเปลี่ยน
-   viewport-fit=cover เฉพาะโหมดแอป (แถบเมนูล่างต้องหลบขีด home ของ iPhone) — หน้าเว็บปกติไม่แตะ */
+/* A154.5 · หน้านี้มีหน้าตาเดียว = แบบแอป (<html class="tk-app"> อยู่ใน markup แล้ว)
+   สคริปต์นี้เหลือหน้าที่เดียว: เปิดจากไอคอนบนหน้าจอโฮม (standalone) → ติด tk-installed
+   ใช้ซ่อนแถบชวนติดตั้ง + จดว่าเครื่องนี้ติดตั้งแล้ว · ?app=1 ของลิงก์เก่าไม่มีผลอะไรแล้ว */
 (function(){
-  var d=document.documentElement, q=/[?&]app=1(&|$)/.test(location.search), s=false;
-  try{ s=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true; }catch(e){}
-  if(!q&&!s) return;
-  d.classList.add('tk-app'); d.setAttribute('data-tab','home');
-  if(s) d.classList.add('tk-installed');   /* A154.4 · เปิดจากไอคอนจริง (ไม่ใช่ลิงก์ดูตัวอย่าง ?app=1) */   /* A154.1 · แอปเปิดที่หน้าภาพรวมเสมอ */
-  var v=document.querySelector('meta[name="viewport"]'); if(v) v.setAttribute('content','width=device-width, initial-scale=1.0, viewport-fit=cover');
-  var t=document.querySelector('meta[name="theme-color"]'); if(t) t.setAttribute('content','#EFE8DE');
+  var s=false; try{ s=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true; }catch(e){}
+  if(s) document.documentElement.classList.add('tk-installed');
 })();
 </script>
 <title>JP Trust Tool &amp; Kit — Dashboard ทอง&amp;หุ้น</title>
@@ -954,7 +949,7 @@ html.tk-app{
   scroll-padding-top:12px;
 }
 html.tk-app body{background:var(--a-bg2) linear-gradient(180deg,var(--a-bg1) 0,var(--a-bg2) 460px) no-repeat;color:var(--a-ink)}
-html.tk-app .sb,html.tk-app .top,html.tk-app .scrim,html.tk-app #prodCard,html.tk-app #pwaBar{display:none!important}
+html.tk-app .sb,html.tk-app .top,html.tk-app .scrim,html.tk-app #prodCard{display:none!important}
 html.tk-app .main{margin-left:0}
 html.tk-app .content{padding:0 16px calc(118px + env(safe-area-inset-bottom,0px));max-width:720px;margin:0 auto;width:100%}
 html.tk-app #viewDash.on{display:flex;flex-direction:column}
@@ -1161,6 +1156,18 @@ html.tk-app .card.tk-more .tk-note{display:none}
 html.tk-app #heroScanner .scn-brand{display:none}
 html.tk-app #heroScanner .scn-top{justify-content:flex-start}
 .tk-note{font-size:11.5px;color:var(--a-sub);margin-top:10px;line-height:1.5}
+
+/* ================= A154.5 · แถบชวนติดตั้งในหน้าตาแอป ================= */
+html.tk-app #tickerTape{order:-3} html.tk-app #pwaBar{order:-2}
+html.tk-app:not([data-tab=home]) #pwaBar,html.tk-installed #pwaBar{display:none!important}
+html.tk-app .pwab{background:var(--a-card);border:0;border-radius:22px;box-shadow:var(--a-sh);padding:14px 12px 14px 16px;margin:0 0 16px;gap:12px}
+html.tk-app .pwab>img{width:42px;height:42px;border-radius:12px}
+html.tk-app .pwab-t b{color:var(--a-ink);font-size:14.5px}
+html.tk-app .pwab-t span{color:var(--a-sub);font-weight:400}
+html.tk-app .pwab-x{color:var(--a-sub)}
+html.tk-app .pwab-how{border-top-color:var(--a-line);color:var(--a-ink);padding-top:12px}
+html.tk-app .pwab-how svg{stroke:var(--a-acc)}
+html.tk-app .pwab-how svg circle{fill:var(--a-acc)}
 .af{display:none}
 html.tk-app .af{display:block;order:9;text-align:center;font-size:11.5px;color:var(--a-sub);margin:22px 12px 0}
 </style>
@@ -3084,7 +3091,7 @@ if(h0){
   }
 
   if(isApp){
-    window.addEventListener('load',function(){ track('app-open'); });
+    window.addEventListener('load',function(){ if(root.classList.contains('tk-installed')) track('app-open'); });   /* A154.5 */
     /* A154.3 · จดเวลาที่เปิดจากแอปล่าสุด — หน้าเว็บใช้ตัดสินว่าไม่ต้องชวนติดตั้ง (หมดอายุ 30 วัน เผื่อถอนการติดตั้ง)
        A154.4 · จดเฉพาะตอนเปิดจากไอคอนจริง — ลิงก์ ?app=1 ที่เปิดในเบราว์เซอร์ในแอป (Custom Tab ใช้ storage ร่วมกับ Chrome)
        เคยทำให้แถบติดตั้งหายทั้งที่ยังไม่ได้ติดตั้ง · เปลี่ยนชื่อคีย์เป็น v2 เพื่อทิ้งค่าที่จดผิดไปแล้ว */
@@ -3178,13 +3185,13 @@ if(h0){
     note(document.getElementById('mkStrInfo'),'ข้อมูลรายวันจากธนาคารกลางยุโรป ไม่ใช่ราคาสด');
     note(document.getElementById('mkFxBox'),'อัตรากลางของตลาด ไม่ใช่ราคารับซื้อ–ขายของธนาคาร');
     note(document.getElementById('mkCalBox'),'เวลาในตารางเป็นเวลาไทย');
-    return;
   }
 
   /* ---------- หน้าเว็บปกติ: แถบชวนติดตั้ง (A154.3) ----------
      ขึ้นทันทีบนมือถือทุกเครื่องที่ยังไม่ได้ติดตั้ง · ปิด × = ไม่ขึ้น 14 วัน
      iPhone = วิธีเพิ่มไปหน้าจอโฮม · Android = ปุ่มติดตั้งจริงเมื่อเบราว์เซอร์พร้อม ไม่งั้นวิธีผ่านเมนู */
   var bar=document.getElementById('pwaBar'); if(!bar) return;
+  if(root.classList.contains('tk-installed')) return;          /* A154.5 · เปิดจากไอคอนแล้ว ไม่ต้องชวน */
   var KEY='jpt_tk_pwa_x', DAYS=14;
   try{ var t=+localStorage.getItem(KEY)||0; if(Date.now()-t<DAYS*864e5) return; }catch(e){}
   try{ var seen=+localStorage.getItem('jpt_tk_app_seen2')||0; if(Date.now()-seen<30*864e5) return; }catch(e){}
