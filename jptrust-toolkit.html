@@ -1211,6 +1211,51 @@ html.tk-app #zonesRow .tk-note,html.tk-app #zonesRow .lad-note{margin-left:2px;m
 .zn-sl :is(.zn-ph,.zn-p,.lad-scroll){display:none!important}
 .zn-sl-nt{margin-top:auto;padding:12px 3px 0;font-size:12px;line-height:1.55;color:var(--a-sub)}
 @media(min-width:600px){.zn-sl{flex-basis:calc(50% - 22px)}}
+/* ================= A158 · แท็บค้นหาหุ้น: รายการโปรด (watchlist) =================
+   อยู่ใน #heroScanner ต่อจาก #scnPanel (โผล่เฉพาะแท็บค้นหา · ผลค้นหา/หน้าหุ้นขึ้นเหนือรายการเสมอ)
+   ทรงแถวตามภาพอ้างอิงแอปการเงินที่จูนส่ง: โลโก้ · ชื่อ+กลุ่ม · เส้น 14 วัน · ราคา + ป้าย % วันล่าสุด */
+.wl{margin-top:14px}
+.wl[hidden]{display:none}
+.wl-h{display:flex;align-items:center;gap:10px}
+.wl-h h3{font-size:15.5px;font-weight:600;color:var(--a-ink);line-height:1.4}
+.wl-n{font-size:12px;color:var(--a-sub)}
+.wl-ed{margin-left:auto;border:0;background:none;font-family:var(--f-b);font-size:13px;font-weight:600;color:var(--a-acc);padding:6px 4px;cursor:pointer}
+.wl-ed[hidden]{display:none}
+.wl-add{width:34px;height:34px;border-radius:50%;border:0;background:var(--a-fill);color:var(--a-ink);display:grid;place-items:center;cursor:pointer;flex:none}
+.wl-ed[hidden]+.wl-add{margin-left:auto}
+.wl-add svg,.wl-star svg,.wl-x svg,.wl-emp i svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.wl-sub{font-size:11.5px;color:var(--a-sub);margin:2px 0 6px}
+.wl-row{display:flex;align-items:center;gap:8px;border-top:1px solid var(--a-line)}
+.wl-row:first-child{border-top:0}
+.wl-go{flex:1;min-width:0;display:grid;grid-template-columns:auto minmax(0,1fr) 62px auto;align-items:center;gap:11px;
+  padding:11px 0;border:0;background:none;text-align:left;font-family:var(--f-b);color:var(--a-ink);cursor:pointer;-webkit-tap-highlight-color:transparent}
+div.wl-go{cursor:default}
+.wl-go .scn-logo{width:38px;height:38px;border-radius:50%}
+.wl-nm{display:flex;flex-direction:column;min-width:0;line-height:1.3}
+.wl-nm b{font-size:15.5px;font-weight:600}
+.wl-nm small{font-size:11.5px;color:var(--a-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wl-sp{width:62px;height:28px;display:block;overflow:visible}
+.wl-sp polyline{fill:none;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.wl-sp.up polyline{stroke:var(--a-up)} .wl-sp.dn polyline{stroke:var(--a-dn)} .wl-sp.fl polyline{stroke:var(--a-sub)}
+.wl-px{display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:74px}
+.wl-px b{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
+.wl-px i{font-style:normal;font-size:12px;font-weight:600;padding:2px 8px;border-radius:8px;font-variant-numeric:tabular-nums}
+.wl-px i.up{color:var(--a-up);background:rgba(30,154,95,.1)} .wl-px i.dn{color:var(--a-dn);background:rgba(209,75,69,.1)} .wl-px i.fl{color:var(--a-sub);background:var(--a-fill)}
+.wl-x{display:none;width:32px;height:32px;border-radius:50%;border:0;background:rgba(209,75,69,.1);color:var(--a-dn);place-items:center;cursor:pointer;flex:none}
+.wl.wl-edit .wl-x{display:grid}
+.wl.wl-edit .wl-px{display:none}
+.wl.wl-edit .wl-go{grid-template-columns:auto minmax(0,1fr) 62px}
+.wl-emp{text-align:center;padding:14px 8px 6px}
+.wl-emp i{width:46px;height:46px;border-radius:50%;background:var(--a-fill);color:var(--a-sub);display:inline-grid;place-items:center;margin-bottom:8px}
+.wl-emp i svg{width:21px;height:21px}
+.wl-emp b{display:block;font-size:14px;font-weight:600;color:var(--a-ink)}
+.wl-emp p{font-size:12.5px;color:var(--a-sub);line-height:1.55;margin-top:3px}
+.wl-star{display:inline-flex;align-items:center;gap:5px;margin-left:auto;border:0;border-radius:999px;padding:8px 13px;
+  background:var(--a-fill);color:var(--a-ink);font-family:var(--f-b);font-size:13px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.wl-star[aria-pressed=true]{background:var(--a-acc);color:#fff}
+.wl-star[aria-pressed=true] svg{fill:currentColor}
+.scn-dhead .wl-star~.scn-dstats{margin-left:0}
+@media(max-width:360px){.wl-go{grid-template-columns:auto minmax(0,1fr) 48px auto;gap:9px}.wl-sp{width:48px}}
 /* ปุ่มค้นหาตรงกลาง: ตอนเป็นแท็บที่เลือก ไอคอนต้องยังขาว (กฎ .on ทั่วไปเปลี่ยนเป็นสีหมึก) */
 .anav .an-c.on{color:#fff;box-shadow:0 0 0 4px rgba(58,21,32,.14),0 8px 18px -6px rgba(58,21,32,.55)}
 /* ชื่อหน้าจออยู่ที่หัวแอปแล้ว — ป้ายในการ์ดค้นหาซ้ำ */
@@ -1384,6 +1429,8 @@ html.tk-app .af{display:block;order:9;text-align:center;font-size:11.5px;color:v
             <div class="scn-idle" id="scnIdle" hidden></div>
           </div>
           <div class="scn-panel" id="scnPanel" role="region" aria-label="ผลการค้นหาหุ้น" hidden></div>
+          <!-- A158 · รายการโปรด (watchlist) — วาดโดยสคริปต์ A158 ท้ายหน้า · เก็บใน localStorage jpt_tk_watch -->
+          <section class="card wl" id="tkWatch" aria-label="รายการโปรด" hidden></section>
         </div>
         <!-- Insight ล่าสุด — สำเนาย่อของ batch ข่าวบนสุด (news/news-latest.json · สร้างโดย tools/gen_news_latest.py) -->
         <div class="card ins" id="insCard">
@@ -2276,7 +2323,7 @@ function mkParseStocks(miniT,mapT){
     const r=by[t], n=r.length; if(r[n-1].d!==asof||!MK_SEC[sec[t]]) continue;   // ตัวที่ราคาค้าง/ไม่มีกลุ่ม ไม่เอามาปน
     const ret={}; for(const k of [1,5,10]) ret[k]=n>k?(r[n-1].c/r[n-1-k].c-1)*100:null;
     const tail=r.slice(-10), dv=tail.reduce((s,x)=>s+x.c*x.v,0)/tail.length;
-    list.push({t,sec:sec[t],c:r[n-1].c,r:ret,w:Math.sqrt(Math.max(dv,1))});   // √ ของมูลค่าซื้อขาย กันไม่ให้ตัวใหญ่ไม่กี่ตัวกินทั้งแผนที่
+    list.push({t,sec:sec[t],c:r[n-1].c,r:ret,w:Math.sqrt(Math.max(dv,1)),s:r.slice(-14).map(x=>x.c)});   /* A158 · s = ปิด 14 วัน ให้เส้นในรายการโปรด */   // √ ของมูลค่าซื้อขาย กันไม่ให้ตัวใหญ่ไม่กี่ตัวกินทั้งแผนที่
   }
   if(list.length<100) throw new Error('ข้อมูลหุ้นน้อยผิดปกติ');
   /* ชุด % เปลี่ยนแปลงรายวันของตลาด (ถ่วงน้ำหนักเท่ากันทุกตัว) — ใช้หาความผันผวนของหุ้นในแผง "เงินไหลไปไหน"
@@ -3302,6 +3349,100 @@ if(h0){
   }
   window.addEventListener('appinstalled',function(){ bar.hidden=true; track('pwa-installed'); try{ localStorage.setItem('jpt_tk_app_seen2',String(Date.now())); }catch(e){} });
   x.addEventListener('click',function(){ bar.hidden=true; try{ localStorage.setItem(KEY,String(Date.now())); }catch(e){} });
+})();
+</script>
+
+<script>
+/* =====================================================================
+   A158 · รายการโปรด (watchlist) ในแท็บค้นหาหุ้น
+   - เก็บ localStorage 'jpt_tk_watch' = ["NVDA","AAPL",…] ตามลำดับที่กดติดตาม · ต่อเครื่อง/เบราว์เซอร์ (ไม่มีบัญชี)
+   - ราคา · % วันล่าสุด · เส้น 14 วัน = mkData() (mini CSV ชุดเดียวกับแท็บตลาด/การ์ด Risk · โหลดรอบเดียว)
+   - ปุ่ม ติดตาม ฉีดเข้าหัวหน้าหุ้นของ hero-scanner ด้วย MutationObserver (scanner วาด #scnPanel ใหม่ทุกครั้ง)
+   - แถว = <button data-tk> อยู่ใน #heroScanner ⇒ click handler ของ scanner เปิดหน้าหุ้นให้ (ตัวที่ scanner ไม่มี = แถวกดไม่ได้)
+   ⚠️ ไม่แตะ hero-scanner.js — ไฟล์ตั้งใจให้ byte-identical กับ public
+   ===================================================================== */
+(function(){
+  var box=document.getElementById('tkWatch'), root=document.getElementById('heroScanner'), panel=document.getElementById('scnPanel');
+  if(!box||!root||!panel) return;
+  var KEY='jpt_tk_watch', SC=null, MKD=null, edit=false;
+  var IC={
+    star:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg>',
+    plus:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+    x:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>'
+  };
+  var load=function(){ try{ var a=JSON.parse(localStorage.getItem(KEY)||'[]'); return Array.isArray(a)?a.filter(function(t){ return typeof t==='string'&&/^[A-Z][A-Z0-9.\-]{0,6}$/.test(t); }):[]; }catch(e){ return []; } };
+  var save=function(a){ try{ localStorage.setItem(KEY,JSON.stringify(a)); }catch(e){} };
+  var has=function(t){ return load().indexOf(t)>=0; };
+  var toggle=function(t){ var a=load(), i=a.indexOf(t); if(i>=0) a.splice(i,1); else a.push(t); save(a); return i<0; };
+  var sg=function(v){ return v>0.005?'up':v<-0.005?'dn':'fl'; };
+  var pc=function(v){ return v==null?'—':(v<0?'\u2212':'+')+Math.abs(v).toFixed(2)+'%'; };
+  var px=function(v){ return '$'+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var spark=function(a){
+    if(!a||a.length<2) return '';
+    var lo=Math.min.apply(null,a), hi=Math.max.apply(null,a), r=hi-lo||1, n=a.length;
+    var pts=a.map(function(v,i){ return (i/(n-1)*100).toFixed(1)+','+(92-(v-lo)/r*84).toFixed(1); }).join(' ');
+    return '<svg class="wl-sp '+sg(a[n-1]/a[0]-1)+'" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="'+pts+'"/></svg>';
+  };
+  var logo=function(t){ return '<span class="scn-logo"><i>'+t.charAt(0)+'</i><img src="logos/'+t+'.png" alt="" loading="lazy" onerror="this.remove()"></span>'; };
+
+  function render(){
+    var a=load(), by={};
+    if(MKD) MKD.list.forEach(function(x){ by[x.t]=x; });
+    if(!a.length) edit=false;
+    box.classList.toggle('wl-edit',edit);
+    var h='<div class="wl-h"><h3>รายการโปรด</h3>'+(a.length?'<span class="wl-n">'+a.length+' ตัว</span>':'')
+      +'<button type="button" class="wl-ed"'+(a.length?'':' hidden')+'>'+(edit?'เสร็จ':'แก้ไข')+'</button>'
+      +'<button type="button" class="wl-add" aria-label="ค้นหาหุ้นเพื่อเพิ่มในรายการโปรด">'+IC.plus+'</button></div>';
+    if(!a.length){
+      h+='<div class="wl-emp"><i>'+IC.star+'</i><b>ยังไม่มีหุ้นที่ติดตาม</b>'
+        +'<p>ค้นหาหุ้นแล้วกดปุ่ม ติดตาม ที่หน้าหุ้น<br>รายการจะขึ้นตรงนี้ พร้อมราคาปิดล่าสุด</p></div>';
+    }else{
+      h+='<div class="wl-sub">'+(MKD?'ราคาปิด '+thDate(MKD.asof)+' · % เทียบวันก่อนหน้า · ':'')+'บันทึกไว้ในเครื่องนี้</div><div class="wl-list">';
+      a.forEach(function(t){
+        var m=by[t], sec=m&&MK_SEC[m.sec]?MK_SEC[m.sec][1]:'', ok=SC&&SC.ticks[t], tag=ok?'button':'div';
+        h+='<div class="wl-row"><'+tag+(ok?' type="button" data-tk="'+t+'" aria-label="เปิดหน้าหุ้น '+t+'"':'')+' class="wl-go">'+logo(t)
+          +'<span class="wl-nm"><b>'+t+'</b><small>'+mkEsc(sec||'S&P 500')+'</small></span>'
+          +(m?spark(m.s):'<span></span>')
+          +'<span class="wl-px">'+(m?'<b>'+px(m.c)+'</b><i class="'+sg(m.r[1])+'">'+pc(m.r[1])+'</i>':'<b>—</b>')+'</span>'
+          +'</'+tag+'><button type="button" class="wl-x" data-rm="'+t+'" aria-label="เอา '+t+' ออกจากรายการโปรด">'+IC.x+'</button></div>';
+      });
+      h+='</div>';
+    }
+    box.innerHTML=h; box.hidden=false;
+  }
+
+  /* ปุ่ม ติดตาม ที่หัวหน้าหุ้น */
+  function paintStar(){
+    var hd=panel.querySelector('.scn-dhead'); if(!hd) return;
+    var dtk=hd.querySelector('.scn-dtk'), t=dtk&&dtk.firstChild&&String(dtk.firstChild.nodeValue||'').trim(); if(!t) return;
+    var b=hd.querySelector('.wl-star');
+    if(!b){ b=document.createElement('button'); b.type='button'; b.className='wl-star'; b.dataset.wl=t; dtk.insertAdjacentElement('afterend',b); }
+    var on=has(t);
+    b.setAttribute('aria-pressed',on?'true':'false');
+    b.innerHTML=IC.star+'<span>'+(on?'ติดตามแล้ว':'ติดตาม')+'</span>';
+    b.setAttribute('aria-label',on?'เอา '+t+' ออกจากรายการโปรด':'เพิ่ม '+t+' ในรายการโปรด');
+  }
+  new MutationObserver(paintStar).observe(panel,{childList:true});
+
+  root.addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b) return;
+    if(b.classList.contains('wl-star')){ toggle(b.dataset.wl); paintStar(); render(); return; }
+    if(b.classList.contains('wl-x')){ toggle(b.dataset.rm); render(); return; }
+    if(b.classList.contains('wl-ed')){ edit=!edit; render(); return; }
+    if(b.classList.contains('wl-add')){
+      var inp=document.getElementById('scnInput'); window.scrollTo({top:0,behavior:'smooth'});
+      if(inp) setTimeout(function(){ try{ inp.focus({preventScroll:true}); }catch(err){ inp.focus(); } },250); return;
+    }
+    if(b.classList.contains('wl-go')){   /* scanner เปิดหน้าหุ้นแล้ว (handler ของมันเอง) — เลื่อนให้เห็นหน้าหุ้น */
+      setTimeout(function(){ if(!panel.hidden) panel.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}); },30);
+    }
+  });
+
+  render();
+  var day=new Date().toISOString().slice(0,10);
+  fetch('sector-latest.json?v='+day).then(function(r){ return r.ok?r.json():null; }).then(function(j){ SC=j; render(); }).catch(function(){});
+  if(typeof mkData==='function') mkData().then(function(d){ MKD=d; render(); }).catch(function(){});
+  window.addEventListener('storage',function(e){ if(e.key===KEY){ render(); paintStar(); } });
 })();
 </script>
 
