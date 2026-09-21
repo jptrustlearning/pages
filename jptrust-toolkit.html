@@ -1394,7 +1394,7 @@ html.tk-app .af{display:block;order:9;text-align:center;font-size:11.5px;color:v
             </div>
           </div>
           <div id="mkrBody"><div class="empty-slot"><div class="e-t">RISK</div><div class="e-d">กำลังอ่านราคาปิดล่าสุด…</div></div></div>
-          <div class="mk-cap" id="mkrCap"></div>
+          <!-- A156 · คำอธิบายวิธีคิดคะแนน (#mkrCap) ตัดออกตามที่จูนสั่ง -->
         </div>
 
         <div class="sec-head" id="zonesHead">
@@ -2901,13 +2901,13 @@ function mkrLegs(n){
 }
 
 function mkrRender(){
-  const body=document.getElementById('mkrBody'), cap=document.getElementById('mkrCap'); if(!body) return;
+  const body=document.getElementById('mkrBody'); if(!body) return;
   const n=MKR.n, R=mkrLegs(n);
   if(!R.legs.length){
     const bad=MKR.errs.length;
     body.innerHTML='<div class="empty-slot"><div class="e-t">RISK</div><div class="e-d">'
       +(bad?'ดึงข้อมูล'+MKR.errs.join(' และ ')+'ไม่สำเร็จ — ลองรีเฟรชอีกครั้ง':'กำลังอ่านราคาปิดล่าสุด…')+'</div></div>';
-    if(cap) cap.textContent=''; return;
+    return;
   }
   const tw=R.legs.reduce((a,x)=>a+x.w,0);
   const g=Math.max(0,Math.min(100,Math.round(50+R.legs.reduce((a,x)=>a+x.w*x.s,0)/tw/2)));
@@ -2935,41 +2935,9 @@ function mkrRender(){
     sv+='</div>';
   }
 
-  const top=R.legs.slice().sort((a,b)=>Math.abs(b.s)-Math.abs(a.s)).slice(0,2);
-  /* ไม่พูดคำโซนซ้ำ — ป้ายใต้เกจบอกไปแล้ว บนมือถือสองอันอยู่ห่างกันไม่ถึงนิ้ว */
-  let say=MKR_PER[n]+' เข็มอยู่ที่ <b>'+g+'</b> จาก 100 · ตัวที่ดึงแรงที่สุดคือ '
-    +mkEsc(top[0].say)+(top[1]?' และ '+mkEsc(top[1].say):'');
-
-  let pr='';
-  for(const L of R.legs){
-    const side=L.s>=0?'on':'off', f=(Math.abs(L.s)/100).toFixed(3);
-    const win=Math.abs(L.s)<4?'<b class="mid">เสมอกัน</b>':'<b class="'+side+'">'+mkEsc(L.say)+'</b>';
-    pr+='<div class="mkr-p"><div class="mkr-pn"><span>'+mkEsc(L.a)+'</span><i>↔</i><span>'+mkEsc(L.b)+'</span>'
-      +'<em>'+L.w+'% · เต็มสเกลที่ '+(L.brd?'75%':L.sc.toFixed(1)+'%')+'</em></div>'
-      +'<div class="mkr-pb"><span class="mid"></span><i class="'+side+'" style="--f:'+f+'"></i></div>'
-      +'<div class="mkr-pd">'+mkEsc(L.d)+' · '+win+'</div></div>';
-  }
-  if(R.miss.length) pr+='<div class="mkr-miss">ยังไม่ได้นับ: '+mkEsc(R.miss.join(' · '))
-    +' — คะแนนคิดจาก '+R.legs.length+' คู่ที่เหลือ (ถ่วงน้ำหนักใหม่แล้ว)</div>';
-
-  body.innerHTML='<div class="mkr-grid"><div class="mkr-gauge">'+sv+'</div>'
-    +'<div><p class="mkr-say">'+say+'</p><div class="mkr-pairs">'+pr+'</div></div></div>';
-
-  if(cap){
-    const src=[];
-    if(R.S) src.push('หุ้น S&P 500 ปิด '+thDate(R.S.asof)+' ('+R.S.n+' ตัว)');
-    if(R.G) src.push('ทอง GC=F ปิด '+thDate(R.G.last));
-    if(R.F) src.push('ค่าเงินอ้างอิง ECB '+thDate(R.F.last));
-    cap.innerHTML='คะแนนรวม = ค่าเฉลี่ยถ่วงน้ำหนักของคู่ด้านบน แล้วแปลงเป็นสเกล 0–100 (50 = ก้ำกึ่ง) · '
-      +'แต่ละคู่เต็มสเกลเมื่อห่างกันถึงเกณฑ์ที่กำกับไว้ท้ายชื่อคู่ ห่างมากกว่านั้นไม่ทำให้คะแนนเกิน · '
-      +'กลุ่มพลังงาน สื่อสาร และอสังหาฯ ไม่ถูกนับในคู่แรก เพราะขยับตามเรื่องเฉพาะตัวมากกว่าความอยากเสี่ยงของตลาด · '
-      +'แผง "เงินไหลไปไหน" วัดคนละแบบกับคู่ด้านขวา: เอาผลตอบแทนหารด้วยความผันผวนของสินทรัพย์นั้นเอง '
-      +'เพราะทองขยับ 1% กับหุ้นขยับ 1% ไม่ได้แปลว่าเงินไหลเท่ากัน · แท่งเขียว = สินทรัพย์เสี่ยง แท่งน้ำเงิน = ที่หลบภัย · '
-      +'ดอลลาร์วัดเทียบตะกร้าสกุลหลัก 7 สกุล · เยน+ฟรังก์วัดในรูปดอลลาร์ · '
-      +(src.length?'ข้อมูล: '+src.join(' · ')+' · ':'')
-      +'<b style="font-weight:600">เกจนี้ไม่มีขาพันธบัตร เครดิต และ VIX</b> เพราะยังไม่มีฟีดฟรีที่ดึงได้จากหน้าเว็บ — '
-      +'อ่านเป็นภาพรวมความอยากเสี่ยงของตลาด ไม่ใช่สัญญาณซื้อขาย';
-  }
+  /* A156 · จูนสั่งตัดชุดในรายละเอียด: ประโยคสรุป + คู่ต่อสู้ 4 คู่ + คำอธิบายวิธีคิด — เหลือเกจ + แผงเงินไหลไปไหน
+     ⚠️ ไม่มี .mkr-grid ครอบแล้ว (เดิมกฎ A154.2 ซ่อน .mkr-grid > div:last-child = คอลัมน์คู่ต่อสู้ ถ้าเหลือลูกเดียวเกจจะหายไปด้วย) */
+  body.innerHTML='<div class="mkr-gauge">'+sv+'</div>';
 }
 
 (function(){
