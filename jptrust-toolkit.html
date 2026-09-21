@@ -1105,7 +1105,7 @@ html.tk-app .anav{display:flex;position:fixed;left:50%;transform:translateX(-50%
 @media(min-width:760px){ html.tk-app .content{padding-left:24px;padding-right:24px} html.tk-app .ah{padding-left:26px;padding-right:26px} }
 
 /* ================= A154.1 · หน้าจอแยกตามแท็บ + ตัวหนังสือน้อยลง (โหมดแอปเท่านั้น) ================= */
-html.tk-app:not([data-tab=home]) :is(#kpis,.ah-sp,#tickerTape,#insCard,#mkRisk,#appJoin){display:none!important}
+html.tk-app:not([data-tab=home]) :is(#kpis,.ah-sp,#tickerTape,#tkUs,#insCard,#mkRisk,#appJoin){display:none!important}
 html.tk-app:not([data-tab=gold]) :is(#zonesHead,#zonesRow){display:none!important}
 html.tk-app:not([data-tab=search]) #heroScanner{display:none!important}
 html.tk-app:not([data-tab=market]) :is(#mkSec,#mkStock,#mkGold,#mkFx,#mkChart){display:none!important}
@@ -1256,6 +1256,22 @@ div.wl-go{cursor:default}
 .wl-star[aria-pressed=true] svg{fill:currentColor}
 .scn-dhead .wl-star~.scn-dstats{margin-left:0}
 @media(max-width:360px){.wl-go{grid-template-columns:auto minmax(0,1fr) 48px auto;gap:9px}.wl-sp{width:48px}}
+/* ================= A160 · หน้าภาพรวม: S&P 500 / Nasdaq 100 ใต้ราคาทอง =================
+   TradingView Tickers widget 2 ตัว (CFD ขยับเกือบ 24 ชม.) ในการ์ดขาวของเรา + ป้ายสถานะตลาดสหรัฐฯ
+   ไม่มีโครงเทาตอนโหลด (จูนไม่ชอบ — เหตุที่ถอด ticker tape A154.9) · กันที่สูงไว้แทนไม่ให้หน้ากระตุก */
+#tkUs{margin:0 0 16px;padding:13px 14px 9px}
+#tkUs[hidden]{display:none}
+.us-h{display:flex;align-items:center;gap:8px;margin:0 2px 4px}
+.us-h b{font-size:13.5px;font-weight:600;color:var(--a-ink)}
+.us-st{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--a-fill);color:var(--a-sub);white-space:nowrap}
+.us-st i{width:6px;height:6px;border-radius:50%;background:currentColor}
+.us-st.pre{background:rgba(184,134,11,.12);color:#946B06}
+.us-st.open{background:rgba(30,154,95,.11);color:var(--a-up)}
+.us-st.post{background:rgba(44,110,158,.1);color:#2C6E9E}
+.us-st span{font-weight:400}
+#tkUs .tradingview-widget-container{min-height:72px}
+#tkUs .tradingview-widget-copyright{display:none}
+.us-nt{font-size:11px;color:var(--a-sub);margin:2px 2px 0}
 /* ปุ่มค้นหาตรงกลาง: ตอนเป็นแท็บที่เลือก ไอคอนต้องยังขาว (กฎ .on ทั่วไปเปลี่ยนเป็นสีหมึก) */
 .anav .an-c.on{color:#fff;box-shadow:0 0 0 4px rgba(58,21,32,.14),0 8px 18px -6px rgba(58,21,32,.55)}
 /* ชื่อหน้าจออยู่ที่หัวแอปแล้ว — ป้ายในการ์ดค้นหาซ้ำ */
@@ -1264,7 +1280,7 @@ html.tk-app #heroScanner .scn-top{justify-content:flex-start}
 .tk-note{font-size:11.5px;color:var(--a-sub);margin-top:10px;line-height:1.5}
 
 /* ================= A154.5 · แถบชวนติดตั้งในหน้าตาแอป ================= */
-html.tk-app #tickerTape{order:-3} html.tk-app #pwaBar{order:-2}
+html.tk-app #tickerTape{order:-3} html.tk-app #tkUs{order:-3} html.tk-app #pwaBar{order:-2}
 html.tk-app:not([data-tab=home]) #pwaBar,html.tk-installed #pwaBar,html.tk-inmember #pwaBar{display:none!important}
 html.tk-app .pwab{background:var(--a-card);border:0;border-radius:22px;box-shadow:var(--a-sh);padding:14px 12px 14px 16px;margin:0 0 16px;gap:12px}
 html.tk-app .pwab>img{width:42px;height:42px;border-radius:12px}
@@ -1407,6 +1423,12 @@ html.tk-app .af{display:block;order:9;text-align:center;font-size:11.5px;color:v
         </a>
 
         <!-- A154.9 · ถอดแถบราคาวิ่ง TradingView (ticker tape) ออกจาก Tool&Kit ตามที่จูนสั่ง — แอปสมาชิกยังมีของตัวเอง -->
+        <!-- A160 · S&P 500 / Nasdaq 100 ใต้ราคาทอง (หน้าภาพรวมเท่านั้น) — widget ฉีดหลังหน้าโหลดเสร็จ โดยสคริปต์ A160 ท้ายหน้า -->
+        <div class="card" id="tkUs" aria-label="ดัชนีหุ้นสหรัฐฯ">
+          <div class="us-h"><b>หุ้นสหรัฐฯ</b><span class="us-st" id="usSt"></span></div>
+          <div class="tradingview-widget-container"><div class="tradingview-widget-container__widget" id="usTv"></div></div>
+          <p class="us-nt">ดัชนีแบบ CFD ซื้อขายเกือบ 24 ชม. · ข้อมูล TradingView</p>
+        </div>
 
 
         <!-- ---------- SECTOR SCANNER (A106) — ค้นหุ้น 221 ตัวใน 24 กลุ่มธีม · เติมข้อมูลโดย hero-scanner.js ---------- -->
@@ -3349,6 +3371,54 @@ if(h0){
   }
   window.addEventListener('appinstalled',function(){ bar.hidden=true; track('pwa-installed'); try{ localStorage.setItem('jpt_tk_app_seen2',String(Date.now())); }catch(e){} });
   x.addEventListener('click',function(){ bar.hidden=true; try{ localStorage.setItem(KEY,String(Date.now())); }catch(e){} });
+})();
+</script>
+
+<script>
+/* =====================================================================
+   A160 · S&P 500 / Nasdaq 100 ใต้ราคาทอง (หน้าภาพรวม)
+   - TradingView Tickers widget · CFD FOREXCOM:SPX500 / FOREXCOM:NSXUSD (ชุดเดียวกับ renderTickerTape ในแอปสมาชิก)
+     % เปลี่ยนแปลงเทียบรอบวันของ CFD (ตัดวันราว 17:00 นิวยอร์ก) ไม่ใช่ราคาปิดดัชนีจริง 16:00 — ใกล้เคียง ใช้ดูทิศทาง
+   - ฉีดหลัง window load (ไม่ถ่วงหน้า) · กลับจากพื้นหลังเกิน 60 วิ = ฉีดใหม่ (ไม่ถี่กว่า 30 วิ) เพราะ socket ของ widget หลับบนมือถือ
+   - ป้ายสถานะ: เวลานิวยอร์กผ่าน Intl (DST อัตโนมัติ) + วันหยุด NYSE 2026–2027 · ไม่คิดวันปิดครึ่งวัน · ⚠️ ต่อรายการวันหยุดก่อนสิ้นปี 2027
+   ===================================================================== */
+(function(){
+  var card=document.getElementById('tkUs'), box=document.getElementById('usTv'), st=document.getElementById('usSt');
+  if(!card||!box||!st) return;
+  var CFG={symbols:[{proName:'FOREXCOM:SPX500',title:'S&P 500'},{proName:'FOREXCOM:NSXUSD',title:'Nasdaq 100'}],
+    colorTheme:'light',locale:'th_TH',isTransparent:true,showSymbolLogo:true,largeChartUrl:''};
+  var HOL={'2026-01-01':1,'2026-01-19':1,'2026-02-16':1,'2026-04-03':1,'2026-05-25':1,'2026-06-19':1,'2026-07-03':1,'2026-09-07':1,'2026-11-26':1,'2026-12-25':1,
+           '2027-01-01':1,'2027-01-18':1,'2027-02-15':1,'2027-03-26':1,'2027-05-31':1,'2027-06-18':1,'2027-07-05':1,'2027-09-06':1,'2027-11-25':1,'2027-12-24':1};
+  var last=0, hidAt=0;
+  function inject(){
+    box.innerHTML=''; card.querySelectorAll('script[src*="embed-widget-tickers"]').forEach(function(x){ x.remove(); });
+    var sc=document.createElement('script'); sc.type='text/javascript'; sc.async=true;
+    sc.src='https://s3.tradingview.com/external-embedding/embed-widget-tickers.js';
+    sc.innerHTML=JSON.stringify(CFG); box.parentElement.appendChild(sc); last=Date.now();
+  }
+  function status(){
+    var now=new Date();
+    var p=new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit',weekday:'short',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(now);
+    var g=function(t){ var x=p.filter(function(q){ return q.type===t; })[0]; return x?x.value:''; };
+    var day=g('year')+'-'+g('month')+'-'+g('day'), wd=g('weekday'), m=(+g('hour'))*60+(+g('minute'));
+    var off=(new Date(now.toLocaleString('en-US',{timeZone:'Asia/Bangkok'}))-new Date(now.toLocaleString('en-US',{timeZone:'America/New_York'})))/60000;
+    var th=function(min){ min=((Math.round(min+off)%1440)+1440)%1440; return String(Math.floor(min/60)).padStart(2,'0')+':'+String(min%60).padStart(2,'0'); };
+    var cls='', txt;
+    if(wd==='Sat'||wd==='Sun') txt='ตลาดปิด';
+    else if(HOL[day]) txt='ตลาดปิด · วันหยุดสหรัฐฯ';
+    else if(m>=240&&m<570){ cls='pre'; txt='ก่อนตลาดเปิด<span> · เปิด '+th(570)+'</span>'; }
+    else if(m>=570&&m<960){ cls='open'; txt='ตลาดเปิด<span> · ปิด '+th(960)+'</span>'; }
+    else if(m>=960&&m<1200){ cls='post'; txt='หลังตลาดปิด'; }
+    else txt='ตลาดปิด';
+    st.className='us-st'+(cls?' '+cls:''); st.innerHTML='<i></i>'+txt;
+  }
+  status(); setInterval(function(){ if(!document.hidden) status(); },30000);
+  if(document.readyState==='complete') setTimeout(inject,300); else window.addEventListener('load',function(){ setTimeout(inject,300); });
+  document.addEventListener('visibilitychange',function(){
+    if(document.hidden){ hidAt=Date.now(); return; }
+    status();
+    if(last&&hidAt&&Date.now()-hidAt>60000&&Date.now()-last>30000) inject();
+  });
 })();
 </script>
 
