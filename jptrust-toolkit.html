@@ -1270,6 +1270,9 @@ div.wl-go{cursor:default}
 .us-st.post{background:rgba(44,110,158,.1);color:#2C6E9E}
 .us-st span{font-weight:400}
 #tkUs .tradingview-widget-container{min-height:72px}
+/* A160.1 · 2 ช่องแยก (Single Ticker ช่องละตัว) */
+.us-g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:6px}
+.us-t{background:var(--a-fill);border-radius:14px;overflow:hidden;min-width:0}
 #tkUs .tradingview-widget-copyright{display:none}
 .us-nt{font-size:11px;color:var(--a-sub);margin:2px 2px 0}
 /* ปุ่มค้นหาตรงกลาง: ตอนเป็นแท็บที่เลือก ไอคอนต้องยังขาว (กฎ .on ทั่วไปเปลี่ยนเป็นสีหมึก) */
@@ -1426,7 +1429,10 @@ html.tk-app .af{display:block;order:9;text-align:center;font-size:11.5px;color:v
         <!-- A160 · S&P 500 / Nasdaq 100 ใต้ราคาทอง (หน้าภาพรวมเท่านั้น) — widget ฉีดหลังหน้าโหลดเสร็จ โดยสคริปต์ A160 ท้ายหน้า -->
         <div class="card" id="tkUs" aria-label="ดัชนีหุ้นสหรัฐฯ">
           <div class="us-h"><b>หุ้นสหรัฐฯ</b><span class="us-st" id="usSt"></span></div>
-          <div class="tradingview-widget-container"><div class="tradingview-widget-container__widget" id="usTv"></div></div>
+          <div class="us-g" id="usTv">
+            <div class="us-t"><div class="tradingview-widget-container" data-sym="FOREXCOM:SPX500"><div class="tradingview-widget-container__widget"></div></div></div>
+            <div class="us-t"><div class="tradingview-widget-container" data-sym="FOREXCOM:NSXUSD"><div class="tradingview-widget-container__widget"></div></div></div>
+          </div>
           <p class="us-nt">ดัชนีแบบ CFD ซื้อขายเกือบ 24 ชม. · ข้อมูล TradingView</p>
         </div>
 
@@ -3377,7 +3383,7 @@ if(h0){
 <script>
 /* =====================================================================
    A160 · S&P 500 / Nasdaq 100 ใต้ราคาทอง (หน้าภาพรวม)
-   - TradingView Tickers widget · CFD FOREXCOM:SPX500 / FOREXCOM:NSXUSD (ชุดเดียวกับ renderTickerTape ในแอปสมาชิก)
+   - TradingView Single Ticker ×2 (A160.1 · เดิม Tickers) · CFD FOREXCOM:SPX500 / FOREXCOM:NSXUSD (ชุดเดียวกับ renderTickerTape ในแอปสมาชิก)
      % เปลี่ยนแปลงเทียบรอบวันของ CFD (ตัดวันราว 17:00 นิวยอร์ก) ไม่ใช่ราคาปิดดัชนีจริง 16:00 — ใกล้เคียง ใช้ดูทิศทาง
    - ฉีดหลัง window load (ไม่ถ่วงหน้า) · กลับจากพื้นหลังเกิน 60 วิ = ฉีดใหม่ (ไม่ถี่กว่า 30 วิ) เพราะ socket ของ widget หลับบนมือถือ
    - ป้ายสถานะ: เวลานิวยอร์กผ่าน Intl (DST อัตโนมัติ) + วันหยุด NYSE 2026–2027 · ไม่คิดวันปิดครึ่งวัน · ⚠️ ต่อรายการวันหยุดก่อนสิ้นปี 2027
@@ -3385,16 +3391,21 @@ if(h0){
 (function(){
   var card=document.getElementById('tkUs'), box=document.getElementById('usTv'), st=document.getElementById('usSt');
   if(!card||!box||!st) return;
-  var CFG={symbols:[{proName:'FOREXCOM:SPX500',title:'S&P 500'},{proName:'FOREXCOM:NSXUSD',title:'Nasdaq 100'}],
-    colorTheme:'light',locale:'th_TH',isTransparent:true,showSymbolLogo:true,largeChartUrl:''};
+  /* A160.1 · Single Ticker ช่องละตัว — Tickers widget เดิมแคบเกินใส่ 2 ตัว (เห็นตัวเดียว) และค้างที่โครงโหลด
+     locale 'en' เหมือน ticker tape (A75) ที่ยืนยันแล้วว่า FOREXCOM:SPX500 / NSXUSD วิ่งในหน้านี้ */
+  var CFG=function(sym){ return {symbol:sym,width:'100%',isTransparent:true,colorTheme:'light',locale:'en'}; };
   var HOL={'2026-01-01':1,'2026-01-19':1,'2026-02-16':1,'2026-04-03':1,'2026-05-25':1,'2026-06-19':1,'2026-07-03':1,'2026-09-07':1,'2026-11-26':1,'2026-12-25':1,
            '2027-01-01':1,'2027-01-18':1,'2027-02-15':1,'2027-03-26':1,'2027-05-31':1,'2027-06-18':1,'2027-07-05':1,'2027-09-06':1,'2027-11-25':1,'2027-12-24':1};
   var last=0, hidAt=0;
   function inject(){
-    box.innerHTML=''; card.querySelectorAll('script[src*="embed-widget-tickers"]').forEach(function(x){ x.remove(); });
-    var sc=document.createElement('script'); sc.type='text/javascript'; sc.async=true;
-    sc.src='https://s3.tradingview.com/external-embedding/embed-widget-tickers.js';
-    sc.innerHTML=JSON.stringify(CFG); box.parentElement.appendChild(sc); last=Date.now();
+    [].forEach.call(box.querySelectorAll('.tradingview-widget-container'),function(c){
+      c.querySelectorAll('script').forEach(function(x){ x.remove(); });
+      c.innerHTML='<div class="tradingview-widget-container__widget"></div>';
+      var sc=document.createElement('script'); sc.type='text/javascript'; sc.async=true;
+      sc.src='https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js';
+      sc.innerHTML=JSON.stringify(CFG(c.dataset.sym)); c.appendChild(sc);
+    });
+    last=Date.now();
   }
   function status(){
     var now=new Date();
