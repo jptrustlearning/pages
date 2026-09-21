@@ -1115,19 +1115,42 @@ html.tk-app #zonesHead{margin:16px 2px 10px}
 html.tk-app #zonesHead .asof{margin-left:0}
 html.tk-app #mkSec{margin:16px 0 12px}
 html.tk-app:not([data-tab=home]) .ah-t b{font-size:24px;letter-spacing:-.2px}
-/* คำอธิบายยาว: ซ่อนจนกว่าจะกดปุ่ม i ของการ์ด */
-html.tk-app .card:not(.tk-more) :is(.mk-cap,.openhint,.lad-note,.lad-scroll,.pivstrip,.zn-cap,.mkr-dh,.mkr-pd,.mkr-pn em,.gbs-drv,.gbs-nt){display:none}
-html.tk-app .card:not(.tk-more) .mkr-dest::before{content:'เงินไหลไปไหน';display:block;font-size:12.5px;font-weight:600;color:var(--a-ink);margin-bottom:2px}
-html.tk-app .card.tk-more .tk-note{display:none}
+/* A154.2 · การ์ดละหนึ่งอย่าง — ซ่อนทุกอย่างที่ไม่ใช่ "มองแวบเดียว" จนกว่าจะกด ดูรายละเอียด (.tk-more) */
+html.tk-app .card:not(.tk-more) :is(.mk-cap,.openhint,.lad-note,.lad-scroll,.pivstrip,.zn-cap,.gbs-drv,.gbs-nt){display:none}
+/* Insight: ข้อแรกข้อเดียว + แถบโทน */
+html.tk-app #insCard:not(.tk-more) :is(.ins-li:nth-child(n+2),.ins-foot,.ins-when){display:none}
 html.tk-app :is(.ins-note,.ins-tone .cnt){display:none}
+html.tk-app #insCard .ins-foot{margin-top:12px}
+/* Risk: เกจ + เงินไหลเข้า/ออกแรงสุดอย่างละแถว · ประโยคสรุป คู่ต่อสู้ 4 คู่ แถวกลาง อยู่ในรายละเอียด */
+html.tk-app #mkRisk:not(.tk-more) :is(.mkr-grid > div:last-child,.mkr-dh,.mkr-d + .mkr-d:not(:last-child)){display:none}
+html.tk-app #mkRisk:not(.tk-more) .mkr-dest::before{content:'เงินไหลเข้า / ออกแรงที่สุด';display:block;font-size:12.5px;font-weight:600;color:var(--a-ink);margin-bottom:2px}
+html.tk-app #mkRisk:not(.tk-more) .mkr-grid{gap:0;grid-template-columns:minmax(0,1fr)}
+html.tk-app .mkr-p{padding:7px 0}
+/* โซนทอง: แผนที่ราคาอย่างเดียว · ตาราง ตัวเลือกพิมพ์ราคาเอง แนวพิวอต อยู่ในรายละเอียด */
+html.tk-app #zonesRow .card:not(.tk-more) :is(.openbar,.zn-tbl){display:none}
 html.tk-app .openrow:has(#openIn.locked){display:none}
 html.tk-app .openbar{background:none;border:0;padding:0;margin-bottom:6px}
-html.tk-app .mkr-p{padding:7px 0}
-.tk-i{flex-shrink:0;width:26px;height:26px;border-radius:50%;border:0;padding:0;background:var(--a-fill);color:var(--a-sub);
-  display:inline-grid;place-items:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.tk-i svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
-.card.tk-more .tk-i{background:var(--a-acc);color:#fff}
-.tk-i:focus-visible{outline:2px solid var(--a-acc);outline-offset:2px}
+html.tk-app #zonesRow .card:not(.tk-more) .zn{display:block}
+/* เวลาตลาด: นาฬิกา + 4 ตลาด · แถบปริมาณกับคำอธิบายสีอยู่ในรายละเอียด */
+html.tk-app #mkSes:not(.tk-more) :is(.ses-ht,.ses-lg){display:none}
+/* ปฏิทิน: เฉพาะที่กำลังจะมา · วันที่ เหตุการณ์ เวลา (ตัวเลขผลจริง/คาดการณ์/ครั้งก่อน + รายการที่ผ่านไปแล้ว อยู่ในรายละเอียด) */
+html.tk-app #mkCal:not(.tk-more) :is(.cal-past,.cal-sep){display:none}
+html.tk-app #mkCal:not(.tk-more) .cal-tb :is(th,td):is(:nth-child(2),:nth-child(n+5)){display:none}
+html.tk-app #mkCal:not(.tk-more) .cal-tb{min-width:0}
+html.tk-app #mkCal:not(.tk-more) .cal-tb td{white-space:normal}
+html.tk-app #mkCal:not(.tk-more) .cal-tb td.cal-d{white-space:nowrap}
+/* ตลาด: heatmap ขึ้นก่อน · แท่งรายกลุ่มไม่มีบรรทัดนับ ขึ้น/ลง */
+html.tk-app .mk-grid > .card:last-child{order:-1}
+html.tk-app #mkStock .card:not(.tk-more) .mk-rl i{display:none}
+/* ค้นหา: ช่องค้นหา + ชิป · แถบเงินไหลเข้ากลุ่มไหนไม่ต้อง */
+html.tk-app #heroScanner .scn-idle{display:none!important}
+html.tk-app .card.tk-more .tk-note{display:none}
+.tk-mb{display:flex;align-items:center;justify-content:center;gap:4px;width:calc(100% + 36px);margin:14px -18px -18px;padding:13px 0 14px;
+  border:0;border-top:1px solid var(--a-line);border-radius:0 0 22px 22px;background:none;font-family:var(--f-b);font-size:13px;font-weight:600;
+  color:var(--a-acc);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.tk-mb svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
+.card.tk-more .tk-mb svg{transform:rotate(180deg)}
+.tk-mb:focus-visible{outline:2px solid var(--a-acc);outline-offset:-3px}
 /* ปุ่มค้นหาตรงกลาง: ตอนเป็นแท็บที่เลือก ไอคอนต้องยังขาว (กฎ .on ทั่วไปเปลี่ยนเป็นสีหมึก) */
 .anav .an-c.on{color:#fff;box-shadow:0 0 0 4px rgba(58,21,32,.14),0 8px 18px -6px rgba(58,21,32,.55)}
 /* ชื่อหน้าจออยู่ที่หัวแอปแล้ว — ป้ายในการ์ดค้นหาซ้ำ */
@@ -3117,17 +3140,30 @@ if(h0){
       if(k==='search'){ var inp=document.getElementById('scnInput'); if(inp) setTimeout(function(){ try{ inp.focus({preventScroll:true}); }catch(err){ inp.focus(); } },60); }
     });
 
-    /* ---------- A154.1 · ตัวหนังสือน้อยลง ----------
-       คำอธิบายยาวของแต่ละการ์ดซ่อนไว้ (CSS) · ปุ่ม i ที่หัวการ์ดเปิดดูได้ · คงหมายเหตุบรรทัดเดียวที่กันอ่านผิด */
-    var CAP='.mk-cap,.openhint,.lad-note,.pivstrip,.zn-cap,.mkr-dh,.mkr-pd,.gbs-drv,.gbs-nt';
-    var IC_I='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><path d="M12 7.6v.1"/></svg>';
+    /* ---------- A154.2 · การ์ดละหนึ่งอย่าง ----------
+       แต่ละการ์ดโชว์แค่สิ่งที่ต้องมองแวบเดียว · ที่เหลือ (คำอธิบาย ตารางเต็ม ตัวเลขละเอียด ตัวเลือกขั้นสูง)
+       ซ่อนด้วย CSS จนกว่าจะกด "ดูรายละเอียด" ท้ายการ์ด (การ์ดได้คลาส .tk-more)
+       ⚠️ CAP = คำอธิบายที่มีอยู่ในหน้าตั้งแต่โหลด ต้องตรงกับรายการใน CSS · FORCE = การ์ดที่เนื้อหาถูกวาดทีหลัง */
+    var CAP='.mk-cap,.openhint,.lad-note,.pivstrip,.gbs-drv,.gbs-nt';
+    var FORCE={insCard:'อ่านทั้งหมด',mkRisk:1,mkSes:1,mkCal:1};
+    var IC_V='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+    var rt=document.querySelector('#mkRisk .card-h h3'); if(rt) rt.textContent='ตลาดโยกเงินไปไหน';
+    var zc=document.querySelector('#zonesRow .card'); if(zc) FORCE.__zones=zc;
+    var sc=document.querySelector('#mkStock .mk-grid > .card'); if(sc) FORCE.__sec=sc;
     [].forEach.call(document.querySelectorAll('#viewDash .card'),function(c){
-      var h=c.querySelector(':scope > .card-h'), h3=h&&h.querySelector('h3');
-      if(!h3||!c.querySelector(CAP)) return;
-      var b=document.createElement('button'); b.type='button'; b.className='tk-i';
-      b.setAttribute('aria-label','วิธีอ่านการ์ดนี้'); b.setAttribute('aria-expanded','false'); b.innerHTML=IC_I;
-      b.addEventListener('click',function(){ var on=c.classList.toggle('tk-more'); b.setAttribute('aria-expanded',on?'true':'false'); });
-      h3.insertAdjacentElement('afterend',b);
+      var f=FORCE[c.id];
+      if(!f&&c!==FORCE.__zones&&c!==FORCE.__sec&&!c.querySelector(CAP)) return;
+      var lab=typeof f==='string'?f:'ดูรายละเอียด';
+      var btn=document.createElement('button'); btn.type='button'; btn.className='tk-mb';
+      btn.setAttribute('aria-expanded','false'); btn.innerHTML='<span>'+lab+'</span>'+IC_V;
+      btn.addEventListener('click',function(){
+        var on=c.classList.toggle('tk-more');
+        btn.setAttribute('aria-expanded',on?'true':'false');
+        btn.firstChild.textContent=on?'ย่อ':lab;
+        if(!on){ var r=c.getBoundingClientRect(); if(r.top<0) window.scrollBy(0,r.top-12); }
+        if(on) setTimeout(function(){ try{ window.dispatchEvent(new Event('resize')); }catch(e){} },30);
+      });
+      c.appendChild(btn);
     });
     var note=function(anchor,txt){ if(!anchor) return; var p=document.createElement('p'); p.className='tk-note'; p.textContent=txt; anchor.insertAdjacentElement('afterend',p); };
     note(document.getElementById('ladder'),'โอกาสแตะคือความถี่จากสถิติย้อนหลัง ไม่ใช่การพยากรณ์');
