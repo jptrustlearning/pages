@@ -18,6 +18,9 @@
 (function(){
   var s=false; try{ s=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true; }catch(e){}
   if(s) document.documentElement.classList.add('tk-installed');
+  /* A154.6 · เปิดอยู่ในกรอบของแอปสมาชิก (แท็บ More → Tool&Kit) */
+  var e=true; try{ e=window.self!==window.top; }catch(x){}
+  if(e) document.documentElement.classList.add('tk-embed');
 })();
 </script>
 <title>JP Trust Tool &amp; Kit — Dashboard ทอง&amp;หุ้น</title>
@@ -1168,6 +1171,20 @@ html.tk-app .pwab-x{color:var(--a-sub)}
 html.tk-app .pwab-how{border-top-color:var(--a-line);color:var(--a-ink);padding-top:12px}
 html.tk-app .pwab-how svg{stroke:var(--a-acc)}
 html.tk-app .pwab-how svg circle{fill:var(--a-acc)}
+
+/* ================= A154.6 · อยู่ในแอปสมาชิก (html.tk-embed) =================
+   แอปสมาชิกมีแถบบน (← Tool&Kit) และแถบเมนูล่างของตัวเองแล้ว ⇒ ซ่อนหัวแอปของเรา
+   และย้ายแถบแท็บของเราขึ้นไปติดด้านบน (สคริปต์ย้าย #appNav มาไว้ก่อน .content) ไม่ให้มีแถบล่างซ้อนสองชั้น */
+html.tk-embed .ah,html.tk-embed #pwaBar,html.tk-embed #appJoin{display:none!important}
+html.tk-embed .content{padding-bottom:calc(28px + env(safe-area-inset-bottom,0px))}
+html.tk-embed .anav{position:sticky;top:8px;left:auto;bottom:auto;transform:none;width:auto;max-width:720px;
+  margin:10px 16px 0;height:56px;border-radius:20px;padding:0 6px}
+@media(min-width:760px){ html.tk-embed .anav{margin-left:auto;margin-right:auto;width:calc(100% - 48px)} }
+html.tk-embed .anav button svg{width:20px;height:20px}
+html.tk-embed .anav .an-c{flex:0 0 42px;height:42px;margin:0 4px;box-shadow:none}
+html.tk-embed .anav .an-c.on{box-shadow:0 0 0 3px rgba(58,21,32,.14)}
+html.tk-embed .anav .an-c svg{width:19px;height:19px}
+html.tk-embed .kpis{margin-top:18px}
 .af{display:none}
 html.tk-app .af{display:block;order:9;text-align:center;font-size:11.5px;color:var(--a-sub);margin:22px 12px 0}
 </style>
@@ -3119,6 +3136,16 @@ if(h0){
     var pb=document.getElementById('ahPort'), pl=document.getElementById('sbPortLink'), pbox=document.getElementById('sbPort');
     if(pb&&pl&&pbox&&!pbox.hidden){ pb.hidden=false; pb.addEventListener('click',function(){ pl.click(); }); }
 
+    /* ---------- A154.6 · อยู่ในแอปสมาชิก ---------- */
+    if(root.classList.contains('tk-embed')){
+      var nv=document.getElementById('appNav'), mn=document.querySelector('.main'), ct=mn&&mn.querySelector('.content');
+      if(nv&&mn&&ct) mn.insertBefore(nv,ct);
+      /* ปุ่มอ่านข่าวเต็ม: ไปแท็บ News ของแอปสมาชิกเลย ไม่เปิดหน้าต่างใหม่ */
+      var nb=document.querySelector('#insCard .ins-foot a.btn');
+      if(nb){ nb.textContent='อ่านข่าวเต็ม'; nb.removeAttribute('target');
+        nb.addEventListener('click',function(e){ e.preventDefault(); try{ window.parent.postMessage({type:'jptNav',screen:'news'},location.origin); }catch(x){} }); }
+      window.addEventListener('load',function(){ track('member-app-open'); });
+    }
     /* ---------- A154.1 · หน้าจอแยกตามแท็บ ----------
        ปุ่มในแถบล่าง = หนึ่งหน้าจอ · CSS ซ่อน/แสดงการ์ดตาม html[data-tab] ไม่ย้าย DOM
        ปุ่มย้อนกลับ (Android) = กลับหน้าภาพรวมก่อน แล้วค่อยออกจากแอป — แบบแถบเมนูของแอปทั่วไป */
