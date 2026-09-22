@@ -2400,6 +2400,26 @@ async function jptResilientFetch(url, opts) {
   throw lastErr || new Error(label + ' failed');
 }
 
+// A174 · โหมดทดสอบ (สูตรเดียวกับ Sniper A173.1): โหลด CSV จาก /dataz/ อย่างเดียว ไม่มีตัวสำรอง /data/
+// /dataz/ = Pages Function สำเนาของ /data/ ที่ส่ง text/plain ให้ Cloudflare บีบอัด (68.8 → ~22.9 MB)
+// ยังใช้ jptResilientFetch เดิม (timeout/ลองซ้ำ) แต่ลองซ้ำที่ /dataz/ เท่านั้น · พังแบบไหน = ป้าย "/dataz/ ERROR"
+// ย้อนกลับ: sp500-strategy-pro-backup-v47.html
+window.__proDataRoute = {};
+async function jptFetchDataz(url, opts) {
+  const fastUrl = url.replace('/data/', '/dataz/');
+  let t;
+  try {
+    t = await jptResilientFetch(fastUrl, opts);
+  } catch (e) {
+    const msg = (e && e.message) || String(e);
+    throw new Error('/dataz/ ' + msg + ' · ' + fastUrl);
+  }
+  // Pages ไม่มี 404.html ⇒ path ที่ไม่มีจะได้ index.html 200 — ต้องเช็คว่าเป็น CSV จริง
+  if (!/^\uFEFF?\s*Ticker,/.test(t.slice(0, 200))) throw new Error('/dataz/ ได้ข้อมูลที่ไม่ใช่ CSV (อาจเป็นหน้า HTML) · ' + fastUrl);
+  window.__proDataRoute[url] = 'dataz';
+  return t;
+}
+
 function showLoaderError(err) {
   const stage = document.querySelector('#loading .owl-loader-stage');
   const textEl = document.querySelector('#loading .owl-loader-text');
@@ -2434,9 +2454,10 @@ async function loadDataFromCloud() {
 
   try {
     // main = required (hard retry); benchmark = optional (best-effort)
+    // A174 โหมดทดสอบ: ทั้งสองไฟล์ผ่าน /dataz/ เท่านั้น — benchmark พังก็ขึ้น error ด้วย (ไม่กลืนเงียบ ไม่ตกกลับ /data/)
     const [csvMain, csvBench] = await Promise.all([
-      jptResilientFetch(fileUrl, { label: 'SP500', timeoutMs: 30000, maxRetries: 3 }),
-      benchUrl ? jptResilientFetch(benchUrl, { label: 'Benchmark', timeoutMs: 15000, maxRetries: 2 }).catch(() => null) : Promise.resolve(null)
+      jptFetchDataz(fileUrl, { label: 'SP500', timeoutMs: 30000, maxRetries: 3 }),
+      benchUrl ? jptFetchDataz(benchUrl, { label: 'Benchmark', timeoutMs: 15000, maxRetries: 2 }) : Promise.resolve(null)
     ]);
 
     // integrity guard: catch truncated / error-page bodies before parsing
@@ -2471,7 +2492,10 @@ async function loadDataFromCloud() {
     clearInterval(fetchInterval);
     console.error('Failed to load cloud data:', error);
     el.status.className = 'status-indicator error';
-    el.status.innerHTML = '<span>\u25CF</span> Upload CSV';
+    // A174: error จาก /dataz/ ขึ้นป้ายของตัวเอง ให้เห็นบนมือถือได้โดยไม่ต้องเปิด console
+    el.status.innerHTML = (error && /^\/dataz\//.test(error.message || ''))
+      ? '<span>\u25CF</span> /dataz/ ERROR'
+      : '<span>\u25CF</span> Upload CSV';
     el.manualUpload.style.display = 'block';
     // KEY FIX: never leave the owl frozen — show real error + retry button
     showLoaderError(error);
