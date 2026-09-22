@@ -129,7 +129,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 /* Member name overlay: hidden — new card has owl/brand on right, no name slot */
 .rc-member-name{display:none}
 /* Points overlay: dynamic number rendered in upper-left maroon space, with static "POINTS" word in image acting as label below */
-.rc-points{position:absolute;left:8%;top:22%;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;width:18%;aspect-ratio:1;pointer-events:none}
+.rc-points{position:absolute;left:8.14%;top:22%;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;width:18%;aspect-ratio:1;pointer-events:none}
 .rc-points-ring{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;border:1.5px solid transparent;border-top-color:rgba(212,175,55,0.7);border-right-color:rgba(244,228,186,0.3);animation:pointsSpin 3s linear infinite;filter:drop-shadow(0 0 4px rgba(212,175,55,0.4))}
 .rc-points-ring2{position:absolute;inset:7%;border-radius:50%;border:1px solid transparent;border-bottom-color:rgba(244,228,186,0.5);border-left-color:rgba(212,175,55,0.2);animation:pointsSpin 5s linear infinite reverse;filter:drop-shadow(0 0 3px rgba(212,175,55,0.3))}
 .rc-points-glow{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,0.18) 0%,rgba(212,175,55,0.06) 50%,transparent 72%);animation:pointsPulse 2.5s ease-in-out infinite}
@@ -152,8 +152,8 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .rc-guide-label{font-family:'Cinzel','Anuphan',serif;font-size:max(10px,2cqw);color:#8B6914;letter-spacing:0.04em;text-align:center;text-shadow:0 1px 2px rgba(255,254,248,0.6);font-weight:600;line-height:1.2;white-space:nowrap}
 @media(max-width:380px){.rc-guide-label{font-size:9px;letter-spacing:0.02em}}
 
-/* A170 · ปุ่ม "ดูสิทธิประโยชน์" บนการ์ด — ปุ่มเป็นภาพใน member-card-rewards.png จึงวางปุ่มใสทับตำแหน่งเดียวกัน (วัดจากพิกเซลจริง 1721×914) · เปลี่ยนรูปการ์ดแล้วปุ่มย้าย ต้องวัดใหม่ */
-.rc-benefit-link{position:absolute;left:6.16%;top:87.75%;width:21.5%;height:7%;border-radius:999px;border:0;padding:0;margin:0;background:transparent;cursor:pointer;z-index:5;-webkit-tap-highlight-color:transparent;transition:background .15s ease,box-shadow .15s ease}
+/* A170 · ปุ่ม "ดูสิทธิประโยชน์" บนการ์ด — ปุ่มเป็นภาพใน member-card-rewards.png จึงวางปุ่มใสทับตำแหน่งเดียวกัน (วัดจากพิกเซลจริง 1721×914) · เปลี่ยนรูปการ์ดแล้วปุ่มย้าย ต้องวัดใหม่ · A171: คอลัมน์ซ้ายจัดกึ่งกลางแกน x=295 (ปุ่มในภาพ x109–481) · วงแหวน .rc-points left 8.14% ให้ศูนย์กลางตรงแกนเดียวกัน */
+.rc-benefit-link{position:absolute;left:6.39%;top:87.75%;width:21.5%;height:7%;border-radius:999px;border:0;padding:0;margin:0;background:transparent;cursor:pointer;z-index:5;-webkit-tap-highlight-color:transparent;transition:background .15s ease,box-shadow .15s ease}
 .rc-benefit-link::before{content:'';position:absolute;inset:-70% -8% -45% -8%}
 .rc-benefit-link:active{background:rgba(244,228,186,.18);box-shadow:0 0 0 1px rgba(244,228,186,.5),0 0 12px rgba(212,175,55,.5)}
 .rc-benefit-link:focus-visible{outline:2px solid var(--gold-light);outline-offset:2px}
@@ -1122,7 +1122,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 
     <div class="screen active" id="screen-home">
         <div class="reward-card fade-up fade-up-1" style="margin:14px 16px 0;overflow:hidden;border-radius:16px;">
-            <img src="member-card-rewards.png?v=1786220125" alt="JP Trust Rewards Card" style="width:100%;display:block;">
+            <img src="member-card-rewards.png?v=1790049600" alt="JP Trust Rewards Card" style="width:100%;display:block;">
             <canvas id="heroCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;"></canvas>
             <div class="rc-member-name" id="cardName">Joonstinn</div>
             <div class="rc-points"><div class="rc-points-glow"></div><div class="rc-points-ring"></div><div class="rc-points-ring2"></div><div class="rc-points-num" id="cardPoints">000</div><div class="rc-points-label">Points</div></div>
