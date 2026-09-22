@@ -1108,7 +1108,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
             <img src="member-card-rewards.png?v=1786220125" alt="JP Trust Rewards Card" style="width:100%;display:block;">
             <canvas id="heroCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;"></canvas>
             <div class="rc-member-name" id="cardName">Joonstinn</div>
-            <div class="rc-points"><div class="rc-points-glow"></div><div class="rc-points-ring"></div><div class="rc-points-ring2"></div><div class="rc-points-num" id="cardPoints">100</div><div class="rc-points-label">Points</div></div>
+            <div class="rc-points"><div class="rc-points-glow"></div><div class="rc-points-ring"></div><div class="rc-points-ring2"></div><div class="rc-points-num" id="cardPoints">000</div><div class="rc-points-label">Points</div></div>
             <div class="rc-guide-link" onclick="openIframe('คู่มือการใช้งาน','./user-guide.html?v=1783496563')" role="button" tabindex="0" aria-label="คู่มือการใช้งาน">
                 <div class="rc-guide-label">คู่มือการใช้งาน</div>
                 <div class="rc-guide-icon-wrap">
@@ -1760,6 +1760,8 @@ async function saveSettingsToCloud(){
         const{data:existing}=await supabaseClient.from('user_settings').select('data').eq('user_id',user.id).maybeSingle();
         const currentData=(existing&&existing.data)?existing.data:{};
         const localPayload={...userSettings};delete localPayload.email;
+        // A169 — roadmap เขียนเองผ่าน JPSettings.patch ใน iframe · ค่าที่หน้านี้ถือไว้อาจเก่ากว่า cloud → ห้ามเขียนทับ
+        delete localPayload.roadmap;delete localPayload.roadmapStartDate;
         const payload={...currentData,...localPayload};
         const{error}=await supabaseClient.from('user_settings').upsert({user_id:user.id,data:payload,updated_at:new Date().toISOString()},{onConflict:'user_id'});
         if(error)console.warn('[settings] save failed:',error.message);
@@ -2524,7 +2526,61 @@ function loadSignalCards(){
     'https://raw.githubusercontent.com/jptrustlearning/btc/main/output_momentum_btc_net.csv');
   */
 }
-function applySettings(){const n=userSettings.name||'Member';var el;el=document.getElementById('displayName');if(el)el.textContent=n;el=document.getElementById('settingsName');if(el)el.textContent=n;el=document.getElementById('settingsEmail');if(el)el.textContent=userSettings.email;el=document.getElementById('settingNameVal');if(el)el.textContent=n;const r={low:'ต่ำ (Low)',medium:'ปานกลาง (Medium)',high:'สูง (High)'};el=document.getElementById('settingRisk');if(el)el.textContent=r[userSettings.risk]||'ปานกลาง';el=document.getElementById('settingCapital');if(el)el.textContent='฿'+Number(userSettings.capital||0).toLocaleString();el=document.getElementById('settingBroker');if(el)el.textContent=userSettings.broker||'ยังไม่ระบุ';const i=n.slice(0,2).toUpperCase();document.querySelectorAll('.avatar,.profile-avatar').forEach(el=>el.textContent=i);el=document.getElementById('cardName');if(el)el.textContent=n}
+function applySettings(){const n=userSettings.name||'Member';var el;el=document.getElementById('displayName');if(el)el.textContent=n;el=document.getElementById('settingsName');if(el)el.textContent=n;el=document.getElementById('settingsEmail');if(el)el.textContent=userSettings.email;el=document.getElementById('settingNameVal');if(el)el.textContent=n;const r={low:'ต่ำ (Low)',medium:'ปานกลาง (Medium)',high:'สูง (High)'};el=document.getElementById('settingRisk');if(el)el.textContent=r[userSettings.risk]||'ปานกลาง';el=document.getElementById('settingCapital');if(el)el.textContent='฿'+Number(userSettings.capital||0).toLocaleString();el=document.getElementById('settingBroker');if(el)el.textContent=userSettings.broker||'ยังไม่ระบุ';const i=n.slice(0,2).toUpperCase();document.querySelectorAll('.avatar,.profile-avatar').forEach(el=>el.textContent=i);el=document.getElementById('cardName');if(el)el.textContent=n;renderRoadmapPoints()}
+// ===== A169 · Points = Roadmap 90 วัน (ทำครบ 1 วัน = 1 point · สูงสุด 90) + กิจกรรม (สำรอง 10 · ยังไม่มี) =====
+// อ่านข้อมูลชุดเดียวกับ roadmap.html: progress (`roadmap` ใน user_settings / localStorage mirror) + วันเริ่ม
+// นับเฉพาะวันที่ติ๊ก done และปลดล็อกแล้ว (Day N เปิดวันที่ start+N−1 · ตรงกับ isDayLocked ของ A167)
+// ใช้ var ไม่ใช่ const — applySettings() อาจถูกเรียกก่อนบรรทัดนี้รัน (TDZ)
+var JPT_RM_PROGRESS_KEY='jpt_roadmap_progress_v1';
+var JPT_RM_START_KEY='jpt_roadmap_start_date_v1';
+var JPT_RM_DAYS=90;
+var JPT_ACTIVITY_POINTS_MAX=10;
+function jptActivityPoints(){return 0}   // TODO: กิจกรรมที่จะเพิ่ม (รวมไม่เกิน JPT_ACTIVITY_POINTS_MAX)
+function jptRmProgress(){
+  const c=userSettings&&userSettings.roadmap;
+  if(c&&typeof c==='object'&&Object.keys(c).length)return c;   // cloud มีของ = ชนะ (กติกาเดียวกับ roadmap.html)
+  try{const p=JSON.parse(localStorage.getItem(JPT_RM_PROGRESS_KEY)||'null');if(p&&typeof p==='object')return p}catch(e){}
+  return {};
+}
+function jptRmStart(){
+  let v=userSettings&&userSettings.roadmapStartDate;
+  if(!v){try{v=localStorage.getItem(JPT_RM_START_KEY)}catch(e){}}
+  const d=v?new Date(v):new Date();
+  if(isNaN(d.getTime()))return null;
+  d.setHours(0,0,0,0);return d;
+}
+function computeRoadmapPoints(){
+  const prog=jptRmProgress(),start=jptRmStart();
+  if(!start)return 0;
+  const today=new Date();today.setHours(0,0,0,0);
+  let n=0;
+  for(let day=1;day<=JPT_RM_DAYS;day++){
+    const r=prog[String(day)];
+    if(!r||!r.done)continue;
+    const dd=new Date(start);dd.setDate(dd.getDate()+day-1);
+    if(dd>today)continue;   // ยังล็อก (ติ๊กล่วงหน้าไว้) = ยังไม่นับ
+    n++;
+  }
+  return n;
+}
+function renderRoadmapPoints(){
+  const el=document.getElementById('cardPoints');if(!el)return;
+  const act=Math.max(0,Math.min(JPT_ACTIVITY_POINTS_MAX,jptActivityPoints()||0));
+  const total=Math.min(JPT_RM_DAYS+JPT_ACTIVITY_POINTS_MAX,computeRoadmapPoints()+act);
+  el.textContent=String(total).padStart(3,'0');
+  el.setAttribute('aria-label',total+' points');
+}
+// roadmap อยู่ใน iframe same-origin → เขียน localStorage แล้ว event 'storage' ยิงมาที่หน้านี้
+window.addEventListener('storage',e=>{
+  if(e.key===JPT_RM_PROGRESS_KEY){
+    try{const p=JSON.parse(e.newValue||'{}');if(p&&typeof p==='object')userSettings.roadmap=p}catch(err){}
+    renderRoadmapPoints();
+  }else if(e.key===JPT_RM_START_KEY){
+    if(e.newValue)userSettings.roadmapStartDate=e.newValue;
+    renderRoadmapPoints();
+  }
+});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)renderRoadmapPoints()});   // ข้ามวัน = วันใหม่ปลดล็อก
 // LOCK ONLY — does NOT sign out from Supabase.
 // PIN stays in localStorage; Supabase session token stays in localStorage;
 // user_id remains identifiable on next entry → analytics continuity preserved.
@@ -3295,7 +3351,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 function btcComingSoon(e){if(e){e.stopPropagation();e.preventDefault()}jptToast('🚧 Bitcoin · กำลังพัฒนา · เร็วๆ นี้')}
 let lastScreen='home';
 function openIframe(title,url,navScreen){const tEl=document.getElementById('iframeTitle'),tb=document.getElementById('iframeTopbar'),ld=document.getElementById('iframeLoading'),ct=document.getElementById('iframeContainer'),ifr=document.getElementById('iframeContent');const cur=document.querySelector('.screen.active');if(cur)lastScreen=cur.id.replace('screen-','');if(tEl)tEl.textContent=title;/* Hide topbar only for pages that already own their header (sp500-combined-strategy); show for everything else including news-detail */if(tb){const hideTopbar=/sp500-combined-strategy|sp500-strategy-pro|sp500-rolling-6m-momentum|gold-momentum-app|roadmap\.html|portfolio-planner|finance-planner|my-portfolio|user-guide/.test(url);tb.style.display=hideTopbar?'none':'flex'}ld.style.display='flex';ct.style.display='none';ifr.src='about:blank';document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-iframe').classList.add('active');/* Sync bottom nav highlight — auto-detect tab from URL when navScreen not explicitly passed */if(!navScreen){if(/sp500-(strategy-pro|combined-strategy|rolling-6m-momentum)|smc-patient-hunter|gold-swing-h1-sensitivity/.test(url))navScreen='lab';else if(/gold-momentum-app|Free_scannerSP500|my-portfolio|user-guide/.test(url))navScreen='more';else if(/portfolio-planner|finance-planner/.test(url))navScreen='roadmap';else if(/news-detail/.test(url))navScreen='news'}document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));if(navScreen){const b=document.querySelector('.nav-item[data-screen="'+navScreen+'"]');if(b)b.classList.add('active')}setTimeout(()=>{ifr.src=url;ifr.onload=function(){ld.style.display='none';ct.style.display='block'}},100);window.scrollTo({top:0});/* Strip cache-bust ?v= for cleaner analytics URLs */const cleanUrl=url.replace(/\?v=\d+/,'');logEvent('page_view',{screen:'iframe',url:cleanUrl})}
-function closeIframe(){document.getElementById('iframeContent').src='about:blank';navigateTo(lastScreen)}
+function closeIframe(){document.getElementById('iframeContent').src='about:blank';navigateTo(lastScreen);renderRoadmapPoints()}
 /* Listen for openIframe requests from within child iframes (e.g. roadmap → portfolio planner) */
 window.addEventListener('message', function(ev) {
   const d = ev.data;
