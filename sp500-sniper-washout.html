@@ -2465,33 +2465,30 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// A173 · ทดลองเฉพาะหน้านี้: โหลด CSV ผ่าน /dataz/ (Pages Function สำเนาของ /data/ ที่ส่ง text/plain ให้ Cloudflare บีบอัด)
-// ตรวจ 3 ชั้น: HTTP ok · ไม่ใช่ HTML (Pages ส่ง index.html 200 ให้เส้นทางที่ไม่มี) · บรรทัดแรกขึ้นต้น "Ticker,"
-// ไม่ผ่านชั้นไหน หรือ error ใดๆ → โหลดจาก /data/ เดิม (พฤติกรรมเดียวกับก่อน A173 ทุกอย่าง)
-// ย้อนกลับทั้งหมด: เอา sp500-sniper-washout-backup-v25.html ทับไฟล์นี้
+// A173.1 · โหมดทดสอบ: โหลด CSV จาก /dataz/ อย่างเดียว (ถอดตัวสำรอง /data/ ออกตามที่จูนสั่ง ให้เห็น error จริง)
+// /dataz/ = Pages Function สำเนาของ /data/ ที่ส่ง text/plain ให้ Cloudflare บีบอัด (68.8 → ~22.9 MB)
+// ตรวจ 3 ชั้น ไม่ผ่านชั้นไหน = throw → ป้ายสถานะขึ้น "/dataz/ ERROR" (ไม่แอบไปโหลด /data/)
+// ย้อนกลับ: backup v26 = มีตัวสำรอง · backup v25 = ก่อน A173 (โหลด /data/ แบบเดิม)
 window.__sniperDataRoute = {};
-async function fetchCsvText(url, required) {
+async function fetchCsvText(url) {
   const fastUrl = url.replace('/data/', '/dataz/');
-  if (fastUrl !== url) {
-    try {
-      const r = await fetch(fastUrl);
-      const ct = (r.headers.get('content-type') || '').toLowerCase();
-      if (r.ok && ct.indexOf('html') === -1) {
-        const t = await r.text();
-        if (/^\uFEFF?\s*Ticker,/.test(t.slice(0, 200))) { window.__sniperDataRoute[url] = 'dataz'; return t; }
-      }
-      console.warn('[sniper A173] /dataz/ ใช้ไม่ได้ — ย้อนกลับ /data/', fastUrl, r.status, ct);
-    } catch (e) {
-      console.warn('[sniper A173] /dataz/ error — ย้อนกลับ /data/', fastUrl, e);
-    }
+  try {
+    return await fetchCsvTextStrict(url, fastUrl);
+  } catch (e) {
+    // เน็ตหลุด/อ่านไฟล์ไม่จบ ก็ต้องขึ้นป้าย /dataz/ ERROR เหมือนกัน
+    const msg = (e && e.message) || String(e);
+    throw new Error(/^\/dataz\//.test(msg) ? msg : '/dataz/ ' + msg + ' · ' + fastUrl);
   }
-  const r2 = await fetch(url);
-  if (!r2.ok) {
-    if (required) throw new Error('Network response was not ok');
-    return null;
-  }
-  window.__sniperDataRoute[url] = 'data';
-  return await r2.text();
+}
+async function fetchCsvTextStrict(url, fastUrl) {
+  const r = await fetch(fastUrl);
+  const ct = (r.headers.get('content-type') || '').toLowerCase();
+  if (!r.ok) throw new Error('/dataz/ HTTP ' + r.status + ' · ' + fastUrl);
+  if (ct.indexOf('html') !== -1) throw new Error('/dataz/ ได้ HTML แทน CSV · ' + fastUrl);
+  const t = await r.text();
+  if (!/^\uFEFF?\s*Ticker,/.test(t.slice(0, 200))) throw new Error('/dataz/ บรรทัดแรกไม่ใช่หัวตาราง · ' + fastUrl);
+  window.__sniperDataRoute[url] = 'dataz';
+  return t;
 }
 
 async function loadDataFromCloud() {
@@ -2507,12 +2504,12 @@ async function loadDataFromCloud() {
 
   try {
     // Fetch SP500 universe + benchmark + macro signals (jpy/commodities) in parallel
-    // A173: ลองเส้นทาง /dataz/ (บีบอัดตอนส่ง ~22 MB แทน 68.8 MB) ก่อน — ผิดปกติตรงไหนตกกลับ /data/ เดิมทันที
+    // A173.1 โหมดทดสอบ: ทั้ง 4 ไฟล์ผ่าน /dataz/ เท่านั้น — ไฟล์ไหนพังก็ขึ้น error (ไม่กลืนเงียบ ไม่ตกกลับ /data/)
     const [csvMain, csvBench, csvJpy, csvComm] = await Promise.all([
-      fetchCsvText(fileUrl, true),
-      benchUrl ? fetchCsvText(benchUrl).catch(() => null) : Promise.resolve(null),
-      CONFIG.cloudJpyUrl ? fetchCsvText(CONFIG.cloudJpyUrl).catch(() => null) : Promise.resolve(null),
-      CONFIG.cloudCommUrl ? fetchCsvText(CONFIG.cloudCommUrl).catch(() => null) : Promise.resolve(null)
+      fetchCsvText(fileUrl),
+      benchUrl ? fetchCsvText(benchUrl) : Promise.resolve(null),
+      CONFIG.cloudJpyUrl ? fetchCsvText(CONFIG.cloudJpyUrl) : Promise.resolve(null),
+      CONFIG.cloudCommUrl ? fetchCsvText(CONFIG.cloudCommUrl) : Promise.resolve(null)
     ]);
     
     let csvCombined = csvMain.trim();
@@ -2546,7 +2543,10 @@ async function loadDataFromCloud() {
     
     // Show Error & Fallback to Manual
     el.status.className = 'status-indicator error';
-    el.status.innerHTML = '<span>●</span> Upload CSV';
+    // A173.1: error จาก /dataz/ ขึ้นป้ายของตัวเอง ให้เห็นบนมือถือได้โดยไม่ต้องเปิด console
+    el.status.innerHTML = (error && /^\/dataz\//.test(error.message || ''))
+      ? '<span>●</span> /dataz/ ERROR'
+      : '<span>●</span> Upload CSV';
     el.manualUpload.style.display = 'block';
   }
 }
