@@ -2961,21 +2961,43 @@ function updateLearningHeader() {
   }
   document.getElementById('pcDayNum').textContent = dayInCycle;
 
-  // Progress bar
-  const pct = Math.round((dayInCycle / ROADMAP_CONFIG.cycleDays) * 100);
-  document.getElementById('pcPct').textContent = pct + '%';
-  renderProgressBar(dayInCycle);
+  // Progress bar + % — A168: นับจากวันที่ทำจริง (ติ๊กแล้ว) ไม่ใช่จำนวนวันที่ผ่านไป
+  updateCycleProgress();
 
 
   // Today summary card
   updateTodayCard(todayDay, today, start);
 }
 
-function renderProgressBar(dayInCycle) {
+// A168 — % และแถบของรอบปัจจุบัน = จำนวนวันที่ติ๊กทำแล้ว ÷ 30
+// ไม่นับวันที่ยังล็อก (วันอนาคตที่เคยติ๊กไว้ก่อน A167) · เรียกซ้ำหลังติ๊ก/บันทึก ให้ตัวเลขขยับทันที
+function doneDaysInCycle(cycle) {
+  const startDay = (cycle - 1) * ROADMAP_CONFIG.cycleDays + 1;
+  const endDay = cycle * ROADMAP_CONFIG.cycleDays;
+  let n = 0;
+  for (let d = startDay; d <= endDay; d++) {
+    if (isDayDone(d) && !isDayLocked(d)) n++;
+  }
+  return n;
+}
+
+function updateCycleProgress() {
+  const done = doneDaysInCycle(getCurrentCycle());
+  const pct = Math.round((done / ROADMAP_CONFIG.cycleDays) * 100);
+  const el = document.getElementById('pcPct');
+  if (el) {
+    el.textContent = pct + '%';
+    el.title = 'ทำแล้ว ' + done + ' จาก ' + ROADMAP_CONFIG.cycleDays + ' วัน';
+  }
+  renderProgressBar(done);
+}
+
+function renderProgressBar(doneDays) {
   const bar = document.getElementById('pcBar');
   if (!bar) return;
   const total = 15; // 15 segments map nicely to a 30-day cycle (1 seg = 2 days)
-  const filled = Math.round((dayInCycle / ROADMAP_CONFIG.cycleDays) * total);
+  let filled = Math.round((doneDays / ROADMAP_CONFIG.cycleDays) * total);
+  if (doneDays > 0 && filled < 1) filled = 1;   // ทำแล้วอย่างน้อยหนึ่งวัน = เห็นแถบหนึ่งช่องเสมอ
   let html = '';
   for (let i = 0; i < total; i++) {
     html += `<div class="pc-bar-seg ${i < filled ? 'filled' : ''}"></div>`;
@@ -3270,6 +3292,7 @@ async function dmSave(opts) {
   }
 
   refreshDayCell(day);
+  updateCycleProgress();   // A168 — % ขยับทันทีที่ติ๊ก
   if (!opts.silent) {
     jptToast(cloud ? 'บันทึกแล้ว' : 'บันทึกในเครื่องแล้ว · เข้าระบบเพื่อซิงก์');
   }
