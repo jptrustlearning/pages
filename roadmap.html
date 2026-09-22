@@ -2048,6 +2048,26 @@ body > * { position: relative; z-index: 1; }
 .cal-cell.today.done .cal-status { color: var(--emerald-dk); }
 .cal-cell.missed .cal-status { color: #B23A3A; opacity: 0.75; }
 
+/* ===== A167 · วันที่ยังไม่ถึง = ล็อก (ปลดวันต่อวัน) =====
+   ต้องอยู่หลัง .cal-cell.program.jp-day (specificity เท่ากัน 0,3,0 — ตัวหลังชนะ) */
+.cal-cell.program.locked {
+  background: linear-gradient(160deg, #FBF4E8 0%, #F7ECDD 100%);
+  border-color: rgba(184,134,11,0.14);
+  cursor: default;
+}
+.cal-cell.program.locked:hover {
+  transform: none;
+  border-color: rgba(184,134,11,0.14);
+  box-shadow: none;
+}
+.cal-cell.program.locked .cal-num { color: var(--maroon); opacity: 0.5; }
+.cal-cell.program.locked .cal-day-label { opacity: 0.5; }
+.cal-cell.program.locked .cal-status {
+  background: rgba(255,254,248,0.6);
+  border-color: rgba(184,134,11,0.18);
+  color: rgba(139,105,20,0.62);
+}
+
 /* ===== A150 · task anime — หัวข้อที่กดดูแอนิเมชันได้ + popup ===== */
 .dm-task.has-anim {
   align-items: center; cursor: pointer; margin: 4px 0 8px;
@@ -2211,9 +2231,9 @@ body > * { position: relative; z-index: 1; }
     </div>
     <div class="lg-item">
       <span class="lg-dot lg-locked">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5.5"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="11" width="13" height="9" rx="2"/><path d="M8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></svg>
       </span>
-      <span>ยังไม่ได้ทำ</span>
+      <span>Locked</span>
     </div>
     <div class="lg-item">
       <span class="lg-dot lg-missed">
@@ -2602,11 +2622,24 @@ function isDayDone(dayN) {
   return !!(rec && rec.done);
 }
 
+// A167 — วันที่ยังไม่ถึง = ล็อก · ปลดวันต่อวันตามวันที่จริงของเครื่อง (Day N เปิดวันที่ dateForDay(N))
+function isDayLocked(dayN) {
+  return dateForDay(dayN) > startOfDay(new Date());
+}
+
+// A167 — แตะวันที่ล็อกอยู่ = บอกว่าจะเปิดวันไหน (ไม่เปิด modal)
+function onLockedDayTap(dayN) {
+  jptToast('Day ' + dayN + ' ยังล็อกอยู่ · เปิดให้ทำ ' + formatThaiDate(dateForDay(dayN)));
+}
+
 function getDayState(dayN) {
   // A137.1 — 'completed' wins over every other state, including today.
   // (A137 checked sameDate() first, so today's cell could never show a tick.)
+  // A167 — 'locked' wins over 'completed': วันอนาคตที่เคยติ๊กไว้ยังล็อก ข้อมูลไม่ลบ
+  //        ถึงวันแล้วจะขึ้นติ๊กเขียวเอง
   const today = startOfDay(new Date());
   const dDate = dateForDay(dayN);
+  if (dDate > today) return 'locked';
   if (isDayDone(dayN)) return 'completed';
   if (sameDate(today, dDate)) return 'today';
   if (dDate < today) return 'missed';
@@ -2678,6 +2711,10 @@ function statusIconSvg(state) {
   if (state === 'today') {
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.5" fill="currentColor"/></svg>';
   }
+  if (state === 'locked') {
+    // A167 — กุญแจ = กดไม่ได้จริง (ถึงวันแล้วค่อยปลด)
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="11" width="13" height="9" rx="2"/><path d="M8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></svg>';
+  }
   // upcoming (default) — A137.1: every day in the cycle can be opened and done,
   // so a padlock was wrong. Hollow ring = not done yet.
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5.5"/></svg>';
@@ -2686,7 +2723,10 @@ function statusIconSvg(state) {
 // ========================================
 // RENDER (replaces old renderAllCycles)
 // ========================================
+let renderedForYmd = null;   // A167 — วันที่ของปฏิทินที่วาดอยู่ (ใช้ปลดล็อกเมื่อข้ามวัน)
+
 function renderAllCycles() {
+  renderedForYmd = ymd(startOfDay(new Date()));
   for (let c = 1; c <= 3; c++) {
     const panel = document.getElementById('cyclePanel-' + c);
     panel.innerHTML = renderCalendarForCycle(c);
@@ -2839,12 +2879,15 @@ function renderMonthGrid(year, month, cycleStartDay, cycleEndDay) {
     } else if (inThisCycle) {
       const dState = getDayState(programDay);
       cls += isJpDay ? ' program jp-day' : ' program';
-      if (dState === 'completed') cls += ' done';
+      if (dState === 'locked') cls += ' locked';
+      else if (dState === 'completed') cls += ' done';
       else if (dState === 'missed') cls += ' missed';
       inner += `<div class="cal-day-label">Day ${programDay}</div>`;
       // Small status icon at the bottom — Joon prefers the inline indicator over a bg watermark
       inner += `<div class="cal-status">${statusIconSvg(dState)}</div>`;
-      click = `onclick="openDayModal(${programDay})"`;
+      click = dState === 'locked'
+        ? `onclick="onLockedDayTap(${programDay})" aria-disabled="true"`
+        : `onclick="openDayModal(${programDay})"`;
       dataDay = ` data-day="${programDay}"`;
     } else if (inProgram) {
       // Other cycle's program day — show muted with small "Day N" hint
@@ -3103,6 +3146,7 @@ const PHASE_TAG = {
 };
 
 function openDayModal(day) {
+  if (isDayLocked(day)) { onLockedDayTap(day); return; }   // A167
   if (!MODULES) {
     jptToast('กำลังโหลดเนื้อหา Day ' + day + ' …');
     loadModules().then(m => { if (m) openDayModal(day); else jptToast('โหลดเนื้อหาไม่สำเร็จ ลองใหม่อีกครั้ง'); });
@@ -3150,7 +3194,7 @@ function openDayModal(day) {
   ts.textContent = rec.at ? ('บันทึกล่าสุด ' + formatThaiDate(new Date(rec.at))) : '';
 
   document.getElementById('dmPrev').disabled = (day <= 1);
-  document.getElementById('dmNext').disabled = (day >= ROADMAP_CONFIG.totalDays);
+  document.getElementById('dmNext').disabled = (day >= ROADMAP_CONFIG.totalDays) || isDayLocked(day + 1);   // A167
 
   const modal = document.getElementById('dayModal');
   modal.classList.add('open');
@@ -3184,6 +3228,7 @@ function dmNav(step) {
   if (d == null) return;
   const next = d + step;
   if (next < 1 || next > ROADMAP_CONFIG.totalDays) return;
+  if (isDayLocked(next)) { onLockedDayTap(next); return; }   // A167
   dmSave({ silent: true, keepOpen: true }).then(() => openDayModal(next));
 }
 
@@ -3192,8 +3237,9 @@ function dmNav(step) {
 function refreshDayCell(day) {
   const st = getDayState(day);
   document.querySelectorAll('[data-day="' + day + '"]').forEach(el => {
-    el.classList.remove('done', 'missed');
-    if (st === 'completed') el.classList.add('done');
+    el.classList.remove('done', 'missed', 'locked');
+    if (st === 'locked') el.classList.add('locked');
+    else if (st === 'completed') el.classList.add('done');
     else if (st === 'missed') el.classList.add('missed');
     const s = el.querySelector('.cal-status');
     if (s) s.innerHTML = statusIconSvg(st);
@@ -3379,6 +3425,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     syncCalSlider(panel);
   }
 });
+
+// A167 — เปิดแอปค้างข้ามเที่ยงคืน / กลับมาจากพื้นหลัง = วาดปฏิทินใหม่ ให้วันใหม่ปลดล็อกเอง
+function checkDayRollover() {
+  if (renderedForYmd == null) return;               // ยังไม่ได้วาดครั้งแรก
+  if (ymd(startOfDay(new Date())) === renderedForYmd) return;
+  renderAllCycles();
+  updateLearningHeader();
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) checkDayRollover(); });
+setInterval(checkDayRollover, 60000);
 
 // Close modals with Escape
 document.addEventListener('keydown', (e) => {
