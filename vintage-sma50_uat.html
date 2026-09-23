@@ -120,6 +120,8 @@ table.vt{border-collapse:separate;border-spacing:0;table-layout:fixed;font-size:
 .uS{box-shadow:inset 3px 0 0 var(--gold)}
 .uN{box-shadow:inset 3px 0 0 #4E6E8E}
 .uSN{box-shadow:inset 3px 0 0 var(--gold),inset 6px 0 0 #4E6E8E}
+.uX{box-shadow:inset 3px 0 0 #7FB3A8}
+.uSX{box-shadow:inset 3px 0 0 var(--gold),inset 6px 0 0 #7FB3A8}
 .ent{color:var(--ink2)}
 .ent small{color:var(--mute);font-size:10.5px;display:block;line-height:1.1;margin-top:1px}
 .vt td.ent{line-height:1.15}
@@ -181,6 +183,7 @@ table.vt{border-collapse:separate;border-spacing:0;table-layout:fixed;font-size:
       <button data-u="all" aria-pressed="true">ทั้งหมด</button>
       <button data-u="S" aria-pressed="false">S&amp;P 500</button>
       <button data-u="N" aria-pressed="false">Nasdaq-100</button>
+      <button data-u="X" aria-pressed="false">Nasdaq 1000</button>
     </div>
     <div class="pxwrap"><span class="seglab" aria-hidden="true">ราคาตอนเข้า</span>
     <div class="seg" id="px" role="group" aria-label="ราคาตอนเข้า (เลือกได้หลายช่วง)">
@@ -234,7 +237,7 @@ table.vt{border-collapse:separate;border-spacing:0;table-layout:fixed;font-size:
       <span><span class="sw" style="background:#FFFEF8;box-shadow:inset 0 -3px 0 #3a1520;border:1px solid #E6DCC6"></span>วันแรกที่ปิดใต้ SMA 50</span>
       <span><span class="sw na" style="border:1px solid #E6DCC6"></span>ยังไม่ถึงวันนั้น</span>
     </div>
-    <p style="margin-top:8px">ชื่อแถวคือหุ้นและวันที่เกิดสัญญาณ เช่น NVDA 2018DEC18 แถบซ้ายสีทองคือ S&amp;P 500 สีฟ้าเทาคือ Nasdaq-100 ถ้ามีสองสีแปลว่าอยู่ทั้งสองดัชนี
+    <p style="margin-top:8px">ชื่อแถวคือหุ้นและวันที่เกิดสัญญาณ เช่น NVDA 2018DEC18 แถบซ้ายสีทองคือ S&amp;P 500 สีฟ้าเทาคือ Nasdaq-100 สีเขียวอ่อนคือ Nasdaq 1000 ที่ไม่อยู่ใน Nasdaq-100 ถ้ามีสองสีแปลว่าอยู่ทั้งสองกลุ่ม
       แตะหัวคอลัมน์ใดก็ได้เพื่อเรียงตามคอลัมน์นั้น แตะซ้ำเพื่อกลับทิศ</p>
   </div>
   <div>
@@ -254,6 +257,7 @@ table.vt{border-collapse:separate;border-spacing:0;table-layout:fixed;font-size:
     <ul>
       <li>S&amp;P 500 ใช้ไฟล์ข้อมูลชุดเดียวกับหน้ากลยุทธ์ในแอป เริ่ม 2 ม.ค. 2015 สัญญาณแรกจึงเริ่มราวกลาง มี.ค. 2015 หลังมีราคาครบ 50 วัน</li>
       <li>Nasdaq-100 ใช้รายชื่อปัจจุบันย้อนหลังทั้งหมด หุ้นที่เคยอยู่แล้วหลุดออกไปจึงไม่มีในตาราง ภาพรวมจะดูดีกว่าความจริงอยู่บ้าง</li>
+      <li>Nasdaq 1000 คือหุ้นสามัญ 1,000 ตัวที่มีมูลค่าตลาดสูงสุดในตลาด NASDAQ ณ ก.ย. 2026 (ไม่รวม warrant, unit, หุ้นบุริมสิทธิ และ SPAC) ใช้รายชื่อนี้ย้อนหลังทั้งหมดเช่นกัน หุ้นเล็กที่วันนี้เข้ามาอยู่ในกลุ่มได้เพราะเคยขึ้นแรง จึงทำให้ภาพย้อนหลังดูดีกว่าความจริงมากกว่ากลุ่มหุ้นใหญ่</li>
       <li>ตารางแสดงสิ่งที่เกิดขึ้นในอดีต ไม่ใช่คำแนะนำให้ซื้อขาย</li>
     </ul>
   </div>
@@ -274,6 +278,8 @@ let META=null, cache={}, year=null, all=[], view=[], sortKey='sig', sortDir=1, u
 const BM={S:'SPY',Q:'QQQ'};
 const PX=new Set();   // price buckets picked: a <$50 · b $50-100 · c >$100 (empty = all)
 const bucket=p=>p<50?'a':p<=100?'b':'c';
+const NOB=new Float32Array(HOLD).fill(NaN);
+const ukey=u=>(u.includes('S')?'S':'')+(u.includes('N')?'N':u.includes('X')?'X':'');   // left bar colour
 let lastWin='',lastHead='',tbl=null;
 
 function nameDate(n){const s=String(n).padStart(6,'0');return '20'+s.slice(0,2)+MON[+s.slice(2,4)-1]+s.slice(4,6);}
@@ -295,16 +301,16 @@ function heat(v,extra){
 /* ---------- data ---------- */
 function series(ld,K){const P=new Float64Array(ld.length);let L=0;for(let i=0;i<ld.length;i++){L+=ld[i];P[i]=Math.exp(L/K);}return P;}
 function decode(doc){
-  const K=doc.k,B=doc.b,bix=new Map();
+  const K=doc.k,B=doc.b,bix=new Map(),bc=new Map();   // bc: benchmark curves shared by every row entering on the same day
   let SC,SO,QC,QO;
   if(B){B.d.forEach((d,i)=>bix.set(d,i));SC=series(B.S,K);SO=series(B.So,K);QC=series(B.Q,K);QO=series(B.Qo,K);}
   const T=doc.t.map(([t,u,L0,d,ended])=>{const n=d.length+1;const P=new Float64Array(n);let L=L0;P[0]=Math.exp(L/K);for(let i=0;i<d.length;i++){L+=d[i];P[i+1]=Math.exp(L/K);}return {t,u,P,ended};});
   return doc.s.map(([ti,sig,ent,pos,open,below,nom])=>{
     const tk=T[ti];const chg=new Float32Array(HOLD).fill(NaN);let n=0,last=NaN,mx=NaN,mn=NaN;
     if(pos>=0){for(let k=0;k<HOLD;k++){const j=pos+k;if(j>=tk.P.length)break;const v=tk.P[j]/open-1;chg[k]=v;n++;last=v;if(!(v<=mx))mx=v;if(!(v>=mn))mn=v;}}
-    const bS=new Float32Array(HOLD).fill(NaN),bQ=new Float32Array(HOLD).fill(NaN);
     const bi=pos>=0&&B?bix.get(ent):undefined;
-    if(bi!==undefined){for(let k=0;k<n;k++){const j=bi+k;if(j>=SC.length)break;bS[k]=SC[j]/SO[bi]-1;bQ[k]=QC[j]/QO[bi]-1;}}
+    let bS=NOB,bQ=NOB;
+    if(bi!==undefined){let c=bc.get(bi);if(!c){const x=new Float32Array(HOLD).fill(NaN),y=new Float32Array(HOLD).fill(NaN);for(let k=0;k<HOLD;k++){const j=bi+k;if(j>=SC.length)break;x[k]=SC[j]/SO[bi]-1;y[k]=QC[j]/QO[bi]-1;}c=[x,y];bc.set(bi,c);}bS=c[0];bQ=c[1];}
     const px=nom>0?nom:open,pxa=!(nom>0);   // as-traded price that day (fallback: adjusted)
     return {t:tk.t,u:tk.u,sig,ent,pos,open,px,pxa,pb:pos>=0?bucket(px):'',below,chg,bS,bQ,n,v:chg,last,max:mx,min:mn,ended:tk.ended,name:tk.t+' '+nameDate(sig)};
   });
@@ -485,7 +491,7 @@ function headCells(c0,c1){
   return h+hb;
 }
 function rowHTML(r,c0,c1){
-  let h=`<tr><td class="nm u${r.u}" title="${r.name}${r.ended?' (ข้อมูลหยุด '+thDate(r.ended)+')':''}"><span class="tk">${r.t}</span><span class="dt">${nameDate(r.sig)}</span></td>`;
+  let h=`<tr><td class="nm u${ukey(r.u)}" title="${r.name}${r.ended?' (ข้อมูลหยุด '+thDate(r.ended)+')':''}"><span class="tk">${r.t}</span><span class="dt">${nameDate(r.sig)}</span></td>`;
   if(r.pos<0){
     h+=`<td class="ent pend">รอเข้า</td><td colspan="4" style="text-align:left;color:#7A6F62">เข้าที่ราคาเปิดวันทำการถัดไป</td>`;
   }else{

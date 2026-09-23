@@ -25,6 +25,9 @@ Usage:
   python3 tools/build_vintage_sma50.py --sp500 ../sp500/input_sp500_daily.csv \
       --ndx $R/ndx_daily.csv --ndx-list $R/ndx_list.csv --sp-yahoo $R/sp_daily_yahoo.csv \
       --bench ../sp500/input_benchmark_daily.csv --nominal $R/entries_nominal.csv
+  one-pass (A175.4, NASDAQ 1000):
+  python3 tools/build_vintage_sma50.py --sp500 ../sp500/input_sp500_daily.csv --ndx-list $R/ndx_list.csv \
+      --nq-list $R/nasdaq1000_list.csv --all-glob "$R/all_daily_part*.csv.gz"
 """
 import argparse, json, math, os
 import numpy as np
@@ -42,6 +45,8 @@ ap.add_argument('--ndx-list', default=None)
 ap.add_argument('--nominal', default=None, help='entries_nominal.csv: as-traded open on each entry date (price filter/display)')
 ap.add_argument('--bench', default=None, help='input_benchmark_daily.csv (SPY/QQQ, same dividend-adjusted basis)')
 ap.add_argument('--sp-yahoo', default=None, help='Yahoo 4-dp series for S&P tickers (replaces the 2-dp file inside its own date range)')
+ap.add_argument('--all-glob', default=None, help='all_daily_part*.csv.gz from fetch_nasdaq1000.py (Ticker,Date,Open,Close,NomOpen) — one-pass prices for every name')
+ap.add_argument('--nq-list', default=None, help='nasdaq1000_list.csv (top 1000 NASDAQ common stocks by market cap)')
 ap.add_argument('--out', default=os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'vintage-sma50'))
 a = ap.parse_args()
 
@@ -95,6 +100,60 @@ if a.ndx and os.path.exists(a.ndx):
             uni[t] = 'N'
     print('NDX added', sum(1 for v in uni.values() if v == 'N'), 'both', sum(1 for v in uni.values() if v == 'SN'),
           'in-both using Yahoo series:', len(swapped))
+
+# ---- one-pass mode (A175.4): every price from the same Yahoo pull; universe letters S / N / X ----
+NOM = {}
+if a.all_glob:
+    import glob
+    Y = pd.concat([pd.read_csv(f) for f in sorted(glob.glob(a.all_glob))], ignore_index=True)
+    Y = Y[Y.Date <= sp_asof]   # common last day (a handful of Yahoo names carry a stray next-day bar)
+    Y = {t: g.sort_values('Date').reset_index(drop=True) for t, g in Y.groupby('Ticker')}
+    S_set = set(sp.Ticker)
+    N_set = set(pd.read_csv(a.ndx_list).Ticker) if a.ndx_list else set()
+    X_set = set(pd.read_csv(a.nq_list).Ticker) if a.nq_list else set()
+    csv_series = {t: g.sort_values('Date')[['Date', 'Open', 'Close']].reset_index(drop=True) for t, g in sp.groupby('Ticker')}
+    series, uni, fb = {}, {}, []
+    for t in sorted(S_set | N_set | X_set):
+        u = ('S' if t in S_set else '') + ('N' if t in N_set else '') + ('X' if t in X_set else '')
+        if t in Y:
+            g = Y[t][['Date', 'Open', 'Close', 'NomOpen']]
+            if u == 'S':   # S&P-only: keep the S&P file's coverage (start at its first day; stop where it stops if it left)
+                s0 = csv_series[t]
+                g = g[g.Date >= s0.Date.iloc[0]]
+                if s0.Date.iloc[-1] < sp_asof:
+                    g = g[g.Date <= s0.Date.iloc[-1]]
+            series[t] = g.reset_index(drop=True)
+        elif t in csv_series:
+            series[t] = csv_series[t]; fb.append(t)
+        else:
+            continue
+        uni[t] = u
+    for t, g in series.items():
+        if 'NomOpen' in g:
+            for d, p_ in zip(g.Date, g.NomOpen):
+                if p_ == p_ and p_ > 0:
+                    NOM[(t, d)] = float(p_)
+    if 'SPY' in Y and 'QQQ' in Y:
+        BENCH_ALL = {k: Y[k] for k in ('SPY', 'QQQ')}
+    from collections import Counter
+    print('one-pass universe', len(series), dict(Counter(uni.values())), 'S&P-file fallback', fb)
+
+# One-day price errors (mostly thin early small-cap history in NASDAQ 1000): a >40% jump that is fully
+# undone the next day (next close back within 15% of the day before). Replace that day's open/close with
+# the geometric mean of its neighbours so it cannot create a fake SMA cross or a fake -90% cell.
+spikes = []
+for t, g in series.items():
+    c = g.Close.to_numpy(float)
+    if len(c) < 3:
+        continue
+    r0 = c[1:-1] / c[:-2]; r2 = c[2:] / c[:-2]
+    bad = np.where(((r0 > 1.4) | (r0 < 0.6)) & (r2 > 0.85) & (r2 < 1.15))[0] + 1
+    for i in bad:
+        m = (c[i - 1] * c[i + 1]) ** 0.5
+        g.loc[i, 'Close'] = m
+        g.loc[i, 'Open'] = m
+        spikes.append((t, g.Date.iloc[i]))
+print('one-day spikes repaired', len(spikes), spikes[:12])
 
 # Known bad adjustment in the source data (both Yahoo and the S&P file): DHR's Fortive spin-off
 # shows as a +61% overnight gap on 2016-07-05. Neutralise the gap by rescaling earlier rows.
@@ -158,7 +217,11 @@ for r in rows:
 
 # benchmarks: SPY / QQQ open+close on their own calendar
 BENCH = {}
-if a.bench and os.path.exists(a.bench):
+if a.all_glob and 'BENCH_ALL' in globals():
+    for t in ('SPY', 'QQQ'):
+        BENCH[t] = BENCH_ALL[t][(BENCH_ALL[t].Date >= '2015-01-01') & (BENCH_ALL[t].Date <= asof)].reset_index(drop=True)
+    print('bench (one-pass)', {t: (g.Date.iloc[0], g.Date.iloc[-1], len(g)) for t, g in BENCH.items()})
+elif a.bench and os.path.exists(a.bench):
     bb = pd.read_csv(a.bench)
     for t in ('SPY', 'QQQ'):
         g = bb[(bb.Ticker == t) & (bb.Date >= '2015-01-01') & (bb.Date <= asof)].sort_values('Date').reset_index(drop=True)
@@ -171,14 +234,14 @@ def logdelta(v):
     L = np.round(np.log(np.maximum(np.asarray(v, float), 1e-6)) * K).astype(np.int64)
     return [int(L[0])] + np.diff(L).tolist()
 
-NOM = {}
-if a.nominal and os.path.exists(a.nominal):
+if not NOM and a.nominal and os.path.exists(a.nominal):
     nm = pd.read_csv(a.nominal)
     NOM = {(t, d): p for t, d, p in zip(nm.Ticker, nm.Date, nm.NomOpen)}
     print('nominal prices', len(NOM))
 
 os.makedirs(a.out, exist_ok=True)
 meta = {'asof': asof, 'k': K, 'hold': HOLD, 'sma': SMA, 'years': [], 'bench': sorted(BENCH),
+        'uni_n': {k: sum(1 for v in uni.values() if k in v) for k in 'SNX'},
         'universe': {'S': sum(1 for v in uni.values() if 'S' in v), 'N': sum(1 for v in uni.values() if 'N' in v)}}
 for y in sorted(by_year):
     rs = sorted(by_year[y], key=lambda r: (series[r[0]].Date.iloc[r[1]], r[0]))
