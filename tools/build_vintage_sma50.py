@@ -12,7 +12,8 @@ Rule (Joon, 22 Sep 2026):
 
 Output (pages/vintage-sma50/):
   meta.json     {asof, years:[{y,n}], k, ...}
-  y{YEAR}.json  {y, asof, k, t:[[ticker, uni, L0, [deltas...], ended]], s:[[ti, sig, ent, pos, open, below, nominal]]}
+  y{YEAR}.json  {y, asof, k, t:[[ticker, uni, L0, [deltas...], ended]], s:[[ti, sig, ent, pos, open, below, nominal, bd, mask]]}
+    bd = days closed at/under SMA50 right before the cross · mask = first-in-window flags (bit0 20d, bit1 30d, bit2 60d)
     prices are stored as round(ln(price) * k) with k = 2000, delta-encoded per ticker
     (precision ~0.05%, plenty for 0.1% display). sig/ent are yymmdd ints.
     pos = entry row index inside the ticker slice (-1 = entry pending: signal on the last data day)
@@ -175,6 +176,12 @@ def yymmdd(d):
     return int(d[2:4] + d[5:7] + d[8:10])
 
 rows = []  # (ticker, sig_idx, entry_idx or -1, below)
+# signal-quality fields (A175.5), keyed by (ticker, sig_idx):
+#   bd   = consecutive closes at/under SMA50 right before the cross day (cap 255)
+#   mask = greedy "first signal in a W-trading-day window" per ticker over its whole history:
+#          bit0 W=20 · bit1 W=30 · bit2 W=60  (kept signals restart the window; skipped ones don't)
+LOCK = (20, 30, 60)
+QUAL = {}
 for t, g in series.items():
     c = g.Close.to_numpy(float)
     o = g.Open.to_numpy(float)
@@ -185,6 +192,16 @@ for t, g in series.items():
     above = c > sma
     valid = ~np.isnan(sma)
     cross = np.where(above[1:] & ~above[:-1] & valid[:-1] & valid[1:])[0] + 1
+    run = np.zeros(n, dtype=np.int32)          # run[j] = consecutive days <= SMA ending at j
+    for j in range(1, n):
+        run[j] = run[j - 1] + 1 if (valid[j] and not above[j]) else 0
+    last_kept = [-10**9] * len(LOCK)
+    for i in cross:
+        m = 0
+        for b, W in enumerate(LOCK):
+            if i - last_kept[b] >= W:
+                m |= 1 << b; last_kept[b] = i
+        QUAL[(t, i)] = (int(min(255, run[i - 1])), m)
     for i in cross:
         e = i + 1
         if e >= n:
@@ -273,9 +290,11 @@ for y in sorted(by_year):
             op = round(op, 4)
             nom = NOM.get((t, g.Date.iloc[e]), 0)
             nom = round(float(nom), 4) if nom and nom == nom else 0
-            sarr.append([tidx[t], sig, ent, int(e - lo), op, int(below), nom])
+            bd, qm = QUAL[(t, i)]
+            sarr.append([tidx[t], sig, ent, int(e - lo), op, int(below), nom, bd, qm])
         else:
-            sarr.append([tidx[t], sig, 0, -1, 0, 0, 0])
+            bd, qm = QUAL[(t, i)]
+            sarr.append([tidx[t], sig, 0, -1, 0, 0, 0, bd, qm])
     doc = {'y': y, 'asof': asof, 'k': K, 't': tarr, 's': sarr}
     if BENCH:
         # window on the SPY calendar: first entry/signal date .. last entry + HOLD days
