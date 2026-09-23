@@ -12,7 +12,7 @@ Rule (Joon, 22 Sep 2026):
 
 Output (pages/vintage-sma50/):
   meta.json     {asof, years:[{y,n}], k, ...}
-  y{YEAR}.json  {y, asof, k, t:[[ticker, uni, L0, [deltas...], ended]], s:[[ti, sig, ent, pos, open, below]]}
+  y{YEAR}.json  {y, asof, k, t:[[ticker, uni, L0, [deltas...], ended]], s:[[ti, sig, ent, pos, open, below, nominal]]}
     prices are stored as round(ln(price) * k) with k = 2000, delta-encoded per ticker
     (precision ~0.05%, plenty for 0.1% display). sig/ent are yymmdd ints.
     pos = entry row index inside the ticker slice (-1 = entry pending: signal on the last data day)
@@ -24,7 +24,7 @@ Usage:
   R=../jptrustdocs/research/vintage-sma50-20260922
   python3 tools/build_vintage_sma50.py --sp500 ../sp500/input_sp500_daily.csv \
       --ndx $R/ndx_daily.csv --ndx-list $R/ndx_list.csv --sp-yahoo $R/sp_daily_yahoo.csv \
-      --bench ../sp500/input_benchmark_daily.csv
+      --bench ../sp500/input_benchmark_daily.csv --nominal $R/entries_nominal.csv
 """
 import argparse, json, math, os
 import numpy as np
@@ -39,6 +39,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument('--sp500', required=True)
 ap.add_argument('--ndx', default=None)
 ap.add_argument('--ndx-list', default=None)
+ap.add_argument('--nominal', default=None, help='entries_nominal.csv: as-traded open on each entry date (price filter/display)')
 ap.add_argument('--bench', default=None, help='input_benchmark_daily.csv (SPY/QQQ, same dividend-adjusted basis)')
 ap.add_argument('--sp-yahoo', default=None, help='Yahoo 4-dp series for S&P tickers (replaces the 2-dp file inside its own date range)')
 ap.add_argument('--out', default=os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'vintage-sma50'))
@@ -170,6 +171,12 @@ def logdelta(v):
     L = np.round(np.log(np.maximum(np.asarray(v, float), 1e-6)) * K).astype(np.int64)
     return [int(L[0])] + np.diff(L).tolist()
 
+NOM = {}
+if a.nominal and os.path.exists(a.nominal):
+    nm = pd.read_csv(a.nominal)
+    NOM = {(t, d): p for t, d, p in zip(nm.Ticker, nm.Date, nm.NomOpen)}
+    print('nominal prices', len(NOM))
+
 os.makedirs(a.out, exist_ok=True)
 meta = {'asof': asof, 'k': K, 'hold': HOLD, 'sma': SMA, 'years': [], 'bench': sorted(BENCH),
         'universe': {'S': sum(1 for v in uni.values() if 'S' in v), 'N': sum(1 for v in uni.values() if 'N' in v)}}
@@ -201,9 +208,11 @@ for y in sorted(by_year):
             ent = yymmdd(g.Date.iloc[e])
             op = float(g.Open.iloc[e])
             op = round(op, 4)
-            sarr.append([tidx[t], sig, ent, int(e - lo), op, int(below)])
+            nom = NOM.get((t, g.Date.iloc[e]), 0)
+            nom = round(float(nom), 4) if nom and nom == nom else 0
+            sarr.append([tidx[t], sig, ent, int(e - lo), op, int(below), nom])
         else:
-            sarr.append([tidx[t], sig, 0, -1, 0, 0])
+            sarr.append([tidx[t], sig, 0, -1, 0, 0, 0])
     doc = {'y': y, 'asof': asof, 'k': K, 't': tarr, 's': sarr}
     if BENCH:
         # window on the SPY calendar: first entry/signal date .. last entry + HOLD days
