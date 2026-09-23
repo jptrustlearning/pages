@@ -1,6 +1,163 @@
 {
-  "lastUpdated": "2026-09-22T08:05:00Z",
+  "lastUpdated": "2026-09-23T08:25:00Z",
   "batches": [
+    {
+      "file": "2026-09-23-0825.md",
+      "date": "2026-09-23T08:25:00Z",
+      "date_display": "23 ก.ย. 2026 · 08:25",
+      "summary": "Nasdaq ปิดสูงสุดเป็นประวัติการณ์วันที่สองติด แต่ Dow ลบ 185 จุดจากแรงขายหุ้นธนาคาร ตลาดเริ่มกังวลว่าผู้ช่วย AI ของ Meta จะแย่งรายได้ธุรกิจการเงิน · Trump บอกบนเวทีสหประชาชาติว่าดีลกับอิหร่านจะเกิดหลังเลือกตั้งกลางเทอม น้ำมันลงวันที่ห้าเพราะซาอุฯ เปิดท่อส่งกลับมา Brent ปิดแถว 99 ดอลลาร์ · ทองโลกฟื้นกลับแถว 4,370 ดอลลาร์หลังร่วงใกล้ 4,300 ทองไทยเมื่อวานปิดลบ 600 บาท ทองแท่งขายออก 68,000 บาท เช้านี้มีโอกาสเปิดบวก · SET ปิด 1,604 จุด แม้ต่างชาติขาย 3,000 ล้านบาท ครม. ต่ออายุไทยช่วยไทยพลัสถึง 30 พ.ย. คนละ 1,000 บาท",
+      "tickers": [
+        "QQQ",
+        "SPY",
+        "DIA",
+        "META",
+        "SNDK",
+        "JPM",
+        "GS",
+        "XLF",
+        "USO",
+        "XLE",
+        "PTT",
+        "PTTEP",
+        "AOT",
+        "GLD",
+        "IAU",
+        "SLV",
+        "UUP",
+        "THD",
+        "DELTA",
+        "SCB",
+        "BBL",
+        "KBANK",
+        "CPALL"
+      ],
+      "headlines": [
+        {
+          "title": "Nasdaq ปิดสูงสุดเป็นประวัติการณ์วันที่สองติด แต่ Dow ลบ 185 จุดจากแรงขายหุ้นธนาคาร ตลาดเริ่มกังวลว่าผู้ช่วย AI ที่ซื้อของและจองตั๋วแทนคนได้ จะกินส่วนแบ่งธุรกิจการเงินและการท่องเที่ยว",
+          "tickers": [
+            {
+              "symbol": "QQQ",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "META",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SNDK",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SPY",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "DIA",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "JPM",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "GS",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "XLF",
+              "sentiment": "negative"
+            }
+          ],
+          "source": "Yahoo Finance, CNBC, Bloomberg, Trading Economics, Benzinga, 24/7 Wall St",
+          "published": "23 ก.ย. 2026"
+        },
+        {
+          "title": "Trump ขึ้นเวทีสหประชาชาติ บอกดีลกับอิหร่านจะเกิดหลังเลือกตั้งกลางเทอม ราคาน้ำมันลงต่อวันที่ห้าเพราะซาอุฯ เปิดท่อส่งกลับมา แต่ถอยจากจุดต่ำสุดเมื่อตลาดรู้ว่าดีลยังอีกหลายสัปดาห์",
+          "tickers": [
+            {
+              "symbol": "USO",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "XLE",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "PTTEP",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "PTT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "Yahoo Finance, CNBC, NBC News, investingLive, OilPrice.com, Stocktwits",
+          "published": "23 ก.ย. 2026"
+        },
+        {
+          "title": "ทองคำโลกฟื้นกลับขึ้นแถว 4,370 ดอลลาร์หลังร่วงไปใกล้ 4,300 ดอลลาร์จากท่าทีเข้มของธนาคารกลางสหรัฐฯ ทองไทยเมื่อวานปรับ 33 ครั้งปิดลบ 600 บาท ทองแท่งขายออก 68,000 บาท เช้านี้มีโอกาสเปิดบวก",
+          "tickers": [
+            {
+              "symbol": "GLD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "IAU",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SLV",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "UUP",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "USAGOLD, Kitco, Trading Economics, Yahoo Finance, ไทยรัฐ, สมาคมค้าทองคำ",
+          "published": "23 ก.ย. 2026"
+        },
+        {
+          "title": "หุ้นไทยกลับขึ้นยืนเหนือ 1,600 จุด ปิด 1,604.44 จุด บวก 6.41 จุด แม้ต่างชาติขายสุทธิ 3,000 ล้านบาท ครม. อนุมัติต่ออายุไทยช่วยไทยพลัสอีก 2 เดือนถึง 30 พ.ย. คนละ 1,000 บาท",
+          "tickers": [
+            {
+              "symbol": "DELTA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SCB",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "BBL",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "CPALL",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "KBANK",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "PTT",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "THD",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "กรุงเทพธุรกิจ, อินโฟเควสท์, ข่าวหุ้น, ฐานเศรษฐกิจ, ผู้จัดการออนไลน์, เดลินิวส์, ประชาชาติธุรกิจ",
+          "published": "23 ก.ย. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-09-22-0805.md",
       "date": "2026-09-22T08:05:00Z",
