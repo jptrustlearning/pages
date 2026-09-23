@@ -2149,7 +2149,12 @@
         <input type="number" id="topNInput" class="input-box" value="10" min="1" max="50" style="max-width:120px;">
         <span style="color:var(--text-muted); font-weight:600;">STOCKS</span>
       </div>
-      <span class="hint">ซื้อหุ้น <strong>อันดับ Top N</strong> จากการจัดอันดับในแต่ละล็อต · default = 10 · <strong>ล็อตต่างรอบถือซ้ำกันได้</strong></span>
+      <div style="display:flex; align-items:center; gap:10px; margin-top:10px;">
+        <span style="color:var(--text-muted); font-weight:600;">เริ่มที่อันดับ</span>
+        <input type="number" id="rankStartInput" class="input-box" value="1" min="1" max="100" style="max-width:90px;">
+        <span id="rankRangeHint" style="color:var(--gold-deep); font-weight:700;">= อันดับ 1–10</span>
+      </div>
+      <span class="hint">ซื้อหุ้น <strong>อันดับ Top N</strong> จากการจัดอันดับในแต่ละล็อต · default = 10 · <strong>ล็อตต่างรอบถือซ้ำกันได้</strong> · "เริ่มที่อันดับ" 11 กับ TOP 10 = ข้ามสิบอันดับแรก แล้วซื้ออันดับ 11–20 แทน (ถ้าอันดับไม่ถึง จะซื้อเท่าที่มี ส่วนที่เหลือถือเป็นเงินสด)</span>
     </div>
 
     <div class="control-group">
@@ -2307,6 +2312,7 @@ let CONFIG = {
   // UAT Nasdaq-100: static clean Yahoo snapshot (adjusted OHLCV + NomClose) — NOT the production S&P file
   cloudCsvUrl: './ndx100-data/ndx100_daily.csv?v=20260923',
   priceCap: 50,                // entry-day as-traded close must be <= this (0 = off)
+  rankStart: 1,                // UAT: buy ranks rankStart .. rankStart+topN-1 (1 = normal Top N)
   // cloudCsvUrlHist = since2001 CSV (2001-2014 ONLY). Built via backfill_sp500_2001 workflow.
   cloudCsvUrlHist: null,
   // HIST 1996: since1996 (1996-2000 current constituents) + delisted names 1996-2010 (survivorship repair)
@@ -2538,7 +2544,8 @@ const DEFAULT_ROLLING_LB6H3 = {
   trailStopPct: 0,        // LAB v1: trailing stop default off
   gateThreshold: 50,      // LAB v1: gate % (default 50% = trail activates when stock hits +50% from entry)
   stopLossPct: 0,         // LAB v7: SL default OFF (kept toggleable in UI)
-  priceCap: 50            // UAT NDX: entry-day as-traded close cap
+  priceCap: 50,           // UAT NDX: entry-day as-traded close cap
+  rankStart: 1            // UAT: 1 = Top N · 11 = ranks 11-20 (with TOP 10)
 };
 
 // Cache for saved settings (needed for dynamic year-dropdown populate)
@@ -2579,7 +2586,8 @@ function getRollingLB6H3Settings() {
       return sl ? (parseFloat(sl.value) || 0) : DEFAULT_ROLLING_LB6H3.stopLossPct;
     })(),
     gateThreshold: g ? parseFloat(g.value) || DEFAULT_ROLLING_LB6H3.gateThreshold : DEFAULT_ROLLING_LB6H3.gateThreshold,
-    priceCap: (function(){ const pc = document.getElementById('priceCapInput'); return pc ? (parseFloat(pc.value) || 0) : 50; })()
+    priceCap: (function(){ const pc = document.getElementById('priceCapInput'); return pc ? (parseFloat(pc.value) || 0) : 50; })(),
+    rankStart: (function(){ const rs = document.getElementById('rankStartInput'); return rs ? Math.max(1, parseInt(rs.value, 10) || 1) : 1; })()
   };
 }
 
@@ -2601,6 +2609,8 @@ function applyRollingLB6H3Settings(s) {
   if (slEl && s.stopLossPct != null) slEl.value = s.stopLossPct;
   const pcEl = document.getElementById('priceCapInput');
   if (pcEl && s.priceCap != null) { pcEl.value = s.priceCap; CONFIG.priceCap = +s.priceCap || 0; }
+  const rsEl = document.getElementById('rankStartInput');
+  if (rsEl && s.rankStart != null) { rsEl.value = s.rankStart; CONFIG.rankStart = Math.max(1, +s.rankStart || 1); }
 }
 
 async function loadRollingLB6H3Settings() {
@@ -2815,7 +2825,9 @@ el.sliderWeight.addEventListener('input', updateWeightsUI);
 el.sliderWeight.addEventListener('change', runBacktest);
 el.inputTopN.addEventListener('change', runBacktest);
 (function(){ const pc = document.getElementById('priceCapInput');
-  if (pc) pc.addEventListener('change', () => { CONFIG.priceCap = parseFloat(pc.value) || 0; runBacktest(); }); })();
+  if (pc) pc.addEventListener('change', () => { CONFIG.priceCap = parseFloat(pc.value) || 0; runBacktest(); });
+  const rs = document.getElementById('rankStartInput');
+  if (rs) rs.addEventListener('change', runBacktest); })();
 el.inputPerLotCap.addEventListener('change', runBacktest);
 el.inputPerLotCap.addEventListener('input', () => {
   if (el.totalDeployedHint) {
@@ -3328,7 +3340,7 @@ function simulateStrategy(wRet, nStocks) {
 
         // Rank (shared function, override weight)
         const candidates = rankStocks(signalIdx, startIdx, wRet);
-        const selected = candidates.slice(0, nStocks);
+        const selected = candidates.slice((CONFIG.rankStart || 1) - 1, (CONFIG.rankStart || 1) - 1 + nStocks);
         const newLot = { entryMonthKey: currentMonthKey, stocks: {} };
         const alloc = newCap / nStocks;
         let deployed = 0;
@@ -3494,6 +3506,10 @@ function runRollingBacktest() {
   // =============================================================
 
   CONFIG.topN = parseInt(el.inputTopN.value) || 10;
+  (function(){ const rs = document.getElementById('rankStartInput');
+    CONFIG.rankStart = rs ? Math.max(1, parseInt(rs.value, 10) || 1) : 1;
+    const h = document.getElementById('rankRangeHint');
+    if (h) h.textContent = '= อันดับ ' + CONFIG.rankStart + '–' + (CONFIG.rankStart + CONFIG.topN - 1); })();
   CONFIG.perLotCapital = parseFloat(el.inputPerLotCap.value) || 600;
   CONFIG.startYear = parseInt(el.inputStartYear.value) || 1996;
   // LAB v1: snapshot trail % from UI (0 = off)
@@ -3921,7 +3937,7 @@ function runRollingBacktest() {
           // rankStocks falls back to CONFIG.weightRet internally when no override is passed,
           // so this is a stylistic change — same result either way.
           candidates = rankStocks(signalIdx, startIdx, CONFIG.weightRet);
-          selected = candidates.slice(0, CONFIG.topN);
+          selected = candidates.slice((CONFIG.rankStart || 1) - 1, (CONFIG.rankStart || 1) - 1 + CONFIG.topN);
           const alloc = newLotCapital / CONFIG.topN;
           for (const st of selected) {
             if (dayData[st.ticker] && dayData[st.ticker].c > 0) {
@@ -4083,7 +4099,7 @@ function runRollingBacktest() {
       if (startIdx >= 0 && startIdx < signalIdx && state.sortedDates[signalIdx] && state.sortedDates[startIdx] && state.marketData[state.sortedDates[signalIdx]] && state.marketData[state.sortedDates[startIdx]]) {
         const candidates = rankStocks(signalIdx, startIdx, CONFIG.weightRet);
         if (candidates && candidates.length > 0) {
-          const picks = candidates.slice(0, CONFIG.topN);
+          const picks = candidates.slice((CONFIG.rankStart || 1) - 1, (CONFIG.rankStart || 1) - 1 + CONFIG.topN);
           // Next lot capital: if a lot will mature next month, use its projected value; else perLotCapital (ramp-up)
           const nextMonthKey = nextRebalYear * 12 + nextRebalMonth;
           const willMature = state.lots.find(lot => (nextMonthKey - lot.entryMonthKey) >= CONFIG.holdMonths);
@@ -5629,7 +5645,7 @@ function updateMarketAnalyzer() {
     const startYr = document.getElementById('startYearSelect') ? document.getElementById('startYearSelect').value : CONFIG.startYear;
     const topN = CONFIG.topN;
     const wRet = parseInt(document.getElementById('weightSlider').value);
-    rscNarrative.innerHTML = `ด้วยการตั้งค่า <strong>Top ${topN} หุ้น</strong> · น้ำหนัก Return ${wRet}% / Volume ${100-wRet}% · ` +
+    rscNarrative.innerHTML = `ด้วยการตั้งค่า <strong>${(CONFIG.rankStart||1) > 1 ? 'อันดับ ' + CONFIG.rankStart + '–' + (CONFIG.rankStart + topN - 1) : 'Top ' + topN} หุ้น</strong>${CONFIG.priceCap ? ' · ราคาเข้าไม่เกิน $' + CONFIG.priceCap : ''} · น้ำหนัก Return ${wRet}% / Volume ${100-wRet}% · ` +
       `ตั้งแต่ปี ${startYr} ทำกำไรรวม <strong class="${pnl>=0?'text-green':'text-red'}">${pnl>=0?'+':''}$${Math.abs(Math.round(pnl)).toLocaleString()}</strong> ` +
       `คิดเป็น <strong>${stratCagr>=0?'+':''}${(stratCagr*100).toFixed(1)}% ต่อปี</strong> ตลอด ${yrs} ปี · ` +
       `Max Drawdown <strong class="text-red">${(state.equityCurve.length > 0 ? '' : '')}</strong>`;
@@ -5775,7 +5791,8 @@ window.switchStatsTab = function(tab) {
         summary: txt('rscPeriod'),
         config: {
           'ทุนต่อล็อต': '$' + (CONFIG.perLotCapital || 0).toLocaleString(),
-          'จำนวนหุ้นต่อล็อต': CONFIG.topN + ' ตัว',
+          'จำนวนหุ้นต่อล็อต': CONFIG.topN + ' ตัว' + ((CONFIG.rankStart||1) > 1 ? ' (อันดับ ' + CONFIG.rankStart + '–' + (CONFIG.rankStart + CONFIG.topN - 1) + ')' : ''),
+          'ราคาเข้าไม่เกิน': CONFIG.priceCap ? '$' + CONFIG.priceCap : 'ไม่จำกัด',
           'น้ำหนัก Return / Volume': Math.round((CONFIG.weightRet||0)*100) + '% / ' + Math.round((CONFIG.weightVol||0)*100) + '%',
           'ระยะถือครอง': CONFIG.holdMonths + ' เดือน',
           'Lookback': 'ย้อน 6 เดือนปฏิทิน (ตามล็อตที่ครบกำหนด)',
