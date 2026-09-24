@@ -3515,8 +3515,9 @@ if(h0){
     });
   }
   status(); setInterval(function(){ if(!document.hidden) status(); },30000);
-  /* A186 · ฉีดทันที — เดิมรอ window load + 300ms = รอ Chart.js/ฟอนต์/รูปครบก่อน ทั้งที่การ์ดอยู่บนสุด · #usTv มีใน DOM แล้วตอนสคริปต์นี้รัน */
-  inject();
+  /* A186.1 · ย้อนการฉีดทันทีของ A186 — หลังเปลี่ยน จูนเห็น widget ค้าง ••• ทั้งสองแถว (24 ก.ย. 18:10) · กลับไปรอ window load แบบเดิม แต่ตัด 300ms ออก
+     (preconnect + รายการโปรดเลิกดึง CSV ตอนเปิดหน้า ของ A186 ยังอยู่ = load มาเร็วขึ้นกว่าเดิมแล้ว) */
+  if(document.readyState==='complete') inject(); else window.addEventListener('load',inject,{once:true});
   document.addEventListener('visibilitychange',function(){
     if(document.hidden){ hidAt=Date.now(); return; }
     status();
