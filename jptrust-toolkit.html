@@ -1212,6 +1212,12 @@ html.tk-app #zonesRow .card-h h3{font-size:17px}
 html.tk-app #zonesRow .card.tk-more .openbar{background:var(--a-card);border-radius:18px;box-shadow:var(--a-sh);padding:14px;margin-bottom:12px}
 html.tk-app #zonesRow .tk-mb{width:100%;margin:12px 0 0;border:0;border-radius:16px;background:var(--a-card);box-shadow:var(--a-sh)}
 html.tk-app #zonesRow .tk-note,html.tk-app #zonesRow .lad-note{margin-left:2px;margin-right:2px}
+/* A180 · โซนทอง: ลิงก์ดูแบบละเอียดในแอปสมาชิก ใต้ปุ่ม ดูรายละเอียด */
+.tk-mlink{display:flex;align-items:center;justify-content:center;gap:6px;margin:10px 0 0;padding:13px 16px;border-radius:16px;
+  background:linear-gradient(135deg,#5A1F26 0%,#722F37 60%,#4A2318 100%);color:#FFF6E6;font-family:var(--f-b);font-size:13px;font-weight:600;
+  text-decoration:none;box-shadow:0 4px 12px rgba(90,31,38,.22);-webkit-tap-highlight-color:transparent}
+.tk-mlink svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tk-mlink:focus-visible{outline:2px solid var(--a-acc);outline-offset:2px}
 .zn-sl{flex-basis:calc(100% - 22px);padding:15px 14px 12px;scroll-snap-stop:always}   /* ปัดแรงก็ไปทีละใบ ไม่ข้ามตาราง */
 .zn-sl .ins-sl-h{margin:0 3px 8px}
 .zn-sl .zn-map{margin:auto 0}
@@ -3374,6 +3380,15 @@ if(h0){
       });
       c.appendChild(btn);
     });
+    /* A180 · เฉพาะการ์ดโซนทอง: ลิงก์ไปแอปสมาชิก (ปุ่มกางเดิมยังอยู่) · มาจากแอปสมาชิก = กลับหน้าต่างเดิม ไม่เปิดแท็บใหม่ */
+    if(zc){
+      var ml=document.createElement('a'); ml.className='tk-mlink';
+      if(root.classList.contains('tk-inmember')) ml.href='/member-dashboard';
+      else { ml.href='https://app.jptrustlearning.com'; ml.target='_blank'; ml.rel='noopener'; }
+      ml.innerHTML='<span>ดูแบบละเอียดในแอปสมาชิก</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+      ml.addEventListener('click',function(){ try{ track('zones-member-link'); }catch(e){} });
+      zc.appendChild(ml);
+    }
     var note=function(anchor,txt){ if(!anchor) return; var p=document.createElement('p'); p.className='tk-note'; p.textContent=txt; anchor.insertAdjacentElement('afterend',p); };
     note(document.getElementById('ladder'),'โอกาสแตะคือความถี่จากสถิติย้อนหลัง ไม่ใช่การพยากรณ์');
     note(document.getElementById('mkStrInfo'),'ข้อมูลรายวันจากธนาคารกลางยุโรป ไม่ใช่ราคาสด');
