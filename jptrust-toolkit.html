@@ -1493,9 +1493,10 @@ html.tk-app .mk-head .modeseg{width:100%;min-width:0;margin-left:0}
         <!-- A160 · S&P 500 / Nasdaq 100 ใต้ราคาทอง (หน้าภาพรวมเท่านั้น) — widget ฉีดหลังหน้าโหลดเสร็จ โดยสคริปต์ A160 ท้ายหน้า -->
         <div class="card" id="tkUs" aria-label="ดัชนีหุ้นสหรัฐฯ">
           <div class="us-h"><b>หุ้นสหรัฐฯ</b><span class="us-st" id="usSt"></span></div>
+          <!-- A183 · ถอดป้าย Pre-market/After-hours ท้ายแถว (จูน: คนจะสับสน — ป้ายไม่มีตัวเลข ดูเหมือนราคา pre-market หาย) · สถานะตลาดยังอยู่ที่หัวการ์ด #usSt · ลูป .us-b ในสคริปต์ A160 ไม่เจออะไร = ไม่ทำงาน · คืนได้จาก backup v71 -->
           <div class="us-l" id="usTv">
-            <div class="us-r"><div class="tradingview-widget-container" data-sym="FOREXCOM:SPX500" data-nm="S&amp;P 500"><div class="tradingview-widget-container__widget"></div></div><span class="us-b" hidden></span></div>
-            <div class="us-r"><div class="tradingview-widget-container" data-sym="FOREXCOM:NSXUSD" data-nm="Nasdaq 100"><div class="tradingview-widget-container__widget"></div></div><span class="us-b" hidden></span></div>
+            <div class="us-r"><div class="tradingview-widget-container" data-sym="FOREXCOM:SPX500" data-nm="S&amp;P 500"><div class="tradingview-widget-container__widget"></div></div></div>
+            <div class="us-r"><div class="tradingview-widget-container" data-sym="FOREXCOM:NSXUSD" data-nm="Nasdaq 100"><div class="tradingview-widget-container__widget"></div></div></div>
           </div>
           <p class="us-nt">ดัชนีแบบ CFD ซื้อขายเกือบ 24 ชม. · ข้อมูล TradingView</p>
         </div>
