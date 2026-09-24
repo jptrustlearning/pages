@@ -589,6 +589,18 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 
 /* Bottom Nav */
 .bottom-nav{position:fixed;bottom:calc(12px + var(--safe-bottom));left:16px;right:16px;background:linear-gradient(135deg,var(--burgundy-dark),var(--burgundy-mid));border:1px solid rgba(212,175,55,0.15);border-radius:28px;display:flex;justify-content:space-around;padding:10px 8px;z-index:1000;box-shadow:0 8px 32px rgba(26,10,14,0.4),0 0 0 1px rgba(212,175,55,0.08)}
+/* A184 · เดสก์ท็อป (≥900px): แอปอยู่ในคอลัมน์กลาง 720px — เดิมทุกอย่างยืดเต็มจอ การ์ด Points กว้าง 1,300px+ สูงเกินจอ และแถบเมนูล่างทับการ์ด (จูน 24 ก.ย. "จัดหน้าใน desktop ให้พอดี")
+   มือถือ/แท็บเล็ต <900px ไม่เปลี่ยน · แถบบนพื้นยังเต็มจอ แต่เนื้อหาในแถบเข้าแนวคอลัมน์ · iframe (Roadmap/กลยุทธ์) กว้างเท่าคอลัมน์ · ย้อนกลับ = ลบบล็อกนี้ */
+@media (min-width:900px){
+  .app>.screen{width:100%;max-width:720px;margin-left:auto;margin-right:auto}
+  .topbar{padding-left:calc(50% - 340px);padding-right:calc(50% - 340px)}
+  .bottom-nav{left:calc(50% - 344px);right:calc(50% - 344px)}
+  .iframe-screen{left:calc(50% - 360px);right:calc(50% - 360px)}
+  /* พื้นทองจางด้านบนจางออกด้านข้างด้วย ไม่งั้นเห็นขอบคอลัมน์เป็นกล่อง */
+  #screen-home::before,#screen-news::before,#screen-lab::before{
+    -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 60%,transparent 100%),linear-gradient(to right,transparent 0%,#000 14%,#000 86%,transparent 100%);
+    -webkit-mask-composite:source-in;mask-image:linear-gradient(to bottom,#000 0%,#000 60%,transparent 100%),linear-gradient(to right,transparent 0%,#000 14%,#000 86%,transparent 100%);mask-composite:intersect}
+}
 .nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 12px;cursor:pointer;position:relative;border:none;background:none}
 .nav-item svg{width:22px;height:22px;color:var(--text-light-muted);transition:color .2s}
 .nav-label{font-size:10px;font-weight:500;color:var(--text-light-muted);font-family:'Sarabun','Anuphan',sans-serif}
