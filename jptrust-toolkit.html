@@ -26,6 +26,9 @@
 <title>JP Trust Tool &amp; Kit — Dashboard ทอง&amp;หุ้น</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- A186 · ต่อ TradingView ไว้ก่อน (widget หุ้นสหรัฐฯ บนสุดของหน้า) -->
+<link rel="preconnect" href="https://s3.tradingview.com">
+<link rel="preconnect" href="https://s.tradingview.com">
 <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;600&family=Cinzel:wght@500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
@@ -3512,7 +3515,8 @@ if(h0){
     });
   }
   status(); setInterval(function(){ if(!document.hidden) status(); },30000);
-  if(document.readyState==='complete') setTimeout(inject,300); else window.addEventListener('load',function(){ setTimeout(inject,300); });
+  /* A186 · ฉีดทันที — เดิมรอ window load + 300ms = รอ Chart.js/ฟอนต์/รูปครบก่อน ทั้งที่การ์ดอยู่บนสุด · #usTv มีใน DOM แล้วตอนสคริปต์นี้รัน */
+  inject();
   document.addEventListener('visibilitychange',function(){
     if(document.hidden){ hidAt=Date.now(); return; }
     status();
@@ -3610,7 +3614,13 @@ if(h0){
   render();
   var day=new Date().toISOString().slice(0,10);
   fetch('sector-latest.json?v='+day).then(function(r){ return r.ok?r.json():null; }).then(function(j){ SC=j; render(); }).catch(function(){});
-  if(typeof mkData==='function') mkData().then(function(d){ MKD=d; render(); }).catch(function(){});
+  /* A186 · เดิมเรียก mkData() ทันที = CSV หุ้น ~350 KB (ไม่บีบอัด) + master_map ถูกดึงตอนเปิดหน้า แย่งเน็ตกับ widget ข้าม A134 ที่ตั้งใจให้รอ
+     → รอหน้าโหลดเสร็จ + idle เหมือนการ์ด Risk (promise ก้อนเดียวกัน ดาวน์โหลดรอบเดียว) · ระหว่างรอ แถวรายการโปรดยังขึ้น แค่ยังไม่มีราคา */
+  (function(){
+    var go=function(){ if(typeof mkData==='function') mkData().then(function(d){ MKD=d; render(); }).catch(function(){}); };
+    var idle=function(){ ('requestIdleCallback' in window)?requestIdleCallback(go,{timeout:3000}):setTimeout(go,700); };
+    if(document.readyState==='complete') idle(); else window.addEventListener('load',idle,{once:true});
+  })();
   window.addEventListener('storage',function(e){ if(e.key===KEY){ render(); paintStar(); } });
 })();
 </script>
