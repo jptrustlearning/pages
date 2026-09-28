@@ -7,6 +7,7 @@
 <title>JP TRUST — S&P 500 Daily Scanner</title>
 <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@200;300;400;500;600;700&family=Cinzel:wght@400;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="./lib/jpt-dataz-v1.js?v=1"></script><!-- A192 · ตัวโหลด /dataz/ อย่างเดียว + เก็บข้อมูลในเครื่อง -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{--font-thai:'Anuphan',sans-serif;--font-label:'Cinzel',serif;--font-number:'DM Serif Display',serif;--gold:#D4AF37;--gold-dark:#B8860B;--gold-light:#F4E4BA;--gold-dim:rgba(212,175,55,0.08);--maroon:#722F37;--maroon-darkest:#1a0a0e;--maroon-mid:#2d1018;--maroon-light:#3a1520;--cream:#FAF6ED;--cream-warm:#F5EFE0;--cream-deep:#EDE4D0;--cream-card:#FFFEF8;--text-dark:#3D3228;--text-heading:#5A3D20;--text-muted:#7A6F62;--text-light:#E8E4DC;--text-light-heading:#F4E4BA;--text-light-muted:#A09B92;--green:#4CAF50;--green-dark:#2E7D32;--red:#E53935;--border-gold:rgba(212,175,55,0.15)}
@@ -294,11 +295,12 @@ async function init() {
   try {
     rampOwlTo(35);  // start ramp during initial fetch
     const [res, sectorRes] = await Promise.all([
-      fetch(CLOUD_URL),
-      fetch(SECTOR_URL).catch(() => null)
+      jptDataz.fetchLike(CLOUD_URL, { label: 'SP500', timeoutMs: 30000, maxRetries: 3 }),  // A192: /dataz/ อย่างเดียว
+      fetch(SECTOR_URL).catch(() => null)  // ตาราง sector จาก GitHub datasets (ไม่ใช่ข้อมูลราคา) — คงเดิม
     ]);
     if (!res.ok) throw new Error('fetch fail: ' + res.status);
     const csv = await res.text();
+    if (!jptDataz.enoughLines(csv, 1000)) throw new Error('SP500 data truncated');
     rampOwlTo(65);
 
     // Parse sector + sub-industry mapping
@@ -325,12 +327,16 @@ async function init() {
     processCSV(csv);
     if (_owlRampTimer) { clearInterval(_owlRampTimer); _owlRampTimer = null; }
     updateOwlProgress(100);
+    setTimeout(jptDataz.commit, 1500); // A192: เก็บข้อมูลลงเครื่องหลังหน้าขึ้นแล้ว
   } catch(e) {
     if (_owlRampTimer) { clearInterval(_owlRampTimer); _owlRampTimer = null; }
     console.error(e);
+    if (window.jptDataz) jptDataz.forget(); // A192: พัง = ลบของในเครื่อง ⇒ ลองใหม่ได้ของสด
+    const _dz = !!(window.jptDataz && jptDataz.isDatazError(e));
     document.getElementById('mainContent').innerHTML = `
       <div class="loading-overlay">
-        <div style="color:var(--red);font-size:1.4rem;margin-bottom:12px;">CONNECT FAILED</div>
+        <div style="color:var(--red);font-size:1.4rem;margin-bottom:12px;">${_dz ? '/dataz/ ERROR' : 'CONNECT FAILED'}</div>
+        <button type="button" onclick="location.reload()" style="margin-bottom:14px;padding:9px 22px;border:none;border-radius:22px;background:linear-gradient(135deg,#D4AF37,#B8860B);color:#1A0A0E;font-weight:700;letter-spacing:.5px;cursor:pointer;">ลองใหม่อีกครั้ง</button>
         <div style="color:var(--text-secondary);font-size:0.85rem;max-width:500px;text-align:center;line-height:1.8;">
           <div style="margin-bottom:12px;">${e.message}</div>
           <div style="margin-top:16px;padding:14px;background:rgba(212,168,71,0.08);border:1px solid var(--border);border-radius:8px;">
