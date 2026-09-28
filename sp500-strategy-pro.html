@@ -6,6 +6,7 @@
 <title>S&P 500 · 6-Month Momentum · JP Trust Learning</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./lib/jpt-dataz-v1.js?v=1"></script><!-- A192 · ตัวโหลด /dataz/ อย่างเดียว + เก็บข้อมูลในเครื่อง -->
 <script src="./jp-settings.js?v=1761234567"></script>
 <script src="./jp-drawdown.js?v=1786540000"></script>
 <!-- Modern Fonts: Outfit (Headings) + Inter (Body/Numbers) -->
@@ -2405,18 +2406,11 @@ async function jptResilientFetch(url, opts) {
 // ยังใช้ jptResilientFetch เดิม (timeout/ลองซ้ำ) แต่ลองซ้ำที่ /dataz/ เท่านั้น · พังแบบไหน = ป้าย "/dataz/ ERROR"
 // ย้อนกลับ: sp500-strategy-pro-backup-v47.html
 window.__proDataRoute = {};
+// A192: ย้ายไปใช้ lib/jpt-dataz-v1.js (สูตรเดียวกับ Rolling-6M A191 · /dataz/ อย่างเดียว + เก็บข้อมูลในเครื่อง)
+//   ตัวโหลดเดิม A174 (jptResilientFetch → /dataz/) อยู่ใน backup v48 · ป้ายสถานะ/ข้อความ error เหมือนเดิม
 async function jptFetchDataz(url, opts) {
-  const fastUrl = url.replace('/data/', '/dataz/');
-  let t;
-  try {
-    t = await jptResilientFetch(fastUrl, opts);
-  } catch (e) {
-    const msg = (e && e.message) || String(e);
-    throw new Error('/dataz/ ' + msg + ' · ' + fastUrl);
-  }
-  // Pages ไม่มี 404.html ⇒ path ที่ไม่มีจะได้ index.html 200 — ต้องเช็คว่าเป็น CSV จริง
-  if (!/^\uFEFF?\s*Ticker,/.test(t.slice(0, 200))) throw new Error('/dataz/ ได้ข้อมูลที่ไม่ใช่ CSV (อาจเป็นหน้า HTML) · ' + fastUrl);
-  window.__proDataRoute[url] = 'dataz';
+  const t = await jptDataz.text(url, opts);
+  window.__proDataRoute[url] = jptDataz.fromDevice(url) ? 'dataz-cache' : 'dataz';
   return t;
 }
 
@@ -2477,7 +2471,7 @@ async function loadDataFromCloud() {
     if (typeof updateOwlProgress === 'function') updateOwlProgress(95);
 
     el.status.className = 'status-indicator success';
-    el.status.innerHTML = '<span>\u25CF</span> Connected';
+    el.status.innerHTML = '<span>\u25CF</span> Connected' + (jptDataz.fromDevice(fileUrl) ? ' · ในเครื่อง' : '');
 
     setTimeout(() => {
       if (typeof updateOwlProgress === 'function') updateOwlProgress(100);
@@ -2485,12 +2479,14 @@ async function loadDataFromCloud() {
         runBacktest();
         el.loading.classList.add('hidden');
         el.dash.classList.remove('hidden');
+        setTimeout(jptDataz.commit, 1500); // A192: เก็บข้อมูลลงเครื่องหลังหน้าขึ้นแล้ว
       }, 250);
     }, 300);
 
   } catch (error) {
     clearInterval(fetchInterval);
     console.error('Failed to load cloud data:', error);
+    jptDataz.forget(); // A192: พัง = ลบของในเครื่อง ⇒ กดลองใหม่ได้ของสด
     el.status.className = 'status-indicator error';
     // A174: error จาก /dataz/ ขึ้นป้ายของตัวเอง ให้เห็นบนมือถือได้โดยไม่ต้องเปิด console
     el.status.innerHTML = (error && /^\/dataz\//.test(error.message || ''))
