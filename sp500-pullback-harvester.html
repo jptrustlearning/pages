@@ -9,6 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.2.0/dist/chartjs-plugin-zoom.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./lib/jpt-dataz-v1.js?v=1"></script><!-- A192 · ตัวโหลด /dataz/ อย่างเดียว + เก็บข้อมูลในเครื่อง -->
 <script src="./jp-settings.js?v=1761234567"></script>
 <script src="./jp-drawdown.js?v=1786540000"></script>
 <!-- Modern Fonts: Outfit (Headings) + Inter (Body/Numbers) -->
@@ -2508,7 +2509,29 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
+// A192 · ป้ายโหลดไม่สำเร็จ + ปุ่มลองใหม่ (สำเนาจาก sp500-strategy-pro.html)
+function showLoaderError(err) {
+  const stage = document.querySelector('#loading .owl-loader-stage');
+  const textEl = document.querySelector('#loading .owl-loader-text');
+  if (!textEl) return;
+  if (!err) {
+    if (stage) stage.style.display = '';
+    textEl.innerHTML = '<span class="loader-dots-left">...</span> Initializing <span class="loader-dots-right">...</span>';
+    return;
+  }
+  if (stage) stage.style.display = 'none';
+  textEl.innerHTML =
+    '<div style="color:#B23A3A;font-weight:700;margin-bottom:6px;">โหลดข้อมูลไม่สำเร็จ</div>' +
+    '<div style="font-size:0.82rem;opacity:0.7;margin-bottom:14px;max-width:280px;">เครือข่ายอาจติดขัดชั่วคราว (rate limit / สัญญาณหลุด) — ระบบลองซ้ำแล้วแต่ยังไม่ผ่าน</div>' +
+    '<button type="button" onclick="loadDataFromCloud()" style="padding:9px 22px;border:none;border-radius:22px;background:linear-gradient(135deg,#D4AF37,#B8860B);color:#1A0A0E;font-weight:700;letter-spacing:.5px;cursor:pointer;">ลองใหม่อีกครั้ง</button>';
+}
+
 async function loadDataFromCloud() {
+  // A192: reset loader (รองรับปุ่ม "ลองใหม่อีกครั้ง")
+  showLoaderError(null);
+  el.manualUpload.style.display = 'none';
+  el.loading.classList.remove('hidden');
+  el.dash.classList.add('hidden');
   const fileUrl = CONFIG.cloudCsvUrl;
   const benchUrl = CONFIG.cloudBenchUrl;
   
@@ -2522,14 +2545,15 @@ async function loadDataFromCloud() {
   try {
     // Fetch SP500 universe + benchmark + macro signals (jpy/commodities) in parallel
     const [responseMain, responseBench, responseJpy, responseComm] = await Promise.all([
-      fetch(fileUrl),
-      benchUrl ? fetch(benchUrl).catch(() => null) : Promise.resolve(null),
-      CONFIG.cloudJpyUrl ? fetch(CONFIG.cloudJpyUrl).catch(() => null) : Promise.resolve(null),
-      CONFIG.cloudCommUrl ? fetch(CONFIG.cloudCommUrl).catch(() => null) : Promise.resolve(null)
+      jptDataz.fetchLike(fileUrl, { label: 'SP500', timeoutMs: 30000, maxRetries: 3 }),
+      benchUrl ? jptDataz.fetchLike(benchUrl, { label: 'Benchmark', timeoutMs: 15000, maxRetries: 2 }) : Promise.resolve(null),
+      CONFIG.cloudJpyUrl ? jptDataz.fetchLike(CONFIG.cloudJpyUrl, { label: 'JPY', timeoutMs: 15000, maxRetries: 2 }) : Promise.resolve(null),
+      CONFIG.cloudCommUrl ? jptDataz.fetchLike(CONFIG.cloudCommUrl, { label: 'Commodities', timeoutMs: 15000, maxRetries: 2 }) : Promise.resolve(null)
     ]);
     if (!responseMain.ok) throw new Error('Network response was not ok');
     
     const csvMain = await responseMain.text();
+    if (!jptDataz.enoughLines(csvMain, 1000)) throw new Error('SP500 data truncated');
     let csvCombined = csvMain.trim();
     for (const rsp of [responseBench, responseJpy, responseComm]) {
       if (rsp && rsp.ok) {
@@ -2544,7 +2568,7 @@ async function loadDataFromCloud() {
     
     // Update UI Status
     el.status.className = 'status-indicator success';
-    el.status.innerHTML = '<span>●</span> Connected';
+    el.status.innerHTML = '<span>●</span> Connected' + (jptDataz.fromDevice(fileUrl) ? ' · ในเครื่อง' : '');
     
     setTimeout(() => {
       if (typeof updateOwlProgress === 'function') updateOwlProgress(100);
@@ -2552,6 +2576,7 @@ async function loadDataFromCloud() {
         runBacktest();
         el.loading.classList.add('hidden');
         el.dash.classList.remove('hidden');
+        setTimeout(jptDataz.commit, 1500); // A192: เก็บข้อมูลลงเครื่องหลังหน้าขึ้นแล้ว
       }, 250);
     }, 300);
 
@@ -2559,10 +2584,14 @@ async function loadDataFromCloud() {
     clearInterval(fetchInterval);
     console.error('Failed to load cloud data:', error);
     
-    // Show Error & Fallback to Manual
+    // A192: /dataz/ อย่างเดียว ไม่มีทางสำรอง · พัง = ลบของในเครื่อง + ป้ายของตัวเอง + ปุ่มลองใหม่ (ไม่ค้างที่นกฮูก)
+    jptDataz.forget();
     el.status.className = 'status-indicator error';
-    el.status.innerHTML = '<span>●</span> Upload CSV';
+    el.status.innerHTML = jptDataz.isDatazError(error)
+      ? '<span>●</span> /dataz/ ERROR'
+      : '<span>●</span> Upload CSV';
     el.manualUpload.style.display = 'block';
+    showLoaderError(error);
   }
 }
 
