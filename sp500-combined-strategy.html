@@ -6,6 +6,7 @@
 <title>Combined Strategy — Momentum + Dark Horse Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./lib/jpt-dataz-v1.js?v=1"></script><!-- A192 · ตัวโหลด /dataz/ อย่างเดียว + เก็บข้อมูลในเครื่อง -->
 <script src="./jp-settings.js?v=1761234567"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2856,7 +2857,29 @@ function handleUpload(e) {
   reader.readAsText(file);
 }
 
+// A192 · ป้ายโหลดไม่สำเร็จ + ปุ่มลองใหม่ (สูตร sp500-strategy-pro.html · หน้านี้ loader คือ #loading-screen)
+function showLoaderError(err) {
+  const stage = document.querySelector('#loading-screen .owl-loader-stage');
+  const textEl = document.querySelector('#loading-screen .owl-loader-text');
+  if (!textEl) return;
+  if (!err) {
+    if (stage) stage.style.display = '';
+    textEl.innerHTML = '<span class="loader-dots-left">...</span> Initializing <span class="loader-dots-right">...</span>';
+    return;
+  }
+  if (stage) stage.style.display = 'none';
+  textEl.innerHTML =
+    '<div style="color:#B23A3A;font-weight:700;margin-bottom:6px;">โหลดข้อมูลไม่สำเร็จ</div>' +
+    '<div style="font-size:0.82rem;opacity:0.7;margin-bottom:14px;max-width:280px;">เครือข่ายอาจติดขัดชั่วคราว (rate limit / สัญญาณหลุด) — ระบบลองซ้ำแล้วแต่ยังไม่ผ่าน</div>' +
+    '<button type="button" onclick="loadCloudData()" style="padding:9px 22px;border:none;border-radius:22px;background:linear-gradient(135deg,#D4AF37,#B8860B);color:#1A0A0E;font-weight:700;letter-spacing:.5px;cursor:pointer;">ลองใหม่อีกครั้ง</button>';
+}
+
 async function loadCloudData() {
+  // A192: reset loader (รองรับปุ่ม "ลองใหม่อีกครั้ง")
+  showLoaderError(null);
+  el.manualUpload.style.display = 'none';
+  el.loading.classList.remove('hidden');
+  el.dash.classList.add('hidden');
   // Kickoff progress animation — grows steadily from 0 toward 70% during fetch
   let fetchPct = 0;
   const fetchInterval = setInterval(() => {
@@ -2866,11 +2889,12 @@ async function loadCloudData() {
   try {
     // Fetch SP500 universe + benchmark (SPY/QQQ/DIA) in parallel
     const [resMain, resBench] = await Promise.all([
-      fetch(CLOUD_URL),
-      fetch(BENCH_URL).catch(() => null)  // benchmark is best-effort; fallback to proxy if it fails
+      jptDataz.fetchLike(CLOUD_URL, { label: 'SP500', timeoutMs: 30000, maxRetries: 3 }),
+      jptDataz.fetchLike(BENCH_URL, { label: 'Benchmark', timeoutMs: 15000, maxRetries: 2 })  // A192: /dataz/ อย่างเดียว benchmark พัง = error (ไม่กลืนเงียบ)
     ]);
     if(!resMain.ok) throw new Error('fetch fail');
     const csvMain = await resMain.text();
+    if (!jptDataz.enoughLines(csvMain, 1000)) throw new Error('SP500 data truncated');
     let csvCombined = csvMain;
     if(resBench && resBench.ok) {
       const csvBench = await resBench.text();
@@ -2881,13 +2905,17 @@ async function loadCloudData() {
     clearInterval(fetchInterval);
     updateOwlProgress(75);
     processCSV(csvCombined);
-    el.status.className='status-indicator success'; el.status.innerHTML='<span>●</span> Connected';
+    el.status.className='status-indicator success'; el.status.innerHTML='<span>●</span> Connected' + (jptDataz.fromDevice(CLOUD_URL) ? ' · ในเครื่อง' : '');
     postLoad();
   } catch(e) {
     clearInterval(fetchInterval);
     console.error(e);
-    el.status.className='status-indicator error'; el.status.innerHTML='<span>●</span> Failed';
+    // A192: /dataz/ อย่างเดียว ไม่มีทางสำรอง · พัง = ลบของในเครื่อง + ป้ายของตัวเอง + ปุ่มลองใหม่ (ไม่ค้างที่นกฮูก)
+    jptDataz.forget();
+    el.status.className='status-indicator error';
+    el.status.innerHTML = jptDataz.isDatazError(e) ? '<span>●</span> /dataz/ ERROR' : '<span>●</span> Failed';
     el.manualUpload.style.display='block';
+    showLoaderError(e);
   }
 }
 
@@ -2901,6 +2929,7 @@ function postLoad() {
       runCombinedBacktest();
       el.loading.classList.add('hidden');
       el.dash.classList.remove('hidden');
+      if (window.jptDataz) setTimeout(jptDataz.commit, 1500); // A192: เก็บข้อมูลลงเครื่องหลังหน้าขึ้นแล้ว
     }, 300);
   }, 250);
 }
