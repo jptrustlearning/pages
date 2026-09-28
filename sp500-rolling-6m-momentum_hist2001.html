@@ -7,6 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./lib/jpt-dataz-v1.js?v=1"></script><!-- A192 · ตัวโหลด /dataz/ อย่างเดียว + เก็บข้อมูลในเครื่อง -->
+<script src="./lib/jpt-freeze-v1.js?v=1"></script><!-- A193 · ล็อกรายชื่อหุ้นล็อตที่ออกโพยแล้ว (ถึงล็อต 1 ก.ย. 2026) -->
 <script src="./jp-settings.js?v=1761234567"></script>
 <!-- Modern Fonts: Outfit (Headings) + Inter (Body/Numbers) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2426,6 +2427,8 @@ async function loadDataFromCloud() {
     }
     clearInterval(fetchInterval);
     if (typeof updateOwlProgress === 'function') updateOwlProgress(80);
+    // A193: ไฟล์ล็อกรายชื่อ (เล็ก · static) — โหลดไม่ได้ = error ไม่เงียบ
+    await jptFreeze.load([fileUrl, histUrl]);
     processData(csvCombined);
     if (typeof updateOwlProgress === 'function') updateOwlProgress(95);
     
@@ -2452,7 +2455,7 @@ async function loadDataFromCloud() {
     el.status.className = 'status-indicator error';
     el.status.innerHTML = jptDataz.isDatazError(error)
       ? '<span>●</span> /dataz/ ERROR'
-      : '<span>●</span> Upload CSV';
+      : (window.jptFreeze && jptFreeze.isFreezeError(error) ? '<span>●</span> /freeze/ ERROR' : '<span>●</span> Upload CSV');
     el.manualUpload.style.display = 'block';
     showLoaderError(error);
   }
@@ -3456,6 +3459,9 @@ function rankStocks(endIdx, startIdx, weightRetOverride) {
   stats.sort((a,b) => a.score - b.score);
   return stats;
 }
+// A193 · ล็อกรายชื่อ: วันจัดอันดับ ≤ 2026-08-31 (ถึงล็อต 1 ก.ย.) เลือกหุ้นด้วยข้อมูลเวอร์ชัน 2 ก.ย. (./freeze/*_freeze_20260831.csv)
+//        ตั้งแต่ล็อต 1 ต.ค. เลือกด้วยข้อมูลปัจจุบัน · กำไรขาดทุน/ราคาซื้อขาย/กราฟ = ข้อมูลจริงเสมอ (lib/jpt-freeze-v1.js)
+if (window.jptFreeze) rankStocks = jptFreeze.wrapRank(rankStocks, () => state);
 
 function calculateStats() {
   const curve = state.equityCurve;
