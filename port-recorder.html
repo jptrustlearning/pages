@@ -1767,13 +1767,22 @@ function mergeSeries(tk, j){
     highs:dates.map(d=>{ const v=map.get(d); return v.h!=null? v.h : v.c; }),
     lows:dates.map(d=>{ const v=map.get(d); return v.l!=null? v.l : v.c; })};
 }
-async function ensureHistory(tk, fromDate){
+/* padDays: ถอยวันเริ่มดึงย้อนไปอีก N วันปฏิทิน — ใช้กับตัวเทียบ (SPY)
+   ไม้แรกที่ลงวันเสาร์/อาทิตย์/วันหยุดตลาด (เช่น ซื้อรอบศุกร์ สลิปไทยลงวันเสาร์)
+   ถ้าดึงตรงวันนั้นพอดี ข้อมูลจะเริ่มวันทำการถัดไป → หาราคาตัวเทียบ "ณ วันเริ่ม" ไม่เจอ
+   → กราฟ VS S&P 500 ว่าง และ needBackfill เป็นจริงตลอด (ดึงซ้ำทุกครั้งที่เปิดแอป)
+   เงื่อนไข needBackfill ยังเทียบกับ fromDate เดิม — ดึงเผื่อครั้งเดียวแล้วจบ */
+function shiftDays(ymd, n){
+  const d=new Date(ymd+'T00:00:00Z'); if(isNaN(d)) return ymd;
+  d.setUTCDate(d.getUTCDate()+n); return d.toISOString().slice(0,10);
+}
+async function ensureHistory(tk, fromDate, padDays){
   if(!workerUrl()) return false;
   const p=PRICES[tk];
   const needBackfill = !p || !p.dates.length || p.dates[0] > fromDate;
   const needUpdate   = !p || !p.dates.length || p.dates[p.dates.length-1] < todayStr();
   if(!needBackfill && !needUpdate) return true;
-  const from = needBackfill ? fromDate : p.dates[p.dates.length-1];
+  const from = needBackfill ? (padDays ? shiftDays(fromDate, -padDays) : fromDate) : p.dates[p.dates.length-1];
   try{
     const j=await fetchHist(tk, from);
     mergeSeries(tk, j); persistLocal(); return true;
@@ -1791,7 +1800,7 @@ async function refreshPrices(manual){
   }
   let ok=0, fail=0;
   for(const tk of Object.keys(tks)){
-    const r=await ensureHistory(tk, tks[tk]); r?ok++:fail++;
+    const r=await ensureHistory(tk, tks[tk], tk===BENCH? 10 : 0); r?ok++:fail++;   // SPY ดึงเผื่อวันหยุด 10 วัน
   }
   if(btn){ btn.disabled=false; btn.textContent='⟳ ราคา'; }
   renderAll();
