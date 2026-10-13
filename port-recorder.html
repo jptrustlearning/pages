@@ -18,7 +18,19 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
 /* === TOP BAR === */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;z-index:100;background:var(--cream);margin:0 -18px 12px;padding:10px 18px;box-shadow:0 4px 14px rgba(58,21,32,0.06)}
 @media(max-width:500px){.topbar{margin:0 -14px 12px;padding:9px 14px}}
-.topbar-brand{display:flex;align-items:center;gap:10px}
+.topbar-brand{display:flex;align-items:center;gap:10px;min-width:0}
+/* A211 · ปุ่ม ← กลับแอปสมาชิก (ซ้ายสุด หน้าโลโก้/ชื่อเจ้าของบัญชี) — สไตล์เดียวกับ .drive-pill */
+.topbar-back{flex-shrink:0;width:36px;height:36px;border-radius:50%;border:1px solid var(--border-gold);background:var(--cream-card);color:var(--text-heading);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;margin-right:-2px;transition:all .15s;-webkit-tap-highlight-color:transparent}
+.topbar-back:hover{border-color:var(--border-gold-strong);background:var(--cream-warm)}
+.topbar-back:disabled{opacity:.55;cursor:default}
+.topbar-back svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;display:block}
+/* กันชื่อเจ้าของยาวดันป้าย Drive ตกขอบ หลังแถบบนแคบลงอีก 36px */
+.topbar-brand>div:last-child{min-width:0}
+.topbar-sub{max-width:100%}
+#ownerName{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.topbar .drive-pill{white-space:nowrap;flex-shrink:0}   /* ป้าย Drive คงบรรทัดเดียว ให้ชื่อเจ้าของเป็นฝ่ายย่อ (…) แทน */
+.topbar-logo{flex-shrink:0}                               /* วงกลม JP เคยถูกบีบแบนเมื่อชื่อยาว (บั๊กเดิม) — ล็อก 38px */
+@media(max-width:500px){.topbar-brand{gap:8px}.topbar-title{letter-spacing:.9px}}   /* ชดเชยที่ปุ่ม ← กินไป ให้ชื่อแอปอยู่บรรทัดเดียวบนจอ ≥390px */
 .topbar-logo{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--gold-dark),var(--gold));display:flex;align-items:center;justify-content:center;font-family:var(--font-label);font-weight:700;color:#3A2410;font-size:.8rem;box-shadow:0 2px 8px rgba(184,134,11,0.3)}
 .topbar-title{font-family:var(--font-label);font-size:.64rem;letter-spacing:1.2px;color:var(--gold-dark);text-transform:uppercase}
 .topbar-sub{font-size:1rem;font-weight:700;color:var(--text-heading);cursor:pointer;display:inline-flex;align-items:center}
@@ -357,6 +369,8 @@ body{font-family:var(--font-thai);color:var(--text-dark);background:var(--cream)
   <!-- TOP BAR -->
   <div class="topbar">
     <div class="topbar-brand">
+      <!-- A211 · กลับแอปสมาชิก — หน้านี้ถูกเปิดเป็นแท็บใหม่ (noopener) จึงพาไป /member-dashboard ตรงๆ · ก่อนไปจะซิงก์ที่ค้างขึ้น Drive ให้จบก่อน -->
+      <button class="topbar-back" id="backBtn" type="button" onclick="PR.backToApp()" aria-label="กลับแอปสมาชิก" title="กลับแอปสมาชิก"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
       <div class="topbar-logo">JP</div>
       <div>
         <div class="topbar-title">JPTrust Port Recorder</div>
@@ -925,6 +939,29 @@ function requireDrive(){
   toast('เชื่อม Google Drive ก่อนบันทึก — ข้อมูลจะได้ไม่หายเมื่อล้างแคช');
   driveConnect();
   return false;
+}
+/* A211 · ปุ่ม ← กลับแอปสมาชิก
+   หน้านี้ถูกเปิดจากแอปสมาชิกเป็นแท็บใหม่แบบ noopener (Home quick-action + การ์ด Tools) ⇒ ไม่มี history ให้ถอย
+   และ window.close() ใช้ไม่ได้แน่นอน จึงพาไป /member-dashboard ตรงๆ (jp-gate ผ่านแล้วในแท็บนี้ ⇒ เจอแค่ PIN ตามปกติ)
+   กันข้อมูลหาย: saveData() หน่วง push 1 วิ — ถ้ากดกลับในจังหวะนั้น (หรือ dirty ค้าง) ให้ยิง push เดี๋ยวนี้แล้วรอให้จบก่อนออก (เพดาน 6 วิ)
+   visibilitychange ทำแบบเดียวกันอยู่แล้ว แต่ fetch ที่ยิงตอนหน้ากำลังปิดอาจถูกเบราว์เซอร์ตัดทิ้ง จึงต้องรอให้เสร็จก่อนค่อยไป
+   ไม่แตะ D.rev · ไม่แตะตรรกะ sync · แค่เรียก requestPush เดิมเร็วขึ้น · ถ้าซิงก์ไม่ทัน ข้อมูลยังอยู่ในเครื่อง (rev สูงกว่า + dirty) เปิดครั้งหน้า driveSync จะ push เอง */
+let leaving=false;
+async function backToApp(){
+  if(leaving) return; leaving=true;
+  const btn=$('backBtn'); if(btn) btn.disabled=true;
+  try{
+    if(DRIVE.connected && !needAuth && (saveTimer || DRIVE.dirty || pushing)){
+      if(saveTimer){ clearTimeout(saveTimer); saveTimer=null; }
+      if(!pushing) requestPush(false);
+      const t0=Date.now(); let told=false;
+      while((pushing || DRIVE.dirty) && !needAuth && Date.now()-t0<6000){
+        if(!told && Date.now()-t0>400){ told=true; toast('กำลังซิงก์ขึ้น Drive ก่อนกลับ…'); }
+        await new Promise(r=>setTimeout(r,120));
+      }
+    }
+  }catch(e){ console.warn('backToApp flush',e); }
+  location.href='/member-dashboard';
 }
 function workerUrl(){ return (CFG.workerUrl||DEFAULT_WORKER_URL||'').replace(/\/+$/,''); }
 function clientId(){ return CFG.clientId||DEFAULT_CLIENT_ID||''; }
@@ -3279,7 +3316,7 @@ return {openOwner,submitOwner,switchTab,gotoSettings,toggleMask,selectPort,openP
   onGisReady,syncGisButtons,
   selectRbPort,rbUseCurrent,rbApplyNew,printRbPlan,renderRebalance,openTargetsModal,addTgtRow,updateTgtSum,submitTargets,
   setView,toggleDense,setSort,toggleGroup,openGa,gaAssign,gaCreateAssign,openGm,gmAddRow,gmDelRow,gmSubmit,deleteSell,openPm,pmDelete,
-  driveConnect,driveSyncNow,driveForcePull,migrateSlipsNow,driveDisconnect,drivePillTap};
+  driveConnect,driveSyncNow,driveForcePull,migrateSlipsNow,driveDisconnect,drivePillTap,backToApp};
 })();
 
 </script>
