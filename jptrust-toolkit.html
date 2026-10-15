@@ -1092,6 +1092,22 @@ html.tk-app .aj{display:flex;align-items:center;gap:14px;margin-top:18px;text-de
 .aj-t span{font-size:12.5px;color:var(--a-sub)}
 .aj-go{flex-shrink:0;background:var(--a-acc);color:#fff;border-radius:999px;padding:9px 15px;font-size:13px;font-weight:600;white-space:nowrap}
 
+/* ---- A224 · การ์ดแจกฟรี (แบบเดียวกับ #freeDlCard ของ A67 · แต่งตามโทนแอป) — หน้าภาพรวมเท่านั้น เหนือการ์ดสมาชิก ----
+   ไฟล์ = /downloads/<ชื่อ>_v<เลข>.ex5 · หน้าวิธีติดตั้ง = ea-<ชื่อ>.html · เปลี่ยนเวอร์ชัน = เพิ่มไฟล์ใหม่ แล้วแก้ href 2 จุด (การ์ด + หน้าติดตั้ง) */
+.fdl{display:flex;flex-direction:column;gap:14px}
+html.tk-app .fdl{order:3;margin-top:18px}
+.fdl-h{display:flex;align-items:flex-start;gap:13px}
+.fdl-ic{width:44px;height:44px;border-radius:14px;flex-shrink:0;display:grid;place-items:center;background:rgba(212,175,55,.16);color:#9A7414}
+.fdl-ic svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fdl-t{flex:1;min-width:0;line-height:1.45}
+.fdl-eb{display:block;font-size:10.5px;font-weight:600;letter-spacing:1.6px;color:#9A7414}
+.fdl-t b{display:flex;align-items:center;gap:7px;font-size:15px;font-weight:600;color:var(--ink)}
+.fdl-t b .mchip{margin-left:0}
+.fdl-d{display:block;font-size:12.5px;color:var(--muted)}
+.fdl-cta{display:flex;gap:8px}
+.fdl-cta .btn{flex:1;justify-content:center}
+.fdl-cta svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
 /* ---- แถบเมนูลอยด้านล่าง ---- */
 html.tk-app .anav{display:flex;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:50;
   width:min(calc(100% - 28px),672px);height:66px; /* A185 · 420 → 672 = กว้างเท่าการ์ดในคอลัมน์ 720 บนเดสก์ท็อป ตรงกับเมนูล่างแอปสมาชิก A184 · มือถือ ≤448px เท่าเดิม */padding:0 8px;border-radius:33px;align-items:center;
@@ -1109,7 +1125,7 @@ html.tk-app .anav{display:flex;position:fixed;left:50%;transform:translateX(-50%
 @media(min-width:760px){ html.tk-app .content{padding-left:24px;padding-right:24px} html.tk-app .ah{padding-left:26px;padding-right:26px} }
 
 /* ================= A154.1 · หน้าจอแยกตามแท็บ + ตัวหนังสือน้อยลง (โหมดแอปเท่านั้น) ================= */
-html.tk-app:not([data-tab=home]) :is(#kpis,.ah-sp,#tickerTape,#tkUs,#insCard,#mkRisk,#appJoin){display:none!important}
+html.tk-app:not([data-tab=home]) :is(#kpis,.ah-sp,#tickerTape,#tkUs,#insCard,#mkRisk,#appJoin,#freeDlOwlet){display:none!important}
 html.tk-app:not([data-tab=gold]) :is(#zonesHead,#zonesRow){display:none!important}
 html.tk-app:not([data-tab=search]) #heroScanner{display:none!important}
 html.tk-app:not([data-tab=market]) :is(#mkSec,#mkStock,#mkGold,#mkFx,#mkChart){display:none!important}
@@ -1758,6 +1774,22 @@ html.tk-app .mk-head .modeseg{width:100%;min-width:0;margin-left:0}
           </div>
         </div>
         <div class="mk-cap" id="mkDailyNote" style="margin-top:12px">ข้อมูลราคาปิดรายวัน อัปเดตวันละครั้งหลังตลาดปิด · เป็นข้อมูลประกอบการศึกษา ไม่ใช่คำแนะนำการลงทุน</div>
+        <!-- A224 · แจกฟรี OWLET BOT v1.12 (จูนส่งไฟล์ 15 ต.ค. 2026 "ทำปุ่ม download เหมือนเดิม" = แบบการ์ด #freeDlCard ของ A67)
+             หน้าภาพรวมเท่านั้น · CSS order 3 + อยู่ก่อน #appJoin ใน DOM = ขึ้นเหนือการ์ดสมาชิก · ข้อความฟีเจอร์ไม่แต่งเอง รอจูนส่ง -->
+        <div class="card fdl" id="freeDlOwlet">
+          <div class="fdl-h">
+            <span class="fdl-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></span>
+            <div class="fdl-t">
+              <span class="fdl-eb">FREE DOWNLOAD</span>
+              <b>OWLET BOT <span class="mchip free">ฟรี</span></b>
+              <span class="fdl-d">บอทเทรดสำหรับ MetaTrader 5 · เวอร์ชัน 1.12 · โหลดได้เลย ไม่ต้องเป็นสมาชิก</span>
+            </div>
+          </div>
+          <div class="fdl-cta">
+            <a class="btn" href="./ea-owlet-bot.html" target="_blank" rel="noopener" data-track="OWLET BOT · วิธีติดตั้ง">วิธีติดตั้ง</a>
+            <a class="btn gold" href="./downloads/OWLET_BOT_v112.ex5" download data-track="OWLET BOT v1.12 · ดาวน์โหลด"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>ดาวน์โหลดฟรี</a>
+          </div>
+        </div>
         <!-- A154 · การ์ดสมาชิกของโหมดแอป — แทนแบนเนอร์เคลื่อนไหว #prodCard ที่ซ่อนในแอป (ลิงก์ที่เดียวกัน) -->
         <a class="card aj" id="appJoin" href="https://app.jptrustlearning.com/new" target="_blank" rel="noopener" data-track="house-ad-services-app">
           <span class="aj-t"><b>เป็นสมาชิก JP Trust Learning</b><span>ทดสอบกลยุทธ์ย้อนหลัง 8 กลยุทธ์ด้วยข้อมูลจริง สแกนหุ้น S&amp;P 500 และอ่านข่าววิเคราะห์ทุกเช้า</span></span>
