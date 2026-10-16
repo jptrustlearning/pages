@@ -1140,6 +1140,26 @@ html.tk-app .anav{display:flex;position:fixed;left:50%;transform:translateX(-50%
 .anav .an-c{flex:0 0 54px;height:54px;border-radius:50%;background:var(--a-acc);color:#fff;justify-content:center;margin:0 6px;
   box-shadow:0 8px 18px -6px rgba(58,21,32,.55)}
 .anav .an-c svg{width:23px;height:23px;stroke-width:2}
+
+/* ---- A233 · ปุ่มติดต่อทีมงาน (Customer Support) → LINE OA @jptrust ----
+   มือถือ/จอแคบ = ลอยเหนือแถบเมนูล่าง มุมขวา · จอกว้าง ≥ 860px = อยู่ข้างขวาแถบเมนู ระดับเดียวกัน
+   ไม่มี animation วน · z-index 48 = ใต้ popup (60) */
+.sup{position:fixed;right:14px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:48;width:56px;height:56px;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;-webkit-tap-highlight-color:transparent;
+  background:rgba(255,255,255,.94);-webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%);
+  box-shadow:0 14px 30px -10px rgba(31,27,28,.34),0 0 0 1px rgba(212,175,55,.45);transition:transform .18s ease,box-shadow .18s ease}
+.sup svg{width:35px;height:35px;display:block}
+.sup-tip{position:absolute;right:0;bottom:calc(100% + 10px);transform:translateY(6px);opacity:0;pointer-events:none;white-space:nowrap;
+  background:var(--a-acc);color:#fff;border-radius:14px;padding:8px 13px;font-family:var(--f-b);line-height:1.25;
+  box-shadow:0 10px 24px -10px rgba(58,21,32,.6);transition:opacity .18s ease,transform .18s ease}
+.sup-tip b{display:block;font-size:13px;font-weight:600}
+.sup-tip span{display:block;font-size:11px;color:var(--gold-l)}
+@media(hover:hover){ .sup:hover{transform:translateY(-2px)} .sup:hover .sup-tip{opacity:1;transform:none} }
+.sup:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.sup:focus-visible .sup-tip{opacity:1;transform:none}
+html.tk-app .sup{bottom:calc(90px + env(safe-area-inset-bottom,0px))}
+@media(min-width:860px){ html.tk-app .sup{bottom:calc(17px + env(safe-area-inset-bottom,0px));right:calc(50% - 406px)} }
+@media print{ .sup{display:none!important} }
 @media(min-width:760px){ html.tk-app .content{padding-left:24px;padding-right:24px} html.tk-app .ah{padding-left:26px;padding-right:26px} }
 
 /* ================= A154.1 · หน้าจอแยกตามแท็บ + ตัวหนังสือน้อยลง (โหมดแอปเท่านั้น) ================= */
@@ -3315,6 +3335,12 @@ if(h0){
   <button type="button" data-tab="market"><svg class="i-o" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="9" rx="1.5"/><rect x="13" y="4" width="7" height="5" rx="1.5"/><rect x="13" y="11" width="7" height="9" rx="1.5"/><rect x="4" y="15" width="7" height="5" rx="1.5"/></svg><svg class="i-f" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="9" rx="1.5"/><rect x="13" y="4" width="7" height="5" rx="1.5"/><rect x="13" y="11" width="7" height="9" rx="1.5"/><rect x="4" y="15" width="7" height="5" rx="1.5"/></svg><span>ตลาด</span></button>
   <button type="button" data-tab="cal"><svg class="i-o" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16"/><path d="M8.5 3.5v4M15.5 3.5v4"/></svg><svg class="i-f" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.6" y="5.2" width="16.8" height="15.2" rx="2.8"/><path class="k" d="M8.5 3.2v3.6M15.5 3.2v3.6"/><path class="w" d="M3.6 10.2h16.8"/><circle class="w" cx="8.6" cy="14.4" r="1.15"/><circle class="w" cx="12" cy="14.4" r="1.15"/><circle class="w" cx="15.4" cy="14.4" r="1.15"/><circle class="w" cx="8.6" cy="17.4" r="1.15"/><circle class="w" cx="12" cy="17.4" r="1.15"/></svg><span>ปฏิทิน</span></button>
 </nav>
+
+<!-- A233 · ปุ่มติดต่อทีมงาน (Customer Support) → LINE OA @jptrust · ไอคอนหูฟัง + กล่องข้อความ (SVG ไม่ใช้อิโมจิ) -->
+<a class="sup" id="tkSupport" href="https://line.me/R/ti/p/@jptrust" target="_blank" rel="noopener" aria-label="ติดต่อทีมงาน ทาง LINE @jptrust" data-track="support-line">
+  <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path d="M9 24.6A15 15 0 0 1 39 24.6" fill="none" stroke="#3a1520" stroke-width="3.7"/><path d="M12.7 21.9V36.4H7.4A2.4 2.4 0 0 1 5 34V24.3A2.4 2.4 0 0 1 7.4 21.9Z" fill="#3a1520"/><path d="M35.3 21.9H40.6A2.4 2.4 0 0 1 43 24.3V34A2.4 2.4 0 0 1 40.6 36.4H35.3Z" fill="#3a1520"/><ellipse cx="24" cy="30.6" rx="9.6" ry="8.3" fill="#D4AF37"/><path d="M18.4 36.4C18.9 38.5 18.3 40 17 41.4C19.7 41.7 22.3 40.9 23.7 38.9Z" fill="#D4AF37"/></svg>
+  <span class="sup-tip" aria-hidden="true"><b>ติดต่อทีมงาน</b><span>LINE @jptrust</span></span>
+</a>
 
 <script>
 /* =====================================================================
