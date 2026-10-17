@@ -496,6 +496,42 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .it-bar i{display:block;height:100%}
 .it-bar .u{background:#2E7D32}.it-bar .n{background:#CFC4AA}.it-bar .d{background:#C62828}
 .it-cnt{flex-basis:100%;font-family:'Anuphan',sans-serif;font-size:10.5px;color:var(--text-dark-muted,#8a7d6b);line-height:1.4}
+/* ===== 17 ต.ค. 2569 · Insight แยกการ์ดแบบ Tool&Kit (จูน "แอพสมาชิกทำให้เหมือน toolkit") — backup v310 =====
+   ประเด็นละการ์ด ปัดซ้าย–ขวา · สีประจำประเด็นชุดเดียวกับ Tool&Kit (INS_AC) · โทนตลาด = การ์ดขาวใต้สไลด์ (เก็บบรรทัดนับไว้)
+   ⚠️ รางยื่นออกเท่า padding ของ .screen-content (20px) ให้ปัดได้ถึงขอบจอ — เปลี่ยน padding ต้องแก้คู่กัน
+   CSS .insight-card/.insight-tone ด้านบนไม่ได้ใช้แล้ว เก็บไว้เผื่อย้อนกลับ */
+.ins2{font-family:'Anuphan',sans-serif;margin:0 0 20px}
+.ins2-h{display:flex;align-items:center;gap:12px;margin:0 2px 8px}
+.ins2-ic{width:40px;height:40px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;background:#FFFFFF;color:#3A1520;box-shadow:0 1px 2px rgba(31,27,28,.04),0 12px 28px -14px rgba(31,27,28,.14)}
+.ins2-ic svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ins2-h h3{margin:0;font-family:'Anuphan',sans-serif;font-size:17px;font-weight:600;color:#1F1B1C;line-height:1.2}
+.ins2-cnt{margin-left:auto;font-size:12px;color:#7D766F;white-space:nowrap}
+.ins2-rail{position:relative;display:flex;gap:12px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding:0 20px;margin:0 -20px;padding:6px 20px 18px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.ins2-rail::-webkit-scrollbar{display:none}
+.ins2-rail:focus-visible{outline:2px solid #3A1520;outline-offset:-2px;border-radius:22px}
+.ins2-sl{flex:0 0 84%;min-width:0;scroll-snap-align:start;position:relative;overflow:hidden;display:flex;flex-direction:column;border-radius:20px;padding:15px 17px 14px;
+  background:linear-gradient(155deg,rgba(var(--ac-rgb),.14) 0%,rgba(var(--ac-rgb),.05) 45%,#FFFFFF 78%);box-shadow:0 1px 2px rgba(31,27,28,.04),0 12px 28px -14px rgba(31,27,28,.14)}
+.ins2-sl-h{position:relative;min-height:28px;margin-bottom:7px}
+.ins2-sl-h b{display:inline-flex;align-items:center;gap:6px;padding:4px 11px 4px 9px;border-radius:999px;background:rgba(var(--ac-rgb),.14);color:var(--ac-tx,var(--ac));font-size:13px;font-weight:600}
+.ins2-sl-h b::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ac)}
+.ins2-no{position:absolute;right:15px;top:5px;font-size:52px;font-weight:600;line-height:1;letter-spacing:-1.5px;color:rgba(var(--ac-rgb),.16);font-variant-numeric:tabular-nums;pointer-events:none}
+.ins2-sl-t{position:relative;flex:1;margin:0;font-size:14.5px;line-height:1.62;color:#1F1B1C}
+.ins2-sl-f{margin-top:12px;font-size:12px;color:#7D766F}
+.ins2-dots{display:flex;justify-content:center;gap:6px;margin:-6px 0 12px}
+.ins2-dots button{position:relative;width:6px;height:6px;padding:0;border:0;border-radius:3px;background:#D5CEC5;cursor:pointer;transition:width .25s,background .25s;-webkit-tap-highlight-color:transparent}
+.ins2-dots button::after{content:'';position:absolute;inset:-9px -4px}
+.ins2-dots button.on{width:18px;background:#3A1520}
+.ins2-tone{padding:13px 16px;background:#FFFFFF;border-radius:18px;box-shadow:0 1px 2px rgba(31,27,28,.04),0 12px 28px -14px rgba(31,27,28,.14);display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px}
+.ins2-tone .lab{font-size:12.5px;color:#1F1B1C;white-space:nowrap}
+.ins2-tone .lab b{font-weight:600}
+.ins2-tone .lab b.u{color:#23834A}.ins2-tone .lab b.d{color:#B23A24}.ins2-tone .lab b.x{color:#8B6914}
+.ins2-bar{flex:1;min-width:100px;height:8px;border-radius:4px;overflow:hidden;display:flex;background:rgba(61,50,40,.08)}
+.ins2-bar i{display:block;height:100%}
+.ins2-bar .u{background:#2E9E5B}.ins2-bar .n{background:#C9BFA8}.ins2-bar .d{background:#C6472E}
+.ins2-tone .cnt{flex-basis:100%;font-size:11.5px;font-weight:300;color:#7D766F}
+.ins2-rail.one .ins2-sl{flex-basis:100%}
+@media(min-width:600px){.ins2-sl{flex-basis:calc(50% - 26px)}}
+@media(prefers-reduced-motion:reduce){.ins2-dots button{transition:none}}
 
 @media (max-width:380px){
   .story-meta{min-width:56px}
@@ -3019,27 +3055,65 @@ function renderInsight(latestBatch){
   const summary=latestBatch.summary||'';
   /* โทนตลาด: เดิมต่อท้ายข้อความเป็นวงเล็บ (20 positive · 7 negative …) → ย้ายมาเป็นแถบ .insight-tone ใต้ข้อความ
      ชุดเดียวกับการ์ด Insight ใน Tool&Kit · วิธีนับไม่เปลี่ยน (tools/gen_news_latest.py ต้องนับแบบเดียวกันนี้เสมอ) */
-  const text=summary
-    ? escapeText(summary)
-    : 'Batch ล่าสุดมี '+(latestBatch.headlines||[]).length+' headlines';
+  /* 17 ต.ค. 2569 · แยกประเด็นละการ์ดแบบ Tool&Kit (ตัดด้วย ' · ' เหมือน Tool&Kit) · ของเดิมรวมเป็นย่อหน้าเดียว → backup v310 */
+  const seg=summary
+    ? String(summary).split(' · ').map(x=>x.trim()).filter(Boolean)
+    : ['Batch ล่าสุดมี '+(latestBatch.headlines||[]).length+' headlines'];
+  const n=seg.length;
+  const bd=parseBatchDate(latestBatch.date);
+  const bkk=x=>new Date(x.getTime()+7*3600e3).toISOString().slice(0,10);
+  const title=(bd&&bkk(bd)===bkk(new Date()))?'Insight วันนี้':'Insight ล่าสุด';
+  const agoTh=x=>{ if(!x) return ''; const m=(Date.now()-x.getTime())/60000;
+    if(m<0) return ''; if(m<60) return Math.max(1,Math.floor(m))+' นาทีที่แล้ว';
+    if(m<1440) return Math.floor(m/60)+' ชม.ที่แล้ว'; return Math.floor(m/1440)+' วันที่แล้ว'; };
+  const meta='สรุปข่าว JP Trust · '+(agoTh(bd)||escapeText(latestBatch.date_display||''));
+  /* สีประจำประเด็น = INS_AC ใน Tool&Kit (เลี่ยงแดง/เขียว) · ช่องที่ 3 = สีตัวหนังสือป้าย (ทองเข้มขึ้นให้อ่านง่าย) */
+  const AC=[['#9A3B5B','154,59,91'],['#B07A00','176,122,0','#8C6100'],['#2C6E9E','44,110,158'],['#7A4E8C','122,78,140'],['#1F7A7A','31,122,122']];
   const w=n=>(n/total*100).toFixed(1)+'%';
   const tone=total>0
-    ? '<div class="insight-tone">'
-        +'<span class="it-lab">โทนตลาดโดยรวม <b class="'+tiltCls+'">'+tilt+'</b></span>'
-        +'<span class="it-bar" aria-hidden="true"><i class="u" style="width:'+w(pos)+'"></i><i class="n" style="width:'+w(neu)+'"></i><i class="d" style="width:'+w(neg)+'"></i></span>'
-        +'<span class="it-cnt">บวก '+pos+' · กลาง '+neu+' · ลบ '+neg+' · จาก '+total+' สินทรัพย์ที่ข่าวพูดถึง</span>'
+    ? '<div class="ins2-tone">'
+        +'<span class="lab">โทนตลาดโดยรวม <b class="'+tiltCls+'">'+tilt+'</b></span>'
+        +'<span class="ins2-bar" aria-hidden="true"><i class="u" style="width:'+w(pos)+'"></i><i class="n" style="width:'+w(neu)+'"></i><i class="d" style="width:'+w(neg)+'"></i></span>'
+        +'<span class="cnt">บวก '+pos+' · กลาง '+neu+' · ลบ '+neg+' · จาก '+total+' สินทรัพย์ที่ข่าวพูดถึง</span>'
       +'</div>'
     : '';
-  root.innerHTML='<div class="insight-card">'
-    +'<div class="insight-icon">'
-      +'<svg viewBox="0 0 24 24"><path d="M9.5 2A2.5 2.5 0 0 0 7 4.5v.05A3 3 0 0 0 5 7.5v.5a3 3 0 0 0 1 2.236V13a3 3 0 0 0 1.5 2.6V18a2.5 2.5 0 0 0 2.5 2.5H10A1 1 0 0 0 11 22V12.5A2.5 2.5 0 0 1 13.5 10H14"/><path d="M14.5 2A2.5 2.5 0 0 1 17 4.5v.05A3 3 0 0 1 19 7.5v.5a3 3 0 0 1-1 2.236V13a3 3 0 0 1-1.5 2.6V18a2.5 2.5 0 0 1-2.5 2.5H14A1 1 0 0 1 13 22V12.5A2.5 2.5 0 0 0 10.5 10H10"/></svg>'
+  root.innerHTML='<section class="ins2" aria-labelledby="ins2Title">'
+    +'<div class="ins2-h"><span class="ins2-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.4 1.1 2.2h5c0-.8.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/></svg></span>'
+      +'<h3 id="ins2Title">'+title+'</h3>'
+      +(n>1?'<span class="ins2-cnt">'+n+' ประเด็น</span>':'')
     +'</div>'
-    +'<div class="insight-body">'
-      +'<div class="insight-label"><span class="insight-label-dot"></span> Insight</div>'
-      +'<div class="insight-text">'+text+'</div>'
-      +tone
+    +'<div class="ins2-rail'+(n===1?' one':'')+'" id="ins2Rail" tabindex="0" aria-label="Insight — ปัดซ้ายขวาเพื่อดูทีละประเด็น">'
+      +seg.map((x,i)=>{ const c=AC[i%AC.length];
+        return '<article class="ins2-sl" style="--ac:'+c[0]+';--ac-rgb:'+c[1]+(c[2]?';--ac-tx:'+c[2]:'')+'">'
+          +(n>1?'<span class="ins2-no" aria-hidden="true">'+String(i+1).padStart(2,'0')+'</span>':'')
+          +'<div class="ins2-sl-h"><b>ประเด็นที่ '+(i+1)+'</b></div>'
+          +'<p class="ins2-sl-t">'+escapeText(x)+'</p>'
+          +'<div class="ins2-sl-f">'+meta+'</div>'
+        +'</article>'; }).join('')
     +'</div>'
-  +'</div>';
+    +(n>1?'<div class="ins2-dots">'+seg.map((x,i)=>'<button type="button" aria-label="ไปประเด็นที่ '+(i+1)+'"></button>').join('')+'</div>':'')
+    +tone
+  +'</section>';
+  insRail2();
+}
+/* จุดใต้สไลด์ Insight (ตรรกะเดียวกับ insRail() ใน Tool&Kit) · แท็บซ่อนอยู่ตอน render (กว้าง 0) = จุดแรก */
+function insRail2(){
+  const rail=document.getElementById('ins2Rail');
+  const dots=[].slice.call(document.querySelectorAll('#insight .ins2-dots button'));
+  if(!rail||!dots.length) return;
+  const sl=[].slice.call(rail.querySelectorAll('.ins2-sl'));
+  const pad=()=>parseFloat(getComputedStyle(rail).scrollPaddingLeft)||0;
+  let raf=0;
+  const sync=()=>{ raf=0; const x=rail.scrollLeft, p=pad(); let k=0;
+    if(rail.clientWidth>0){
+      if(x>=rail.scrollWidth-rail.clientWidth-2) k=sl.length-1;
+      else sl.forEach((el,i)=>{ if(el.offsetLeft-p-x<=el.offsetWidth/2) k=i; });
+    }
+    dots.forEach((bt,i)=>{ bt.classList.toggle('on',i===k); bt.setAttribute('aria-current',i===k?'true':'false'); }); };
+  rail.addEventListener('scroll',()=>{ if(!raf) raf=requestAnimationFrame(sync); },{passive:true});
+  dots.forEach((bt,i)=>bt.addEventListener('click',()=>rail.scrollTo({left:sl[i].offsetLeft-pad(),
+    behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})));
+  sync();
 }
 
 /* ===== MARKET MOVERS (SP500 daily CSV via Papa Parse) ===== */
