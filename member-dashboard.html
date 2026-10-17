@@ -425,11 +425,12 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .news-dash-card:active{transform:scale(.99)}
 
 /* news impact = ทิศทาง + ความแรงของข่าว (แทนไอคอนสัตว์ · โทนเดียวกับตาราง Scanner) */
-.news-trend{display:flex;align-items:center;justify-content:center;gap:4px;font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;line-height:1.15;text-align:center}
+/* 17 ต.ค. 2569 · จูนเลือกแบบ B: คำ BULLISH / BEARISH / NEUTRAL ในป้ายพื้นสีจาง ไม่มีลูกศร/ขีด (เดิม UP/MIXED/DOWN + ลูกศร · backup v311) */
+.news-trend{display:inline-flex;align-items:center;justify-content:center;padding:3px 8px;border-radius:999px;border:1px solid transparent;font-family:'Cinzel',serif;font-size:9.5px;font-weight:700;letter-spacing:0.3px;text-transform:uppercase;line-height:1.15;text-align:center;white-space:nowrap}
 .news-trend svg{width:14px;height:14px;flex-shrink:0;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.news-trend.up{color:#2E7D32}.news-trend.up svg{stroke:#2E7D32}
-.news-trend.mix{color:#8B6914}.news-trend.mix svg{stroke:#8B6914}
-.news-trend.down{color:#C62828}.news-trend.down svg{stroke:#C62828}
+.news-trend.up{color:#2E7D32;background:rgba(46,125,50,0.10);border-color:rgba(46,125,50,0.30)}.news-trend.up svg{stroke:#2E7D32}
+.news-trend.mix{color:#8B6914;background:rgba(212,175,55,0.13);border-color:rgba(212,175,55,0.40)}.news-trend.mix svg{stroke:#8B6914}
+.news-trend.down{color:#C62828;background:rgba(198,40,40,0.09);border-color:rgba(198,40,40,0.28)}.news-trend.down svg{stroke:#C62828}
 .news-strbar{display:flex;gap:3px}
 .news-strbar i{width:7px;height:3px;border-radius:2px;background:rgba(122,111,98,0.22)}
 .news-strbar.up i.on{background:#2E7D32}
@@ -444,7 +445,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .story-tag.negative{color:#C62828;background:rgba(198,40,40,0.09);border-color:rgba(198,40,40,0.30)}
 .story-tag.neutral{color:#8B6914;background:rgba(212,175,55,0.13);border-color:rgba(212,175,55,0.40)}
 
-.story-meta{flex-shrink:0;align-self:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:66px;font-family:'Sarabun','Anuphan',sans-serif}
+.story-meta{flex-shrink:0;align-self:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-width:72px;font-family:'Sarabun','Anuphan',sans-serif}
 .story-meta-time{font-family:'Sarabun','Anuphan',sans-serif;font-size:10px;font-weight:400;letter-spacing:0.2px;text-align:center;color:var(--text-dark-muted);line-height:1.1;white-space:nowrap;opacity:0.9}
 
 /* Latest Dispatches sect-hd + refresh button */
@@ -2840,7 +2841,7 @@ function newsStrength(tickers,tone,source){
   var levelText=level===3?'Strong':(level===2?'Moderate':'Weak');
   var bars=Math.max(1,Math.min(5,Math.round(score/20)));
   var dir=tone.impactClass==='bullish'?'up':(tone.impactClass==='bearish'?'down':'mix');
-  var dirText=dir==='up'?'Up':(dir==='down'?'Down':'Mixed');
+  var dirText=dir==='up'?'Bullish':(dir==='down'?'Bearish':'Neutral');   /* 17 ต.ค. 2569 · เดิม Up/Down/Mixed (backup v311) · ค่า dir (up/down/mix) ไม่เปลี่ยน */
   return{dir:dir,dirText:dirText,level:level,levelText:levelText,bars:bars,score:score};
 }
 function trendGlyph(dir){
@@ -2959,7 +2960,7 @@ function renderHeadlineCard(h){
       +'<div class="story-tags">'+tagsHtml+'</div>'
     +'</div>'
     +'<div class="story-meta">'
-      +'<div class="news-trend '+ns.dir+'"><svg viewBox="0 0 24 24">'+trendGlyph(ns.dir)+'</svg>'+ns.dirText+'</div>'
+      +'<div class="news-trend '+ns.dir+'">'+ns.dirText+'</div>'   /* 17 ต.ค. 2569 · ถอดลูกศร/ขีด trendGlyph() ออกตามจูน (ฟังก์ชันยังอยู่) */
       +strengthBar(ns.dir,ns.bars)
       +(time?'<div class="story-meta-time">'+escapeText(time)+'</div>':'')
     +'</div>'
