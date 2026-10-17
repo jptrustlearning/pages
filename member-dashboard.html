@@ -181,11 +181,12 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
 .qa-icon.bg-gold,.qa-icon.bg-blue,.qa-icon.bg-green,.qa-icon.bg-burgundy{background:linear-gradient(160deg,#FFF1D8 0%,#FCE4CB 60%,#F8D5BC 100%);border:1px solid rgba(218,160,120,0.42);color:#722F37;box-shadow:0 2px 6px rgba(114,47,55,0.10)}
 .qa-icon.bg-gold .jpt-icon svg,.qa-icon.bg-blue .jpt-icon svg,.qa-icon.bg-green .jpt-icon svg,.qa-icon.bg-burgundy .jpt-icon svg{color:#722F37;stroke:#722F37}
 .qa-label{font-size:11px;font-weight:500;color:var(--text-dark-muted);text-align:center;line-height:1.3}
-/* Home shortcut row: no white tile — the gold trim on the icon carries it */
-.quick-actions .quick-action{background:transparent;border:none;box-shadow:none;padding:6px 4px;gap:9px}
-.quick-actions .quick-action:active{transform:scale(.93);box-shadow:none}
-.quick-actions .qa-icon{width:48px;height:48px;border-radius:15px;border:1.5px solid var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,0.10),0 3px 8px rgba(114,47,55,0.10)}
-.quick-actions .qa-label{color:var(--text-dark)}
+/* Home shortcut row — 17 ต.ค. 2569 แบบ B3 (จูนเลือก): ไทล์ครีมยกนูนแยกชิ้น + ไอคอนวงกลมเบอร์กันดี เส้นทอง ให้ดูออกว่ากดได้แบบแอปธนาคาร (ก่อนหน้า: ไม่มีไทล์ · backup v309) */
+.quick-actions .quick-action{background:#FFFEF8;border:1px solid #EFE3C8;border-radius:16px;box-shadow:0 4px 12px rgba(90,40,30,0.10);padding:14px 4px 12px;gap:9px;transition:transform .12s ease,box-shadow .12s ease}
+.quick-actions .quick-action:active{transform:translateY(2px) scale(.96);box-shadow:0 1px 3px rgba(90,40,30,0.12)}
+.quick-actions .qa-icon{width:46px;height:46px;border-radius:50%;border:none;background:linear-gradient(150deg,#922C39 0%,#5C1620 100%);box-shadow:0 3px 8px rgba(114,47,55,0.35),inset 0 1px 0 rgba(255,255,255,0.18)}
+.quick-actions .qa-icon .jpt-icon svg{width:22px;height:22px;color:#F2D27C;stroke:#F2D27C;stroke-width:2}
+.quick-actions .qa-label{font-size:11.5px;font-weight:700;color:var(--text-dark);line-height:1.25}
 
 .section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .section-title{font-size:16px;font-weight:600;color:var(--text-dark)}.section-link{font-size:13px;color:var(--gold-dark);cursor:pointer;font-weight:500}
@@ -1178,7 +1179,7 @@ html,body{font-family:'Sarabun','Anuphan',sans-serif;background:var(--cream);col
                 <div class="quick-action" onclick="openIframe('วางแผนพอร์ตการลงทุน','./portfolio-planner.html?v=1783496563')"><div class="qa-icon bg-burgundy"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3 v9 l9 0"/></svg></span></div><div class="qa-label">Portfolio<br>Planner</div></div>
                 <div class="quick-action" onclick="location.href='/jptrust-toolkit'"><!-- A154.8 · แทน Weekly Momentum (เปิดหน้าต่างเดียวกัน ไม่มีปุ่ม × · Tool&Kit มีปุ่ม ← กลับ) --><div class="qa-icon bg-gold"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0 5 5l-9.4 9.4a2.1 2.1 0 0 1-3-3l9.4-9.4Z"/><path d="M14.7 6.3 18 3l3 3-3.3 3.3"/><circle cx="6.5" cy="6.5" r="3.5"/></svg></span></div><div class="qa-label">Tool&amp;Kit<br>Dashboard</div></div>
                 <div class="quick-action" onclick="window.open('https://app.jptrustlearning.com/port-recorder','_blank','noopener')"><!-- 2 ต.ค. 2569 · แทน 6M Momentum (backup v308) · เปิดแท็บใหม่เหมือนการ์ดใน Tools เพราะ Google Drive login ใช้ใน iframe ไม่ได้ --><div class="qa-icon bg-blue"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 3h6v3H9z"/><line x1="8" y1="12" x2="8" y2="17"/><line x1="12" y1="10" x2="12" y2="17"/><line x1="16" y1="14" x2="16" y2="17"/></svg></span></div><div class="qa-label">Portfolio<br>Recorder</div></div>
-                <div class="quick-action" onclick="openIframe('Gold Momentum Dashboard','./gold-momentum-app.html?v=1788330496')"><div class="qa-icon bg-gold"><span class="jpt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span></div><div class="qa-label">Gold<br>Dashboard</div></div>
+                <div class="quick-action" onclick="openIframe('Gold Momentum Dashboard','./gold-momentum-app.html?v=1788330496')"><div class="qa-icon bg-gold"><span class="jpt-icon"><!-- 17 ต.ค. 2569 · ไอคอนแท่งทอง แทนนาฬิกา (แบบ B3) --><svg viewBox="1 3 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h8l-1.6-5H4.6z"/><path d="M13 20h8l-1.6-5h-4.8z"/><path d="M8 13.5h8l-1.6-5H9.6z"/></svg></span></div><div class="qa-label">Gold<br>Dashboard</div></div>
             </div>
             <!-- TradingView Ticker Tape Widget -->
             <div class="ticker-tape-wrapper fade-up fade-up-2">
