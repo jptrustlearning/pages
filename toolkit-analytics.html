@@ -72,6 +72,20 @@ body{background:var(--cream);color:var(--ink);font-family:var(--f-b);line-height
 .tbl tr:last-child td{border-bottom:none}
 .foot{font-size:12px;color:var(--muted);padding:0 0 40px;line-height:1.8}
 .hide{display:none!important}
+/* A257 · คะแนนของแจกฟรี */
+.rvs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.rv-it{border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.rv-it b{display:block;font-size:14px;color:var(--maroon)}
+.rv-it .rv-avg{font-family:var(--f-n);font-size:30px;color:var(--maroon);line-height:1.1}
+.rv-it .rv-avg span{font-family:var(--f-b);font-size:12px;color:var(--muted);margin-left:6px}
+.rv-row{display:grid;grid-template-columns:38px 1fr 34px;gap:8px;align-items:center;font-size:12px;color:var(--muted);margin-top:4px}
+.rv-row i{display:block;height:8px;border-radius:4px;background:rgba(212,175,55,.15);overflow:hidden}
+.rv-row i s{display:block;height:100%;background:var(--gold)}
+.rv-row em{font-style:normal;text-align:right;font-variant-numeric:tabular-nums}
+.rv-notes{list-style:none;margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.rv-notes li{font-size:13px;border-top:1px solid rgba(212,175,55,.12);padding-top:8px;overflow-wrap:anywhere}
+.rv-notes .m{display:block;font-size:11.5px;color:var(--muted)}
+.rv-st{color:var(--gold);letter-spacing:1px}
 @media(max-width:600px){ .hd h1{font-size:20px} .kpi .vl{font-size:26px} .cw{height:220px} }
 </style>
 </head>
@@ -141,6 +155,13 @@ body{background:var(--cream);color:var(--ink);font-family:var(--f-b);line-height
       <h3>ลิงก์ที่ถูกกด</h3>
       <div class="cs">ปลายทางที่ผู้เข้ากดออกไป</div>
       <div id="tblLinks"></div>
+    </div>
+
+    <!-- A257 · คะแนนดาวหลังกดดาวน์โหลดของแจกฟรี (ตาราง tool_reviews · supabase/migrations/tool_reviews_v1.sql) -->
+    <div class="card full">
+      <h3>คะแนนของแจกฟรี</h3>
+      <div class="cs">จากป๊อปอัพให้ดาวหลังกดดาวน์โหลด · นับทั้งหมด ไม่ขึ้นกับช่วงวันด้านบน · 1 เครื่องต่อ 1 เวอร์ชัน</div>
+      <div id="rvBox"><div class="empty">กำลังโหลด</div></div>
     </div>
   </div>
 
@@ -222,6 +243,39 @@ async function load(days){
   var cur=rows.filter(function(r){return new Date(r.created_at)>=start});
   var prv=rows.filter(function(r){return new Date(r.created_at)<start});
   render(cur,prv,days,start,now);
+  loadReviews();
+}
+
+/* ---- A257 · คะแนนของแจกฟรี ---- */
+async function loadReviews(){
+  var box=$('rvBox'); if(!box) return;
+  var res=await sb.from('tool_reviews').select('item,version,stars,note,device,updated_at')
+    .order('updated_at',{ascending:false}).limit(5000);
+  if(res.error){
+    box.innerHTML='<div class="empty">ยังอ่านคะแนนไม่ได้ · ถ้ายังไม่ได้รัน <code>supabase/migrations/tool_reviews_v1.sql</code> ให้รันใน SQL Editor ก่อน<br><small>'+esc(res.error.message)+'</small></div>';
+    return;
+  }
+  var rows=res.data||[];
+  if(!rows.length){ box.innerHTML='<div class="empty">ยังไม่มีคะแนน · คะแนนจะขึ้นที่นี่เมื่อลูกค้ากดดาวน์โหลดแล้วให้ดาว</div>'; return; }
+  var g={}, order=[];
+  rows.forEach(function(r){
+    var k=r.item+' v'+r.version;
+    if(!g[k]){ g[k]={n:0,sum:0,dist:[0,0,0,0,0,0],notes:[]}; order.push(k); }
+    var x=g[k]; x.n++; x.sum+=r.stars; x.dist[r.stars]++;
+    if(r.note && x.notes.length<20) x.notes.push(r);
+  });
+  box.innerHTML='<div class="rvs">'+order.map(function(k){
+    var x=g[k], avg=x.sum/x.n, h='<div class="rv-it"><b>'+esc(k)+'</b><div class="rv-avg">'+avg.toFixed(2)+'<span>ดาวเฉลี่ย · '+x.n+' รีวิว</span></div>';
+    for(var s=5;s>=1;s--){
+      var p=x.dist[s]/x.n*100;
+      h+='<div class="rv-row"><span>'+s+' ดาว</span><i><s style="width:'+p.toFixed(1)+'%"></s></i><em>'+x.dist[s]+'</em></div>';
+    }
+    h+='<ul class="rv-notes">'+(x.notes.length?x.notes.map(function(r){
+      var d=new Date(r.updated_at);
+      return '<li><span class="m"><span class="rv-st">'+r.stars+' ดาว</span> · '+d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+(r.device?' · '+esc(r.device):'')+'</span>'+esc(r.note)+'</li>';
+    }).join(''):'<li><span class="m">ยังไม่มีความเห็นเป็นข้อความ</span></li>')+'</ul></div>';
+    return h;
+  }).join('')+'</div>';
 }
 
 function renderError(msg){

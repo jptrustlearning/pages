@@ -1416,6 +1416,88 @@ html.tk-app .mk-head .modeseg{width:100%;min-width:0;margin-left:0}
   .ins-rail[data-rl]{cursor:grab}
   .ins-rail.rl-drag{cursor:grabbing;scroll-snap-type:none;-webkit-user-select:none;user-select:none}
 }
+
+/* ---- A257 · ป๊อปอัพให้ดาวหลังกดดาวน์โหลด (ของแจกฟรี) ----
+   ผูกกับลิงก์ a[download][data-review-item] · ไฟล์โหลดตามปกติ แล้ว 1 วิ ป๊อปอัพเด้ง
+   มือถือ = แผ่นเลื่อนขึ้นจากล่าง · จอ ≥ 600px = กล่องกลางจอ · z 85–91 (สูงกว่าทุกอย่างในหน้า ซึ่งสูงสุด 60) */
+.rvw-scrim[hidden],.rvw[hidden],.rvw-view[hidden],.rvw-more[hidden],.rvw-help[hidden],.fdl-rated[hidden],#rvwGuide[hidden]{display:none!important}
+.rvw-scrim{position:fixed;inset:0;z-index:90;background:rgba(31,27,28,.42);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);opacity:0;transition:opacity .25s ease}
+.rvw-scrim.on{opacity:1}
+.rvw{position:fixed;left:0;right:0;bottom:0;z-index:91;max-width:520px;margin:0 auto;background:#fff;color:#1F1B1C;font-family:var(--f-b);line-height:1.6;
+  border-radius:28px 28px 0 0;box-shadow:0 -18px 40px -16px rgba(31,27,28,.35);
+  padding:8px max(22px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(22px,env(safe-area-inset-left,0px));
+  transform:translateY(104%);transition:transform .34s cubic-bezier(.2,.8,.2,1);max-height:92%;overflow-y:auto;overscroll-behavior:contain}
+.rvw.on{transform:none}
+.rvw-grab{width:40px;height:5px;border-radius:3px;background:rgba(31,27,28,.14);margin:0 auto 14px}
+@media(min-width:600px){
+  .rvw{left:50%;right:auto;bottom:auto;top:50%;width:420px;max-width:calc(100% - 32px);border-radius:26px;padding:24px 26px 22px;
+    box-shadow:0 30px 70px -20px rgba(31,27,28,.45);transform:translate(-50%,-47%) scale(.97);opacity:0;transition:transform .26s ease,opacity .2s ease}
+  .rvw.on{transform:translate(-50%,-50%);opacity:1}
+  .rvw-grab{display:none}
+}
+.rvw-view{display:flex;flex-direction:column;gap:14px}
+.rvw-dl{display:flex;align-items:center;gap:12px;background:#F2EFEA;border-radius:16px;padding:10px 12px}
+.rvw-dl-ic{width:36px;height:36px;border-radius:11px;flex-shrink:0;display:grid;place-items:center;background:#fff;color:#1E9A5F}
+.rvw-dl-ic svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.rvw-dl-t{flex:1;min-width:0;line-height:1.35}
+.rvw-dl-k{display:block;font-size:11.5px;font-weight:600;color:#1E9A5F}
+.rvw-dl-t b{display:block;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rvw-dl-s{display:block;font-size:11.5px;color:#857E78}
+.rvw-bar{display:block;height:3px;border-radius:2px;background:rgba(30,154,95,.15);overflow:hidden;margin-top:6px}
+.rvw-bar i{display:block;height:100%;width:100%;background:#1E9A5F;transform-origin:left;animation:rvwbar 1s ease-out both}
+@keyframes rvwbar{from{transform:scaleX(.08)}to{transform:scaleX(1)}}
+.rvw-head{text-align:center}
+.rvw-head h2{margin:2px 0 4px;font-size:19px;font-weight:600;line-height:1.35;color:#1F1B1C;text-wrap:balance}
+.rvw-head p{margin:0 auto;max-width:32ch;font-size:13px;color:#857E78;line-height:1.55}
+.rvw-stars{display:flex;justify-content:center;gap:6px;padding:2px 0}
+.rvw-star{width:50px;height:50px;border:0;background:none;padding:4px;border-radius:14px;cursor:pointer;display:grid;place-items:center;transition:transform .15s ease;-webkit-tap-highlight-color:transparent}
+.rvw-star svg{width:40px;height:40px;fill:#ECE6DD;stroke:#D8D0C4;stroke-width:1.2;stroke-linejoin:round;transition:fill .15s ease,stroke .15s ease}
+.rvw-star.lit svg{fill:#D9A92A;stroke:#B98A1A}
+.rvw-star:focus-visible{outline:2px solid var(--a-acc,#3A1520);outline-offset:1px}
+.rvw-star.pop{animation:rvwpop .32s ease}
+@keyframes rvwpop{40%{transform:scale(1.22)}100%{transform:scale(1)}}
+@media(hover:hover){ .rvw-star:hover{transform:translateY(-2px)} }
+.rvw-lab{margin:-4px 0 0;text-align:center;font-size:13.5px;font-weight:600;min-height:1.6em;color:#1F1B1C}
+.rvw-lab.idle{font-weight:400;color:#857E78}
+.rvw-more{display:flex;flex-direction:column;gap:6px}
+.rvw-nl{font-size:12.5px;color:#857E78}
+.rvw-more textarea{width:100%;resize:none;border:1px solid rgba(31,27,28,.1);background:#F2EFEA;border-radius:14px;padding:10px 12px;font-family:var(--f-b);font-size:16px;color:#1F1B1C;line-height:1.5}
+.rvw-more textarea:focus{outline:2px solid var(--a-acc,#3A1520);outline-offset:0;background:#fff}
+.rvw-cnt{align-self:flex-end;font-size:11px;color:#857E78;font-variant-numeric:tabular-nums}
+.rvw-act{display:flex;flex-direction:column;gap:8px}
+.rvw-send{border:0;border-radius:999px;padding:13px 18px;font-family:var(--f-b);font-size:14.5px;font-weight:600;background:var(--a-acc,#3A1520);color:#fff;cursor:pointer;text-align:center;text-decoration:none;transition:opacity .15s ease}
+.rvw-send:disabled{opacity:.32;cursor:not-allowed}
+.rvw-later{border:0;background:none;color:#857E78;font-family:var(--f-b);font-size:13.5px;padding:8px;cursor:pointer;border-radius:999px}
+.rvw-send:focus-visible,.rvw-later:focus-visible{outline:2px solid var(--a-acc,#3A1520);outline-offset:2px}
+.rvw-fine{margin:-4px 0 0;text-align:center;font-size:11.5px;color:#857E78}
+.rvw-done{text-align:center;align-items:center}
+.rvw-ok{width:62px;height:62px;border-radius:50%;background:var(--a-acc,#3A1520);display:grid;place-items:center;margin-top:6px}
+.rvw-ok svg{width:30px;height:30px;fill:none;stroke:#D4AF37;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.rvw-ok svg path{stroke-dasharray:30;stroke-dashoffset:30;animation:rvwtick .45s .1s ease-out forwards}
+@keyframes rvwtick{to{stroke-dashoffset:0}}
+.rvw-done h2{margin:0;font-size:19px;font-weight:600;color:#1F1B1C;outline:none}
+.rvw-done p{margin:0;max-width:34ch;font-size:13px;color:#857E78;line-height:1.6}
+.rvw-help{font-size:12.5px;background:#F2EFEA;border-radius:14px;padding:10px 14px;color:#1F1B1C!important;width:100%;max-width:none!important}
+.rvw-help a{color:var(--a-acc,#3A1520);font-weight:600}
+.rvw-done .rvw-act{width:100%}
+.rvw-mini{display:inline-flex;gap:2px;vertical-align:-2px}
+.rvw-mini svg{width:13px;height:13px}
+.rvw-done .rvw-mini svg{width:17px;height:17px}
+.rvw-mini .on{fill:#D9A92A;stroke:#B98A1A}
+.rvw-mini .off{fill:#ECE6DD;stroke:#D8D0C4}
+.fdl-rated{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+.fdl-rated b{color:var(--ink);font-weight:600}
+.rvw-toast{position:fixed;left:50%;bottom:calc(160px + env(safe-area-inset-bottom,0px));z-index:85;transform:translate(-50%,10px);opacity:0;
+  background:#1F1B1C;color:#fff;font-family:var(--f-b);font-size:12.5px;border-radius:999px;padding:9px 16px;max-width:calc(100% - 40px);text-align:center;
+  pointer-events:none;transition:opacity .2s ease,transform .2s ease}
+.rvw-toast.on{opacity:1;transform:translate(-50%,0)}
+@media(min-width:860px){ .rvw-toast{bottom:calc(96px + env(safe-area-inset-bottom,0px))} }
+@media (prefers-reduced-motion: reduce){
+  .rvw,.rvw-scrim,.rvw-toast,.rvw-star,.rvw-star svg{transition:none}
+  .rvw-star.pop,.rvw-bar i,.rvw-ok svg path{animation:none}
+  .rvw-ok svg path{stroke-dashoffset:0}
+}
+@media print{ .rvw,.rvw-scrim,.rvw-toast{display:none!important} }
 </style>
 </head>
 <body>
@@ -1825,7 +1907,7 @@ html.tk-app .mk-head .modeseg{width:100%;min-width:0;margin-left:0}
           </div>
           <div class="fdl-cta">
             <a class="btn" href="./ea-owlet-bot.html" target="_blank" rel="noopener" data-track="OWLET BOT · วิธีติดตั้ง">วิธีติดตั้ง</a>
-            <a class="btn gold" href="./downloads/OWLET_BOT_v112.ex5" download data-track="OWLET BOT v1.12 · ดาวน์โหลด"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>ดาวน์โหลดฟรี</a>
+            <a class="btn gold" href="./downloads/OWLET_BOT_v112.ex5" download data-track="OWLET BOT v1.12 · ดาวน์โหลด" data-review-item="OWLET BOT" data-review-ver="1.12" data-review-size="125 KB" data-review-guide="./ea-owlet-bot.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>ดาวน์โหลดฟรี</a>
           </div>
         </div>
         <!-- A154 · การ์ดสมาชิกของโหมดแอป — แทนแบนเนอร์เคลื่อนไหว #prodCard ที่ซ่อนในแอป (ลิงก์ที่เดียวกัน) -->
@@ -3341,6 +3423,225 @@ if(h0){
   <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path d="M9 24.6A15 15 0 0 1 39 24.6" fill="none" stroke="#3a1520" stroke-width="3.7"/><path d="M12.7 21.9V36.4H7.4A2.4 2.4 0 0 1 5 34V24.3A2.4 2.4 0 0 1 7.4 21.9Z" fill="#3a1520"/><path d="M35.3 21.9H40.6A2.4 2.4 0 0 1 43 24.3V34A2.4 2.4 0 0 1 40.6 36.4H35.3Z" fill="#3a1520"/><ellipse cx="24" cy="30.6" rx="9.6" ry="8.3" fill="#D4AF37"/><path d="M18.4 36.4C18.9 38.5 18.3 40 17 41.4C19.7 41.7 22.3 40.9 23.7 38.9Z" fill="#D4AF37"/></svg>
   <span class="sup-tip" aria-hidden="true"><b>ติดต่อทีมงาน</b><span>LINE @jptrust</span></span>
 </a>
+
+<!-- A257 · ป๊อปอัพให้ดาวหลังกดดาวน์โหลด (จูน 22 ต.ค. 2026 "เวลาลูกค้าดาวโหลดให้ เด้งรีวิว กดให้ดาวด้วย")
+     ผูกกับลิงก์ a[download][data-review-item] · ส่งคะแนนเข้า Supabase RPC submit_tool_review (supabase/migrations/tool_reviews_v1.sql)
+     ส่งไม่สำเร็จ (ยังไม่รัน SQL / เน็ตหลุด) = เก็บรอในเครื่อง แล้วส่งใหม่ตอนเปิดหน้าครั้งถัดไป · ให้ดาวแล้วเวอร์ชันนั้นไม่ถามซ้ำ
+     ของแจกฟรีชิ้นใหม่ = ใส่ data-review-item / -ver / -size / -guide บนลิงก์ดาวน์โหลด + INSERT ชื่อใน tool_review_items -->
+<div class="rvw-toast" id="rvwToast" role="status" aria-live="polite"></div>
+<div class="rvw-scrim" id="rvwScrim" hidden></div>
+<div class="rvw" id="rvw" role="dialog" aria-modal="true" aria-labelledby="rvwTitle" hidden>
+  <div class="rvw-grab" aria-hidden="true"></div>
+  <div class="rvw-view" id="rvwAsk">
+    <div class="rvw-dl">
+      <span class="rvw-dl-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v10m0 0 4-4m-4 4-4-4M5 19h14"/></svg></span>
+      <span class="rvw-dl-t">
+        <span class="rvw-dl-k">เริ่มดาวน์โหลดแล้ว</span>
+        <b id="rvwFile"></b>
+        <span class="rvw-dl-s" id="rvwSize"></span>
+        <span class="rvw-bar" aria-hidden="true"><i></i></span>
+      </span>
+    </div>
+    <div class="rvw-head">
+      <h2 id="rvwTitle"></h2>
+      <p>คะแนนของคุณช่วยให้ทีมงานทำเครื่องมือฟรีชิ้นต่อไปได้ตรงใจขึ้น</p>
+    </div>
+    <div class="rvw-stars" id="rvwStars" role="radiogroup" aria-label="ให้คะแนน 1 ถึง 5 ดาว" data-no-track></div>
+    <p class="rvw-lab idle" id="rvwLab" aria-live="polite">แตะดาวเพื่อให้คะแนน</p>
+    <div class="rvw-more" id="rvwMore" hidden data-no-track>
+      <label class="rvw-nl" for="rvwNote" id="rvwNoteLab">อยากบอกอะไรทีมงาน (ไม่บังคับ)</label>
+      <textarea id="rvwNote" rows="3" maxlength="300"></textarea>
+      <span class="rvw-cnt" id="rvwCnt">0/300</span>
+    </div>
+    <div class="rvw-act">
+      <button type="button" class="rvw-send" id="rvwSend" disabled data-track="รีวิวของแจกฟรี · ส่งคะแนน">ส่งคะแนน</button>
+      <button type="button" class="rvw-later" id="rvwLater" data-track="รีวิวของแจกฟรี · ไว้ทีหลัง">ไว้ทีหลัง</button>
+    </div>
+    <p class="rvw-fine">ไม่ต้องล็อกอิน · ไม่เก็บชื่อหรืออีเมล</p>
+  </div>
+  <div class="rvw-view rvw-done" id="rvwDone" hidden>
+    <span class="rvw-ok" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5.5 12.5l4.2 4.2L18.5 8"/></svg></span>
+    <h2 id="rvwDoneTitle" tabindex="-1">ขอบคุณสำหรับคะแนน</h2>
+    <span class="rvw-mini" id="rvwDoneStars"></span>
+    <p id="rvwNext"></p>
+    <p class="rvw-help" id="rvwHelp" hidden>ติดตรงไหน ทักทีมงานทาง LINE <a href="https://line.me/R/ti/p/@jptrust" target="_blank" rel="noopener" data-track="รีวิวของแจกฟรี · LINE">@jptrust</a> ได้เลย</p>
+    <div class="rvw-act">
+      <a class="rvw-send" id="rvwGuide" href="#" target="_blank" rel="noopener" data-track="รีวิวของแจกฟรี · ดูวิธีติดตั้ง">ดูวิธีติดตั้ง</a>
+      <button type="button" class="rvw-later" id="rvwClose" data-track="รีวิวของแจกฟรี · ปิด">ปิด</button>
+    </div>
+  </div>
+</div>
+<script>
+/* A257 · ป๊อปอัพให้ดาว — ไม่แตะการดาวน์โหลด (ไม่ preventDefault) · ไม่มี dependency */
+(function(){
+  'use strict';
+  var SB  = 'https://rcdukwwcbyryauhqlzmx.supabase.co';
+  var KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZHVrd3djYnlyeWF1aHFsem14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MTY0MDAsImV4cCI6MjA4NTQ5MjQwMH0.rprPmudJYyb6dyhXb9Z9GrtQWEeIX99A2Wrj55PvS54';
+  var DELAY = 1000, PENDING = 'tk_review_pending';
+  var STAR = 'M12 2.9l2.8 5.66 6.25.91-4.52 4.4 1.07 6.22L12 17.16l-5.6 2.93 1.07-6.22-4.52-4.4 6.25-.91z';
+  var LABELS = ['', 'ต้องปรับปรุง', 'พอใช้', 'ดี', 'ดีมาก', 'ยอดเยี่ยม'];
+  var $ = function(id){ return document.getElementById(id); };
+  var rv = $('rvw'); if (!rv) return;
+  var scrim = $('rvwScrim'), starsBox = $('rvwStars'), lab = $('rvwLab'), more = $('rvwMore'), note = $('rvwNote'),
+      cnt = $('rvwCnt'), sendBtn = $('rvwSend'), ask = $('rvwAsk'), done = $('rvwDone');
+
+  /* ---------- เก็บในเครื่อง (ห่อ try ทุกครั้ง · โหมดส่วนตัวใช้ไม่ได้ก็ยังทำงาน) ---------- */
+  function lsGet(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }
+  function lsSet(k, v){ try { localStorage.setItem(k, v); } catch(e){} }
+  function uuid(){
+    try { if (crypto && crypto.randomUUID) return crypto.randomUUID(); } catch(e){}
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c){ var r = Math.random()*16|0; return (c === 'x' ? r : (r&3|8)).toString(16); });
+  }
+  var vid = lsGet('jpt_vid');                       // id เครื่องเดียวกับ jpt-track.js (UUID สุ่ม ไม่ผูกตัวตน)
+  if (!vid){ vid = uuid(); lsSet('jpt_vid', vid); }
+  var ua = navigator.userAgent || '';
+  var device = /iPad|Tablet/i.test(ua) ? 'tablet' : (/Mobi|Android|iPhone|iPod/i.test(ua) ? 'mobile' : 'desktop');
+  var memRated = {};
+  function ratedKey(it, ver){ return 'tk_rated:' + it + ':' + ver; }
+  function getRated(it, ver){ var v = lsGet(ratedKey(it, ver)) || memRated[ratedKey(it, ver)]; return v ? +v : 0; }
+  function setRated(it, ver, n){ memRated[ratedKey(it, ver)] = n; lsSet(ratedKey(it, ver), String(n)); }
+
+  /* ---------- ส่งเข้า Supabase · ล้มเหลวชั่วคราว = เก็บรอส่งใหม่ ---------- */
+  function readPending(){ try { var a = JSON.parse(lsGet(PENDING) || '[]'); return Array.isArray(a) ? a : []; } catch(e){ return []; } }
+  function writePending(a){ lsSet(PENDING, JSON.stringify(a.slice(-10))); }
+  function post(rec){
+    return fetch(SB + '/rest/v1/rpc/submit_tool_review', {
+      method: 'POST', mode: 'cors', keepalive: true,
+      headers: { 'Content-Type': 'application/json', 'apikey': KEY, 'Authorization': 'Bearer ' + KEY },
+      body: JSON.stringify({ p_item: rec.item, p_version: rec.ver, p_visitor: vid, p_stars: rec.stars, p_note: rec.note || null, p_device: device })
+    }).then(function(r){
+      if (r.ok) return 'done';                                    // true = บันทึก · false = DB ปัดตก (ไม่ส่งซ้ำ)
+      if (r.status === 404 || r.status === 429 || r.status >= 500) return 'retry';   // 404 = ยังไม่รัน SQL
+      return 'drop';
+    }, function(){ return 'retry'; });
+  }
+  function sameRec(a, b){ return a.item === b.item && a.ver === b.ver; }
+  function queue(rec){ var a = readPending().filter(function(x){ return !sameRec(x, rec); }); a.push(rec); writePending(a); }
+  function unqueue(rec){ writePending(readPending().filter(function(x){ return !sameRec(x, rec); })); }
+  function submit(rec){
+    queue(rec);                                                   // เก็บก่อน · ส่งสำเร็จค่อยลบ
+    post(rec).then(function(s){ if (s !== 'retry') unqueue(rec); });
+  }
+  function flushPending(){
+    var a = readPending(); if (!a.length || navigator.onLine === false) return;
+    a.forEach(function(rec){ post(rec).then(function(s){ if (s !== 'retry') unqueue(rec); }); });
+  }
+  setTimeout(flushPending, 4000);
+
+  /* ---------- ดาว ---------- */
+  function svg(cls){ return '<svg viewBox="0 0 24 24" aria-hidden="true"><path' + (cls ? ' class="' + cls + '"' : '') + ' d="' + STAR + '"/></svg>'; }
+  function mini(n){ var h = ''; for (var i = 1; i <= 5; i++) h += svg(i <= n ? 'on' : 'off'); return h; }
+  var stars = [];
+  for (var i = 1; i <= 5; i++){
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'rvw-star'; b.dataset.n = i;
+    b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', 'false');
+    b.setAttribute('aria-label', i + ' ดาว · ' + LABELS[i]);
+    b.tabIndex = i === 1 ? 0 : -1; b.innerHTML = svg();
+    starsBox.appendChild(b); stars.push(b);
+  }
+  var pick = 0, cur = null, timer = 0, closeT = 0, lastFocus = null;
+  function paint(n){ stars.forEach(function(s, k){ s.classList.toggle('lit', k < n); }); }
+  function choose(n, focus){
+    pick = n; paint(n);
+    stars.forEach(function(s, k){ s.setAttribute('aria-checked', k === n - 1 ? 'true' : 'false'); s.tabIndex = k === n - 1 ? 0 : -1; });
+    var s = stars[n - 1]; s.classList.remove('pop'); void s.offsetWidth; s.classList.add('pop');
+    if (focus) s.focus();
+    lab.textContent = LABELS[n]; lab.classList.remove('idle');
+    $('rvwNoteLab').textContent = n >= 4 ? 'ชอบตรงไหน บอกทีมงานได้ (ไม่บังคับ)' : 'อยากให้ปรับตรงไหน บอกทีมงานได้ (ไม่บังคับ)';
+    more.hidden = false; sendBtn.disabled = false;
+  }
+  starsBox.addEventListener('click', function(e){ var s = e.target.closest('.rvw-star'); if (s) choose(+s.dataset.n); });
+  starsBox.addEventListener('mouseover', function(e){ var s = e.target.closest('.rvw-star'); if (s && window.matchMedia && matchMedia('(hover:hover)').matches) paint(+s.dataset.n); });
+  starsBox.addEventListener('mouseleave', function(){ paint(pick); });
+  starsBox.addEventListener('keydown', function(e){
+    var k = e.key;
+    if (k === 'ArrowRight' || k === 'ArrowUp'){ e.preventDefault(); choose(Math.min(5, pick + 1), true); }
+    else if (k === 'ArrowLeft' || k === 'ArrowDown'){ e.preventDefault(); choose(Math.max(1, pick - 1), true); }
+    else if (/^[1-5]$/.test(k)){ e.preventDefault(); choose(+k, true); }
+  });
+  note.addEventListener('input', function(){ cnt.textContent = note.value.length + '/300'; });
+
+  /* ---------- เปิด/ปิด ---------- */
+  function open(info){
+    clearTimeout(closeT); cur = info;
+    pick = 0; paint(0); note.value = ''; cnt.textContent = '0/300';
+    stars.forEach(function(s, k){ s.setAttribute('aria-checked', 'false'); s.tabIndex = k === 0 ? 0 : -1; });
+    lab.textContent = 'แตะดาวเพื่อให้คะแนน'; lab.classList.add('idle');
+    more.hidden = true; sendBtn.disabled = true; ask.hidden = false; done.hidden = true;
+    $('rvwTitle').textContent = 'ให้คะแนน ' + info.item;
+    $('rvwFile').textContent = info.file;
+    $('rvwSize').textContent = (info.size ? info.size + ' · ' : '') + 'ไฟล์จะอยู่ในโฟลเดอร์ดาวน์โหลดของเครื่อง';
+    lastFocus = document.activeElement;
+    rv.hidden = false; scrim.hidden = false; void rv.offsetWidth;
+    rv.classList.add('on'); scrim.classList.add('on');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function(){ try { stars[0].focus({ preventScroll: true }); } catch(e){ stars[0].focus(); } }, 60);
+  }
+  function close(){
+    if (rv.hidden) return;
+    rv.classList.remove('on'); scrim.classList.remove('on');
+    document.body.style.overflow = '';
+    closeT = setTimeout(function(){ rv.hidden = true; scrim.hidden = true; }, 340);
+    if (lastFocus && lastFocus.focus) { try { lastFocus.focus({ preventScroll: true }); } catch(e){} }
+  }
+  var toastEl = $('rvwToast'), toastT = 0;
+  function toast(msg){ toastEl.textContent = msg; toastEl.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function(){ toastEl.classList.remove('on'); }, 2600); }
+
+  function showRated(a, n){
+    var card = a.closest('.card'); if (!card) return;
+    var el = card.querySelector('.fdl-rated');
+    if (!el){ el = document.createElement('div'); el.className = 'fdl-rated'; card.appendChild(el); }
+    el.innerHTML = '<span class="rvw-mini" aria-hidden="true">' + mini(n) + '</span><span>คุณให้คะแนนเวอร์ชันนี้แล้ว <b>' + n + ' ดาว</b> · ขอบคุณ</span>';
+    el.hidden = false;
+  }
+  function infoOf(a){
+    var href = a.getAttribute('href') || '';
+    return { a: a, item: a.dataset.reviewItem, ver: a.dataset.reviewVer || '1', size: a.dataset.reviewSize || '',
+             file: decodeURIComponent(href.split('?')[0].split('/').pop() || a.dataset.reviewItem), guide: a.dataset.reviewGuide || '' };
+  }
+
+  /* ---------- ผูกกับปุ่มดาวน์โหลด ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('a[download][data-review-item]'), function(a){
+    var info = infoOf(a), n = getRated(info.item, info.ver);
+    if (n) showRated(a, n);
+    a.addEventListener('click', function(){                       // ไม่ preventDefault — ไฟล์โหลดตามปกติ
+      clearTimeout(timer);
+      var r = getRated(info.item, info.ver);
+      if (r){ toast('เริ่มดาวน์โหลดแล้ว · เวอร์ชันนี้คุณให้คะแนนแล้ว ' + r + ' ดาว'); return; }
+      timer = setTimeout(function(){ open(info); }, DELAY);
+    });
+  });
+
+  sendBtn.addEventListener('click', function(){
+    if (!pick || !cur) return;
+    var rec = { item: cur.item, ver: cur.ver, stars: pick, note: note.value.trim().slice(0, 300) };
+    setRated(cur.item, cur.ver, pick); submit(rec); showRated(cur.a, pick);
+    $('rvwDoneStars').innerHTML = mini(pick); $('rvwDoneStars').setAttribute('aria-label', 'คุณให้ ' + pick + ' ดาว');
+    $('rvwNext').textContent = cur.guide ? 'ขั้นต่อไป ติดตั้ง ' + cur.item + ' ตามขั้นตอนในหน้าวิธีติดตั้ง' : 'ไฟล์อยู่ในโฟลเดอร์ดาวน์โหลดของเครื่องแล้ว';
+    var g = $('rvwGuide'); g.hidden = !cur.guide; if (cur.guide) g.href = cur.guide;
+    $('rvwHelp').hidden = pick > 2;
+    ask.hidden = true; done.hidden = false;
+    try { $('rvwDoneTitle').focus({ preventScroll: true }); } catch(e){}
+  });
+  $('rvwLater').addEventListener('click', close);
+  $('rvwClose').addEventListener('click', close);
+  $('rvwGuide').addEventListener('click', function(){ setTimeout(close, 150); });
+  scrim.addEventListener('click', close);
+  document.addEventListener('keydown', function(e){
+    if (rv.hidden) return;
+    if (e.key === 'Escape'){ e.preventDefault(); close(); return; }
+    if (e.key === 'Tab'){                                         // วนโฟกัสอยู่ในป๊อปอัพ
+      var f = Array.prototype.filter.call(rv.querySelectorAll('button,a[href],textarea'), function(el){
+        return !el.disabled && !el.hidden && el.tabIndex !== -1 && el.offsetParent !== null; });
+      if (!f.length) return;
+      var first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+    }
+  });
+})();
+</script>
 
 <script>
 /* =====================================================================
