@@ -41,7 +41,7 @@ body{background:var(--cream);color:var(--ink);font-family:var(--f-b);line-height
 .brand span{display:block;font-family:var(--f-b);font-size:10.5px;letter-spacing:.3px;color:rgba(244,228,186,.5);font-weight:300}
 .rng{margin-left:auto;display:flex;gap:0;background:rgba(0,0,0,.28);border:1px solid rgba(212,175,55,.25);border-radius:11px;overflow:hidden}
 .rng button{border:0;background:transparent;color:rgba(244,228,186,.6);font-family:var(--f-b);font-size:12.5px;
-  font-weight:500;padding:7px 13px;cursor:pointer;transition:.15s}
+  font-weight:500;padding:7px 13px;cursor:pointer;transition:.15s;white-space:nowrap}
 .rng button.on{background:linear-gradient(135deg,var(--gold),var(--gold-d));color:#231016;font-weight:700}
 .tbtn{border:1px solid rgba(212,175,55,.3);background:transparent;color:rgba(244,228,186,.7);
   border-radius:9px;padding:7px 12px;font-family:var(--f-b);font-size:12.5px;cursor:pointer}
@@ -104,7 +104,7 @@ select{font-family:var(--f-b);font-size:12.5px;padding:5px 9px;border-radius:9px
 .panel{display:none}.panel.on{display:block}
 
 @media(max-width:1000px){.kpis{grid-template-columns:repeat(3,1fr)}.row2{grid-template-columns:1fr}}
-@media(max-width:560px){.kpis{grid-template-columns:repeat(2,1fr)}.kpi .v{font-size:25px}.rng{margin-left:0;width:100%}.rng button{flex:1}}
+@media(max-width:560px){.kpis{grid-template-columns:repeat(2,1fr)}.kpi .v{font-size:25px}.rng{margin-left:0;width:100%}.rng button{flex:1;padding:7px 4px}}
 </style>
 </head>
 <body>
@@ -127,6 +127,7 @@ select{font-family:var(--f-b);font-size:12.5px;padding:5px 9px;border-radius:9px
     <div class="top-in">
       <div class="brand">JP TRUST LEARNING<span>สถิติการใช้งาน Tool &amp; Kit</span></div>
       <div class="rng" id="rng">
+        <button data-d="0">วันนี้</button>
         <button data-d="7">7 วัน</button>
         <button data-d="30" class="on">30 วัน</button>
         <button data-d="90">90 วัน</button>
@@ -326,9 +327,9 @@ async function loadMemDaily(){
       data:{ labels: rows.map(r => r.d.slice(5)),
         datasets:[
           { label:'เปิดแอพ', data: rows.map(r => r.opens), borderColor:'#D4AF37',
-            backgroundColor:'rgba(212,175,55,.16)', fill:true, tension:.3, borderWidth:2, pointRadius:0 },
+            backgroundColor:'rgba(212,175,55,.16)', fill:true, tension:.3, borderWidth:2, pointRadius: rows.length <= 3 ? 4 : 0 },
           { label:'สมาชิกไม่ซ้ำ', data: rows.map(r => r.members), borderColor:'#722F37',
-            backgroundColor:'transparent', tension:.3, borderWidth:2, pointRadius:0 }
+            backgroundColor:'transparent', tension:.3, borderWidth:2, pointRadius: rows.length <= 3 ? 4 : 0 }
         ]},
       options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
         plugins:{ legend:{ labels:{ font:{family:'Anuphan'}, boxWidth:12 } } },
@@ -395,9 +396,9 @@ async function loadDaily(){
       data:{ labels: rows.map(r => r.d.slice(5)),
         datasets:[
           { label:'เปิดหน้า', data: rows.map(r => r.views), borderColor:'#D4AF37',
-            backgroundColor:'rgba(212,175,55,.16)', fill:true, tension:.3, borderWidth:2, pointRadius:0 },
+            backgroundColor:'rgba(212,175,55,.16)', fill:true, tension:.3, borderWidth:2, pointRadius: rows.length <= 3 ? 4 : 0 },
           { label:'คนไม่ซ้ำ', data: rows.map(r => r.visitors), borderColor:'#722F37',
-            backgroundColor:'transparent', tension:.3, borderWidth:2, pointRadius:0 }
+            backgroundColor:'transparent', tension:.3, borderWidth:2, pointRadius: rows.length <= 3 ? 4 : 0 }
         ]},
       options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
         plugins:{ legend:{ labels:{ font:{family:'Anuphan'}, boxWidth:12 } } },
