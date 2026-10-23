@@ -1554,10 +1554,8 @@ html.tk-app .mk-head .modeseg{width:100%;min-width:0;margin-left:0}
       <div class="crumb">
         <b>หน้าหลัก</b><span class="sep">/</span><span class="cur" id="crumb">Dashboard ทอง&amp;หุ้น</span>
       </div>
-      <div class="sponsor" id="sponsor" title="Sponsored by FISG">
-        <span class="sp-t"><span class="sp-k">SPONSORED BY</span><b>FISG</b></span>
-        <img src="sponsor-fisg.png" alt="FISG" width="247" height="173">
-      </div>
+      <!-- A263.1 (23 ต.ค. 2026) จูน: "เอาlogo fisg ออกครับ" — ถอดป้ายสปอนเซอร์ FISG ทั้งป้าย (ป้ายห้ามเหลือคำ SPONSORED BY ลอยๆ)
+           ไฟล์ sponsor-fisg.png ยังอยู่ ไม่ได้ลบ · คืนได้จาก jptrust-toolkit-backup-v82.html · CSS .sponsor/.sp-* ที่เหลือ = โค้ดตาย -->
       <div class="top-act">
         <a class="btn hide" id="btnOpen" target="_blank" rel="noopener">เปิดในแท็บใหม่ ↗</a>
         <button class="btn hide" id="btnBack">← หน้าแรก</button>
@@ -3656,13 +3654,8 @@ if(h0){
       hi.textContent = h>=5&&h<12 ? 'สวัสดีตอนเช้า' : h>=12&&h<17 ? 'สวัสดีตอนบ่าย' : h>=17&&h<21 ? 'สวัสดีตอนเย็น' : 'สวัสดีตอนค่ำ';
     }
 
-    /* สปอนเซอร์ FISG — ย้ายจากแถบบน (ซ่อนในแอป) มาไว้มุมขวาของราคาทอง ให้อยู่ในจอแรกเสมอ */
-    var kp=document.getElementById('kpis');
-    if(kp){
-      var sp=document.createElement('div'); sp.className='ah-sp'; sp.title='Sponsored by FISG';
-      sp.innerHTML='<span>Sponsored by</span><img src="sponsor-fisg.png" alt="FISG" width="247" height="173">';
-      kp.parentNode.insertBefore(sp,kp);
-    }
+    /* สปอนเซอร์ FISG (มุมขวาของราคาทอง · .ah-sp) — ถอดแล้ว A263.1 (23 ต.ค. 2026 · จูน "เอาlogo fisg ออกครับ")
+       คืนได้จาก jptrust-toolkit-backup-v82.html · CSS html.tk-app .ah-sp ที่เหลือ = โค้ดตาย */
 
     /* ป้ายการ์ดค้นหาหุ้นเป็นภาษาไทยในแอป (หน้าเว็บยังเป็น SECTOR SCANNER) */
     var sb2=document.querySelector('#heroScanner .scn-brand span:last-child'); if(sb2) sb2.textContent='ค้นหาหุ้น S&P 500';
