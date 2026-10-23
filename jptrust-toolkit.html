@@ -1751,20 +1751,8 @@ html.tk-app .mk-head .modeseg{width:100%;min-width:0;margin-left:0}
 
         </div>
 
-        <!-- ---------- FOREX SESSIONS: ช่วงเวลาตลาด 4 ศูนย์กลาง เวลาไทย (มาแทนการ์ดกราฟทอง 60 วัน + โซนวันนี้ — ของเดิมอยู่ใน backup v21) ---------- -->
-        <div class="card" id="mkSes">
-          <div class="card-h">
-            <h3>ช่วงเวลาตลาด Forex · เวลาไทย</h3>
-            <span class="mk-live"><span class="dotlive"></span>ตามเวลาจริง</span>
-          </div>
-          <div class="ses-top">
-            <div class="ses-clock" id="sesClock">--:--</div>
-            <div class="ses-date"><b id="sesDay">&nbsp;</b>เวลาประเทศไทย (GMT+7)</div>
-            <div class="ses-liq" id="sesLiq"><i></i>ปริมาณซื้อขายโดยทั่วไป <b>—</b></div>
-          </div>
-          <div class="ses-body" id="sesBody"><div class="empty-slot"><div class="e-t">SESSIONS</div><div class="e-d">กำลังคำนวณเวลา…</div></div></div>
-          <div class="ses-lg" id="sesLg"></div>
-        </div>
+        <!-- ---------- FOREX SESSIONS (#mkSes) — ถอดแล้ว A263.4 (23 ต.ค. 2026 · จูนส่งภาพการ์ดนี้ "เอาอันนี้ออกเลยครับ")
+             markup/CSS/JS เดิมคืนได้จาก jptrust-toolkit-backup-v84.html · CSS .ses-* และฟังก์ชัน mkSes* ที่เหลือ = โค้ดตาย (ไม่เริ่มนาฬิกาแล้ว) ---------- -->
 
         <!-- ---------- ปฏิทินข่าวเศรษฐกิจสหรัฐฯ (ผลกระทบสูงเท่านั้น) ---------- -->
         <div class="card" id="mkCal">
@@ -1977,7 +1965,7 @@ const MENU=[
     {t:'Dashboard ทอง&หุ้น',ic:'grid',dash:true},
     {t:'ค้นหาหุ้น S&P 500',ic:'chart',mk:1,to:'heroScanner',chip:'ใหม่'},
     {t:'Risk-on / Risk-off',ic:'spark',mk:1,to:'mkRisk',chip:'ใหม่'},
-    {t:'เวลาตลาด Forex',ic:'clock',mk:1,to:'mkSes',chip:'ใหม่'},
+    /* A263.4 · เมนู 'เวลาตลาด Forex' (to:'mkSes') ถอดพร้อมการ์ด */
     {t:'ปฏิทินข่าว US',ic:'clock',mk:1,to:'mkCal',chip:'ใหม่'},
     {t:'Heatmap หุ้น · ทองคำ',ic:'chart',mk:1,chip:'ใหม่'},
     {t:'ทองไหลไปตลาดไหน',ic:'coin',mk:'gold',to:'mkBasis',chip:'ใหม่'},
@@ -3037,7 +3025,7 @@ function mkSesStart(){
   if(!sesTimer) sesTimer=setInterval(()=>{ if(mkSesVisible()) mkSesRender(); },15000);
 }
 document.addEventListener('visibilitychange',()=>{ if(sesTimer&&mkSesVisible()) mkSesRender(); });
-mkSesStart();                                      // การ์ดอยู่ในหน้าภาพรวมโดยตรง (ไม่ได้อยู่ในแท็บ) — เริ่มทันทีที่โหลดหน้า
+if(document.getElementById('mkSes')) mkSesStart();   /* A263.4 · การ์ดถอดแล้ว — ไม่เริ่มนาฬิกา 15 วิ */ // การ์ดอยู่ในหน้าภาพรวมโดยตรง (ไม่ได้อยู่ในแท็บ) — เริ่มทันทีที่โหลดหน้า
 
 /* =====================================================================
    HOUSE AD — แบนเนอร์บริการของ JP Trust Learning (#prodCard)
