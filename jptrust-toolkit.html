@@ -594,6 +594,14 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 /* ---- ปฏิทินข่าวเศรษฐกิจสหรัฐฯ ผลกระทบสูง (#mkCal) ---- */
 #mkCal{margin-top:14px;scroll-margin-top:70px}
 .mk-calwrap{overflow-x:auto}
+/* A263 · ปฏิทินเปลี่ยนเป็น TradingView Economic Calendar widget (กรองสหรัฐฯ + ผลกระทบสูง) — รองพื้นแบบเดียวกับ .mk-fxbox */
+.mk-tvcal{height:640px;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#fff;position:relative}
+.mk-tvcal::before{content:'กำลังโหลดปฏิทินข่าว… ถ้าไม่ขึ้นภายในครู่เดียว ลองปิดตัวบล็อกโฆษณาแล้วรีเฟรช';position:absolute;inset:0;display:grid;place-items:center;
+  padding:0 24px;text-align:center;font-size:12.5px;color:var(--muted);font-weight:300}
+.mk-tvcal .tradingview-widget-container{position:relative;z-index:1}
+.mk-tvcal .tradingview-widget-container,.mk-tvcal .tradingview-widget-container__widget{height:100%;width:100%}
+.mk-tvcal .tradingview-widget-copyright{display:none}
+@media(max-width:640px){.mk-tvcal{height:580px}}
 .cal-tb{width:100%;border-collapse:collapse;font-size:12.5px}
 .cal-tb th{background:linear-gradient(180deg,var(--maroon),var(--maroon2));color:var(--gold-l);font-family:var(--f-d);
   font-size:10.5px;letter-spacing:1.3px;font-weight:600;text-align:left;padding:8px 10px;white-space:nowrap}
@@ -1762,8 +1770,8 @@ html.tk-app .mk-head .modeseg{width:100%;min-width:0;margin-left:0}
           <div class="card-h">
             <h3>ปฏิทินข่าวเศรษฐกิจสหรัฐฯ · เฉพาะข่าวแรง</h3>
           </div>
-          <div class="mk-calwrap" id="mkCalBox"><div class="empty-slot"><div class="e-t">CALENDAR</div><div class="e-d">กำลังโหลดปฏิทิน…</div></div></div>
-          <div class="mk-cap" id="mkCalCap">เฉพาะสหรัฐฯ และเฉพาะรายการที่ขยับตลาดจริง — ดอกเบี้ยเฟด การจ้างงานนอกภาคเกษตร และเงินเฟ้อ CPI · <b>เวลาเป็นเวลาไทยเสมอ</b> ไม่ขึ้นกับเครื่องที่เปิด (คิด DST ของสหรัฐฯ ให้แล้ว ช่วงหลัง 1 พ.ย. ต่างกัน 12 ชม. ไม่ใช่ 11) · วันเวลามาจากตารางประกาศทางการของเฟดและ BLS ตัวเลขคาดการณ์จากฟีดสาธารณะ · ช่องผลจริงจะขึ้นหลังประกาศ</div>
+          <div class="mk-calwrap mk-tvcal" id="mkCalBox"><div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div></div></div>
+          <div class="mk-cap" id="mkCalCap">ปฏิทินเศรษฐกิจจาก TradingView (widget ฟรี) · กรองเฉพาะสหรัฐฯ และเฉพาะข่าวผลกระทบสูง (ข่าวแดง) — เช่น ดอกเบี้ยเฟด การจ้างงานนอกภาคเกษตร เงินเฟ้อ CPI/PCE GDP ยอดค้าปลีก · ตัวเลขผลจริง คาดการณ์ และครั้งก่อนอัพเดทเองจาก TradingView · <b>เวลาแสดงตามเขตเวลาของเครื่องที่เปิด</b> (เครื่องที่ตั้งเวลาไทย = เวลาไทย)</div>
         </div>
 
         <!-- ---------- MARKET OVERVIEW: bars + heatmap (หุ้น / ทอง) ---------- -->
@@ -2924,45 +2932,21 @@ document.addEventListener('visibilitychange',()=>{            // กลับจ
 });
 
 /* =====================================================================
-   ปฏิทินข่าวเศรษฐกิจสหรัฐฯ — ตารางของเราเอง อ่านจาก news/us-calendar.json (#mkCal)
-   เวลาในไฟล์แปลงเป็นเวลาไทยไว้แล้ว (คิด DST สหรัฐฯ ตอนเติมข้อมูล) ส่วน utc ใช้แค่ตัดสินว่าผ่านไปแล้วหรือยัง
-   เติมด้วยมือ — วันเวลาจาก federalreserve.gov + bls.gov · ตัวเลขคาดการณ์จากฟีดสาธารณะของ Forex Factory
-   โหลดครั้งเดียวตอนการ์ดเลื่อนเข้ามาใกล้จอ
+   ปฏิทินข่าวเศรษฐกิจสหรัฐฯ — TradingView "Economic Calendar" widget (embed-widget-events.js) · A263 (23 ต.ค. 2026)
+   จูน: "เปลี่ยนตารางข่าว ให้ใช้ widget ฟรี ที่หาได้ เอาเฉพาะข่าวแดง" → แทนตารางเติมมือจาก news/us-calendar.json
+   (ไฟล์ JSON เดิมยังอยู่ ไม่ได้ลบ · ตารางเดิมคืนได้จาก jptrust-toolkit-backup-v81.html)
+   countryFilter 'us' = สหรัฐฯ อย่างเดียว (ขอบเขตเดิมของการ์ด) · importanceFilter '1' = ผลกระทบสูงเท่านั้น (-1 ต่ำ · 0 กลาง · 1 สูง)
+   อยากได้ประเทศอื่นด้วย → เติมรหัสใน countryFilter เช่น 'us,eu,gb,jp,cn'
+   เวลาใน widget = เขตเวลาของเครื่องผู้ชม · โหลดครั้งเดียวตอนการ์ดเลื่อนเข้ามาใกล้จอ (ในแอปการ์ดซ่อนจนกดแท็บปฏิทิน)
    ===================================================================== */
-const MK_CAL_URL='news/us-calendar.json';
-function mkCalEsc(x){return String(x==null?'':x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
-function mkCalRender(data){
-  const box=document.getElementById('mkCalBox'); if(!box) return;
-  const ev=(data&&data.events||[]).slice().sort((a,b)=>new Date(a.utc)-new Date(b.utc));
-  if(!ev.length){ box.innerHTML='<div class="empty-slot"><div class="e-t">CALENDAR</div><div class="e-d">ยังไม่มีรายการ</div></div>'; return; }
-  const now=Date.now();
-  const cell=v=>v?'<span class="cal-num">'+mkCalEsc(v)+'</span>':'<span class="cal-na">—</span>';
-  let sep=false, nextDone=false, rows='';
-  for(const e of ev){
-    const past=new Date(e.utc).getTime()<now;
-    if(!past&&!sep){ rows+='<tr class="cal-sep"><td colspan="6">กำลังจะถึง</td></tr>'; sep=true; }
-    const cls=(past?'cal-past':'')+(!past&&!nextDone?' cal-next':'');
-    if(!past) nextDone=true;
-    rows+='<tr class="'+cls.trim()+'">'
-      +'<td class="cal-d">'+mkCalEsc(e.d)+'</td>'
-      +'<td><span class="cal-src '+(e.src==='Fed'?'fed':'bls')+'">'+mkCalEsc(e.src)+'</span></td>'
-      +'<td>'+mkCalEsc(e.title)+'</td>'
-      +'<td class="cal-t r">'+mkCalEsc(e.t)+'</td>'
-      +'<td class="r">'+(e.actual?'<span class="cal-num a">'+mkCalEsc(e.actual)+'</span>':'<span class="cal-na">—</span>')+'</td>'
-      +'<td class="r">'+cell(e.forecast)+'</td>'
-      +'<td class="r">'+cell(e.previous)+'</td></tr>';
-  }
-  rows=rows.replace(/colspan="6"/g,'colspan="7"');
-  box.innerHTML='<table class="cal-tb"><thead><tr><th>วันที่</th><th>แหล่ง</th><th>เหตุการณ์</th>'
-    +'<th class="r">เวลาไทย</th><th class="r">ผลจริง</th><th class="r">คาดการณ์</th><th class="r">ครั้งก่อน</th></tr></thead>'
-    +'<tbody>'+rows+'</tbody></table>';
-}
+const MK_CAL_CFG={colorTheme:'light',isTransparent:false,locale:'th_TH',countryFilter:'us',importanceFilter:'1',width:'100%',height:'100%'};
 function mkCalLoad(){
-  const box=document.getElementById('mkCalBox'); if(!box||box.dataset.loaded==='1') return;
-  box.dataset.loaded='1';
-  fetch(MK_CAL_URL,{cache:'no-store'}).then(r=>r.json()).then(mkCalRender).catch(()=>{
-    box.innerHTML='<div class="empty-slot"><div class="e-t">CALENDAR</div><div class="e-d">โหลดปฏิทินไม่สำเร็จ</div></div>';
-  });
+  const box=document.querySelector('#mkCalBox .tradingview-widget-container__widget'); if(!box||box.dataset.tvLoaded==='1') return;
+  box.dataset.tvLoaded='1';
+  const sc=document.createElement('script'); sc.type='text/javascript'; sc.async=true;
+  sc.src='https://s3.tradingview.com/external-embedding/embed-widget-events.js';
+  sc.innerHTML=JSON.stringify(MK_CAL_CFG);
+  box.parentElement.appendChild(sc);
 }
 (function(){
   const el=document.getElementById('mkCal'); if(!el) return;
@@ -3774,7 +3758,7 @@ if(h0){
     note(document.getElementById('ladder'),'โอกาสแตะคือความถี่จากสถิติย้อนหลัง ไม่ใช่การพยากรณ์');
     note(document.getElementById('mkStrInfo'),'ข้อมูลรายวันจากธนาคารกลางยุโรป ไม่ใช่ราคาสด');
     note(document.getElementById('mkFxBox'),'อัตรากลางของตลาด ไม่ใช่ราคารับซื้อ–ขายของธนาคาร');
-    note(document.getElementById('mkCalBox'),'เวลาในตารางเป็นเวลาไทย');
+    note(document.getElementById('mkCalBox'),'ข้อมูลจาก TradingView · เวลาตามเครื่องที่เปิด');
   }
 
   /* ---------- หน้าเว็บปกติ: แถบชวนติดตั้ง (A154.3) ----------
