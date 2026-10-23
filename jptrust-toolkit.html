@@ -605,6 +605,34 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 /* A263.2 · จูน "ให้ตารางข่าวย่อเหลือ วันต่อวัน" — ปกติกรอบเตี้ยพอดีราวหนึ่งวัน (ปัดในกรอบดูวันถัดไป) · กด ดูรายละเอียด (.tk-more) = ขยายเต็มเท่าเดิม */
 #mkCal.tk-more .mk-tvcal{height:640px}
 @media(max-width:640px){#mkCal.tk-more .mk-tvcal{height:580px}}
+/* A263.5 · ตารางข่าวแดงของเราเอง วันต่อวัน (.mk-tvcal ข้างบน = โค้ดตายแล้ว) */
+.fc{overflow:visible}
+.fc-nav{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.fc-btn{flex:0 0 40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--a-fill,#F2EFEA);color:var(--a-acc,var(--maroon));
+  display:grid;place-items:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.fc-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.fc-btn:disabled{opacity:.3;cursor:default}
+.fc-day{flex:1;min-width:0;text-align:center;line-height:1.25}
+.fc-day b{display:block;font-size:16px;font-weight:600;color:var(--ink)}
+.fc-day span{display:block;font-size:12px;color:var(--muted)}
+.fc-day span.now{color:var(--a-acc,var(--maroon));font-weight:600}
+.fc-list{touch-action:pan-y}
+.fc-row{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px 4px 11px 10px;border-top:1px solid var(--line);position:relative}
+.fc-row:first-child{border-top:0}
+.fc-row.past{opacity:.5}
+.fc-row.next::before{content:'';position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:3px;background:var(--gold)}
+.fc-t{font-variant-numeric:tabular-nums;font-weight:600;font-size:14px;color:var(--ink)}
+.fc-ti{font-size:14px;font-weight:600;color:var(--ink);line-height:1.35;display:flex;gap:7px;align-items:baseline}
+.fc-ti i{flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:var(--a-dn,var(--down));transform:translateY(-1px)}
+.fc-en{font-size:11.5px;color:var(--muted);line-height:1.3;margin:2px 0 0 15px;overflow-wrap:anywhere}
+.fc-num{display:flex;flex-direction:column;align-items:flex-end;gap:1px;font-variant-numeric:tabular-nums;font-size:13px;color:var(--ink);white-space:nowrap}
+.fc-num small{font-size:10.5px;color:var(--muted);margin-right:4px}
+.fc-num .na{color:var(--muted)}
+.fc-empty{padding:18px 6px;text-align:center;font-size:13.5px;color:var(--muted);line-height:1.6}
+.fc-jump{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--a-fill,#F2EFEA);
+  color:var(--a-acc,var(--maroon));font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.fc-today{display:block;margin:8px auto 0;padding:7px 16px;border-radius:999px;border:0;background:var(--a-acc,var(--maroon));color:#fff;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
+.fc-today[hidden]{display:none}
 .cal-tb{width:100%;border-collapse:collapse;font-size:12.5px}
 .cal-tb th{background:linear-gradient(180deg,var(--maroon),var(--maroon2));color:var(--gold-l);font-family:var(--f-d);
   font-size:10.5px;letter-spacing:1.3px;font-weight:600;text-align:left;padding:8px 10px;white-space:nowrap}
@@ -1759,8 +1787,17 @@ html.tk-app .mk-head .modeseg{width:100%;min-width:0;margin-left:0}
           <div class="card-h">
             <h3>ปฏิทินข่าวเศรษฐกิจสหรัฐฯ · เฉพาะข่าวแรง</h3>
           </div>
-          <div class="mk-calwrap mk-tvcal" id="mkCalBox"><div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div></div></div>
-          <div class="mk-cap" id="mkCalCap">ปฏิทินเศรษฐกิจจาก TradingView (widget ฟรี) · กรองเฉพาะสหรัฐฯ และเฉพาะข่าวผลกระทบสูง (ข่าวแดง) — เช่น ดอกเบี้ยเฟด การจ้างงานนอกภาคเกษตร เงินเฟ้อ CPI/PCE GDP ยอดค้าปลีก · ตัวเลขผลจริง คาดการณ์ และครั้งก่อนอัพเดทเองจาก TradingView · <b>เวลาแสดงตามเขตเวลาของเครื่องที่เปิด</b> (เครื่องที่ตั้งเวลาไทย = เวลาไทย)</div>
+          <!-- A263.5 · ตารางเบาของเรา ‹ วันนี้ › (แทน TradingView widget ที่หน่วง) · ข้อมูล news/ff-calendar.json -->
+          <div class="mk-calwrap fc" id="mkCalBox">
+            <div class="fc-nav">
+              <button type="button" class="fc-btn" id="fcPrev" aria-label="วันก่อนหน้า"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+              <div class="fc-day" aria-live="polite"><b id="fcDay">กำลังโหลด…</b><span id="fcSub">&nbsp;</span></div>
+              <button type="button" class="fc-btn" id="fcNext" aria-label="วันถัดไป"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+            </div>
+            <div class="fc-list" id="fcList"><div class="fc-empty">กำลังโหลดปฏิทิน…</div></div>
+            <button type="button" class="fc-today" id="fcToday" hidden>กลับไปวันนี้</button>
+          </div>
+          <div class="mk-cap" id="mkCalCap">เฉพาะข่าวผลกระทบสูง (ข่าวแดง) ของสหรัฐฯ จากฟีดสาธารณะของ ForexFactory · <b>เวลาเป็นเวลาไทยเสมอ</b> ไม่ขึ้นกับเครื่องที่เปิด · อัพเดทเองราวทุก 3 ชั่วโมง · ฟีดมีเฉพาะสัปดาห์นี้ (สัปดาห์ถัดไปมักขึ้นวันอาทิตย์) · มีตัวเลขคาดการณ์และครั้งก่อน ยังไม่มีผลจริง · ปัดซ้าย–ขวาที่ตารางเพื่อเปลี่ยนวันได้<span id="fcUpd"></span></div>
         </div>
 
         <!-- ---------- MARKET OVERVIEW: bars + heatmap (หุ้น / ทอง) ---------- -->
@@ -2921,21 +2958,107 @@ document.addEventListener('visibilitychange',()=>{            // กลับจ
 });
 
 /* =====================================================================
-   ปฏิทินข่าวเศรษฐกิจสหรัฐฯ — TradingView "Economic Calendar" widget (embed-widget-events.js) · A263 (23 ต.ค. 2026)
-   จูน: "เปลี่ยนตารางข่าว ให้ใช้ widget ฟรี ที่หาได้ เอาเฉพาะข่าวแดง" → แทนตารางเติมมือจาก news/us-calendar.json
-   (ไฟล์ JSON เดิมยังอยู่ ไม่ได้ลบ · ตารางเดิมคืนได้จาก jptrust-toolkit-backup-v81.html)
-   countryFilter 'us' = สหรัฐฯ อย่างเดียว (ขอบเขตเดิมของการ์ด) · importanceFilter '1' = ผลกระทบสูงเท่านั้น (-1 ต่ำ · 0 กลาง · 1 สูง)
-   อยากได้ประเทศอื่นด้วย → เติมรหัสใน countryFilter เช่น 'us,eu,gb,jp,cn'
-   เวลาใน widget = เขตเวลาของเครื่องผู้ชม · โหลดครั้งเดียวตอนการ์ดเลื่อนเข้ามาใกล้จอ (ในแอปการ์ดซ่อนจนกดแท็บปฏิทิน)
+   ปฏิทินข่าวแดงสหรัฐฯ — ตารางเบาของเรา วันต่อวัน ‹ วันนี้ › · A263.5 (23 ต.ค. 2026)
+   ประวัติ: A263 เปลี่ยนเป็น TradingView widget → จูน "หน้าปฏิทินมันหน่วงมาก" → วัดบนเครื่อง GitHub:
+   main thread +1.1 วิ (CPU ช้า 4 เท่า) · 45 ไฟล์ 260 KB · กรอบดักนิ้ว หน้าไม่เลื่อน → จูนเลือกตารางเบาของเรา
+   (widget คืนได้จาก jptrust-toolkit-backup-v85.html · ตารางเติมมือรุ่นแรกจาก v81)
+   ข้อมูล news/ff-calendar.json = USD + impact High จากฟีด ForexFactory · workflow .github/workflows/ff_calendar.yml
+   ดึงทุก 3 ชม. (tools/ff_calendar.py) · ฟีดไม่มี CORS เบราว์เซอร์ดึงตรงไม่ได้ จึงต้องผ่าน repo
+   เวลาแปลงเป็น Asia/Bangkok ตายตัวด้วย Intl (ไม่ขึ้นกับเครื่อง) · ไม่มีตัวเลขผลจริง
    ===================================================================== */
-const MK_CAL_CFG={colorTheme:'light',isTransparent:false,locale:'th_TH',countryFilter:'us',importanceFilter:'1',width:'100%',height:'100%'};
+const FC_URL='news/ff-calendar.json', FC_TZ='Asia/Bangkok';
+const FC_WD=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+const FC_MO=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+/* ชื่อไทยของข่าวแดงที่เจอบ่อย — ไม่มีในรายการ = โชว์ชื่ออังกฤษอย่างเดียว */
+const FC_TH=[
+  [/^Non-Farm Employment Change$/i,'การจ้างงานนอกภาคเกษตร (NFP)'],[/^ADP Non-Farm Employment Change$/i,'การจ้างงานภาคเอกชน ADP'],
+  [/^Unemployment Rate$/i,'อัตราว่างงาน'],[/^Unemployment Claims$/i,'ผู้ขอสวัสดิการว่างงานรายสัปดาห์'],
+  [/^Average Hourly Earnings m\/m$/i,'ค่าจ้างรายชั่วโมงเฉลี่ย เทียบเดือน'],[/^JOLTS Job Openings$/i,'ตำแหน่งงานว่าง JOLTS'],
+  [/^Core CPI m\/m$/i,'เงินเฟ้อพื้นฐาน CPI เทียบเดือน'],[/^Core CPI y\/y$/i,'เงินเฟ้อพื้นฐาน CPI เทียบปี'],
+  [/^CPI m\/m$/i,'เงินเฟ้อ CPI เทียบเดือน'],[/^CPI y\/y$/i,'เงินเฟ้อ CPI เทียบปี'],
+  [/^Core PCE Price Index m\/m$/i,'เงินเฟ้อพื้นฐาน PCE เทียบเดือน'],[/^Core PCE Price Index y\/y$/i,'เงินเฟ้อพื้นฐาน PCE เทียบปี'],
+  [/^PCE Price Index m\/m$/i,'เงินเฟ้อ PCE เทียบเดือน'],[/^Core PPI m\/m$/i,'ราคาผู้ผลิตพื้นฐาน PPI เทียบเดือน'],[/^PPI m\/m$/i,'ราคาผู้ผลิต PPI เทียบเดือน'],
+  [/^Federal Funds Rate$/i,'ดอกเบี้ยนโยบายเฟด'],[/^FOMC Statement$/i,'แถลงการณ์ FOMC'],[/^FOMC Press Conference$/i,'แถลงข่าวประธานเฟด'],
+  [/^FOMC Economic Projections$/i,'ประมาณการเศรษฐกิจของเฟด'],[/^FOMC Meeting Minutes$/i,'รายงานการประชุม FOMC'],
+  [/^Fed Chair .+ (Speaks|Testifies)$/i,'ประธานเฟดกล่าว'],
+  [/^Advance GDP q\/q$/i,'GDP ประมาณการแรก เทียบไตรมาส'],[/^Prelim GDP q\/q$/i,'GDP ประมาณการครั้งที่ 2'],[/^Final GDP q\/q$/i,'GDP ประมาณการสุดท้าย'],
+  [/^Retail Sales m\/m$/i,'ยอดค้าปลีก เทียบเดือน'],[/^Core Retail Sales m\/m$/i,'ยอดค้าปลีกพื้นฐาน เทียบเดือน'],
+  [/^ISM Manufacturing PMI$/i,'ISM ภาคการผลิต'],[/^ISM Services PMI$/i,'ISM ภาคบริการ'],
+  [/^Flash Manufacturing PMI$/i,'PMI ภาคการผลิต (เบื้องต้น)'],[/^Flash Services PMI$/i,'PMI ภาคบริการ (เบื้องต้น)'],
+  [/^CB Consumer Confidence$/i,'ความเชื่อมั่นผู้บริโภค (CB)'],[/^Prelim UoM Consumer Sentiment$/i,'ความเชื่อมั่นผู้บริโภค UoM (เบื้องต้น)'],
+  [/^Revised UoM Consumer Sentiment$/i,'ความเชื่อมั่นผู้บริโภค UoM (ปรับปรุง)'],[/^Prelim UoM Inflation Expectations$/i,'คาดการณ์เงินเฟ้อ UoM (เบื้องต้น)'],
+  [/^Revised UoM Inflation Expectations$/i,'คาดการณ์เงินเฟ้อ UoM (ปรับปรุง)'],[/^Durable Goods Orders m\/m$/i,'ยอดสั่งซื้อสินค้าคงทน'],
+  [/^Philly Fed Manufacturing Index$/i,'ดัชนีภาคการผลิตฟิลาเดลเฟีย'],[/^Empire State Manufacturing Index$/i,'ดัชนีภาคการผลิตนิวยอร์ก']
+];
+const FC={ev:[], byDay:{}, day:null, min:null, max:null, ok:false};
+function fcEsc(x){return String(x==null?'':x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function fcParts(d){
+  const p=new Intl.DateTimeFormat('en-CA',{timeZone:FC_TZ,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(d);
+  const g=t=>(p.find(x=>x.type===t)||{}).value||'';
+  return {key:g('year')+'-'+g('month')+'-'+g('day'), hm:g('hour')+':'+g('minute')};
+}
+function fcShift(key,n){ return new Date(new Date(key+'T12:00:00Z').getTime()+n*864e5).toISOString().slice(0,10); }
+function fcLabel(key){ const d=new Date(key+'T12:00:00Z'); return 'วัน'+FC_WD[d.getUTCDay()]+' '+d.getUTCDate()+' '+FC_MO[d.getUTCMonth()]; }
+function fcTh(t){ for(const [re,th] of FC_TH) if(re.test(t)) return th; return ''; }
+function fcRender(){
+  const list=document.getElementById('fcList'), dayEl=document.getElementById('fcDay'), sub=document.getElementById('fcSub');
+  if(!list||!FC.ok) return;
+  const now=Date.now(), today=fcParts(new Date()).key, key=FC.day;
+  const rows=FC.byDay[key]||[];
+  dayEl.textContent=fcLabel(key);
+  const rel=key===today?'วันนี้':key===fcShift(today,1)?'พรุ่งนี้':key===fcShift(today,-1)?'เมื่อวาน':'';
+  sub.textContent=(rel?rel+' · ':'')+(rows.length?rows.length+' ข่าวแดง':'ไม่มีข่าวแดง');
+  sub.className=rel==='วันนี้'?'now':'';
+  document.getElementById('fcPrev').disabled=key<=FC.min;
+  document.getElementById('fcNext').disabled=key>=FC.max;
+  document.getElementById('fcToday').hidden=key===today;
+  if(!rows.length){
+    const nx=FC.ev.find(e=>e.t>now&&e.key>key)||FC.ev.find(e=>e.key>key);
+    list.innerHTML='<div class="fc-empty">ไม่มีข่าวแดงของสหรัฐฯ ในวันนี้'
+      +(nx?'<br><button type="button" class="fc-jump" data-k="'+nx.key+'">ข่าวแดงถัดไป · '+fcEsc(fcLabel(nx.key).replace('วัน',''))+' '+nx.hm+' น.</button>'
+          :'<br>สัปดาห์นี้ไม่มีข่าวแดงของสหรัฐฯ เหลือแล้ว · ข่าวสัปดาห์ถัดไปจะขึ้นเองเมื่อฟีดอัพเดท (มักเป็นวันอาทิตย์)')+'</div>';
+    return;
+  }
+  const nextT=(FC.ev.find(e=>e.t>=now)||{}).t;
+  list.innerHTML=rows.map(e=>{
+    const th=fcTh(e.title), cls=(e.t<now?'past':'')+(e.t===nextT?' next':'');
+    const num=(lab,v)=>'<span><small>'+lab+'</small>'+(v?fcEsc(v):'<span class="na">—</span>')+'</span>';
+    return '<div class="fc-row '+cls.trim()+'"><div class="fc-t">'+e.hm+'</div>'
+      +'<div><div class="fc-ti"><i aria-hidden="true"></i><span>'+fcEsc(th||e.title)+'</span></div>'+(th?'<div class="fc-en">'+fcEsc(e.title)+'</div>':'')+'</div>'
+      +'<div class="fc-num">'+num('คาด',e.forecast)+num('ก่อน',e.previous)+'</div></div>';
+  }).join('');
+}
+function fcGo(n){ const k=fcShift(FC.day,n); if(k<FC.min||k>FC.max) return; FC.day=k; fcRender(); }
+function fcInit(data){
+  const today=fcParts(new Date()).key;
+  FC.ev=(data&&data.events||[]).map(e=>{ const d=new Date(e.date); if(isNaN(d)) return null; const p=fcParts(d);
+    return {t:d.getTime(),key:p.key,hm:p.hm,title:e.title||'',forecast:e.forecast||'',previous:e.previous||''}; }).filter(Boolean).sort((a,b)=>a.t-b.t);
+  FC.byDay={}; FC.ev.forEach(e=>{ (FC.byDay[e.key]=FC.byDay[e.key]||[]).push(e); });
+  const keys=FC.ev.map(e=>e.key).concat([today], data&&data.covers&&data.covers[1]?[data.covers[1]]:[]);
+  FC.min=keys.reduce((a,b)=>a<b?a:b); FC.max=keys.reduce((a,b)=>a>b?a:b);
+  FC.day=today; FC.ok=true;
+  const u=document.getElementById('fcUpd');
+  if(u&&data&&data.changed_utc){ const p=fcParts(new Date(data.changed_utc)); u.textContent=' · ข้อมูลเปลี่ยนล่าสุด '+fcLabel(p.key).replace('วัน','')+' '+p.hm+' น.'; }
+  fcRender();
+}
 function mkCalLoad(){
-  const box=document.querySelector('#mkCalBox .tradingview-widget-container__widget'); if(!box||box.dataset.tvLoaded==='1') return;
-  box.dataset.tvLoaded='1';
-  const sc=document.createElement('script'); sc.type='text/javascript'; sc.async=true;
-  sc.src='https://s3.tradingview.com/external-embedding/embed-widget-events.js';
-  sc.innerHTML=JSON.stringify(MK_CAL_CFG);
-  box.parentElement.appendChild(sc);
+  const box=document.getElementById('mkCalBox'); if(!box||box.dataset.loaded==='1') return;
+  box.dataset.loaded='1';
+  document.getElementById('fcPrev').addEventListener('click',()=>fcGo(-1));
+  document.getElementById('fcNext').addEventListener('click',()=>fcGo(1));
+  document.getElementById('fcToday').addEventListener('click',()=>{ FC.day=fcParts(new Date()).key; fcRender(); });
+  const list=document.getElementById('fcList');
+  list.addEventListener('click',e=>{ const b=e.target.closest('.fc-jump'); if(b){ FC.day=b.dataset.k; fcRender(); } });
+  let sx=0, sy=0, st=0;   /* ปัดซ้าย–ขวาเปลี่ยนวัน */
+  list.addEventListener('touchstart',e=>{ const t=e.touches[0]; sx=t.clientX; sy=t.clientY; st=Date.now(); },{passive:true});
+  list.addEventListener('touchend',e=>{ const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy;
+    if(Date.now()-st<600&&Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5) fcGo(dx<0?1:-1); },{passive:true});
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&FC.ok) fcRender(); });
+  fetch(FC_URL,{cache:'no-store'}).then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); }).then(fcInit).catch(()=>{
+    document.getElementById('fcDay').textContent='โหลดปฏิทินไม่สำเร็จ';
+    list.innerHTML='<div class="fc-empty">ยังโหลดข้อมูลไม่ได้ ลองรีเฟรชอีกครั้ง</div>';
+    ['fcPrev','fcNext'].forEach(id=>{ document.getElementById(id).disabled=true; });
+  });
 }
 (function(){
   const el=document.getElementById('mkCal'); if(!el) return;
@@ -3742,7 +3865,7 @@ if(h0){
     note(document.getElementById('ladder'),'โอกาสแตะคือความถี่จากสถิติย้อนหลัง ไม่ใช่การพยากรณ์');
     note(document.getElementById('mkStrInfo'),'ข้อมูลรายวันจากธนาคารกลางยุโรป ไม่ใช่ราคาสด');
     note(document.getElementById('mkFxBox'),'อัตรากลางของตลาด ไม่ใช่ราคารับซื้อ–ขายของธนาคาร');
-    note(document.getElementById('mkCalBox'),'ข้อมูลจาก TradingView · เวลาตามเครื่องที่เปิด');
+    note(document.getElementById('mkCalBox'),'ข่าวแดงสหรัฐฯ จาก ForexFactory · เวลาไทย');
   }
 
   /* ---------- หน้าเว็บปกติ: แถบชวนติดตั้ง (A154.3) ----------

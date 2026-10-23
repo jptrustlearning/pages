@@ -1,0 +1,45 @@
+# A263.5 (23 ต.ค. 2026) · ปฏิทินข่าวแดงสหรัฐฯ ของ Tool&Kit (#mkCal) — ดึงฟีด ForexFactory แล้วเขียน news/ff-calendar.json
+# commit เฉพาะตอนเนื้อหาเปลี่ยน (ไม่ให้ Cloudflare Pages deploy ทุกรอบ) · สคริปต์ = tools/ff_calendar.py
+# ปิดชั่วคราว: Actions › FF calendar › ... › Disable workflow (ไฟล์ข้อมูลเดิมยังอยู่ หน้าเว็บโชว์ของล่าสุดที่มี)
+name: FF calendar (USD high impact)
+
+on:
+  schedule:
+    - cron: '17 */3 * * *'      # ทุก 3 ชม. (GitHub อาจดีเลย์ได้หลายชั่วโมง — รับได้)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ff-calendar
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            tools/ff_calendar.py
+            news/ff-calendar.json
+          sparse-checkout-cone-mode: false
+      - name: Build news/ff-calendar.json
+        run: python3 tools/ff_calendar.py
+      - name: Commit if changed
+        run: |
+          if [ -z "$(git status --porcelain -- news/ff-calendar.json)" ]; then echo "no change"; exit 0; fi
+          git config user.name jptrustlearning
+          git config user.email jptrustlearning@users.noreply.github.com
+          git add news/ff-calendar.json
+          git commit -m "data(ff-calendar): ข่าวแดงสหรัฐฯ อัพเดท $(date -u +%Y-%m-%dT%H:%MZ)"
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            echo "push rejected, rebasing (attempt $i)"
+            git pull --rebase origin main || exit 1
+            sleep 5
+          done
+          exit 1
