@@ -1526,6 +1526,31 @@ html.tk-app .mk-head .modeseg{width:100%;min-width:0;margin-left:0}
 .rvw-mini .off{fill:#ECE6DD;stroke:#D8D0C4}
 .fdl-rated{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
 .fdl-rated b{color:var(--ink);font-weight:600}
+/* ---- A263.8 · สรุปรีวิวบนการ์ดของแจกฟรี (โชว์เมื่อ ≥ 5 รีวิว · ข้อมูล RPC tool_review_public) ---- */
+.fdl-rv{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;border-radius:14px;background:var(--a-fill,#F2EFEA);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.fdl-rv[hidden],.fdl-rvx[hidden]{display:none!important}
+.fdl-rv:focus-visible{outline:2px solid var(--a-acc,#3A1520);outline-offset:2px}
+.fdl-rv-st{position:relative;display:inline-block;line-height:0;flex-shrink:0}
+.fdl-rv-st span{display:flex;gap:2px}
+.fdl-rv-st .on{position:absolute;inset:0 auto 0 0;overflow:hidden;white-space:nowrap}
+.fdl-rv-st svg{width:15px;height:15px;flex-shrink:0}
+.fdl-rv-st .off svg{fill:#E2DBD0}
+.fdl-rv-st .on svg{fill:#D9A92A}
+.fdl-rv-t{flex:1;min-width:0;font-size:13px;color:var(--muted);line-height:1.4}
+.fdl-rv-t b{color:var(--ink);font-weight:600;font-size:15px;margin-right:3px}
+.fdl-rv-c{width:16px;height:16px;fill:none;stroke:var(--muted);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s ease;flex-shrink:0}
+.fdl-rv[aria-expanded=true] .fdl-rv-c{transform:rotate(180deg)}
+.fdl-rvx{display:grid;gap:12px;padding:2px 2px 0}
+.fdl-rvb{display:grid;gap:5px}
+.fdl-rvb div{display:grid;grid-template-columns:34px minmax(0,1fr) 28px;gap:8px;align-items:center;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.fdl-rvb i{display:block;height:7px;border-radius:4px;background:var(--a-fill,#F2EFEA);overflow:hidden}
+.fdl-rvb i b{display:block;height:100%;border-radius:4px;background:#D9A92A}
+.fdl-rvb em{font-style:normal;text-align:right}
+.fdl-rvq{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.fdl-rvq li{font-size:13px;line-height:1.55;color:var(--ink);border-left:3px solid rgba(217,169,42,.55);padding:2px 0 2px 10px}
+.fdl-rvq small{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
+.fdl-rvn{font-size:11.5px;color:var(--muted);line-height:1.5;margin:0}
+@media (prefers-reduced-motion:reduce){ .fdl-rv-c{transition:none} }
 .rvw-toast{position:fixed;left:50%;bottom:calc(160px + env(safe-area-inset-bottom,0px));z-index:85;transform:translate(-50%,10px);opacity:0;
   background:#1F1B1C;color:#fff;font-family:var(--f-b);font-size:12.5px;border-radius:999px;padding:9px 16px;max-width:calc(100% - 40px);text-align:center;
   pointer-events:none;transition:opacity .2s ease,transform .2s ease}
@@ -3574,6 +3599,7 @@ if(h0){
   var SB  = 'https://rcdukwwcbyryauhqlzmx.supabase.co';
   var KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZHVrd3djYnlyeWF1aHFsem14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MTY0MDAsImV4cCI6MjA4NTQ5MjQwMH0.rprPmudJYyb6dyhXb9Z9GrtQWEeIX99A2Wrj55PvS54';
   var DELAY = 1000, PENDING = 'tk_review_pending';
+  window.__jptSB = { u: SB, k: KEY };   /* A263.8 · การ์ดสรุปรีวิวบนของแจกฟรีใช้ key เดียวกัน */
   var STAR = 'M12 2.9l2.8 5.66 6.25.91-4.52 4.4 1.07 6.22L12 17.16l-5.6 2.93 1.07-6.22-4.52-4.4 6.25-.91z';
   var LABELS = ['', 'ต้องปรับปรุง', 'พอใช้', 'ดี', 'ดีมาก', 'ยอดเยี่ยม'];
   var $ = function(id){ return document.getElementById(id); };
@@ -4161,5 +4187,69 @@ if(h0){
 
 <script defer src="/lib/jpt-track.js" data-page="jptrust-toolkit"></script>
 <script src="hero-scanner.js" defer></script>
+<script>
+/* =====================================================================
+   A263.8 · สรุปรีวิวบนการ์ดของแจกฟรี (จูน 23 ต.ค. 2026 "ทำครับ" — เพิ่มรีวิวให้ลูกค้าเห็นเพื่อความมั่นใจ)
+   - ทุกการ์ดที่มีลิงก์ a[download][data-review-item] ได้แถบ "ดาวเฉลี่ย · N รีวิว" เหนือปุ่ม · แตะ = จำนวนแต่ละดาว + ความเห็น
+   - ข้อมูล RPC public.tool_review_public() (pages/supabase/migrations/tool_reviews_v2.sql) · anon key เดียวกับป๊อปอัพให้ดาว
+   - โชว์เมื่อรีวิว ≥ RV_MIN เท่านั้น · ค่าเฉลี่ยรวมทุกคะแนน (ไม่ตัดคะแนนต่ำ) · ความเห็นเฉพาะที่ทีมงานอนุญาต (show_public) ไม่มีชื่อ
+   - ยังไม่รัน SQL / เน็ตหลุด / รีวิวไม่พอ = ซ่อนเงียบ ไม่มีอะไรเปลี่ยนบนหน้า · โหลดตอนการ์ดเข้าใกล้จอ · แคช 10 นาทีต่อแท็บ
+   ===================================================================== */
+(function(){
+  'use strict';
+  var RV_MIN = 5, CACHE = 'tk_rv_pub', TTL = 10*60*1000, QMAX = 3;
+  var STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.9l2.8 5.66 6.25.91-4.52 4.4 1.07 6.22L12 17.16l-5.6 2.93 1.07-6.22-4.52-4.4 6.25-.91z"/></svg>';
+  var CHEV = '<svg class="fdl-rv-c" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+  var MO = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  var links = document.querySelectorAll('a[download][data-review-item]');
+  if (!links.length) return;
+  function esc(x){ return String(x == null ? '' : x).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function five(){ var h = ''; for (var i = 0; i < 5; i++) h += STAR; return h; }
+  function when(iso){ var d = new Date(iso); return isNaN(d) ? '' : MO[d.getMonth()] + ' ' + (d.getFullYear() + 543); }
+  function render(items){
+    var by = {}; (items || []).forEach(function(it){ by[it.item] = it; });
+    Array.prototype.forEach.call(links, function(a){
+      var it = by[a.dataset.reviewItem], card = a.closest('.card'), cta = a.closest('.fdl-cta');
+      if (!it || !card || !cta || (it.n || 0) < RV_MIN || card.querySelector('.fdl-rv')) return;
+      var avg = Number(it.avg) || 0, pct = Math.max(0, Math.min(100, avg / 5 * 100)), d = it.dist || [0,0,0,0,0];
+      var id = 'rv' + Math.random().toString(36).slice(2, 8);
+      var btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'fdl-rv'; btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-controls', id);
+      btn.setAttribute('data-track', a.dataset.reviewItem + ' · ดูรีวิว');
+      btn.setAttribute('aria-label', 'คะแนนเฉลี่ย ' + avg.toFixed(1) + ' จาก 5 ดาว จาก ' + it.n + ' รีวิว แตะเพื่อดูรายละเอียด');
+      btn.innerHTML = '<span class="fdl-rv-st" aria-hidden="true"><span class="off">' + five() + '</span><span class="on" style="width:' + pct.toFixed(1) + '%">' + five() + '</span></span>'
+        + '<span class="fdl-rv-t"><b>' + avg.toFixed(1) + '</b>จาก 5 · ' + it.n.toLocaleString('th-TH') + ' รีวิว</span>' + CHEV;
+      var box = document.createElement('div');
+      box.className = 'fdl-rvx'; box.id = id; box.hidden = true;
+      var bars = '';
+      for (var k = 5; k >= 1; k--){ var c = d[k-1] || 0, w = it.n ? (c / it.n * 100) : 0;
+        bars += '<div><span>' + k + ' ดาว</span><i><b style="width:' + w.toFixed(1) + '%"></b></i><em>' + c + '</em></div>'; }
+      var qs = (it.quotes || []).slice(0, QMAX).map(function(q){
+        return '<li>' + esc(q.note) + '<small>' + q.stars + ' ดาว · ' + when(q.at) + '</small></li>'; }).join('');
+      box.innerHTML = '<div class="fdl-rvb">' + bars + '</div>' + (qs ? '<ul class="fdl-rvq">' + qs + '</ul>' : '')
+        + '<p class="fdl-rvn">คะแนนจากผู้ที่ดาวน์โหลดจริง ไม่ต้องล็อกอิน · 1 เครื่องให้คะแนนได้ 1 ครั้งต่อเวอร์ชัน · ค่าเฉลี่ยรวมทุกคะแนน'
+        + (qs ? ' · ความเห็นที่แสดงคัดโดยทีมงาน ไม่เปิดเผยชื่อ' : '') + '</p>';
+      btn.addEventListener('click', function(){
+        var on = btn.getAttribute('aria-expanded') !== 'true';
+        btn.setAttribute('aria-expanded', on ? 'true' : 'false'); box.hidden = !on;
+      });
+      card.insertBefore(btn, cta); card.insertBefore(box, cta);
+    });
+  }
+  function load(){
+    try { var c = JSON.parse(sessionStorage.getItem(CACHE) || 'null'); if (c && Date.now() - c.t < TTL) { render(c.d); return; } } catch(e){}
+    var sb = window.__jptSB; if (!sb || !sb.u || !sb.k || !window.fetch) return;
+    fetch(sb.u + '/rest/v1/rpc/tool_review_public', { method: 'POST', body: '{}',
+      headers: { 'apikey': sb.k, 'Authorization': 'Bearer ' + sb.k, 'Content-Type': 'application/json' } })
+      .then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function(d){ if (!Array.isArray(d)) return; try { sessionStorage.setItem(CACHE, JSON.stringify({ t: Date.now(), d: d })); } catch(e){} render(d); })
+      .catch(function(){ /* ยังไม่รัน SQL v2 / เน็ตหลุด — ซ่อนเงียบ */ });
+  }
+  var target = links[0].closest('.card') || links[0];
+  if (!('IntersectionObserver' in window)) { load(); return; }
+  var io = new IntersectionObserver(function(es){ if (es.some(function(e){ return e.isIntersecting; })) { io.disconnect(); load(); } }, { rootMargin: '300px' });
+  io.observe(target);
+})();
+</script>
 </body>
 </html>
