@@ -595,13 +595,16 @@ td.hot{color:#9a7d1e!important;font-weight:600;background:var(--gold-soft)}
 #mkCal{margin-top:14px;scroll-margin-top:70px}
 .mk-calwrap{overflow-x:auto}
 /* A263 · ปฏิทินเปลี่ยนเป็น TradingView Economic Calendar widget (กรองสหรัฐฯ + ผลกระทบสูง) — รองพื้นแบบเดียวกับ .mk-fxbox */
-.mk-tvcal{height:640px;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#fff;position:relative}
+.mk-tvcal{height:360px;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#fff;position:relative}
 .mk-tvcal::before{content:'กำลังโหลดปฏิทินข่าว… ถ้าไม่ขึ้นภายในครู่เดียว ลองปิดตัวบล็อกโฆษณาแล้วรีเฟรช';position:absolute;inset:0;display:grid;place-items:center;
   padding:0 24px;text-align:center;font-size:12.5px;color:var(--muted);font-weight:300}
 .mk-tvcal .tradingview-widget-container{position:relative;z-index:1}
 .mk-tvcal .tradingview-widget-container,.mk-tvcal .tradingview-widget-container__widget{height:100%;width:100%}
 .mk-tvcal .tradingview-widget-copyright{display:none}
-@media(max-width:640px){.mk-tvcal{height:580px}}
+@media(max-width:640px){.mk-tvcal{height:340px}}
+/* A263.2 · จูน "ให้ตารางข่าวย่อเหลือ วันต่อวัน" — ปกติกรอบเตี้ยพอดีราวหนึ่งวัน (ปัดในกรอบดูวันถัดไป) · กด ดูรายละเอียด (.tk-more) = ขยายเต็มเท่าเดิม */
+#mkCal.tk-more .mk-tvcal{height:640px}
+@media(max-width:640px){#mkCal.tk-more .mk-tvcal{height:580px}}
 .cal-tb{width:100%;border-collapse:collapse;font-size:12.5px}
 .cal-tb th{background:linear-gradient(180deg,var(--maroon),var(--maroon2));color:var(--gold-l);font-family:var(--f-d);
   font-size:10.5px;letter-spacing:1.3px;font-weight:600;text-align:left;padding:8px 10px;white-space:nowrap}
