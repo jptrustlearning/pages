@@ -1,6 +1,275 @@
 {
-  "lastUpdated": "2026-10-23T22:45:00Z",
+  "lastUpdated": "2026-10-24T07:50:00Z",
   "batches": [
+    {
+      "file": "2026-10-24-0750.md",
+      "date": "2026-10-24T07:50:00Z",
+      "date_display": "24 ต.ค. 2026 · 07:50",
+      "summary": "สรุปตลาดสหรัฐฯ ปิดศุกร์และทั้งสัปดาห์ Dow ลบ 1.23% แต่ทั้งสัปดาห์ยังบวก 0.4% S&P 500 และ Nasdaq ลบเป็นสัปดาห์ที่สอง แรงขายกระจายไปหุ้นการเงินและค่ายมือถือ · หุ้นเด่นของสัปดาห์ Meta ร่วง 6.98% แม้รายได้โต 26% เพราะกระแสเงินสดอิสระติดลบครั้งแรกในรอบกว่าสิบปีจากเงินลงทุน AI · Brent ปิด 116.72 ดอลลาร์สูงสุดในรอบราวหกเดือนจากเหตุโจมตีในซาอุฯ และรายงานแผนโจมตีอิหร่านหลังเลือกตั้ง ทองหลุด 4,000 ดอลลาร์ ทั้งสัปดาห์ลบราว 3.5%",
+      "tickers": [
+        "SPX",
+        "IXIC",
+        "DJI",
+        "AXP",
+        "T",
+        "TMUS",
+        "VZ",
+        "CCI",
+        "AMT",
+        "SPCX",
+        "SLB",
+        "COP",
+        "CVX",
+        "RUT",
+        "US10Y",
+        "MSFT",
+        "GOOGL",
+        "AMZN",
+        "INTC",
+        "SET",
+        "META",
+        "SOX",
+        "NVDA",
+        "AMD",
+        "CRWV",
+        "DELTA",
+        "KCE",
+        "HANA",
+        "BRENT",
+        "WTI",
+        "PTTEP",
+        "PTT",
+        "GLD",
+        "SLV",
+        "UAL",
+        "DAL",
+        "AAL",
+        "AOT",
+        "AAV",
+        "BCP",
+        "TOP"
+      ],
+      "headlines": [
+        {
+          "title": "ตลาดสหรัฐฯ ปิดศุกร์: Dow ลบ 652 จุด (−1.23%) S&P 500 ลบ 0.52% Nasdaq ลบ 0.21% — ทั้งสัปดาห์ S&P 500 ลบ 0.5% Nasdaq ลบ 0.7% เป็นสัปดาห์ที่สองติด ขณะที่ Dow ยังบวก 0.4% · กลุ่มพลังงานขึ้นทำสถิติใหม่ตามน้ำมัน ส่วนหุ้นการเงินและหุ้นค่ายมือถือถูกขาย",
+          "tickers": [
+            {
+              "symbol": "SPX",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "IXIC",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DJI",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AXP",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "T",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "TMUS",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "VZ",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "CCI",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AMT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SPCX",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SLB",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "COP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "CVX",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "RUT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "US10Y",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "MSFT",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "GOOGL",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "AMZN",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "INTC",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "SET",
+              "sentiment": "neutral"
+            }
+          ],
+          "tone_override": "bearish",
+          "source": "Reuters, AP, Yahoo Finance, BNN Bloomberg, TheStreet",
+          "published": "24 ต.ค. 2026"
+        },
+        {
+          "title": "หุ้นเด่นของสัปดาห์: Meta ร่วง 6.98% ไปที่ 648.85 ดอลลาร์ แม้รายได้ไตรมาส 3 โต 26% ดีกว่าคาด — เพราะกระแสเงินสดอิสระติดลบ 2,120 ล้านดอลลาร์ครั้งแรกในรอบกว่าสิบปี ภาระผูกพันสัญญาเช่าพุ่งเป็นราว 825,000 ล้านดอลลาร์ และแผนออกหุ้นไม่มีสิทธิออกเสียง ทำให้ตลาดถามว่าบริษัทจะหาเงินจากไหนมาลงทุน AI ต่อ",
+          "tickers": [
+            {
+              "symbol": "META",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "SOX",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AMD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "INTC",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "CRWV",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "MSFT",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "GOOGL",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "AMZN",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "SPX",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "KCE",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "HANA",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "Meta Investor Relations, TradingKey, TheStreet, Trefis, AP",
+          "published": "24 ต.ค. 2026"
+        },
+        {
+          "title": "น้ำมัน Brent ปิด 116.72 ดอลลาร์ (+3.1%) สูงสุดในรอบราวหกเดือน บวกเป็นสัปดาห์ที่สามติด หลังกลุ่มฮูตีโจมตีซาอุดีอาระเบียและมีรายงานแผนโจมตีอิหร่านหลังเลือกตั้งสหรัฐฯ — ทองหลุด 4,000 ดอลลาร์ต่ำสุดในรอบสามเดือน ทั้งสัปดาห์ลบราว 3.5% ตรงกรอบสงครามพลังงาน",
+          "tickers": [
+            {
+              "symbol": "BRENT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "WTI",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SLB",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "COP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "CVX",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTTEP",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "GLD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "SLV",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "UAL",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DAL",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AAL",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AAV",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "BCP",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "TOP",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "Reuters, AP, Yahoo Finance, TipRanks, TIME",
+          "published": "24 ต.ค. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-10-23-2245.md",
       "date": "2026-10-23T22:45:00Z",
