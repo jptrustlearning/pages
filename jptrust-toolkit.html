@@ -1164,12 +1164,63 @@ html.tk-app .fdl{order:3;margin-top:18px}
 .fdl-cta{display:flex;gap:8px}
 .fdl-cta .btn{flex:1;justify-content:center}
 .fdl-cta svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-/* A280 · แบนเนอร์แบรนด์ OWLET BOT บนการ์ดดาวน์โหลด (จูน 24 ต.ค. 2026 "ตรง download ให้เป็นแบรนด์") · ภาพ 2048x768 = 8:3 */
-.fdl-ban{display:block;position:relative;border-radius:14px;overflow:hidden;line-height:0;aspect-ratio:8/3;background:#06131d;-webkit-tap-highlight-color:transparent}
-.fdl-ban img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .35s ease}
-.fdl-ban:hover img{transform:scale(1.015)}
+/* A280 · แบนเนอร์แบรนด์ OWLET BOT บนการ์ดดาวน์โหลด (จูน 24 ต.ค. 2026 "ตรง download ให้เป็นแบรนด์") · ภาพ 8:3 · A281.1 ภาพใหม่ไม่มีคำ BETTING + เคลื่อนไหว (จูน 11:04 "ทำภาพเคลื่อนไหวเหมือนแบรนด์") */
+/* A281.1 · แบนเนอร์ OWLET BOT เคลื่อนไหว — ภาพของจูนเป็นฐาน + โค้ดทำแสง/อนุภาค (MOTION-GUIDELINE §2) · ตำแหน่งวัดจากภาพ 2048x768 · ขยับเมื่อการ์ดอยู่ในจอเท่านั้น (.ob-run) */
+.fdl-ban{display:block;position:relative;border-radius:14px;overflow:hidden;line-height:0;aspect-ratio:8/3;background:#06131d;-webkit-tap-highlight-color:transparent;container-type:inline-size;isolation:isolate}
 .fdl-ban:focus-visible{outline:2px solid var(--a-acc,#3A1520);outline-offset:2px}
-@media (prefers-reduced-motion:reduce){.fdl-ban img{transition:none}.fdl-ban:hover img{transform:none}}
+.ob-stage{position:absolute;inset:0;display:block;transform-origin:52% 56%}
+.ob-stage img{display:block;width:100%;height:100%;object-fit:cover}
+.fdl-ban:hover .ob-stage{filter:brightness(1.06)}
+.ob-fx{position:absolute;inset:0;pointer-events:none}
+.ob-fx>*{position:absolute;display:block}
+.ob-logo{left:37.598%;top:9.115%;width:35.645%;height:23.698%;overflow:hidden;-webkit-mask:url(./brand/owlet-bot-v2-logo-mask.png) 0 0/100% 100% no-repeat;mask:url(./brand/owlet-bot-v2-logo-mask.png) 0 0/100% 100% no-repeat}
+.ob-logo::before{content:"";position:absolute;top:-20%;bottom:-20%;left:0;width:22%;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.9) 50%,rgba(255,255,255,0));transform:translateX(-140%) skewX(-18deg)}
+.ob-card{inset:0;mix-blend-mode:screen}
+.ob-card.c1{clip-path:polygon(72.852% 37.760%,80.322% 31.641%,81.445% 62.760%,74.219% 66.146%)}
+.ob-card.c2{clip-path:polygon(81.055% 28.906%,90.674% 23.177%,89.746% 58.333%,81.543% 58.854%)}
+.ob-card.c3{clip-path:polygon(90.918% 31.901%,99.121% 25.781%,98.340% 57.552%,89.453% 58.073%)}
+.ob-card::before{content:"";position:absolute;top:0;bottom:0;left:72%;width:9%;background:linear-gradient(100deg,transparent,rgba(200,245,255,.34) 50%,transparent);transform:translateX(-130%)}
+.ob-glow{border-radius:50%;mix-blend-mode:screen;opacity:0}
+.ob-glow.g1{left:14.893%;top:28.255%;width:9.277%;height:24.740%;background:radial-gradient(closest-side,rgba(255,196,70,.75),rgba(255,160,40,.25) 55%,transparent)}
+.ob-glow.g2{left:80.566%;top:52.474%;width:7.324%;height:19.531%;background:radial-gradient(closest-side,rgba(110,225,255,.8),rgba(60,170,255,.22) 55%,transparent)}
+.ob-glow.g3{left:25.391%;top:18.490%;width:4.688%;height:12.500%;background:radial-gradient(closest-side,rgba(255,170,40,.6),transparent 70%)}
+.ob-glow.g4{left:31.787%;top:24.870%;width:3.613%;height:9.635%;background:radial-gradient(closest-side,rgba(255,170,40,.55),transparent 70%)}
+.ob-star{mix-blend-mode:screen;opacity:0;transform:scale(.2)}
+.ob-star::before,.ob-star::after{content:"";position:absolute;left:50%;top:50%;width:100%;height:9%;transform:translate(-50%,-50%);background:radial-gradient(closest-side,#fff,rgba(255,255,255,0));border-radius:50%}
+.ob-star::after{transform:translate(-50%,-50%) rotate(90deg)}
+.ob-star.s1{left:27.197%;top:18.880%;width:3.125%;height:8.333%}
+.ob-star.s2{left:32.910%;top:25.000%;width:2.441%;height:6.510%}
+.ob-star.s3{left:83.594%;top:41.016%;width:3.711%;height:9.896%}
+.ob-sand{left:95.605%;top:72.526%;width:0.244%;height:8.464%;mix-blend-mode:screen;background:repeating-linear-gradient(180deg,rgba(255,214,140,.95) 0 18%,rgba(255,214,140,0) 18% 34%);background-size:100% 40%;opacity:.85}
+.ob-btn{left:36.133%;top:69.792%;width:30.469%;height:12.630%;border-radius:999px;overflow:hidden;background-image:url(./brand/owlet-bot-banner-v2-1024.webp);background-size:328.205% 791.753%;background-position:51.966% 79.881%;box-shadow:0 0 0 0 rgba(255,196,60,0)}
+.ob-btn::after{content:"";position:absolute;top:-30%;bottom:-30%;left:0;width:22%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.75) 50%,transparent);mix-blend-mode:soft-light;transform:translateX(-160%) skewX(-22deg)}
+.ob-dust{inset:0;width:100%;height:100%}
+/* จังหวะ: เดินเมื่อการ์ดอยู่ในจอ */
+.ob-run .ob-stage{animation:obPush 18s ease-in-out infinite alternate}
+.ob-run .ob-logo::before{animation:obSweep 7s cubic-bezier(.5,0,.3,1) 1.2s infinite}
+.ob-run .ob-card::before{animation:obSheen 6s ease-in-out infinite}
+.ob-run .ob-card.c1::before{animation-delay:2.2s}
+.ob-run .ob-card.c2::before{animation-delay:2.6s}
+.ob-run .ob-card.c3::before{animation-delay:3s}
+.ob-run .ob-glow.g1{animation:obGlow 4.2s ease-in-out infinite}
+.ob-run .ob-glow.g2{animation:obGlow 3.6s ease-in-out .8s infinite}
+.ob-run .ob-glow.g3,.ob-run .ob-glow.g4{animation:obEye 5s ease-in-out infinite}
+.ob-run .ob-star.s1{animation:obTwinkle 5s ease-out .4s infinite}
+.ob-run .ob-star.s2{animation:obTwinkle 5s ease-out .55s infinite}
+.ob-run .ob-star.s3{left:83.594%;top:41.016%;width:3.711%;height:9.896%}
+.ob-run .ob-sand{animation:obSand .9s linear infinite}
+.ob-run .ob-btn{animation:obBtn 2.4s ease-in-out infinite}
+.ob-run .ob-btn::after{animation:obShine 3.2s cubic-bezier(.45,0,.25,1) .6s infinite}
+@keyframes obPush{from{transform:scale(1)}to{transform:scale(1.045) translateX(-.6%)}}
+@keyframes obSweep{0%{transform:translateX(-140%) skewX(-18deg)}24%,100%{transform:translateX(560%) skewX(-18deg)}}
+@keyframes obSheen{0%{transform:translateX(-130%)}30%,100%{transform:translateX(330%)}}
+@keyframes obGlow{0%,100%{opacity:0}50%{opacity:.9}}
+@keyframes obEye{0%,100%{opacity:.15}50%{opacity:.6}}
+@keyframes obTwinkle{0%{opacity:0;transform:scale(.2) rotate(0)}6%{opacity:1;transform:scale(1) rotate(45deg)}14%,100%{opacity:0;transform:scale(.2) rotate(90deg)}}
+@keyframes obSand{from{background-position:0 0}to{background-position:0 40%}}
+@keyframes obBtn{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,196,60,0)}50%{transform:scale(1.045);box-shadow:0 0 14px 3px rgba(255,196,60,.55);box-shadow:0 0 2.4cqw .5cqw rgba(255,196,60,.55)}}
+@keyframes obShine{0%{transform:translateX(-160%) skewX(-22deg)}40%,100%{transform:translateX(560%) skewX(-22deg)}}
+@media (prefers-reduced-motion:reduce){.ob-run .ob-stage,.ob-run .ob-fx>*,.ob-run .ob-fx>*::before,.ob-run .ob-fx>*::after{animation:none!important}.ob-dust{display:none}}
 
 /* ---- แถบเมนูลอยด้านล่าง ---- */
 html.tk-app .anav{display:flex;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:50;
@@ -1962,8 +2013,8 @@ html.tk-app .mk-head .modeseg{width:100%;min-width:0;margin-left:0}
         <!-- A224 · แจกฟรี OWLET BOT v1.12 (จูนส่งไฟล์ 15 ต.ค. 2026 "ทำปุ่ม download เหมือนเดิม" = แบบการ์ด #freeDlCard ของ A67)
              หน้าภาพรวมเท่านั้น · CSS order 3 + อยู่ก่อน #appJoin ใน DOM = ขึ้นเหนือการ์ดสมาชิก · ข้อความฟีเจอร์ไม่แต่งเอง รอจูนส่ง -->
         <div class="card fdl" id="freeDlOwlet">
-          <!-- A280 · แบนเนอร์แบรนด์ (จูนส่งภาพ 24 ต.ค. 2026) · แตะ = ดาวน์โหลดไฟล์เดียวกับปุ่ม (ในภาพมีปุ่ม Download Free) · ต้นฉบับ brand/owlet-bot-banner.png -->
-          <a class="fdl-ban" href="./downloads/OWLET_BOT_v112.ex5" download data-track="OWLET BOT v1.12 · ดาวน์โหลด (แบนเนอร์)" data-review-item="OWLET BOT" data-review-ver="1.12" data-review-size="125 KB" data-review-guide="./ea-owlet-bot.html" aria-label="ดาวน์โหลด OWLET BOT ฟรี"><picture><source type="image/webp" srcset="./brand/owlet-bot-banner-1024.webp 1024w, ./brand/owlet-bot-banner-2048.webp 2048w" sizes="(min-width:900px) 640px, 100vw"><img src="./brand/owlet-bot-banner-1280.jpg" width="2048" height="768" loading="lazy" decoding="async" alt="OWLET BOT — EA Semi Auto Bot สำหรับ MetaTrader 5 · ดาวน์โหลดฟรี"></picture></a>
+          <!-- A280 · แบนเนอร์แบรนด์ (จูนส่งภาพ 24 ต.ค. 2026) · แตะ = ดาวน์โหลดไฟล์เดียวกับปุ่ม (ในภาพมีปุ่ม Download Free) · A281.1 ภาพ v2 (ต้นฉบับ brand/owlet-bot-banner-v2.png) + ชั้นแสง .ob-fx (ตำแหน่งวัดจากภาพ 2048x768 — เปลี่ยนภาพที่องค์ประกอบย้าย ต้องวัดใหม่) -->
+          <a class="fdl-ban ob" href="./downloads/OWLET_BOT_v112.ex5" download data-track="OWLET BOT v1.12 · ดาวน์โหลด (แบนเนอร์)" data-review-item="OWLET BOT" data-review-ver="1.12" data-review-size="125 KB" data-review-guide="./ea-owlet-bot.html" aria-label="ดาวน์โหลด OWLET BOT ฟรี"><span class="ob-stage"><picture><source type="image/webp" srcset="./brand/owlet-bot-banner-v2-1024.webp 1024w, ./brand/owlet-bot-banner-v2-2048.webp 2048w" sizes="(min-width:900px) 640px, 100vw"><img src="./brand/owlet-bot-banner-v2-1280.jpg" width="2048" height="768" loading="lazy" decoding="async" alt="OWLET BOT — EA Semi Auto Bot สำหรับ MetaTrader 5 · ดาวน์โหลดฟรี"></picture><span class="ob-fx" aria-hidden="true"><span class="ob-glow g1"></span><span class="ob-glow g2"></span><span class="ob-glow g3"></span><span class="ob-glow g4"></span><span class="ob-logo"></span><span class="ob-card c1"></span><span class="ob-card c2"></span><span class="ob-card c3"></span><span class="ob-sand"></span><span class="ob-btn"></span><span class="ob-star s1"></span><span class="ob-star s2"></span><span class="ob-star s3"></span><canvas class="ob-dust"></canvas></span></span></a>
           <div class="fdl-h">
             <span class="fdl-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></span>
             <div class="fdl-t">
@@ -4257,6 +4308,53 @@ if(h0){
   if (!('IntersectionObserver' in window)) { load(); return; }
   var io = new IntersectionObserver(function(es){ if (es.some(function(e){ return e.isIntersecting; })) { io.disconnect(); load(); } }, { rootMargin: '300px' });
   io.observe(target);
+})();
+</script>
+<script>
+/* A281.1 · แบนเนอร์ OWLET BOT เคลื่อนไหว — เดินเฉพาะตอนการ์ดอยู่ในจอ (.ob-run) · ฝุ่นทองเป็น canvas · ปิดเมื่อผู้ใช้ตั้งลดการเคลื่อนไหว */
+(function(){
+  'use strict';
+  var ban = document.querySelector('.fdl-ban.ob'); if (!ban) return;
+  var rm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (rm || !('IntersectionObserver' in window)) return;
+  var cv = ban.querySelector('.ob-dust'), cx = cv && cv.getContext && cv.getContext('2d');
+  var on = false, raf = 0, last = 0, P = [], W = 0, H = 0, R = 1;
+  /* จุดเกิดฝุ่น (สัดส่วนของภาพ 2048x768): กองเหรียญขวาล่าง · รอบปุ่ม Download · ใต้นาฬิกาทราย */
+  var SRC = [[0.69,0.79,0.89,0.90,0.6],[0.37,0.70,0.66,0.82,0.3],[0.90,0.80,0.99,0.88,0.1]];
+  function size(){ var r = cv.getBoundingClientRect(); R = Math.min(window.devicePixelRatio || 1, 2); W = Math.max(1, Math.round(r.width * R)); H = Math.max(1, Math.round(r.height * R)); cv.width = W; cv.height = H; }
+  function spawn(){
+    var u = Math.random(), s = SRC[0], acc = 0;
+    for (var i = 0; i < SRC.length; i++){ acc += SRC[i][4]; if (u <= acc){ s = SRC[i]; break; } }
+    var gold = Math.random() > 0.18;
+    return { x:(s[0] + Math.random()*(s[2]-s[0])) * W, y:(s[1] + Math.random()*(s[3]-s[1])) * H,
+      vx:(Math.random()-0.5) * 0.012 * W / 60, vy:-(0.02 + Math.random()*0.05) * H / 60,
+      r:(0.6 + Math.random()*1.6) * R * Math.max(0.6, W / R / 520), life:0, max:90 + Math.random()*120,
+      c: gold ? '255,206,96' : '170,235,255', tw: Math.random()*6.28 };
+  }
+  function tick(t){
+    raf = 0; if (!on) return;
+    var dt = last ? Math.min(3, (t - last) / 16.7) : 1; last = t;
+    if (cv.width !== Math.round(cv.getBoundingClientRect().width * R)) size();
+    while (P.length < 46) P.push(spawn());
+    cx.clearRect(0, 0, W, H); cx.globalCompositeOperation = 'lighter';
+    for (var i = 0; i < P.length; i++){
+      var p = P[i]; p.life += dt; p.x += p.vx * dt + Math.sin((p.life + p.tw*20) / 18) * 0.12 * R; p.y += p.vy * dt;
+      var k = p.life / p.max; if (k >= 1){ P[i] = spawn(); continue; }
+      var a = (k < 0.2 ? k / 0.2 : 1 - (k - 0.2) / 0.8) * (0.55 + 0.45 * Math.sin(p.life / 6 + p.tw));
+      var g = cx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 3.2);
+      g.addColorStop(0, 'rgba(' + p.c + ',' + (0.95 * a).toFixed(3) + ')'); g.addColorStop(1, 'rgba(' + p.c + ',0)');
+      cx.fillStyle = g; cx.beginPath(); cx.arc(p.x, p.y, p.r * 3.2, 0, 6.2832); cx.fill();
+    }
+    raf = requestAnimationFrame(tick);
+  }
+  function set(v){
+    v = v && !document.hidden; if (v === on) return; on = v;
+    ban.classList.toggle('ob-run', on);
+    if (cx){ if (on){ size(); last = 0; if (!raf) raf = requestAnimationFrame(tick); } else if (raf){ cancelAnimationFrame(raf); raf = 0; } }
+  }
+  var vis = false;
+  new IntersectionObserver(function(es){ vis = es[es.length - 1].isIntersecting; set(vis); }, { threshold: 0.15 }).observe(ban);
+  document.addEventListener('visibilitychange', function(){ set(vis); });
 })();
 </script>
 </body>
