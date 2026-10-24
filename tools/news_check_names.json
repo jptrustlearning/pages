@@ -1,0 +1,1152 @@
+{
+  "note": "ตารางชื่อสำหรับ tools/news_check.py (A283 · 24 ต.ค. 2026) — ชิปหุ้นในข่าวเป็นสัญลักษณ์ (MSFT) แต่เนื้อข่าวเขียนเป็นชื่อ (Microsoft) · names = ชื่อที่นับว่า 'ข่าวพูดถึงชิปนี้แล้ว' · flag_names = ชื่อบริษัทที่ถ้าโผล่ในหัวข้อไหน หัวข้อนั้นต้องมีชิปตัวใดตัวหนึ่งในรายการ · macro = ดัชนี สินค้าโภคภัณฑ์ ค่าเงิน คริปโต พันธบัตร ETF (ไม่มีชิป = แค่เตือน ไม่บล็อก) · not_tickers = ตัวพิมพ์ใหญ่ที่บังเอิญตรงกับชิปแต่ในข่าวมักแปลว่าอย่างอื่น · เพิ่มชื่อได้เมื่อสคริปต์เตือน (commit พร้อม batch) · ห้ามลบแถวเดิม · ชื่อที่ขึ้นต้นด้วย re: = regex (ใช้กับคำไทยที่ซ้ำคำอื่น เช่น เงิน = silver)",
+  "macro": [
+    "SPX",
+    "IXIC",
+    "NDX",
+    "DJI",
+    "RUT",
+    "N225",
+    "KOSPI",
+    "KOSDAQ",
+    "HSI",
+    "SET",
+    "SET50",
+    "SET100",
+    "TOPIX",
+    "TAIEX",
+    "TWII",
+    "STOXX",
+    "STOXX50E",
+    "DAX",
+    "GDAXI",
+    "CAC",
+    "CAC40",
+    "FCHI",
+    "FTSE",
+    "FTSEMIB",
+    "IBEX",
+    "ASX200",
+    "SSEC",
+    "SHCOMP",
+    "CSI300",
+    "JKSE",
+    "SOX",
+    "VIX",
+    "DXY",
+    "US10Y",
+    "JGB10Y",
+    "BRENT",
+    "WTI",
+    "USDTHB",
+    "EURUSD",
+    "USDJPY",
+    "USDIDR",
+    "BTC",
+    "ETH",
+    "SOL",
+    "XRP",
+    "BNB",
+    "USDT",
+    "ZEC",
+    "GLD",
+    "SLV",
+    "TLT",
+    "IEF",
+    "USO",
+    "UUP",
+    "SPY",
+    "QQQ",
+    "DIA",
+    "RSP",
+    "SMH",
+    "SOXX",
+    "SOXL",
+    "IBIT",
+    "FBTC",
+    "ETHA",
+    "IGV",
+    "KBWB",
+    "CIBR",
+    "SPLV",
+    "THD",
+    "EIDO",
+    "ACWI",
+    "XLE",
+    "XLK",
+    "XLV",
+    "XLF",
+    "XLP",
+    "XLU",
+    "XHB",
+    "GDX",
+    "FEZ",
+    "FXE",
+    "EWJ",
+    "BWX",
+    "JCI"
+  ],
+  "not_tickers": [
+    "DRAM",
+    "CXMT",
+    "OSP",
+    "GE",
+    "PTC",
+    "USD",
+    "EUR",
+    "JPY",
+    "THB",
+    "CNY",
+    "GBP",
+    "CHF"
+  ],
+  "names": {
+    "BRENT": [
+      "Brent",
+      "เบรนท์"
+    ],
+    "WTI": [
+      "WTI",
+      "เวสต์เท็กซัส"
+    ],
+    "GLD": [
+      "ทองคำ",
+      "ทอง",
+      "Gold",
+      "GLD"
+    ],
+    "SLV": [
+      "silver",
+      "Silver",
+      "แร่เงิน",
+      "โลหะเงิน",
+      "ราคาเงิน",
+      "เงินแท่ง",
+      "เงินสปอต",
+      "ราคาเงินโลก",
+      "สัญญาเงิน",
+      "re:เงิน\\S{0,6}\\s*(?:ลบ|บวก|ขึ้น|ลง|ร่วง|พุ่ง)\\s*(?:ราว\\s*)?[\\d.,]+\\s*%"
+    ],
+    "SPX": [
+      "S&P 500",
+      "S&P500",
+      "S&P"
+    ],
+    "SPY": [
+      "SPY",
+      "S&P 500",
+      "S&P"
+    ],
+    "DJI": [
+      "Dow",
+      "ดาวโจนส์"
+    ],
+    "DIA": [
+      "DIA",
+      "Dow"
+    ],
+    "NDX": [
+      "Nasdaq-100",
+      "Nasdaq 100",
+      "Nasdaq",
+      "แนสแดก"
+    ],
+    "IXIC": [
+      "Nasdaq",
+      "แนสแดก"
+    ],
+    "QQQ": [
+      "QQQ",
+      "Nasdaq"
+    ],
+    "RUT": [
+      "Russell 2000",
+      "Russell"
+    ],
+    "N225": [
+      "Nikkei",
+      "นิกเกอิ"
+    ],
+    "HSI": [
+      "Hang Seng",
+      "ฮั่งเส็ง"
+    ],
+    "KOSPI": [
+      "KOSPI",
+      "Kospi",
+      "คอสปี"
+    ],
+    "KOSDAQ": [
+      "KOSDAQ",
+      "Kosdaq"
+    ],
+    "TOPIX": [
+      "TOPIX",
+      "Topix"
+    ],
+    "TAIEX": [
+      "TAIEX",
+      "Taiex",
+      "ดัชนีไต้หวัน",
+      "ตลาดหุ้นไต้หวัน",
+      "ไต้หวัน"
+    ],
+    "TWII": [
+      "TAIEX",
+      "Taiex",
+      "ดัชนีไต้หวัน",
+      "ตลาดหุ้นไต้หวัน",
+      "ไต้หวัน"
+    ],
+    "SSEC": [
+      "Shanghai",
+      "เซี่ยงไฮ้"
+    ],
+    "SHCOMP": [
+      "Shanghai",
+      "เซี่ยงไฮ้"
+    ],
+    "CSI300": [
+      "CSI 300",
+      "CSI300"
+    ],
+    "ASX200": [
+      "ASX",
+      "ออสเตรเลีย"
+    ],
+    "SET": [
+      "SET",
+      "ตลาดหุ้นไทย",
+      "หุ้นไทย"
+    ],
+    "US10Y": [
+      "10 ปี",
+      "10-year",
+      "Treasury",
+      "ยีลด์"
+    ],
+    "JGB10Y": [
+      "JGB",
+      "พันธบัตรญี่ปุ่น"
+    ],
+    "TLT": [
+      "TLT",
+      "พันธบัตร"
+    ],
+    "IEF": [
+      "IEF",
+      "พันธบัตร"
+    ],
+    "DXY": [
+      "DXY",
+      "ดัชนีดอลลาร์",
+      "ดอลลาร์"
+    ],
+    "UUP": [
+      "UUP",
+      "ดอลลาร์"
+    ],
+    "USDTHB": [
+      "บาท",
+      "THB"
+    ],
+    "USDJPY": [
+      "เยน",
+      "JPY"
+    ],
+    "EURUSD": [
+      "ยูโร",
+      "EUR"
+    ],
+    "BTC": [
+      "Bitcoin",
+      "บิตคอยน์",
+      "BTC"
+    ],
+    "ETH": [
+      "Ethereum",
+      "อีเธอเรียม",
+      "ETH"
+    ],
+    "SOL": [
+      "Solana",
+      "SOL"
+    ],
+    "USO": [
+      "USO",
+      "น้ำมัน"
+    ],
+    "SOX": [
+      "SOX",
+      "ดัชนีชิป",
+      "หุ้นชิป",
+      "เซมิคอนดักเตอร์",
+      "Semiconductor"
+    ],
+    "SOXX": [
+      "SOXX",
+      "ดัชนีชิป",
+      "หุ้นชิป",
+      "เซมิคอนดักเตอร์"
+    ],
+    "SMH": [
+      "SMH",
+      "หุ้นชิป",
+      "เซมิคอนดักเตอร์"
+    ],
+    "VIX": [
+      "VIX",
+      "ดัชนีความกลัว"
+    ],
+    "STOXX": [
+      "STOXX",
+      "Stoxx",
+      "ยุโรป"
+    ],
+    "STOXX50E": [
+      "STOXX",
+      "Stoxx",
+      "ยุโรป"
+    ],
+    "DAX": [
+      "DAX",
+      "เยอรมนี"
+    ],
+    "GDAXI": [
+      "DAX",
+      "เยอรมนี"
+    ],
+    "CAC": [
+      "CAC",
+      "ฝรั่งเศส"
+    ],
+    "CAC40": [
+      "CAC",
+      "ฝรั่งเศส"
+    ],
+    "FCHI": [
+      "CAC",
+      "ฝรั่งเศส"
+    ],
+    "FTSE": [
+      "FTSE",
+      "อังกฤษ"
+    ],
+    "FTSEMIB": [
+      "FTSE MIB",
+      "อิตาลี"
+    ],
+    "XLE": [
+      "XLE",
+      "หุ้นพลังงาน",
+      "กลุ่มพลังงาน"
+    ],
+    "GDX": [
+      "GDX",
+      "เหมืองทอง"
+    ],
+    "NVDA": [
+      "Nvidia",
+      "NVIDIA",
+      "เอ็นวิเดีย"
+    ],
+    "TSM": [
+      "TSMC"
+    ],
+    "2330.TW": [
+      "TSMC"
+    ],
+    "000660.KS": [
+      "SK hynix",
+      "SK Hynix",
+      "ไฮนิกซ์"
+    ],
+    "005930.KS": [
+      "Samsung",
+      "ซัมซุง"
+    ],
+    "009150.KS": [
+      "Samsung Electro-Mechanics",
+      "SEMCO"
+    ],
+    "402340.KS": [
+      "SK Square"
+    ],
+    "TSLA": [
+      "Tesla",
+      "เทสลา"
+    ],
+    "META": [
+      "Meta"
+    ],
+    "MSFT": [
+      "Microsoft",
+      "ไมโครซอฟท์"
+    ],
+    "GOOGL": [
+      "Alphabet",
+      "Google",
+      "กูเกิล"
+    ],
+    "AMZN": [
+      "Amazon",
+      "อเมซอน",
+      "AWS"
+    ],
+    "AAPL": [
+      "Apple",
+      "แอปเปิล"
+    ],
+    "INTC": [
+      "Intel",
+      "อินเทล"
+    ],
+    "MU": [
+      "Micron",
+      "ไมครอน"
+    ],
+    "LRCX": [
+      "Lam Research",
+      "Lam"
+    ],
+    "AMAT": [
+      "Applied Materials"
+    ],
+    "KLAC": [
+      "KLA"
+    ],
+    "AVGO": [
+      "Broadcom",
+      "บรอดคอม"
+    ],
+    "ORCL": [
+      "Oracle",
+      "ออราเคิล"
+    ],
+    "CRWV": [
+      "CoreWeave"
+    ],
+    "NBIS": [
+      "Nebius"
+    ],
+    "ARM": [
+      "ARM",
+      "Arm"
+    ],
+    "MRVL": [
+      "Marvell"
+    ],
+    "WDC": [
+      "Western Digital"
+    ],
+    "SNDK": [
+      "SanDisk",
+      "Sandisk"
+    ],
+    "STX": [
+      "Seagate"
+    ],
+    "SMCI": [
+      "Super Micro",
+      "Supermicro"
+    ],
+    "DELL": [
+      "Dell"
+    ],
+    "PLTR": [
+      "Palantir"
+    ],
+    "NFLX": [
+      "Netflix",
+      "เน็ตฟลิกซ์"
+    ],
+    "SPCX": [
+      "SpaceX"
+    ],
+    "VICR": [
+      "Vicor"
+    ],
+    "TXN": [
+      "Texas Instruments"
+    ],
+    "NXPI": [
+      "NXP"
+    ],
+    "WOLF": [
+      "Wolfspeed"
+    ],
+    "STM": [
+      "STMicro"
+    ],
+    "IFX.DE": [
+      "Infineon"
+    ],
+    "NTAP": [
+      "NetApp"
+    ],
+    "FLEX": [
+      "Flex"
+    ],
+    "JPM": [
+      "JPMorgan",
+      "JP Morgan",
+      "เจพีมอร์แกน"
+    ],
+    "GS": [
+      "Goldman Sachs",
+      "Goldman"
+    ],
+    "MS": [
+      "Morgan Stanley"
+    ],
+    "BAC": [
+      "Bank of America",
+      "BofA"
+    ],
+    "C": [
+      "Citigroup",
+      "Citi"
+    ],
+    "WFC": [
+      "Wells Fargo"
+    ],
+    "BK": [
+      "BNY"
+    ],
+    "SCHW": [
+      "Schwab"
+    ],
+    "BLK": [
+      "BlackRock"
+    ],
+    "BX": [
+      "Blackstone"
+    ],
+    "STT": [
+      "State Street"
+    ],
+    "USB": [
+      "U.S. Bancorp",
+      "US Bancorp"
+    ],
+    "TFC": [
+      "Truist"
+    ],
+    "IBKR": [
+      "Interactive Brokers"
+    ],
+    "PGR": [
+      "Progressive"
+    ],
+    "DB": [
+      "Deutsche Bank"
+    ],
+    "SAN": [
+      "Santander"
+    ],
+    "GLE.PA": [
+      "Société Générale",
+      "Societe Generale",
+      "SocGen"
+    ],
+    "UCG.MI": [
+      "UniCredit"
+    ],
+    "BARC.L": [
+      "Barclays"
+    ],
+    "BKT.MC": [
+      "Bankinter"
+    ],
+    "T": [
+      "AT&T"
+    ],
+    "VZ": [
+      "Verizon"
+    ],
+    "TMUS": [
+      "T-Mobile"
+    ],
+    "CCI": [
+      "Crown Castle"
+    ],
+    "AMT": [
+      "American Tower"
+    ],
+    "SBAC": [
+      "SBA Communications",
+      "SBA"
+    ],
+    "CMCSA": [
+      "Comcast"
+    ],
+    "ASTS": [
+      "AST SpaceMobile"
+    ],
+    "IRDM": [
+      "Iridium"
+    ],
+    "CVX": [
+      "Chevron"
+    ],
+    "XOM": [
+      "Exxon",
+      "ExxonMobil"
+    ],
+    "COP": [
+      "ConocoPhillips"
+    ],
+    "OXY": [
+      "Occidental"
+    ],
+    "SHEL": [
+      "Shell"
+    ],
+    "PSX": [
+      "Phillips 66"
+    ],
+    "MPC": [
+      "Marathon Petroleum"
+    ],
+    "VLO": [
+      "Valero"
+    ],
+    "ENI.MI": [
+      "Eni"
+    ],
+    "LLY": [
+      "Eli Lilly",
+      "Lilly"
+    ],
+    "PFE": [
+      "Pfizer"
+    ],
+    "MRK": [
+      "Merck"
+    ],
+    "MRNA": [
+      "Moderna"
+    ],
+    "JNJ": [
+      "Johnson & Johnson",
+      "J&J"
+    ],
+    "UNH": [
+      "UnitedHealth"
+    ],
+    "AMGN": [
+      "Amgen"
+    ],
+    "ABBV": [
+      "AbbVie"
+    ],
+    "AZN": [
+      "AstraZeneca"
+    ],
+    "GILD": [
+      "Gilead"
+    ],
+    "HUM": [
+      "Humana"
+    ],
+    "CNC": [
+      "Centene"
+    ],
+    "MOH": [
+      "Molina"
+    ],
+    "ALHC": [
+      "Alignment Healthcare",
+      "Alignment"
+    ],
+    "UCB.BR": [
+      "UCB"
+    ],
+    "PG": [
+      "Procter & Gamble",
+      "P&G"
+    ],
+    "PEP": [
+      "PepsiCo",
+      "Pepsi"
+    ],
+    "KO": [
+      "Coca-Cola"
+    ],
+    "WMT": [
+      "Walmart"
+    ],
+    "NKE": [
+      "Nike"
+    ],
+    "MCD": [
+      "McDonald"
+    ],
+    "SBUX": [
+      "Starbucks"
+    ],
+    "CMG": [
+      "Chipotle"
+    ],
+    "NESN.SW": [
+      "Nestlé",
+      "Nestle"
+    ],
+    "KER.PA": [
+      "Kering"
+    ],
+    "RMS.PA": [
+      "Hermès",
+      "Hermes"
+    ],
+    "MC.PA": [
+      "LVMH"
+    ],
+    "RI.PA": [
+      "Pernod"
+    ],
+    "TSCO.L": [
+      "Tesco"
+    ],
+    "LMT": [
+      "Lockheed"
+    ],
+    "RTX": [
+      "RTX",
+      "Raytheon"
+    ],
+    "NOC": [
+      "Northrop"
+    ],
+    "BA": [
+      "Boeing"
+    ],
+    "GEV": [
+      "GE Vernova"
+    ],
+    "KTOS": [
+      "Kratos"
+    ],
+    "DAL": [
+      "Delta Air Lines",
+      "Delta Air"
+    ],
+    "UAL": [
+      "United Airlines",
+      "United"
+    ],
+    "AAL": [
+      "American Airlines"
+    ],
+    "CEG": [
+      "Constellation"
+    ],
+    "VST": [
+      "Vistra"
+    ],
+    "PLD": [
+      "Prologis"
+    ],
+    "ERIC": [
+      "Ericsson"
+    ],
+    "CRM": [
+      "Salesforce"
+    ],
+    "ADBE": [
+      "Adobe"
+    ],
+    "NOW": [
+      "ServiceNow"
+    ],
+    "PANW": [
+      "Palo Alto"
+    ],
+    "CRWD": [
+      "CrowdStrike"
+    ],
+    "ZS": [
+      "Zscaler"
+    ],
+    "DDOG": [
+      "Datadog"
+    ],
+    "SNOW": [
+      "Snowflake"
+    ],
+    "MSTR": [
+      "MicroStrategy",
+      "Strategy"
+    ],
+    "HOOD": [
+      "Robinhood"
+    ],
+    "COIN": [
+      "Coinbase"
+    ],
+    "WBD": [
+      "Warner Bros"
+    ],
+    "CTVA": [
+      "Corteva"
+    ],
+    "PSNY": [
+      "Polestar"
+    ],
+    "VOLCAR-B.ST": [
+      "Volvo Cars",
+      "Volvo"
+    ],
+    "9984.T": [
+      "SoftBank",
+      "ซอฟต์แบงก์"
+    ],
+    "8035.T": [
+      "Tokyo Electron"
+    ],
+    "6857.T": [
+      "Advantest"
+    ],
+    "285A.T": [
+      "Kioxia"
+    ],
+    "9983.T": [
+      "Fast Retailing",
+      "Uniqlo"
+    ],
+    "6758.T": [
+      "Sony"
+    ],
+    "8306.T": [
+      "Mitsubishi UFJ",
+      "MUFG"
+    ],
+    "6146.T": [
+      "Disco"
+    ],
+    "3436.T": [
+      "SUMCO",
+      "Sumco"
+    ],
+    "5706.T": [
+      "Mitsui Mining",
+      "Mitsui Kinzoku"
+    ],
+    "5803.T": [
+      "Fujikura"
+    ],
+    "8267.T": [
+      "Aeon",
+      "AEON"
+    ],
+    "2501.T": [
+      "Sapporo"
+    ],
+    "2801.T": [
+      "Kikkoman"
+    ],
+    "2317.TW": [
+      "Foxconn",
+      "Hon Hai"
+    ],
+    "2454.TW": [
+      "MediaTek"
+    ],
+    "2308.TW": [
+      "Delta Electronics"
+    ],
+    "3711.TW": [
+      "ASE"
+    ],
+    "0700.HK": [
+      "Tencent"
+    ],
+    "9988.HK": [
+      "Alibaba"
+    ],
+    "1810.HK": [
+      "Xiaomi"
+    ],
+    "0992.HK": [
+      "Lenovo"
+    ],
+    "9999.HK": [
+      "NetEase"
+    ],
+    "3750.HK": [
+      "CATL"
+    ]
+  },
+  "flag_names": {
+    "Nvidia": [
+      "NVDA",
+      "NVDA80X",
+      "NVDA01",
+      "NVDA19",
+      "NVDA23",
+      "NVDA06",
+      "NVDA03"
+    ],
+    "NVIDIA": [
+      "NVDA",
+      "NVDA80X",
+      "NVDA01",
+      "NVDA19",
+      "NVDA23",
+      "NVDA06",
+      "NVDA03"
+    ],
+    "TSMC": [
+      "TSM",
+      "2330.TW",
+      "TSMC80"
+    ],
+    "SK hynix": [
+      "000660.KS"
+    ],
+    "SK Hynix": [
+      "000660.KS"
+    ],
+    "Samsung Electronics": [
+      "005930.KS"
+    ],
+    "Tesla": [
+      "TSLA",
+      "TSLA80X",
+      "TSLA01",
+      "TSLA19",
+      "TSLA23",
+      "TSLA06",
+      "TSLA03"
+    ],
+    "Microsoft": [
+      "MSFT",
+      "MSFT80",
+      "MSFT01",
+      "MSFT19",
+      "MSFT23",
+      "MSFT06",
+      "MSFT03"
+    ],
+    "Alphabet": [
+      "GOOGL",
+      "GOOG",
+      "GOOGL80",
+      "GOOG80",
+      "GOOGL01"
+    ],
+    "Amazon": [
+      "AMZN",
+      "AMZN80",
+      "AMZN19",
+      "AMZN06",
+      "AMZN01",
+      "AMZN23",
+      "AMZN03"
+    ],
+    "Apple": [
+      "AAPL",
+      "AAPL80X",
+      "AAPL01",
+      "AAPL19",
+      "AAPL23",
+      "AAPL03"
+    ],
+    "Intel": [
+      "INTC"
+    ],
+    "Micron": [
+      "MU"
+    ],
+    "Lam Research": [
+      "LRCX"
+    ],
+    "Applied Materials": [
+      "AMAT"
+    ],
+    "Broadcom": [
+      "AVGO"
+    ],
+    "Oracle": [
+      "ORCL"
+    ],
+    "CoreWeave": [
+      "CRWV"
+    ],
+    "Nebius": [
+      "NBIS"
+    ],
+    "Marvell": [
+      "MRVL"
+    ],
+    "Western Digital": [
+      "WDC"
+    ],
+    "SanDisk": [
+      "SNDK"
+    ],
+    "Sandisk": [
+      "SNDK"
+    ],
+    "Seagate": [
+      "STX"
+    ],
+    "Super Micro": [
+      "SMCI"
+    ],
+    "Palantir": [
+      "PLTR"
+    ],
+    "Netflix": [
+      "NFLX",
+      "NFLX80",
+      "NFLX01",
+      "NFLX19"
+    ],
+    "SpaceX": [
+      "SPCX",
+      "SPACEX80",
+      "SPACEX01",
+      "SPACEX03",
+      "SPACEX06",
+      "SPACEX23",
+      "SPACEX19"
+    ],
+    "Verizon": [
+      "VZ"
+    ],
+    "T-Mobile": [
+      "TMUS"
+    ],
+    "Crown Castle": [
+      "CCI"
+    ],
+    "American Tower": [
+      "AMT"
+    ],
+    "Chevron": [
+      "CVX"
+    ],
+    "ExxonMobil": [
+      "XOM"
+    ],
+    "ConocoPhillips": [
+      "COP"
+    ],
+    "Eli Lilly": [
+      "LLY"
+    ],
+    "Pfizer": [
+      "PFE"
+    ],
+    "Moderna": [
+      "MRNA"
+    ],
+    "UnitedHealth": [
+      "UNH"
+    ],
+    "Procter & Gamble": [
+      "PG"
+    ],
+    "PepsiCo": [
+      "PEP"
+    ],
+    "Walmart": [
+      "WMT"
+    ],
+    "Starbucks": [
+      "SBUX"
+    ],
+    "Chipotle": [
+      "CMG"
+    ],
+    "Lockheed": [
+      "LMT"
+    ],
+    "Northrop": [
+      "NOC"
+    ],
+    "Boeing": [
+      "BA"
+    ],
+    "GE Vernova": [
+      "GEV"
+    ],
+    "Kratos": [
+      "KTOS"
+    ],
+    "Delta Air Lines": [
+      "DAL"
+    ],
+    "United Airlines": [
+      "UAL"
+    ],
+    "American Airlines": [
+      "AAL"
+    ],
+    "Salesforce": [
+      "CRM"
+    ],
+    "Adobe": [
+      "ADBE"
+    ],
+    "CrowdStrike": [
+      "CRWD"
+    ],
+    "Palo Alto": [
+      "PANW"
+    ],
+    "Robinhood": [
+      "HOOD"
+    ],
+    "Coinbase": [
+      "COIN"
+    ],
+    "MicroStrategy": [
+      "MSTR"
+    ],
+    "SoftBank": [
+      "9984.T"
+    ],
+    "Tokyo Electron": [
+      "8035.T"
+    ],
+    "Advantest": [
+      "6857.T"
+    ],
+    "Kioxia": [
+      "285A.T"
+    ],
+    "Foxconn": [
+      "2317.TW"
+    ],
+    "Hon Hai": [
+      "2317.TW"
+    ],
+    "MediaTek": [
+      "2454.TW"
+    ],
+    "Tencent": [
+      "0700.HK",
+      "TENCENT80"
+    ],
+    "Alibaba": [
+      "9988.HK",
+      "BABA",
+      "BABA80"
+    ],
+    "Xiaomi": [
+      "1810.HK",
+      "XIAOMI80"
+    ],
+    "Kering": [
+      "KER.PA"
+    ],
+    "LVMH": [
+      "MC.PA"
+    ],
+    "Volvo Cars": [
+      "VOLCAR-B.ST"
+    ]
+  }
+}
