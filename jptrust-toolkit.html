@@ -1164,6 +1164,12 @@ html.tk-app .fdl{order:3;margin-top:18px}
 .fdl-cta{display:flex;gap:8px}
 .fdl-cta .btn{flex:1;justify-content:center}
 .fdl-cta svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+/* A280 · แบนเนอร์แบรนด์ OWLET BOT บนการ์ดดาวน์โหลด (จูน 24 ต.ค. 2026 "ตรง download ให้เป็นแบรนด์") · ภาพ 2048x768 = 8:3 */
+.fdl-ban{display:block;position:relative;border-radius:14px;overflow:hidden;line-height:0;aspect-ratio:8/3;background:#06131d;-webkit-tap-highlight-color:transparent}
+.fdl-ban img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .35s ease}
+.fdl-ban:hover img{transform:scale(1.015)}
+.fdl-ban:focus-visible{outline:2px solid var(--a-acc,#3A1520);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.fdl-ban img{transition:none}.fdl-ban:hover img{transform:none}}
 
 /* ---- แถบเมนูลอยด้านล่าง ---- */
 html.tk-app .anav{display:flex;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:50;
@@ -1956,6 +1962,8 @@ html.tk-app .mk-head .modeseg{width:100%;min-width:0;margin-left:0}
         <!-- A224 · แจกฟรี OWLET BOT v1.12 (จูนส่งไฟล์ 15 ต.ค. 2026 "ทำปุ่ม download เหมือนเดิม" = แบบการ์ด #freeDlCard ของ A67)
              หน้าภาพรวมเท่านั้น · CSS order 3 + อยู่ก่อน #appJoin ใน DOM = ขึ้นเหนือการ์ดสมาชิก · ข้อความฟีเจอร์ไม่แต่งเอง รอจูนส่ง -->
         <div class="card fdl" id="freeDlOwlet">
+          <!-- A280 · แบนเนอร์แบรนด์ (จูนส่งภาพ 24 ต.ค. 2026) · แตะ = ดาวน์โหลดไฟล์เดียวกับปุ่ม (ในภาพมีปุ่ม Download Free) · ต้นฉบับ brand/owlet-bot-banner.png -->
+          <a class="fdl-ban" href="./downloads/OWLET_BOT_v112.ex5" download data-track="OWLET BOT v1.12 · ดาวน์โหลด (แบนเนอร์)" data-review-item="OWLET BOT" data-review-ver="1.12" data-review-size="125 KB" data-review-guide="./ea-owlet-bot.html" aria-label="ดาวน์โหลด OWLET BOT ฟรี"><picture><source type="image/webp" srcset="./brand/owlet-bot-banner-1024.webp 1024w, ./brand/owlet-bot-banner-2048.webp 2048w" sizes="(min-width:900px) 640px, 100vw"><img src="./brand/owlet-bot-banner-1280.jpg" width="2048" height="768" loading="lazy" decoding="async" alt="OWLET BOT — EA Semi Auto Bot สำหรับ MetaTrader 5 · ดาวน์โหลดฟรี"></picture></a>
           <div class="fdl-h">
             <span class="fdl-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></span>
             <div class="fdl-t">
