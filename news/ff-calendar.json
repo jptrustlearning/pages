@@ -1,10 +1,41 @@
 {
  "source": "ForexFactory public weekly feed (ff_calendar_thisweek.json) · USD · impact High",
  "note": "ข่าวแดงสหรัฐฯ · date = เวลาตามฟีด (มี offset) ให้หน้าเว็บแปลงเป็นเวลาไทยเอง · ไม่มีตัวเลขผลจริง",
- "changed_utc": "2026-10-23T04:46:35Z",
+ "changed_utc": "2026-10-25T11:22:36Z",
  "covers": [
-  "2026-10-18",
-  "2026-10-24"
+  "2026-10-25",
+  "2026-10-30"
  ],
- "events": []
+ "events": [
+  {
+   "date": "2026-10-28T14:00:00-04:00",
+   "title": "Federal Funds Rate",
+   "forecast": "4.00%",
+   "previous": "4.00%"
+  },
+  {
+   "date": "2026-10-28T14:00:00-04:00",
+   "title": "FOMC Statement",
+   "forecast": "",
+   "previous": ""
+  },
+  {
+   "date": "2026-10-28T14:30:00-04:00",
+   "title": "FOMC Press Conference",
+   "forecast": "",
+   "previous": ""
+  },
+  {
+   "date": "2026-10-29T08:30:00-04:00",
+   "title": "Advance GDP q/q",
+   "forecast": "3.2%",
+   "previous": "1.5%"
+  },
+  {
+   "date": "2026-10-29T08:30:00-04:00",
+   "title": "Core PCE Price Index m/m",
+   "forecast": "0.3%",
+   "previous": "0.2%"
+  }
+ ]
 }
