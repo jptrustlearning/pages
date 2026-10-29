@@ -1,6 +1,190 @@
 {
-  "lastUpdated": "2026-10-29T16:52:00Z",
+  "lastUpdated": "2026-10-29T22:58:00Z",
   "batches": [
+    {
+      "file": "2026-10-29-2258.md",
+      "date": "2026-10-29T22:58:00Z",
+      "date_display": "29 ต.ค. 2026 · 22:58",
+      "summary": "คืนวันพฤหัสฯ: GDP สหรัฐฯ ไตรมาส 3 โต 3.4% ดีกว่าคาด แต่เงินเฟ้อ PCE กันยายน 3.6% (พื้นฐาน 3.1%) ยังสูง การขึ้นดอกเบี้ยเดือนธันวาคมยังเปิดอยู่ · ECB คงดอกเบี้ย 2.50% Lagarde ประกาศลาออกก่อนครบวาระ มีผล 7 ก.พ. 2027 ยูโรอ่อนแถว 1.11 · หุ้นเด่นก่อนตลาดเปิด Eli Lilly บวก 4–5% รายได้โต 39% ขึ้นเป้าทั้งปีเป็น 91,000–92,000 ล้านดอลลาร์ · หุ้นเด่นชั่วโมงแรก ServiceNow และ Fortinet ร่วงราว 23% หลังงบ ลาก Nasdaq −1.3% ขณะที่ Russell 2000 +1.1% · ยีลด์ 10 ปีย่อแถว 4.98–5.01% ทองและน้ำมันอ่อน · คืนนี้รองบ Amazon และ Intel",
+      "tickers": [
+        "SPX",
+        "IXIC",
+        "DJI",
+        "RUT",
+        "US10Y",
+        "DXY",
+        "GLD",
+        "WTI",
+        "BRENT",
+        "GOOGL",
+        "AMZN",
+        "INTC",
+        "SET",
+        "USDTHB",
+        "EURUSD",
+        "STOXX",
+        "FCHI",
+        "LLY",
+        "MRK",
+        "NOW",
+        "FTNT",
+        "IGV"
+      ],
+      "headlines": [
+        {
+          "title": "คืนวันพฤหัสฯ: GDP สหรัฐฯ ไตรมาส 3 โต 3.4% ดีกว่าคาด 3.2% แต่เงินเฟ้อ PCE เดือนกันยายนยังสูง 3.6% (พื้นฐาน 3.1%) ตามคาด ทำให้การขึ้นดอกเบี้ยเดือนธันวาคมยังเปิดอยู่ · วอลล์สตรีทชั่วโมงแรก Nasdaq ลบราว 1.3% จากหุ้นเทคและซอฟต์แวร์ ขณะที่ Russell 2000 บวกราว 1.1% · ยีลด์ 10 ปีย่อลงแถว 4.98–5.01% น้ำมันและทองอ่อนตัว",
+          "tickers": [
+            {
+              "symbol": "SPX",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "IXIC",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DJI",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "RUT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "US10Y",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "DXY",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "GLD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "WTI",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "BRENT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "GOOGL",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AMZN",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "INTC",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "SET",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "USDTHB",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "U.S. Bureau of Economic Analysis, Charles Schwab, NPR, Yahoo Finance, Investrade",
+          "published": "29 ต.ค. 2026"
+        },
+        {
+          "title": "ECB คงดอกเบี้ย 2.50% ตามคาด แต่ข่าวใหญ่คือ Lagarde ประกาศลาออกก่อนครบวาระราว 9 เดือน มีผล 7 ก.พ. 2027 ขณะที่เงินเฟ้อยูโรโซน 3.8% เกือบสองเท่าของเป้า · ยูโรอ่อนลงแถว 1.11 ดอลลาร์ ต่ำสุดในราว 17 เดือน",
+          "tickers": [
+            {
+              "symbol": "EURUSD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DXY",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "STOXX",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "FCHI",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "GLD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "US10Y",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "Irish Times, Euronews, Investrade",
+          "published": "29 ต.ค. 2026"
+        },
+        {
+          "title": "หุ้นเด่นงบก่อนตลาดเปิด: Eli Lilly บวกราว 4–5% ก่อนตลาดเปิด หลังรายได้ไตรมาส 3 โต 39% เป็น 24,400 ล้านดอลลาร์ สูงกว่าคาดราว 1,800 ล้านดอลลาร์ และขึ้นเป้ารายได้ทั้งปีเป็น 91,000–92,000 ล้านดอลลาร์ จากเดิม 85,000–87,000 ล้าน — ยายาลดน้ำหนักยังโตเร็วกว่าที่ตลาดคิด",
+          "tickers": [
+            {
+              "symbol": "LLY",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "MRK",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "TradingKey, Investrade, Yahoo Finance, Stock Titan",
+          "published": "29 ต.ค. 2026"
+        },
+        {
+          "title": "หุ้นเด่นชั่วโมงแรก: หุ้นซอฟต์แวร์ร่วงหนัก ServiceNow และ Fortinet ลบราว 23% หลังงบ แม้รายได้โต 20% ทั้งคู่ เพราะคำสั่งซื้อไตรมาส 4 ชะลอและรายได้บริการถูกปรับลด — ลาก Nasdaq ลงราว 1.3% ในคืนที่ตลาดตั้งคำถามว่า AI จะกินส่วนแบ่งซอฟต์แวร์แบบเดิมหรือไม่",
+          "tickers": [
+            {
+              "symbol": "NOW",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "FTNT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "IGV",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "GOOGL",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "IXIC",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "RUT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AMZN",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "INTC",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "US10Y",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "TradingKey, Investrade, Stock Titan, Yahoo Finance, Charles Schwab",
+          "published": "29 ต.ค. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-10-29-1652.md",
       "date": "2026-10-29T16:52:00Z",
