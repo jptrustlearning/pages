@@ -891,6 +891,52 @@
     color:#FFA8A8;
   }
 
+  /* --- PERCENTILE TIER MODAL (31 ต.ค. 2026 · หน้าเทค) — แตะ ① BREADTH / ② DRAWDOWN บนการ์ด SNIPER STATUS --- */
+  .tier-modal-content { max-width:620px; }
+  .tier-sec { margin-top:6px; padding:16px 16px 14px; border:1px solid rgba(212,175,55,0.22); border-radius:12px;
+    background:linear-gradient(145deg, rgba(244,228,186,0.06), rgba(244,228,186,0.02)); transition:box-shadow .4s, border-color .4s; }
+  .tier-sec + .tier-sec { margin-top:16px; }
+  .tier-sec.flash { border-color:rgba(212,175,55,0.75); box-shadow:0 0 0 2px rgba(212,175,55,0.25); }
+  .tier-sec-head { font-family:'Cinzel','Anuphan',serif; font-size:.74rem; font-weight:700; letter-spacing:1.6px; color:#D4AF37; }
+  .tier-sec-sub { font-family:'Sarabun','Anuphan',sans-serif; font-size:.74rem; color:#C4B88A; margin-top:2px; line-height:1.5; }
+  .tier-now-line { font-family:'Sarabun','Anuphan',sans-serif; font-size:.86rem; color:#E8E4DC; margin:10px 0 4px; line-height:1.6; }
+  .tier-now-line strong { color:#FFE9A3; }
+  .tier-bar-wrap { position:relative; margin:30px 0 30px; }
+  .tier-bar { display:flex; height:16px; border-radius:6px; overflow:hidden; border:1px solid rgba(212,175,55,0.3); }
+  .tier-bar > div { height:100%; }
+  .tier-bar > div + div { border-left:1px solid rgba(26,10,14,0.55); }
+  .tier-mark { position:absolute; top:-6px; bottom:-6px; width:0; }
+  .tier-mark::before { content:''; position:absolute; top:0; bottom:0; left:-1px; width:2px; border-radius:1px; }
+  .tier-mark span { position:absolute; left:0; transform:translateX(-50%); white-space:nowrap;
+    font-family:'Sarabun','Anuphan',sans-serif; font-size:.66rem; font-weight:700; line-height:1; padding:3px 6px; border-radius:4px; }
+  .tier-mark.now::before { background:#FFE9A3; box-shadow:0 0 6px rgba(255,233,163,0.8); }
+  .tier-mark.now span { bottom:calc(100% + 3px); background:#FFE9A3; color:#2d1018; }
+  .tier-mark.arm::before { background:none; border-left:2px dashed rgba(244,228,186,0.7); }
+  .tier-mark.arm span { top:calc(100% + 3px); background:rgba(26,10,14,0.85); color:#F4E4BA; border:1px solid rgba(212,175,55,0.4); font-weight:600; }
+  .tier-table { width:100%; border-collapse:separate; border-spacing:0 4px; font-family:'Sarabun','Anuphan',sans-serif; }
+  .tier-table th { font-size:.64rem; font-weight:600; color:#C4B88A; text-align:left; padding:0 8px 2px; letter-spacing:.3px; }
+  .tier-table th:last-child, .tier-table td:last-child { text-align:right; }
+  .tier-table td { font-size:.8rem; color:#E8E4DC; padding:7px 8px; background:rgba(244,228,186,0.04); vertical-align:middle; }
+  .tier-table td:first-child { border-radius:7px 0 0 7px; border-left:4px solid transparent; }
+  .tier-table td:last-child { border-radius:0 7px 7px 0; }
+  .tier-table tr.is-now td { background:rgba(255,233,163,0.13); color:#FFF3D0; }
+  .tier-name { font-weight:700; color:#F4E4BA; white-space:nowrap; }
+  .tier-desc { display:block; font-size:.68rem; color:#C4B88A; font-weight:400; }
+  .tier-pill { display:inline-block; margin-left:5px; padding:1px 6px; border-radius:4px; font-size:.6rem; font-weight:700; vertical-align:1px; }
+  .tier-pill.now { background:#FFE9A3; color:#2d1018; }
+  .tier-pill.arm { border:1px dashed rgba(244,228,186,0.6); color:#F4E4BA; font-weight:600; }
+  .tier-share { font-family:'DM Serif Display',serif; font-size:1.02rem; color:#F4E4BA; line-height:1.15; }
+  .tier-days { display:block; font-size:.64rem; color:#C4B88A; }
+  .tier-days .nw { white-space:nowrap; }
+  .tier-note { font-family:'Sarabun','Anuphan',sans-serif; font-size:.72rem; color:#C4B88A; line-height:1.65; margin-top:16px;
+    padding-top:12px; border-top:1px dashed rgba(212,175,55,0.25); }
+  .tier-chip-link { display:block; margin-top:3px; font-size:.62rem; font-weight:700; color:var(--gold-deep, #8B6914); letter-spacing:.2px; }
+  @media (max-width:600px) {
+    .tier-modal-content { padding:22px 14px 18px; }
+    .tier-sec { padding:14px 10px 12px; }
+    .tier-table td { padding:7px 6px; font-size:.76rem; }
+  }
+
   @media (max-width:600px) {
     .fab-stack { bottom:16px; right:16px; gap:10px; }
     .fab { width:52px; height:52px; font-size:1.2rem; }
@@ -2236,6 +2282,16 @@
 </aside>
 
 <!-- ABOUT MODAL -->
+<!-- PERCENTILE TIER MODAL (31 ต.ค. 2026 · หน้าเทค) — เปิดจากชิป ① BREADTH / ② DRAWDOWN บนการ์ด SNIPER STATUS · เนื้อหาเติมด้วย renderTierModal() -->
+<div id="tierModal" class="about-modal" onclick="if(event.target===this)closeTierModal()">
+  <div class="about-modal-content tier-modal-content" id="tierModalContent">
+    <button class="panel-close" onclick="closeTierModal()" aria-label="ปิด">✕</button>
+    <h2 style="padding-right:44px;">ระดับเปอร์เซ็นไทล์</h2>
+    <div class="about-sub" id="tierModalSub" style="margin-bottom:14px;padding-bottom:12px;">—</div>
+    <div id="tierModalBody"></div>
+  </div>
+</div>
+
 <div id="aboutModal" class="about-modal" onclick="if(event.target===this)closeAboutModal()">
   <div class="about-modal-content">
     <button class="panel-close" onclick="closeAboutModal()" aria-label="ปิด">✕</button>
@@ -4457,16 +4513,19 @@ function renderTradeLog() {
       const pct = (v, d) => (v == null || !isFinite(v)) ? '—' : (v >= 0 ? '' : '−') + Math.abs(v).toFixed(d === undefined ? 1 : d) + '%';
 
       // --- แถวเงื่อนไข 3 ข้อ (ตัวกรอง 2 ใน 3) ---
-      const chip = (num, name, valTxt, thrTxt, on) =>
-        '<div style="flex:1 1 148px;min-width:132px;border:1px solid ' + (on ? TH.b : 'var(--border)') + ';background:' + (on ? TH.bg : 'rgba(255,254,248,0.55)') + ';border-radius:9px;padding:8px 10px;">' +
+      // tierKey ('breadth' | 'dd') = แตะแล้วเปิดหน้าต่างระดับเปอร์เซ็นไทล์ (หน้าเดียวกันทั้งคู่)
+      const chip = (num, name, valTxt, thrTxt, on, tierKey) =>
+        '<div' + (tierKey ? ' role="button" tabindex="0" onclick="openTierModal(\'' + tierKey + '\')" onkeydown="if(event.key===\'Enter\')openTierModal(\'' + tierKey + '\')" title="แตะดูระดับเปอร์เซ็นไทล์"' : '') +
+        ' style="flex:1 1 148px;min-width:132px;border:1px solid ' + (on ? TH.b : 'var(--border)') + ';background:' + (on ? TH.bg : 'rgba(255,254,248,0.55)') + ';border-radius:9px;padding:8px 10px;' + (tierKey ? 'cursor:pointer;' : '') + '">' +
           '<div style="font-family:\'Cinzel\',\'Anuphan\',serif;font-size:.58rem;letter-spacing:1.1px;font-weight:700;color:' + (on ? TH.c : 'var(--text-label)') + ';">' + num + ' ' + name + (on ? ' ✓' : '') + '</div>' +
           '<div style="font-family:\'DM Serif Display\',serif;font-size:1.02rem;line-height:1.3;color:' + (on ? TH.c : 'var(--text-main)') + ';">' + valTxt + '</div>' +
           '<div style="font-size:.64rem;color:var(--text-muted);line-height:1.35;">' + thrTxt + '</div>' +
+          (tierKey ? '<span class="tier-chip-link">ดูระดับเปอร์เซ็นไทล์ ›</span>' : '') +
         '</div>';
 
       const chipsHtml = '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">' +
-        chip('①', 'BREADTH', pct(st.breadthNow), 'เข้าโซนเมื่อ ≥ ' + st.breadthArm.toFixed(1) + '%', st.breadthArmed) +
-        chip('②', 'DRAWDOWN', pct(st.ddNow == null ? null : st.ddNow * 100), 'เข้าโซนเมื่อ ≤ ' + pct(st.ddArm * 100), st.ddArmed) +
+        chip('①', 'BREADTH', pct(st.breadthNow), 'เข้าโซนเมื่อ ≥ ' + st.breadthArm.toFixed(1) + '%', st.breadthArmed, 'breadth') +
+        chip('②', 'DRAWDOWN', pct(st.ddNow == null ? null : st.ddNow * 100), 'เข้าโซนเมื่อ ≤ ' + pct(st.ddArm * 100), st.ddArmed, 'dd') +
         chip('③', 'MACRO', st.macroBenign ? 'SPY ติด top-2' : 'SPY หลุด top-2', st.macroBenign ? 'ตลาดยังปกติ' : 'นับเป็นสัญญาณสมทบ', !st.macroBenign) +
       '</div>';
 
@@ -5043,6 +5102,177 @@ function closeSettingsPanel() {
   document.getElementById('panelBackdrop').classList.remove('open');
   document.body.style.overflow = '';
 }
+// ============================================================
+// PERCENTILE TIER MODAL (31 ต.ค. 2026 · คำสั่งจูน · หน้าเทคก่อน)
+// แตะชิป ① BREADTH หรือ ② DRAWDOWN บนการ์ด SNIPER STATUS → เปิดหน้าต่างเดียวกัน แล้วเลื่อนไปส่วนที่แตะ
+//   ระดับ = เปอร์เซ็นไทล์ของ "ความรุนแรง" จากข้อมูลทุกวันที่หน้านี้โหลด (breadth = ค่าตรงๆ · DD = ความลึก −dd)
+//   จุดตัด P50/P75/P90/P95/P99 = quantile แบบ linear (ตรงกับ numpy.percentile ค่าเริ่มต้น)
+//   สัดส่วนเวลา = จำนวนวันที่ค่าอยู่ในช่วงนั้น ÷ วันทั้งหมด (นับจริง — ค่าซ้ำมากอย่าง breadth 0% ทำให้ไม่เท่าช่วง P พอดี)
+//   ติ๊ก "วันนี้" = อันดับเปอร์เซ็นไทล์แบบ mid-rank ของค่าวันล่าสุด · เส้นประ = เกณฑ์เข้าโซนใน CONFIG (ตรึงไว้)
+//   อ่านอย่างเดียวจาก state._sniper — ไม่แตะ engine / ผล backtest
+// ============================================================
+const TIER_QS = [0.50, 0.75, 0.90, 0.95, 0.99];
+const TIER_PLABEL = ['ต่ำกว่า P50', 'P50–P75', 'P75–P90', 'P90–P95', 'P95–P99', 'P99 ขึ้นไป'];
+const TIER_COLORS = ['rgba(244,228,186,0.20)', 'rgba(212,175,55,0.36)', 'rgba(212,175,55,0.68)', '#E0A040', '#D2553F', '#B0182E'];
+let _tierFlashTimer = null;
+
+function _tierQuantile(sorted, q) {
+  const pos = (sorted.length - 1) * q, lo = Math.floor(pos), hi = Math.ceil(pos);
+  return sorted[lo] + (sorted[hi] - sorted[lo]) * (pos - lo);
+}
+function _tierCountBelow(sorted, x) {            // จำนวนค่าที่ < x (binary search)
+  let lo = 0, hi = sorted.length;
+  while (lo < hi) { const mid = (lo + hi) >> 1; if (sorted[mid] < x) lo = mid + 1; else hi = mid; }
+  return lo;
+}
+// xs = ค่า "ยิ่งมาก = ยิ่งรุนแรง" ทุกวัน · nowX = ค่าวันล่าสุดในหน่วยเดียวกัน
+function computeTierStats(xs, nowX) {
+  const s = Float64Array.from(xs).sort();
+  const N = s.length;
+  const cuts = TIER_QS.map(q => _tierQuantile(s, q));
+  const tierOf = (x) => { let k = 0; while (k < cuts.length && x >= cuts[k]) k++; return k; };
+  const counts = new Array(cuts.length + 1).fill(0);
+  for (let i = 0; i < N; i++) counts[tierOf(s[i])]++;
+  const below = _tierCountBelow(s, nowX);
+  const atOrBelow = _tierCountBelow(s, nowX + 1e-9);
+  const rank = N ? (below + (atOrBelow - below) / 2) / N : 0;   // mid-rank 0..1
+  return { N, cuts, counts, nowTier: tierOf(nowX), rank, shareBelow: (x) => N ? _tierCountBelow(s, x) / N : 0 };
+}
+
+function _tierSectionHtml(o) {
+  const T = o.stats, N = T.N;
+  const segs = T.counts.map((c, k) => '<div style="width:' + (c / N * 100).toFixed(3) + '%;background:' + TIER_COLORS[k] + ';" title="' + TIER_PLABEL[k] + '"></div>').join('');
+  const nowP = T.rank * 100, armP = T.shareBelow(o.armX) * 100;
+  // ตำแหน่งป้ายถูกดันไม่ให้ล้นขอบใน _tierFixLabels() หลังเปิดหน้าต่าง
+  const mark = (cls, p, label) => '<div class="tier-mark ' + cls + '" style="left:' + p.toFixed(2) + '%;"><span>' + label + '</span></div>';
+  const armTier = (() => { let k = 0; while (k < T.cuts.length && o.armX >= T.cuts[k]) k++; return k; })();
+  const rows = [];
+  for (let k = T.counts.length - 1; k >= 0; k--) {
+    const share = T.counts[k] / N;
+    const isNow = k === T.nowTier;
+    rows.push('<tr class="' + (isNow ? 'is-now' : '') + '">' +
+      '<td style="border-left-color:' + TIER_COLORS[k] + ';"><span class="tier-name">' + TIER_PLABEL[k] + '</span>' +
+        (isNow ? '<span class="tier-pill now">วันนี้</span>' : '') +
+        (k === armTier ? '<span class="tier-pill arm">เส้นเข้าโซน</span>' : '') +
+        '<span class="tier-desc">' + o.desc[k] + '</span></td>' +
+      '<td>' + o.rangeTxt(k, T.cuts) + '</td>' +
+      '<td><span class="tier-share">' + (share * 100).toFixed(1) + '%</span>' +
+        '<span class="tier-days"><span class="nw">' + T.counts[k].toLocaleString() + ' วัน</span> · <span class="nw">≈ ' + Math.round(share * 252) + ' วัน/ปี</span></span></td>' +
+    '</tr>');
+  }
+  return '<div class="tier-sec" id="tierSec-' + o.key + '">' +
+    '<div class="tier-sec-head">' + o.head + '</div>' +
+    '<div class="tier-sec-sub">' + o.sub + '</div>' +
+    '<div class="tier-now-line">' + o.nowLine + '</div>' +
+    '<div class="tier-bar-wrap" data-tier-bar="' + o.key + '">' +
+      '<div class="tier-bar">' + segs + '</div>' +
+      mark('arm', armP, o.armLabel) +
+      mark('now', nowP, 'วันนี้ P' + Math.round(nowP)) +
+    '</div>' +
+    '<table class="tier-table"><thead><tr><th>ระดับ</th><th>ช่วงค่า</th><th>สัดส่วนเวลา</th></tr></thead><tbody>' + rows.join('') + '</tbody></table>' +
+  '</div>';
+}
+
+function renderTierModal() {
+  const S = state._sniper;
+  const body = document.getElementById('tierModalBody');
+  const sub = document.getElementById('tierModalSub');
+  if (!body) return false;
+  if (!S || !S.n) { body.innerHTML = '<p>ยังไม่มีข้อมูล — รอโหลดข้อมูลให้เสร็จก่อน</p>'; return false; }
+  const fmtD = (iso) => {
+    const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const m = parseInt(String(iso).substring(5, 7), 10);
+    return (m >= 1 && m <= 12) ? iso.substring(8, 10) + '-' + M[m - 1] + '-' + iso.substring(0, 4) : iso;
+  };
+  const f1 = (v) => (Math.abs(v) < 0.05 ? 0 : v).toFixed(1);
+
+  // ① breadth — วันที่หน้าต่าง z-score เต็มแล้ว (i ≥ zWindow−1) เหมือนที่ใช้ตั้งเกณฑ์ 22.2%
+  const W = CONFIG.zWindow;
+  const bx = [];
+  for (let i = W - 1; i < S.n; i++) bx.push(S.breadth[i]);
+  const bLast = S.n - 1, bNow = S.breadth[bLast];
+  const bT = computeTierStats(bx, bNow);
+
+  // ② drawdown SPY 60 วัน — ความลึก (บวก) · วันล่าสุดที่มีค่า (SPY อาจยังไม่อัปเดตวันเดียวกับหุ้น)
+  const dx = []; let dLast = -1;
+  for (let i = 0; i < S.n; i++) {
+    const v = S.ddArr ? S.ddArr[i] : NaN;
+    if (isFinite(v)) { dx.push(v === 0 ? 0 : -v * 100); dLast = i; }
+  }
+  if (!bx.length || !dx.length) { body.innerHTML = '<p>ข้อมูลไม่พอคำนวณระดับ</p>'; return false; }
+  const dNowDepth = S.ddArr[dLast] === 0 ? 0 : -S.ddArr[dLast] * 100;
+  const dT = computeTierStats(dx, dNowDepth);
+  const armDepth = -CONFIG.ddArm * 100;
+
+  sub.innerHTML = 'ข้อมูลจริงทุกวันทำการ ' + fmtD(S.dates[W - 1]) + ' → ' + fmtD(S.dates[bLast]) +
+    ' · ติ๊กสีทอง = จุดที่เราอยู่วันนี้ · ความกว้างแต่ละช่องของแถบ = สัดส่วนเวลาที่ค่าอยู่ในระดับนั้น';
+
+  const bDesc = ['ปกติ', 'มีแรงขายบ้าง', 'แรงขายชัด', 'ตึงเครียด', 'ล้างหนัก', 'ล้างรุนแรงที่สุด'];
+  const dDesc = ['ใกล้ยอด', 'ย่อปกติ', 'ย่อลึก', 'ปรับฐาน', 'ลงหนัก', 'ลงรุนแรงที่สุด'];
+  const bRange = (k, c) => k === 0 ? 'ต่ำกว่า ' + f1(c[0]) + '%' : (k === c.length ? '≥ ' + f1(c[k - 1]) + '%' : f1(c[k - 1]) + ' – ' + f1(c[k]) + '%');
+  const dRange = (k, c) => k === 0 ? '0 ถึง −' + f1(c[0]) + '%' : (k === c.length ? 'ลึกกว่า −' + f1(c[k - 1]) + '%' : '−' + f1(c[k - 1]) + ' ถึง −' + f1(c[k]) + '%');
+  const sameDay = dLast === bLast;
+
+  body.innerHTML =
+    _tierSectionHtml({
+      key: 'breadth', head: '① BREADTH หุ้นเทค',
+      sub: '% หุ้นเทคใน S&amp;P 500 ที่ z &lt; −2 · ยิ่งสูง = เทขายกว้าง · ' + bT.N.toLocaleString() + ' วัน',
+      nowLine: 'วันนี้ (' + fmtD(S.dates[bLast]) + ') <strong>' + f1(bNow) + '%</strong> · สูงกว่าราว <strong>' + Math.round(bT.rank * 100) + '%</strong> ของวันทั้งหมด → ระดับ <strong>' + TIER_PLABEL[bT.nowTier] + '</strong> (' + bDesc[bT.nowTier] + ')',
+      stats: bT, armX: CONFIG.breadthArm, armLabel: 'เข้าโซน ' + CONFIG.breadthArm.toFixed(1) + '%',
+      desc: bDesc, rangeTxt: bRange
+    }) +
+    _tierSectionHtml({
+      key: 'dd', head: '② DRAWDOWN SPY',
+      sub: 'SPY หลุดจากยอด 60 วันกี่ % · ยิ่งลึก = ยิ่งรุนแรง · ' + dT.N.toLocaleString() + ' วัน',
+      nowLine: (sameDay ? 'วันนี้' : 'ข้อมูล SPY ล่าสุด') + ' (' + fmtD(S.dates[dLast]) + ') <strong>' + (dNowDepth === 0 ? '0.0' : '−' + f1(dNowDepth)) + '%</strong> · ลึกกว่าราว <strong>' + Math.round(dT.rank * 100) + '%</strong> ของวันทั้งหมด → ระดับ <strong>' + TIER_PLABEL[dT.nowTier] + '</strong> (' + dDesc[dT.nowTier] + ')',
+      stats: dT, armX: armDepth, armLabel: 'เข้าโซน −' + armDepth.toFixed(0) + '%',
+      desc: dDesc, rangeTxt: dRange
+    }) +
+    '<div class="tier-note">P ยิ่งสูง = ยิ่งหายาก เช่น P95 = แรงกว่า 95% ของวันทั้งหมด · สัดส่วนเวลานับจากจำนวนวันจริง ค่าที่ซ้ำกันมาก (เช่น breadth 0% หรือ SPY อยู่ที่ยอดพอดี) ทำให้สัดส่วนไม่เท่าช่วง P เป๊ะ · ' +
+      'เส้นประ = เกณฑ์เข้าโซนของกลยุทธ์ (breadth ' + CONFIG.breadthArm.toFixed(1) + '% · DD −' + armDepth.toFixed(0) + '%) ตรึงไว้ ไม่ขยับตามข้อมูลใหม่ · ระดับเป็นสถิติย้อนหลัง ไม่ได้บอกว่าตลาดจะไปทางไหนต่อ</div>';
+  return true;
+}
+
+function _tierFixLabels() {
+  // ดันป้ายกำกับไม่ให้ล้นขอบแถบ (คำนวณหลังเปิด เพราะต้องรู้ความกว้างจริง)
+  document.querySelectorAll('#tierModalBody .tier-bar-wrap').forEach(wrap => {
+    const W = wrap.clientWidth;
+    wrap.querySelectorAll('.tier-mark span').forEach(sp => {
+      sp.style.left = '0px';
+      const mark = sp.parentElement;
+      const x = mark.offsetLeft, half = sp.offsetWidth / 2;
+      let shift = 0;
+      if (x - half < 0) shift = half - x;
+      else if (x + half > W) shift = W - (x + half);
+      sp.style.left = shift.toFixed(0) + 'px';
+    });
+  });
+}
+
+function openTierModal(which) {
+  renderTierModal();
+  const m = document.getElementById('tierModal');
+  m.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  requestAnimationFrame(() => {
+    _tierFixLabels();
+    const box = document.getElementById('tierModalContent');
+    const sec = document.getElementById('tierSec-' + (which === 'dd' ? 'dd' : 'breadth'));
+    if (box) box.scrollTop = (which === 'dd' && sec) ? Math.max(0, sec.offsetTop - 12) : 0;
+    if (sec) {
+      sec.classList.add('flash');
+      clearTimeout(_tierFlashTimer);
+      _tierFlashTimer = setTimeout(() => sec.classList.remove('flash'), 1400);
+    }
+  });
+}
+function closeTierModal() {
+  const m = document.getElementById('tierModal');
+  if (m) m.classList.remove('open');
+  document.body.style.overflow = '';
+}
+window.addEventListener('resize', () => { const m = document.getElementById('tierModal'); if (m && m.classList.contains('open')) _tierFixLabels(); });
+
 function openAboutModal() {
   document.getElementById('aboutModal').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -5057,6 +5287,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     closeSettingsPanel();
     closeAboutModal();
+    closeTierModal();
   }
 });
 
