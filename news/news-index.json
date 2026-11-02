@@ -1,6 +1,210 @@
 {
-  "lastUpdated": "2026-11-02T16:50:00Z",
+  "lastUpdated": "2026-11-02T23:10:00Z",
   "batches": [
+    {
+      "file": "2026-11-02-2310.md",
+      "date": "2026-11-02T23:10:00Z",
+      "date_display": "2 พ.ย. 2026 · 23:10",
+      "summary": "คืนวันจันทร์: Wall Street ฟื้น Dow บวกกว่า 600 จุดช่วงกลางเซสชัน หลังน้ำมัน WTI ร่วงราว 6% ไปแถว 97.5 ดอลลาร์จากข่าวอิหร่านไฟเขียวเจรจา · ISM ภาคการผลิต 55.5 ดีกว่าคาด ยีลด์ 10 ปีลดเหลือ 4.89% ทองบวก 2% · หุ้นเด่นก่อนตลาดเปิด Marvell ซื้อ Lumentum 115,000 ล้านดอลลาร์แลกหุ้นล้วน แต่หุ้นทั้งคู่ลง · หุ้นเด่นชั่วโมงแรก Oracle ลบราว 5% หลังระดมทุน 20,000 ล้านดอลลาร์ทั้งเพิ่มทุนและหุ้นกู้",
+      "tickers": [
+        "SPX",
+        "NDX",
+        "DJI",
+        "WTI",
+        "BRENT",
+        "GLD",
+        "US10Y",
+        "DXY",
+        "AMZN",
+        "NVDA",
+        "GOOGL",
+        "XLE",
+        "LNG",
+        "BTC",
+        "PTTEP",
+        "PTT",
+        "AOT",
+        "AAPL",
+        "PLTR",
+        "AMD",
+        "MRVL",
+        "LITE",
+        "COHR",
+        "AVGO",
+        "INTC",
+        "DELTA",
+        "KCE",
+        "HANA",
+        "ORCL",
+        "MSFT",
+        "CRWV"
+      ],
+      "headlines": [
+        {
+          "title": "คืนวันจันทร์: Wall Street ฟื้นหลังวันศุกร์ที่แย่สุดตั้งแต่ มิ.ย. Dow บวกกว่า 600 จุดช่วงกลางเซสชัน · น้ำมัน WTI ร่วงราว 6% ลงไปแถว 97.5 ดอลลาร์ หลังผู้นำสูงสุดอิหร่านไฟเขียวเจรจา · ISM ภาคการผลิต 55.5 ดีกว่าคาด ราคาวัตถุดิบเริ่มผ่อน · ยีลด์ 10 ปีลดเหลือ 4.89% ทองบวก 2% กลับแถว 3,950 ดอลลาร์",
+          "tickers": [
+            {
+              "symbol": "SPX",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "NDX",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DJI",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "WTI",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "BRENT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "GLD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "US10Y",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "DXY",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AMZN",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "GOOGL",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "XLE",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "LNG",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "BTC",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "PTTEP",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "PTT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AAPL",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "PLTR",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "AMD",
+              "sentiment": "neutral"
+            }
+          ],
+          "tone_override": "bullish",
+          "source": "Bloomberg, AP, ISM, ActionForex, TheStreet, Yahoo Finance",
+          "published": "2 พ.ย. 2026"
+        },
+        {
+          "title": "หุ้นเด่นก่อนตลาดเปิด: Marvell ประกาศซื้อ Lumentum มูลค่าราว 115,000 ล้านดอลลาร์ แลกหุ้นล้วน หนึ่งในดีลเทคใหญ่ที่สุดในประวัติศาสตร์ · แต่หุ้นทั้งคู่กลับลงระหว่างวัน Marvell ลบราว 6–10% Lumentum ลบราว 9–11% · Coherent คู่แข่งบวกก่อนตลาดเปิดเกือบ 4%",
+          "tickers": [
+            {
+              "symbol": "MRVL",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "LITE",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "COHR",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AVGO",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "INTC",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AMD",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "KCE",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "HANA",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "Bloomberg, Reuters, Yahoo Finance, Motley Fool, TheStreet, Investing.com",
+          "published": "2 พ.ย. 2026"
+        },
+        {
+          "title": "หุ้นเด่นชั่วโมงแรก: Oracle ลบราว 4–5.7% แถว 123–125 ดอลลาร์ หลังยื่นขายหุ้นเพิ่มทุน 10,000 ล้านดอลลาร์ควบคู่ออกหุ้นกู้อีก 10,000 ล้าน ไม่กี่วันหลังบอกนักลงทุนว่าจะจำกัดการระดมทุนใหม่ · ขณะที่ Microsoft และ Amazon บวกตามตลาด",
+          "tickers": [
+            {
+              "symbol": "ORCL",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "MSFT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AMZN",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "CRWV",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "GOOGL",
+              "sentiment": "neutral"
+            }
+          ],
+          "tone_override": "bearish",
+          "source": "Stocktwits, TipRanks, 24/7 Wall St, Investing.com, Bloomberg",
+          "published": "2 พ.ย. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-11-02-1650.md",
       "date": "2026-11-02T16:50:00Z",
