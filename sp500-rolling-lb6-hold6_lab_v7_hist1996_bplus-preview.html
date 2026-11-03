@@ -4193,7 +4193,8 @@ function runRollingBacktest() {
             ? bplusDecide(candidates, isSPYInMacroTop2AtIdx(signalIdx) === false) : null;
           const pExtend = !!(pDecision && pDecision.extend);
           // ยืด = ยังโชว์ 10 อันดับแรก ณ ราคาปิดล่าสุดให้ดู แต่รอบนี้ไม่ซื้อ (การ์ด EXTEND)
-          const picks = bplusFilter(candidates, pExtend ? null : pDecision).slice(0, CONFIG.topN);
+          // กลุ่มตั้งรับติด 2 แรก = ตัดหุ้น IT ออกจากรายชื่อทั้งการ์ดซื้อและการ์ด EXTEND (จูน 3 พ.ย. 17:39)
+          const picks = bplusFilter(candidates, pDecision ? { exclIT: pDecision.defRank <= 2 } : null).slice(0, CONFIG.topN);
           // Next lot capital: if a lot will mature next month, use its projected value; else perLotCapital (ramp-up)
           const willMature = state.lots.find(lot => (nextMonthKey - lot.entryMonthKey) >= CONFIG.holdMonths);
           let projectedCap = CONFIG.perLotCapital;
@@ -4977,7 +4978,7 @@ function renderTradeLog() {
           '<div class="trade-summary">' +
           'รอบ <strong>' + ps.nextRebalLabel + '</strong> (' + daysLabel + ') · สัญญาณภาวะตลาด ณ ราคาปิดล่าสุดชี้ให้ตั้งรับ → <strong>' + lotsTxt + '</strong> · ไม่เปิดล็อตใหม่' +
           '</div></div></div>' +
-          '<div class="trade-section"><div class="trade-section-label mom">ติดอันดับ ณ ราคาปิดล่าสุด — ' + (ps.picks || []).length + ' ตัว ' +
+          '<div class="trade-section"><div class="trade-section-label mom">ติดอันดับ ณ ราคาปิดล่าสุด (ผ่านตัวกรองของ engine) — ' + (ps.picks || []).length + ' ตัว ' +
           '<span class="alloc-info">· ไม่ซื้อรอบนี้ (ยืดถือ) · ตัดสินจริงด้วยราคาปิดวันทำการสุดท้ายของเดือน · ถ้าสัญญาณเปลี่ยนก่อนสิ้นเดือน การ์ดนี้จะกลับเป็นรายชื่อซื้อล็อตใหม่</span>' +
           '</div><div>' + extBadges + '</div></div>';
         container.appendChild(card);
