@@ -3186,10 +3186,13 @@ window.downloadDetailsPdf = function(event, entryDate, exitDate, isPending) {
   let tickers;
   let title;
   let dateLabel;
+  const isExtendPdf = !!(isPending && state.pendingSignal && state.pendingSignal.decision === 'extend');
   if (isPending) {
     tickers = (state.pendingSignal?.picks || []).map(p => p.ticker);
-    title = 'PENDING — ล็อตใหม่รอบถัดไป (' + (state.pendingSignal?.nextRebalLabel || '') + ')';
-    dateLabel = 'PENDING-' + (state.pendingSignal?.signalDate || 'unknown');
+    title = isExtendPdf
+      ? 'EXTEND — รายชื่อติดอันดับรอบ ' + (state.pendingSignal?.nextRebalLabel || '') + ' (ไม่ซื้อรอบนี้)'
+      : 'PENDING — ล็อตใหม่รอบถัดไป (' + (state.pendingSignal?.nextRebalLabel || '') + ')';
+    dateLabel = (isExtendPdf ? 'EXTEND-' : 'PENDING-') + (state.pendingSignal?.signalDate || 'unknown');
   } else {
     const entry = state.tradeLog.find(t => t.date === entryDate);
     tickers = entry ? entry.stocks : [];
@@ -3276,7 +3279,7 @@ window.downloadDetailsPdf = function(event, entryDate, exitDate, isPending) {
   <div class="subtitle">JPT ROLLING LB6/H3 HYBRID · LOT DETAILS</div>
   <h1>${title}</h1>
   <div class="meta">
-    <div><strong>หุ้นในล็อต:</strong> ${tickers.length} ตัว · ${tickers.join(', ')}</div>
+    <div><strong>${isExtendPdf ? 'รายชื่อติดอันดับ (ไม่ซื้อรอบนี้):' : 'หุ้นในล็อต:'}</strong> ${tickers.length} ตัว · ${tickers.join(', ')}</div>
     <div style="margin-top:6px;"><strong>หน้าต่าง lookback:</strong> ${dates.lookbackStart} → ${dates.lookbackEnd}${dates.holdingEnd ? ' · <strong>ถือถึง:</strong> ' + dates.holdingEnd + (dates.holdingEndIsPlanned ? ' (ตามแผน)' : '') : ' · ยังไม่ได้เริ่มถือ'}</div>
   </div>
   ${sectionsHtml}
@@ -4977,7 +4980,12 @@ function renderTradeLog() {
           '<div style="font-family:\'Cinzel\',\'Anuphan\',serif;font-size:0.7rem;font-weight:700;color:var(--gold-deep);letter-spacing:0.1em;text-transform:uppercase;margin-top:5px;opacity:0.85;">Signal Date · ' + _fmtTradeDate(ps.signalDate) + '</div>' +
           '<div class="trade-summary">' +
           'รอบ <strong>' + ps.nextRebalLabel + '</strong> (' + daysLabel + ') · สัญญาณภาวะตลาด ณ ราคาปิดล่าสุดชี้ให้ตั้งรับ → <strong>' + lotsTxt + '</strong> · ไม่เปิดล็อตใหม่' +
-          '</div></div></div>' +
+          '</div></div>' +
+          (ps.picks && ps.picks.length ? '<button class="trade-details-btn" onclick="downloadDetailsPdf(event, null, null, true)" title="ดาวน์โหลดรายละเอียดเป็น PDF">' +
+          '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>Details PDF' +
+          '</button>' +
+          '' : '') +
+          '</div>' +
           '<div class="trade-section"><div class="trade-section-label mom">ติดอันดับ ณ ราคาปิดล่าสุด (ผ่านตัวกรองของ engine) — ' + (ps.picks || []).length + ' ตัว ' +
           '<span class="alloc-info">· ไม่ซื้อรอบนี้ (ยืดถือ) · ตัดสินจริงด้วยราคาปิดวันทำการสุดท้ายของเดือน · ถ้าสัญญาณเปลี่ยนก่อนสิ้นเดือน การ์ดนี้จะกลับเป็นรายชื่อซื้อล็อตใหม่</span>' +
           '</div><div>' + extBadges + '</div></div>';
