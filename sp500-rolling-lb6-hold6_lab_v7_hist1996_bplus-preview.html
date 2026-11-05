@@ -3839,6 +3839,7 @@ function runRollingBacktest() {
             ageMonths: Math.round(((new Date(dateStr) - new Date(lot.entryDate)) / 86400000) / 30),
             // LAB v1+v5 exit metadata
             exitMode: 'lot_exits_complete',  // every asset exited via trail or SL before maturity
+            extendCount: lot.extendCount || 0,
             stockExits: stockExits,
             trailExitCount: trailCount,
             stopLossExitCount: slCount,
@@ -3975,6 +3976,7 @@ function runRollingBacktest() {
             ageMonths: currentMonthKey - mLot.entryMonthKey,
             // LAB v1+v5 exit metadata
             exitMode: 'maturity',
+            extendCount: mLot.extendCount || 0,   // เก็บไว้ให้ป้าย EXTENDED ยังขึ้นหลังล็อตปิด (เดิมหายตอนปิด)
             stockExits: stockExits,
             trailExitCount: trailCount,
             stopLossExitCount: slCount,
