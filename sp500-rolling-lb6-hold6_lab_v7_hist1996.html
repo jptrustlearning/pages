@@ -3839,6 +3839,7 @@ function runRollingBacktest() {
             ageMonths: Math.round(((new Date(dateStr) - new Date(lot.entryDate)) / 86400000) / 30),
             // LAB v1+v5 exit metadata
             exitMode: 'lot_exits_complete',  // every asset exited via trail or SL before maturity
+            extendCount: lot.extendCount || 0,
             stockExits: stockExits,
             trailExitCount: trailCount,
             stopLossExitCount: slCount,
@@ -3975,6 +3976,7 @@ function runRollingBacktest() {
             ageMonths: currentMonthKey - mLot.entryMonthKey,
             // LAB v1+v5 exit metadata
             exitMode: 'maturity',
+            extendCount: mLot.extendCount || 0,   // เก็บไว้ให้ป้าย EXTENDED ยังขึ้นหลังล็อตปิด (เดิมหายตอนปิด)
             stockExits: stockExits,
             trailExitCount: trailCount,
             stopLossExitCount: slCount,
@@ -5031,6 +5033,7 @@ function renderTradeLog() {
     const active = (state.lots || []).find(lt => lt.entryDate === log.date);
 
     let pnl = 0, pnlPct = 0, exitDate = null, stockRets = [], isOpen = false;
+    let dueNext = null, scheduledExit = null;   // B+: ล็อตที่จะครบรอบถัดไป ('extend' | 'buy')
     const lotCap = log.lotCapital || log.equity || 0;
 
     if (closed) {
@@ -5069,6 +5072,18 @@ function renderTradeLog() {
       // v7: pass current entryMonthKey (which is bumped by holdMonths on each
       // extend) so the displayed exit date reflects the actual upcoming maturity.
       exitDate = plannedExitForOpenLot(log.date, active.entryMonthKey);
+      // B+ (จูน 5 พ.ย. 2026): ล็อตที่จะครบรอบถัดไป → บอกว่าจะยืดไหม ตามการตัดสินใจของล็อตล่วงหน้า (ราคาปิดล่าสุด)
+      //   ยืด = แสดงวันครบใหม่ (+holdMonths) · ไม่ยืด = ขายตามกำหนด · ตัดสินจริงด้วยราคาปิดวันทำการสุดท้ายของเดือน
+      {
+        const _ps = state.pendingSignal;
+        if (_ps && _ps.decision && ((_ps.nextRebalYear * 12 + _ps.nextRebalMonth) - active.entryMonthKey) >= CONFIG.holdMonths) {
+          dueNext = _ps.decision;
+          if (_ps.decision === 'extend') {
+            scheduledExit = exitDate;
+            exitDate = plannedExitForOpenLot(log.date, active.entryMonthKey + CONFIG.holdMonths);
+          }
+        }
+      }
       // LAB v1: prefer stockMeta so trail-exited stocks show ⛔ even while lot still active
       if (active.stockMeta) {
         stockRets = Object.entries(active.stockMeta).map(([ticker, meta]) => {
@@ -5133,7 +5148,8 @@ function renderTradeLog() {
       // historical rows; fall back to the active (open) lot for in-flight rows.
       // (Bug fix: previously read only from `active`, so closed/old extended
       //  rounds always showed 0 and the 🔁 EXTENDED badge never appeared.)
-      extendCount: closed ? (closed.extendCount || 0) : (active ? (active.extendCount || 0) : 0)
+      extendCount: closed ? (closed.extendCount || 0) : (active ? (active.extendCount || 0) : 0),
+      dueNext, scheduledExit
     };
   }).reverse();  // newest first
 
@@ -5191,15 +5207,27 @@ function renderTradeLog() {
       ? '<span style="display:inline-block;background:rgba(156,43,43,0.12);color:#9C2B2B;border:1px solid rgba(156,43,43,0.4);padding:1px 7px;border-radius:4px;font-family:\'Cinzel\',\'Anuphan\',serif;font-size:0.58rem;font-weight:700;letter-spacing:1.2px;margin-left:6px;" title="Lot maturity extended ' + r.extendCount + ' time(s) — the engine market-regime signal was defensive at the scheduled rebalance, so the same picks were held another 6 months instead of being rebalanced. Exit date shown is the updated maturity.">🔁 EXTENDED ' + r.extendCount + 'x</span>'
       : '';
 
+    // B+: ป้ายล็อตที่จะครบรอบถัดไป
+    const dueBadge = r.dueNext === 'extend'
+      ? '<span style="display:inline-block;background:rgba(156,43,43,0.12);color:#9C2B2B;border:1px solid rgba(156,43,43,0.4);padding:1px 7px;border-radius:4px;font-family:\'Cinzel\',\'Anuphan\',serif;font-size:0.58rem;font-weight:700;letter-spacing:1.2px;margin-left:6px;">EXTEND</span>'
+      : (r.dueNext === 'buy'
+        ? '<span style="display:inline-block;background:rgba(212,175,55,0.14);color:var(--gold-deep);border:1px solid rgba(212,175,55,0.45);padding:1px 7px;border-radius:4px;font-family:\'Anuphan\',sans-serif;font-size:0.66rem;font-weight:700;margin-left:6px;">ครบรอบนี้</span>'
+        : '');
+    const dueNote = r.dueNext === 'extend'
+      ? '<div class="trade-summary" style="margin-top:4px;color:#9C2B2B;">สัญญาณภาวะตลาด ณ ราคาปิดล่าสุดชี้ให้ยืดถือ → วันครบเลื่อนจาก <strong>' + _fmtTradeDate(r.scheduledExit) + '</strong> เป็น <strong>' + _fmtTradeDate(r.exitDate) + '</strong> · ตัดสินจริงด้วยราคาปิดวันทำการสุดท้ายของเดือน</div>'
+      : (r.dueNext === 'buy'
+        ? '<div class="trade-summary" style="margin-top:4px;">ครบกำหนด <strong>' + _fmtTradeDate(r.exitDate) + '</strong> · สัญญาณ ณ ราคาปิดล่าสุดไม่ยืด → ขายตามกำหนด · ตัดสินจริงด้วยราคาปิดวันทำการสุดท้ายของเดือน</div>'
+        : '');
+
     let header = `<div class="trade-header"><div>
-      <div class="trade-date"><span class="trade-date-tag">Entry</span>${_fmtTradeDate(r.date)}${r.exitDate ? '<span class="trade-date-arrow">→</span><span class="trade-date-tag">Exit</span><span class="exit-date">' + _fmtTradeDate(r.exitDate) + '</span>' : ''}${r.isOpen ? ' <span class="open-badge">OPEN</span>' : ''}${reinvestBadge}${extendBadge}</div>
+      <div class="trade-date"><span class="trade-date-tag">Entry</span>${_fmtTradeDate(r.date)}${r.exitDate ? '<span class="trade-date-arrow">→</span><span class="trade-date-tag">Exit</span><span class="exit-date">' + _fmtTradeDate(r.exitDate) + '</span>' : ''}${r.isOpen ? ' <span class="open-badge">OPEN</span>' : ''}${dueBadge}${reinvestBadge}${extendBadge}</div>
       <div class="trade-summary">ล็อตนี้ <strong>${r.stocks.length} ตัว</strong> · ทุน <strong>$${Math.round(r.equity).toLocaleString()}</strong>`;
     if (!r.isOpen) {
       header += ` · P&L: <span class="${retCls}"><strong>$${Math.round(r.pnl).toLocaleString()}</strong> (${r.pnlPct>=0?'+':''}${r.pnlPct.toFixed(2)}%)</span>`;
     } else {
       header += ` · <span style="color:var(--gold-deep);font-weight:600;">ยังถืออยู่:</span> <span class="${retCls}"><strong>$${Math.round(r.pnl).toLocaleString()}</strong> (${r.pnlPct>=0?'+':''}${r.pnlPct.toFixed(2)}%)</span>`;
     }
-    header += `</div></div>
+    header += `</div>${dueNote}</div>
       <button class="trade-details-btn" onclick="downloadDetailsPdf(event, '${r.date}', '${r.exitDate || ''}', false)" title="ดาวน์โหลดรายละเอียดเป็น PDF">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>Details PDF
       </button>
