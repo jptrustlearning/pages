@@ -5207,7 +5207,7 @@ function renderTradeLog() {
 
     // B+: ป้ายล็อตที่จะครบรอบถัดไป
     const dueBadge = r.dueNext === 'extend'
-      ? '<span style="display:inline-block;background:rgba(156,43,43,0.12);color:#9C2B2B;border:1px solid rgba(156,43,43,0.45);padding:1px 7px;border-radius:4px;font-family:\'Anuphan\',sans-serif;font-size:0.66rem;font-weight:700;margin-left:6px;">จะยืดถือ</span>'
+      ? '<span style="display:inline-block;background:rgba(156,43,43,0.12);color:#9C2B2B;border:1px solid rgba(156,43,43,0.4);padding:1px 7px;border-radius:4px;font-family:\'Cinzel\',\'Anuphan\',serif;font-size:0.58rem;font-weight:700;letter-spacing:1.2px;margin-left:6px;">EXTEND</span>'
       : (r.dueNext === 'buy'
         ? '<span style="display:inline-block;background:rgba(212,175,55,0.14);color:var(--gold-deep);border:1px solid rgba(212,175,55,0.45);padding:1px 7px;border-radius:4px;font-family:\'Anuphan\',sans-serif;font-size:0.66rem;font-weight:700;margin-left:6px;">ครบรอบนี้</span>'
         : '');
