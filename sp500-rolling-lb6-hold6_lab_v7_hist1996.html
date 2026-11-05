@@ -7,7 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./lib/jpt-dataz-v1.js?v=1"></script><!-- A192 · ตัวโหลด /dataz/ อย่างเดียว + เก็บข้อมูลในเครื่อง -->
-<script src="./lib/jpt-freeze-v1.js?v=1"></script><!-- A193 · ล็อกรายชื่อหุ้นล็อตที่ออกโพยแล้ว (ถึงล็อต 1 ก.ย. 2026) -->
+<script src="./lib/jpt-freeze-v2.js?v=1"></script><!-- A193 + B+ preview · ล็อกรายชื่อหุ้นล็อตที่ออกโพยแล้ว (ถึงล็อต 2 พ.ย. 2026 · 2 ชุด) -->
 <script src="./jp-settings.js?v=1761234567"></script>
 <script src="./jp-drawdown.js?v=1786540000"></script>
 <!-- Modern Fonts: Outfit (Headings) + Inter (Body/Numbers) -->
@@ -1589,7 +1589,7 @@
 <div class="container">
   <!-- Luxe Hero Header -->
   <header>
-    <div class="subtitle-lab">LAB v7 · Rolling 6M-Rank · 6M-Hold · Hold-Through-Bear · Extend Lot When SPY Out of Top-2 · HIST 1996 (+Delisted · Survivorship-Reduced)</div>
+    <div class="subtitle-lab">LAB v7 · Rolling 6M-Rank · 6M-Hold · Hold-Through-Bear · Extend Lot In Defensive Regime · HIST 1996 (+Delisted · Survivorship-Reduced)</div>
     <div class="header-title-wrap">
       <h1>S&amp;P 500 Rolling <span class="h1-amp">6M⇒</span> 6M v7 · Hold-Through-Bear · HIST 1996</h1>
     </div>
@@ -2249,7 +2249,7 @@
     <div class="about-philosophy">
       <div class="philosophy-label">Trading Philosophy</div>
       <div class="philosophy-text">
-        ใช้ <strong>การจัดอันดับ 6 เดือน</strong>ย้อนหลัง · <strong>ถือแต่ละล็อต 6 เดือน</strong> · เข้าซื้อทุกเดือน · <strong>6 ล็อตซ้อนกัน</strong> · เมื่อครบ 6 เดือนขายและซื้อใหม่ด้วย ranking 6 เดือนล่าสุด · เสริม <strong>defensive extend</strong> (ตอน SPY หลุด macro top-2 → ไม่ขาย ยืดถือต่ออีก 6 เดือน)
+        ใช้ <strong>การจัดอันดับ 6 เดือน</strong>ย้อนหลัง · <strong>ถือแต่ละล็อต 6 เดือน</strong> · เข้าซื้อทุกเดือน · <strong>6 ล็อตซ้อนกัน</strong> · เมื่อครบ 6 เดือนขายและซื้อใหม่ด้วย ranking 6 เดือนล่าสุด · เสริม <strong>defensive extend</strong> (เมื่อสัญญาณภาวะตลาดของ engine ชี้ให้ตั้งรับ → ไม่ขาย ยืดถือต่ออีก 6 เดือน)
       </div>
       <div class="philosophy-signature">Time Diversification · Auto-Compounding</div>
     </div>
@@ -2273,7 +2273,7 @@
       </div>
     </div>
 
-    <p>กลยุทธ์นี้ <strong>เข้าซื้อทุกวันทำการแรกของเดือน</strong> · แต่ละรอบจัดอันดับหุ้นด้วย momentum <strong>6 เดือน</strong>ย้อนหลัง (signal ยาวกว่า ลด noise) · ซื้อ Top N · <strong>ถือแต่ละล็อต 6 เดือน</strong>จึงขาย · ช่วง 6 เดือนแรกเป็น <strong>ramp-up</strong> (ใส่เงินใหม่ทุกเดือน) · เดือนที่ 7 เป็นต้นไปเข้าสู่ <strong>steady state</strong> (มี 6 ล็อตทำงานพร้อมกัน)</p>
+    <p>กลยุทธ์นี้ <strong>เข้าซื้อทุกวันทำการแรกของเดือน</strong> · แต่ละรอบจัดอันดับหุ้นด้วย momentum <strong>6 เดือน</strong>ย้อนหลัง (signal ยาวกว่า ลด noise) · ซื้อ Top N ที่ผ่านตัวกรองภาวะตลาดของ engine · <strong>ถือแต่ละล็อต 6 เดือน</strong>จึงขาย · ช่วง 6 เดือนแรกเป็น <strong>ramp-up</strong> (ใส่เงินใหม่ทุกเดือน) · เดือนที่ 7 เป็นต้นไปเข้าสู่ <strong>steady state</strong> (มี 6 ล็อตทำงานพร้อมกัน)</p>
 
     <p>ข้อดี: <strong>signal เข้มข้น</strong>จาก lookback 6 เดือน + ถือยาว 6 เดือนต่อล็อต → <strong>turnover ต่ำกว่า</strong> hybrid H3 (ค่าธรรมเนียม/tax น้อยกว่า) · เสริม <strong>defensive overlay</strong> ตอนตลาดอันตราย (ยืดถือ lot เดิมแทน rebal ใหม่) เพื่อลด drawdown · เทียบเท่า Rolling 6M เดิมแต่เพิ่มเกราะ regime</p>
   </div>
@@ -2366,6 +2366,84 @@ const BENCHMARK_TICKERS = new Set(['SPY', 'QQQ', 'DIA',
   // LAB v3: also exclude macro signal/execution tickers + cash ETFs from rankStocks
   'USDJPY', 'WTI', 'GOLD', 'FXY', 'USL', 'USO', 'GLD', 'SGOV', 'BIL', 'SHY', '$CASH'
 ]);
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Regime engine B+ (3 พ.ย. 2026 · ใช้กับเดือนรีบาลานซ์ตั้งแต่ BPLUS_FROM · เดือนก่อนหน้าใช้กติกาเดิมทุกอย่าง)
+//   สัญญาณ = ranking เดิมของ engine ณ ราคาปิดสิ้นเดือนก่อน (signalIdx = i-1)
+//   อันดับอุตฯ = ลำดับที่หุ้นตัวแรกของแต่ละอุตฯ (GICS · master_map.csv คอลัมน์ sector) โผล่ใน ranking รวม
+//   ยืด = SPY ไม่ติด 2 แรกของ SPY/ทอง/น้ำมัน/เยน (แบบเดิม) หรือ Information Technology ไม่ติด 2 อันดับแรก
+//   ไม่ยืด + min(อันดับ Health Care · Consumer Staples · Utilities) ≤ 2 → ล็อตใหม่เลือก Top N จาก ranking ที่ตัดหุ้น IT
+//   ล็อตที่ถืออยู่ไม่เปลี่ยนหุ้น · stop-loss gate ยังใช้สัญญาณ SPY แบบเดิม
+//   อ้างอิง Project claude/PLAN-BOX4-BPLUS-20261103.md · เทียบ Python bplus_ref.py
+// ═══════════════════════════════════════════════════════════════════════════
+let BPLUS_FROM = '2026-12';   // YYYY-MM ของวันรีบาลานซ์
+const BPLUS_IT = 'Information Technology';
+const BPLUS_DEF = ['Health Care', 'Consumer Staples', 'Utilities'];
+const SECTOR_MAP = {};        // ticker → GICS sector
+const SECTOR_MAP_URLS = [
+  'https://app.jptrustlearning.com/data/master_map.csv',
+  'https://app.jptrustlearning.com/map/master_map.csv'
+];
+function bplusFromKey() {
+  const m = /^(\d{4})-(\d{2})$/.exec(String(BPLUS_FROM || ''));
+  return m ? parseInt(m[1], 10) * 12 + parseInt(m[2], 10) - 1 : Infinity;
+}
+function isBplusMonth(monthKey) { return monthKey >= bplusFromKey(); }
+function parseSectorMap(text) {
+  const lines = text.trim().split('\n');
+  const head = lines[0].replace(/^\uFEFF/, '').split(',').map(s => s.trim());
+  const iT = head.indexOf('ticker'), iS = head.indexOf('sector');
+  if (iT < 0 || iS < 0) throw new Error('master_map.csv: ticker/sector column missing');
+  let n = 0;
+  for (let i = 1; i < lines.length; i++) {
+    const c = lines[i].split(',');
+    const tk = (c[iT] || '').trim(), sc = (c[iS] || '').trim();
+    if (!tk || !sc) continue;
+    SECTOR_MAP[tk.replace(/\./g, '-')] = sc;
+    n++;
+  }
+  return n;
+}
+// โหลดไม่ได้ = throw "/map/ ..." (ไม่เงียบ — ไม่งั้นการตัดสินใจรอบรีบาลานซ์จะผิดโดยไม่มีใครรู้)
+async function loadSectorMap() {
+  if (Object.keys(SECTOR_MAP).length > 0) return;
+  let lastErr = null;
+  for (const url of SECTOR_MAP_URLS) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const r = await fetch(url + '?v=' + Date.now(), attempt ? { cache: 'reload' } : undefined);
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const n = parseSectorMap(await r.text());
+        if (n > 100) return;
+        throw new Error('rows ' + n);
+      } catch (e) { lastErr = e; }
+    }
+  }
+  throw new Error('/map/ โหลดกลุ่มอุตสาหกรรมไม่สำเร็จ · ' + ((lastErr && lastErr.message) || lastErr));
+}
+function sectorOf(t) { return SECTOR_MAP[String(t).replace(/\./g, '-')] || null; }
+// อันดับอุตฯ จาก ranking รวม (หุ้นที่ไม่มีกลุ่มข้ามไป)
+function sectorRanksOf(candidates) {
+  const rk = {}; let k = 0;
+  for (const c of candidates) {
+    const s = sectorOf(c.ticker);
+    if (!s || rk[s]) continue;
+    rk[s] = ++k;
+  }
+  return rk;
+}
+// การตัดสินใจของเดือนรีบาลานซ์ (หรือล็อตล่วงหน้า) · bear = SPY หลุด 2 แรก ณ วันสัญญาณ
+function bplusDecide(candidates, bear) {
+  const rk = sectorRanksOf(candidates);
+  const techRank = rk[BPLUS_IT] || 99;
+  const defRank = Math.min(...BPLUS_DEF.map(s => rk[s] || 99));
+  const extend = !!bear || techRank > 2;
+  const exclIT = !extend && defRank <= 2;
+  return { techRank, defRank, bear: !!bear, extend, exclIT };
+}
+function bplusFilter(candidates, decision) {
+  return (decision && decision.exclIT) ? candidates.filter(c => sectorOf(c.ticker) !== BPLUS_IT) : candidates;
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // LAB v2: Macro-Regime Signal — runtime helpers
@@ -2742,6 +2820,7 @@ async function loadDataFromCloud() {
     const commUrl = CONFIG.cloudCommUrl;
     const hist1996Url = CONFIG.cloudCsvUrlHist1996;
     const delistedUrl = CONFIG.cloudCsvUrlDelisted;
+    const sectorMapP = loadSectorMap().then(() => null, e => e);  // B+: กลุ่มอุตฯ (เล็ก · โหลดคู่กัน)
     const [responseMain, responseHist1996, responseDelisted, responseHist, responseBench, responseJpy, responseComm] = await Promise.all([
       jptDataz.fetchLike(fileUrl, { label: 'SP500', timeoutMs: 30000, maxRetries: 3 }),
       hist1996Url ? jptDataz.fetchLike(hist1996Url, { label: 'HIST1996', timeoutMs: 30000, maxRetries: 3 }) : Promise.resolve(null),
@@ -2789,6 +2868,8 @@ async function loadDataFromCloud() {
     if (typeof updateOwlProgress === 'function') updateOwlProgress(80);
     // A193: ไฟล์ล็อกรายชื่อ (เล็ก · static) — โหลดไม่ได้ = error ไม่เงียบ
     await jptFreeze.load([fileUrl, histUrl, hist1996Url]);
+    const sectorMapErr = await sectorMapP;
+    if (sectorMapErr) throw sectorMapErr;
     processData(csvCombined);
     if (typeof updateOwlProgress === 'function') updateOwlProgress(95);
     
@@ -2815,7 +2896,8 @@ async function loadDataFromCloud() {
     el.status.className = 'status-indicator error';
     el.status.innerHTML = jptDataz.isDatazError(error)
       ? '<span>●</span> /dataz/ ERROR'
-      : (window.jptFreeze && jptFreeze.isFreezeError(error) ? '<span>●</span> /freeze/ ERROR' : '<span>●</span> Upload CSV');
+      : (window.jptFreeze && jptFreeze.isFreezeError(error) ? '<span>●</span> /freeze/ ERROR'
+        : (/^\/map\//.test((error && error.message) || '') ? '<span>●</span> /map/ ERROR' : '<span>●</span> Upload CSV'));
     el.manualUpload.style.display = 'block';
     showLoaderError(error);
   }
@@ -2878,8 +2960,15 @@ function handleUpload(e) {
   el.dash.classList.add('hidden');
   
   const reader = new FileReader();
-  reader.onload = (evt) => {
+  reader.onload = async (evt) => {
     processData(evt.target.result);
+    try { await loadSectorMap(); }   // B+: ต้องมีกลุ่มอุตฯ ก่อนคำนวณ
+    catch (e) {
+      el.status.className = 'status-indicator error';
+      el.status.innerHTML = '<span>●</span> /map/ ERROR';
+      showLoaderError(e);
+      return;
+    }
     el.status.className = 'status-indicator success';
     el.status.innerHTML = '<span>●</span> LOCAL FILE LOADED';
     
@@ -3097,10 +3186,13 @@ window.downloadDetailsPdf = function(event, entryDate, exitDate, isPending) {
   let tickers;
   let title;
   let dateLabel;
+  const isExtendPdf = !!(isPending && state.pendingSignal && state.pendingSignal.decision === 'extend');
   if (isPending) {
     tickers = (state.pendingSignal?.picks || []).map(p => p.ticker);
-    title = 'PENDING — ล็อตใหม่รอบถัดไป (' + (state.pendingSignal?.nextRebalLabel || '') + ')';
-    dateLabel = 'PENDING-' + (state.pendingSignal?.signalDate || 'unknown');
+    title = isExtendPdf
+      ? 'EXTEND — รายชื่อติดอันดับรอบ ' + (state.pendingSignal?.nextRebalLabel || '') + ' (ไม่ซื้อรอบนี้)'
+      : 'PENDING — ล็อตใหม่รอบถัดไป (' + (state.pendingSignal?.nextRebalLabel || '') + ')';
+    dateLabel = (isExtendPdf ? 'EXTEND-' : 'PENDING-') + (state.pendingSignal?.signalDate || 'unknown');
   } else {
     const entry = state.tradeLog.find(t => t.date === entryDate);
     tickers = entry ? entry.stocks : [];
@@ -3187,7 +3279,7 @@ window.downloadDetailsPdf = function(event, entryDate, exitDate, isPending) {
   <div class="subtitle">JPT ROLLING LB6/H3 HYBRID · LOT DETAILS</div>
   <h1>${title}</h1>
   <div class="meta">
-    <div><strong>หุ้นในล็อต:</strong> ${tickers.length} ตัว · ${tickers.join(', ')}</div>
+    <div><strong>${isExtendPdf ? 'รายชื่อติดอันดับ (ไม่ซื้อรอบนี้):' : 'หุ้นในล็อต:'}</strong> ${tickers.length} ตัว · ${tickers.join(', ')}</div>
     <div style="margin-top:6px;"><strong>หน้าต่าง lookback:</strong> ${dates.lookbackStart} → ${dates.lookbackEnd}${dates.holdingEnd ? ' · <strong>ถือถึง:</strong> ' + dates.holdingEnd + (dates.holdingEndIsPlanned ? ' (ตามแผน)' : '') : ' · ยังไม่ได้เริ่มถือ'}</div>
   </div>
   ${sectionsHtml}
@@ -3786,7 +3878,15 @@ function runRollingBacktest() {
         //     lot will sell and the chain resumes normally
         // No-lookahead: slActiveThisMonth was set at the top of today's loop
         // using i-1 close of last business day of prior month.
-        if (slActiveThisMonth) {
+        // Regime engine B+ (เดือนรีบาลานซ์ตั้งแต่ BPLUS_FROM): ยืดเมื่อ SPY หลุด 2 แรก หรือ IT หลุด 2 อันดับแรกของอุตฯ
+        // ใช้ ranking เดียวกับที่ใช้เลือกหุ้น (signalIdx = i-1) · เดือนก่อน BPLUS_FROM = กติกาเดิมทุกอย่าง
+        let bplusCandidates = null, bplusDecision = null;
+        if (isBplusMonth(currentMonthKey)) {
+          bplusCandidates = rankStocks(signalIdx, startIdx, CONFIG.weightRet);
+          bplusDecision = bplusDecide(bplusCandidates, slActiveThisMonth);
+        }
+        const extendThisMonth = bplusDecision ? bplusDecision.extend : slActiveThisMonth;
+        if (extendThisMonth) {
           const extendedLots = state.lots.filter(lot => (currentMonthKey - lot.entryMonthKey) >= CONFIG.holdMonths);
           if (extendedLots.length > 0) {
             // Record extend event for stats / trade log
@@ -3803,7 +3903,8 @@ function runRollingBacktest() {
                 entryDate: eLot.entryDate,
                 extendCount: eLot.extendCount,
                 originalMaturityMonthKey: eLot.entryMonthKey,  // current value reflects already-bumped
-                tickers: Object.keys(eLot.stocks)
+                tickers: Object.keys(eLot.stocks),
+                regime: bplusDecision ? { techRank: bplusDecision.techRank, defRank: bplusDecision.defRank, bear: bplusDecision.bear } : null
               });
             }
           }
@@ -3923,7 +4024,8 @@ function runRollingBacktest() {
           // Pass CONFIG.weightRet explicitly for consistency with runOptimization (line 3245).
           // rankStocks falls back to CONFIG.weightRet internally when no override is passed,
           // so this is a stylistic change — same result either way.
-          candidates = rankStocks(signalIdx, startIdx, CONFIG.weightRet);
+          candidates = bplusCandidates || rankStocks(signalIdx, startIdx, CONFIG.weightRet);
+          candidates = bplusFilter(candidates, bplusDecision);   // B+: กลุ่มตั้งรับติด 2 แรก → ตัดหุ้น IT ออกจากล็อตนี้
           selected = candidates.slice(0, CONFIG.topN);
           const alloc = newLotCapital / CONFIG.topN;
           for (const st of selected) {
@@ -3989,7 +4091,9 @@ function runRollingBacktest() {
           cashPocket: 0,
           // LAB v4: blend-override metadata
           isBlendOverride: isBlendOverride,
-          macroDecision: macroDecision
+          macroDecision: macroDecision,
+          // B+: สัญญาณของรอบนี้ (ภายใน · ไม่แสดงบนหน้า)
+          regime: bplusDecision ? { techRank: bplusDecision.techRank, defRank: bplusDecision.defRank, exclIT: bplusDecision.exclIT } : null
         };
         // Refund any non-deployed alloc (selected ticker missing price data) back to cash
         cash += (newLotCapital - deployed);
@@ -4086,9 +4190,15 @@ function runRollingBacktest() {
       if (startIdx >= 0 && startIdx < signalIdx && state.sortedDates[signalIdx] && state.sortedDates[startIdx] && state.marketData[state.sortedDates[signalIdx]] && state.marketData[state.sortedDates[startIdx]]) {
         const candidates = rankStocks(signalIdx, startIdx, CONFIG.weightRet);
         if (candidates && candidates.length > 0) {
-          const picks = candidates.slice(0, CONFIG.topN);
-          // Next lot capital: if a lot will mature next month, use its projected value; else perLotCapital (ramp-up)
           const nextMonthKey = nextRebalYear * 12 + nextRebalMonth;
+          // B+: ล็อตล่วงหน้าใช้การตัดสินใจเดียวกับรอบจริง ณ ราคาปิดล่าสุด (รอบจริงตัดสินด้วยราคาปิดวันทำการสุดท้ายของเดือน)
+          const pDecision = isBplusMonth(nextMonthKey)
+            ? bplusDecide(candidates, isSPYInMacroTop2AtIdx(signalIdx) === false) : null;
+          const pExtend = !!(pDecision && pDecision.extend);
+          // ยืด = ยังโชว์ 10 อันดับแรก ณ ราคาปิดล่าสุดให้ดู แต่รอบนี้ไม่ซื้อ (การ์ด EXTEND)
+          // กลุ่มตั้งรับติด 2 แรก = ตัดหุ้น IT ออกจากรายชื่อทั้งการ์ดซื้อและการ์ด EXTEND (จูน 3 พ.ย. 17:39)
+          const picks = bplusFilter(candidates, pDecision ? { exclIT: pDecision.defRank <= 2 } : null).slice(0, CONFIG.topN);
+          // Next lot capital: if a lot will mature next month, use its projected value; else perLotCapital (ramp-up)
           const willMature = state.lots.find(lot => (nextMonthKey - lot.entryMonthKey) >= CONFIG.holdMonths);
           let projectedCap = CONFIG.perLotCapital;
           if (willMature) {
@@ -4111,6 +4221,11 @@ function runRollingBacktest() {
             daysUntil: daysUntil,
             capital: projectedCap,
             isReinvest: !!willMature,
+            // B+: 'extend' = รอบนี้ยืดถือล็อตที่ครบกำหนด ไม่เปิดล็อตใหม่ · null = กติกาเดิม (แสดงแบบเดิม)
+            decision: pDecision ? (pExtend ? 'extend' : 'buy') : null,
+            extendLots: pExtend
+              ? state.lots.filter(lot => (nextMonthKey - lot.entryMonthKey) >= CONFIG.holdMonths).map(lot => lot.entryDate)
+              : [],
             picks: picks.map(p => ({
               ticker: p.ticker || '?',
               ret: typeof p.ret === 'number' ? p.ret : 0,
@@ -4846,6 +4961,37 @@ function renderTradeLog() {
         ? 'อีก <strong>' + actualDaysUntil + ' วัน</strong>'
         : 'เร็วๆ นี้';
 
+      if (ps.decision === 'extend') {
+        // B+: รอบถัดไปยืดถือ — ไม่มีรายชื่อซื้อ
+        card.style.borderColor = 'rgba(156,43,43,0.45)';
+        card.style.background = 'linear-gradient(135deg, rgba(156,43,43,0.06), rgba(255,254,248,1))';
+        card.style.boxShadow = '0 0 24px rgba(156,43,43,0.12)';
+        const extBadges = (ps.picks || []).map(p =>
+          '<span class="stock-badge" style="border-color:rgba(156,43,43,0.28);color:var(--gold-deep);background:rgba(156,43,43,0.04);">' +
+          p.ticker + ' ' + (p.ret * 100).toFixed(1) + '%</span>').join('');
+        const lotsTxt = (ps.extendLots && ps.extendLots.length)
+          ? 'ยืดถือล็อตที่ครบกำหนด (Entry ' + ps.extendLots.map(_fmtTradeDate).join(', ') + ') ต่ออีก ' + CONFIG.holdMonths + ' เดือน'
+          : 'ไม่มีล็อตครบกำหนดในรอบนี้';
+        card.innerHTML = '<div class="trade-header"><div>' +
+          '<div class="trade-date" style="color:#9C2B2B;">' +
+          'NEXT REBALANCE — ' + _fmtTradeDate(plannedEntry) +
+          '<span style="display:inline-block;background:rgba(156,43,43,0.12);color:#9C2B2B;border:1px solid rgba(156,43,43,0.4);padding:2px 10px;border-radius:5px;font-family:\'Cinzel\',\'Anuphan\',serif;font-size:0.62rem;font-weight:700;letter-spacing:1.5px;margin-left:6px;">EXTEND</span>' +
+          '</div>' +
+          '<div style="font-family:\'Cinzel\',\'Anuphan\',serif;font-size:0.7rem;font-weight:700;color:var(--gold-deep);letter-spacing:0.1em;text-transform:uppercase;margin-top:5px;opacity:0.85;">Signal Date · ' + _fmtTradeDate(ps.signalDate) + '</div>' +
+          '<div class="trade-summary">' +
+          'รอบ <strong>' + ps.nextRebalLabel + '</strong> (' + daysLabel + ') · สัญญาณภาวะตลาด ณ ราคาปิดล่าสุดชี้ให้ตั้งรับ → <strong>' + lotsTxt + '</strong> · ไม่เปิดล็อตใหม่' +
+          '</div></div>' +
+          (ps.picks && ps.picks.length ? '<button class="trade-details-btn" onclick="downloadDetailsPdf(event, null, null, true)" title="ดาวน์โหลดรายละเอียดเป็น PDF">' +
+          '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>Details PDF' +
+          '</button>' +
+          '' : '') +
+          '</div>' +
+          '<div class="trade-section"><div class="trade-section-label mom">ติดอันดับ ณ ราคาปิดล่าสุด (ผ่านตัวกรองของ engine) — ' + (ps.picks || []).length + ' ตัว ' +
+          '<span class="alloc-info">· ไม่ซื้อรอบนี้ (ยืดถือ) · ตัดสินจริงด้วยราคาปิดวันทำการสุดท้ายของเดือน · ถ้าสัญญาณเปลี่ยนก่อนสิ้นเดือน การ์ดนี้จะกลับเป็นรายชื่อซื้อล็อตใหม่</span>' +
+          '</div><div>' + extBadges + '</div></div>';
+        container.appendChild(card);
+      } else {
+
       let headerHtml = '<div class="trade-header"><div>' +
         '<div class="trade-date" style="color:#2E9F5F;">' +
         'NEXT ENTRY — ' + _fmtTradeDate(plannedEntry) +
@@ -4874,6 +5020,7 @@ function renderTradeLog() {
 
       card.innerHTML = headerHtml + sectionHtml;
       container.appendChild(card);
+      }  // end B+ else (ล็อตล่วงหน้าแบบซื้อ = การ์ดเดิม)
     }
   } catch (err) {
     console.warn('Pending card render failed:', err);
@@ -5007,7 +5154,7 @@ function renderTradeLog() {
   if (totalPages > 1) {
     const pagBar = document.createElement('div');
     pagBar.className = 'trade-log-pagination';
-    const pendingMsg = state.pendingSignal ? ' · <span style="color:#2E9F5F;">+1 ล็อตรอ</span>' : '';
+    const pendingMsg = (state.pendingSignal && state.pendingSignal.decision !== 'extend') ? ' · <span style="color:#2E9F5F;">+1 ล็อตรอ</span>' : '';
     let pagHtml = '<div class="tlp-info"><strong>' + records.length + '</strong> ล็อต' + pendingMsg + ' · หน้า <strong>' + page + '</strong>/' + totalPages + '</div>';
     pagHtml += `<button class="tlp-btn nav" onclick="gotoTradeLogPage(1)" ${page===1?'disabled':''}>«</button>`;
     pagHtml += `<button class="tlp-btn nav" onclick="gotoTradeLogPage(${page-1})" ${page===1?'disabled':''}>‹</button>`;
@@ -5041,7 +5188,7 @@ function renderTradeLog() {
     // v7: extend badge — appears only when this lot has been extended at least once.
     // Color matches the burgundy SL palette but slightly muted to differentiate.
     const extendBadge = (r.extendCount > 0)
-      ? '<span style="display:inline-block;background:rgba(156,43,43,0.12);color:#9C2B2B;border:1px solid rgba(156,43,43,0.4);padding:1px 7px;border-radius:4px;font-family:\'Cinzel\',\'Anuphan\',serif;font-size:0.58rem;font-weight:700;letter-spacing:1.2px;margin-left:6px;" title="Lot maturity extended ' + r.extendCount + ' time(s) — SPY was out of macro top-2 at scheduled rebalance, so the same picks were held another 3 months instead of being rebalanced. Exit date shown is the updated maturity.">🔁 EXTENDED ' + r.extendCount + 'x</span>'
+      ? '<span style="display:inline-block;background:rgba(156,43,43,0.12);color:#9C2B2B;border:1px solid rgba(156,43,43,0.4);padding:1px 7px;border-radius:4px;font-family:\'Cinzel\',\'Anuphan\',serif;font-size:0.58rem;font-weight:700;letter-spacing:1.2px;margin-left:6px;" title="Lot maturity extended ' + r.extendCount + ' time(s) — the engine market-regime signal was defensive at the scheduled rebalance, so the same picks were held another 6 months instead of being rebalanced. Exit date shown is the updated maturity.">🔁 EXTENDED ' + r.extendCount + 'x</span>'
       : '';
 
     let header = `<div class="trade-header"><div>
