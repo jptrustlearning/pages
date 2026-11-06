@@ -2158,7 +2158,7 @@
     <div class="about-philosophy">
       <div class="philosophy-label">Trading Philosophy</div>
       <div class="philosophy-text">
-        <strong>กระจายเวลาเข้าซื้อ · เก็บกำไรแบบทบต้น</strong> · เราใช้ <strong>การจัดอันดับ 6 เดือน</strong>เหมือน 6M Momentum ทุกประการ · แต่แทนที่จะ rebalance ทั้งพอร์ตทุก 6 เดือน · เราจะ<strong>เข้าซื้อทุกเดือน</strong>และ<strong>ถือแต่ละล็อต 6 เดือน</strong>เต็ม เมื่อครบกำหนดจึงขายและนำเงินไปซื้อรอบใหม่ทันที
+        <strong>กระจายเวลาเข้าซื้อ · เก็บกำไรแบบทบต้น</strong> · เราใช้ <strong>การจัดอันดับ 6 เดือน</strong>แบบเดียวกับ 6M Momentum · แต่แทนที่จะ rebalance ทั้งพอร์ตทุก 6 เดือน · เราจะ<strong>เข้าซื้อทุกเดือน</strong>และ<strong>ถือแต่ละล็อต 6 เดือน</strong>เต็ม เมื่อครบกำหนดจึงขายและนำเงินไปซื้อรอบใหม่ทันที
       </div>
       <div class="philosophy-signature">Time Diversification · Auto-Compounding</div>
     </div>
@@ -2182,7 +2182,7 @@
       </div>
     </div>
 
-    <p>กลยุทธ์นี้ <strong>เข้าซื้อทุกวันทำการแรกของเดือน</strong> · แต่ละรอบซื้อ Top N ของหุ้นตามอันดับ 6 เดือน · <strong>ถือแต่ละล็อต 6 เดือนเต็ม</strong>จึงขาย · ช่วง 6 เดือนแรกเป็น <strong>ramp-up</strong> (ใส่เงินใหม่ทุกเดือน) · เดือนที่ 7 เป็นต้นไปเข้าสู่ <strong>steady state</strong> (มี 6 ล็อตทำงานพร้อมกัน · ล็อตที่ครบอายุขายเงินกลับมาซื้อล็อตใหม่)</p>
+    <p>กลยุทธ์นี้ <strong>เข้าซื้อทุกวันทำการแรกของเดือน</strong> · แต่ละรอบซื้อ Top N ตามลำดับคะแนนของ engine · <strong>ถือแต่ละล็อต 6 เดือนเต็ม</strong>จึงขาย · ช่วง 6 เดือนแรกเป็น <strong>ramp-up</strong> (ใส่เงินใหม่ทุกเดือน) · เดือนที่ 7 เป็นต้นไปเข้าสู่ <strong>steady state</strong> (มี 6 ล็อตทำงานพร้อมกัน · ล็อตที่ครบอายุขายเงินกลับมาซื้อล็อตใหม่)</p>
 
     <p>ข้อดีของ Rolling: <strong>กระจายจุดเข้าซื้อ</strong>ลดความเสี่ยง timing · <strong>เงินหมุนเวียนอัตโนมัติ</strong>ไม่ต้องรอครบ 6 เดือนเต็ม · ปรับ <strong>เงินต่อรอบ</strong>และ <strong>Top N</strong> ตามเงินทุนและความกระจายที่ต้องการ</p>
   </div>
@@ -2204,6 +2204,83 @@ let CONFIG = {
 };
 
 const BENCHMARK_TICKERS = new Set(['SPY', 'QQQ', 'DIA']);
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ตัวกรองกลุ่มอุตฯ ของไม้ใหม่ (6 พ.ย. 2026 · A318.4 · ใช้กับเดือนเปิดไม้ตั้งแต่ BPLUS_FROM · เดือนก่อนหน้าใช้กติกาเดิมทุกอย่าง)
+//   = การเลือกหุ้นแบบ B+ ของกล่อง 4 แต่ไม่มีการยืด (ทุกเดือนยังเปิดไม้ใหม่ตามปกติ)
+//   สัญญาณ = ranking เดิมของ engine ณ ราคาปิดวันก่อนวันเปิดไม้ (signalIdx = i-1)
+//   อันดับอุตฯ = ลำดับที่หุ้นตัวแรกของแต่ละอุตฯ (GICS · master_map.csv คอลัมน์ sector) โผล่ใน ranking รวม
+//   Information Technology ไม่ติด 2 อันดับแรก หรือ min(อันดับ Health Care · Consumer Staples · Utilities) ≤ 2
+//     → ไม้ใหม่เลือก Top N จาก ranking ที่ตัดหุ้น IT · ไม้ที่ถืออยู่ไม่เปลี่ยนหุ้น
+//   เทียบ Python research/rolling-extend-tech-20261103/scripts/box3/box3_ref.py --variant C
+// ═══════════════════════════════════════════════════════════════════════════
+let BPLUS_FROM = '2026-12';   // YYYY-MM ของเดือนเปิดไม้
+const BPLUS_IT = 'Information Technology';
+const BPLUS_DEF = ['Health Care', 'Consumer Staples', 'Utilities'];
+const SECTOR_MAP = {};        // ticker → GICS sector
+const SECTOR_MAP_URLS = [
+  'https://app.jptrustlearning.com/data/master_map.csv',
+  'https://app.jptrustlearning.com/map/master_map.csv'
+];
+function bplusFromKey() {
+  const m = /^(\d{4})-(\d{2})$/.exec(String(BPLUS_FROM || ''));
+  return m ? parseInt(m[1], 10) * 12 + parseInt(m[2], 10) - 1 : Infinity;
+}
+function isBplusMonth(monthKey) { return monthKey >= bplusFromKey(); }
+function parseSectorMap(text) {
+  const lines = text.trim().split('\n');
+  const head = lines[0].replace(/^\uFEFF/, '').split(',').map(s => s.trim());
+  const iT = head.indexOf('ticker'), iS = head.indexOf('sector');
+  if (iT < 0 || iS < 0) throw new Error('master_map.csv: ticker/sector column missing');
+  let n = 0;
+  for (let i = 1; i < lines.length; i++) {
+    const c = lines[i].split(',');
+    const tk = (c[iT] || '').trim(), sc = (c[iS] || '').trim();
+    if (!tk || !sc) continue;
+    SECTOR_MAP[tk.replace(/\./g, '-')] = sc;
+    n++;
+  }
+  return n;
+}
+// โหลดไม่ได้ = throw "/map/ ..." (ไม่เงียบ — ไม่งั้นการเลือกหุ้นของไม้ใหม่จะผิดโดยไม่มีใครรู้)
+async function loadSectorMap() {
+  if (Object.keys(SECTOR_MAP).length > 0) return;
+  let lastErr = null;
+  for (const url of SECTOR_MAP_URLS) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const r = await fetch(url + '?v=' + Date.now(), attempt ? { cache: 'reload' } : undefined);
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const n = parseSectorMap(await r.text());
+        if (n > 100) return;
+        throw new Error('rows ' + n);
+      } catch (e) { lastErr = e; }
+    }
+  }
+  throw new Error('/map/ โหลดกลุ่มอุตสาหกรรมไม่สำเร็จ · ' + ((lastErr && lastErr.message) || lastErr));
+}
+function sectorOf(t) { return SECTOR_MAP[String(t).replace(/\./g, '-')] || null; }
+// อันดับอุตฯ จาก ranking รวม (หุ้นที่ไม่มีกลุ่มข้ามไป)
+function sectorRanksOf(candidates) {
+  const rk = {}; let k = 0;
+  for (const c of candidates) {
+    const s = sectorOf(c.ticker);
+    if (!s || rk[s]) continue;
+    rk[s] = ++k;
+  }
+  return rk;
+}
+// การตัดสินใจของเดือนเปิดไม้ (หรือไม้ล่วงหน้า) · ไม่มีการยืด
+function bplusDecide(candidates) {
+  const rk = sectorRanksOf(candidates);
+  const techRank = rk[BPLUS_IT] || 99;
+  const defRank = Math.min(...BPLUS_DEF.map(s => rk[s] || 99));
+  const exclIT = candidates.length > 0 && (techRank > 2 || defRank <= 2);
+  return { techRank, defRank, exclIT };
+}
+function bplusFilter(candidates, decision) {
+  return (decision && decision.exclIT) ? candidates.filter(c => sectorOf(c.ticker) !== BPLUS_IT) : candidates;
+}
 
 // --- Default backtest settings (for Reset button) ---
 const DEFAULT_ROLLING_6M = {
@@ -2519,6 +2596,7 @@ async function loadDataFromCloud() {
     if (typeof updateOwlProgress === 'function') updateOwlProgress(80);
     // A193: ไฟล์ล็อกรายชื่อ (เล็ก · static) — โหลดไม่ได้ = error ไม่เงียบ
     await jptFreeze.load([fileUrl]);
+    await loadSectorMap();   // กลุ่มอุตฯ ของตัวกรองไม้ใหม่ · โหลดไม่ได้ = /map/ ERROR
     processData(csvCombined);
     if (typeof updateOwlProgress === 'function') updateOwlProgress(95);
 
@@ -2547,7 +2625,8 @@ async function loadDataFromCloud() {
     el.status.className = 'status-indicator error';
     el.status.innerHTML = (error && /^\/dataz\//.test(error.message || ''))
       ? '<span>●</span> /dataz/ ERROR'
-      : (window.jptFreeze && jptFreeze.isFreezeError(error) ? '<span>●</span> /freeze/ ERROR' : '<span>●</span> Upload CSV');
+      : (window.jptFreeze && jptFreeze.isFreezeError(error) ? '<span>●</span> /freeze/ ERROR'
+        : (/^\/map\//.test((error && error.message) || '') ? '<span>●</span> /map/ ERROR' : '<span>●</span> Upload CSV'));
     el.manualUpload.style.display = 'block';
     // never leave the owl frozen — show real error + retry button
     showLoaderError(error);
@@ -2611,8 +2690,15 @@ function handleUpload(e) {
   el.dash.classList.add('hidden');
   
   const reader = new FileReader();
-  reader.onload = (evt) => {
+  reader.onload = async (evt) => {
     processData(evt.target.result);
+    try { await loadSectorMap(); }   // ตัวกรองไม้ใหม่ต้องมีกลุ่มอุตฯ ก่อนคำนวณ
+    catch (e) {
+      el.status.className = 'status-indicator error';
+      el.status.innerHTML = '<span>●</span> /map/ ERROR';
+      showLoaderError(e);
+      return;
+    }
     el.status.className = 'status-indicator success';
     el.status.innerHTML = '<span>●</span> LOCAL FILE LOADED';
     
@@ -3028,7 +3114,8 @@ function simulateStrategy(wRet, nStocks) {
         cash -= newCap;
 
         // Rank (shared function, override weight)
-        const candidates = rankStocks(signalIdx, startIdx, wRet);
+        const candidatesAll = rankStocks(signalIdx, startIdx, wRet);
+        const candidates = isBplusMonth(currentMonthKey) ? bplusFilter(candidatesAll, bplusDecide(candidatesAll)) : candidatesAll;
         const selected = candidates.slice(0, nStocks);
         const newLot = { entryMonthKey: currentMonthKey, stocks: {} };
         const alloc = newCap / nStocks;
@@ -3305,8 +3392,11 @@ function runRollingBacktest() {
         }
         cash -= newLotCapital;  // decrement before allocating to lot
 
-        // === 5. Rank stocks (IDENTICAL to 6M Momentum — Rule 5 invariants preserved) ===
-        const candidates = rankStocks(signalIdx, startIdx);
+        // === 5. Rank stocks (ranking เดียวกับ 6M Momentum — Rule 5 invariants preserved) ===
+        //        ตั้งแต่ BPLUS_FROM: ผ่านตัวกรองกลุ่มอุตฯ ของไม้ใหม่ (bplusDecide · ไม่มีการยืด)
+        const candidatesAll = rankStocks(signalIdx, startIdx);
+        const lotDecision = isBplusMonth(currentMonthKey) ? bplusDecide(candidatesAll) : null;
+        const candidates = bplusFilter(candidatesAll, lotDecision);
         const selected = candidates.slice(0, CONFIG.topN);
 
         // === 6. Pre-compute deployment ===
@@ -3356,7 +3446,8 @@ function runRollingBacktest() {
           initialCapital: deployed,
           isReinvest: isReinvest,
           stocks: newLotStocks,
-          picks: selected.map(s => s.ticker)
+          picks: selected.map(s => s.ticker),
+          exclIT: !!(lotDecision && lotDecision.exclIT)
         };
         // Refund any non-deployed alloc (selected ticker missing price data) back to cash
         cash += (newLotCapital - deployed);
@@ -3421,7 +3512,9 @@ function runRollingBacktest() {
       const prevRebalFirstIdx = firstDayIdxInMonth(prevAnchor.year, prevAnchor.month);
       const startIdx = prevRebalFirstIdx >= 0 ? prevRebalFirstIdx + 1 : -1;
       if (startIdx >= 0 && startIdx < signalIdx && state.sortedDates[signalIdx] && state.sortedDates[startIdx] && state.marketData[state.sortedDates[signalIdx]] && state.marketData[state.sortedDates[startIdx]]) {
-        const candidates = rankStocks(signalIdx, startIdx);
+        const candidatesAll = rankStocks(signalIdx, startIdx);
+        const pendDecision = (candidatesAll && isBplusMonth(nextRebalYear * 12 + nextRebalMonth)) ? bplusDecide(candidatesAll) : null;
+        const candidates = candidatesAll ? bplusFilter(candidatesAll, pendDecision) : candidatesAll;
         if (candidates && candidates.length > 0) {
           const picks = candidates.slice(0, CONFIG.topN);
           // Next lot capital: if a lot will mature next month, use its projected value; else perLotCapital (ramp-up)
@@ -3447,6 +3540,7 @@ function runRollingBacktest() {
             daysUntil: daysUntil,
             capital: projectedCap,
             isReinvest: !!willMature,
+            decision: pendDecision,
             picks: picks.map(p => ({
               ticker: p.ticker || '?',
               ret: typeof p.ret === 'number' ? p.ret : 0,
