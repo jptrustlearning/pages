@@ -1476,6 +1476,13 @@
   }
   .trade-date-arrow { color:var(--accent); font-weight:500; opacity:0.65; margin:0 5px; font-size:0.85em; }
   .trade-date .exit-date { color:var(--text-dark); font-weight:700; }
+  /* B111.5 — ป้ายวิธียิงของแต่ละไม้ใน trade log */
+  .fire-tag { display:inline-block; font-family:'Anuphan',sans-serif; font-size:0.66rem; font-weight:700; letter-spacing:0.02em; text-transform:none; padding:1px 8px; border-radius:4px; margin-left:8px; border:1px solid; vertical-align:1px; opacity:1; }
+  .fire-tag.two { color:#8B6914; background:rgba(212,175,55,0.12); border-color:rgba(212,175,55,0.55); }
+  .fire-tag.full { color:#722F37; background:rgba(114,47,55,0.08); border-color:rgba(114,47,55,0.45); }
+  .fire-tag.fullGap { color:#9C2B2B; background:rgba(156,43,43,0.10); border-color:rgba(156,43,43,0.5); }
+  .fire-tag.p99 { color:#1F3A5F; background:rgba(31,58,95,0.08); border-color:rgba(31,58,95,0.5); }
+  .fire-why { font-family:'Anuphan',sans-serif; font-size:0.66rem; color:var(--text-muted); font-weight:400; letter-spacing:0; text-transform:none; margin-left:6px; }
   .trade-date-tag { font-family:'Cinzel','Anuphan',serif; font-size:0.58rem; font-weight:700; color:var(--gold-deep); letter-spacing:0.1em; text-transform:uppercase; margin-right:5px; opacity:0.85; }
 
   /* Pagination */
@@ -1985,6 +1992,7 @@
             ② drawdown sniper ยิง (SPY หลุดจากยอด 60 วัน ≥ 7% แล้ว breadth หดเหลือครึ่งพีครอบนั้น)
             ③ SPY หลุด macro top-2 (Δ6 เดือน เทียบ Yen / Oil / Gold) ·
             นับย้อนหลังได้ไม่เกิน 5 วันเทรด <strong>ห้ามมองอนาคต</strong> ลงมือที่ราคาเปิดวันถัดไป ·
+            <strong>ไม้ P99 รอฟื้น</strong>: พายุที่ breadth หุ้นเทคพีคถึง 48.3% (percentile 99) ขึ้นไป ยิงได้เองตอนหดเหลือครึ่งพีค แม้ไม่ครบ 2 ใน 3 ·
             <strong>แตะที่ข้าวหลามตัดเพื่อดูว่าไม้นั้นผ่านด้วยเงื่อนไขไหน</strong>
           </div>
         </div>
@@ -2230,7 +2238,7 @@
         <option value="150">5 เดือน (150 วัน)</option>
         <option value="180">6 เดือน (180 วัน)</option>
       </select>
-      <span class="hint">ถ้าสัญญาณใหม่มาเร็วกว่าที่กำหนด <strong>ข้ามไปเลย ไม่เปิดไม้ และไม่ยกไปยิงย้อนหลังตอนพ้น MIN GAP</strong> · นับเป็น<strong>วันปฏิทินรวมเสาร์–อาทิตย์</strong> (1 เดือน = 30 วัน) · ยิ่งห่างมาก = ไม้น้อยลง เงินที่ต้องเตรียมน้อยลง แต่พลาดจังหวะช่วงวิกฤตที่สัญญาณมาถี่ · นับจาก<strong>ไม้ที่เปิดจริงไม้ล่าสุด</strong> ไม่ใช่สัญญาณที่ถูกข้าม · ⚠️ <strong>ข้อยกเว้น (เข้ม):</strong> ยิงได้ทันทีแม้ยังไม่พ้น MIN GAP เฉพาะสัญญาณที่เข้าเงื่อนไขครบ <strong>3 ใน 3</strong> (breadth + drawdown + SPY หลุด top-2) <strong>และ</strong>ราคาทำก้นลึกกว่าวันสัญญาณของไม้ก่อนหน้า = พายุแย่ลงจริง ไม่ใช่คลื่นลูกเดิม</span>
+      <span class="hint">ถ้าสัญญาณใหม่มาเร็วกว่าที่กำหนด <strong>ข้ามไปเลย ไม่เปิดไม้ และไม่ยกไปยิงย้อนหลังตอนพ้น MIN GAP</strong> · นับเป็น<strong>วันปฏิทินรวมเสาร์–อาทิตย์</strong> (1 เดือน = 30 วัน) · ยิ่งห่างมาก = ไม้น้อยลง เงินที่ต้องเตรียมน้อยลง แต่พลาดจังหวะช่วงวิกฤตที่สัญญาณมาถี่ · นับจาก<strong>ไม้ที่เปิดจริงไม้ล่าสุด</strong> ไม่ใช่สัญญาณที่ถูกข้าม · ⚠️ <strong>ข้อยกเว้น (เข้ม):</strong> ยิงได้ทันทีแม้ยังไม่พ้น MIN GAP เฉพาะสัญญาณที่เข้าเงื่อนไขครบ <strong>3 ใน 3</strong> (breadth + drawdown + SPY หลุด top-2) <strong>และ</strong>ราคาทำก้นลึกกว่าวันสัญญาณของไม้ก่อนหน้า = พายุแย่ลงจริง ไม่ใช่คลื่นลูกเดิม · <strong>ไม้ P99 รอฟื้นไม่ติด MIN GAP</strong> และไม่นับเป็นไม้ล่าสุดของ MIN GAP</span>
     </div>
 
     <div class="control-group">
@@ -2313,7 +2321,7 @@
           <span class="pillar-title">TRIGGER</span>
         </div>
         <div class="pillar-subtitle">Tech Breadth Washout</div>
-        <div class="pillar-desc">Breadth หุ้นเทค ≥ 22.2% (percentile 95 ของ breadth หุ้นเทคจากข้อมูลจริง 2015–2026 — ตรึงไว้ ไม่จูน · หน้าทั้งตลาดใช้ 19%) แล้วหดกลับ ≤ ครึ่งพีค · เข้าไม้จริงต้องผ่าน<strong>ตัวกรอง 2 ใน 3</strong> ชุดเดียวกับหน้าหลัก: ① breadth หุ้นเทคยิง ② SPY หลุดจากยอด 60 วัน ≥ 7% ③ SPY หลุด macro top-2</div>
+        <div class="pillar-desc">Breadth หุ้นเทค ≥ 22.2% (percentile 95 ของ breadth หุ้นเทคจากข้อมูลจริง 2015–2026 — ตรึงไว้ ไม่จูน · หน้าทั้งตลาดใช้ 19%) แล้วหดกลับ ≤ ครึ่งพีค · เข้าไม้จริงต้องผ่าน<strong>ตัวกรอง 2 ใน 3</strong> ชุดเดียวกับหน้าหลัก: ① breadth หุ้นเทคยิง ② SPY หลุดจากยอด 60 วัน ≥ 7% ③ SPY หลุด macro top-2 · ยกเว้น<strong>ไม้ P99 รอฟื้น</strong>: พายุที่พีคถึง 48.3% (percentile 99) ยิงได้เองตอนหดครึ่งพีค ไม่ติด MIN GAP</div>
       </div>
       <div class="about-pillar vol">
         <div class="pillar-header">
@@ -2353,7 +2361,14 @@ let CONFIG = {
   ddEscalate: true,            // ยังไม่ฟื้นก็ arm ใหม่ได้ ถ้า DD ทำก้นลึกกว่าก้นที่ยิงไปแล้ว (กันพลาดก้น COVID)
   conflWindow: 5,              // ตัวกรองซ้อนชั้น: นับสัญญาณอีกตัวที่เกิดภายในกี่วันเทรด "ย้อนหลัง" (ห้ามมองอนาคต)
   minGapDays: 120,             // ระยะห่างขั้นต่ำระหว่างไม้ (วันปฏิทิน รวมเสาร์-อาทิตย์) · ค่าโรงงาน A65 = 120 (4 เดือน) · 0 = ไม่กำหนด
-  lb: 126,                     // LB6 = ผลตอบแทน 126 วันเทรด
+  // --- ไม้ P99 รอฟื้น (B111.5 · Joon เคาะ 7 พ.ย. 2026 "แบบปลอดภัย") ---
+  //   พายุที่พีค breadth หุ้นเทค ≥ p99Level → ยิงวันที่ breadth หดเหลือ ≤ ครึ่งพีค (จังหวะเดียวกับสัญญาณ breadth)
+  //   แม้ยังไม่ครบ 2 ใน 3 · ไม่ติด MIN GAP และไม่นับเป็น "ไม้ล่าสุด" ของ MIN GAP ไม้ 2 ใน 3
+  //   ไม่ใช้กติกาพีคต้องแรงกว่าเดิม 1.15× · วันเดียวกับไม้ 2 ใน 3 = ไม้เดียวกัน (ไม่ซื้อซ้ำ)
+  //   48.3% = p99 ของ breadth หุ้นเทค 2015-01 → 2026-11-05 (ตรึงไว้ ไม่จูน) · ref: jptrustdocs research/tech-washout-sniper-20261017/threshold-grid-20261107/p99_recover.py
+  p99Recover: true,
+  p99Level: 48.3,
+  lb: 126,                    // LB6 = ผลตอบแทน 126 วันเทรด
   weightRet: 0.7,              // น้ำหนัก Return ในการจัดอันดับ (Volume = 1 − weightRet) · ค่าโรงงาน A65 = 0.7 (Return 70 / Volume 30)
   feeSide: 0.0005,             // ค่าธรรมเนียม 0.05% ต่อข้าง
   startYear: 2015,
@@ -3118,6 +3133,9 @@ function buildSniperSeries() {
   //    ที่ 1.15× เพดาน = 87.0% (พีคสูงสุดที่เคยเกิดจริง = 90.7% มี.ค. 2020 ซึ่งเป็นรอบสองอยู่แล้ว)
   //    ห้ามขยับเกิน 1.55× เด็ดขาด — ไม้ก้น COVID (90.7 ÷ 57.6 = 1.57×) จะหลุด
   const signals = [];
+  // ไม้ P99 รอฟื้น (B111.5): ทุกรอบที่หดครึ่งพีค และพีครอบนั้น ≥ p99Level — ไม่ผ่านกติกา 1.15× (ดู CONFIG)
+  const p99Signals = [], p99Peaks = [];
+  const p99Lv = (CONFIG.p99Recover !== false && CONFIG.p99Level > 0) ? CONFIG.p99Level : Infinity;
   let armed = false, peakB = 0, refPeak = 0, quietDays = 0;
   for (let i = 0; i < n; i++) {
     const b = breadth[i];
@@ -3128,6 +3146,7 @@ function buildSniperSeries() {
     } else {
       if (b > peakB) peakB = b;
       if (b <= peakB / 2) {
+        if (peakB >= p99Lv) { p99Signals.push(i); p99Peaks.push(peakB); }
         if (peakB >= refPeak * CONFIG.episodeEscalation) { signals.push(i); refPeak = peakB; }   // ไม่แรงกว่าเดิมพอ = คลื่นลูกเดิม ไม่ยิง
         armed = false; peakB = 0;
       }
@@ -3227,7 +3246,7 @@ function buildSniperSeries() {
   }
 
   state._sniper = { n, m, offset, dates, tickers, closeA, openA, volA, breadth, signals, ddSignals,
-                    conflSignals, conflReasons, ddArr,
+                    conflSignals, conflReasons, ddArr, p99Signals, p99Peaks,
                     lastArmed: armed, lastPeak: peakB, lastRefPeak: refPeak, macroBenign,
                     ddLastArmed: ddLastArmed, ddLastPeakB: ddLastPeakB, ddLastTrough: ddLastTrough };
   return state._sniper;
@@ -3290,11 +3309,17 @@ function sniperRun(H, topN, perTrade, startIdx) {
   //    คือพายุที่ลงลึกกว่าเดิมอยู่แล้ว) ผลคือ MIN GAP ไม่มีผลเลย = 26 ไม้ เท่ากับปิด MIN GAP ทิ้ง
   const _minGap = CONFIG.minGapDays | 0;
   const skippedByGap = [];
+  // B111.5 — ป้ายวิธียิงของแต่ละไม้ (โชว์ใน trade log): 'two' 2 ใน 3 · 'full' 3 ใน 3 · 'fullGap' 3 ใน 3 ข้าม MIN GAP · 'p99' P99 รอฟื้น
+  const reasonAt = new Map();
+  (S.conflSignals || []).forEach((t, k) => reasonAt.set(t, (S.conflReasons || [])[k] || ''));
+  const fireKindAt = new Map();
+  const _kindOf = (t, viaGapException) => {
+    const isFull = (reasonAt.get(t) || '').indexOf('3/3') >= 0;
+    return isFull ? (viaGapException ? 'fullGap' : 'full') : 'two';
+  };
   if (_minGap > 0) {
     const kept = [];
     let lastMs = -Infinity, lastDd = 0;
-    const reasonAt = new Map();
-    (S.conflSignals || []).forEach((t, k) => reasonAt.set(t, (S.conflReasons || [])[k] || ''));
     const ddOf = (i) => (S.ddArr && isFinite(S.ddArr[i])) ? S.ddArr[i] : 0;
     for (const t of signals) {
       const ms = Date.parse(dates[t]);
@@ -3306,19 +3331,34 @@ function sniperRun(H, topN, perTrade, startIdx) {
       const gapOk = kept.length === 0 || (ms - lastMs) / 86400000 >= _minGap;
       if (gapOk || (isFull && isDeeper)) {
         kept.push(t); lastMs = ms; lastDd = dd;
+        fireKindAt.set(t, _kindOf(t, !gapOk));
       } else {
         skippedByGap.push({ date: dates[t], daysSince: Math.round((ms - lastMs) / 86400000),
                             reason: reason, isFull: isFull, dd: dd, prevDd: lastDd });
       }
     }
     signals = kept;
+  } else {
+    signals.forEach(t => fireKindAt.set(t, _kindOf(t, false)));
+  }
+  // ไม้ P99 รอฟื้น — เติมหลัง MIN GAP (ไม่ติด gap · ไม่ถูกนับใน lastMs ของไม้ 2 ใน 3 ข้างบน)
+  //   วันเดียวกับไม้ 2 ใน 3 ที่เข้าจริง = ไม้เดียวกัน คงป้าย 2/3 หรือ 3/3 ไว้ (ไม่ซื้อซ้ำ)
+  const p99PeakAt = new Map();
+  (S.p99Signals || []).forEach((t, k) => p99PeakAt.set(t, (S.p99Peaks || [])[k]));
+  if (CONFIG.p99Recover !== false && p99PeakAt.size > 0) {
+    const have = new Set(signals);
+    for (const t of p99PeakAt.keys()) {
+      if (have.has(t)) continue;
+      fireKindAt.set(t, 'p99'); have.add(t);
+    }
+    signals = Array.from(have).sort((a, b) => a - b);
   }
   const FEE = CONFIG.feeSide, LBn = CONFIG.lb;
   const t0 = Math.max(startIdx || 0, 0);
 
   // 1) plan — ทุกสัญญาณ = ไม้ใหม่ทุนก้อนละ perTrade (ถือซ้อนกันได้ ไม่มีเงื่อนไขรอ)
   const plan = [];
-  let firePending = null;
+  let firePending = null, firePendingKind = null;
   const macroOnly = CONFIG.macroFilter === 'defensive';
   const benignArr = S.macroBenign;
   for (let s = 0; s < signals.length; s++) {
@@ -3327,7 +3367,7 @@ function sniperRun(H, topN, perTrade, startIdx) {
     // ตัวกรองมหภาค: ยิงเฉพาะตอน SPY หลุด top-2 ณ ปิดวันสัญญาณ (ลงมือ open t+1 → ไม่มี look-ahead)
     if (macroOnly && benignArr && benignArr[t]) continue;
     const ent = t + 1, ex = ent + H;
-    if (ent >= n) { firePending = t; continue; }
+    if (ent >= n) { firePending = t; firePendingKind = fireKindAt.get(t) || 'two'; continue; }
     const picks = sniperRankLB6(S, t, topN);
     const legs = [];
     for (const p of picks) {
@@ -3338,7 +3378,8 @@ function sniperRun(H, topN, perTrade, startIdx) {
     if (legs.length === 0) continue;
     const base = perTrade * (1 - FEE);
     const full = legs.map(lg => ({ j: lg.j, r: lg.r, po: lg.po, sh: (base / legs.length) / lg.po, lp: lg.po }));
-    plan.push({ sig: t, ent: ent, ex: ex, legs: full, isOpen: ex >= n, extends: 0 });
+    plan.push({ sig: t, ent: ent, ex: ex, legs: full, isOpen: ex >= n, extends: 0,
+                fireKind: fireKindAt.get(t) || 'two', fireReason: reasonAt.get(t) || '', p99Peak: p99PeakAt.get(t) });
   }
 
   // 2) walk — equity = กำไรสะสมรวมทุกไม้ (Σ มูลค่าไม้ − ทุนไม้) · exit ประมวลก่อน entry
@@ -3383,6 +3424,7 @@ function sniperRun(H, topN, perTrade, startIdx) {
           pl: exitVal - perTrade,
           returnPct: exitVal / perTrade - 1,
           extendCount: tr.extends,
+          fireKind: tr.fireKind, fireReason: tr.fireReason, p99Peak: tr.p99Peak,
           stocks: Object.fromEntries(tr.legs.map(lg => [tickers[lg.j], lg.sh])),
           legs: tr.legs.map(lg => {
             let px = openA[i * m + lg.j];
@@ -3415,11 +3457,12 @@ function sniperRun(H, topN, perTrade, startIdx) {
     signalDate: dates[tr.sig], entryDate: dates[tr.ent], entryIdx: tr.ent,
     plannedExitIdx: tr.ex, plannedExitDate: tr.ex < n ? dates[tr.ex] : null,
     extendCount: tr.extends,
+    fireKind: tr.fireKind, fireReason: tr.fireReason, p99Peak: tr.p99Peak,
     initialCapital: perTrade,
     stocks: Object.fromEntries(tr.legs.map(lg => [tickers[lg.j], lg.sh])),
     legs: tr.legs.map(lg => ({ ticker: tickers[lg.j], lb6: lg.r, entryPrice: lg.po }))
   }));
-  return { equity: equity, closed: closed, openLots: openLots, firePending: firePending,
+  return { equity: equity, closed: closed, openLots: openLots, firePending: firePending, firePendingKind: firePendingKind,
            entered: entered, maxConcurrent: maxConcurrent, yearMaxConc: yearMaxConc,
            skippedByGap: skippedByGap,
            deployedTotal: entered * perTrade };
@@ -3571,12 +3614,12 @@ function runSniperBacktest() {
   for (const cl of res.closed) {
     state.tradeLog.push({ date: cl.entryDate, signalDate: cl.signalDate, equity: cl.initialCapital,
       stocks: cl.legs.map(l => l.ticker), lotCapital: cl.initialCapital, isReinvest: false, chainId: cl.chainId,
-      extendCount: cl.extendCount || 0 });
+      extendCount: cl.extendCount || 0, fireKind: cl.fireKind, fireReason: cl.fireReason, p99Peak: cl.p99Peak });
   }
   for (const ol of res.openLots) {
     state.tradeLog.push({ date: ol.entryDate, signalDate: ol.signalDate, equity: ol.initialCapital,
       stocks: ol.legs.map(l => l.ticker), lotCapital: ol.initialCapital, isReinvest: false, chainId: ol.chainId,
-      extendCount: ol.extendCount || 0 });
+      extendCount: ol.extendCount || 0, fireKind: ol.fireKind, fireReason: ol.fireReason, p99Peak: ol.p99Peak });
   }
   state.tradeLog.sort((a, b) => (a.date < b.date ? -1 : 1));
   state.externalCapitalTimeline = state.tradeLog.map((t, i) => ({ date: t.date, cumulativeDeployed: (i + 1) * PT }));
@@ -3598,9 +3641,11 @@ function runSniperBacktest() {
       .map(p => ({ ticker: _S.tickers[p.j], ret: p.r, score: p.r }));
 
     // ระยะห่างจากไม้ที่เปิดจริงล่าสุด (วันปฏิทิน) เทียบ MIN GAP — ไม่ใช่จากสัญญาณที่ถูกข้าม
+    // B111.5: ไม้ P99 รอฟื้นไม่นับ (MIN GAP ใช้กับไม้ 2 ใน 3 เท่านั้น)
     let lastEntryDate = null;
     for (const l of [...res.closed, ...res.openLots]) {
-      if (l && l.entryDate && (!lastEntryDate || l.entryDate > lastEntryDate)) lastEntryDate = l.entryDate;
+      if (!l || l.fireKind === 'p99') continue;
+      if (l.entryDate && (!lastEntryDate || l.entryDate > lastEntryDate)) lastEntryDate = l.entryDate;
     }
     const gapDays = lastEntryDate ? Math.round((Date.parse(lastDate) - Date.parse(lastEntryDate)) / 86400000) : null;
     const minGap = CONFIG.minGapDays | 0;
@@ -3635,6 +3680,10 @@ function runSniperBacktest() {
       peak: state.pendingSignal ? state.pendingSignal.peak : 0,
       fireLevel: state.pendingSignal ? state.pendingSignal.fireLevel : 0,
       lastEntryDate: lastEntryDate, gapDays: gapDays, minGap: minGap, gapLeft: gapLeft,
+      p99On: CONFIG.p99Recover !== false, p99Level: CONFIG.p99Level,
+      p99Armed: CONFIG.p99Recover !== false && bArmed && _S.lastPeak >= CONFIG.p99Level,
+      p99FireLevel: bArmed ? _S.lastPeak / 2 : 0, breadthPeak: bArmed ? _S.lastPeak : 0,
+      firePendingKind: res.firePendingKind,
       lastSkipped: (() => {
         // สัญญาณล่าสุดที่ถูก MIN GAP ตัดทิ้ง และเกิด "หลัง" ไม้ล่าสุด = ยังเป็นเหตุการณ์ปัจจุบัน
         const sk = res.skippedByGap || [];
@@ -4224,14 +4273,17 @@ function renderEntrySpyChart() {
   (S.conflSignals || []).forEach((t, k) => {
     reasonBySigDate.set(S.dates[t], (S.conflReasons || [])[k] || '');
   });
-  const sigDateByEntry = new Map();
+  const sigDateByEntry = new Map(), p99ByEntry = new Map();
   [...(state.closedLots || []), ...(state.lots || [])].forEach(L => {
     if (L && L.entryDate) sigDateByEntry.set(L.entryDate, L.signalDate);
+    // B111.5: ไม้ P99 รอฟื้นไม่อยู่ใน conflSignals → ใช้ป้ายของไม้เอง
+    if (L && L.entryDate && L.fireKind === 'p99')
+      p99ByEntry.set(L.entryDate, 'P99 รอฟื้น' + (isFinite(L.p99Peak) ? ' (breadth พีค ' + L.p99Peak.toFixed(1) + '%)' : ''));
   });
   const cfMap = new Map();
   entries.forEach(e => {
     if (e.i < from) return;
-    cfMap.set(e.i - from, reasonBySigDate.get(sigDateByEntry.get(e.date)) || '');
+    cfMap.set(e.i - from, p99ByEntry.get(e.date) || reasonBySigDate.get(sigDateByEntry.get(e.date)) || '');
   });
   // มือถือ: ย่อจุดลง ไม่งั้นข้าวหลามตัดทับกันจนอ่านไม่ออก
   // ⚠️ ใช้ window.innerWidth ไม่ใช่ cv.clientWidth — ตอนวาดครั้งแรกแท็บยังซ่อนอยู่ canvas กว้าง 0
@@ -4473,6 +4525,27 @@ function renderAll() {
   updateMarketAnalyzer();
 }
 
+// B111.5 — ป้าย "ยิงแบบไหน" ในกล่อง trade log (Joon 7 พ.ย. 2026: "อันไหนยิงแบบไหนช่วยแท็กไว้หน่อยในแต่ละกล่อง")
+//   two = ครบ 2 ใน 3 · full = ครบ 3 ใน 3 · fullGap = 3 ใน 3 + ก้นลึกกว่าไม้ก่อน → ข้าม MIN GAP · p99 = ไม้ P99 รอฟื้น
+function _fireTagHtml(r) {
+  const k = r.fireKind || 'two';
+  const label = { two: 'ยิงแบบ 2 ใน 3', full: 'ยิงแบบ 3 ใน 3', fullGap: '3 ใน 3 · ข้าม MIN GAP', p99: 'P99 รอฟื้น' }[k] || 'ยิงแบบ 2 ใน 3';
+  const tip = {
+    two: 'เข้าเงื่อนไข 2 ใน 3 ณ วันสัญญาณ',
+    full: 'เข้าเงื่อนไขครบ 3 ใน 3 ณ วันสัญญาณ',
+    fullGap: 'ครบ 3 ใน 3 และก้นลึกกว่าไม้ก่อนหน้า จึงยิงได้แม้ยังไม่พ้น MIN GAP',
+    p99: 'พายุที่ breadth พีคถึงระดับ P99 ยิงตอน breadth หดเหลือครึ่งพีค แม้ไม่ครบ 2 ใน 3 · ไม่ติด MIN GAP'
+  }[k] || '';
+  let why = '';
+  if (k === 'p99') {
+    why = (r.p99Peak != null && isFinite(r.p99Peak)) ? 'breadth พีค ' + r.p99Peak.toFixed(1) + '%' : '';
+  } else if (r.fireReason) {
+    why = r.fireReason.replace(/\s*\(\d\/3\)\s*$/, '');
+  }
+  return '<span class="fire-tag ' + k + '" title="' + tip + '">' + label + '</span>' +
+         (why ? '<span class="fire-why">' + why + '</span>' : '');
+}
+
 function renderTradeLog() {
   const container = document.getElementById('tradeLogContainer');
   container.innerHTML = '';
@@ -4554,9 +4627,9 @@ function renderTradeLog() {
       } else if (st.lastEntryDate == null) {
         gapTxt = 'MIN GAP ' + st.minGap + ' วัน · ยังไม่มีไม้ในช่วงที่เลือก';
       } else if (st.gapLeft > 0) {
-        gapTxt = 'ไม้ล่าสุด ' + _fmtTradeDate(st.lastEntryDate) + ' · ผ่านมา ' + st.gapDays + ' วัน · MIN GAP ' + st.minGap + ' วัน — <strong style="color:var(--red);">ต้องรออีก ' + st.gapLeft + ' วัน</strong>';
+        gapTxt = 'ไม้ 2 ใน 3 ล่าสุด ' + _fmtTradeDate(st.lastEntryDate) + ' · ผ่านมา ' + st.gapDays + ' วัน · MIN GAP ' + st.minGap + ' วัน — <strong style="color:var(--red);">ต้องรออีก ' + st.gapLeft + ' วัน</strong>';
       } else {
-        gapTxt = 'ไม้ล่าสุด ' + _fmtTradeDate(st.lastEntryDate) + ' · ผ่านมา ' + st.gapDays + ' วัน · MIN GAP ' + st.minGap + ' วัน — <strong style="color:var(--green);">พ้นแล้ว</strong>';
+        gapTxt = 'ไม้ 2 ใน 3 ล่าสุด ' + _fmtTradeDate(st.lastEntryDate) + ' · ผ่านมา ' + st.gapDays + ' วัน · MIN GAP ' + st.minGap + ' วัน — <strong style="color:var(--green);">พ้นแล้ว</strong>';
       }
       const openTxt = st.openCount > 0 ? 'ถืออยู่ ' + st.openCount + ' ไม้ · ' : '';
       // A66 ข้อ A — บอกให้ชัดว่ามีสัญญาณเกิดขึ้นแล้วถูกข้าม ไม่ใช่การ์ดกลับไปเงียบเฉยๆ
@@ -4572,11 +4645,18 @@ function renderTradeLog() {
       const footHtml = '<div style="margin-top:10px;font-size:.68rem;color:var(--text-muted);line-height:1.6;border-top:1px dashed var(--border);padding-top:8px;">' +
         openTxt + gapTxt + '<br>เข้าไม้จริงต้องเข้าเงื่อนไข <strong>2 ใน 3</strong> ณ วันสัญญาณ · วันเข้าถูกกำหนดโดยตลาด ไม่ใช่ปฏิทิน' +
         (st.minGap ? '<br>ข้ามช่วง MIN GAP ได้เฉพาะสัญญาณที่เข้าครบ <strong>3 ใน 3</strong> <strong>และ</strong>ทำก้นลึกกว่าไม้ก่อนหน้า' : '') +
+        (st.p99On ? '<br><strong>ไม้ P99 รอฟื้น</strong>: พายุที่ breadth พีคถึง ' + st.p99Level.toFixed(1) + '% ขึ้นไป ยิงได้เองตอน breadth หดเหลือครึ่งพีค แม้ไม่ครบ 2 ใน 3 · ไม่ติด MIN GAP และไม่นับเป็นไม้ล่าสุดของ MIN GAP' : '') +
       '</div>';
+      // B111.5 — พายุรอบนี้ถึงระดับ P99 แล้ว: บอกเส้นยิงของไม้ P99 รอฟื้น
+      const p99Html = (isWatch && st.p99Armed)
+        ? '<div style="margin-top:10px;border:1px solid rgba(31,58,95,0.4);background:rgba(31,58,95,0.06);border-radius:8px;padding:8px 10px;font-size:.7rem;color:var(--text-main);line-height:1.6;">' +
+            '<strong style="color:#1F3A5F;">พีครอบนี้ ' + st.breadthPeak.toFixed(1) + '% ถึงระดับ P99 แล้ว</strong> (≥ ' + st.p99Level.toFixed(1) + '%) — ถ้า breadth หดถึง ≤ ' + st.p99FireLevel.toFixed(1) + '% จะยิง<strong>ไม้ P99 รอฟื้น</strong> แม้ยังไม่ครบ 2 ใน 3 · ถ้าวันนั้นครบ 2 ใน 3 ด้วย นับเป็นไม้ 2 ใน 3 ไม้เดียว' +
+          '</div>'
+        : '';
 
       // --- หัวการ์ด ---
       const line1 = isFired
-        ? 'สัญญาณยิงแล้ว — เข้าซื้อที่<strong>ราคาเปิดวันทำการถัดไป</strong>'
+        ? (st.firePendingKind === 'p99' ? 'สัญญาณ<strong>ไม้ P99 รอฟื้น</strong>ยิงแล้ว' : 'สัญญาณยิงแล้ว') + ' — เข้าซื้อที่<strong>ราคาเปิดวันทำการถัดไป</strong>'
         : (isWatch
             ? 'ตลาดเข้าโซนล้างพอร์ตแล้ว — กำลังวัดความหนักของรอบ (' +
               [st.breadthArmed ? 'breadth' : null, st.ddArmed ? 'drawdown' : null].filter(Boolean).join(' + ') + ')'
@@ -4609,7 +4689,7 @@ function renderTradeLog() {
           '</div><div>' + badges + '</div></div>';
       }
 
-      card.innerHTML = headerHtml + chipsHtml + barHtml + skipHtml + footHtml + sectionHtml;
+      card.innerHTML = headerHtml + chipsHtml + barHtml + p99Html + skipHtml + footHtml + sectionHtml;
       container.appendChild(card);
     }
   } catch (err) {
@@ -4661,6 +4741,7 @@ function renderTradeLog() {
       date: log.date, signalDate: log.signalDate || '', stocks: log.stocks,
       equity: lotCap, isOpen, exitDate, plannedNote, pnl, pnlPct, stockRets,
       extendCount: (closed && closed.extendCount) || (active && active.extendCount) || 0,
+      fireKind: log.fireKind || 'two', fireReason: log.fireReason || '', p99Peak: log.p99Peak,
       isReinvest: log.isReinvest || false
     };
   }).reverse();  // newest first
@@ -4713,7 +4794,7 @@ function renderTradeLog() {
 
     let header = `<div class="trade-header"><div>
       <div class="trade-date"><span class="trade-date-tag">Entry</span>${_fmtTradeDate(r.date)}${r.exitDate ? '<span class="trade-date-arrow">→</span><span class="trade-date-tag">Exit</span><span class="exit-date">' + _fmtTradeDate(r.exitDate) + '</span>' : (r.plannedNote || '')}${r.isOpen ? ' <span class="open-badge">OPEN</span>' : ''}${r.extendCount > 0 ? ' <span style="display:inline-block;background:rgba(156,43,43,0.12);color:#9C2B2B;border:1px solid rgba(156,43,43,0.4);padding:1px 7px;border-radius:4px;font-family:\'Cinzel\',\'Anuphan\',serif;font-size:0.58rem;font-weight:700;letter-spacing:1.2px;margin-left:6px;" title="Lot maturity extended ' + r.extendCount + ' time(s) — SPY was out of macro top-2 at scheduled exit, so the same picks were held another hold period instead of being sold. Exit date shown is the updated maturity.">↻ EXTENDED ' + r.extendCount + 'x</span>' : ''}${reinvestBadge}</div>
-      <div style="font-family:'Cinzel','Anuphan',serif;font-size:0.68rem;font-weight:700;color:var(--gold-deep);letter-spacing:0.1em;text-transform:uppercase;margin-top:4px;opacity:0.85;">Signal · ${_fmtTradeDate(r.signalDate)}</div>
+      <div style="font-family:'Cinzel','Anuphan',serif;font-size:0.68rem;font-weight:700;color:var(--gold-deep);letter-spacing:0.1em;text-transform:uppercase;margin-top:4px;opacity:0.85;">Signal · ${_fmtTradeDate(r.signalDate)}${_fireTagHtml(r)}</div>
       <div class="trade-summary">ไม้นี้ <strong>${r.stocks.length} ตัว</strong> · ทุน <strong>$${Math.round(r.equity).toLocaleString()}</strong>`;
     if (!r.isOpen) {
       header += ` · P&L: <span class="${retCls}"><strong>$${Math.round(r.pnl).toLocaleString()}</strong> (${r.pnlPct>=0?'+':''}${r.pnlPct.toFixed(2)}%)</span>`;
@@ -4764,6 +4845,12 @@ function renderBreadthChart() {
   const skippedData = labels.map((d, i) => (sigSet.has(i) && !firedDates.has(d)) ? bdata[i] : null);
   const hasSkipped  = skippedData.some(v => v !== null);
   const armLine = labels.map(() => CONFIG.breadthArm);
+  // B111.5: เส้น P99 + จุดไม้ P99 รอฟื้นที่เข้าจริง (ไม่ใช่ไม้ 2 ใน 3)
+  const p99On = CONFIG.p99Recover !== false && CONFIG.p99Level > 0;
+  const p99Line = labels.map(() => CONFIG.p99Level);
+  const p99Fired = new Set([...(state.closedLots || []), ...(state.lots || [])].filter(t => t.fireKind === 'p99').map(t => t.signalDate));
+  const p99Data = labels.map((d, i) => p99Fired.has(d) ? bdata[i] : null);
+  const hasP99 = p99On && p99Data.some(v => v !== null);
   charts.breadth = new Chart(ctx, {
     type: 'line',
     data: {
@@ -4776,7 +4863,11 @@ function renderBreadthChart() {
         { label: 'สัญญาณยิง', data: sigData, borderColor: 'rgba(46,159,95,0)',
           backgroundColor: '#2E9F5F', pointRadius: 4, pointHoverRadius: 6, showLine: false },
         ...(hasSkipped ? [{ label: 'ไม่ผ่านตัวกรอง 2 ใน 3', data: skippedData, borderColor: 'rgba(139,125,94,0)',
-          backgroundColor: 'rgba(139,125,94,0.55)', pointRadius: 4, pointHoverRadius: 6, showLine: false }] : [])
+          backgroundColor: 'rgba(139,125,94,0.55)', pointRadius: 4, pointHoverRadius: 6, showLine: false }] : []),
+        ...(p99On ? [{ label: 'ระดับ P99 ' + CONFIG.p99Level + '%', data: p99Line, borderColor: 'rgba(31,58,95,0.55)',
+          borderDash: [2, 4], borderWidth: 1.1, pointRadius: 0, fill: false }] : []),
+        ...(hasP99 ? [{ label: 'ไม้ P99 รอฟื้น', data: p99Data, borderColor: 'rgba(31,58,95,0)',
+          backgroundColor: '#1F3A5F', pointStyle: 'rectRot', pointRadius: 5, pointHoverRadius: 7, showLine: false }] : [])
       ]
     },
     options: {
