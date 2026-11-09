@@ -1,6 +1,192 @@
 {
-  "lastUpdated": "2026-11-09T16:50:00Z",
+  "lastUpdated": "2026-11-09T22:50:00Z",
   "batches": [
+    {
+      "file": "2026-11-09-2250.md",
+      "date": "2026-11-09T22:50:00Z",
+      "date_display": "9 พ.ย. 2026 · 22:50",
+      "summary": "ชั่วโมงแรกตลาดสหรัฐฯ เด้งกว้าง S&P 500 +1.96% Nasdaq +2.43% Dow +1.62% VIX ลดเหลือราว 21 · Brent ต่ำกว่า 94 ดอลลาร์ ลบเกือบ 5% หลัง Trump บอกโอกาสโจมตีอิหร่าน \"ต่ำมาก\" ทอง +1.3% แถว 4,130 · หุ้นเด่นก่อนเปิด หุ้นโรงไฟฟ้า Constellation กำไรเกินคาดปรับเป้าขึ้น NRG ขายโรงไฟฟ้าก๊าซ 4,000 ล้านดอลลาร์ซื้อหุ้นคืน · หุ้นเด่นชั่วโมงแรก หุ้นชิปเด้ง AMD ได้เลื่อนอันดับเป้า 600 Broadcom +6.5% แต่ Nvidia ลบ 4–6% · รอ CPI คืนวันอังคาร 20:30 น.",
+      "tickers": [
+        "SPX",
+        "IXIC",
+        "DJI",
+        "BRENT",
+        "RUT",
+        "WTI",
+        "GLD",
+        "US10Y",
+        "DXY",
+        "VIX",
+        "NVDA",
+        "SET",
+        "PTT",
+        "PTTEP",
+        "AOT",
+        "CEG",
+        "NRG",
+        "AMZN",
+        "GOOGL",
+        "GULF",
+        "GPSC",
+        "AMD",
+        "AVGO",
+        "SOX",
+        "MRVL",
+        "INTC",
+        "QCOM",
+        "DELTA",
+        "KCE",
+        "HANA"
+      ],
+      "headlines": [
+        {
+          "title": "ชั่วโมงแรกตลาดสหรัฐฯ คืนวันจันทร์: หุ้นเด้งกว้างทั้งกระดาน S&P 500 +1.96% Nasdaq +2.43% Dow +1.62% ณ 22:44 น. · Brent ลงไปต่ำกว่า 94 ดอลลาร์ หลัง Trump บอกโอกาสโจมตีอิหร่านรอบใหม่ \"ต่ำมาก\" · ทองฟิวเจอร์ส +1.3% แถว 4,130 ดอลลาร์ · VIX ลดเหลือราว 21 แต่ Nvidia เป็นหุ้นใหญ่ตัวเดียวที่ยังลบ",
+          "tickers": [
+            {
+              "symbol": "SPX",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "IXIC",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DJI",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "BRENT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "RUT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "WTI",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "GLD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "US10Y",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "DXY",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "VIX",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "SET",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "PTT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "PTTEP",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AOT",
+              "sentiment": "positive"
+            }
+          ],
+          "tone_override": "bullish",
+          "source": "Reuters, Yahoo Finance, Investopedia, The National, Le Private Banker, Coinpaper",
+          "published": "9 พ.ย. 2026"
+        },
+        {
+          "title": "หุ้นเด่นก่อนตลาดเปิด: หุ้นโรงไฟฟ้าสหรัฐฯ หลัง Constellation Energy กำไรไตรมาส 3 เกินคาดและปรับเป้าทั้งปีขึ้นเป็นครั้งที่สองของปี หุ้น +3–5% ก่อนเปิด · ส่วน NRG Energy ขายโรงไฟฟ้าก๊าซ 4.9 กิกะวัตต์มูลค่า 4,000 ล้านดอลลาร์ แล้วนำเงินไปซื้อหุ้นคืนเพิ่ม",
+          "tickers": [
+            {
+              "symbol": "CEG",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "NRG",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AMZN",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "GOOGL",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "GULF",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "GPSC",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "Constellation Energy, NRG Energy, Investing.com, Reuters, Stocktwits",
+          "published": "9 พ.ย. 2026"
+        },
+        {
+          "title": "หุ้นเด่นชั่วโมงแรก: หุ้นชิปเด้งแรงหลัง Oppenheimer เลื่อนอันดับ AMD เป็น \"น่าลงทุนกว่าตลาด\" เป้า 600 ดอลลาร์ คาดรายได้ศูนย์ข้อมูลปี 2027 โต 135% — Broadcom +6.5% Marvell +5% ดัชนีหุ้นชิป SOX +3.3% แต่ Nvidia สวนทางลบ 4–6% จากข่าวสอบสวนซีอีโอ",
+          "tickers": [
+            {
+              "symbol": "AMD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AVGO",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "SOX",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "MRVL",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "INTC",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "QCOM",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "KCE",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "HANA",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "Reuters, Yahoo Finance, Investopedia, FinanceFeeds, The Crypto Basic, GuruFocus",
+          "published": "9 พ.ย. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-11-09-1650.md",
       "date": "2026-11-09T16:50:00Z",
