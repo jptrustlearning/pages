@@ -1669,7 +1669,7 @@
         <label class="onelot-bar-label" for="startMonthSelect">เริ่มกลยุทธ์เดือน</label>
         <select id="startMonthSelect" class="input-box onelot-select"></select>
       </div>
-      <div class="onelot-bar-note">ลงเงินทั้งก้อนไม้เดียว · ซื้อวันทำการแรกของเดือนที่เลือก · ครบ 6 เดือนรีบาลานซ์ด้วยเงินก้อนเดิม (B+ บอกยืด = ถือต่อ)</div>
+      <div class="onelot-bar-note">ลงเงินทั้งก้อนไม้เดียว · ซื้อราคาเปิดวันทำการแรกของเดือนที่เลือก · ครบ 6 เดือนรีบาลานซ์ด้วยเงินก้อนเดิม (B+ บอกยืด = ถือต่อ)</div>
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════
@@ -2320,11 +2320,12 @@
     <div class="about-philosophy" style="margin:14px 0;">
       <div class="philosophy-label">Experiment · คอลัมน์ 4 แบบไม้เดียว</div>
       <div class="philosophy-text" style="line-height:1.75;">
-        <strong>ไม้เดียว เลือกเดือนเริ่ม</strong> · วันทำการแรกของเดือนที่เลือก ซื้อ Top 10 ด้วยเงินทั้งก้อนทันที (แม้เดือนนั้น B+ บอกยืด) · ครบ 6 เดือน B+ บอกยืด = ถือต่ออีก 6 เดือน · ไม่ยืด = ขายทั้งไม้แล้วซื้อ Top 10 ใหม่ด้วยเงินทั้งก้อน · มีไม้เดียวตลอด ไม่กระจาย 6 ไม้<br>
+        <strong>ไม้เดียว เลือกเดือนเริ่ม</strong> · วันทำการแรกของเดือนที่เลือก ซื้อ Top 10 ด้วยเงินทั้งก้อนทันทีที่ราคาเปิด (แม้เดือนนั้น B+ บอกยืด) · ครบ 6 เดือน B+ บอกยืด = ถือต่ออีก 6 เดือน · ไม่ยืด = ขายทั้งไม้แล้วซื้อ Top 10 ใหม่ด้วยเงินทั้งก้อน · มีไม้เดียวตลอด ไม่กระจาย 6 ไม้<br>
         <strong>B+ ทุกเดือน</strong> · ยืดถือเมื่อ SPY หมี หรือหุ้นเทคหลุด 2 อันดับแรกของกลุ่มอุตสาหกรรม · ถ้ากลุ่มตั้งรับ (สุขภาพ · สินค้าจำเป็น · สาธารณูปโภค) ติด 2 แรก ล็อตใหม่ไม่เอาหุ้นเทค<br>
-        <strong>ขายสเตจ 4 รายสัปดาห์</strong> · เช็คราคาปิดวันทำการสุดท้ายของสัปดาห์ หุ้นตัวไหนปิดต่ำกว่าเส้นเฉลี่ย 30 สัปดาห์ และเส้นเฉลี่ยต่ำกว่าสัปดาห์ก่อน → ขายราคาปิดวันทำการถัดไป เงินเข้าไม้นั้น<br>
+        <strong>ขายสเตจ 4 รายสัปดาห์</strong> · เช็คราคาปิดวันทำการสุดท้ายของสัปดาห์ หุ้นตัวไหนปิดต่ำกว่าเส้นเฉลี่ย 30 สัปดาห์ และเส้นเฉลี่ยต่ำกว่าสัปดาห์ก่อน → ขายราคาเปิดวันทำการถัดไป เงินเข้าไม้นั้น<br>
         <strong>ซื้อ 3 ตัวใหม่</strong> · แบ่งเงินที่ขายได้ซื้อ 3 อันดับแรกจากการจัดอันดับ ณ วันนั้น (วิธีเดียวกับรอบรีบาลานซ์ · ไม่เอาตัวที่ไม้นั้นถืออยู่ · ไม่เอาตัวที่เป็นสเตจ 4) · ตัวที่ซื้อแทนก็ถูกเช็คทุกสัปดาห์เหมือนกัน<br>
         <strong>ถือเงินสดเฉพาะช่วง SPY หมี</strong> · พอ SPY พ้นหมี วันเช็คถัดไปเอาเงินสดที่ค้างในไม้ไปซื้อ 3 ตัวใหม่ทันที แม้สัปดาห์นั้นไม่มีการขาย<br>
+        <strong>ราคาที่ใช้</strong> · สัญญาณจากราคาปิดของวันก่อนหน้า · ซื้อขายทุกครั้ง (ขายไม้ครบรอบ · ซื้อไม้ใหม่ · ขายสเตจ 4 · ซื้อแทน) ใช้ราคาเปิดของวันลงมือ · มูลค่าพอร์ตรายวันคิดราคาปิด<br>
         ไม้ครบรอบ 6 เดือน / ยืดถือ ตามกติกา B+ เดิม · ไม่คิดค่าธรรมเนียม
       </div>
     </div>
@@ -2503,7 +2504,7 @@ function bplusFilter(candidates, decision) {
 // คอลัมน์ 4 (จูน 10 พ.ย. 2026) — สเตจ 4 ตาม Stan Weinstein (Stage Analysis) รายหุ้น รายสัปดาห์
 //   วันเช็ค = วันเทรดสุดท้ายของแต่ละสัปดาห์ (เสาร์–ศุกร์ · ปกติวันศุกร์) · ราคาปิดรายสัปดาห์ = ราคาปิดล่าสุดที่มี ณ วันนั้น
 //   สเตจ 4 = ปิดต่ำกว่าเส้นเฉลี่ย 30 สัปดาห์ และเส้นเฉลี่ยต่ำกว่าสัปดาห์ก่อน
-//   ลงมือวันเทรดถัดไป ราคาปิด (ไม่มองอนาคต):
+//   ลงมือวันเทรดถัดไป ราคาเปิด (จูน 10 พ.ย. 22:51 · เดิมราคาปิด) (ไม่มองอนาคต):
 //     หุ้นในไม้ที่เป็นสเตจ 4 → ขาย เงินเข้าไม้นั้น (lot.cashPocket)
 //     SPY ไม่หมี → แบ่งเงินในไม้ซื้อ 3 ตัวแรกจากการจัดอันดับ ณ วันนั้น (6 เดือนปฏิทินแบบรอบรีบาลานซ์ · สัญญาณ ณ ปิดวันเช็ค ·
 //       B+ ตัดหุ้น IT เมื่อกลุ่มตั้งรับติด 2 แรก · ไม่เอาตัวที่ไม้นั้นถืออยู่ · ไม่เอาตัวที่เป็นสเตจ 4)
@@ -2557,6 +2558,11 @@ function stage4Build() {
   }
   _s4Cache = { dates: D, md: M, n: N, isEnd, weekOf, ends, ser, sma, st4 };
   return _s4Cache;
+}
+function _s4Open(i, t) {   // คอลัมน์ 4: ราคาเปิดวัน i · ไม่มี = ราคาปิดวันนั้น/ย้อนหา 5 วัน
+  const dd = state.marketData[state.sortedDates[i]];
+  if (dd && dd[t] && dd[t].o > 0) return dd[t].o;
+  return _s4Px(i, t);
 }
 function stage4Is(S, t, w) { const a = S.st4[t]; return !!(a && w >= 0 && a[w]); }
 function _s4Px(i, t) {
@@ -2741,7 +2747,7 @@ function _s4CardHtml(r, fmt, allocPerStock) {
         '<div class="s4-ev-body">' + parts.join('') + '</div></div>';
     }).join('');
     h += '<div class="trade-section"><div class="trade-section-label mom" style="color:#9C2B2B;">สเตจ 4 — ขายรายตัว · ซื้อแทน · ' + evs.length + ' ครั้ง' +
-      '<span class="alloc-info">· เช็คราคาปิดวันทำการสุดท้ายของสัปดาห์ → ลงมือราคาปิดวันทำการถัดไป · % = เทียบราคาที่ซื้อตัวนั้น</span></div>' +
+      '<span class="alloc-info">· เช็คราคาปิดวันทำการสุดท้ายของสัปดาห์ → ลงมือราคาเปิดวันทำการถัดไป · % = เทียบราคาที่ซื้อตัวนั้น</span></div>' +
       '<div class="s4-timeline">' + rows + '</div></div>';
   }
   if (reb.length) {
@@ -2771,7 +2777,7 @@ function _s4PdfHtml(entryDate) {
     return '<tr><td class="ticker">' + ev.date + '<div style="font-size:0.7rem;color:#7a6f62;font-family:Sarabun,sans-serif;font-weight:400;">เช็คปิด ' + ev.checkDate + '</div></td><td style="text-align:left;white-space:normal;">' + out.join('<br>') + '</td></tr>';
   }).join('');
   return '<div class="date-section"><div class="date-header">สเตจ 4 — ขายรายตัว · ซื้อแทน (' + evs.length + ' ครั้ง)</div>' +
-    '<div class="date-note">เช็คราคาปิดวันทำการสุดท้ายของสัปดาห์ · ลงมือราคาปิดวันทำการถัดไป · % เทียบราคาที่ซื้อตัวนั้น</div>' +
+    '<div class="date-note">เช็คราคาปิดวันทำการสุดท้ายของสัปดาห์ · ลงมือราคาเปิดวันทำการถัดไป · % เทียบราคาที่ซื้อตัวนั้น</div>' +
     '<div class="table-wrap"><table><thead><tr><th class="ticker">วันลงมือ</th><th class="ticker">รายการ</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>';
 }
 
@@ -4079,89 +4085,8 @@ function runRollingBacktest() {
       }
     }
 
-    // === 1. Mark-to-market: sum all active lots + cash + each lot's cashPocket ===
-    // LAB v3: walk back up to 5 days for missing prices (ETF data gaps,
-    // delisting near maturity, etc). Previous 1-day fallback could return 0
-    // if i-1 also lacked the ticker, causing spurious MaxDD spikes.
-    let lotsVal = 0;
-    for (const lot of state.lots) {
-      let thisLotVal = 0;   // MFE: value of THIS lot alone, for peak tracking
-      for (const [t, shares] of Object.entries(lot.stocks)) {
-        let price = dayData[t] ? dayData[t].c : null;
-        if (price == null || !(price > 0)) {
-          for (let back = 1; back <= 5 && i - back >= 0; back++) {
-            const prev = state.marketData[state.sortedDates[i - back]];
-            if (prev && prev[t] && prev[t].c > 0) { price = prev[t].c; break; }
-          }
-        }
-        thisLotVal += shares * (price || 0);
-      }
-      thisLotVal += (lot.cashPocket || 0);  // include any banked trail-exit proceeds
-      lotsVal += thisLotVal;
-      // MFE bookkeeping: highest value this lot has reached while held
-      if (lot.peakValue == null || thisLotVal > lot.peakValue) {
-        lot.peakValue = thisLotVal;
-        lot.peakDate  = dateStr;
-      }
-    }
-    const currentEquity = cash + lotsVal;
-    state.equityCurve.push({ date: dateStr, equity: currentEquity });
-
-    // === 1b. LAB v1: Update peak/gate + check trail trigger on TODAY'S CLOSE ===
-    // (After mark-to-market so equityCurve reflects today's snapshot before any new pendingExit flags)
-    if (CONFIG.trailStopPct > 0) {
-      for (const lot of state.lots) {
-        if (!lot.stockMeta) continue;
-        for (const t of Object.keys(lot.stockMeta)) {
-          const meta = lot.stockMeta[t];
-          if (meta.exited || meta.pendingExit) continue;
-          const closePx = dayData[t] ? dayData[t].c : null;
-          if (closePx == null || !(closePx > 0)) continue;
-          // Track peak close
-          if (closePx > meta.peakClose) {
-            meta.peakClose = closePx;
-            meta.peakDate = dateStr;
-          }
-          // Gate: peak must reach entry × (1 + gateThreshold) before trail activates
-          if (!meta.gateOpen && meta.peakClose >= meta.entryPrice * (1 + CONFIG.gateThreshold)) {
-            meta.gateOpen = true;
-            meta.gateDate = dateStr;
-          }
-          // Trail trigger: only after gate
-          if (meta.gateOpen && closePx < meta.peakClose * (1 - CONFIG.trailStopPct)) {
-            meta.pendingExit = true;
-            meta.signalDate = dateStr;
-            meta.signalClose = closePx;
-          }
-        }
-      }
-    }
-
-    // === 1d. LAB v5+v6: Check STOP-LOSS trigger on TODAY'S CLOSE ===
-    // Independent of trail; uses entry price (not peak). \$CASH never triggers
-    // because closePx never drops (price=1 always).
-    // LAB v6: GATED by slActiveThisMonth — SL only fires in defensive regime
-    // (SPY out of macro top-2). Benign regime → no new triggers this month.
-    if (CONFIG.stopLossPct > 0 && slActiveThisMonth) {
-      for (const lot of state.lots) {
-        if (!lot.stockMeta) continue;
-        for (const t of Object.keys(lot.stockMeta)) {
-          const meta = lot.stockMeta[t];
-          if (meta.exited || meta.pendingExitSL) continue;
-          const closePx = dayData[t] ? dayData[t].c : null;
-          if (closePx == null || !(closePx > 0)) continue;
-          // SL trigger: today's close ≤ entry × (1 - SL%)
-          if (closePx <= meta.entryPrice * (1 - CONFIG.stopLossPct)) {
-            meta.pendingExitSL = true;
-            meta.signalDateSL = dateStr;
-            meta.signalCloseSL = closePx;
-          }
-        }
-      }
-    }
-
-    // === 1e. คอลัมน์ 4: สเตจ 4 รายสัปดาห์ — วันเช็ค = i-1 (วันเทรดสุดท้ายของสัปดาห์) · ลงมือราคาปิดวันนี้ ===
-    // (หลังบันทึกมูลค่าพอร์ตของวันนี้แล้ว · ก่อนรอบรีบาลานซ์ · ขายและซื้อราคาปิดเดียวกัน → มูลค่าวันนี้ไม่เปลี่ยน)
+    // === 1e. คอลัมน์ 4: สเตจ 4 รายสัปดาห์ — วันเช็ค = i-1 (วันเทรดสุดท้ายของสัปดาห์) · ลงมือราคาเปิดวันนี้ ===
+    // (ตอนเปิดตลาด · ก่อนรอบรีบาลานซ์ · ขายและซื้อราคาเปิด · มูลค่าพอร์ตวันนี้คิดหลังจากนี้ ณ ราคาปิด)
     if (S4 && i > 0 && S4.isEnd[i - 1]) {
       const w4 = S4.weekOf[i - 1];
       const checkDate = state.sortedDates[i - 1];
@@ -4173,7 +4098,7 @@ function runRollingBacktest() {
         const sold = [];
         for (const t of Object.keys(lot.stocks)) {
           if (!stage4Is(S4, t, w4)) continue;
-          const px = _s4Px(i, t);
+          const px = _s4Open(i, t);   // ขายราคาเปิด
           if (!(px > 0)) continue;
           const sh = lot.stocks[t], val = sh * px;
           lot.cashPocket = (lot.cashPocket || 0) + val;
@@ -4208,7 +4133,7 @@ function runRollingBacktest() {
           if (picks.length) {
             const part = lot.cashPocket / picks.length;
             for (const c of picks) {
-              const t = c.ticker, px = dayData[t].c, sh = part / px;
+              const t = c.ticker, px = (dayData[t].o > 0 ? dayData[t].o : dayData[t].c), sh = part / px;   // ซื้อแทนราคาเปิด
               if (lot.stockMeta[t]) lot.closedLegs.push(_s4LegFromMeta(t, lot.stockMeta[t]));   // เคยออกด้วย SL/trail → เก็บประวัติ
               lot.stocks[t] = sh;
               lot.stockMeta[t] = {
@@ -4284,6 +4209,7 @@ function runRollingBacktest() {
     }
 
     // === 2. Check if first business day of month ===
+    rebal: {   // คอลัมน์ 4: บล็อกรอบรีบาลานซ์ (ออกด้วย break rebal แทน continue เพื่อคิดมูลค่าพอร์ต ณ ปิดต่อ)
     const currentMonthKey = dateObj.getFullYear() * 12 + dateObj.getMonth();
     const isFirstWeek = dateObj.getDate() <= 7;
     const notAlreadyRebalanced = currentMonthKey !== lastRebalancedMonth;
@@ -4314,7 +4240,7 @@ function runRollingBacktest() {
         // ไม้เดียว: ไม้ยังไม่ครบรอบ → เดือนนี้ไม่ทำอะไร (ไม่เปิดไม้ใหม่)
         if (state.lots.length > 0 && state.lots.every(lot => (currentMonthKey - lot.entryMonthKey) < CONFIG.holdMonths)) {
           lastRebalancedMonth = currentMonthKey;
-          continue;
+          break rebal;   // (หน้าคอลัมน์ 4 ลงมือราคาเปิด: ออกจากบล็อกรีบาลานซ์ แล้วคิดมูลค่าพอร์ต ณ ปิด)
         }
         let bplusCandidates = null, bplusDecision = null;
         if (isBplusMonth(currentMonthKey)) {
@@ -4349,7 +4275,7 @@ function runRollingBacktest() {
           // new lot was opened, so the ramp-up counter pauses.
           lastRebalancedMonth = currentMonthKey;
           // Skip the rest of the rebal block — no maturity sale, no new lot.
-          continue;
+          break rebal;
         }
 
         // === 3. Sell any lot that has matured (age ≥ holdMonths = 3) — LB6 ranking, H3 maturity ===
@@ -4360,7 +4286,7 @@ function runRollingBacktest() {
           // LAB v3: walk back up to 5 days on missing prices (was 1 day — could return 0)
           let activeProceeds = 0;
           for (const [t, shares] of Object.entries(mLot.stocks)) {
-            let price = dayData[t] ? dayData[t].c : null;
+            let price = (dayData[t] && dayData[t].o > 0) ? dayData[t].o : (dayData[t] ? dayData[t].c : null);   // คอลัมน์ 4: ขายไม้ครบรอบราคาเปิด
             if (price == null || !(price > 0)) {
               for (let back = 1; back <= 5 && i - back >= 0; back++) {
                 const prev = state.marketData[state.sortedDates[i - back]];
@@ -4450,7 +4376,7 @@ function runRollingBacktest() {
           const alloc = newLotCapital / CONFIG.topN;
           for (const st of selected) {
             if (dayData[st.ticker] && dayData[st.ticker].c > 0) {
-              const entryPx = dayData[st.ticker].c;
+              const entryPx = dayData[st.ticker].o > 0 ? dayData[st.ticker].o : dayData[st.ticker].c;   // คอลัมน์ 4: ซื้อไม้ใหม่ราคาเปิด
               newLotStocks[st.ticker] = alloc / entryPx;
               deployed += alloc;
               newLotStockMeta[st.ticker] = {
@@ -4486,7 +4412,7 @@ function runRollingBacktest() {
           lastRebalancedMonth = currentMonthKey;  // mark so we don't retry on day 2
           // do NOT increment monthsElapsedAtEntry — no actual entry happened, the next
           // valid rebal should keep its expected chainId in the rolling chain
-          continue;
+          break rebal;
         }
 
         // === 6b. Create new lot — use ACTUAL DEPLOYED capital ===
@@ -4526,7 +4452,7 @@ function runRollingBacktest() {
         // === 7. Populate tradeLog for existing render/stats compatibility ===
         state.tradeLog.push({
           date: dateStr,
-          equity: currentEquity,
+          equity: (state.equityCurve.length ? state.equityCurve[state.equityCurve.length - 1].equity : CONFIG.initialCapital),   // คอลัมน์ 4: ลงมือราคาเปิด → มูลค่า ณ ปิดวันก่อน
           stocks: selected.map(s => s.ticker),
           lotCapital: deployed,
           isReinvest: isReinvest,
@@ -4539,6 +4465,88 @@ function runRollingBacktest() {
 
         lastRebalancedMonth = currentMonthKey;
         monthsElapsedAtEntry++;
+      }
+    }
+    }  // end rebal · คอลัมน์ 4: รอบรีบาลานซ์ลงมือราคาเปิด แล้วค่อยคิดมูลค่าพอร์ต ณ ราคาปิดด้านล่าง
+
+    // === 1. Mark-to-market: sum all active lots + cash + each lot's cashPocket ===
+    // LAB v3: walk back up to 5 days for missing prices (ETF data gaps,
+    // delisting near maturity, etc). Previous 1-day fallback could return 0
+    // if i-1 also lacked the ticker, causing spurious MaxDD spikes.
+    let lotsVal = 0;
+    for (const lot of state.lots) {
+      let thisLotVal = 0;   // MFE: value of THIS lot alone, for peak tracking
+      for (const [t, shares] of Object.entries(lot.stocks)) {
+        let price = dayData[t] ? dayData[t].c : null;
+        if (price == null || !(price > 0)) {
+          for (let back = 1; back <= 5 && i - back >= 0; back++) {
+            const prev = state.marketData[state.sortedDates[i - back]];
+            if (prev && prev[t] && prev[t].c > 0) { price = prev[t].c; break; }
+          }
+        }
+        thisLotVal += shares * (price || 0);
+      }
+      thisLotVal += (lot.cashPocket || 0);  // include any banked trail-exit proceeds
+      lotsVal += thisLotVal;
+      // MFE bookkeeping: highest value this lot has reached while held
+      if (lot.peakValue == null || thisLotVal > lot.peakValue) {
+        lot.peakValue = thisLotVal;
+        lot.peakDate  = dateStr;
+      }
+    }
+    const currentEquity = cash + lotsVal;
+    state.equityCurve.push({ date: dateStr, equity: currentEquity });
+
+    // === 1b. LAB v1: Update peak/gate + check trail trigger on TODAY'S CLOSE ===
+    // (After mark-to-market so equityCurve reflects today's snapshot before any new pendingExit flags)
+    if (CONFIG.trailStopPct > 0) {
+      for (const lot of state.lots) {
+        if (!lot.stockMeta) continue;
+        for (const t of Object.keys(lot.stockMeta)) {
+          const meta = lot.stockMeta[t];
+          if (meta.exited || meta.pendingExit) continue;
+          const closePx = dayData[t] ? dayData[t].c : null;
+          if (closePx == null || !(closePx > 0)) continue;
+          // Track peak close
+          if (closePx > meta.peakClose) {
+            meta.peakClose = closePx;
+            meta.peakDate = dateStr;
+          }
+          // Gate: peak must reach entry × (1 + gateThreshold) before trail activates
+          if (!meta.gateOpen && meta.peakClose >= meta.entryPrice * (1 + CONFIG.gateThreshold)) {
+            meta.gateOpen = true;
+            meta.gateDate = dateStr;
+          }
+          // Trail trigger: only after gate
+          if (meta.gateOpen && closePx < meta.peakClose * (1 - CONFIG.trailStopPct)) {
+            meta.pendingExit = true;
+            meta.signalDate = dateStr;
+            meta.signalClose = closePx;
+          }
+        }
+      }
+    }
+
+    // === 1d. LAB v5+v6: Check STOP-LOSS trigger on TODAY'S CLOSE ===
+    // Independent of trail; uses entry price (not peak). \$CASH never triggers
+    // because closePx never drops (price=1 always).
+    // LAB v6: GATED by slActiveThisMonth — SL only fires in defensive regime
+    // (SPY out of macro top-2). Benign regime → no new triggers this month.
+    if (CONFIG.stopLossPct > 0 && slActiveThisMonth) {
+      for (const lot of state.lots) {
+        if (!lot.stockMeta) continue;
+        for (const t of Object.keys(lot.stockMeta)) {
+          const meta = lot.stockMeta[t];
+          if (meta.exited || meta.pendingExitSL) continue;
+          const closePx = dayData[t] ? dayData[t].c : null;
+          if (closePx == null || !(closePx > 0)) continue;
+          // SL trigger: today's close ≤ entry × (1 - SL%)
+          if (closePx <= meta.entryPrice * (1 - CONFIG.stopLossPct)) {
+            meta.pendingExitSL = true;
+            meta.signalDateSL = dateStr;
+            meta.signalCloseSL = closePx;
+          }
+        }
       }
     }
   }
@@ -5491,7 +5499,7 @@ function renderTradeLog() {
       card.innerHTML = '<div class="trade-header"><div>' +
         '<div class="trade-date" style="color:#9C2B2B;">STAGE 4 — เช็คปิดสัปดาห์ ' + _fmtTradeDate(sw.checkDate) + pill + '</div>' +
         '<div class="trade-summary">ราคาปิดล่าสุด <strong>' + _fmtTradeDate(sw.lastDate) + '</strong> · ' +
-        (sw.weekDone ? 'สัญญาณปิดสัปดาห์แล้ว' : 'ถ้าปิดสัปดาห์แบบนี้') + ' → ลงมือราคาปิดวัน' + actDay + ' <strong>' + _fmtTradeDate(sw.actDate) + '</strong> · ' + rule + '</div>' +
+        (sw.weekDone ? 'สัญญาณปิดสัปดาห์แล้ว' : 'ถ้าปิดสัปดาห์แบบนี้') + ' → ลงมือราคาเปิดวัน' + actDay + ' <strong>' + _fmtTradeDate(sw.actDate) + '</strong> · ' + rule + '</div>' +
         '</div></div>' +
         '<div class="trade-section"><div class="trade-section-label mom" style="color:#9C2B2B;">หุ้นในไม้ที่เป็นสเตจ 4 ณ ราคาปิดล่าสุด' +
         '<span class="alloc-info">· % = เทียบราคาที่ซื้อ · ตัดสินจริงด้วยราคาปิดวันทำการสุดท้ายของสัปดาห์ ก่อนหน้านั้นรายชื่อเปลี่ยนได้</span></div>' +
