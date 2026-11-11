@@ -1,6 +1,186 @@
 {
-  "lastUpdated": "2026-11-10T22:50:00Z",
+  "lastUpdated": "2026-11-11T07:49:00Z",
   "batches": [
+    {
+      "file": "2026-11-11-0749.md",
+      "date": "2026-11-11T07:49:00Z",
+      "date_display": "11 พ.ย. 2026 · 07:49",
+      "summary": "Wall Street ปิดลบหลัง CPI ร้อน S&P 500 −0.38% Nasdaq −0.74% Dow −0.30% · Waller เปิดทางขึ้นดอกเบี้ย 0.50% ใน ธ.ค. ยีลด์ 10 ปีแถว 4.98% ทองลงกว่า 2% แถว 4,000 ดอลลาร์ Brent 91.49 · หุ้นไทยเมื่อวานปิด 1,496 จุด · หุ้นเด่นเช้านี้ CoreWeave รายได้โต 168% ปรับเป้าทั้งปีขึ้น หุ้นบวกหลังตลาดปิด · Anthropic ตั้งช่วงราคา IPO 70–78 ดอลลาร์ เข้าตลาด 19 พ.ย. Microsoft −2.2% Broadcom +3.9%",
+      "tickers": [
+        "SPX",
+        "NDX",
+        "DJI",
+        "US10Y",
+        "GLD",
+        "BRENT",
+        "WTI",
+        "NVDA",
+        "RUT",
+        "LEN",
+        "DHI",
+        "BTC",
+        "VIX",
+        "SET",
+        "USDTHB",
+        "USDJPY",
+        "DELTA",
+        "GULF",
+        "CRWV",
+        "MSFT",
+        "AVGO",
+        "TSM",
+        "GOOGL",
+        "AMD",
+        "MU"
+      ],
+      "headlines": [
+        {
+          "title": "เช้าวันพุธ: Wall Street ปิดลบหลังเงินเฟ้อ CPI ร้อนกว่าคาด S&P 500 −0.38% Nasdaq −0.74% Dow −0.30% · กรรมการเฟด Waller เปิดทางขึ้นดอกเบี้ย 0.50% ใน ธ.ค. · ยีลด์ 10 ปีขึ้นราว 12bp แถว 4.98% · ทองฟิวเจอร์สลงกว่า 2% เหลือแถว 4,000 ดอลลาร์ · Brent ปิด 91.49 ดอลลาร์ · หุ้นไทยเมื่อวานปิด 1,496 จุด จ่อ 1,500",
+          "tickers": [
+            {
+              "symbol": "SPX",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "NDX",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DJI",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "US10Y",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "GLD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "BRENT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "WTI",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "RUT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "LEN",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DHI",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "BTC",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "VIX",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "SET",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "USDTHB",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "USDJPY",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "GULF",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "CRWV",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "Yahoo Finance, Gulf News, Business Standard, Stock Titan, 24/7 Wall St, กรุงเทพธุรกิจ",
+          "published": "11 พ.ย. 2026"
+        },
+        {
+          "title": "หุ้นเด่นเช้านี้: CoreWeave รายได้ไตรมาส 3 โต 168% เป็น 3,661 ล้านดอลลาร์ สูงกว่าคาด ปรับเป้ารายได้ทั้งปีขึ้นเป็น 13,000–13,300 ล้านดอลลาร์ งานในมือ 132,500 ล้านดอลลาร์ · หุ้นบวกราว 3–6% หลังตลาดปิด แม้ดอกเบี้ยจ่ายพุ่งเป็น 846 ล้านดอลลาร์และขาดทุนสุทธิ 709 ล้านดอลลาร์",
+          "tickers": [
+            {
+              "symbol": "CRWV",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "GULF",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "CoreWeave IR, Seoul Economic Daily, Investing.com, Stock Titan, Rock and Turner",
+          "published": "11 พ.ย. 2026"
+        },
+        {
+          "title": "เทคยักษ์ใหญ่แยกทาง: Anthropic ตั้งช่วงราคา IPO 70–78 ดอลลาร์ ระดมทุนได้สูงสุดราว 64,400 ล้านดอลลาร์ มูลค่าสูงสุดราว 1.4 ล้านล้านดอลลาร์ เข้าซื้อขายใน Nasdaq 19 พ.ย. · Microsoft −2.2% หลังเครื่องมือใหม่ของ Anthropic ชนงานส่วนหนึ่งของ Office · Broadcom +3.9% TSMC +2% หลังร่วมลงทุนแบบเฉพาะเจาะจง",
+          "tickers": [
+            {
+              "symbol": "MSFT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AVGO",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "TSM",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "GOOGL",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "AMD",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "MU",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "Yahoo Finance, Fortune, Fast Company, Rock and Turner, CappNotes, 24/7 Wall St",
+          "published": "11 พ.ย. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-11-10-2250.md",
       "date": "2026-11-10T22:50:00Z",
