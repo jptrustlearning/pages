@@ -1,6 +1,186 @@
 {
-  "lastUpdated": "2026-11-15T19:50:00Z",
+  "lastUpdated": "2026-11-16T07:50:00Z",
   "batches": [
+    {
+      "file": "2026-11-16-0750.md",
+      "date": "2026-11-16T07:50:00Z",
+      "date_display": "16 พ.ย. 2026 · 07:50",
+      "summary": "ฟิวเจอร์สสหรัฐฯ เปิดสัปดาห์บวก Nasdaq 100 ราว +0.6% ญี่ปุ่นเศรษฐกิจไตรมาส 3 หดตัว 0.1% ต่อปี เยนจ่อ 160 บาทอ่อนสุดรอบ 19 เดือน · อิหร่านอ้างเรือบรรทุกน้ำมัน 2 ล้านบาร์เรลจมในช่องแคบฮอร์มุซ ยังไม่มีใครยืนยัน Brent กลับลบแถว 95.50 ดอลลาร์ · หุ้นเด่น Nvidia รัฐมนตรีคลังสหรัฐฯ ขอซีอีโอจากภายนอกและให้ตอบเรื่องชิปไหลเข้าจีนใน 10 วัน ก่อนงบเช้ามืดวันพุธ",
+      "tickers": [
+        "SPX",
+        "NDX",
+        "N225",
+        "USDJPY",
+        "KOSPI",
+        "SET",
+        "USDTHB",
+        "BRENT",
+        "WTI",
+        "GLD",
+        "BTC",
+        "US10Y",
+        "ANT",
+        "PTTEP",
+        "PTT",
+        "BCP",
+        "TOP",
+        "XLE",
+        "USO",
+        "DXY",
+        "NVDA",
+        "NVDA80X",
+        "AMD",
+        "AVGO",
+        "AAPL",
+        "005930.KS",
+        "000660.KS"
+      ],
+      "headlines": [
+        {
+          "title": "เช้าวันจันทร์: ฟิวเจอร์สสหรัฐฯ เปิดสัปดาห์บวก S&P 500 ราว +0.3% Nasdaq 100 ราว +0.6% · ญี่ปุ่นรายงานเศรษฐกิจไตรมาส 3 หดตัว 0.1% ต่อปี สวนคาดว่าจะโต 0.3% · เยนอ่อนจ่อ 160 ต่อดอลลาร์ · Nikkei เปิดลบ Kospi เปิดบวกเล็กน้อย 0.28% · บาทอ่อนสุดรอบ 19 เดือนแถว 33.92 · สัปดาห์นี้รองบบริษัทชิปรายใหญ่และหุ้นใหม่ Anthropic",
+          "tickers": [
+            {
+              "symbol": "SPX",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "NDX",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "N225",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "USDJPY",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "KOSPI",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SET",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "USDTHB",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "BRENT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "WTI",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "GLD",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "BTC",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "US10Y",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "ANT",
+              "sentiment": "neutral"
+            }
+          ],
+          "tone_override": "mixed",
+          "source": "investingLive, Korea JoongAng Daily, Nikkei Asia, Thansettakij (KBank), The Bangkok Insight",
+          "published": "16 พ.ย. 2026"
+        },
+        {
+          "title": "ช่องแคบฮอร์มุซ: กองกำลังพิทักษ์การปฏิวัติอิหร่าน (IRGC) อ้างเรือบรรทุกน้ำมันขนาดใหญ่ที่บรรทุกน้ำมันดิบกว่า 2 ล้านบาร์เรล \"จม\" หลังชนทุ่นระเบิด — ยังไม่มีฝั่งที่สามยืนยัน UKMTO รายงานลูกเรือปลอดภัย · Brent เปิดสัปดาห์กลับลบราว 0.7% แถว 95.50 ดอลลาร์ ตลาดยังไม่เชื่อจนกว่าจะเห็นหลักฐาน",
+          "tickers": [
+            {
+              "symbol": "BRENT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "PTTEP",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "PTT",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "WTI",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "BCP",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "TOP",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "XLE",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "USO",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "GLD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DXY",
+              "sentiment": "positive"
+            }
+          ],
+          "tone_override": "mixed",
+          "source": "AFP (RTE · The New Arab), investingLive, UKMTO, ASTIG",
+          "published": "16 พ.ย. 2026"
+        },
+        {
+          "title": "หุ้นเด่นเช้านี้: Nvidia — รัฐมนตรีคลังสหรัฐฯ Scott Bessent ออกรายการ Fox News เรียกร้องให้บริษัท \"เขย่าใหญ่\" และหาซีอีโอจากภายนอก ให้บอร์ดตอบภายใน 10 วันว่าปล่อยให้ชิป AI ไหลเข้าจีนผ่านบริษัทนอมินีหรือไม่ · FT รายงานว่า Jensen Huang กำลังคุยเรื่องกลับมา · Huang ยอมให้สัมภาษณ์ลับต่อ 3 คณะกรรมาธิการสภา · งบไตรมาส 3 เช้ามืดวันพุธเวลาไทย",
+          "tickers": [
+            {
+              "symbol": "NVDA",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "NVDA80X",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AMD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AVGO",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "AAPL",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "005930.KS",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "000660.KS",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "Fox News (ผ่าน investingLive), TRT World/AA, Seeking Alpha, CBS News, Korea JoongAng Daily",
+          "published": "16 พ.ย. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-11-15-1950.md",
       "date": "2026-11-15T19:50:00Z",
