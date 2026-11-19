@@ -1,0 +1,90 @@
+# A342.1 (19 พ.ย. 2026) · อัปเดตการ์ด S&P 500 Momentum Scanner ในแอป (Planning Toolkit · scanner-summary.json) อัตโนมัติทุกสัปดาห์
+# อ่านข้อมูล sp500 แบบอ่านอย่างเดียว (raw) — ไม่แตะ ไม่ dispatch workflow ของ sp500
+# สคริปต์ = tools/scanner_weekly.py (ครอบ tools/gen_scanner_summary.py · สูตรไม่เปลี่ยน · ด่านตรวจตาม jptrustdocs reference/weekly-scan/README.md)
+# ด่านไม่ผ่าน = workflow แดง ไม่แตะไฟล์ (การ์ดค้างวันเดิม) · backup ไฟล์เดิมก่อนทับทุกครั้ง (2 commit: backup → JSON ใหม่)
+# ปิดชั่วคราว: Actions › Scanner summary (weekly) › ... › Disable workflow
+# ทดลองโดยไม่ commit: Run workflow › ติ๊ก dry_run (ไม่มีข้อมูลใหม่ = รัน parity กับไฟล์ปัจจุบันเป็น self-test)
+name: Scanner summary (weekly)
+
+on:
+  schedule:
+    - cron: '43 1 * * 6'   # เสาร์ 08:43 น. ไทย — ข้อมูลวันศุกร์เข้า sp500 ราว 07:30 น.
+    - cron: '43 1 * * 0'   # อาทิตย์ 08:43 น. รอบสำรอง (ถ้าเสาร์ทำไปแล้ว = ไม่มีข้อมูลใหม่ จบเฉยๆ)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'ทดลอง: ตรวจ + คำนวณ แต่ไม่ commit'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scanner-summary
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            tools/gen_scanner_summary.py
+            tools/scanner_weekly.py
+            scanner-summary.json
+            scanner-summary-backup-as-of-*.json
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install pandas
+        run: pip install --quiet pandas numpy
+
+      - name: Fetch sp500 data (read-only)
+        run: |
+          mkdir -p "$RUNNER_TEMP/sp500"
+          cd "$RUNNER_TEMP/sp500"
+          for f in input_sp500_daily.csv output_combined_score_sp500.csv all_profiles.csv; do
+            curl -sfSL --retry 3 -o "$f" "https://raw.githubusercontent.com/jptrustlearning/sp500/main/$f"
+          done
+          curl -sfSL --retry 3 -o constituents.csv https://raw.githubusercontent.com/datasets/s-and-p-500-companies/main/data/constituents.csv
+          ls -la
+          tail -1 input_sp500_daily.csv
+
+      - name: Build + checks
+        id: build
+        env:
+          SP500_DIR: ${{ runner.temp }}/sp500
+          CONSTITUENTS: ${{ runner.temp }}/sp500/constituents.csv
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: python3 tools/scanner_weekly.py
+
+      - name: Commit (backup first, then new JSON)
+        if: steps.build.outputs.changed == 'true'
+        env:
+          BACKUP: ${{ steps.build.outputs.backup }}
+          OLD_ASOF: ${{ steps.build.outputs.old_asof }}
+          NEW_ASOF: ${{ steps.build.outputs.new_asof }}
+          STATS: ${{ steps.build.outputs.stats }}
+        run: |
+          git config user.name jptrustlearning
+          git config user.email jptrustlearning@users.noreply.github.com
+          if [ -n "$BACKUP" ]; then
+            git add --sparse "$BACKUP"
+            git commit -m "backup scanner-summary as_of $OLD_ASOF before regen (auto weekly)"
+          fi
+          git add --sparse scanner-summary.json
+          git commit -m "scanner-summary: regen as_of $NEW_ASOF ($STATS · auto weekly)"
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            echo "push rejected, rebasing (attempt $i)"
+            git pull --rebase origin main || exit 1
+            sleep 5
+          done
+          exit 1
