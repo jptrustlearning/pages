@@ -1,6 +1,164 @@
 {
-  "lastUpdated": "2026-11-22T07:46:00Z",
+  "lastUpdated": "2026-11-22T19:46:00Z",
   "batches": [
+    {
+      "file": "2026-11-22-1946.md",
+      "date": "2026-11-22T19:46:00Z",
+      "date_display": "22 พ.ย. 2026 · 19:46",
+      "summary": "มองสัปดาห์หน้า (สัปดาห์ Thanksgiving ตลาดสหรัฐฯ ปิดพฤหัสบดี ศุกร์ปิดเร็ว) · คืนวันพุธ 25 พ.ย. 20:30 น. ตัวเลขหนักออกพร้อมกัน: PCE ต.ค. GDP ไตรมาส 3 สินค้าคงทน ผู้ขอสวัสดิการว่างงาน · ตลาดให้โอกาสเฟดขึ้นดอกเบี้ย 8–9 ธ.ค. ราว 92–100% · SET กรอบ 1,410–1,490 จุด รอส่งออก ต.ค. · หุ้นเด่น: Dell ประกาศงบเช้าวันพุธเวลาไทย หุ้นต่ำกว่าจุดสูงสุดราวครึ่งหนึ่ง เป็นบททดสอบความต้องการเซิร์ฟเวอร์ AI หลัง Nvidia ลบเจ็ดสัปดาห์ติด · หุ้นค้าปลีก Best Buy Dick's Dollar Tree Burlington ประกาศวันอังคารก่อน Black Friday",
+      "tickers": [
+        "SPX",
+        "IXIC",
+        "US10Y",
+        "DXY",
+        "GLD",
+        "VIX",
+        "SET",
+        "USDTHB",
+        "DELL",
+        "HPE",
+        "NVDA",
+        "NVDA80X",
+        "DELTA",
+        "KCE",
+        "HANA",
+        "ZM",
+        "WDAY",
+        "HPQ",
+        "BBY",
+        "DKS",
+        "DLTR",
+        "BURL",
+        "DE",
+        "TU"
+      ],
+      "headlines": [
+        {
+          "title": "มองสัปดาห์หน้า: สัปดาห์ Thanksgiving ตลาดสหรัฐฯ เปิดแค่ 3 วันครึ่ง แต่ตัวเลขหนักกองรวมคืนวันพุธ 25 พ.ย. 20:30 น. — PCE ต.ค. · GDP ไตรมาส 3 ครั้งที่สอง · คำสั่งซื้อสินค้าคงทน · ผู้ขอสวัสดิการว่างงาน · ตลาดให้โอกาสเฟดขึ้นดอกเบี้ย 8–9 ธ.ค. ราว 92–100% · SET รอบนี้ กสิกรให้กรอบ 1,410–1,490 จุด",
+          "tickers": [
+            {
+              "symbol": "SPX",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "IXIC",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "US10Y",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "DXY",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "GLD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "VIX",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SET",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "USDTHB",
+              "sentiment": "neutral"
+            }
+          ],
+          "tone_override": "bearish",
+          "source": "Stock Titan, LiteFinance, JournalArta, TheStreet (อ้าง Reuters), EconoTimes (อ้าง CME FedWatch), Seoul Economic Daily, InfoQuest, ฐานเศรษฐกิจ",
+          "published": "22 พ.ย. 2026"
+        },
+        {
+          "title": "หุ้นเด่นสัปดาห์หน้า: Dell ประกาศงบคืนวันอังคาร (เช้าวันพุธเวลาไทย) ในวันที่หุ้นอยู่ต่ำกว่าจุดสูงสุดราว 47–50% — ตลาดคาดรายได้ราว 49,200 ล้านดอลลาร์ โต 82% · งานในมือด้าน AI 95,000 ล้านดอลลาร์ · HPE เปิดก่อนคืนวันจันทร์ · บททดสอบว่าความต้องการเซิร์ฟเวอร์ AI ยังอยู่ หลัง Nvidia ลบเจ็ดสัปดาห์ติด",
+          "tickers": [
+            {
+              "symbol": "DELL",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "HPE",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "NVDA",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "NVDA80X",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "KCE",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "HANA",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "ZM",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "WDAY",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "HPQ",
+              "sentiment": "neutral"
+            }
+          ],
+          "tone_override": "mixed",
+          "source": "TradingKey, BigGo Finance, CoinCentral, If You Spent, Stock Titan, JournalArta",
+          "published": "22 พ.ย. 2026"
+        },
+        {
+          "title": "หุ้นเด่นค้าปลีก: Best Buy · Dick's · Dollar Tree · Burlington ประกาศงบวันอังคาร ก่อน Black Friday 27 พ.ย. — คาดยอดขายออนไลน์ Black Friday 12,900 ล้านดอลลาร์ โต 9.2% แต่ความเชื่อมั่นผู้บริโภคยังต่ำ ตลาดจะได้เห็นว่าคนอเมริกันยังใช้จ่ายหรือไม่ในวันที่หุ้นร่วงและดอกเบี้ยขาขึ้น",
+          "tickers": [
+            {
+              "symbol": "BBY",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "DKS",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DLTR",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "BURL",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "DE",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "TU",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "USDTHB",
+              "sentiment": "neutral"
+            }
+          ],
+          "tone_override": "mixed",
+          "source": "Stock Titan, Retail Dive, Retail TouchPoints, JournalArta, If You Spent, LiteFinance",
+          "published": "22 พ.ย. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-11-22-0746.md",
       "date": "2026-11-22T07:46:00Z",
