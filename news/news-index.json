@@ -1,6 +1,181 @@
 {
-  "lastUpdated": "2026-11-23T16:45:00Z",
+  "lastUpdated": "2026-11-23T22:45:00Z",
   "batches": [
+    {
+      "file": "2026-11-23-2245.md",
+      "date": "2026-11-23T22:45:00Z",
+      "date_display": "23 พ.ย. 2026 · 22:45",
+      "summary": "Wall Street เปิดเด้งแรง ชั่วโมงแรก S&P 500 บวกราว 5% Nasdaq 100 ราว 7–8% หลังลงเจ็ดวันติด · PMI สหรัฐฯ ต่ำกว่าคาด รวม 54.6 แต่ยีลด์ 10 ปียังแถว 4.95% และตลาดยังให้โอกาสเฟดขึ้นดอกเบี้ย ธ.ค. เกิน 90% · ทองบวกราว 4% แถว 3,670 ดอลลาร์ Brent ลงราว 4–5% · หุ้นเด่น: CrowdStrike ซื้อ Zscaler ด้วยหุ้น 43,900 ล้านดอลลาร์ ZS บวก CRWD ลบ · หุ้นเด่น: Nvidia บวกราว 26–33% หลังบอร์ดรับ Jensen Huang กลับเป็นซีอีโอ ลามทั้งสายฮาร์ดแวร์ AI",
+      "tickers": [
+        "SPX",
+        "NDX",
+        "DJI",
+        "RUT",
+        "VIX",
+        "US10Y",
+        "GLD",
+        "BRENT",
+        "WTI",
+        "BTC",
+        "DXY",
+        "SET",
+        "DELTA",
+        "ZS",
+        "CRWD",
+        "PANW",
+        "GOOGL",
+        "NVDA",
+        "NVDA80X",
+        "IREN",
+        "DELL",
+        "APLD",
+        "CRWV",
+        "MU",
+        "SMCI",
+        "AMD",
+        "HANA",
+        "KCE"
+      ],
+      "headlines": [
+        {
+          "title": "คืนวันจันทร์: Wall Street เปิดเด้งแรงสุดในรอบหลายปี — ชั่วโมงแรก S&P 500 บวกราว 5% Nasdaq 100 บวกราว 7–8% หลังลงเจ็ดวันติด · PMI สหรัฐฯ ต่ำกว่าคาด (รวม 54.6 ต่ำสุดสี่เดือน) แต่ยีลด์ 10 ปียังทรงตัวแถว 4.95–4.97% · ทองบวกราว 4% ขึ้นแถว 3,670 ดอลลาร์ ขณะที่ Brent ลงราว 4–5% เหลือราว 88 ดอลลาร์ · VIX ลงจาก 35.89 เหลือราว 27",
+          "tickers": [
+            {
+              "symbol": "SPX",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "NDX",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DJI",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "RUT",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "VIX",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "US10Y",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "GLD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "BRENT",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "WTI",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "BTC",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DXY",
+              "sentiment": "neutral"
+            },
+            {
+              "symbol": "SET",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "Yahoo Finance, 24/7 Wall St., JournalArta, Reuters (ผ่าน SRN News), FXEmpire, investingLive",
+          "published": "23 พ.ย. 2026"
+        },
+        {
+          "title": "หุ้นเด่นก่อนตลาดเปิด: CrowdStrike ประกาศซื้อ Zscaler ด้วยหุ้นทั้งหมด มูลค่าราว 43,900 ล้านดอลลาร์ ดีลไซเบอร์ใหญ่ที่สุดเท่าที่เคยมี — Zscaler ก่อนเปิดบวกราว 8–13% · CrowdStrike ลบราว 8.5–9.6% และเป็นหุ้นที่ลบหนักสุดในช่วงต้นตลาด · Palo Alto บวกราว 4%",
+          "tickers": [
+            {
+              "symbol": "ZS",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "CRWD",
+              "sentiment": "negative"
+            },
+            {
+              "symbol": "PANW",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "GOOGL",
+              "sentiment": "neutral"
+            }
+          ],
+          "source": "SecurityWeek, FinanceFeeds, StockTwits, Yahoo Finance, 24/7 Wall St.",
+          "published": "23 พ.ย. 2026"
+        },
+        {
+          "title": "หุ้นเด่นชั่วโมงแรก: Nvidia บวกราว 26–33% ในชั่วโมงแรก จาก 125.53 ขึ้นไปแถว 158–166 ดอลลาร์ หลังบอร์ดลงมติเอกฉันท์รับ Jensen Huang กลับเป็นซีอีโอ — แรงซื้อลามทั้งสายฮาร์ดแวร์ AI: IREN +30.8% · Dell +29.5% ก่อนย่อ · Applied Digital +29.1% · CoreWeave +27.2% · Micron ราว +20% · Super Micro ราว +20% · แต่การสอบสวนของ SEC และกระทรวงยุติธรรมยังเดินต่อ",
+          "tickers": [
+            {
+              "symbol": "NVDA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "NVDA80X",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "IREN",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DELL",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "APLD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "CRWV",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "MU",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "SMCI",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "AMD",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "DELTA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "HANA",
+              "sentiment": "positive"
+            },
+            {
+              "symbol": "KCE",
+              "sentiment": "positive"
+            }
+          ],
+          "source": "Yahoo Finance, Seeking Alpha, 24/7 Wall St., Reuters (ผ่าน Yahoo Finance)",
+          "published": "23 พ.ย. 2026"
+        }
+      ]
+    },
     {
       "file": "2026-11-23-1645.md",
       "date": "2026-11-23T16:45:00Z",
